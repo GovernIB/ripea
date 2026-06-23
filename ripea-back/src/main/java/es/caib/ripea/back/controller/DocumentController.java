@@ -483,6 +483,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
         
 		String data = Utils.desencripta(dades, aplicacioService.propertyFindByNom("es.caib.ripea.encription.key"));
 		String[] dataSplri = data.split("#");
+		Long expedientId = null;
         
 		//Comunicam a PF que la firma ha finalitzat
 		FirmaResultatDto firmaResultat =  documentService.firmaSimpleWebEnd(transactionID);
@@ -499,7 +500,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			for (FirmaSignatureStatus firmaSignatureStatus : firmaResultat.getSignatures()) {
 			
 				if (StatusEnumDto.OK.equals(firmaResultat.getSignatures().get(0).getStatus())) {
-					documentService.processarFirmaClient(
+					expedientId = documentService.processarFirmaClient(
 							getEntitatActualComprovantPermisos(request).getId(),
 							Long.valueOf(firmaSignatureStatus.getSignID()),
 							firmaResultat.getSignatures().get(0).getFitxerFirmatNom(),
@@ -519,7 +520,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			firmaResultat.setMsg("Firma finalitzada amb estat no correcte: "+firmaResultat.getMsg());
 		}
 		
-		FirmaFinalitzadaEvent ffe = new FirmaFinalitzadaEvent(null, firmaResultat);
+		FirmaFinalitzadaEvent ffe = new FirmaFinalitzadaEvent(expedientId, firmaResultat);
 		eventService.notifyFirmaNavegadorFinalitzada(ffe);
 		
 		return ResponseEntity.ok().header("Content-Type", "text/plain; charset=UTF-8").body("OK");

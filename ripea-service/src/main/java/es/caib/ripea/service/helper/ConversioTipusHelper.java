@@ -36,6 +36,7 @@ import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExecucioMassivaContingutEntity;
 import es.caib.ripea.persistence.entity.ExecucioMassivaEntity;
 import es.caib.ripea.persistence.entity.ExpedientComentariEntity;
+import es.caib.ripea.persistence.entity.ExpedientTascaComentariEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.ExpedientPeticioEntity;
 import es.caib.ripea.persistence.entity.ExpedientTascaEntity;
@@ -77,6 +78,7 @@ import es.caib.ripea.service.intf.dto.ExecucioMassivaContingutDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaEstatDto;
 import es.caib.ripea.service.intf.dto.ExpedientComentariDto;
+import es.caib.ripea.service.intf.dto.ExpedientTascaComentariDto;
 import es.caib.ripea.service.intf.dto.ExpedientDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatPendentDistribucioEnumDto;
@@ -131,7 +133,6 @@ public class ConversioTipusHelper {
 
 	private MapperFactory mapperFactory;
 
-	@Autowired private ContingutHelper contingutHelper;
 	@Autowired private OrganGestorRepository organGestorRepository;
 	@Autowired private MetaDadaRepository metaDadaRepository;
 	@Autowired private MetaDocumentRepository metaDocumentRepository;
@@ -270,6 +271,36 @@ public class ConversioTipusHelper {
 		      })
 	      .byDefault().register();
 
+	      mapperFactory.classMap(ExpedientTascaComentariEntity.class, ExpedientTascaComentariDto.class)
+	      .customize(new CustomMapper<ExpedientTascaComentariEntity, ExpedientTascaComentariDto>() {
+	      		@Override
+				public void mapAtoB(ExpedientTascaComentariEntity source, ExpedientTascaComentariDto target, MappingContext context) {
+					if (source.getCreatedBy()!=null && source.getCreatedBy().isPresent()) {
+		      			UsuariEntity ue = usuariRepository.findByCodi(source.getCreatedBy().get());
+		      			UsuariDto uDto = new UsuariDto();
+		      			uDto.setCodi(ue.getCodi());
+		      			uDto.setNom(ue.getNom());
+		      			uDto.setNif(ue.getNif());
+		      			uDto.setEmail(ue.getEmail());
+		      			target.setCreatedBy(uDto);
+					}
+					if (source.getLastModifiedBy()!=null && source.getLastModifiedBy().isPresent()) {
+		      			UsuariEntity ue = usuariRepository.findByCodi(source.getLastModifiedBy().get());
+		      			UsuariDto uDto = new UsuariDto();
+		      			uDto.setCodi(ue.getCodi());
+		      			uDto.setNom(ue.getNom());
+		      			uDto.setNif(ue.getNif());
+		      			uDto.setEmail(ue.getEmail());
+		      			target.setLastModifiedBy(uDto);
+					}
+					if (source.getCreatedDate()!=null) {
+						LocalDateTime localDateTime = source.getCreatedDate().get();
+						target.setCreatedDate(Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant()));
+					}
+	      		}
+		      })
+	      .byDefault().register();
+
 	      mapperFactory.classMap(MetaNodeEntity.class, MetaNodeDto.class)
 	      .customize(new CustomMapper<MetaNodeEntity, MetaNodeDto>() {
       		@Override
@@ -324,7 +355,14 @@ public class ConversioTipusHelper {
 						organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(source.getExpedient().getId()));
 						ExpedientTascaDto target = new ExpedientTascaDto();
 						target.setId(source.getId());
-						target.setExpedient((ExpedientDto) contingutHelper.toContingutDto(source.getExpedient(), false, false));
+						ExpedientDto expedientDto = new ExpedientDto();
+						if (source.getExpedient()!=null) {
+							expedientDto.setId(source.getExpedient().getId());
+							expedientDto.setNom(source.getExpedient().getNom());
+							expedientDto.setNumero(source.getExpedient().getNumero());
+						}
+//						target.setExpedient((ExpedientDto) contingutHelper.toContingutDto(source.getExpedient(), false, false));
+						target.setExpedient(expedientDto);
 						target.setMetaExpedientTasca(convertir(source.getMetaTasca(), MetaExpedientTascaDto.class));
 						target.setResponsableActual(convertir(source.getResponsableActual(), UsuariDto.class));
 						target.setResponsables(convertirList(source.getResponsables(), UsuariDto.class));
@@ -698,8 +736,9 @@ public class ConversioTipusHelper {
 						target.setDataFinalitzacio(source.getProcessatData());
 						target.setError(source.isError());
 						if (Utils.isNotEmpty(source.getDocumentEnviamentInteressats())) {
-							String enviamentDatatEstat  = source.getDocumentEnviamentInteressats().iterator().next().getEnviamentDatatEstat();
-							target.setEnviamentDatatEstat(enviamentDatatEstat);
+							DocumentEnviamentInteressatEntity enviamentInteressat = source.getDocumentEnviamentInteressats().iterator().next();
+							target.setEnviamentDatatEstat(enviamentInteressat.getEnviamentDatatEstat());
+							target.setRegistreEstat(enviamentInteressat.getRegistreEstat());
 						}
 						
 						InteressatEntity destinatari = !source.getDocumentEnviamentInteressats().isEmpty() ? HibernateHelper.deproxy(source.getDocumentEnviamentInteressats().iterator().next().getInteressat()) : null;

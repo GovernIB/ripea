@@ -21,8 +21,7 @@ public class TipusDocumentalEntity extends RipeaAuditable<Long> {
 
 	@Column(name = "codi", length = 64, nullable = false)
 	private String codi;
-//	@Column(name = "codi_especific", length = 64)
-//	private String codiEspecific;
+	
 	@Column(name = "nom", length = 256, nullable = false)
 	private String nomEspanyol;
 	@Column(name = "nom_catala", length = 256)
@@ -49,33 +48,25 @@ public class TipusDocumentalEntity extends RipeaAuditable<Long> {
 		return nomCatala;
 	}
 
-//	public String getCodiEspecific() {
-//		return codiEspecific;
-//	}
-
 	public void update(
 			String codi,
 			String nom, 
-			String nomCatala, 
-			String codiEspecific) {
+			String nomCatala) {
 		this.codi = codi;
 		this.nomEspanyol = nom;
 		this.nomCatala = nomCatala;
-//		this.codiEspecific = codiEspecific;
 	}
 
 	public static Builder getBuilder(
 			String codi,
 			String nom,
 			EntitatEntity entitat, 
-			String nomCatala, 
-			String codiEspecific) {
+			String nomCatala) {
 		return new Builder(
 				codi,
 				nom,
 				entitat, 
-				nomCatala, 
-				codiEspecific);
+				nomCatala);
 	}
 	public static class Builder {
 		TipusDocumentalEntity built;
@@ -83,15 +74,12 @@ public class TipusDocumentalEntity extends RipeaAuditable<Long> {
 				String codi,
 				String nom,
 				EntitatEntity entitat,
-				String nomCatala, 
-				String codiEspecific) {
+				String nomCatala) {
 			built = new TipusDocumentalEntity();
 			built.codi = codi;
 			built.nomEspanyol = nom;
 			built.entitat = entitat;
 			built.nomCatala = nomCatala;
-//			built.codiEspecific = codiEspecific;
-			
 		}
 		public TipusDocumentalEntity build() {
 			return built;

@@ -1,6 +1,6 @@
-import {useEffect, useMemo, useRef, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {
-    useBaseAppContext, useFormContext, MuiFormDialogApi
+    useBaseAppContext, useFormContext, useMuiFormDialogApiRef
 } from "reactlib";
 import {useTranslation} from "react-i18next";
 import GridFormField from "../../../components/GridFormField.tsx";
@@ -24,15 +24,15 @@ const columns = [
     },
     {
         field: 'numero',
-        flex: 1,
+        flex: 0.9,
     },
     {
         field: 'nom',
-        flex: 1.6,
+        flex: 1.5,
     },
     {
         field: 'estat',
-        flex: 0.5,
+        flex: 0.7,
         renderCell: (params: any) => <StyledEstat entity={params?.row}>{params.formattedValue}</StyledEstat>,
         sortProcessor: (field: string, sort: GridSortDirection) => {
             return [
@@ -68,10 +68,10 @@ const ActionFilterFrom = () => {
     );
 
     return <>
-        <GridFormField xs={3} name="metaExpedient" filter={filterMetaExpedient}/>
-        <GridFormField xs={2} name="numero"/>
-        <GridFormField xs={2} name="nom"/>
-        <GridFormField xs={2} name="estat" requestParams={{metaExpedientId: data?.metaExpedient?.id}}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="metaExpedient" filter={filterMetaExpedient}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 2}} name="numero"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 2}} name="nom"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 2}} name="estat" requestParams={{metaExpedientId: data?.metaExpedient?.id}}/>
     </>
 }
 
@@ -83,7 +83,6 @@ const ActionFilter = (props:any) => {
         code="EXPEDIENT_FILTER"
         springFilterBuilder={springFilterBuilder}
         onSpringFilterChange={onSpringFilterChange}
-        buttonGridProps={{xs: 3}}
     >
         <ActionFilterFrom/>
     </StyledMuiFilter>
@@ -93,7 +92,7 @@ const RelacionarForm= () => {
     const {data, apiRef} = useFormContext();
     const selectionModel = useMemo(()=>{
         return data?.ids
-    }, [])
+    }, [data])
 
     const [springFilter, setSpringFilter] = useState<string>();
     const [selectedRows, setSelectedRows] = useState<any[]>(selectionModel || []);
@@ -111,6 +110,7 @@ const RelacionarForm= () => {
         <Load value={load} noEffect>
         <StyledMuiGrid
             resourceName={'expedientResource'}
+            persistentStateKey={'expedientResource_relacionar'}
             columns={columns}
             filter={builder.and(
                 builder.neq('id', apiRef?.current?.getId()),
@@ -171,7 +171,7 @@ const Relacionar = (props:any) => {
 
 const useRelacionar= (refresh?: () => void) => {
     const { t } = useTranslation();
-    const formApiRef = useRef<MuiFormDialogApi>()
+    const formApiRef = useMuiFormDialogApiRef()
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id:any, row:any) :void => {

@@ -6,6 +6,7 @@ import es.caib.ripea.service.intf.base.model.BaseResource;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ContingutVistaEnumDto;
 import es.caib.ripea.service.intf.dto.IdiomaEnumDto;
+import es.caib.ripea.service.intf.dto.InterficieUsuariEnumDto;
 import es.caib.ripea.service.intf.dto.MoureDestiVistaEnumDto;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.Getter;
@@ -85,6 +86,8 @@ public class UsuariResource extends BaseResource<String> {
     }
 
 	private MoureDestiVistaEnumDto vistaMoureActual = MoureDestiVistaEnumDto.LLISTA;
+
+	private InterficieUsuariEnumDto interficieUsuari = InterficieUsuariEnumDto.REACT;
 
 	@Override
 	public String getId() {

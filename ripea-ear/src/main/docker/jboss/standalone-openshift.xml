@@ -617,12 +617,14 @@
                 </security-domain>
                 <!-- ##KEYCLOAK_SECURITY_DOMAIN## -->
                 <!-- no additional security domains configured --><!-- ##ADDITIONAL_SECURITY_DOMAINS## -->
-<security-domain name="keycloak">
-	<authentication>
-		<login-module code="org.keycloak.adapters.jboss.KeycloakLoginModule" flag="required"/>
-	</authentication>
-</security-domain>
-</security-domains>
+                <security-domain name="keycloak">
+                    <authentication>
+                        <login-module code="org.keycloak.adapters.jboss.KeycloakLoginModule"
+                                      flag="required"
+                                      module="org.keycloak.keycloak-jboss-adapter-core"/>
+                    </authentication>
+                </security-domain>
+            </security-domains>
 
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:security-manager:1.0">

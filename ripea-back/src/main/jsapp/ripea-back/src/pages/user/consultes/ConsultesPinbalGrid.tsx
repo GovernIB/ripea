@@ -71,13 +71,13 @@ const useConsultaPinbalActions = (refresh?: () => void) => {
 // Filter
 const ConsultesPinbalFilterForm = () => {
     return <>
-        <GridFormField xs={4} name="expedient"/>
-        <GridFormField xs={4} name="metaExpedient"/>
-        <GridFormField xs={4} name="servei"/>
-        <GridFormField xs={4} name="createdBy"/>
-        <GridFormField xs={4} name="createdDateInici" type={"date"}/>
-        <GridFormField xs={4} name="createdDateFi" type={"date"}/>
-        <GridFormField xs={4} name="estat"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="metaExpedient"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="expedient"/>        
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="servei"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="createdBy"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="createdDateInici" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="createdDateFi" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="estat"/>
     </>
 }
 
@@ -166,7 +166,7 @@ const ConsultesPinbalGrid = () => {
 
     const {apiIsReady, actions, components} = useConsultaPinbalActions(refresh);
 
-    return <GridPage disableMargins>
+    return <GridPage autoHeight>
         <CardPage title={t('page.user.menu.pinbalEnviades')}>
             <ConsultesPinbalFilter onSpringFilterChange={setSpringFilter}/>
 
@@ -174,6 +174,7 @@ const ConsultesPinbalGrid = () => {
             <StyledMuiGrid
                 apiRef={apiRef}
                 resourceName={"consultaPinbalResource"}
+				persistentStateKey={"consultaPinbalResource_consulta"}
                 columns={columns}
                 filter={springFilter}
                 perspectives={perspectives}

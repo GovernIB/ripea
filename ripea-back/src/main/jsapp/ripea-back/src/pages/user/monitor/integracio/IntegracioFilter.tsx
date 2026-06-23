@@ -1,28 +1,27 @@
 import GridFormField, {GridButton} from "../../../../components/GridFormField.tsx";
 import * as builder from "../../../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../../../components/StyledMuiFilter.tsx";
-import {Icon} from "@mui/material";
 import {useIntegracioDiagnostic} from "./IntegracioDiagnostic.tsx";
 import {useTranslation} from "react-i18next";
 
 const IntegracioFilterForm = ({handleOpen}:any) => {
     const {t} = useTranslation()
     return <>
-        <GridFormField xs={3} name="entitat"/>
-        <GridFormField xs={3} name="dataInici"/>
-        <GridFormField xs={3} name="dataFi"/>
-        <GridFormField xs={3} name="tipus"/>
-        <GridFormField xs={3} name="descripcio"/>
-        <GridFormField xs={3} name="estat"/>
-        <GridButton xs={2} onClick={handleOpen} variant={'contained'} color={'success'}>
-            <Icon>build</Icon>{t('page.integracio.action.diagnosticAll.label')}
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="entitat"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="dataInici"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="dataFi"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="tipus"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="descripcio"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="estat"/>
+        <GridButton size={{xs: 12, sm: 3, md: 2}} icon={'build'} onClick={handleOpen} variant={'contained'} color={'success'}>
+            {t('page.integracio.action.diagnosticAll.label')}
         </GridButton>
     </>
 }
 
 const springFilterBuilder = (data:any) => {
     return builder.and(
-        builder.eq('entitat.id', data?.entitat?.id),
+        builder.eq('entitat.id', data?.entitat?.id), //Al back (additionalSpringFilter) es substitueix per entitatCodi
         builder.betweenDates('data', data?.dataInici, data?.dataFi),
         builder.eq('tipus', `'${data?.tipus}'`),
         builder.like('descripcio', data?.descripcio),

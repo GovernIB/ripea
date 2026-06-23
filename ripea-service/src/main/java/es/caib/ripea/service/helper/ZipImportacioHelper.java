@@ -255,7 +255,6 @@ public class ZipImportacioHelper {
         documentDto.setNtiVersion(NTI_VERSION);
         documentDto.setDataCaptura(new Date());
         documentDto.setData(new Date());
-
         
         if (metaNodeId==null) {
             documentDto.setNtiOrigen(NTI_ORIGEN);

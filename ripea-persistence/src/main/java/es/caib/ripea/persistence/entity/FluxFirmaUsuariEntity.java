@@ -48,6 +48,11 @@ public class FluxFirmaUsuariEntity extends RipeaAuditable<Long> {
 		this.destinataris = destinataris;
 	}
 
+	public void updateNomDescripcio(String nom, String descripcio) {
+		this.nom = nom;
+		this.descripcio = descripcio;
+	}
+
 	public static Builder getBuilder(
 			String nom,
 			String descripcio,

@@ -2,10 +2,12 @@ import { Typography, Icon, TypographyProps } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { getContrastRatio } from "@mui/material/styles";
 
+type ColorKey = 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success';
+
 interface StyledLabelProps extends TypographyProps {
     title?: string;
     icon?: string;
-    backgroundColor?: string;
+    backgroundColor?: ColorKey | string;
     color?: string;
     dashed?: boolean;
     children?: React.ReactNode;
@@ -26,11 +28,10 @@ export const StyledLabel = (props: StyledLabelProps) => {
     } = props;
 
     const resolvedBg =
-        backgroundColor && theme?.palette?.[backgroundColor as keyof typeof theme.palette]
-            ? theme?.palette?.[backgroundColor as keyof typeof theme.palette]?.main
+        backgroundColor
+            ? theme.palette[backgroundColor as ColorKey]?.main ?? backgroundColor
             : backgroundColor;
 
-    // 2. Calcular el color del texto con validación try-catch
     let calculatedContrastColor = 'inherit';
 
     if (resolvedBg && typeof resolvedBg === 'string') {
@@ -49,7 +50,6 @@ export const StyledLabel = (props: StyledLabelProps) => {
         }
     }
 
-    // El color explícito tiene prioridad sobre el calculado
     const resolvedColor = color ?? calculatedContrastColor;
 
     if (dashed)

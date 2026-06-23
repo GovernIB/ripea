@@ -11,7 +11,7 @@ import {useActions} from "../details/CommonActions.tsx";
 import {springFilterBuilder as expedientFilterBuilder} from "../ExpedientFilter.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 
-const sortModel:any = [{ field: 'createdDate', sort: 'desc' }];
+const sortModel:any[] = [{ field: 'createdDate', sort: 'desc' }];
 const perspectives = ['ESTAT']
 
 const columns = [
@@ -58,10 +58,10 @@ const ActionFilterFrom = () => {
     );
 
     return <>
-        <GridFormField xs={2.4} name="metaExpedient" filter={filterMetaExpedient}/>
-        <GridFormField xs={2.4} name="numero"/>
-        <GridFormField xs={2.4} name="nom"/>
-        <GridFormField xs={2.4} name="estat" requestParams={{metaExpedientId: data?.metaExpedient?.id}}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 2.4}} name="metaExpedient" filter={filterMetaExpedient}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 2.4}} name="numero"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 2.4}} name="nom"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 2.4}} name="estat" requestParams={{metaExpedientId: data?.metaExpedient?.id}}/>
     </>
 }
 
@@ -103,6 +103,7 @@ const ImportarExpedient = (props:any) => {
         <Load value={load} noEffect>
             <StyledMuiGrid
                 resourceName={'expedientResource'}
+                persistentStateKey={'expedientResource_importarExpedient'}
                 columns={columns}
                 filter={builder.and(
                     builder.exists(

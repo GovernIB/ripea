@@ -28,7 +28,6 @@ public class TipusDocumentalResourceEntity extends BaseAuditableEntity<TipusDocu
 
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "entitat_id")
-    @org.hibernate.annotations.ForeignKey(name = BaseConfig.DB_PREFIX + "entitat_tipus_doc_fk")
     protected EntitatResourceEntity entitat;
 
 }

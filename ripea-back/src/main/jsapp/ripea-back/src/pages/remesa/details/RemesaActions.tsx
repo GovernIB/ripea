@@ -54,7 +54,7 @@ export const useActions = (refresh?: () => void) => {
         apiAction(undefined, {code: 'ACTUALITZAR_ESTAT', data:{ids, massivo: true}})
             .then(() => {
                 refresh?.();
-                temporalMessageShow(null, t('page.notificacio.action.actualitzarEstat.massiveOk'), 'success');
+                temporalMessageShow(null, t('page.notificacio.action.actualitzarEstat.massiveOk'), 'info');
             })
             .catch((error) => {
                 temporalMessageShow(null, error.message, 'error');

@@ -1,4 +1,4 @@
-import StyledMuiFilter from "../../components/StyledMuiFilter.tsx";
+import StyledMuiFilter, {FILTER_ADVANCED_ICON_ONLY_BREAKPOINT} from "../../components/StyledMuiFilter.tsx";
 import * as builder from '../../util/springFilterUtils';
 import GridFormField from "../../components/GridFormField.tsx";
 import {useFormContext} from "reactlib";
@@ -10,22 +10,23 @@ const TasquesFilterForm = () => {
 
     return <>
         {(!data?.advanced) && <>
-            <GridFormField xs={3} name="metaExpedient"/>
-            <GridFormField xs={2} name="titol"/>
-            <GridFormField xs={2} name="prioritat"/>
-            <GridFormField xs={2.5} name="estats" multiple/>
+            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="metaExpedient"/>
+			<GridFormField size={{xs: 12, sm: 6, md: 2}} name="metaExpedientTasca" filter={procedimentFilter}/>
+            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="titol"/>
+            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="prioritat"/>
+            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="estats" multiple/>
         </>}
         {(data?.advanced) && <>
-            <GridFormField xs={3} name="metaExpedient"/>
-            <GridFormField xs={3} name="expedient" filter={procedimentFilter}/>
-            <GridFormField xs={2} name="metaExpedientTasca" filter={procedimentFilter}/>
-            <GridFormField xs={2} name="titol"/>
-            <GridFormField xs={2} name="prioritat"/>
-            <GridFormField xs={1.5} name="dataInici" type={"date"}/>
-            <GridFormField xs={1.5} name="dataFi" type={"date"}/>
-            <GridFormField xs={1.5} name="dataLimitInici" type={"date"}/>
-            <GridFormField xs={1.5} name="dataLimitFi" type={"date"}/>
-            <GridFormField xs={3.5} name="estats" multiple/>
+            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="metaExpedient"/>
+            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="expedient" filter={procedimentFilter}/>
+            <GridFormField size={{xs: 12, sm: 4, md: 2}} name="metaExpedientTasca" filter={procedimentFilter}/>
+            <GridFormField size={{xs: 12, sm: 4, md: 2}} name="titol"/>
+            <GridFormField size={{xs: 12, sm: 4, md: 2}} name="prioritat"/>
+            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="dataInici" type={"date"}/>
+            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="dataFi" type={"date"}/>
+            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="dataLimitInici" type={"date"}/>
+            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="dataLimitFi" type={"date"}/>
+            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="estats" multiple/>
         </>}
     </>
 }
@@ -53,6 +54,8 @@ const TasquesFilter = (props:any) => {
         onSpringFilterChange={onSpringFilterChange}
         filterOnFieldEnterKeyPressed
         advancedSearch
+        buttonGridProps={{size: {xs: 12, sm: 6, md: 2}}}
+        buttonIconOnlyBreakpoint={FILTER_ADVANCED_ICON_ONLY_BREAKPOINT}
     >
         <TasquesFilterForm/>
     </StyledMuiFilter>

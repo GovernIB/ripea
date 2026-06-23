@@ -2,11 +2,17 @@ package es.caib.ripea.plugin.caib.comanda;
 
 import java.util.Properties;
 
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 
 import es.caib.comanda.model.management.Avis;
 import es.caib.comanda.model.management.Tasca;
 import es.caib.comanda.model.management.TascaPage;
+import es.caib.comanda.model.server.monitoring.EstatSalutEnum;
+import es.caib.comanda.model.server.monitoring.SalutInfo;
 import es.caib.comanda.service.management.AppComandaClient;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.comanda.ComandaCaibPlugin;
@@ -84,5 +90,24 @@ public class ComandaCaibPluginImpl extends RipeaAbstractPluginProperties impleme
 		String password = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_PWR));
 		AppComandaClient clientcomanda = new AppComandaClient(url, username, password);
 		return clientcomanda.obtenirLlistatTasques(quickFilter, null, "0", 1);
+	}
+
+	@Override
+	public EstatSalutEnum getSalutComanda() throws Exception {
+		String url		= getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_URL));
+		String username	= getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_USR));
+		String password	= getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_PWR));
+		HttpHeaders headers = new HttpHeaders();
+		headers.setBasicAuth(username, password);
+		ResponseEntity<SalutInfo> response = new RestTemplate().exchange(
+				url + "/salut/v1",
+				HttpMethod.GET,
+				new HttpEntity<>(headers),
+				SalutInfo.class);
+		SalutInfo salutInfo = response.getBody();
+		if (salutInfo != null && salutInfo.getEstatGlobal() != null) {
+			return salutInfo.getEstatGlobal().getEstat();
+		}
+		return null;
 	}
 }

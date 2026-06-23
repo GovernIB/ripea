@@ -728,7 +728,7 @@ public class EmailHelper {
 				"\tDocument nom: " + document.getNom() + "\n" +
 				(document.getMetaDocument() != null ? "\tDocument tipus.: " + document.getMetaDocument().getNom() : "" ) + "\n" +
 				"\tDocument fitxer: " + document.getFitxerNom() + "\n\n" +
-				"Estat anterior:" + estatAnterior!=null? estatAnterior.toString() : "" + "\n" +
+				"Estat anterior:" + (estatAnterior !=null ? estatAnterior.toString() : "") + "\n" +
 				"Estat actual:" + estat + "\n" +
 				getEnllacExpedient(expedient.getId());
 

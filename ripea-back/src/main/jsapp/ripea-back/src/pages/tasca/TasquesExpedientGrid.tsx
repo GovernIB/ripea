@@ -23,19 +23,19 @@ const TasquesGridForm = () => {
     );
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="metaExpedientTasca" filter={metaTascaFilter}/>
-        <GridFormField xs={12} name="metaExpedientTascaDescription" type={"textarea"} readOnly disabled/>
-        <GridFormField xs={12} name="responsables" multiple required/>
-        <GridFormField xs={12} name="observadors" multiple/>
-        <GridFormField xs={6} name="duracio" debounce/>
-        <GridFormField xs={6} name="dataLimit" type={"date"}/>
-        <GridFormField xs={12} name="titol"/>
-        <GridFormField xs={12} name="observacions" type={"textarea"}/>
-        <GridFormField xs={12} name="prioritat" required/>
+        <GridFormField name="metaExpedientTasca" filter={metaTascaFilter}/>
+        <GridFormField name="metaExpedientTascaDescription" type={"textarea"} readOnly disabled/>
+        <GridFormField name="responsables" multiple required/>
+        <GridFormField name="observadors" multiple/>
+        <GridFormField size={6} name="duracio" debounce/>
+        <GridFormField size={6} name="dataLimit" type={"date"}/>
+        <GridFormField name="titol"/>
+        <GridFormField name="observacions" type={"textarea"}/>
+        <GridFormField name="prioritat" required/>
     </Grid>
 }
 
-const perspectives = ["RESPONSABLES_RESUM"]
+const perspectives = ["RESPONSABLES_RESUM", "CONTEXT_USUARI", "AUDITORIA"]
 const columns = [
     {
         field: 'metaExpedientTasca',
@@ -113,6 +113,7 @@ const TasquesExpedientGrid = (props: any) => {
         <StyledMuiGrid
             apiRef={apiRef}
             resourceName="expedientTascaResource"
+			persistentStateKey={"expedientTascaResource_expedientTab"}
             popupEditFormDialogResourceTitle={t('page.tasca.title')}
             columns={additionalColumns}
             paginationActive={false}
@@ -123,13 +124,15 @@ const TasquesExpedientGrid = (props: any) => {
             onRowCountChange={onRowCountChange}
             popupEditCreateActive
 			toolbarCreateTitle={t('page.tasca.action.new.label')}
+            toolbarShowQuickFilter
             popupEditFormContent={<TasquesGridForm/>}
+            popupEditFormComponentProps={{ perspectives: ["RESPONSABLES_RESUM"] }}
             formAdditionalData={{
                 expedient: {id: entity?.id},
                 metaExpedient: entity?.metaExpedient,
             }}
             rowAdditionalActions={actions}
-            toolbarHideCreate={!entity?.potModificar}
+            toolbarShowCreate={entity?.potModificar}
 
             onRowClick={(params: any) => handleOpen(params?.row?.id) }
             popupEditFormI18nKeys={{

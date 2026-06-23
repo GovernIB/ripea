@@ -82,7 +82,7 @@ export const SseExpedient: React.FC<any> = (props:any) => {
             // Gestionar l'esdeveniment de flux creat
             addEventListener(eventSource, fluxCreateKey)
 
-			// Gestionar l'esdeveniment de firma finalitzada
+			// Gestionar l'esdeveniment de scan finalitzat
 			addEventListener(eventSource, scanFinalitzatKey)
 
 			// Gestionar l'esdeveniment de validació d'expedient

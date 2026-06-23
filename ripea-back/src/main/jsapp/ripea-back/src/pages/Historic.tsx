@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {Grid2} from "@mui/material";
+import {Grid} from "@mui/material";
 import {BasePage, MuiDialog} from "reactlib";
 import {useTranslation} from "react-i18next";
 import TabComponent from "../components/TabComponent.tsx";
@@ -28,7 +28,7 @@ const columnsAccions = [
 
 const sortModel:any = [{ field: 'createdDate', sort: 'asc' }];
 const Accions = (props:any) => {
-    const { id, onRowCountChange } = props;
+    const { id, onRowCountChange, contingutTipus } = props;
     const { t } = useTranslation();
 
     const {handleOpen, dialog} = useAccioDialog()
@@ -45,13 +45,15 @@ const Accions = (props:any) => {
     return <BasePage>
         <StyledMuiGrid
             resourceName={'contingutLogResource'}
-            filter={builder.eq('contingut.id', id)}
+            filter={builder.and(
+                builder.eq('contingutId', id),
+                builder.eq('contingutTipus', `'${contingutTipus}'`),
+            )}
             staticSortModel={sortModel}
             columns={columnsAccions}
             rowAdditionalActions={actions}
             onRowCountChange={onRowCountChange}
             autoHeight
-            paginationModel={{page: 0, pageSize: 5}}
             toolbarHide
             readOnly
         />
@@ -95,7 +97,7 @@ const useAccioDialog = () => {
             }
         }}
     >
-        <Grid2 container columnSpacing={1} rowSpacing={1}>
+        <Grid container columnSpacing={1} rowSpacing={1}>
             <DetailCard title={t('page.contingut.log.param')}>
                 <DetailCardContent title={t('page.contingut.log.param1')} size={6}>{entity?.param1}</DetailCardContent>
                 <DetailCardContent title={t('page.contingut.log.param2')} size={6}>{entity?.param2}</DetailCardContent>
@@ -116,7 +118,7 @@ const useAccioDialog = () => {
                 <DetailCardContent title={t('page.contingut.moviment.origen')} size={6}>#{entity?.moviment?.origen?.id}</DetailCardContent>
                 <DetailCardContent title={t('page.contingut.moviment.desti')} size={6}>#{entity?.moviment?.desti?.id}</DetailCardContent>
             </DetailCard>
-        </Grid2>
+        </Grid>
     </MuiDialog>
 
     return {
@@ -161,7 +163,6 @@ const Moviment = (props:any) => {
             columns={columnsMoviment}
             onRowCountChange={onRowCountChange}
             autoHeight
-            paginationModel={{page: 0, pageSize: 5}}
             toolbarHide
             readOnly
         />
@@ -172,7 +173,7 @@ const Auditoria = (props:any) => {
     const { t } = useTranslation();
 
     return <BasePage>
-        <Grid2 container direction={"row"} columnSpacing={1} rowSpacing={1}>
+        <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
             <DetailCard title={t('page.contingut.history.create')} size={6}>
                 <DetailCardContent title={t('page.contingut.history.user')}>{entity?.createdByFullName}</DetailCardContent>
                 <DetailCardContent title={t('page.contingut.history.date')} >{formatDate(entity?.createdDate)}</DetailCardContent>
@@ -181,11 +182,17 @@ const Auditoria = (props:any) => {
                 <DetailCardContent title={t('page.contingut.history.user')} >{entity?.lastModifiedByFullName}</DetailCardContent>
                 <DetailCardContent title={t('page.contingut.history.date')} >{formatDate(entity?.lastModifiedDate)}</DetailCardContent>
             </DetailCard>
-        </Grid2>
+        </Grid>
     </BasePage>;
 }
 
-const useHistoric = () => {
+export const HistoricContingutTipusEnum = {
+    CONTINGUT: "CONTINGUT",
+    METANODE: "METANODE",
+    TASCA: "TASCA",
+} as const;
+type HistoricContingutTipus = keyof typeof HistoricContingutTipusEnum;
+const useHistoric = (contingutTipus:HistoricContingutTipus = HistoricContingutTipusEnum.CONTINGUT) => {
     const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
@@ -210,15 +217,16 @@ const useHistoric = () => {
         {
             value: 'actions',
             label: t('page.contingut.tabs.actions'),
-            content: <Accions id={entity?.id} onRowCountChange={setNumAccions}/>,
+            content: <Accions id={entity?.id} contingutTipus={contingutTipus} onRowCountChange={setNumAccions}/>,
             badge: numAccions,
         },
         {
             value: "move",
             label: t('page.contingut.tabs.move'),
-            content: <Moviment id={entity?.id} onRowCountChange={setMoviment}/>,
+            content: <Moviment id={entity?.id} contingutTipus={contingutTipus} onRowCountChange={setMoviment}/>,
             badge: numMoviment ?? entity?.numMoviments,
             disabled: entity?.numMoviments === 0,
+            hidden: entity?.numMoviments == null,
             showZero: true,
         },
         {

@@ -1,13 +1,12 @@
-import {MuiDataGridApi, MuiFormDialogApi} from "reactlib";
+import {useMuiFormDialogApiRef} from "reactlib";
 import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
-import {MutableRefObject, useRef} from "react";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 
-const ImportRolsacForm = () => {
+export const ImportRolsacForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="codiSia"/>
+        <GridFormField name="codiSia"/>
     </Grid>
 }
 
@@ -28,14 +27,14 @@ const ImportRolsac = (props: any) => {
     </FormActionDialog>
 }
 
-export const useImportRolsac = (apiGridRef:MutableRefObject<MuiDataGridApi>) => {
-    const apiRef = useRef<MuiFormDialogApi>();
+export const useImportRolsac = (apiGridRef:any) => {
+    const apiRef = useMuiFormDialogApiRef();
 
     const handleShow = () :void => {
         apiRef.current?.show?.()
     }
     const onSuccess = (response:any) :void => {
-        apiGridRef.current?.showCreateDialog(undefined, response)
+        apiGridRef.current?.triggerCreate(undefined, response)
     }
 
     return {

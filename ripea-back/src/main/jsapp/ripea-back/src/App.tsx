@@ -6,6 +6,7 @@ import governLogo from './assets/govern-logo.png'
 import AppRoutes from './AppRoutes';
 import {useEntitatSession} from "./components/Session.tsx";
 import TitleHeaderConfigurator from "./TitleHeaderConfigurator.tsx";
+import { useTranslation } from 'react-i18next';
 
 const changeFavicon = (faviconUrl:any) => {
     const link:any =
@@ -24,10 +25,18 @@ export const getImgFromBytes = (img:string) :string | undefined => {
 
 export const App: React.FC = () => {
     const version = '1.0.1';
-    const { value: entitat } = useEntitatSession()
+    const { value: entitat } = useEntitatSession();
+    const { i18n } = useTranslation();
+
+    // Sincronizar lang del <html> con el idioma activo de i18next
+    useEffect(() => {
+        document.documentElement.lang = i18n.language;
+    }, [i18n.language]);  // ← se ejecuta en el arranque y cada vez que cambie
+
     useEffect(() => {
         changeFavicon(getImgFromBytes(entitat?.conf?.favicon) || favicon)
     }, [entitat?.conf?.favicon, favicon]);
+    
     return <BaseApp
         code="cmd"
         logo={getImgFromBytes(entitat?.conf?.logo) || governLogo}
@@ -39,7 +48,7 @@ export const App: React.FC = () => {
             mr: 4,
             borderRight: `1px solid ${entitat?.conf?.colorLletra}`
         }}
-        title={<img src={ripea_logo} style={{ height: '80px', paddingTop: '8px' }} />}
+        title={<img src={ripea_logo} alt={"logo_aplicacion"} style={{ height: '65px', paddingTop: '8px' }} />}
         version={version}
         appbarBackgroundColor={entitat?.conf?.colorFons}>
         <TitleHeaderConfigurator/>

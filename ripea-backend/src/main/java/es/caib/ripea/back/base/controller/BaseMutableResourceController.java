@@ -102,9 +102,12 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 								null,
 								true,
 								null,
+								null,
 								resourceApiService.permissionsCurrentUser(
 										getResourceClass(),
-										created.getId())).toArray(new Link[0])));
+										created.getId()),
+								true,
+								true).toArray(new Link[0])));
 	}
 
 	@Override
@@ -138,9 +141,12 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 								null,
 								true,
 								null,
+								null,
 								resourceApiService.permissionsCurrentUser(
 										getResourceClass(),
-										id)).toArray(new Link[0])));
+										id),
+								true,
+								true).toArray(new Link[0])));
 	}
 
 	@Override
@@ -177,9 +183,12 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 								null,
 								true,
 								null,
+								null,
 								resourceApiService.permissionsCurrentUser(
 										getResourceClass(),
-										id)).toArray(new Link[0])));
+										id),
+								true,
+								true).toArray(new Link[0])));
 	}
 
 	@Override
@@ -518,13 +527,19 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 			String[] perspective,
 			boolean withDownloadLink,
 			Link singleResourceSelfLink,
-			ResourcePermissions resourcePermissions) {
+			List<ResourceArtifact> artifactsAll,
+			ResourcePermissions resourcePermissions,
+			boolean withEditLinksInputAndOutput,
+			boolean withArtifactLinks) {
 		List<Link> links = super.buildSingleResourceLinks(
 				id,
 				perspective,
 				withDownloadLink,
 				singleResourceSelfLink,
-				resourcePermissions);
+				artifactsAll,
+				resourcePermissions,
+				withEditLinksInputAndOutput,
+				withArtifactLinks);
 		Link selfLink = links.stream().
 				filter(l -> l.getRel().value().equals("self")).
 				findFirst().orElse(null);
@@ -532,13 +547,22 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 			if (resourcePermissions.isWriteGranted()) {
 				ConfigurableAffordance affordance = Affordances.of(selfLink).
 						afford(FAKE_DEFAULT_TEMPLATE_HTTP_METHOD).
-						withName("default").
-						andAfford(HttpMethod.PUT).
-						withInputAndOutput(getResourceClass()).
-						withName("update").
-						andAfford(HttpMethod.PATCH).
-						withInputAndOutput(getResourceClass()).
-						withName("patch");
+						withName("default");
+				if (withEditLinksInputAndOutput) {
+					affordance = affordance.
+							andAfford(HttpMethod.PUT).
+							withInputAndOutput(getResourceClass()).
+							withName("update").
+							andAfford(HttpMethod.PATCH).
+							withInputAndOutput(getResourceClass()).
+							withName("patch");
+				} else {
+					affordance = affordance.
+							andAfford(HttpMethod.PUT).
+							withName("update").
+							andAfford(HttpMethod.PATCH).
+							withName("patch");
+				}
 				if (resourcePermissions.isDeleteGranted()) {
 					affordance = affordance.
 							andAfford(HttpMethod.DELETE).
@@ -629,10 +653,12 @@ public abstract class BaseMutableResourceController<R extends Resource<? extends
 	}
 
 	@Override
-	protected List<Link> buildSingleResourceArtifactLinks(Serializable id) {
-		List<Link> superLinks = super.buildSingleResourceArtifactLinks(id);
-		List<ResourceArtifact> artifacts = getReadonlyResourceService().artifactFindAll(null);
-		List<Link> links = artifacts.stream().
+	protected List<Link> buildSingleResourceArtifactLinks(Serializable id, List<ResourceArtifact> artifactsAll) {
+		List<Link> superLinks = super.buildSingleResourceArtifactLinks(id, artifactsAll);
+		List<ResourceArtifact> thisArtifactsAll = artifactsAll != null ?
+				artifactsAll :
+				getReadonlyResourceService().artifactFindAll(null);
+		List<Link> links = thisArtifactsAll.stream().
 				filter(a -> a.getType() == ResourceArtifactType.ACTION && a.getRequiresId() != null && a.getRequiresId()).
 				map(a -> buildActionLinkWithAffordances(a, id)).
 				collect(Collectors.toList());

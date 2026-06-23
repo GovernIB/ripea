@@ -110,6 +110,12 @@
 							<td colspan="4"><spring:message code="notificacio.enviamentEstat.enum.${enviament.enviamentDatatEstat}"/></td>
 						</c:if>
 					</tr>
+					<c:if test="${enviament.registreEstat == 'OFICI_SIR' || enviament.registreEstat == 'OFICI_ACCEPTAT' || enviament.registreEstat == 'REBUTJAT'}">
+						<tr>
+							<td width="30%"><strong><spring:message code="enviament.info.dada.registre.estat"/></strong></td>
+							<td colspan="4"><spring:message code="notificacio.registreEstat.enum.${enviament.registreEstat}"/></td>
+						</tr>
+					</c:if>
 				</tbody>
 				</table>
 			</div>

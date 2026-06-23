@@ -6,9 +6,15 @@
 	<parent>
 		<groupId>es.caib.ripea</groupId>
 		<artifactId>ripea</artifactId>
-		<version>1.0.4</version>
+		<version>1.0.5</version>
 	</parent>
 	<artifactId>ripea-service</artifactId>
+	<!-- Valors buits per defecte: quan JaCoCo no s'activa (perfil 'cobertura' inactiu)
+	     surefire i failsafe utilitzen @{...} (late binding) i substitueixen per cadena buida. -->
+	<properties>
+		<jacoco.surefire.argLine></jacoco.surefire.argLine>
+		<jacoco.failsafe.argLine></jacoco.failsafe.argLine>
+	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -124,6 +130,26 @@
 <!--			<groupId>es.caib.portafib</groupId>-->
 <!--			<artifactId>portafib-ws-callback-api</artifactId>-->
 <!--		</dependency>-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
 		<dependency>
 			<groupId>ma.glasnost.orika</groupId>
 			<artifactId>orika-core</artifactId>
@@ -218,6 +244,57 @@
 			<version>1.26.1</version>
 		</dependency>
 	</dependencies>
+	<build>
+		<plugins>
+			<!-- Tests unitaris: s'executen a la fase 'test' (inclosa en 'package').
+			     Exclou els tests d'integració (*IT) perquè els gestiona Failsafe. -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>**/*IT.java</exclude>
+					</excludes>
+					<!-- Orika (i altres llibreries de generació de bytecode) necessiten
+					     accedir a ClassLoader.defineClass, blocat per defecte a Java 11. -->
+					<argLine>
+						@{jacoco.surefire.argLine}
+						--add-opens java.base/java.lang=ALL-UNNAMED
+						--add-opens java.base/java.util=ALL-UNNAMED
+						--add-opens java.base/java.lang.reflect=ALL-UNNAMED
+					</argLine>
+				</configuration>
+			</plugin>
+
+			<!-- Tests d'integració: s'executen a la fase 'verify' (inclosa en 'install').
+			     Inclou només els tests *IT. -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<configuration>
+					<includes>
+						<include>**/*IT.java</include>
+					</includes>
+					<argLine>
+						@{jacoco.failsafe.argLine}
+						--add-opens java.base/java.lang=ALL-UNNAMED
+						--add-opens java.base/java.util=ALL-UNNAMED
+						--add-opens java.base/java.lang.reflect=ALL-UNNAMED
+					</argLine>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+	</build>
+
 	<profiles>
 		<profile>
 			<id>apb</id>
@@ -235,5 +312,67 @@
 				</dependency>
 			</dependencies>
 		</profile>
-	</profiles>	
+
+		<!-- Perfil de cobertura de codi.
+		     Activa'l amb: mvn package -P cobertura  (tests unitaris + informe)
+		                   mvn install -P cobertura  (tests unitaris + ITs + informes)
+		     Requereix que org.jacoco:jacoco-maven-plugin:0.8.12 i les seves
+		     dependències estiguin disponibles al repositori Maven. -->
+		<profile>
+			<id>cobertura</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<version>0.8.12</version>
+						<executions>
+							<!-- Injecta l'agent JVM per als tests unitaris (surefire) -->
+							<execution>
+								<id>jacoco-prepare-agent</id>
+								<goals>
+									<goal>prepare-agent</goal>
+								</goals>
+								<configuration>
+									<propertyName>jacoco.surefire.argLine</propertyName>
+								</configuration>
+							</execution>
+							<!-- Injecta l'agent JVM per als tests d'integració (failsafe) -->
+							<execution>
+								<id>jacoco-prepare-agent-integration</id>
+								<goals>
+									<goal>prepare-agent-integration</goal>
+								</goals>
+								<configuration>
+									<propertyName>jacoco.failsafe.argLine</propertyName>
+								</configuration>
+							</execution>
+							<!-- Informe de tests unitaris: target/site/jacoco/ -->
+							<execution>
+								<id>jacoco-report</id>
+								<phase>test</phase>
+								<goals>
+									<goal>report</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${project.reporting.outputDirectory}/jacoco</outputDirectory>
+								</configuration>
+							</execution>
+							<!-- Informe de tests d'integració: target/site/jacoco-it/ -->
+							<execution>
+								<id>jacoco-report-integration</id>
+								<phase>post-integration-test</phase>
+								<goals>
+									<goal>report-integration</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>

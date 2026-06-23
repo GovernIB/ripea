@@ -1,12 +1,14 @@
 import {useTranslation} from 'react-i18next';
-import {useParams} from 'react-router-dom';
-import {GridPage, useResourceApiService} from 'reactlib';
+import {useNavigate, useParams, Link as RrLink} from 'react-router-dom';
+import {GridPage, useBaseAppContext, useResourceApiService} from 'reactlib';
 import {useState, useEffect} from "react";
-import {Typography, Grid2 as Grid, Icon, IconButton, Link, Alert, Button, Box, Grid2} from '@mui/material';
+import {Typography, Grid, Icon, IconButton, Link, Alert, Button, Box, alpha} from '@mui/material';
 import {formatDate} from '../../../util/dateUtils.ts';
 import TabComponent from "../../../components/TabComponent.tsx";
 import InteressatsGrid from "../../interessats/InteressatsGrid.tsx";
 import DocumentsGrid from "../../contingut/DocumentsGrid.tsx";
+import Carpeta from "../../carpeta/details/Carpeta.tsx";
+import ContingutBreadcrumb from "./ContingutBreadcrumb.tsx";
 import TasquesExpedientGrid from "../../tasca/TasquesExpedientGrid.tsx";
 import AnotacionsExpedientGrid from "../../anotacioExpedient/AnotacionsExpedientGrid.tsx";
 import ExpedientActionButton from "./ExpedientActionButton.tsx";
@@ -26,6 +28,7 @@ import {icons} from "../../user/UserHeadToolbar.tsx";
 import {setTitlePage} from "../../../TitleHeaderConfigurator.tsx";
 import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
 import {ErrorPage} from "../../../components/ErrorPage.tsx";
+import * as builder from "../../../util/springFilterUtils.ts";
 
 const border= { border: '1px solid #e3e3e3', borderRadius: '4px' };
 
@@ -33,30 +36,49 @@ const ExpedientsRelacionats = (props:any) => {
     const { entity: expedient } = props;
     const { t } = useTranslation();
 
-    const refresh = () => {
-        window.location.reload();
+    const {
+        isReady: apiIsReady,
+        find: apiFind,
+    } = useResourceApiService('expedientResource');
+    const {temporalMessageShow} = useBaseAppContext();
+    const [relacionats, setRelacionats] = useState<any[]>([]);
+
+    const findRelacionats = () => {
+        apiFind({
+            filter: builder.or(
+                builder.exists(builder.eq('relacionatsPer.id', expedient?.id)),
+                builder.exists(builder.eq('relacionatsAmb.id', expedient?.id)),
+            ),
+            unpaged: true,
+        })
+            .then((result) => {
+                setRelacionats(result?.rows)
+            })
+            .catch((error) => {
+                temporalMessageShow(null, error?.message, 'error');
+                setRelacionats([])
+            });
     }
 
-    const {eliminarRelacio} = useActions(refresh)
+    const {eliminarRelacio} = useActions(findRelacionats)
 
-    const relacionats :any[] = [...new Set([
-        ...expedient?.relacionatsPer ?? [],
-        ...expedient?.relacionatsAmb ?? []
-    ])];
+    useEffect(() => {
+        if (apiIsReady) {
+            findRelacionats()
+        }
+    }, [apiIsReady, expedient]);
 
-    if (relacionats.length == 0)
-        return <></>
-
-    return <Grid2 size={12} p={1} my={2}>
+    return <Load value={relacionats.length > 0} noEffect>
+        <Grid size={12} p={1} my={1}>
         <DetailCard title={t('page.contingut.action.importarExpedient.title')} display={'flex'} flexDirection={'column'} sx={{ px: 1 }} hidden={relacionats?.length==0}>
             {
                 relacionats?.map((relacionat:any) =>
-                    <Grid key={relacionat?.id} container alignItems="center">
+                    <Grid key={relacionat?.id} container display={'flex'} alignItems="center">
                         <Grid size={1}>
                             <Icon sx={{ fontSize: "1.3rem", paddingTop: "4px" }}>drive_file_move</Icon>
                         </Grid>
                         <Grid size={10}>
-                            <Link sx={{ fontSize: "0.9rem" }} href={`./${relacionat?.id}`}>{relacionat?.description}</Link>
+                            <Link sx={{ fontSize: "0.9rem" }} href={`./${relacionat?.id}`}>{relacionat?.nom}</Link>
                         </Grid>
                         <Grid size={1}>
                             {expedient?.potModificar &&
@@ -64,7 +86,7 @@ const ExpedientsRelacionats = (props:any) => {
                                     onClick={()=>eliminarRelacio(expedient?.id, expedient, relacionat?.id)}
                                     title={t('page.expedient.action.eliminarRelacio.label')}
                                     sx={{ color: 'black'}}>
-                                        <Icon sx={{ fontSize: "1.3rem" }}>link_off</Icon>
+                                    <Icon sx={{ fontSize: "1.3rem" }}>link_off</Icon>
                                 </IconButton>
                             }
                         </Grid>
@@ -72,7 +94,8 @@ const ExpedientsRelacionats = (props:any) => {
                 )
             }
         </DetailCard>
-    </Grid2>
+    </Grid>
+    </Load>
 }
 
 export const ExpedientInfo = (props:any) => {
@@ -89,12 +112,14 @@ export const ExpedientInfo = (props:any) => {
         <FieldData size={8} sx={{ borderBottom: "1px solid" }} field={"estat"} renderCell={(formattedValue:string) => <StyledEstat entity={expedient}>{formattedValue}</StyledEstat>}/>
         <FieldData size={4} sx={{ borderBottom: "1px solid" }} field={"prioritat"} renderCell={(formattedValue:string) => <StyledPrioritat entity={expedient}>{formattedValue}</StyledPrioritat>}/>
 
+        {expedient?.grup && <FieldData field={"grup"}/>}
+
         <ExpedientsRelacionats entity={expedient}/>
 
         {!readOnly &&
-            <Grid2 size={12} display={'flex'} justifyContent={'end'} p={1}>
+            <Grid size={12} display={'flex'} justifyContent={'end'} p={1}>
                 <ExpedientActionButton entity={expedient}/>
-            </Grid2>
+            </Grid>
         }
     </DetailCard></MuiDetail>
 }
@@ -117,10 +142,10 @@ const ExpedientAlert = (props:any) => {
         {expedient?.agafatPer?.id != user?.codi && expedient?.usuariActualWrite && !rol?.isAdminLectura && user?.rolActual != 'IPA_ADMIN' &&
             <Alert severity="info"
                    action={
-                       <Button sx={{py:0}} 
+                       <Button sx={{py:0}}
                        onClick={()=>agafar(expedient?.id, expedient)} variant="outlined">
                            <Icon>lock</Icon>
-						   <Typography variant={"subtitle2"}>{t('page.expedient.action.agafar.label')}</Typography>
+						   <Typography variant={"subtitle2"} component="span">{t('page.expedient.action.agafar.label')}</Typography>
                        </Button>
                    }
             >{t('page.expedient.alert.owner')}</Alert>
@@ -137,7 +162,7 @@ const ExpedientAlert = (props:any) => {
                        <Button sx={{py: 0}} variant="outlined"
                                onClick={() => handelAlert(expedient?.id, expedient)}>
                             <Icon>search</Icon>
-                           <Typography variant={"subtitle2"}>{t('common.consult')}</Typography>
+                           <Typography variant={"subtitle2"} component="span">{t('common.consult')}</Typography>
                        </Button>
                    }
             >{t('page.expedient.alert.alert')}</Alert>
@@ -148,7 +173,7 @@ const ExpedientAlert = (props:any) => {
                        <Button sx={{py: 0}} variant="outlined"
                                onClick={() => hanldeErrorValidacio(expedient?.id, expedient)}>
                             <Icon>search</Icon>
-                           <Typography variant={"subtitle2"}>{t('common.consult')}</Typography>
+                           <Typography variant={"subtitle2"} component="span">{t('common.consult')}</Typography>
                        </Button>
                    }
             >{t('page.expedient.alert.validation')}</Alert>
@@ -158,10 +183,13 @@ const ExpedientAlert = (props:any) => {
     </>
 }
 
-const perspectives = ['COUNT', 'ESTAT', 'RELACIONAT', 'AMB_PINBAL', "META_EXPEDIENT", "PERMIS_CONTINGUT"]
+const CARPETA_PATH_PERSPECTIVES = ['PATH', 'RESTRICCIONS', 'RESPONSABLE_RESTRICCIO'];
+
+const perspectives = ['BASIC', 'AVISOS', 'COUNT', 'ESTAT', 'AMB_PINBAL', "META_EXPEDIENT", "PERMIS_CONTINGUT", "AUDITORIA"];
 const Expedient = () => {
     const { t } = useTranslation();
     const { id } = useParams();
+    const navigate = useNavigate();
     const [error, setError] = useState<any>();
 
     const refresh = () => {
@@ -176,21 +204,84 @@ const Expedient = () => {
         getOne: appGetOne,
         currentFields: fields
     } = useResourceApiService('expedientResource');
-    const [expedient, setExpedient] = useState<any>();
+    const {
+        isReady: apiCarpetaReady,
+        getOne: carpetaGetOne,
+    } = useResourceApiService('carpetaResource');
 
-    useEffect(()=>{
-        if (apiIsReady) {
-            appGetOne(id, {perspectives})
-                .then((app) => setExpedient(app))
-                .catch((error) => setError(error))
+    const [expedient, setExpedient] = useState<any>();
+    const [carpetaNode, setCarpetaNode] = useState<any>();
+
+    useEffect(() => {
+        if (!apiIsReady || id == null) {
+            return;
         }
-    },[apiIsReady])
+        let cancelled = false;
+        setError(undefined);
+
+        const load = async () => {
+            try {
+                const app = await appGetOne(id, { perspectives });
+                if (cancelled) {
+                    return;
+                }
+                setCarpetaNode(null);
+                setExpedient(app);
+                return;
+            } catch {
+                /* id no és d'un expedient */
+            }
+
+            if (user.sessionScope?.isContingutCarpetaDetallAccesActiva !== true) {
+                if (!cancelled) {
+                    navigate('/expedient', { replace: true });
+                }
+                return;
+            }
+
+            if (!apiCarpetaReady) {
+                return;
+            }
+
+            try {
+                const carpeta = await carpetaGetOne(id, { perspectives: CARPETA_PATH_PERSPECTIVES });
+                if (cancelled) {
+                    return;
+                }
+                const expedientId = carpeta?.expedient?.id;
+                if (expedientId == null) {
+                    if (!cancelled) {
+                        navigate('/expedient', { replace: true });
+                    }
+                    return;
+                }
+                const app = await appGetOne(expedientId, { perspectives });
+                if (cancelled) {
+                    return;
+                }
+                setCarpetaNode(carpeta);
+                setExpedient(app);
+            } catch {
+                if (!cancelled) {
+                    navigate('/expedient', { replace: true });
+                }
+            }
+        };
+
+        void load();
+        return () => {
+            cancelled = true;
+        };
+    }, [apiIsReady, apiCarpetaReady, id, navigate, user, user?.sessionScope?.isContingutCarpetaDetallAccesActiva]);
 
     useEffect(() => {
         if (expedient) {
-            setTitlePage(expedient?.nom)
+            const title = carpetaNode?.nom
+                ? `${expedient?.nom} — ${carpetaNode.nom}`
+                : expedient?.nom;
+            setTitlePage(title);
         }
-    }, [expedient]);
+    }, [expedient, carpetaNode]);
 
     const [numContingut, setNumContingut] = useState<number>(expedient?.numContingut);
     const [numInteressats, setNumInteressats] = useState<number>(expedient?.numInteressats);
@@ -203,11 +294,15 @@ const Expedient = () => {
     if (error)
         return <ErrorPage error={error}/>
 
+    const isCarpetaUrl = carpetaNode != null;
+
     const tabs = [
         {
             value: "contingut",
             label: t('page.contingut.tabs.contingut'),
-            content: <DocumentsGrid entity={expedient} onRowCountChange={setNumContingut}/>,
+            content: isCarpetaUrl && id != null
+                ? <Carpeta key={`carpeta-${id}`} expedient={expedient} carpetaId={id} onRowCountChange={setNumContingut}/>
+                : <DocumentsGrid key={`expedient-${expedient?.id}`} entity={expedient} onRowCountChange={setNumContingut}/>,
             badge: numContingut ?? expedient?.numContingut,
             showZero: true,
         },
@@ -245,7 +340,7 @@ const Expedient = () => {
         {
             value: "anotacions",
             label: t('page.contingut.tabs.anotacions'),
-            content: <AnotacionsExpedientGrid id={id} onRowCountChange={setNumAnotacions}/>,
+            content: <AnotacionsExpedientGrid id={expedient?.id} onRowCountChange={setNumAnotacions}/>,
             badge: numAnotacions ?? expedient?.numAnotacions,
             hidden: !expedient?.numAnotacions,
             showZero: true,
@@ -255,28 +350,49 @@ const Expedient = () => {
             label: t('page.contingut.tabs.tasques'),
             content: <TasquesExpedientGrid entity={expedient} onRowCountChange={setNumTasques}/>,
             badge: numTasques ?? expedient?.numTasques,
+            hidden: expedient?.hideTasca,
             showZero: true,
         },
     ]
 
     const headerMain = <>
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Icon sx={{ fontSize: '2rem' }}>{icons.expedient}</Icon>
-            <Typography variant="h4" sx={{ display: 'flex' }}>{expedient?.nom}</Typography>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', columnGap: 1, rowGap: 0.5, width: '100%' }}>
+            <Icon sx={{ fontSize: '2rem', color: 'primary.light' }}>{icons.expedient}</Icon>
+            <Typography variant="h4" component="h1" sx={{ lineHeight: 1.2, flexShrink: 0 }}>
+                {isCarpetaUrl && expedient?.id != null ? (
+                    <Link
+                        component={RrLink}
+                        to={`/contingut/${expedient.id}`}
+                        underline="hover"
+                        color="inherit"
+                        sx={{ fontWeight: 'inherit', fontSize: 'inherit', lineHeight: 'inherit' }}
+                    >
+                        {expedient.nom}
+                    </Link>
+                ) : (
+                    expedient?.nom
+                )}
+            </Typography>
+            {isCarpetaUrl && (
+                <Icon sx={{ fontSize: '1.5rem', color: 'text.secondary', flexShrink: 0 }} aria-hidden>
+                    chevron_right
+                </Icon>
+            )}
+            <ContingutBreadcrumb expedient={expedient} carpetaNode={isCarpetaUrl ? carpetaNode : null} />
         </Box>
         <Box>
-            <Typography variant={"subtitle1"} sx={{border}} px={2} hidden={!expedient?.agafatPer}>
+            <Typography variant={"subtitle1"} component="p" sx={{border, flexShrink: 0, whiteSpace: 'nowrap', bgcolor: (theme) => alpha(theme.palette.common.white, 0.9), color: (theme) => theme.palette.getContrastText(theme.palette.common.white)}} px={2} hidden={!expedient?.agafatPer}>
                 {t('page.expedient.title')} {t('page.expedient.detall.agafatPer')}: {expedient?.agafatPer?.description}
                 {expedient?.agafatPer?.id == user?.codi &&
-                    <IconButton aria-label="lock_open" color={"inherit"} onClick={() => alliberar(id, expedient)} title={t('page.expedient.action.lliberar.label')}>
+                    <IconButton aria-label="lock_open" color={"inherit"} onClick={() => alliberar(expedient?.id, expedient)} title={t('page.expedient.action.lliberar.label')}>
                         <Icon>lock_open</Icon>
                     </IconButton>
                 }
             </Typography>
         </Box>
     </>;
-    return <GridPage disableMargins>
-        <SseExpedient id={id}/>
+    return <GridPage autoHeight>
+        {expedient?.id != null && <SseExpedient id={expedient.id}/>}
         <Load value={expedient} noEffect>
             <CardPage header={headerMain} componentProps={{ justifyContent: 'space-between' }}>
                 <Grid container spacing={2}>

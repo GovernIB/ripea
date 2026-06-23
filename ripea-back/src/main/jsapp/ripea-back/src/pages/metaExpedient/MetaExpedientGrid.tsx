@@ -1,6 +1,6 @@
 import {useTranslation} from "react-i18next";
 import {useMemo, useState} from "react";
-import {GridPage, useFilterApiRef, useFormApiRef, useFormContext, useMuiDataGridApiRef} from "reactlib";
+import {GridPage, useFilterApiRef, useFormContext, useMuiDataGridApiRef} from "reactlib";
 import {CardPage} from "../../components/CardData.tsx";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 import {Alert, Badge, Chip, Grid, Icon, IconButton, MenuItem} from "@mui/material";
@@ -27,32 +27,33 @@ export const MetaExpedientForm = ({ isAdmin }:any) => {
     const {data} = useFormContext()
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="tipusProcedimentServei" required/>
-        <GridFormField xs={12} name="codi"/>
-        <GridFormField xs={2} name="tipusClassificacio" required/>
-        <GridFormField xs={10} name="classificacio" debounce disabled={data?.tipusClassificacio == 'ID'}/>
-        <Grid item xs={12} hidden={data?.msgSiaRolsac == null}>
+        <GridFormField name="tipusProcedimentServei" required/>
+        <GridFormField name="codi"/>
+        <GridFormField size={2} name="tipusClassificacio" required/>
+        <GridFormField size={10} name="classificacio" debounce disabled={data?.tipusClassificacio == 'ID'}/>
+        <Grid size={12} hidden={data?.msgSiaRolsac == null}>
             <Alert severity={'warning'} sx={{ mt: 0.5 }}>{data.msgSiaRolsac}</Alert>
         </Grid>
-        <GridFormField xs={4} name="crearReglaDistribucio" disabled={!isAdmin || data?.id}/>
-        <GridFormField xs={12} name="nom"/>
-        <GridFormField xs={12} name="descripcio"/>
-        <GridFormField xs={12} name="serieDocumental"/>
-        <GridFormField xs={4} name="procedimentComu"/>
-        <GridFormField xs={8} name="organGestor" required hidden={data?.procedimentComu}/>
-        <GridFormField xs={12} name="expressioNumero"
+        <GridFormField size={4} name="crearReglaDistribucio" disabled={!isAdmin || data?.id}/>
+        <GridFormField name="nom"/>
+        <GridFormField name="descripcio"/>
+        <GridFormField name="serieDocumental"/>
+        <GridFormField size={4} name="procedimentComu"/>
+        <GridFormField size={8} name="organGestor" required hidden={data?.procedimentComu}/>
+        <GridFormField name="expressioNumero"
                        componentProps={{ helperText: t('page.metaExpedient.detall.expressioNumero') }}/>
 
-        <GridFormField xs={6} name="permetMetadocsGenerals"/>
-        <GridFormField xs={6} name="gestioAmbGrupsActiva"/>
-        <GridFormField xs={6} name="interessatObligatori"/>
-        <GridFormField xs={6} name="permisDirecte" disabled={!isAdmin}
+        <GridFormField size={6} name="permetMetadocsGenerals"/>
+        <GridFormField size={6} name="gestioAmbGrupsActiva"/>
+        <GridFormField size={6} name="interessatObligatori"/>
+        <GridFormField size={6} name="permisDirecte" disabled={!isAdmin}
                        componentProps={{ helperText: t('page.metaExpedient.detall.permisDirecte') }}/>
 
         {data?.id &&
-            <Grid xs={12} sx={{ pl: '8px', pt: '8px' }}>
+            <Grid size={12} sx={{ pl: '8px', pt: '8px' }}>
                 <Alert severity={'info'}>
                     {t('common.auditoria.create', {createdDate: formatDate(data.createdDate), createdBy: data.createdByFullName})}
+                    &nbsp;
                     {data.lastModifiedDate != null &&
                         t('common.auditoria.update', {lastModifiedDate: formatDate(data.lastModifiedDate), lastModifiedBy: data.lastModifiedByFullName})}
                 </Alert>
@@ -94,26 +95,6 @@ const columns = [
         field: 'organGestor',
         flex: 2,
     },
-    {
-        field: 'procedimentComu',
-        flex: 0.25,
-        renderCell: (params:any) => (params?.row?.procedimentComu && <Icon>check</Icon>),
-    },
-    {
-        field: 'permisDirecte',
-        flex: 0.25,
-        renderCell: (params:any) => (params?.row?.permisDirecte && <Icon>check</Icon>),
-    },
-    {
-        field: 'gestioAmbGrupsActiva',
-        flex: 0.25,
-        renderCell: (params:any) => (params?.row?.gestioAmbGrupsActiva && <Icon>check</Icon>),
-    },
-    {
-        field: 'actiu',
-        flex: 0.25,
-        renderCell: (params:any) => (params?.row?.actiu && <Icon>check</Icon>),
-    },
 ]
 
 const sortModel: any = [{field: 'nom', sort: 'asc'}]
@@ -138,38 +119,39 @@ const MetaExpedientGrid = () => {
     const additionalColumns = useMemo(() => [
         ...columns,
         {
+            field: 'procedimentComu',
+            headerName: t('page.metaExpedient.columnes.comu'),
+            flex: 0.25,
+            minWidth: 90,
+            renderCell: (params:any) => (params?.row?.procedimentComu && <Icon>check</Icon>),
+        },
+        {
+            field: 'permisDirecte',
+            headerName: t('page.metaExpedient.columnes.directe'),
+            flex: 0.25,
+            minWidth: 90,
+            renderCell: (params:any) => (params?.row?.permisDirecte && <Icon>check</Icon>),
+        },
+        {
+            field: 'gestioAmbGrupsActiva',
+            headerName: t('page.metaExpedient.columnes.grups'),
+            flex: 0.25,
+            minWidth: 90,
+            renderCell: (params:any) => (params?.row?.gestioAmbGrupsActiva && <Icon>check</Icon>),
+        },
+        {
+            field: 'actiu',
+            headerName: t('page.metaExpedient.columnes.actiu'),
+            flex: 0.25,
+            minWidth: 90,
+            renderCell: (params:any) => (params?.row?.actiu && <Icon>check</Icon>),
+        },
+        {
             field: 'revisioEstat',
-            flex: 0.5,
+            headerName: t('page.metaExpedient.columnes.estat'),
+            flex: 0.75,
             renderCell: (params:any) => <StyledEstat entity={params?.row}>{params.formattedValue}</StyledEstat>,
             hidden: !user?.sessionScope?.isRevisioActiva
-        },
-        {
-            field: 'numComentaris',
-            headerName: '',
-            sortable: false,
-            flex: 0.25,
-            renderCell: (params: any) => <MetaExpedientComment
-                entity={params?.row}
-                readOnly={params?.row?.usuariActualOnlyObservador}
-                onClose={refresh}
-            />
-        },
-        {
-            field: 'numPermisos',
-            headerName: '',
-            sortable: false,
-            flex: 0.25,
-            hidden: !(rol?.isAdmin || rol?.isOrganAdmin),
-            renderCell: (params:any) => <LinkIcon
-                aria-label="key"
-                color="inherit"
-                title="Permisos"
-                to={`/metaExpedient/${params?.row?.id}/permis`}
-            >
-                <Badge badgeContent={params?.row?.numPermisos} color="primary" showZero>
-                    <Icon>key</Icon>
-                </Badge>
-            </LinkIcon>
         },
         {
             field: 'id',
@@ -212,6 +194,36 @@ const MetaExpedientGrid = () => {
                     </StyledBadge>
                 </MenuItem>}
             </MenuButton>
+        },
+        {
+            field: 'numComentaris',
+            headerName: '',
+            sortable: false,
+            flex: 0.25,
+            minWidth: 55,
+            renderCell: (params: any) => <MetaExpedientComment
+                entity={params?.row}
+                readOnly={params?.row?.usuariActualOnlyObservador}
+                onClose={refresh}
+            />
+        },
+        {
+            field: 'numPermisos',
+            headerName: '',
+            sortable: false,
+            flex: 0.25,
+            minWidth: 55,
+            hidden: !(rol?.isAdmin || rol?.isOrganAdmin),
+            renderCell: (params:any) => <LinkIcon
+                aria-label="key"
+                color="inherit"
+                title="Permisos"
+                to={`/metaExpedient/${params?.row?.id}/permis`}
+            >
+                <Badge badgeContent={params?.row?.numPermisos} color="primary" showZero>
+                    <Icon>key</Icon>
+                </Badge>
+            </LinkIcon>
         },
     ].filter((col:any)=>!col?.hidden), [t, user?.sessionScope?.isRevisioActiva])
 
@@ -260,18 +272,17 @@ const MetaExpedientGrid = () => {
     ],[t])
 
     const filterRef = useFilterApiRef();
-    const formRef = useFormApiRef();
     const [load, setLoad] = useState<boolean>(true);
     const {value: revisioEstatMssg, save: setRevisioEstatMssg} = useSessionContext('revisioEstatMssg')
 
-    return <GridPage disableMargins>
+    return <GridPage autoHeight>
         <CardPage title={ rol?.isRevisor ? t('page.user.menu.revisar') : t('page.user.menu.procedimentsTitle')}>
 
             { rol?.isAdmin && user?.sessionScope?.numProcsPendentsRevisio > 0 && !revisioEstatMssg &&
                 <Alert severity={'info'} sx={{mb:1}}>
                     {t('page.metaExpedient.alert.pendentsRevisio', {num: user?.sessionScope?.numProcsPendentsRevisio})}
                     <IconButton sx={{ml: 1, p: 0}} onClick={() => {
-                        formRef.current?.setFieldValue('revisioEstat', 'PENDENT')
+                        filterRef.current?.setFieldValue?.('revisioEstat', 'PENDENT')
                         filterRef.current?.filter()
                         setLoad(true)
                         setRevisioEstatMssg(true)
@@ -281,7 +292,7 @@ const MetaExpedientGrid = () => {
                 </Alert>
             }
 
-            <MetaExpedientFilter apiRef={filterRef} formApiRef={formRef} onSpringFilterChange={(filter:string) => {
+            <MetaExpedientFilter apiRef={filterRef} onSpringFilterChange={(filter:string) => {
                 setSpringFilter(filter)
                 setLoad(false)
             }}/>
@@ -298,6 +309,7 @@ const MetaExpedientGrid = () => {
                 perspectives={perspectives}
                 sortModel={sortModel}
                 rowAdditionalActions={actions}
+                rowActionsColumnProps={{ width: 55, minWidth: 55 }}
                 toolbarMassiveActions={massiveActions}
                 toolbarElementsWithPositions={elementsWithPositions}
 

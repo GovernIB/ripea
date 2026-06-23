@@ -34,6 +34,9 @@ import lombok.experimental.FieldNameConstants;
                     type = ResourceArtifactType.FILTER,
                     code = DocumentPortafirmesResource.FILTER_ENVIATS_PORTAFIRMA_CODE,
                     formClass = DocumentPortafirmesResource.EnviatsPortafirmesFilter.class),
+            @ResourceArtifact(
+                    type = ResourceArtifactType.PERSPECTIVE,
+                    code = DocumentPortafirmesResource.PERSPECTIVE_PORTAFIB_DETALL_CODE),
 		}
 )
 public class DocumentPortafirmesResource extends DocumentEnviamentResource {
@@ -42,6 +45,7 @@ public class DocumentPortafirmesResource extends DocumentEnviamentResource {
 
 	public static final String ACTION_CANCEL_FIRMA = "CANCEL_FIRMA";
 	public static final String FILTER_ENVIATS_PORTAFIRMA_CODE = "FILTER_ENVIATS_PORTAFIRMA";
+	public static final String PERSPECTIVE_PORTAFIB_DETALL_CODE = "PORTAFIB_DETALL";
 
 	private PortafirmesPrioritatEnumDto prioritat;
 	private Date caducitatData;

@@ -1,8 +1,11 @@
 package es.caib.ripea.service.helper;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,7 +115,7 @@ public class TascaHelper {
 							validacioOk = true; //Si el tipus de document no esta actiu acualment al procediment, no es valida perque no es podrá aportar...
 						} else {
 							for (DocumentEntity docExp: documentsExpedient) {
-								if (docExp.getMetaDocument().getId().equals(validacioTasca.getItemId())) {
+								if (docExp.getMetaDocument()!=null && docExp.getMetaDocument().getId().equals(validacioTasca.getItemId())) {
 									switch (validacioTasca.getTipusValidacio()) {
 									case AP:
 										//S'ha trobat un document del tipus definit a la validació, no fa falta validar res més
@@ -200,8 +203,12 @@ public class TascaHelper {
 	}
 
 	public ExpedientTascaEntity updateDataLimit(Long tascaId, Date dataLimit, Integer duracio) {
+		
 		ExpedientTascaEntity expedientTascaEntity = expedientTascaRepository.getOne(tascaId);
-
+		
+		Calendar c = Calendar.getInstance();
+		c.setTime(expedientTascaEntity.getDataLimit());
+		
 		//Si no ha canviat res en el DTO respecte del entity (info a BBDD), no fer cap acció
 		if (Utils.sonValorsDiferentsControlantNulls(expedientTascaEntity.getDataLimit(), dataLimit) ||
 			Utils.sonValorsDiferentsControlantNulls(expedientTascaEntity.getDuracio(), duracio)) {
@@ -210,14 +217,41 @@ public class TascaHelper {
 			emailHelper.enviarEmailModificacioDataLimitTasca(expedientTascaEntity);
 		}
 		
-		logAccioTasca(expedientTascaEntity, LogTipusEnumDto.CANVI_DATALIMIT_TASCA);
+		logAccioTasca(expedientTascaEntity, LogTipusEnumDto.CANVI_DATALIMIT_TASCA, c.getTime());
 		
 		pluginHelper.comandaTascaSend(expedientTascaEntity);
 		
 		return expedientTascaEntity;
 	}
 	
-	public void logAccioTasca(ExpedientTascaEntity expedientTascaEntity, LogTipusEnumDto tipusLog) {
+	private void logAccioTasca(
+			ExpedientTascaEntity expedientTascaEntity,
+			LogTipusEnumDto tipusLog) {
+		logAccioTasca(expedientTascaEntity, tipusLog, null, null, null, null);
+	}
+	
+	private void logAccioTasca(
+			ExpedientTascaEntity expedientTascaEntity,
+			LogTipusEnumDto tipusLog,
+			Date dataLimitAnterior) {
+		logAccioTasca(expedientTascaEntity, tipusLog, null, null, dataLimitAnterior, null);
+	}
+	
+	private void logAccioTasca(
+			ExpedientTascaEntity expedientTascaEntity,
+			LogTipusEnumDto tipusLog,
+			TascaEstatEnumDto tascaEstat) {
+		logAccioTasca(expedientTascaEntity, tipusLog, null, null, null, tascaEstat);
+	}
+	
+	private void logAccioTasca(
+			ExpedientTascaEntity expedientTascaEntity,
+			LogTipusEnumDto tipusLog,
+			List<UsuariEntity> responsablesAnteriors,
+			UsuariEntity delegatAnterior,
+			Date dataLimitAnterior,
+			TascaEstatEnumDto tascaEstatAnterior) {
+		
 		contingutLogHelper.log(
 			expedientTascaEntity.getExpedient(),
 			LogTipusEnumDto.MODIFICACIO,
@@ -228,6 +262,58 @@ public class TascaHelper {
 			expedientTascaEntity.getComentaris().size() == 1 ? expedientTascaEntity.getComentaris().get(0).getText() : null, // expedientTascaEntity.getComentari(),
 			false,
 			false);
+
+			String parametreCanviTasca1 = "";
+			String parametreCanviTasca2 = "";
+			
+			try {
+			
+				switch (tipusLog) {
+				case CANVI_ESTAT: 
+					parametreCanviTasca1 = tascaEstatAnterior!=null?tascaEstatAnterior.toString():"Sense estat anterior";
+					parametreCanviTasca2 = expedientTascaEntity.getEstat()!=null?expedientTascaEntity.getEstat().toString():"Sense estat actual";
+					break;
+				case DELEGAR_TASCA: 
+					parametreCanviTasca1 = expedientTascaEntity.getDelegat()!=null?expedientTascaEntity.getDelegat().getCodiAndNom():"Sense delegat.";
+					if (expedientTascaEntity.getComentaris()!=null && expedientTascaEntity.getComentaris().size()>0) {
+						parametreCanviTasca2 = expedientTascaEntity.getComentaris().get(expedientTascaEntity.getComentaris().size()-1).getText();
+					} else {
+						parametreCanviTasca2 = "No s'ha indicat cap comentari.";
+					}
+					break;
+				case CANVI_RESPONSABLES:
+					parametreCanviTasca1 = responsablesToString(responsablesAnteriors);
+					parametreCanviTasca2 = responsablesToString(expedientTascaEntity.getResponsables());
+					break;
+				case CANCELAR_DELEGACIO_TASCA:
+					parametreCanviTasca1 = delegatAnterior!=null?delegatAnterior.getCodiAndNom():"Sense delegat anterior.";
+					parametreCanviTasca2 = expedientTascaEntity.getDelegat()!=null?expedientTascaEntity.getDelegat().getCodiAndNom():"Sense delegat actual.";
+					break;			
+				case CANVI_DATALIMIT_TASCA: 
+					parametreCanviTasca1 = new SimpleDateFormat("dd/MM/yyyy").format(dataLimitAnterior);
+					parametreCanviTasca2 = new SimpleDateFormat("dd/MM/yyyy").format(expedientTascaEntity.getDataLimit());
+					break;
+				case CREACIO:
+					parametreCanviTasca1 = expedientTascaEntity.getTitol()!=null?expedientTascaEntity.getTitol():expedientTascaEntity.getMetaTasca().getNom();
+					parametreCanviTasca2 = responsablesToString(expedientTascaEntity.getResponsables());
+					break;
+				default:
+					parametreCanviTasca1 = expedientTascaEntity.getTitol()!=null?expedientTascaEntity.getTitol():expedientTascaEntity.getMetaTasca().getNom();
+					parametreCanviTasca2 = expedientTascaEntity.getResponsableActual()!=null?expedientTascaEntity.getResponsableActual().getCodi():"Sense responsable actual.";
+					break;
+				}
+			} catch (Exception e) {}
+			
+			contingutLogHelper.logTasca(expedientTascaEntity.getId(), tipusLog, parametreCanviTasca1, parametreCanviTasca2);
+	}
+	
+	private String responsablesToString(List<UsuariEntity> responsables) {
+	    if (responsables == null || responsables.isEmpty()) {
+	        return "";
+	    }
+	    return responsables.stream()
+	            .map(u -> u.getCodi() + " - " + u.getNom())
+	            .collect(Collectors.joining(", "));
 	}
 	
 	public ExpedientTascaEntity createTasca(Long entitatId, Long expedientId, ExpedientTascaDto expedientTasca) {
@@ -357,7 +443,7 @@ public class TascaHelper {
 		
 		pluginHelper.comandaTascaSend(expedientTascaEntity);
 		
-		logAccioTasca(expedientTascaEntity, LogTipusEnumDto.CANCELAR_DELEGACIO_TASCA);
+		logAccioTasca(expedientTascaEntity, LogTipusEnumDto.CANCELAR_DELEGACIO_TASCA, null, delegat, null, null);
 		return expedientTascaEntity;
 	}
 	
@@ -389,6 +475,7 @@ public class TascaHelper {
 	
 		ExpedientTascaEntity expedientTascaEntity = expedientTascaRepository.getOne(expedientTascaId);
 		List<UsuariEntity> responsables = new ArrayList<UsuariEntity>();
+		List<UsuariEntity> responsablesAnteriors = new ArrayList<>(expedientTascaEntity.getResponsables());
 		for (String responsableCodi : responsablesCodi) {
 			UsuariEntity responsable = usuariRepository.findById(responsableCodi).orElse(null);
 			if (responsable==null) throw new NotFoundException(responsableCodi, UsuariEntity.class);
@@ -406,7 +493,8 @@ public class TascaHelper {
 		
 		pluginHelper.comandaTascaSend(expedientTascaEntity);
 		
-		logAccioTasca(expedientTascaEntity, LogTipusEnumDto.CANVI_RESPONSABLES);
+		logAccioTasca(expedientTascaEntity, LogTipusEnumDto.CANVI_RESPONSABLES, responsablesAnteriors, null, null, null);
+
 		return expedientTascaEntity;
 	}
 	
@@ -420,7 +508,8 @@ public class TascaHelper {
 			UsuariEntity responsableActual = usuariRepository.findById(auth.getName()).orElse(null);
 			if (responsableActual==null) throw new NotFoundException(auth.getName(), UsuariEntity.class);
 			ExpedientTascaEntity tascaEntity = expedientTascaRepository.getOne(tascaId);
-	
+			TascaEstatEnumDto tascaEstatAnterior = tascaEntity.getEstat();
+			
 			try {
 				tascaEntity = comprovarTasca(tascaId);
 			} catch (Exception e) {
@@ -435,8 +524,6 @@ public class TascaHelper {
 					true,
 					rolActual);
 			}
-	
-			TascaEstatEnumDto tascaEstatAnterior = tascaEntity.getEstat();
 	
 			if (tascaEstat == TascaEstatEnumDto.REBUTJADA) {
 				tascaEntity.updateRebutjar(motiu);
@@ -482,8 +569,10 @@ public class TascaHelper {
 			
 			pluginHelper.comandaTascaSend(tascaEntity);
 			
-			logAccioTasca(tascaEntity, LogTipusEnumDto.CANVI_ESTAT);
+			logAccioTasca(tascaEntity, LogTipusEnumDto.CANVI_ESTAT, tascaEstatAnterior);
+			
 			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Expedient.canviEstatTasca", "resultado", "exito");
+			
 			return tascaEntity;
 			
 		} catch (Exception e) {

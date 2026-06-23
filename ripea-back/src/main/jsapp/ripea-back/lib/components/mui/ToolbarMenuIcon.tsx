@@ -20,31 +20,36 @@ export const useToolbarMenuIcon = (): UseToolbarMenuIconReturnType => {
     const [shrink, setShrink] = React.useState<boolean>(false);
     const [iconClicked, setIconClicked] = React.useState<boolean>(false);
     const handleToolbarMenuIconClick = () => {
-        !smallScreen && setShrink(shrink => !shrink);
-        setIconClicked(c => !c);
-    }
-    const buttonComponent = <ToolbarMenuIcon
-        icon={smallScreen ? 'menu' : 'menu_open'}
-        iconFlipX={shrink}
-        handleClick={handleToolbarMenuIconClick} />;
+        !smallScreen && setShrink((shrink) => !shrink);
+        setIconClicked((c) => !c);
+    };
+    const buttonComponent = (
+        <ToolbarMenuIcon
+            icon={smallScreen ? 'menu' : 'menu_open'}
+            iconFlipX={shrink}
+            handleClick={handleToolbarMenuIconClick}
+        />
+    );
     return {
         shrink,
         iconClicked,
-        buttonComponent
-    }
-}
+        buttonComponent,
+    };
+};
 
 export const ToolbarMenuIcon: React.FC<ToolbarMenuIconProps> = (props) => {
     const { icon, iconFlipX, handleClick } = props;
-    return <IconButton
-        size="large"
-        edge="start"
-        color="inherit"
-        aria-label="menu"
-        onClick={handleClick}
-        sx={{ mr: 2 }}>
-        <Icon sx={iconFlipX ? { transform: 'scaleX(-1)' } : undefined}>{icon}</Icon>
-    </IconButton>;
-}
+    return (
+        <IconButton
+            size="large"
+            edge="start"
+            color="inherit"
+            aria-label="menu"
+            onClick={handleClick}
+            sx={{ mr: 2 }}>
+            <Icon sx={iconFlipX ? { transform: 'scaleX(-1)' } : undefined}>{icon}</Icon>
+        </IconButton>
+    );
+};
 
 export default ToolbarMenuIcon;

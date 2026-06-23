@@ -106,7 +106,12 @@ import lombok.experimental.FieldNameConstants;
                 @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = MetaExpedientResource.ACTION_IMPORT_FITXER_CODE,
-                        formClass = MetaExpedientResource.ImportarFitxerFormAction.class),                
+                        formClass = MetaExpedientResource.ImportarFitxerFormAction.class),
+                @ResourceArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = MetaExpedientResource.ACTION_CLONAR_CODE,
+                        formClass = MetaExpedientResource.ClonarFormAction.class,
+                        requiresId = true),
 				@ResourceArtifact(
 						type = ResourceArtifactType.REPORT,
 						code = MetaExpedientResource.REPORT_EXPORT_JSON,
@@ -134,6 +139,7 @@ public class MetaExpedientResource extends MetaNodeResource {
     public static final String ACTION_CANVIAR_PENDENT_CODE	= "CANVIAR_PENDENT";    
     public static final String ACTION_IMPORT_ROLSAC_CODE	= "IMPORT_ROLSAC";
     public static final String ACTION_IMPORT_FITXER_CODE	= "IMPORT_FITXER";
+    public static final String ACTION_CLONAR_CODE			= "CLONAR";
     public static final String REPORT_EXPORT_JSON 			= "REPORT_EXPORT_JSON";
 
 	@Size(max = 64)
@@ -250,6 +256,17 @@ public class MetaExpedientResource extends MetaNodeResource {
         private Long grupId;
     }
     
+    @Getter
+    @Setter
+    public static class ClonarFormAction implements Serializable {
+        private static final long serialVersionUID = 1L;
+        @NotNull
+        @Size(max = 64)
+        private String codi;
+        @NotNull
+        private String classificacio;
+    }
+
     @Getter
     @Setter
     public static class ImportarRolsacFormAction implements Serializable {

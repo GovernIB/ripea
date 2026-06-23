@@ -24,6 +24,7 @@ public class SeguimentDto implements Serializable {
 	private DocumentEnviamentEstatEnumDto portafirmesEstat;
 	private DocumentNotificacioEstatEnumDto notificacioEstat;
 	private String enviamentDatatEstat;
+	private String registreEstat;
 	private boolean error;
 	private String notificacioIdentificador;
 	private String destinataris;

@@ -81,6 +81,7 @@ import es.caib.ripea.service.helper.MetaExpedientHelper;
 import es.caib.ripea.service.helper.PaginacioHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.helper.RolHelper;
+import es.caib.ripea.service.helper.TipusDocumentalHelper;
 import es.caib.ripea.service.helper.UsuariHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.DiagnosticFiltreDto;
@@ -96,6 +97,8 @@ import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.dto.ValidacioErrorDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
+import es.caib.ripea.service.intf.exception.SistemaExternException;
+import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.permission.ExtendedPermission;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -113,13 +116,13 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Autowired private ExcepcioLogHelper excepcioLogHelper;
 	@Autowired private UsuariHelper usuariHelper;
 	@Autowired private GrupRepository grupRepository;
-	@Autowired private RolHelper rolHelper;
 	@Autowired private ConfigHelper configHelper;
 	@Autowired private PaginacioHelper paginacioHelper;
 	@Autowired private MetaExpedientRepository metaExpedientRepository;
 	@Autowired private MetaExpedientHelper metaExpedientHelper;
     @Autowired private EntitatRepository entitatRepository;
     @Autowired private OrganGestorRepository organGestorRepository;
+    @Autowired private TipusDocumentalHelper tipusDocumentalHelper;
 
     //UpdateUsuaris
     @Autowired private ExpedientRepository expedientRepository;
@@ -226,16 +229,18 @@ public class AplicacioServiceImpl implements AplicacioService {
 	public void processarAutenticacioUsuari(boolean comprovaAmbUsuariPlugin) {
 		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		logger.debug("Processant autenticació (usuariCodi=" + auth.getName() + ")");
-		UsuariEntity usuari = usuariRepository.findById(auth.getName()).orElse(null);
+		String codiUsuariLowerCase = auth.getName().toLowerCase();
+		
+		logger.debug("Processant autenticació (usuariCodi=" + codiUsuariLowerCase + ")");
+		UsuariEntity usuari = usuariRepository.findById(codiUsuariLowerCase).orElse(null);
 
-		logger.debug("Consultant plugin de dades d'usuari (usuariCodi=" + auth.getName() + ")");		
-		DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
+		logger.debug("Consultant plugin de dades d'usuari (usuariCodi=" + codiUsuariLowerCase + ")");		
+		DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(codiUsuariLowerCase);
 		
 		//Per si de cas s'ha quedat cacheat el null https://github.com/GovernIB/ripea/issues/1700
 		if (dadesUsuari==null) {
-			cacheHelper.evictUsuariAmbCodi(auth.getName());
-			dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
+			cacheHelper.evictUsuariAmbCodi(codiUsuariLowerCase);
+			dadesUsuari = cacheHelper.findUsuariAmbCodi(codiUsuariLowerCase);
 		}
 		
 		if (dadesUsuari != null) {
@@ -259,7 +264,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 				logger.debug("Dades usuari getEmail: "+dadesUsuari.getEmail());
 				usuari = usuariRepository.save(
 						UsuariEntity.getBuilder(
-								dadesUsuari.getCodi(),
+								codiUsuariLowerCase,
 								dadesUsuari.getNomSencer(),
 								dadesUsuari.getNif(),
 								dadesUsuari.getEmail(),
@@ -272,7 +277,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 					logger.debug("auth.getName(): "+auth.getName());
 					usuari = usuariRepository.save(
 							UsuariEntity.getBuilder(
-									auth.getName(),
+									codiUsuariLowerCase,
 									auth.getName(),
 									null,
 									null,
@@ -340,10 +345,11 @@ public class AplicacioServiceImpl implements AplicacioService {
 				dto.isExpedientListComentaris(),
 				dto.isExpedientListGrup(),
 				dto.getProcedimentId() != null ? metaExpedientRepository.getOne(dto.getProcedimentId()) : null,
-				dto.getVistaActual(), 
+				dto.getVistaActual(),
 				dto.isExpedientExpandit(),
 				dto.getEntitatPerDefecteId() != null ? entitatRepository.getOne(dto.getEntitatPerDefecteId()) : null,
-				dto.getVistaMoureActual());
+				dto.getVistaMoureActual(),
+				dto.getInterficieUsuari());
 		
 		return toUsuariDtoAmbRols(usuari);
 	}
@@ -415,13 +421,18 @@ public class AplicacioServiceImpl implements AplicacioService {
 
 	@Override
 	public List<IntegracioAccioDto> getLastIntegracions(IntegracioEnumDto codiIntegracio, int numElements) {
-		List<IntegracioAccioDto> listaAccions = integracioHelper.getLlistaAccions(codiIntegracio.name());
-		if (listaAccions!=null) {
-			int toIndex = Math.min(listaAccions.size(), numElements);
-			return listaAccions.subList(0, toIndex);
+		List<IntegracioAccioDto> listaAccions = integracioHelper.findAccionsByIntegracioCodi(codiIntegracio.name(), null);
+		if (listaAccions != null) {
+			return listaAccions.subList(0, Math.min(listaAccions.size(), numElements));
 		} else {
 			return new ArrayList<IntegracioAccioDto>();
 		}
+	}
+
+	@Override
+	public IntegracioAccioDto integracioFindOne(Long id) {
+		logger.debug("Consultant el detall d'una acció d'integració (id=" + id + ")");
+		return integracioHelper.findOne(id);
 	}
 	
 	@Override
@@ -445,6 +456,20 @@ public class AplicacioServiceImpl implements AplicacioService {
 	public List<ExcepcioLogDto> excepcioFindAll() {
 		logger.debug("Consulta de les excepcions disponibles");
 		return excepcioLogHelper.findAll();
+	}
+
+	@Override
+	public PaginaDto<ExcepcioLogDto> excepcioFindPage(PaginacioParamsDto params) {
+		logger.debug("Consulta paginada de les excepcions disponibles");
+		List<ExcepcioLogDto> excepcions = excepcioLogHelper.findAll();
+		if (excepcions == null || excepcions.isEmpty()) {
+			return new PaginaDto<>();
+		}
+		List<List<ExcepcioLogDto>> pagines = paginacioHelper.getPages(excepcions, params.getPaginaTamany());
+		int paginaNum = Math.min(params.getPaginaNum(), pagines.size() - 1);
+		PaginaDto<ExcepcioLogDto> pagina = paginacioHelper.toPaginaDto(pagines.get(paginaNum), null);
+		pagina.setContingut(pagines.get(paginaNum));
+		return paginacioHelper.prepararPagina(pagina, pagines, excepcions);
 	}
 
 	@Override
@@ -585,10 +610,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 	}
 	
 	@Override
-	public boolean doesCurrentUserHasRol(
-			String rolToCheck) {
-
-		return rolHelper.doesCurrentUserHasRol(rolToCheck);
+	public boolean doesCurrentUserHasRol(String rolToCheck) {
+		return RolHelper.doesCurrentUserHasRol(rolToCheck);
 	}
 
 	private String getIdiomaPerDefecte() {
@@ -774,7 +797,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 				 usuariAntic.getVistaActual(),
 				 usuariAntic.isExpedientExpandit(),
 				 usuariAntic.getEntitatPerDefecte(),
-				 usuariAntic.getVistaMoureActual());
+				 usuariAntic.getVistaMoureActual(),
+				 usuariAntic.getInterficieUsuari());
 		 
 		 usuariNou.setInicialitzat(usuariAntic.isInicialitzat());
 		 usuariNou.setRolActual(usuariAntic.getRolActual());
@@ -824,6 +848,10 @@ public class AplicacioServiceImpl implements AplicacioService {
 					dpe.getDocument(),
 					rolActual!=null?rolActual:"IPA_ADMIN");
 			resultat+="Cancelada la firma pendent del document "+dpe.getDocument().getNom()+"</br>";
+		} catch (ValidationException vEx) {
+			resultat+=vEx.getMessage()+"</br>";
+		} catch (SistemaExternException seEx) {
+			resultat+=seEx.getMessage()+"</br>";
 		} catch (Exception ex) {
 			throw new Exception("Error al cancelar la firma pendent del document esborrat="+portafirmesDocIs+": "+ex.getMessage());
 		}
@@ -836,8 +864,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	public List<Long> getTasquesComanda() {
 		return expedientTascaRepository.findTasquesPendents();
 	}
-	
-	
+
 	@Override
 	@Transactional
 	public String executeTascaComanda(Long tascaId) throws Exception {
@@ -888,5 +915,23 @@ public class AplicacioServiceImpl implements AplicacioService {
 		}
 		
 		return resultat;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<Long> getEntitatsSenseTipusDocumentals() {
+		return entitatRepository.findAllIds();
+	}
+
+	@Override
+	@Transactional
+	public String executeCrearTipusDocumentalsEntitat(Long entitatId) throws Exception {
+		try {
+			EntitatEntity entitat = entitatRepository.findById(entitatId).get();
+			tipusDocumentalHelper.crearTipusDocumentalsEntitat(entitat.getCodi());
+			return "Tipus documentals creats per a l'entitat " + entitat.getCodi();
+		} catch (Exception ex) {
+			throw new Exception("Error al crear els tipus documentals per a l'entitat amb id=" + entitatId + ": " + ex.getMessage());
+		}
 	}
 }

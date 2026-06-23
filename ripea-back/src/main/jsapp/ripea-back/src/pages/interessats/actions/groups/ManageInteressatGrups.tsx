@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import StyledMuiGrid from "../../../../components/StyledMuiGrid.tsx";
 import { Typography } from "@mui/material";
 import * as builder from '../../../../util/springFilterUtils.ts';
-import { MuiFormDialogApi, useBaseAppContext, useFormContext } from "reactlib";
+import { useMuiFormDialogApiRef, useBaseAppContext, useFormContext } from "reactlib";
 import FormActionDialog from "../../../../components/FormActionDialog.tsx";
 
 const sortModel: any = [{ field: 'nom', sort: 'asc' }];
@@ -40,6 +40,7 @@ const InteressatsManageGrupsForm = () => {
 
 	      <StyledMuiGrid
 	        resourceName="interessatGrupResource"
+			persistentStateActive={false}
 	        columns={columns}
 	        filter={filter}
 	        sortModel={sortModel}
@@ -73,7 +74,7 @@ const ManageInteressatGrups = (props:any) => {
 
 const useManageInteressatGrups = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const formApiRef = useRef<MuiFormDialogApi>();
+    const formApiRef = useMuiFormDialogApiRef();
     const { temporalMessageShow } = useBaseAppContext();
 
     const handleShow = (id:any, row:any) => {

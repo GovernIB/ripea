@@ -39,12 +39,12 @@ const RevisioMetaExpedientForm = (props:any) => {
 // Filter
 const RevisioMetaExpedientFilterForm = () => {
     return <>
-        <GridFormField xs={4} name="codi"/>
-        <GridFormField xs={4} name="classificacio"/>
-        <GridFormField xs={4} name="nom"/>
-        <GridFormField xs={3} name="revisioEstat"/>
-        <GridFormField xs={3} name="organGestor"/>
-        <GridFormField xs={3} name="tipus"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 4}} name="codi"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 4}} name="classificacio"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 4}} name="nom"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="revisioEstat"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="organGestor"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="tipus"/>
     </>
 }
 
@@ -183,18 +183,18 @@ const RevisioMetaExpedientGrid = () => {
         },
     ], [t])
 
-    return <GridPage disableMargins>
+    return <GridPage autoHeight>
         <CardPage title={t('page.user.menu.revisar')}>
             <RevisioMetaExpedientFilter onSpringFilterChange={setSpringFilter}/>
             <StyledMuiGrid
                 apiRef={apiRef}
                 resourceName={"metaExpedientResource"}
+				persistentStateKey={"metaExpedientResource_revisioConsulta"}
                 columns={columnsAddition}
                 filter={springFilter}
                 sortModel={sortModel}
                 perspectives={perspectives}
                 namedQueries={namedQueries}
-
                 toolbarHideCreate
                 rowHideUpdateButton={false}
                 popupEditCreateActive

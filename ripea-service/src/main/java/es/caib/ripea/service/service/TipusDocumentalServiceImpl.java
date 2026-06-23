@@ -48,8 +48,7 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 				tipusDocumental.getCodi(),
 				tipusDocumental.getNomEspanyol(),
 				entitat,
-				tipusDocumental.getNomCatala(), 
-				tipusDocumental.getCodiEspecific()).build();
+				tipusDocumental.getNomCatala()).build();
 		TipusDocumentalDto dto = conversioTipusHelper.convertir(
 				tipusDocumentalRepository.save(entity),
 				TipusDocumentalDto.class);
@@ -81,8 +80,7 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 		tipusDocumentalEntity.update(
 				tipusDocumental.getCodi(),
 				tipusDocumental.getNomEspanyol(), 
-				tipusDocumental.getNomCatala(), 
-				tipusDocumental.getCodiEspecific());
+				tipusDocumental.getNomCatala());
 		TipusDocumentalDto dto = conversioTipusHelper.convertir(
 				tipusDocumentalEntity,
 				TipusDocumentalDto.class);

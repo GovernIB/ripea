@@ -22,8 +22,7 @@ const AnotacionsExpedientGrid = (props:any) => {
             flex: 1,
         },
         {
-            field: 'registreInfo.origenRegistreNumero',
-            headerName: t('page.registre.grid.origenRegistreNumero'),
+            field: 'identificador',
             sortable: false,
             flex: 0.5,
         },
@@ -50,6 +49,7 @@ const AnotacionsExpedientGrid = (props:any) => {
     return <>
         <StyledMuiGrid
             resourceName="expedientPeticioResource"
+			persistentStateKey={"expedientPeticioResource_expedientTab"}
             filter={builder.eq('expedient.id', id)}
             sortModel={sortModel}
             perspectives={perspectives}

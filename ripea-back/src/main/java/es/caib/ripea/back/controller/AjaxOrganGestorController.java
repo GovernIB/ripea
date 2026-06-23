@@ -42,7 +42,6 @@ public class AjaxOrganGestorController extends BaseAdminController{
 	@RequestMapping(value = "/organgestor/{text}", method = RequestMethod.GET)
 	@ResponseBody
 	public List<OrganGestorDto> get(HttpServletRequest request, @PathVariable String text, Model model) {
-
 		return getWithParam(request, text, model, false);
 	}
 		

@@ -43,19 +43,19 @@ const useActions = (refresh?: () => void) => {
 
     return {active, desactive}
 }
-const MetaExpedientTascaValidacioForm = () => {
+export const MetaExpedientTascaValidacioForm = () => {
     const {data} = useFormContext()
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="itemValidacio" required/>
-        <GridFormField xs={12} name="metaDada" hidden={data?.itemValidacio!="DADA"} filter={builder.eq("metaNode.id", data?.metaExpedient?.id)}/>
-        <GridFormField xs={12} name="metaDocument" hidden={data?.itemValidacio!="DOCUMENT"} filter={builder.eq("metaExpedient.id", data?.metaExpedient?.id)}/>
-        <GridFormField xs={12} name="tipusValidacio" disabled={data?.itemValidacio=="DADA"} required/>
+        <GridFormField name="itemValidacio" required/>
+        <GridFormField name="metaDada" hidden={data?.itemValidacio!="DADA"} filter={builder.eq("metaNode.id", data?.metaExpedient?.id)}/>
+        <GridFormField name="metaDocument" hidden={data?.itemValidacio!="DOCUMENT"} filter={builder.eq("metaExpedient.id", data?.metaExpedient?.id)}/>
+        <GridFormField name="tipusValidacio" disabled={data?.itemValidacio=="DADA"} required/>
     </Grid>
 }
 
 const sortModel: any = [{field: 'id', sort: 'asc'}]
 const perspectives: string[] = [];
-const columns = [
+export const columns = [
     {
         field: 'itemValidacio',
         flex: 1,
@@ -152,7 +152,7 @@ const MetaExpedientTascaValidacioGrid = () => {
     if (error)
         return <ErrorPage error={error}/>
 
-    return <GridPage disableMargins>
+    return <GridPage autoHeight>
         <Load value={metaExpedientTasca}>
             <CardPage title={t('page.metaExpedientTasca.detall.validacio', {nom: metaExpedientTasca?.nom})}
                       header={<>
@@ -173,7 +173,7 @@ const MetaExpedientTascaValidacioGrid = () => {
                     popupEditFormDialogResourceTitle={t('page.metaExpedientTascaValidacio.title')}
                     popupEditFormContent={<MetaExpedientTascaValidacioForm/>}
                     columns={columns}
-                    toolbarHideQuickFilter={false}
+                    toolbarShowQuickFilter
                     filter={builder.eq("metaExpedientTasca.id", tascaId)}
                     formAdditionalData={{ metaExpedient: {id}, metaExpedientTasca: {id: tascaId} }}
                     staticSortModel={sortModel}

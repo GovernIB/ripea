@@ -5,9 +5,11 @@ package es.caib.ripea.back.helper;
 
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.OrganGestorDto;
+import es.caib.ripea.service.intf.dto.UsuariAnotacioDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.EntitatService;
+import es.caib.ripea.service.intf.service.EventService;
 import es.caib.ripea.service.intf.service.OrganGestorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,17 +49,22 @@ public class EntitatHelper {
 	}
 
 	public static void processarCanviEntitats(HttpServletRequest request, EntitatService entitatService, AplicacioService aplicacioService) {
-        processarCanviEntitats(request, request.getParameter(REQUEST_PARAMETER_CANVI_ENTITAT), entitatService, aplicacioService);
+        processarCanviEntitats(request, request.getParameter(REQUEST_PARAMETER_CANVI_ENTITAT), entitatService, aplicacioService, null, null);
     }
 	public static void processarCanviEntitats(HttpServletRequest request, String canviEntitat, EntitatService entitatService, AplicacioService aplicacioService) {
+        processarCanviEntitats(request, canviEntitat, entitatService, aplicacioService, null, null);
+    }
+	public static void processarCanviEntitats(HttpServletRequest request, String canviEntitat, EntitatService entitatService, AplicacioService aplicacioService, OrganGestorService organGestorService, EventService eventService) {
 		if (canviEntitat != null && canviEntitat.length() > 0) {
 			LOGGER.debug("Processant canvi entitat (id=" + canviEntitat + ")");
+			boolean entitatCanviada = false;
 			try {
 				Long canviEntitatId = new Long(canviEntitat);
 				List<EntitatDto> entitats = findEntitatsAccessibles(request, entitatService);
 				for (EntitatDto entitat : entitats) {
 					if (canviEntitatId.equals(entitat.getId())) {
 						canviEntitatActual(request, entitat, entitatService);
+						entitatCanviada = true;
 					}
 				}
 			} catch (NumberFormatException ignored) {
@@ -66,6 +73,30 @@ public class EntitatHelper {
 			if (usuariCodi != null) {
 				aplicacioService.evictCountAnotacionsPendents(usuariCodi);
 				AnotacionsPendentsHelper.resetCounterAnotacionsPendents(request);
+				// Igual que en el canvi d'òrgan gestor: el client React només refresca el badge via SSE (el JSP
+				// recarrega la pàgina). En canviar d'entitat cal recalcular els òrgans accessibles per resoldre
+				// l'òrgan actual de la nova entitat i notificar el nou recompte d'anotacions pendents.
+				if (eventService != null && entitatCanviada) {
+					try {
+						if (organGestorService != null) {
+							findOrganismesEntitatAmbPermisCache(request, organGestorService);
+						}
+						EntitatDto entitatActual = getEntitatActual(request);
+						Long entitatActualId = entitatActual != null ? entitatActual.getId() : null;
+						String rolActual = (String) request.getSession().getAttribute(RolHelper.SESSION_ATTRIBUTE_ROL_ACTUAL);
+						UsuariAnotacioDto uaDto = new UsuariAnotacioDto(usuariCodi, rolActual, getOrganGestorActualId(request), entitatActualId);
+						eventService.notifyAnotacionsPendents(List.of(uaDto));
+						// El comptador de tasques pendents només es mostra per al rol base (tothom). El seu valor és
+						// global per usuari (no depèn d'entitat/òrgan), però el client React no reconnecta el SSE en
+						// canviar de dimensió, així que cal reenviar-lo perquè el badge es refresqui. No cal evict de
+						// la caché: només la invalida un canvi real de tasca.
+						if (RolHelper.isRolActualUsuari(request)) {
+							eventService.notifyTasquesPendents(List.of(usuariCodi));
+						}
+					} catch (Exception ex) {
+						LOGGER.error("Error notificant el recompte d'anotacions pendents al canvi d'entitat", ex);
+					}
+				}
 			}
 		}
 	}
@@ -188,17 +219,22 @@ public class EntitatHelper {
 	}
 	
 	public static void processarCanviOrganGestor(HttpServletRequest request, AplicacioService aplicacioService) {
-        processarCanviOrganGestor(request, request.getParameter(REQUEST_PARAMETER_CANVI_GESTOR_ACTUAL), aplicacioService);
+        processarCanviOrganGestor(request, request.getParameter(REQUEST_PARAMETER_CANVI_GESTOR_ACTUAL), aplicacioService, null);
     }
 	public static void processarCanviOrganGestor(HttpServletRequest request, String canviOrganGestor, AplicacioService aplicacioService) {
+        processarCanviOrganGestor(request, canviOrganGestor, aplicacioService, null);
+    }
+	public static void processarCanviOrganGestor(HttpServletRequest request, String canviOrganGestor, AplicacioService aplicacioService, EventService eventService) {
 		if (canviOrganGestor != null && canviOrganGestor.length() > 0) {
 			LOGGER.debug("Processant canvi òrgan gestor (id=" + canviOrganGestor + ")");
+			Long organActualId = null;
 			try {
 				Long canviOrganGestorId = new Long(canviOrganGestor);
 				List<OrganGestorDto> OrgansGestors = findOrganGestorsAccessibles(request);
 				for (OrganGestorDto organGestor : OrgansGestors) {
 					if (canviOrganGestorId.equals(organGestor.getId())) {
 						setOrganGestorActual(request, organGestor);
+						organActualId = organGestor.getId();
 					}
 				}
 			} catch (NumberFormatException ignored) {
@@ -207,6 +243,27 @@ public class EntitatHelper {
 			if (usuariCodi != null) {
 				aplicacioService.evictCountAnotacionsPendents(usuariCodi);
 				AnotacionsPendentsHelper.resetCounterAnotacionsPendents(request);
+				// A diferència del JSP (que recarrega la pàgina i recalcula el comptador en servidor), el
+				// client React només actualitza el badge via SSE. Cal notificar el nou recompte per a l'òrgan
+				// seleccionat perquè el comptador d'anotacions pendents es refresqui sense recàrrega de pàgina.
+				if (eventService != null && organActualId != null) {
+					try {
+						EntitatDto entitatActual = getEntitatActual(request);
+						Long entitatActualId = entitatActual != null ? entitatActual.getId() : null;
+						String rolActual = (String) request.getSession().getAttribute(RolHelper.SESSION_ATTRIBUTE_ROL_ACTUAL);
+						UsuariAnotacioDto uaDto = new UsuariAnotacioDto(usuariCodi, rolActual, organActualId, entitatActualId);
+						eventService.notifyAnotacionsPendents(List.of(uaDto));
+						// El comptador de tasques pendents només es mostra per al rol base (tothom). El seu valor és
+						// global per usuari (no depèn d'entitat/òrgan), però el client React no reconnecta el SSE en
+						// canviar de dimensió, així que cal reenviar-lo perquè el badge es refresqui. No cal evict de
+						// la caché: només la invalida un canvi real de tasca.
+						if (RolHelper.isRolActualUsuari(request)) {
+							eventService.notifyTasquesPendents(List.of(usuariCodi));
+						}
+					} catch (Exception ex) {
+						LOGGER.error("Error notificant el recompte d'anotacions pendents al canvi d'òrgan gestor", ex);
+					}
+				}
 			}
 		}
 	}

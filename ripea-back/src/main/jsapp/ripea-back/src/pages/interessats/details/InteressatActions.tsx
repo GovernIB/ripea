@@ -1,7 +1,6 @@
 import {Divider} from "@mui/material";
 import {
     useBaseAppContext,
-    useConfirmDialogButtons,
     useResourceApiService
 } from "reactlib";
 import {useTranslation} from "react-i18next";
@@ -10,6 +9,7 @@ import useCreate, {useCreateRepresentant} from "../actions/Create.tsx";
 import {iniciaDescargaBlob, iniciaDescargaJSON} from "../../expedient/details/CommonActions.tsx";
 import useImportarSGD from "../actions/ImportarSGD.tsx";
 import useManageInteressatGrups from "../actions/groups/ManageInteressatGrups.tsx";
+import { useConfirmDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 export const useActions = (refresh?: () => void) => {
     const { t } = useTranslation();
@@ -99,7 +99,7 @@ export const useMassiveActions = (refresh?: () => void) => {
             });
     }
 
-    const guardarArxiu = (ids: any[]): void => { massiveAction(ids, 'GUARDAR_ARXIU', t('page.expedient.results.actionOk')); }
+    const guardarArxiu = (ids: any[]): void => { massiveAction(ids, 'GUARDAR_ARXIU', t('page.expedient.results.actionBackgroundOk')); }
     const exportar = (ids:any[], entity:any) => {
         return apiReport(undefined, {code :'EXPORTAR', data:{ ids: ids, massivo: true, expedient: {id: entity?.id, description: entity?.nom,} }, fileType: 'JSON'})
             .then((result) => {

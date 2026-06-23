@@ -5,13 +5,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
-import es.caib.ripea.service.helper.*;
-import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.model.InteressatResource;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 import com.turkraft.springfilter.FilterBuilder;
@@ -23,6 +20,15 @@ import es.caib.ripea.persistence.entity.resourceentity.DocumentNotificacioResour
 import es.caib.ripea.persistence.entity.resourcerepository.DocumentNotificacioResourceRepository;
 import es.caib.ripea.plugin.notificacio.RespostaJustificantEnviamentNotib;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.DocumentHelper;
+import es.caib.ripea.service.helper.DocumentNotificacioHelper;
+import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.helper.ExcepcioLogHelper;
+import es.caib.ripea.service.helper.ExecucioMassivaHelper;
+import es.caib.ripea.service.helper.MessageHelper;
+import es.caib.ripea.service.helper.MetaExpedientHelper;
+import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
@@ -30,15 +36,19 @@ import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotDeletedException;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
+import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioTipusEnumDto;
+import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.DocumentEnviamentResource;
 import es.caib.ripea.service.intf.model.DocumentNotificacioResource;
-import es.caib.ripea.service.intf.model.DocumentResource;
+import es.caib.ripea.service.intf.model.DocumentNotificacioResource.MassiveAction;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.ExpedientResource;
-import es.caib.ripea.service.intf.model.DocumentNotificacioResource.MassiveAction;
+import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.resourceservice.DocumentNotificacioResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.RequiredArgsConstructor;
@@ -60,6 +70,7 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
 	private final ExcepcioLogHelper excepcioLogHelper;
 	private final EntityComprovarHelper entityComprovarHelper;
 	private final DocumentNotificacioHelper documentNotificacioHelper;
+	private final ExecucioMassivaHelper execucioMassivaHelper;
 	private final MessageHelper messageHelper;
 	private final MetaExpedientHelper metaExpedientHelper;
 
@@ -82,8 +93,9 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
     	
         Filter filtreBase = FilterBuilder.and(
                 (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
-                FilterBuilder.equal(DocumentEnviamentResource.Fields.document + "." + ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
+                FilterBuilder.equal(DocumentEnviamentResource.Fields.document + "." + ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi,
                 		entitatActualCodi != null?entitatActualCodi:"................................................................................")
+//              ,Filter.parse("exists(documentInteressats.id is not null)")
         );
         
         Filter filtrePermisos = null;
@@ -115,7 +127,7 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
                 entity.getExpedient().getMetaExpedient().getNomClassificacio()));
         if (entity.getDocumentInteressats()!=null && !entity.getDocumentInteressats().isEmpty()) {
 	        resource.setDestinatari(
-	                objectMappingHelper.newInstanceMap(entity.getDocumentInteressats().iterator().next().getInteressat(), InteressatResource.class)
+	                objectMappingHelper.newInstanceMap(Hibernate.unproxy(entity.getDocumentInteressats().iterator().next().getInteressat()), InteressatResource.class)
 	        );
         }
     }
@@ -142,9 +154,11 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
         @Override
         public Serializable exec(String code, DocumentNotificacioResourceEntity entity, MassiveAction params) throws ActionExecutionException {
         	try {
-        		
+
         		if (params.getIds()!=null) {
         			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+
+        			//Comprovam l'accés a totes les notificacions seleccionades abans d'executar res
         			for (Long docId: params.getIds()) {
         				DocumentNotificacioResourceEntity notificacio = documentNotificacioResourceRepository.findById(docId).get();
                     	DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
@@ -152,15 +166,27 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
                     			notificacio.getDocument().getId(),
                     			false,
                     			true);
-                    	if (document!=null) {
-                    		documentNotificacioHelper.actualitzarEstat(docId);
-                    	} else {
+                    	if (document==null) {
                     		throw new ActionExecutionException(
                     				getResourceClass(),
                     				docId,
                     				code,
                     				messageHelper.getMessage("documentNotificacio.actualitzarEstat.reject.credential"));
                     	}
+        			}
+
+        			if (!params.isMassivo()) {
+        				//Acció individual: execució síncrona
+        				for (Long docId: params.getIds()) {
+        					documentNotificacioHelper.actualitzarEstat(docId);
+        				}
+        			} else {
+        				//Acció massiva: execució en segon pla
+        				ExecucioMassivaDto dto = new ExecucioMassivaDto();
+        				dto.setTipus(ExecucioMassivaTipusDto.ACTUALITZAR_ESTAT_NOTIFICACIONS);
+        				dto.setContingutIds(params.getIds());
+        				dto.setRolActual(configHelper.getRolActual());
+        				execucioMassivaHelper.crearExecucioMassiva(entitatEntity.getId(), dto, ElementTipusEnumDto.NOTIFICACIO);
         			}
         		}
 

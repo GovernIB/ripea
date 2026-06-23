@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,11 +28,46 @@ import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
 @Component
 public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> {
 
-	@Query(	"select d from DocumentEntity d where d.arxiuUuid is not null order by data desc")
-	Page<DocumentEntity> findLastByUuid(Pageable pageable);
+	@Query(	"select d from DocumentEntity d where d.arxiuUuid is not null "
+			+ "and (:arxiuEstat is null OR d.arxiuEstat=:arxiuEstat) "
+			+ "order by data desc")
+	Page<DocumentEntity> findLastByUuid(@Param("arxiuEstat") ArxiuEstatEnumDto arxiuEstat, Pageable pageable);
 	
-	@Query(	"select d from DocumentEntity d where d.arxiuUuid is not null and d.fitxerContentType in (:fitxerContentTypes) order by data desc")
-	Page<DocumentEntity> findLastByUuid(@Param("fitxerContentTypes") List<String> fitxerContentTypes, Pageable pageable);
+	@Query(	"select d from DocumentEntity d where d.arxiuUuid is not null "
+			+ "and d.arxiuEstat = es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto.DEFINITIU "
+			+ "and lower(d.fitxerNom) like '%.pdf' and d.ntiCsv is not null "
+			+ "and d.createdDate <= :creacioMaxima "
+			+ "order by d.data desc")
+	Page<DocumentEntity> findLastWithCsv(
+			@Param("creacioMaxima") LocalDateTime creacioMaxima,
+			Pageable pageable);
+
+	default DocumentEntity findLastWithCsv() {
+		Page<DocumentEntity> page = findLastWithCsv(LocalDateTime.now().minusHours(1), PageRequest.of(0, 1));
+		return page.hasContent() ? page.getContent().get(0) : null;
+	}
+	
+	@Query(	"select d from DocumentEntity d "
+			+ "where (lower(d.fitxerNom) like '%.pdf' or lower(d.fitxerNom) like '%.odt' or lower(d.fitxerNom) like '%.docx') "
+			+ "and d.createdDate <= :creacioMaxima "
+			+ "order by d.data desc")
+	Page<DocumentEntity> findLastConvertible(
+			@Param("creacioMaxima") LocalDateTime creacioMaxima,
+			Pageable pageable);
+
+	default DocumentEntity findLastConvertible() {
+		Page<DocumentEntity> page = findLastWithCsv(LocalDateTime.now().minusHours(1), PageRequest.of(0, 1));
+		return page.hasContent() ? page.getContent().get(0) : null;
+	}
+	
+	@Query(	"select d from DocumentEntity d where d.arxiuUuid is not null "
+			+ "and d.fitxerContentType in (:fitxerContentTypes) "
+			+ "and (:arxiuEstat is null OR d.arxiuEstat=:arxiuEstat) "
+			+ "order by data desc")
+	Page<DocumentEntity> findLastByUuid(
+			@Param("fitxerContentTypes") List<String> fitxerContentTypes,
+			@Param("arxiuEstat") ArxiuEstatEnumDto arxiuEstat,
+			Pageable pageable);
 	
 	List<DocumentEntity> findByExpedientAndEstatAndEsborrat(
 			ExpedientEntity expedient,

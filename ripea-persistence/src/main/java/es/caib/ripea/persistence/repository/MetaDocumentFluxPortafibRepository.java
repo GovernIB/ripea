@@ -9,10 +9,10 @@ import es.caib.ripea.persistence.entity.MetaDocumentFluxPortafibEntity;
 
 @Component
 public interface MetaDocumentFluxPortafibRepository extends JpaRepository<MetaDocumentFluxPortafibEntity, Long> {
-	
+
 	public List<MetaDocumentFluxPortafibEntity> findByMetaDocumentId(Long metaDocumentId);
 
 	public MetaDocumentFluxPortafibEntity findByMetaDocumentIdAndPortafirmesFluxId(Long metaDocumentId, String portafirmesFluxId);
-	
+
 	public MetaDocumentFluxPortafibEntity findByMetaDocumentIsNullAndPortafirmesFluxId(String portafirmesFluxId);
 }

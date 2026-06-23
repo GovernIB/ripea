@@ -25,19 +25,24 @@ export const FormFieldRange: React.FC<FormFieldCustomProps> = (props) => {
         value: 100,
         label: '100%',
     }];*/
-    return <Box sx={{ ml: 1, mr: 1 }}>
-        <Typography variant="subtitle1" gutterBottom>{label}</Typography>
-        <Slider
-            name={name}
-            defaultValue={value}
-            min={0}
-            max={100}
-            step={5}
-            marks/*={marks}*/
-            valueLabelDisplay="auto"
-            disabled={disabled}
-            onChange={(_event: Event, value: number | number[]) => onChange(value)}
-            {...componentProps} />
-    </Box>;
-}
+    return (
+        <Box sx={{ ml: 1, mr: 1 }}>
+            <Typography variant="subtitle1" gutterBottom>
+                {label}
+            </Typography>
+            <Slider
+                name={name}
+                defaultValue={value}
+                min={0}
+                max={100}
+                step={5}
+                marks /*={marks}*/
+                valueLabelDisplay="auto"
+                disabled={disabled}
+                onChange={(_event: Event, value: number | number[]) => onChange(value)}
+                {...componentProps}
+            />
+        </Box>
+    );
+};
 export default FormFieldRange;

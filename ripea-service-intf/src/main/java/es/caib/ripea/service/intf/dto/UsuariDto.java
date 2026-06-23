@@ -41,6 +41,7 @@ public class UsuariDto implements Serializable {
 	private ContingutVistaEnumDto vistaActual;
 	private boolean expedientExpandit;
 	private MoureDestiVistaEnumDto vistaMoureActual;
+	private InterficieUsuariEnumDto interficieUsuari;
 	
 	
 	public String getCodiAndNom() {

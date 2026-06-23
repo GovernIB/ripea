@@ -397,7 +397,7 @@ public class ExpedientServiceEjb extends AbstractServiceEjb<ExpedientService> im
 	}
 
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN", "IPA_DISSENY"})
+	@RolesAllowed({"IPA_ADMIN", "IPA_ADMIN_LECTURA", "IPA_ORGAN_ADMIN", "IPA_DISSENY"})
 	public PaginaDto<ExpedientDto> findExpedientMetaExpedientPaginat(Long entitatId, Long metaExpedientId,
 			PaginacioParamsDto paginacioParams) {
 		return delegateService.findExpedientMetaExpedientPaginat(entitatId, metaExpedientId, paginacioParams);

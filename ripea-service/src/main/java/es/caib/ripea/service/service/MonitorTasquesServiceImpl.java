@@ -1,19 +1,20 @@
 package es.caib.ripea.service.service;
 
+import es.caib.ripea.service.helper.MessageHelper;
 import es.caib.ripea.service.intf.dto.MonitorTascaEstatEnum;
 import es.caib.ripea.service.intf.dto.MonitorTascaInfo;
 import es.caib.ripea.service.intf.service.MonitorTasquesService;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.*;
-
-
 
 @Service
 public class MonitorTasquesServiceImpl implements MonitorTasquesService {
 	
 	private static Map<String, MonitorTascaInfo> tasques = new HashMap<>();
-
+	@Autowired private MessageHelper messageHelper;
+	
 	@Override
 	public MonitorTascaInfo addTasca(String codiTasca) {
 		
@@ -39,8 +40,10 @@ public class MonitorTasquesServiceImpl implements MonitorTasquesService {
 	public List<MonitorTascaInfo> findAll() {
 		
 		List<MonitorTascaInfo> monitorTasques = new ArrayList<>();
-		for(Map.Entry<String, MonitorTascaInfo> tasca : MonitorTasquesServiceImpl.tasques.entrySet()) {
-			monitorTasques.add(tasca.getValue());
+		for(Map.Entry<String, MonitorTascaInfo> tasques : MonitorTasquesServiceImpl.tasques.entrySet()) {
+			MonitorTascaInfo tasca = tasques.getValue();
+			tasca.setDescripcio(messageHelper.getMessage("monitor.tasques.tasca.codi."+tasques.getKey()));
+			monitorTasques.add(tasca);
 		}
 		return monitorTasques;
 	}

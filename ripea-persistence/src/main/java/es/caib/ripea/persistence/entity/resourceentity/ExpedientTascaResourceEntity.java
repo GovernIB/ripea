@@ -40,9 +40,6 @@ public class ExpedientTascaResourceEntity extends BaseAuditableEntity<ExpedientT
             name = BaseConfig.DB_PREFIX + "expedient_tasca_resp",
             joinColumns = {@JoinColumn(name = "tasca_id", referencedColumnName="id")},
             inverseJoinColumns = {@JoinColumn(name = "responsable_codi")})
-    @org.hibernate.annotations.ForeignKey(
-            name = BaseConfig.DB_PREFIX + "expedient_tasca_fk",
-            inverseName = BaseConfig.DB_PREFIX + "expedient_tascaresp_fk")
     private List<UsuariResourceEntity> responsables = new ArrayList<UsuariResourceEntity>();
 
     @OneToOne
@@ -54,9 +51,6 @@ public class ExpedientTascaResourceEntity extends BaseAuditableEntity<ExpedientT
             name = BaseConfig.DB_PREFIX + "expedient_tasca_obse",
             joinColumns = {@JoinColumn(name = "tasca_id", referencedColumnName="id")},
             inverseJoinColumns = {@JoinColumn(name = "observador_codi")})
-    @org.hibernate.annotations.ForeignKey(
-            name = BaseConfig.DB_PREFIX + "expedient_obse_tasca_fk",
-            inverseName = BaseConfig.DB_PREFIX + "expedient_tascaobse_fk")
     private List<UsuariResourceEntity> observadors = new ArrayList<UsuariResourceEntity>();
 
     @Temporal(TemporalType.TIMESTAMP)

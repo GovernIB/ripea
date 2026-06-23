@@ -136,11 +136,18 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
     @PreAuthorize("this.isPublic() or hasPermission(null, this.getResourceClass().getName(), this.getOperation('FIND'))")
     public ResponseEntity<UserPermissionInfo> postActualInfo(HttpServletRequest request, @RequestBody Map<String, Object> response) throws MethodArgumentNotValidException {
 
-        EntitatHelper.processarCanviEntitats(request, String.valueOf(response.get("canviEntitat")), entitatService, aplicacioService);
+        // Les claus absents al cos de la petició no s'han de tractar com a canvis: el front React envia
+        // només la clau modificada (canviEntitat, canviOrganGestor o canviRol). Convertim-les a null real
+        // (i no a la cadena "null") perquè cada helper processi i notifiqui únicament la dimensió canviada.
+        String canviEntitat = response.get("canviEntitat") != null ? String.valueOf(response.get("canviEntitat")) : null;
+        String canviOrganGestor = response.get("canviOrganGestor") != null ? String.valueOf(response.get("canviOrganGestor")) : null;
+        String canviRol = response.get("canviRol") != null ? String.valueOf(response.get("canviRol")) : null;
+
+        EntitatHelper.processarCanviEntitats(request, canviEntitat, entitatService, aplicacioService, organGestorService, eventService);
         EntitatHelper.findOrganismesEntitatAmbPermisCache(request, organGestorService);
-        EntitatHelper.processarCanviOrganGestor(request, String.valueOf(response.get("canviOrganGestor")), aplicacioService);
+        EntitatHelper.processarCanviOrganGestor(request, canviOrganGestor, aplicacioService, eventService);
         EntitatHelper.findEntitatsAccessibles(request, entitatService);
-        RolHelper.processarCanviRols(request, String.valueOf(response.get("canviRol")), aplicacioService, organGestorService, eventService);
+        RolHelper.processarCanviRols(request, canviRol, aplicacioService, organGestorService, eventService);
         RolHelper.setRolActualFromDb(request, aplicacioService);
 
         return getUsuariActualSecurityInfo(request);
@@ -159,7 +166,7 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         response.put("isCreacioFluxUsuariActiu", FluxFirmaHelper.isCreacioFluxUsuariActiu(request));
         response.put("teAccesEstadistiques", ExpedientHelper.teAccesEstadistiques(request));
         response.put("isMostrarSeguimentEnviamentsUsuariActiu", SeguimentEnviamentsUsuariHelper.isMostrarSeguimentEnviamentsUsuariActiu(request));
-        response.put("isConvertirDefinitiuActiu", ExpedientHelper.isConversioDefinitiuActiva(request));
+        response.put("isConvertirDefinitiuActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CONVERSIO_DEFINITIU)));
         response.put("isUrlValidacioDefinida", aplicacioService.propertyFindByNom(PropertyConfig.VALIDACIO_URL_IMPRIMIBLES)!=null);
         response.put("isDocumentsGeneralsEnabled", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.DOCUMENTS_GENERALS_ACTIUS)));
         response.put("isTipusDocumentsEnabled", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.TIPUS_DOCUMENT_ACTIUS)));       
@@ -182,6 +189,7 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         response.put("isImportacioRelacionatsActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.IMPORTACIO_RELACIONATS_ACTIVA)));
         response.put("isWsUsuariEntitatActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.PORTAFIB_PLUGIN_USUARISPF_WS)));
         response.put("ordenacioContingutPermesa", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.ORDENACIO_CONTINGUT_ACTIU)));
+        response.put("isContingutCarpetaDetallAccesActiva", aplicacioService.propertyBooleanFindByKey(PropertyConfig.CARPETA_DETALL_ACCES_ACTIVA, false));
         response.put("moureMateixExpedients", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MOURE_MATEIX_EXPEDIENTS)));
         response.put("permesEsborrarFinals", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.PERMATRE_ESBORRAR_FINAL)));
         response.put("isRevisioActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.METAEXPEDIENT_REVISIO_ACTIVA)));
@@ -189,6 +197,8 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         response.put("isPropagarMetadades", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.PROPAGAR_METADADES)));
         response.put("isCarpetesDefecte", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CARPETES_PER_DEFECTE)));
         response.put("isRestringirCarpetesActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CARPETES_RESTRINGIR_ACTIU)));
+        String maxResultsSelects = aplicacioService.propertyFindByNom(PropertyConfig.MAX_RESULTS_SELECT);
+        response.put("maxResultSelects", maxResultsSelects!=null?Integer.parseInt(maxResultsSelects):30);
 
         if ("IPA_ADMIN".equals(userPermissionInfo.getRolActual()) && userPermissionInfo.getEntitatActualId()!=null) {
         	try {

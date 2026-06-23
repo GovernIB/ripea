@@ -22,7 +22,6 @@ import org.springframework.util.ReflectionUtils;
 import es.caib.ripea.persistence.base.entity.ReorderableEntity;
 import es.caib.ripea.persistence.base.entity.ResourceEntity;
 import es.caib.ripea.service.base.helper.ResourceReferenceToEntityHelper;
-import es.caib.ripea.service.base.service.BaseMutableResourceService.FieldFileManager;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
@@ -42,8 +41,6 @@ import es.caib.ripea.service.intf.base.model.ResourceArtifact;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
 import es.caib.ripea.service.intf.base.service.MutableResourceService;
 import es.caib.ripea.service.intf.base.util.TypeUtil;
-import liquibase.pro.packaged.E;
-import liquibase.pro.packaged.R;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -70,7 +67,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 
 	@Override
 	public R newResourceInstance() {
-		log.debug("Creating new resource instance");
+		//log.debug("Creating new resource instance");
 		return newClassInstance(getResourceClass());
 	}
 
@@ -93,7 +90,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 				entity,
 				null,
 				null,
-				true,
+				null,
 				false);
 		E saved = entitySaveFlushAndRefresh(entity);
 		fieldFilesSave(resource, saved);
@@ -110,8 +107,9 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		log.debug("Updating resource (id={}, resource={})", id, resource);
 		completeResource(resource);
 		E entity = getEntity(id);
+		Long reorderPreviousSequence = reorderGetPreviousSequence(entity);
+		Long reorderNewSequence = reorderGetNewSequence(resource);
 		ID reorderPreviousParentId = reorderGetParentId(entity);
-		Long reorderResourceSequence = reorderGetSequenceFromResourceOrEntity(resource, entity);
 		beforeUpdateEntity(entity, resource, answers);
 		Map<String, Persistable<?>> referencedEntities = resourceReferenceToEntityHelper.getReferencedEntitiesForResource(
 				resource,
@@ -121,9 +119,9 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		E saved = entitySaveFlushAndRefresh(entity);
 		boolean anyOrderChanged = reorderIfReorderable(
 				saved,
-				reorderResourceSequence,
+				reorderPreviousSequence,
+				reorderNewSequence,
 				reorderPreviousParentId,
-				true,
 				false);
 		fieldFilesSave(resource, saved);
 		afterUpdateSave(saved, resource, answers, anyOrderChanged);
@@ -143,7 +141,7 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 				entity,
 				null,
 				null,
-				true,
+				null,
 				true);
 		fieldFilesDelete(entity);
 		entityRepositoryFlush();
@@ -430,21 +428,25 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 		resourceEntityMappingHelper.updateEntityWithResource(entity, resource, referencedEntities);
 	}
 
-	protected List<E> reorderFindLinesWithParent(Serializable parentId) {
+	protected List<E> reorderFindLinesWithParentAndSorted(Serializable parentId) {
 		return Collections.emptyList();
 	}
 	protected Integer reorderGetIncrement() {
 		return null;
 	}
-	protected Long reorderGetSequenceFromResourceOrEntity(R resource, E entity) {
+	protected Long reorderGetPreviousSequence(E entity) {
+		if (entity instanceof ReorderableEntity<?>) {
+			ReorderableEntity<ID> reorderableEntity = (ReorderableEntity<ID>)entity;
+			return reorderableEntity.getOrder();
+		} else {
+			return null;
+		}
+	}
+	protected Long reorderGetNewSequence(R resource) {
 		Long sequence = null;
 		ResourceConfig resourceConfig = resource.getClass().getAnnotation(ResourceConfig.class);
 		if (resourceConfig != null && !resourceConfig.orderField().isEmpty()) {
 			sequence = TypeUtil.getFieldOrGetterValue(resourceConfig.orderField(), resource, Long.class);
-		}
-		if (sequence == null && entity instanceof ReorderableEntity<?>) {
-			ReorderableEntity<ID> reorderableEntity = (ReorderableEntity<ID>)entity;
-			sequence = reorderableEntity.getOrder();
 		}
 		return sequence;
 	}
@@ -464,24 +466,33 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 	}
 	protected boolean reorderIfReorderable(
 			E entity,
-			Long sequenceForEntity,
+			Long previousSequence,
+			Long newSequence,
 			ID previousParentId,
-			boolean sameSequenceInsertBefore,
 			boolean isDelete) {
 		boolean anyOrderChanged = false;
 		if (entity instanceof ReorderableEntity<?>) {
 			ReorderableEntity<ID> reorderableEntity = (ReorderableEntity<ID>)entity;
 			boolean parentIdChanged = !Objects.equals(reorderableEntity.getOrderParentId(), previousParentId);
-			log.debug("\tReordenant entitat {} amb la seqüència {} (previousParentId={})",
-					entity,
-					sequenceForEntity,
-					previousParentId);
+			if (!isDelete) {
+				log.debug("\tReordenant entitat {} {} cap a la seqüència {} (previousParentId={})",
+						entity,
+						previousSequence != null ? "amb seqüència actual " + previousSequence : "<new>",
+						newSequence,
+						previousParentId);
+			} else {
+				log.debug("\tReordenant entitat {} eliminada", entity);
+			}
+			boolean goingUp = (previousSequence != null ? previousSequence : 0) > (newSequence != null ? newSequence : 0);
+			if (parentIdChanged) {
+				goingUp = true;
+			}
+			Long reorderSequence = (newSequence == null && !parentIdChanged) ? previousSequence : newSequence;
 			boolean anyOrderChanged1 = reorderWithParentId(
 					reorderableEntity,
-					sequenceForEntity,
+					reorderSequence,
 					reorderableEntity.getOrderParentId(),
-					parentIdChanged,
-					sameSequenceInsertBefore,
+					goingUp,
 					isDelete);
 			if (anyOrderChanged1) anyOrderChanged = true;
 			if (parentIdChanged) {
@@ -489,7 +500,6 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 						null,
 						null,
 						previousParentId,
-						false,
 						false,
 						false);
 				if (anyOrderChanged2) anyOrderChanged = true;
@@ -499,13 +509,12 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 	}
 	protected boolean reorderWithParentId(
 			@Nullable ReorderableEntity<ID> reorderableEntity,
-			@Nullable Long sequenceForEntity,
+			@Nullable Long newSequence,
 			@Nullable ID parentId,
-			boolean parentIdChanged,
 			boolean sameSequenceInsertBefore,
 			boolean isDelete) {
 		boolean anyOrderChanged = false;
-		List<E> linesToReorder = reorderFindLinesWithParent(parentId);
+		List<E> linesToReorder = reorderFindLinesWithParentAndSorted(parentId);
 		log.debug("\tConsulta d'entitats a reordenar (pareId={}): {} entitats trobades",
 				parentId,
 				linesToReorder.size());
@@ -515,9 +524,9 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 			ReorderableEntity<ID> line = (ReorderableEntity<ID>)value;
 			if (!line.equals(reorderableEntity)) {
 				Long currentSequence = line.getOrder();
-				boolean insertHere = !parentIdChanged && sequenceForEntity != null && (sameSequenceInsertBefore ?
-						currentSequence != null && currentSequence.compareTo(sequenceForEntity) >= 0 :
-						currentSequence != null && currentSequence.compareTo(sequenceForEntity) > 0);
+				boolean insertHere = newSequence != null && (sameSequenceInsertBefore ?
+						currentSequence != null && currentSequence.compareTo(newSequence) >= 0 :
+						currentSequence != null && currentSequence.compareTo(newSequence) > 0);
 				if (!inserted && insertHere) {
 					long sequence = reorderSetNextSequence(reorderableEntity, index++);
 					log.debug("\tInsertant entitat {} amb ordre {}", reorderableEntity, sequence);

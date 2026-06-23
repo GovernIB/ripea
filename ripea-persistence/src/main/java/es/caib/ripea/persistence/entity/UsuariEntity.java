@@ -5,6 +5,7 @@ package es.caib.ripea.persistence.entity;
 
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.ContingutVistaEnumDto;
+import es.caib.ripea.service.intf.dto.InterficieUsuariEnumDto;
 import es.caib.ripea.service.intf.dto.MoureDestiVistaEnumDto;
 import lombok.Getter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -101,6 +102,10 @@ public class UsuariEntity implements Serializable {
 	@Column(name="vista_moure_actual", length = 16)
 	@Enumerated(EnumType.STRING)
 	private MoureDestiVistaEnumDto vistaMoureActual = MoureDestiVistaEnumDto.LLISTA;
+
+	@Column(name="interficie_usuari", length = 5)
+	@Enumerated(EnumType.STRING)
+	private InterficieUsuariEnumDto interficieUsuari;
 	
 	public ContingutVistaEnumDto getVistaActual() {
 		return vistaActual;
@@ -119,7 +124,7 @@ public class UsuariEntity implements Serializable {
 			String emailAlternatiu,
 			String idioma,
 			boolean rebreEmailsAgrupats,
-			boolean rebreAvisosNovesAnotacions, 
+			boolean rebreAvisosNovesAnotacions,
 			boolean rebreEmailsCanviEstatRevisio,
 			Long numElementsPagina,
 			boolean expedientListDataDarrerEnviament,
@@ -128,10 +133,11 @@ public class UsuariEntity implements Serializable {
 			boolean expedientListComentaris,
 			boolean expedientListGrup,
 			MetaExpedientEntity procediment,
-			ContingutVistaEnumDto vistaActual, 
+			ContingutVistaEnumDto vistaActual,
 			boolean expedientExpandit,
 			EntitatEntity entitatPerDefecte,
-			MoureDestiVistaEnumDto vistaMoureActual) {
+			MoureDestiVistaEnumDto vistaMoureActual,
+			InterficieUsuariEnumDto interficieUsuari) {
 		this.emailAlternatiu = emailAlternatiu;
 		this.idioma = idioma;
 		this.rebreEmailsAgrupats = rebreEmailsAgrupats;
@@ -147,6 +153,7 @@ public class UsuariEntity implements Serializable {
 		this.expedientExpandit = expedientExpandit;
 		this.entitatPerDefecte = entitatPerDefecte;
 		this.vistaMoureActual = vistaMoureActual;
+		this.interficieUsuari = interficieUsuari != null ? interficieUsuari : InterficieUsuariEnumDto.REACT;
 	}
 
 	public void update(

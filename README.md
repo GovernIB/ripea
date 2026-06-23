@@ -30,3 +30,38 @@ Aquest lloc web és parcialment conforme amb el RD 1112/2018:
 ### [ripea-1.0](https://github.com/GovernIB/ripea/tree/ripea-1.0]) Versió estable
 ### [ripea-1.0-dev](https://github.com/GovernIB/ripea/tree/ripea-1.0-dev) Seguent versió candidata
 ### [ripea-1.0-wip](https://github.com/GovernIB/ripea/tree/ripea-1.0-wip) Branca de treball
+
+## <a name="configuracio"></a> Configuració del Build
+
+Aquest projecte utilitza Docker per construir la imatge de l'aplicació. Si s'utilitzen imatges base privades, cal configurar les següents variables d'entorn per a l'autenticació:
+
+*   `DOCKER_USER`: El teu nom d'usuari (per a GitHub, utilitza `git`).
+*   `DOCKER_TOKEN`: El teu Personal Access Token (PAT).
+
+### Com configurar les variables d'entorn
+
+#### A la terminal (Linux / macOS)
+Pots exportar-les directament abans d'executar el build de Maven:
+```bash
+export DOCKER_USER="el_teu_usuari"
+export DOCKER_TOKEN="el_teu_token"
+./mvnw clean install
+```
+Per fer-ho permanent, afegeix aquestes línies al teu fitxer `~/.bashrc` o `~/.zshrc`.
+
+#### A la terminal (Windows - PowerShell)
+```powershell
+$env:DOCKER_USER="el_teu_usuari"
+$env:DOCKER_TOKEN="el_teu_token"
+.\mvnw.cmd clean install
+```
+
+#### A GitHub Actions
+Si utilitzes GitHub Actions, afegeix-les com a `secrets` del repositori i configura-les en el teu fitxer de workflow:
+```yaml
+- name: Build with Maven
+  run: ./mvnw clean install
+  env:
+    DOCKER_USER: ${{ secrets.DOCKER_USER }}
+    DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+```

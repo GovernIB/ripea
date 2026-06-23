@@ -26,23 +26,23 @@ export const ExpedientGridForm = () => {
         builder.eq('actiu', true),
     );
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField  xs={12} name="metaExpedient"
-                        hidden={!!data?.id}
-                        filter={filterMetaExpedientCrear}
-                        namedQueries={[ data?.id ? 'EXPEDIENT_UPDATE' : 'EXPEDIENT_CREATE' ]}/>
-        <GridFormField xs={12} name="nom"/>
-        <GridFormField xs={12} name="organGestor"
+        <GridFormField name="metaExpedient"
+                       hidden={!!data?.id}
+                       filter={filterMetaExpedientCrear}
+                       namedQueries={[ data?.id ? 'EXPEDIENT_UPDATE' : 'EXPEDIENT_CREATE' ]}/>
+        <GridFormField name="nom"/>
+        <GridFormField name="organGestor"
                        namedQueries={[`EXPEDIENT_FORM#${data?.metaExpedient?.id || 0}`]}
                        disabled={!data?.metaExpedient || data?.disableOrganGestor}
                        readOnly={!data?.metaExpedient || data?.disableOrganGestor}/>
-        <GridFormField xs={6} name="sequencia" disabled/>
-        <GridFormField xs={6} name="any" thousandSeparator={false}/>
-        <GridFormField xs={12} name="grup"
+        <GridFormField size={6} name="sequencia" disabled/>
+        <GridFormField size={6} name="any" thousandSeparator={false}/>
+        <GridFormField name="grup"
                        namedQueries={[`BY_PROCEDIMENT#${data?.metaExpedient?.id ?? 0}`]}
                        hidden={!data?.grup && !data?.gestioAmbGrupsActiva} required/>
-        <GridFormField xs={12} name="prioritat" required/>
-        <GridFormField xs={12} name="prioritatMotiu" type={"textarea"} hidden={data?.prioritat == 'B_NORMAL'} required/>
-        <GridFormField xs={12} name="asignarSeguidor" type={"checkbox"} hidden={!!data?.id}/>
+        <GridFormField name="prioritat" required/>
+        <GridFormField name="prioritatMotiu" type={"textarea"} hidden={data?.prioritat == 'B_NORMAL'} required/>
+        <GridFormField name="asignarSeguidor" type={"checkbox"} hidden={!!data?.id}/>
     </Grid>
 }
 
@@ -110,12 +110,11 @@ export const Avisos = (props: any) => {
 const beforeAvis = [
     {
         field: 'numero',
-        flex: 0.70,
+        flex: 0.85,
     },
     {
         field: 'metaExpedient',
         flex: 1.15,
-        sortable: false,
     },
     {
         field: 'nom',
@@ -125,7 +124,7 @@ const beforeAvis = [
 const afterAvis = [
     {
         field: 'createdDate',
-        flex: 0.8,
+        flex: 0.75,
         valueFormatter: (value: any) => formatDate(value)
     },
     {
@@ -147,9 +146,8 @@ const afterAvis = [
     },
 ];
 
-// sortModel i perspectives per prevenir re-renders
+// sortModel memoitzat per prevenir re-renders
 const sortModel: any = [{field: 'createdDate', sort: 'desc'}];
-const perspectives = ["INTERESSATS_RESUM", "ESTAT", 'RELACIONAT', "COUNT", "AUDITORIA"];
 
 const ExpedientGrid = () => {
     const {t} = useTranslation();
@@ -159,6 +157,16 @@ const ExpedientGrid = () => {
     const apiRef = useMuiDataGridApiRef();
 
     const {value: user, rol} = useUserSession();
+
+    // Perspectives memoitzades. Es demana el mínim necessari per pintar el llistat:
+    //  - COUNT_RESUM (en lloc de COUNT) només calcula numComentaris i numSeguidors (badges)
+    //  - INTERESSATS_RESUM només si la columna d'interessats és visible per l'usuari
+    //  - AUDITORIA s'ha eliminat: el llistat no mostra createdByFullName/lastModifiedByFullName
+    const perspectives = useMemo(() => {
+        const p = ["BASIC", "AVISOS", "ESTAT", "RELACIONAT", "COUNT_RESUM"];
+        if (user?.conf?.expedientListInteressats) p.push("INTERESSATS_RESUM");
+        return p;
+    }, [user]);
 
     const refresh = () => {
         apiRef?.current?.refresh?.();
@@ -252,54 +260,58 @@ const ExpedientGrid = () => {
     ]
         .filter((col:any)=>!col?.hidden), [user]);
 
-    return <GridPage disableMargins>
-        <CardPage title={t('page.expedient.filter.title')}>
-            <ExpedientFilter onSpringFilterChange={(value:any)=>{
-                setSpringFilter(value)
-                setLoad(true)
-            }}/>
+    return (
+        <GridPage autoHeight>
+            <CardPage title={t('page.expedient.filter.title')}>
+                <ExpedientFilter
+                    onSpringFilterChange={(value: any) => {
+                        setSpringFilter(value);
+                        setLoad(true);
+                    }}
+                />
 
-            <Load value={load} noEffect>
-            <StyledMuiGrid
-                resourceName={"expedientResource"}
-                popupEditFormDialogResourceTitle={t('page.expedient.title')}
-                columns={columnsAddition}
-                filter={springFilter}
-                sortModel={sortModel}
-                perspectives={perspectives}
-                apiRef={apiRef}
-                popupEditCreateActive
-                popupEditFormContent={<ExpedientGridForm/>}
-                popupEditFormDialogTitle={t('page.expedient.action.new.title')}
-                readOnly={rol?.isAdminLectura}
-                onRowClick={(params: any) => navigate(`/contingut/${params?.id}`)}
-                rowAdditionalActions={actions}
-                toolbarCreateTitle={t('page.expedient.action.new.label')}
-                toolbarMassiveActions={massiveActions}
-                rowProps={(row: any) => {
-                    const color = row?.estatAdditionalInfo?.color;
-                    return color
-                        ? {
-                            'box-shadow': `${color} -6px 0px 0px`,
-                            'border-left': `6px solid ${color}`,
-                        }
-                        : {
-                            'padding-left': '6px'
-                        }
-                }}
-                popupEditFormI18nKeys={{
-                    createSuccess: 'page.expedient.action.new.ok',
-                    updateSuccess: 'page.expedient.action.update.ok',
-                }}
-            />
-            </Load>
-
-            {components}
-            {massiveComponents}
-            {dialogAlert}
-            {dialogErrorValidacio}
-        </CardPage>
-    </GridPage>
+                <Load value={load} noEffect>
+                    <StyledMuiGrid
+                        resourceName={'expedientResource'}
+                        popupEditFormDialogResourceTitle={t('page.expedient.title')}
+                        columns={columnsAddition}
+                        rowActionsColumnProps={{ width: 55, minWidth: 55 }}
+                        filter={springFilter}
+                        sortModel={sortModel}
+                        perspectives={perspectives}
+                        apiRef={apiRef}
+                        popupEditCreateActive
+                        popupEditFormContent={<ExpedientGridForm />}
+                        popupEditFormDialogTitle={t('page.expedient.action.new.title')}
+                        readOnly={rol?.isAdminLectura}
+                        onRowClick={(params: any) => navigate(`/contingut/${params?.id}`)}
+                        rowAdditionalActions={actions}
+                        toolbarCreateTitle={t('page.expedient.action.new.label')}
+                        toolbarMassiveActions={massiveActions}
+                        rowProps={(row: any) => {
+                            const color = row?.estatAdditionalInfo?.color;
+                            return color
+                                ? {
+                                      'box-shadow': `${color} -6px 0px 0px`,
+                                      'border-left': `6px solid ${color}`,
+                                  }
+                                : {
+                                      'padding-left': '6px',
+                                  };
+                        }}
+                        popupEditFormI18nKeys={{
+                            createSuccess: 'page.expedient.action.new.ok',
+                            updateSuccess: 'page.expedient.action.update.ok',
+                        }}
+                    />
+                </Load>
+                {components}
+                {massiveComponents}
+                {dialogAlert}
+                {dialogErrorValidacio}
+            </CardPage>
+        </GridPage>
+    );
 }
 
 export default ExpedientGrid;

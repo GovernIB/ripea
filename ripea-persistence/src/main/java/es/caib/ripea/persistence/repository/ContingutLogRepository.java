@@ -13,11 +13,12 @@ import es.caib.ripea.persistence.aggregation.ContingutLogCountAggregation;
 import es.caib.ripea.persistence.entity.ContingutLogEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.UsuariEntity;
+import es.caib.ripea.service.intf.dto.LogContingutTipusEnumDto;
 
 @Component
 public interface ContingutLogRepository extends JpaRepository<ContingutLogEntity, Long> {
 
-	List<ContingutLogEntity> findByContingutIdOrderByCreatedDateAsc(Long contingutId);
+	List<ContingutLogEntity> findByContingutTipusAndContingutIdOrderByCreatedDateAsc(LogContingutTipusEnumDto contingutTipus, Long contingutId);
 
 	@Query( "select   " +
 			"    new es.caib.ripea.persistence.aggregation.ContingutLogCountAggregation( " +

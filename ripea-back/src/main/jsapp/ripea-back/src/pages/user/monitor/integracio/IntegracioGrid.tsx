@@ -71,7 +71,7 @@ export const IntegracioGrid = () => {
         }
     ], [apiIsReady, value]);
 
-    return <GridPage disableMargins>
+    return <GridPage autoHeight>
         <CardPage title={t('navigate.integracio')}>
             <IntegracioFilter integracions={integracions} onSpringFilterChange={setSpringFilter}/>
 
@@ -84,7 +84,7 @@ export const IntegracioGrid = () => {
                 perspectives={perspectives}
                 namedQueries={useMemo(() => [value], [value])}
                 // onRefresh={refresh}
-                onRowClick={(params: any) => handleOpen(params?.row?.id, params?.row)}
+                onRowClick={(params: any) => handleOpen(params?.row?.id)}
                 rowAdditionalActions={actions}
                 toolbarElementsWithPositions={[
                      {
@@ -93,7 +93,6 @@ export const IntegracioGrid = () => {
                      }
                 ]}
                 readOnly
-                paginationActive={false}
             />
             </Load>
             {dialog}

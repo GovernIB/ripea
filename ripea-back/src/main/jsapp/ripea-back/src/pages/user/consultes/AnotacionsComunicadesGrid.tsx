@@ -12,11 +12,11 @@ import {useActions, useMassiveActions} from "../../anotacions/details/AnotacioAc
 
 const AnotacionsComunicadesFilterForm = () => {
     return <>
-        <GridFormField xs={3} name="numRegistre"/>
-        <GridFormField xs={3} name="estat"/>
-        <GridFormField xs={3} name="dataAltaInici" type={"date"}/>
-        <GridFormField xs={3} name="dataAltaFi" type={"date"}/>
-        <GridButtonField xs={0.6} name={"nomesAmbErrors"} icon={"warning"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 2.15}} name="numRegistre"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 2.15}} name="estat"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 2.15}} name="dataAltaInici" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 2.15}} name="dataAltaFi" type={"date"}/>
+        <GridButtonField size={{xs: 12, sm: 2, md: 1}} name={"nomesAmbErrors"} icon={"warning"}/>
     </>
 }
 
@@ -112,13 +112,14 @@ const AnotacionsComunicadesGrid = () => {
         },
     ]
 
-    return <GridPage disableMargins>
+    return <GridPage autoHeight>
         <CardPage title={t('page.user.menu.comunicades')}>
             <AnotacionsComunicadesFilter onSpringFilterChange={setSpringFilter}/>
 
             <StyledMuiGrid
                 apiRef={apiRef}
                 resourceName={"expedientPeticioResource"}
+				persistentStateKey={"expedientPeticioResource_anotacionsComunicades"}
                 columns={columns}
                 filter={springFilter}
                 sortModel={sortModel}

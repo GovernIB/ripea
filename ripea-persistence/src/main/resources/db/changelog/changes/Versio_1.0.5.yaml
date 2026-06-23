@@ -1,0 +1,225 @@
+databaseChangeLog:
+- changeSet:
+    id: Versio_1.0.5
+    author: limit
+    changes:
+      - sqlFile:
+          dbms: oracle
+          path: ../scripts/oracle/1.0.5/Versio_1.0.5_DDL_1.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+      - sqlFile:
+          dbms: postgresql
+          path: ../scripts/postgres/1.0.5/Versio_1.0.5_DDL_1.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+- changeSet:
+    id: Versio_1.0.5_2
+    author: limit
+    changes:
+      - sqlFile:
+          dbms: oracle
+          path: ../scripts/oracle/1.0.5/Versio_1.0.5_DDL_2.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+      - sqlFile:
+          dbms: postgresql
+          path: ../scripts/postgres/1.0.5/Versio_1.0.5_DDL_2.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+- changeSet:
+    id: Versio_1.0.5_3
+    author: limit
+    changes:
+      - sqlFile:
+          dbms: oracle
+          path: ../scripts/oracle/1.0.5/Versio_1.0.5_DML_1.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+      - sqlFile:
+          dbms: postgresql
+          path: ../scripts/postgres/1.0.5/Versio_1.0.5_DML_1.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+- changeSet:
+    id: Versio_1.0.5_4
+    author: limit
+    changes:
+      - sqlFile:
+          dbms: oracle
+          path: ../scripts/oracle/1.0.5/Versio_1.0.5_DDL_3.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+      - sqlFile:
+          dbms: postgresql
+          path: ../scripts/postgres/1.0.5/Versio_1.0.5_DDL_3.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+- changeSet:
+    id: Versio_1.0.5_5
+    author: limit
+    changes:
+      - sqlFile:
+          dbms: oracle
+          path: ../scripts/oracle/1.0.5/Versio_1.0.5_DML_2.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+      - sqlFile:
+          dbms: postgresql
+          path: ../scripts/postgres/1.0.5/Versio_1.0.5_DML_2.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+- changeSet:
+    id: Versio_1.0.5_6
+    author: limit
+    changes:
+      - sqlFile:
+          dbms: oracle
+          path: ../scripts/oracle/1.0.5/Versio_1.0.5_DDL_4.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+      - sqlFile:
+          dbms: postgresql
+          path: ../scripts/postgres/1.0.5/Versio_1.0.5_DDL_4.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+- changeSet:
+    id: Versio_1.0.5_7
+    author: limit
+    changes:
+      - sqlFile:
+          dbms: oracle
+          path: ../scripts/oracle/1.0.5/Versio_1.0.5_DDL_6.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+      - sqlFile:
+          dbms: postgresql
+          path: ../scripts/postgres/1.0.5/Versio_1.0.5_DDL_6.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+- changeSet:
+    id: Versio_1.0.5_8
+    author: limit
+    changes:
+      - sqlFile:
+          dbms: oracle
+          path: ../scripts/oracle/1.0.5/Versio_1.0.5_DML_3.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+      - sqlFile:
+          dbms: postgresql
+          path: ../scripts/postgres/1.0.5/Versio_1.0.5_DML_3.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+- changeSet:
+    id: Versio_1.0.5_9
+    author: limit
+    changes:
+      - sqlFile:
+          dbms: oracle
+          path: ../scripts/oracle/1.0.5/Versio_1.0.5_DML_4.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+      - sqlFile:
+          dbms: postgresql
+          path: ../scripts/postgres/1.0.5/Versio_1.0.5_DML_4.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+- changeSet:
+    id: Versio_1.0.5_10
+    author: limit
+    changes:
+      - sqlFile:
+          dbms: oracle
+          path: ../scripts/oracle/1.0.5/Versio_1.0.5_DML_5.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+      - sqlFile:
+          dbms: postgresql
+          path: ../scripts/postgres/1.0.5/Versio_1.0.5_DML_5.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+- changeSet:
+    id: Versio_1.0.5_11
+    author: limit
+    changes:
+      - sqlFile:
+          dbms: oracle
+          path: ../scripts/oracle/1.0.5/Versio_1.0.5_DML_6.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+      - sqlFile:
+          dbms: postgresql
+          path: ../scripts/postgres/1.0.5/Versio_1.0.5_DML_6.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+- changeSet:
+    id: Versio_1.0.5_12
+    author: limit
+    changes:
+      - sqlFile:
+          dbms: oracle
+          path: ../scripts/oracle/1.0.5/Versio_1.0.5_DML_7.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+      - sqlFile:
+          dbms: postgresql
+          path: ../scripts/postgres/1.0.5/Versio_1.0.5_DML_7.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+- changeSet:
+    id: Versio_1.0.5_13
+    author: limit
+    changes:
+      - sqlFile:
+          dbms: oracle
+          path: ../scripts/oracle/1.0.5/Versio_1.0.5_DML_8.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+      - sqlFile:
+          dbms: postgresql
+          path: ../scripts/postgres/1.0.5/Versio_1.0.5_DML_8.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+- changeSet:
+    id: Versio_1.0.5_14
+    author: limit
+    changes:
+      - sqlFile:
+          dbms: oracle
+          path: ../scripts/oracle/1.0.5/Versio_1.0.5_DML_9.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true
+      - sqlFile:
+          dbms: postgresql
+          path: ../scripts/postgres/1.0.5/Versio_1.0.5_DML_9.sql
+          splitStatements: true
+          stripComments: true
+          relativeToChangelogFile: true

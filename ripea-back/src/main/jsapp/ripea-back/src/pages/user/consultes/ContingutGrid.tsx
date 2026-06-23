@@ -6,7 +6,7 @@ import {
     useMuiDataGridApiRef,
     useFormContext,
     useResourceApiService,
-    useBaseAppContext, useConfirmDialogButtons
+    useBaseAppContext
 } from "reactlib";
 import {CardPage, DetailCard} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
@@ -22,6 +22,7 @@ import useAssignar from "../../expedient/actions/Assignar.tsx";
 import {useSession} from "../../../components/SessionStorageContext.tsx";
 import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
 import Box from "@mui/material/Box";
+import { useConfirmDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const useActions = (refresh?: () => void) => {
     const {t} = useTranslation();
@@ -182,17 +183,17 @@ const ContingutFilterForm = () => {
     const isOther = !isExpedient && !isDocument;
 
     return <>
-        <GridFormField xs={3} name="nom"/>
-        <GridFormField xs={3} name="createdBy"/>
-        <GridFormField xs={3} name="tipus"/>
-        <GridFormField xs={3} name="expedient" disabled={isOther}/>
-        {/*<GridFormField xs={3} name="metaExpedient" hidden={!isExpedient}/>*/}
-        {/*<GridFormField xs={3} name="metaDocument" hidden={!isDocument}/>*/}
-        <GridFormField xs={1.9} name="dataEsborratInici" type={"date"}/>
-        <GridFormField xs={1.9} name="dataEsborratFi" type={"date"}/>
-        <GridFormField xs={2} name="esborrat" required/>
-        <GridFormField xs={1.9} name="dataInici" type={"date"}/>
-        <GridFormField xs={1.9} name="dataFi" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="nom"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="createdBy"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="tipus"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="expedient" disabled={isOther}/>
+        {/*<GridFormField size={3} name="metaExpedient" hidden={!isExpedient}/>*/}
+        {/*<GridFormField size={3} name="metaDocument" hidden={!isDocument}/>*/}
+        <GridFormField size={{xs: 12, sm: 6, md: 1.9}} name="dataEsborratInici" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 1.9}} name="dataEsborratFi" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 1.9}} name="dataInici" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 1.9}} name="dataFi" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 2}} name="esborrat" required/>
     </>
 }
 
@@ -285,9 +286,7 @@ const ContingutGrid = () => {
 
     const sessionKey = "MASSIVE_CONTINGUT_FILTER";
     const { value: filterData } = useSession(sessionKey);
-    const haveRequirements = useMemo(() =>
-        filterData?.esborrat === "NOMES_ESBORRATS",
-        [filterData?.esborrat])
+    const [esborratFilter, setEsborratFilter] = useState<string | undefined>(() => filterData?.esborrat);
 
     const refresh = () => {
         apiRef?.current?.refresh?.();
@@ -316,14 +315,14 @@ const ContingutGrid = () => {
             icon: "replay",
             showInMenu: true,
             onClick: recuperar,
-            hidden: (row:any) => row?.esborrat != 1,
+            hidden: (row:any) => row?.esborrat == 0,
         },
         {
             label: t('common.delete'),
             icon: "delete",
             showInMenu: true,
             onClick: esborrar,
-            hidden: (row:any) => row?.esborrat != 1,
+            hidden: (row:any) => row?.esborrat == 1,
         },
         {
             label: t('page.expedient.action.assignar.label'),
@@ -334,30 +333,34 @@ const ContingutGrid = () => {
             hidden: (row:any) => row?.tipus !== 'EXPEDIENT',
         },
     ]
-    const massiveActions = [
+    const massiveActions = useMemo(() => [
         {
             label: t('page.contingut.action.replay.label'),
             icon: "replay",
             showInMenu: true,
             onClick: recuperarMassive,
+            hidden: esborratFilter === 'NOMES_NO_ESBORRATS',
         },
         {
             label: t('common.delete'),
             icon: "delete",
             showInMenu: true,
             onClick: esborrarMassive,
+            hidden: esborratFilter === 'NOMES_ESBORRATS',
         },
-    ]
+    ], [esborratFilter, t, recuperarMassive, esborrarMassive])
 
-    return <GridPage disableMargins>
+    return <GridPage autoHeight>
         <CardPage title={t('page.user.menu.continguts')}>
             <ContingutFilter
                 sessionKey={sessionKey}
-                onSpringFilterChange={setSpringFilter}/>
+                onSpringFilterChange={setSpringFilter}
+                onDataChange={(data: any) => setEsborratFilter(data?.esborrat)}/>
 
             <StyledMuiGrid
                 apiRef={apiRef}
                 resourceName={"contingutResource"}
+				persistentStateKey={"contingutResource_consulta"}
                 columns={additionalColumns}
                 filter={springFilter}
                 sortModel={sortModel}
@@ -365,8 +368,6 @@ const ContingutGrid = () => {
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}
                 onRowClick={(params: any) => handleDetail(params?.row?.id)}
-                isRowSelectable={(params:any) => params?.row?.esborrat == 1 }
-                disabledMassiveDefSelector={!haveRequirements}
                 toolbarHideCreate
             />
         </CardPage>

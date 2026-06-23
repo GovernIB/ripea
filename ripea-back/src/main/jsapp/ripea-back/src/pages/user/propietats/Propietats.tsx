@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useDebounce } from 'reactlib';
 import { PropietatsGroups } from './PropietatsGroups.tsx';
 import { PropietatsProps } from './PropietatsProps.tsx';
-import {TextField, InputAdornment, Icon, IconButton, Grid2 as Grid, Button} from "@mui/material";
+import {TextField, InputAdornment, Icon, IconButton, Grid, Button} from "@mui/material";
 import {GridPage, useBaseAppContext, useResourceApiService} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
 import {useParams} from "react-router-dom";
@@ -71,7 +71,7 @@ export const Propietats: React.FC = () => {
         }
     }, [apiIsReady]);
 
-    return <GridPage disableMargins>
+    return <GridPage autoHeight>
         <CardPage title={t('page.user.menu.props')}>
             <Grid container spacing={2}>
                 <Grid size={12} sx={{ px: 1 }} display={'flex'} justifyContent={'end'}>
@@ -120,7 +120,7 @@ export const PropietatsByEntitat: React.FC = () => {
         }
     }, [entity]);
 
-    return <GridPage disableMargins>
+    return <GridPage autoHeight>
         <CardPage title={`${t('page.user.menu.props')} - ${entity?.nom}`}>
             <Load value={entity}>
                 <Grid container spacing={2}>

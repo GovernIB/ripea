@@ -56,6 +56,7 @@ import es.caib.ripea.plugin.notificacio.EnviamentEstat;
 import es.caib.ripea.plugin.notificacio.EnviamentReferencia;
 import es.caib.ripea.plugin.notificacio.Notificacio;
 import es.caib.ripea.plugin.notificacio.NotificacioEstat;
+import es.caib.ripea.plugin.notificacio.RegistreEstat;
 import es.caib.ripea.plugin.notificacio.NotificacioPlugin;
 import es.caib.ripea.plugin.notificacio.Persona;
 import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatEnviament;
@@ -350,6 +351,7 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 				resposta.setRegistreData(registre.getData());
 				resposta.setRegistreNumero(registre.getNumero());
 				resposta.setRegistreNumeroFormatat(registre.getNumeroFormatat());
+				resposta.setRegistreEstat(registre.getEstat() != null ? RegistreEstat.valueOf(registre.getEstat().name()) : null);
 			}
 			
 			return resposta;

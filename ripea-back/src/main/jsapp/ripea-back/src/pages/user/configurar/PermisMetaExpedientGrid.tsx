@@ -133,11 +133,12 @@ const PermisMetaExpedientOrganGrid = (props:any) => {
                         :row?.organGestor?.description;
                 },
             }}
-            treeDataAdditionalRows={(_rows: any) => {
-                const additionalRows: any[] = [];
+            rowsTransformer={(_rows: any) => {
+                if (!_rows) return [];
+                const additionalRows: any[] = _rows;
                 if (_rows!=null){
                     for (const row of _rows) {
-                        for (const sid of row?.sids) {
+                        for (const sid of (row?.sids ?? [])) {
                             const newId = row?.id+"-"+sid.id
                             if (!additionalRows.map((b) => b.id).includes(newId)) {
                                 additionalRows.push({
@@ -239,6 +240,7 @@ const PermisMetaExpedientNodeGrid = (props:any) => {
         <StyledMuiGrid
             apiRef={gridApiRef}
             resourceName={"aclSidResource"}
+            persistentStateActive={false}
             popupEditUpdateActive
             columns={columnsNode}
             sortModel={sortModelNode}
@@ -291,7 +293,7 @@ const PermisMetaExpedientGrid = ()=> {
         setTitlePage(t('page.user.menu.procedimentPermis', {nom: entity?.nom}))
     }, [entity]);
 
-    return <GridPage disableMargins>
+    return <GridPage autoHeight>
         <Load value={entity}>
             <CardPage title={t('page.user.menu.procedimentPermis', {nom: entity?.nom})}
                       header={<>

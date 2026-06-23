@@ -14,7 +14,7 @@ type CommonProps = {
     onSuccess?: (result?: any) => void,
     onError?: (error?: any) => void,
     onClose?: (error?: any) => void,
-	onSubmit?: () => void
+	// onSubmit?: () => void
 }
 type FormActionDialogProp = CommonProps & {
     action: string,
@@ -44,10 +44,10 @@ const FormActionDialog = (props:FormActionDialogProp) => {
         onSuccess,
         onError = (error:any) => error?.message && temporalMessageShow(null, error?.message, 'error'),
         onClose,
-		onSubmit
+		// onSubmit
     } = props;
     const {
-        initialized,
+        available: initialized,
         formDialogComponent,
         exec: actionExecutor,
         close,
@@ -59,15 +59,17 @@ const FormActionDialog = (props:FormActionDialogProp) => {
         false,
         undefined,
         undefined,
+        undefined,
         initialOnChange,
         children,
+        undefined,
         formDialogButtons,
         formDialogComponentProps,
         formDialogResultProcessor,
         onSuccess,
         onError,
         onClose,
-		onSubmit,
+        true,
         (reason?: string) => reason !== 'backdropClick'
     )
 
@@ -99,10 +101,11 @@ export const FormReportDialog = (props:FormReportDialogProp) => {
         formDialogResultProcessor,
         onSuccess,
         onError = (error:any) => error?.message && temporalMessageShow(null, error?.message, 'error'),
+        onClose,
     } = props;
 
     const {
-        initialized,
+        available: initialized,
         formDialogComponent,
         exec: reportExecutor,
         close,
@@ -114,13 +117,17 @@ export const FormReportDialog = (props:FormReportDialogProp) => {
         false,
         undefined,
         undefined,
+        undefined,
         initialOnChange,
         children,
+        undefined,
         formDialogButtons,
         formDialogComponentProps,
         formDialogResultProcessor,
         onSuccess,
         onError,
+        onClose,
+        true,
         (reason?: string) => reason !== 'backdropClick'
     )
 

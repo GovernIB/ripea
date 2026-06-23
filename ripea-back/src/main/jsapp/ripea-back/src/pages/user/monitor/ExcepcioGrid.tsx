@@ -6,7 +6,7 @@ import {formatDate} from "../../../util/dateUtils.ts";
 import Load from "../../../components/Load.tsx";
 import {useMemo, useState} from "react";
 import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
-import {Grid2} from "@mui/material";
+import {Grid} from "@mui/material";
 import {ErrorArea} from "../../../components/ErrorPage.tsx";
 
 const ExcepcioDetail = ({entity, currentFields}:any) => {
@@ -18,11 +18,11 @@ const ExcepcioDetail = ({entity, currentFields}:any) => {
             <FieldData field={'message'}/>
         </DetailCard>
 
-        <Grid2 size={12}>
+        <Grid size={12}>
             <ErrorArea sx={{ maxHeight: '400px' }}>
                 {entity?.stacktrace}
             </ErrorArea>
-        </Grid2>
+        </Grid>
     </MuiDetail>
 }
 
@@ -115,7 +115,7 @@ export const ExcepcioGrid = () => {
         },
     ], [apiIsReady]);
 
-    return <GridPage disableMargins>
+    return <GridPage autoHeight>
         <CardPage title={t('navigate.exception')}>
             <StyledMuiGrid
                 resourceName={"excepcioLogResource"}
@@ -123,6 +123,7 @@ export const ExcepcioGrid = () => {
                 sortModel={sortModel}
                 perspectives={perspectives}
                 rowAdditionalActions={actions}
+                toolbarShowQuickFilter
                 readOnly
             />
             {dialog}

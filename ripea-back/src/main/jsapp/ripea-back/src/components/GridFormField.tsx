@@ -1,47 +1,73 @@
-import {Button, Grid, Icon, IconButton} from "@mui/material";
-import {FormField, FormFieldProps, FormFieldDataActionType, useFormContext} from "reactlib";
+import React from "react";
+import {Box, Button, Grid, Icon, IconButton, useMediaQuery, useTheme} from "@mui/material";
+import {FormField, FormFieldProps, useFormContext} from "reactlib";
+import {FormFieldDataActionType} from "../../lib/components/form/FormContext";
 import Load from "./Load.tsx";
 import {useTranslation} from "react-i18next";
 import {useUserSession} from "./Session.tsx";
 import {useCallback, useEffect, useMemo, useState} from "react";
 import InputAdornment from "@mui/material/InputAdornment";
 
-export const GridButton = (props:any) => {
-    const { title, xs, children, hidden, ...other} = props;
+// Renders a base material icon ligature with a smaller secondary icon placed
+// adjacent to its bottom-right corner (e.g. zoom_in + expand_more), without
+// overlapping the base glyph. Both icons inherit the button's current color.
+export const CombinedIcon = (props:any) => {
+    const { base, badge, sx, badgeSx } = props;
+    return <Box sx={{ display: 'inline-flex', alignItems: 'flex-end', lineHeight: 1, ...sx }}>
+        <Icon>{base}</Icon>
+        <Icon sx={{ fontSize: '0.85rem', lineHeight: 1, ml: '1px', ...badgeSx }}>{badge}</Icon>
+    </Box>
+}
 
-    return <Grid item title={title} xs={xs} hidden={hidden}>
+export const GridButton = (props:any) => {
+    const { title, icon, size, children, hidden, sx, iconOnlyBreakpoint = 'md', ...other} = props;
+
+    const theme = useTheme();
+    const iconOnly = useMediaQuery(theme.breakpoints.down(iconOnlyBreakpoint));
+
+    const iconNode = typeof icon === 'string'
+        ? <Icon sx={{mr: (!iconOnly && children) ? 0.5 : 0, ...props.iconSx}}>{icon}</Icon>
+        : icon;
+
+    return <Grid title={title} size={size} hidden={hidden}>
         <Button
             variant="outlined"
-            sx={{ borderRadius: '4px', width: '100%', height: '100%'}}
+            sx={{ borderRadius: '4px', width: '100%', height: '100%', ...sx }}
             style={{margin: 0}}
+            aria-label={(title && (iconOnly || !children)) ? title : undefined}
             {...other}
         >
-            {children}
+            {iconNode}
+            {!iconOnly && children}
         </Button>
     </Grid>
 }
 
 export const GridButtonField = (props:any) => {
-    const {name, icon, whitLabel, ...other} = props;
+    const {name, whitLabel, icon, title, ...other} = props;
     const {data, apiRef, fields} = useFormContext()
 
+    const active = !!data?.[name]
     const label = fields?.find?.(item => item?.name === name)?.label || ''
     return <Load value={apiRef} noEffect><GridButton
         onClick={()=>{
-            apiRef?.current?.setFieldValue?.(name, !data?.[name])
+            apiRef?.current?.setFieldValue?.(name, !active)
         }}
-        variant={ data?.[name] ?"contained":"outlined" }
-        title={label}
+        variant={ active ?"contained":"outlined" }
+        title={(typeof title === 'function') ? title?.(active) :(title ?? label)}
+        icon={(typeof icon === 'function') ? icon?.(active) :icon}
         {...other}
     >
-        <Icon sx={{mr: (whitLabel && label) ?1 :0, ...props.iconSx}}>{icon}</Icon>
         {whitLabel && label}
     </GridButton></Load>
 }
 
+const DIGITS_ALLOWED_KEYS = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'Home', 'End'];
+
 type GridFormField = FormFieldProps & {
-    xs: number,
+    size?: any,
     hidden?: boolean,
+    digitsOnly?: boolean,
 }
 
 export function formatByteCount(bytes:number) {
@@ -95,14 +121,24 @@ export const PasswordFormField = (props:GridFormField) => {
 const GridFormField = (props:GridFormField) => {
     const {
         name,
-        xs,
+        size = 12,
         hidden,
         componentProps = {},
         disabled,
         onChange,
         validator,
+        digitsOnly,
         ...other
     } = props;
+
+    const digitsOnlyProps = digitsOnly ? {
+        slotProps: { htmlInput: { inputMode: 'numeric' as const, ...componentProps?.slotProps?.htmlInput } },
+        onKeyDown: (e: React.KeyboardEvent) => {
+            if (/^\d$/.test(e.key) || DIGITS_ALLOWED_KEYS.includes(e.key) || e.ctrlKey || e.metaKey) return;
+            e.preventDefault();
+        },
+        ...componentProps,
+    } : componentProps;
     const {fields, dataDispatchAction, validationSetFieldErrors} = useFormContext()
 
     const [field, setField] = useState<any>();
@@ -124,15 +160,15 @@ const GridFormField = (props:GridFormField) => {
         }
     }, [dataDispatchAction, field, name]);
 
-    return <Grid item xs={xs} hidden={!!hidden}>
+    return <Grid size={size} hidden={!!hidden}>
         <FormField
             name={name}
             disabled={disabled}
             readOnly={disabled}
             {...other}
             componentProps={{
-                sx: {color: 'black', backgroundColor: 'white'},
-                ...componentProps
+                className: 'input',
+                ...digitsOnlyProps
             }}
             onFieldValueChange={handleFieldValueChange}
             debounce

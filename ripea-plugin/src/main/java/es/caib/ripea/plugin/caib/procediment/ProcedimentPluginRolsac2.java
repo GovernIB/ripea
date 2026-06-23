@@ -1,0 +1,210 @@
+package es.caib.ripea.plugin.caib.procediment;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
+import org.fundaciobit.genapp.common.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
+
+import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
+import es.caib.ripea.plugin.SistemaExternException;
+import es.caib.ripea.plugin.procediment.ProcedimentPlugin;
+import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.ProcedimentDto;
+
+public class ProcedimentPluginRolsac2 extends RipeaAbstractPluginProperties implements ProcedimentPlugin {
+
+	private static Map<String, String> unitatsAdministratives = new HashMap<String, String>();
+	private Client jerseyClient;
+	private ObjectMapper mapper;
+
+	public ProcedimentPluginRolsac2() {
+		super();
+	}
+	public ProcedimentPluginRolsac2(String propertyKeyBase, Properties properties) {
+		super(propertyKeyBase, properties);
+	}
+	
+	@Override
+	public ProcedimentDto findAmbCodiSia(String codiDir3, String codiSia) throws SistemaExternException {
+		
+		logger.debug("Consulta del procediment pel codi SIA i codiDir3 (codiSia=" + codiSia + "codiDir3=" + codiDir3 + ")");
+		
+		try {
+			String url = getServiceUrl();
+			url += (url.charAt(url.length()-1) != '/' ? "/" : "") + "procedimientos";
+
+			Rolsac2ProcedimentFilterRequest body = Rolsac2ProcedimentFilterRequest.builder()
+					.codigoSia(codiSia)
+					.codigoUADir3(codiDir3)
+					.estadoSia("A")
+					.buscarEnDescendientesUA(1)
+					.activo(1)
+					.filtroPaginacion(new Rolsac2FiltrePaginacio(0, 1))
+					.build();
+			
+			logger.debug("Enviant petició REST a ROLSAC2 (" +
+					"url=" + url + ", " +
+					"tipus=application/json, " +
+					"body=" + body + ")");
+			ClientResponse clientResponse = getJerseyClient().
+					resource(url).
+					accept("application/json").
+					type("application/json").
+					post(ClientResponse.class, body);
+			Rolsac2ProcedimientosResponse response = clientResponse.getEntity(Rolsac2ProcedimientosResponse.class);
+			
+			if (response != null && response.getStatus().equals("200")) {
+				if (response.getItems() != null && !response.getItems().isEmpty()) {
+					return toProcedimentDto2(response.getItems().get(0));
+				} else { 
+					return null;
+				}
+			} else if (response != null && response.getStatus().equals("400") && Utils.isEmpty(response.getItems()) && es.caib.ripea.service.intf.utils.Utils.equals(response.getMensaje(), "La petición recibida es incorrecta(parametro: filtro // Tipo esperado: filtro)")) {
+				return null;
+			} else {
+				throw new SistemaExternException(
+						"No s'han pogut consultar el procediment de ROLSAC2 (codiSia=" + body.getCodigoSia() + "). Resposta rebuda amb el codi " + response.getStatus());
+			}		
+		} catch (Exception ex) {
+			throw new SistemaExternException("No s'han pogut consultar el procediment de ROLSAC (codiSia=" + codiSia + ")",ex);
+		}
+	}
+	
+	@Override
+	public String getUnitatAdministrativa(String codi) throws SistemaExternException {
+		
+		if (unitatsAdministratives.containsKey(codi))
+			return unitatsAdministratives.get(codi);
+		
+		try {
+			
+			String url = getServiceUrl();
+			url += (url.charAt(url.length()-1) != '/' ? "/" : "") + "unidades_administrativas/" + codi;
+			
+			String unitatCodi = null;
+			
+			Rolsac2UAResponse resposta = getJerseyClient().resource(url).post(Rolsac2UAResponse.class);
+			
+			logger.debug("Response get unitat administrativa del ROLSAC2 (codi=" + codi + "): " + resposta.toString());
+			
+			if (resposta.getItems() != null && !resposta.getItems().isEmpty()) {
+				Rolsac2UnitatAdministrativa unitat = resposta.getItems().get(0);
+				if (unitat.getCodigoDIR3() != null && !unitat.getCodigoDIR3().isEmpty()) {
+					unitatCodi = unitat.getCodigoDIR3();
+				} else if (unitat.getLink_padre()!=null) {
+					unitatCodi = getUnitatAdministrativa(unitat.getLink_padre().getCodigo());
+				}
+			}
+			unitatsAdministratives.put(codi, unitatCodi);
+			return unitatCodi;				
+			
+		} catch (Exception ex) {
+			throw new SistemaExternException("No s'ha pogut consultar la UA via REST a ROLSAC",ex);
+		}
+	}
+	
+	public ProcedimentDto toProcedimentDto (Procediment procediment) throws  SistemaExternException {
+		ProcedimentDto dto = new ProcedimentDto();
+		if (procediment != null) {
+			dto.setCodi(procediment.getCodigo());
+			dto.setCodiSia(procediment.getCodigoSIA());
+			dto.setNom(procediment.getNombre());
+			dto.setResum(procediment.getResumen());
+			dto.setUnitatOrganitzativaCodi(getUnitatAdministrativa(procediment.getUnidadAdministrativa().getCodigo()));
+			//Com que Procediment ens ve amb Boolean i al nostre sistema ho tenim amb boolean primitiu, si es null ho tractam com false:
+			if (procediment.getComun() != null)
+				dto.setComu(procediment.getComun().booleanValue());	
+			else 
+				dto.setComu(false);
+			
+		}
+		return dto;
+	}
+
+	private Client getJerseyClient() {
+		if (jerseyClient == null) {
+			jerseyClient = new Client();
+			if (getServiceTimeout() != null) {
+				jerseyClient.setConnectTimeout(getServiceTimeout());
+				jerseyClient.setReadTimeout(getServiceTimeout());
+			}
+			if (getServiceUsername() != null) {
+				jerseyClient.addFilter(new HTTPBasicAuthFilter(getServiceUsername(), getServicePassword()));
+			}
+			//jerseyClient.addFilter(new LoggingFilter(System.out));
+			mapper = new ObjectMapper();
+			// Permet rebre un sol objecte en el lloc a on hi hauria d'haver una llista.
+			mapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+			// Mecanisme de deserialització dels enums
+			mapper.enable(DeserializationFeature.READ_ENUMS_USING_TO_STRING);
+			// Per a no serialitzar propietats amb valors NULL
+			mapper.setSerializationInclusion(Include.NON_NULL);
+			// No falla si hi ha propietats que no estan definides a l'objecte destí
+			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+		}
+		return jerseyClient;
+	}
+
+	private ProcedimentDto toProcedimentDto2(Rolsac2Procediment procediment) throws  SistemaExternException {
+		ProcedimentDto dto = new ProcedimentDto();
+		if (procediment != null) {
+			dto.setCodi(String.valueOf(procediment.getCodigo()));
+			dto.setCodiSia(procediment.getCodigoSIA()!=null?procediment.getCodigoSIA().toString():null);
+			dto.setNom(procediment.getNombreProcedimientoWorkFlow());
+			String resum = procediment.getObjeto()!=null?procediment.getObjeto():"";
+			resum += procediment.getDestinatarios()!=null?". Dirigit a " +procediment.getDestinatarios()+".":"";
+			dto.setResum(es.caib.ripea.service.intf.utils.Utils.abbreviate(resum, 1024));
+			String codiUnitatAdministrativa = null;
+			if (procediment.getLinkUnidadAdministrativaResponsable() != null) {
+				codiUnitatAdministrativa = procediment.getLinkUnidadAdministrativaResponsable().getCodigo();
+			} else if (procediment.getLinkUnidadAdministrativaCompetente() != null) {
+				codiUnitatAdministrativa = procediment.getLinkUnidadAdministrativaCompetente().getCodigo();
+			} else if (procediment.getLinkUnidadAdministrativaInstructora() != null) {
+				codiUnitatAdministrativa = procediment.getLinkUnidadAdministrativaInstructora().getCodigo();
+			}
+			if (codiUnitatAdministrativa!=null) {
+				dto.setUnitatOrganitzativaCodi(getUnitatAdministrativa(codiUnitatAdministrativa));
+			}
+			dto.setComu(procediment.getComun()>0?true:false);
+		}
+		return dto;
+	}
+
+	private String getServiceUrl() {
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.ROLSAC_PLUGIN_URL));
+	}
+	private String getServiceUsername() {
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.ROLSAC_PLUGIN_USR));
+	}
+	private String getServicePassword() {
+		return getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.ROLSAC_PLUGIN_PAS));
+	}
+	private Integer getServiceTimeout() {
+		String key = PropertyConfig.getPropertySuffix(PropertyConfig.ROLSAC_PLUGIN_TIMEOUT);
+		if (getProperty(key) != null) {
+			return getAsInt(key);
+		} else {
+			return null;
+		}
+	}
+	@Override
+	public String getEndpointURL() {
+		String endpoint = getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.ROLSAC_PLUGIN_ENDPOINT));
+		if (Utils.isEmpty(endpoint)) {
+			endpoint = getServiceUrl();
+		}
+		return endpoint;
+	}
+
+	private static final Logger logger = LoggerFactory.getLogger(ProcedimentPluginRolsac.class);
+}

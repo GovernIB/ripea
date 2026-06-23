@@ -1,5 +1,5 @@
 import React from 'react';
-import {Box, Button, ButtonGroup, Chip, Icon, Tooltip} from '@mui/material';
+import {Box, Button, ButtonGroup, Chip, Icon, Tooltip, Typography} from '@mui/material';
 import {useResourceApiService} from 'reactlib';
 import { useTranslation } from 'react-i18next';
 import {MenuActionButton} from "./MenuButton.tsx";
@@ -22,10 +22,11 @@ type MassiveActionSelectorProps = {
     namedQueries?: string[];
     disabledDefSelector?: boolean,
     hiddenDefSelector?: boolean,
+    isRowSelectable?: (row:any) => boolean
 }
 
 const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (props:MassiveActionSelectorProps) => {
-    const {resourceName, filter, namedQueries, selectedRows, setSelectedRows, disabledDefSelector, hiddenDefSelector, actions } = props;
+    const {resourceName, filter, namedQueries, selectedRows, setSelectedRows, disabledDefSelector, hiddenDefSelector, actions, isRowSelectable } = props;
     const { t } = useTranslation();
 
     const {
@@ -38,7 +39,9 @@ const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (props:Massi
         if (apiIsReady) {
             apiFindAll({unpaged: true, filter: filter, namedQueries: namedQueries})
                 .then((app) => {
-                    const allIds = app?.rows?.map(row=>row?.id)
+                    const allIds = app?.rows
+                        ?.filter(row=> isRowSelectable ?isRowSelectable?.({row}) :true)
+                        ?.map(row=>row?.id)
                     setSelectedRows(allIds);
                 })
         }
@@ -80,22 +83,8 @@ const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (props:Massi
         <ButtonGroup
             variant="outlined"
             size="small"
-            sx={{
-                '& .MuiButton-root': {
-                    borderColor: 'rgba(0, 0, 0, 0.23)' // Standard MUI outlined button border color
-                },
-                '& .MuiButton-root:hover': {
-                    borderColor: 'rgba(0, 0, 0, 0.50)' // Standard MUI outlined button border color
-                },
-                '& .MuiButton-root.Mui-disabled': {
-                    borderColor: 'rgba(0, 0, 0, 0.1)',
-                    color: 'rgba(0, 0, 0, 0.3)',
-                    backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                },
-                '& .MuiButton-root.Mui-disabled .MuiSvgIcon-root': {
-                    color: 'rgba(0, 0, 0, 0.3)',
-                },
-            }}>
+            className={'massive-selector'}
+        >
             {
                 buttonActions.map((action:any, index:number)=>
                     !(typeof action.hidden === 'function' ? action.hidden(selectedRows) : action.hidden)
@@ -105,7 +94,9 @@ const MassiveActionSelector: React.FC<MassiveActionSelectorProps> = (props:Massi
                             disabled={typeof action?.disabled === 'function' ? action?.disabled(selectedRows) : action?.disabled}
                             sx={{ minWidth: '40px', maxHeight: '32.5px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
                         >
-                            <Icon color="action" sx={{m: 0, mr: action?.title ?1 :0}}>{action?.icon}</Icon>{action?.title}
+                            <Icon color="action" sx={{m: 0}}>{action?.icon}</Icon>
+                            {action?.title && <Typography variant={'body2'} sx={{display: {xs: 'none', sm: 'none', md: 'block'}}}
+                                         ml={1}>{action?.title}</Typography>}
                         </Button>
                     </Tooltip>
                 )

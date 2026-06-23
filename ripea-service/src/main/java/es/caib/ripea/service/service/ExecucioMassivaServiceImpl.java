@@ -40,7 +40,6 @@ import es.caib.ripea.persistence.entity.ExecucioMassivaEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.repository.ContingutMovimentRepository;
-import es.caib.ripea.persistence.repository.ContingutRepository;
 import es.caib.ripea.persistence.repository.ExecucioMassivaContingutRepository;
 import es.caib.ripea.persistence.repository.ExecucioMassivaRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
@@ -57,6 +56,7 @@ import es.caib.ripea.service.helper.ExpedientHelper;
 import es.caib.ripea.service.helper.MessageHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.helper.UsuariHelper;
+import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.DocumentAmbTipusDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
@@ -70,6 +70,7 @@ import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.ValidationException;
+import es.caib.ripea.service.intf.model.ExpedientResource.ExportGenericForm;
 import es.caib.ripea.service.intf.service.ExecucioMassivaService;
 import es.caib.ripea.service.intf.utils.Utils;
 import io.micrometer.core.instrument.Timer;
@@ -77,7 +78,6 @@ import io.micrometer.core.instrument.Timer;
 @Service
 public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 
-	@Autowired private ContingutRepository contingutRepository;
 	@Autowired private UsuariRepository usuariRepository;
 	@Autowired private ExecucioMassivaRepository execucioMassivaRepository;
 	@Autowired private ExecucioMassivaContingutRepository execucioMassivaContingutRepository;
@@ -99,54 +99,15 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 	
 	@Transactional
 	@Override
+	public void crearExecucioMassiva(Long entitatId, ExecucioMassivaDto dto, ElementTipusEnumDto elementTipus)
+			throws NotFoundException, ValidationException {
+		execucioMassivaHelper.crearExecucioMassiva(entitatId, dto, elementTipus);
+	}
+	
+	@Transactional
+	@Override
 	public void crearExecucioMassiva(Long entitatId, ExecucioMassivaDto dto) throws NotFoundException, ValidationException {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				false,
-				false, 
-				true, false);
-		
-		ExecucioMassivaEntity execucioMassiva = null;
-		
-		Date dataInici;
-		if (dto.getDataInici() == null) {
-			dataInici = new Date();
-		} else {
-			dataInici = dto.getDataInici();
-		}
-		
-		if (dto.getTipus() == ExecucioMassivaTipusDto.PORTASIGNATURES) {
-			execucioMassiva = ExecucioMassivaEntity.getBuilder(
-					ExecucioMassivaTipusDto.PORTASIGNATURES,
-					dataInici,
-					dto.getMotiu(), 
-					dto.getPrioritat(),
-					dto.getPortafirmesResponsablesString(),
-					dto.getPortafirmesSequenciaTipus(),
-					dto.getPortafirmesFluxId(),
-					dto.getPortafirmesTransaccioId(),
-					dto.getDataCaducitat(), 
-					dto.getEnviarCorreu(),
-					entitat,
-					dto.getRolActual(),
-					dto.getPortafirmesAvisFirmaParcial(),
-					dto.getPortafirmesFirmaParcial()).build();
-		}
-		
-		int ordre = 0;
-		for (Long contingutId: dto.getContingutIds()) {
-			ExecucioMassivaContingutEntity emc = ExecucioMassivaContingutEntity.getBuilder(
-					execucioMassiva, 
-					contingutId, 
-					contingutRepository.getOne(contingutId).getNom(),
-					ElementTipusEnumDto.DOCUMENT, 
-					ordre++).build();
-			
-			execucioMassiva.addContingut(emc);
-		}
-		
-		execucioMassivaRepository.save(execucioMassiva);
+		crearExecucioMassiva(entitatId, dto, ElementTipusEnumDto.DOCUMENT);
 	}
 
 	@Override
@@ -267,6 +228,7 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 						generaZipDocumentsExpedients(execucioMassiva);
 					} else if (ExecucioMassivaTipusDto.EXPORTAR_INDEX_ZIP.equals(execucioMassiva.getTipus()) ||
 							ExecucioMassivaTipusDto.EXPORTAR_INDEX_PDF.equals(execucioMassiva.getTipus())||
+							ExecucioMassivaTipusDto.EXPORTAR_GENERIC.equals(execucioMassiva.getTipus())||
 							ExecucioMassivaTipusDto.EXPORTAR_INDEX_EXCEL.equals(execucioMassiva.getTipus()) ||
 							ExecucioMassivaTipusDto.EXPORTAR_ENI.equals(execucioMassiva.getTipus()) || 
 							ExecucioMassivaTipusDto.EXPORTAR_INSIDE.equals(execucioMassiva.getTipus()) ||
@@ -355,6 +317,14 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 				resultat = expedientHelper.exportacio(execucioMassiva.getEntitat().getId(), ids, "ODS");
 			} else if (ExecucioMassivaTipusDto.EXPORTAR_CSV.equals(execucioMassiva.getTipus())) {
 				resultat = expedientHelper.exportacio(execucioMassiva.getEntitat().getId(), ids, "CSV");
+			} else if (ExecucioMassivaTipusDto.EXPORTAR_GENERIC.equals(execucioMassiva.getTipus())) {
+				ObjectMapper mapper = new ObjectMapper();
+				ExportGenericForm params = mapper.readValue(execucioMassiva.getMotiu(), ExportGenericForm.class);
+				DownloadableFile df = execucioMassivaHelper.getDownloadableFileFromExport(execucioMassiva.getEntitat().getId(), params);
+				resultat.setContentType(df.getContentType());
+				resultat.setContingut(df.getContent());
+				resultat.setNom(df.getName());
+				execucioMassiva.setMotiu(null);
 			}
 			
 			String directoriDesti = configHelper.getConfig(PropertyConfig.APP_DATA_DIR);
@@ -375,7 +345,7 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 		} catch (Exception exc) {
 			//En aquets cas, no es pot saber quin expedient ha fallat, els marcam a tots com a error
 			for (ExecucioMassivaContingutEntity execucioMassivaContingutEntity : execucioMassiva.getContinguts()) {
-				execucioMassivaContingutEntity.updateError(new Date(), "Error en la generació del index dels expedients."+execucioMassiva.getTipus().toString());
+				execucioMassivaContingutEntity.updateError(new Date(), "Error en l'exportació "+execucioMassiva.getTipus().toString()+" dels expedients: "+exc.getMessage());
 			}
 		}
 	}	

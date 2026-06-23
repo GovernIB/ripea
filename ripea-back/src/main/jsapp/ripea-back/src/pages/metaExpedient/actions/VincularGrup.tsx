@@ -1,16 +1,15 @@
-import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
+import {useMuiFormDialogApiRef, useBaseAppContext, useFormContext} from "reactlib";
 import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
-import {useRef} from "react";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 
-const VincularGrupForm = () => {
+export const VincularGrupForm = () => {
     const {data} = useFormContext()
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="grup" namedQueries={`VINCULAR_PROCEDIMENT#${data?.id}`}/>
-        <GridFormField xs={12} name="organGestor" disabled/>
-        <GridFormField xs={12} name="perDefecte"/>
+        <GridFormField name="grup" namedQueries={`VINCULAR_PROCEDIMENT#${data?.id}`}/>
+        <GridFormField name="organGestor" disabled/>
+        <GridFormField name="perDefecte"/>
     </Grid>
 }
 
@@ -33,7 +32,7 @@ const VincularGrup = (props: any) => {
 
 export const useVincularGrup = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id:any) :void => {

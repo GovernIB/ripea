@@ -27,7 +27,7 @@ export const ErrorArea = ({ children, ...other }: { children: ReactNode, [key: s
 export function ErrorPage({ error }: any) {
     console.log('error', error)
     const {t} = useTranslation();
-    return (<GridPage disableMargins>
+    return (<GridPage>
         <CardPage header={<>
             <Icon sx={{ fontSize: 'inherit' }}>warning</Icon>
             <Typography variant={'h3'}>{error.name}</Typography>
@@ -43,7 +43,7 @@ export function ErrorPage({ error }: any) {
                             <IconButton
                                 color="inherit"
                                 size="small"
-                                onClick={() => navigator.clipboard.writeText(error.message)}
+                                onClick={() => navigator.clipboard.writeText(error.stackTrace?error.stackTrace:error.message)}
                             >
                                 <Icon sx={{ m: 0 }}>content_copy</Icon>
                             </IconButton>
@@ -53,7 +53,7 @@ export function ErrorPage({ error }: any) {
                             sx={{
                                 maxHeight: '500px',
                             }}
-                        >{error.message}</ErrorArea>
+                        >{error.stackTrace?error.stackTrace:error.message}</ErrorArea>
                     </AlertExpand>
                 </DetailCardContent>
             </DetailCard>

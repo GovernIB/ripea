@@ -10,6 +10,8 @@ import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfig
 import org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
+import org.springframework.boot.autoconfigure.jms.JmsAutoConfiguration;
+import org.springframework.boot.autoconfigure.jms.artemis.ArtemisAutoConfiguration;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration;
@@ -34,7 +36,7 @@ import java.util.jar.Manifest;
 @Slf4j
 @ConditionalOnWarDeployment
 @SpringBootApplication(exclude = {
-		DataSourceAutoConfiguration.class, 
+		DataSourceAutoConfiguration.class,
 		DataSourceTransactionManagerAutoConfiguration.class,
 		JpaRepositoriesAutoConfiguration.class,
 		HibernateJpaAutoConfiguration.class,
@@ -42,7 +44,9 @@ import java.util.jar.Manifest;
 		LiquibaseAutoConfiguration.class,
 		FreeMarkerAutoConfiguration.class,
 		WebSocketServletAutoConfiguration.class,
-		JerseyServerMetricsAutoConfiguration.class
+		JerseyServerMetricsAutoConfiguration.class,
+		ArtemisAutoConfiguration.class,
+		JmsAutoConfiguration.class
 })
 @ComponentScan(
 		basePackages = { BaseConfig.BASE_PACKAGE },

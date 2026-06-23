@@ -22,8 +22,8 @@ type FormFieldNumberProps = FormFieldCustomProps & {
     prefix?: string;
     /** Suffix per a valors que representen una divisa (atribut de react-number-format) */
     suffix?: string;
-    /** Indica si s'ha de fer debounce amb els valors del camp */
-    debounce?: true;
+    /** Indica si s'ha de deshabilitar el debounce amb els valors del camp */
+    debounceDisabled?: true;
 };
 
 type CustomProps = {
@@ -71,10 +71,10 @@ const NumericFormatCustom = React.forwardRef<NumericFormatProps, CustomProps>((p
     );
 });
 
-export const FormFieldNumber: React.FC<
+export const InnerFormFieldNumber: React.FC<
     FormFieldNumberProps & {
-    overrideTextFieldProps?: TextFieldProps;
-}
+        overrideTextFieldProps?: TextFieldProps;
+    }
 > = (props) => {
     const {
         name,
@@ -88,6 +88,7 @@ export const FormFieldNumber: React.FC<
         readOnly,
         onChange,
         componentProps,
+        overrideTextFieldProps,
         allowNegative,
         decimalScale,
         decimalSeparator,
@@ -95,7 +96,6 @@ export const FormFieldNumber: React.FC<
         valueIsNumericString,
         prefix,
         suffix,
-        debounce,
     } = props;
     const { helperText, title, startAdornment } = useFormFieldCommon(
         field,
@@ -122,16 +122,6 @@ export const FormFieldNumber: React.FC<
         suffix,
         style: { textAlign: 'right' },
     };
-
-    const [localValue, setLocalValue] = React.useState<string | null>(value);
-    const debounceValue = useDebounce(localValue, undefined, true)
-    const changedValue = debounce ? debounceValue : localValue;
-    React.useEffect(() => {
-        setLocalValue(value);
-    }, [value]);
-    React.useEffect(() => {
-        onChange?.(changedValue);
-    }, [changedValue]);
     return (
         <TextField
             name={name}
@@ -142,16 +132,67 @@ export const FormFieldNumber: React.FC<
             disabled={disabled}
             error={fieldError != null}
             title={title}
-            helperText={helperText}
-            onChange={(e) => setLocalValue(e.target.value === '' ? null : e.target.value)}
+            onChange={(e) => onChange(e.target.value === '' ? null : e.target.value)}
             fullWidth
             {...componentProps}
+            helperText={helperText ?? componentProps.helperText}
             slotProps={{
                 input: inputProps,
                 htmlInput: htmlInputProps,
             }}
+            {...overrideTextFieldProps}
         />
     );
+};
+
+const useIsUserTypingRef = (delay: number = 250): [React.RefObject<boolean>, () => void] => {
+    const isUserTypingRef = React.useRef(false);
+    const timeoutIdRef = React.useRef<any>(null);
+    const onUserInput = () => {
+        isUserTypingRef.current = true;
+        if (timeoutIdRef.current != null) {
+            clearTimeout(timeoutIdRef.current);
+        }
+        timeoutIdRef.current = setTimeout(() => {
+            isUserTypingRef.current = false;
+        }, delay);
+    };
+    return [isUserTypingRef, onUserInput];
+};
+
+const InnerFormFieldNumberDebounce: React.FC<FormFieldNumberProps> = (props) => {
+    const { value, onChange } = props;
+    const [localValue, setLocalValue] = React.useState<string | null>(value);
+    const changedValue = useDebounce(localValue, undefined, true);
+    const [isUserTypingRef, onUserInput] = useIsUserTypingRef();
+    React.useEffect(() => {
+        if (!isUserTypingRef.current) {
+            setLocalValue(value);
+        }
+    }, [value]);
+    React.useEffect(() => {
+        onChange?.(changedValue);
+    }, [changedValue]);
+    return (
+        <InnerFormFieldNumber
+            {...props}
+            overrideTextFieldProps={{
+                value: localValue ?? '',
+                onChange: (e) => {
+                    onUserInput();
+                    setLocalValue(e.target.value === '' ? null : e.target.value);
+                },
+            }}
+        />
+    );
+};
+
+export const FormFieldNumber: React.FC<FormFieldNumberProps> = (props) => {
+    if (!props.debounceDisabled) {
+        return <InnerFormFieldNumberDebounce {...props} />;
+    } else {
+        return <InnerFormFieldNumber {...props} />;
+    }
 };
 
 export default FormFieldNumber;

@@ -5,13 +5,12 @@ import {Divider} from "@mui/material";
 export const useActions = (refresh?: () => void) => {
     const {t} = useTranslation();
     const {
-        patch: apiPatch,
         artifactAction: apiAction,
     } = useResourceApiService('metaDocumentResource');
     const {temporalMessageShow} = useBaseAppContext();
 
     const active = (id:any) => {
-        apiPatch(id, {data: { actiu: true }})
+        apiAction(id, { code: 'ACTIVAR' })
             .then(() => {
                 refresh?.()
                 temporalMessageShow(null, t('page.metaDocument.action.activar.ok'), 'success');
@@ -22,7 +21,7 @@ export const useActions = (refresh?: () => void) => {
     }
 
     const desactive = (id:any) => {
-        apiPatch(id, {data: { actiu: false }})
+        apiAction(id, { code: 'DESACTIVAR' })
             .then(() => {
                 refresh?.()
                 temporalMessageShow(null, t('page.metaDocument.action.desactivar.ok'), 'success');

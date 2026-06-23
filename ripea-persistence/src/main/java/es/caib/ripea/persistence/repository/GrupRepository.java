@@ -27,6 +27,15 @@ public interface GrupRepository extends JpaRepository<GrupEntity, Long> {
 			@Param("filtre") String filtre,	
 			Pageable pageable);
 
+	@Query( "select me.id " +
+			"from GrupEntity gr left join gr.metaExpedients me " +
+			"where me.organGestor is not null and gr.id in (:grupsIds)")
+	List<Long> findOrgansGestorsOfProcedimentsNoComunsGrups(@Param("grupsIds") List<Long> grupsIds);
+	
+	@Query( "select og.codi " +
+			"from GrupEntity gr left join gr.organGestor og " +
+			"where gr.organGestor is not null and gr.id in (:grupsIds)")
+	List<String> findOrgansGestorsCodisOfGrups(@Param("grupsIds") List<Long> grupsIds);
 
 	static final String FIND_BY_ENTITAT_AND_PROCEDIMENT_AND_FILTRE = "select distinct " +
 			"    grup " +

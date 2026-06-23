@@ -21,15 +21,15 @@ import org.springframework.jms.core.JmsTemplate;
 @EnableJms
 public class JmsConfig {
 
-	@Value("${es.caib.ripea.jms.broker.url:tcp://localhost:61617}") private String brokerUrl;
-	
+	@Value("${es.caib.ripea.jms.broker.url:vm://0}") private String brokerUrl;
+
 	@Bean(initMethod = "start", destroyMethod = "stop")
 	public EmbeddedActiveMQ createEmbeddedBroker() throws Exception {
 	    EmbeddedActiveMQ embeddedBroker = new EmbeddedActiveMQ();
 	    org.apache.activemq.artemis.core.config.Configuration configuration = new ConfigurationImpl()
 	        .setPersistenceEnabled(false)
 	        .setSecurityEnabled(false)
-	        .addAcceptorConfiguration("tcp", brokerUrl);
+	        .addAcceptorConfiguration("invm", brokerUrl);
 	    embeddedBroker.setConfiguration(configuration);
 	    
 	    //Prevenció de WARNINGS: 

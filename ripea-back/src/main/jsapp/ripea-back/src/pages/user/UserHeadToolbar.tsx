@@ -15,6 +15,7 @@ import {
 import {getImgFromBytes} from "../../App.tsx";
 import goib_escut_logo from "../../assets/goib_escut_logo.png"
 import {useSistemaDetail} from "./monitor/SistemaDetail.tsx";
+import {useTheme, useMediaQuery} from "@mui/material";
 
 export const icons = {
     expedient: 'folder',
@@ -37,7 +38,7 @@ export const useToProgramaAntic = () => {
             ref = "/" + ref
         }
         return `${cleanApiUrl}${ref}`;
-    },[]);
+    },[cleanApiUrl]);
 
     return {
         getUrl,
@@ -49,7 +50,7 @@ const Link = React.forwardRef<HTMLAnchorElement, RouterLinkProps>((itemProps, re
     return <RouterLink ref={ref} {...itemProps} role={undefined} />;
 });
 
-const generateMenuItems = (appMenuEntries: any[], entitat:any) => {
+const generateMenuItems = (appMenuEntries: any[], entitat:any, iconOnly:boolean) => {
 	/*
 	 iconVariant — valores posibles (Material Icons):
 	  - 'material-icons'          : filled (por defecto)
@@ -63,19 +64,19 @@ const generateMenuItems = (appMenuEntries: any[], entitat:any) => {
         ? appMenuEntries.map((entry) => (
             <Button
                 className="appMenuItem"
+                title={entry.hover || entry.title}
                 key={entry.id}
-                style={{ color: entitat?.conf?.colorLletra, marginLeft: 0, ...entry?.componentProps }}
-                component={Link}
-                to={entry.to} // Navegació amb React Router
+                style={{ color: entitat?.conf?.colorLletra, minWidth: '3rem', marginLeft: 0, ...entry?.componentProps }}
+                {...(entry.to ? { component: Link, to: entry.to } : {})}
                 onClick={entry?.onClick}>
                 {entry?.icon && <Icon baseClassName={entry?.iconVariant ?? 'material-icons'}>{entry?.icon}</Icon>}
-                {entry.title}
+                {!iconOnly && entry.children}
             </Button>
         )) : [];
 }
 
 const AppMenuBadge = (props:any) => {
-    return <StyledBadge textcolor={'white'} badgecolor={'primary'} {...props}/>
+    return <StyledBadge sx={{px: 0.5}} textcolor={'white'} badgecolor={'primary'} {...props}/>
 }
 const MenuBadge = (props:any) => {
     return <StyledBadge sx={{pl: 0}} textcolor={'primary'} badgecolor={'white'} {...props}/>
@@ -141,16 +142,19 @@ const UserHeadToolbar = () => {
     });
 
     appMenuEntries.forEach((entrie)=>{
-        entrie.title = <AppMenuBadge badgeContent={entrie?.badge} title={entrie?.hover}>{entrie.title}</AppMenuBadge>
+        entrie.children = <AppMenuBadge badgeContent={entrie?.badge}>{entrie.title}</AppMenuBadge>
     })
 
     menuEntries.forEach((entrie)=>{
-        entrie.title = <MenuBadge badgeContent={entrie?.badge} title={entrie?.hover}>{entrie.title}</MenuBadge>
+        entrie.title = <MenuBadge badgeContent={entrie?.badge} title={entrie?.hover || entrie.title}>{entrie.title}</MenuBadge>
     })
 
-    return <Grid container rowSpacing={1} columnSpacing={1} item xs={8} flexDirection={"row"} alignContent={'center'} justifyContent={'end'}>
-        <Grid item xs={10} display={"flex"} justifyContent={"end"}>{...generateMenuItems(appMenuEntries, entitat)} {/* Menu */}</Grid>
-        {menuEntries?.length > 0 && <Grid item xs={1} display={"flex"} justifyContent={"center"}>
+    const theme = useTheme();
+    const iconOnly = useMediaQuery(theme.breakpoints.down('md'));
+
+    return <Grid container display={"flex"} rowSpacing={1} flexDirection={"row"} alignContent={'center'} justifyContent={'end'}>
+        <Grid size={11} gap={1.5} display={"flex"} justifyContent={"end"}>{...generateMenuItems(appMenuEntries, entitat, iconOnly)} {/* Menu */}</Grid>
+        {menuEntries?.length > 0 && <Grid size={1} display={"flex"} justifyContent={"end"}>
             <AppMenu key="app_menu" menuEntries={menuEntries} logo={menuLogo}/> {/* Side Menu */}
             {...contents} {/* Additional content */}
         </Grid>}
@@ -171,13 +175,13 @@ const useMenuSupAdmin = () => {
         {
             id: 'integracions',
             title: t('page.user.menu.integracions'),
-            // icon: '',
+            icon: 'build',
             to: '/integracio',
         },
         {
             id: 'excepcions',
             title: t('page.user.menu.excepcions'),
-            // icon: '',
+            icon: 'warning',
             to:'/excepcio',
         },
     ];
@@ -300,7 +304,7 @@ const useMenuAdmin = () => {
                 {
                     id: 'procediments',
                     title: t('page.user.menu.procediments'),
-                    barge: user?.sessionScope?.organsNoSincronitzats,
+                    badge: user?.sessionScope?.organsNoSincronitzats,
                     // icon: '',
                     to: '/metaExpedient',
                 },
@@ -455,7 +459,7 @@ const useMenuAdminLectura = () => {
         {
             id: 'procediments',
             title: t('page.user.menu.procediments'),
-            barge: user?.sessionScope?.organsNoSincronitzats,
+            badge: user?.sessionScope?.organsNoSincronitzats,
             hover: t('page.user.menu.procedimentsTitle'),
 			icon: 'integration_instructions',
 			iconVariant: 'material-icons-outlined',
@@ -725,7 +729,7 @@ const useAccionesMassivas = () => {
                     title: t('page.user.massive.csv'),
                     // icon: '',
                     to: '/massiu/csv',
-                    hiddden: !user?.sessionScope?.isUrlValidacioDefinida,
+                    hidden: !user?.sessionScope?.isUrlValidacioDefinida,
                 },
                 {
                     id: 'anexos',

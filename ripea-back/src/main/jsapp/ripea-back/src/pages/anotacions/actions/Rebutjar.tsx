@@ -1,13 +1,12 @@
-import {useRef} from "react";
 import {Grid} from "@mui/material";
-import {MuiFormDialogApi, useBaseAppContext} from "reactlib";
+import {useMuiFormDialogApiRef, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import GridFormField from "../../../components/GridFormField.tsx";
 
 const RebutjarForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="motiu" type={"textarea"} required/>
+        <GridFormField name="motiu" type={"textarea"} required/>
     </Grid>
 }
 
@@ -30,7 +29,7 @@ const Rebutjar = (props:any) => {
 
 const useRebutjar = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id:any) :void => {

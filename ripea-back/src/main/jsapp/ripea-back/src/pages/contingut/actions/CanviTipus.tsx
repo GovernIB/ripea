@@ -1,6 +1,5 @@
-import {useRef} from "react";
 import {Grid} from "@mui/material";
-import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
+import {useMuiFormDialogApiRef, useBaseAppContext, useFormContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import GridFormField from "../../../components/GridFormField.tsx";
@@ -16,7 +15,7 @@ const CanviTipusForm = () => {
     )
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="metaDocument" filter={filter} required/>
+        <GridFormField name="metaDocument" filter={filter} namedQueries={[`CREATE_NEW_DOC#${data?.expedientId}`]} required/>
     </Grid>
 }
 
@@ -39,7 +38,7 @@ const CanviTipus = (props:any) => {
 
 const useCanviTipus = (entity:any, refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleMassiveShow = (ids:any[]) :void => {
@@ -47,6 +46,7 @@ const useCanviTipus = (entity:any, refresh?: () => void) => {
             ids: ids,
             massivo: true,
             metaExpedient: entity?.metaExpedient,
+            expedientId: entity?.id,
         })
     }
     const onSuccess = () :void => {

@@ -8,6 +8,8 @@ import useReglaDistribucio from "../actions/ReglaDistribucio.tsx";
 import useExpedientDialog from "./ExpedientDialog.tsx";
 import {Divider} from "@mui/material";
 import {useMemo} from "react";
+import useHistoric, {HistoricContingutTipusEnum} from "../../Historic.tsx";
+import useClonarProcediment from "../actions/ClonarProcediment.tsx";
 
 export const useActions = (refresh?: () => void) => {
     const {t} = useTranslation()
@@ -138,11 +140,13 @@ export const useMetaExpedientActions = (refresh?: () => void) => {
     const {t} = useTranslation();
     const {value: user, rol} = useUserSession()
 
+    const {handleOpen: handleHistoricOpen, dialog: dialogHistoric} = useHistoric(HistoricContingutTipusEnum.METANODE);
     const {handleOpen: handleExpedient, dialog: dialogExpedient} = useExpedientDialog();
     const {handleOpen: handleDetail, dialog: dialogDetail} = useMetaExpedientDetail();
     const {handleShow: handleCanviEstat, content: contentCanviEstat} = useCanviEstatRevisio(refresh);
     const {handleOpen: handleRegla, dialog: dialogRegla} = useReglaDistribucio(refresh);
     const {apiIsReady, active, desactive, exportar, canviDisseny, canviPendent} = useActions(refresh)
+    const {handleShow: handleClonar, content: contentClonar} = useClonarProcediment(refresh)
 
     const actions:any[] = useMemo(() => [
         {
@@ -188,6 +192,13 @@ export const useMetaExpedientActions = (refresh?: () => void) => {
             hidden: !(rol?.isAdmin || rol?.isOrganAdmin || rol?.isDissenyOrgan),
         },
         {
+            label: t('page.metaExpedient.action.clonar.label'),
+            icon: "content_copy",
+            showInMenu: true,
+            onClick: handleClonar,
+            hidden: !(rol?.isAdmin || rol?.isOrganAdmin || rol?.isDissenyOrgan),
+        },
+        {
             label: t('page.metaExpedient.action.regla.label'),
             icon: "search",
             showInMenu: true,
@@ -226,7 +237,12 @@ export const useMetaExpedientActions = (refresh?: () => void) => {
             label: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
             showInMenu: true,
             disabled: true,
-            hidden: (row:any) => !(rol?.isAdmin || rol?.isDissenyOrgan || (row?.revisioEstat != 'REVISAT' && rol?.isOrganAdmin)),
+        },
+        {
+            label: t('page.contingut.action.history.label'),
+            icon: "list",
+            showInMenu: true,
+            onClick: handleHistoricOpen,
         },
         {
             label: t('common.delete'),
@@ -242,6 +258,8 @@ export const useMetaExpedientActions = (refresh?: () => void) => {
         {contentCanviEstat}
         {dialogDetail}
         {dialogRegla}
+        {dialogHistoric}
+        {contentClonar}
     </>
 
     return {

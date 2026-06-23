@@ -58,7 +58,17 @@ public class SessioHelper {
 				if (usuariActual.getRolActual()!=null && RolHelper.getRolsUsuariActual(request).contains(usuariActual.getRolActual())) {
 					request.getSession().setAttribute(RolHelper.SESSION_ATTRIBUTE_ROL_ACTUAL, usuariActual.getRolActual());
 				} else {
-					request.getSession().setAttribute(RolHelper.SESSION_ATTRIBUTE_ROL_ACTUAL, RolHelper.getRolActual(request));
+					//El rol persistit a BD (IPA_USUARI.ROL_ACTUAL) està obsolet (null o ja no és un rol
+					//vigent de l'usuari a Keycloak). Com que un usuari amb un sol rol no fa mai canvi de
+					//rol, aquest valor fòssil no s'actualitzaria mai i els consumidors sense sessió HTTP
+					//(recompte d'anotacions pendents a EventHelper, EmailHelper...) el llegirien i
+					//entrarien per una branca de permisos incorrecta retornant 0. Per això, a més de
+					//fixar el rol vàlid a la sessió, el persistim a BD (setRolUsuariActual també buida la
+					//caché del comptador perquè es recalculi). Es fa una sola vegada per sessió i val per
+					//a totes dues UIs (JSP i React), ja que aquest interceptor no exclou /api/**.
+					String rolFallback = RolHelper.getRolActual(request);
+					request.getSession().setAttribute(RolHelper.SESSION_ATTRIBUTE_ROL_ACTUAL, rolFallback);
+					aplicacioService.setRolUsuariActual(rolFallback);
 				}
 				if (RolHelper.isRolActualDissenyadorOrgan(request)) {
 					resultat = "/ripeaback/metaExpedient";
@@ -77,7 +87,6 @@ public class SessioHelper {
                 habilitarTipusDocument = aplicacioService.propertyBooleanFindByKey(PropertyConfig.TIPUS_DOCUMENT_ACTIUS, false);
                 habilitarDocumentsGenerals = aplicacioService.propertyBooleanFindByKey(PropertyConfig.DOCUMENTS_GENERALS_ACTIUS, false);
                 habilitarDominis = aplicacioService.propertyBooleanFindByKey(PropertyConfig.DOMINIS_HABILITATS);
-                isReactActiu = aplicacioService.propertyBooleanFindByKey(PropertyConfig.REACT_ACTIU);
 				propietatsInicialitzades = true;
 			}
 			String idioma_usuari = usuariActual.getIdioma();
@@ -88,7 +97,7 @@ public class SessioHelper {
 			request.getSession().setAttribute("SessionHelper.isTipusDocumentsEnabled", habilitarTipusDocument);
 			request.getSession().setAttribute("SessionHelper.isDocumentsGeneralsEnabled", habilitarDocumentsGenerals);
 			request.getSession().setAttribute("SessionHelper.isDominisEnabled", habilitarDominis);
-			request.getSession().setAttribute("SessionHelper.isReactActiu", isReactActiu);
+			request.getSession().setAttribute("SessionHelper.isReactActiu", aplicacioService.propertyBooleanFindByKey(PropertyConfig.REACT_ACTIU));
 			request.getSession().setAttribute(SESSION_ATTRIBUTE_IDIOMA_USUARI, idioma_usuari);
 			aplicacioService.actualitzarEntitatThreadLocal(entitatActual);
 			Object rolActualSessio = request.getSession().getAttribute(RolHelper.SESSION_ATTRIBUTE_ROL_ACTUAL);

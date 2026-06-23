@@ -30,6 +30,7 @@ export const StyledDate = (props: any) => {
 
 const sortModel:any = [{field: 'dataInici', sort: 'desc'}];
 const namedQueries:any = ['USUARI_RELACIONAT'];
+const perspectives:any = ['CONTEXT_USUARI'];
 const TasquesGrid = () => {
     const { t } = useTranslation();
     const { value: user } = useUserSession();
@@ -111,7 +112,7 @@ const TasquesGrid = () => {
     const { actions, components, isTramitable } = useTascaActions({potModificar: true}, refresh)
     const { handleOpen, dialog } = useTascaDetail();
 
-    return <GridPage disableMargins>
+    return <GridPage autoHeight>
         <CardPage title={t('page.user.menu.tasca')}>
             <TasquesFilter
                 onSpringFilterChange={(value:any) => {
@@ -128,6 +129,7 @@ const TasquesGrid = () => {
                     filter={springFilter}
                     namedQueries={namedQueries}
                     sortModel={sortModel}
+                    perspectives={perspectives}
                     rowAdditionalActions={actions}
                     onRowClick={(params: any) => {
                         if (isTramitable(params?.row)) {

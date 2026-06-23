@@ -1,15 +1,14 @@
-import {useRef} from "react";
 import {Grid} from "@mui/material";
-import {MuiFormDialogApi, useBaseAppContext} from "reactlib";
+import {useMuiFormDialogApiRef, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import GridFormField from "../../../components/GridFormField.tsx";
 
 const CambiarFechaLimiteForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="dataInici" type={"date"} readOnly disabled required/>
-        <GridFormField xs={6} name="duracio" required/>
-        <GridFormField xs={6} name="dataLimit" type={"date"} componentProps={{disablePast: true}} required/>
+        <GridFormField name="dataInici" type={"date"} readOnly disabled required/>
+        <GridFormField size={6} name="duracio" required/>
+        <GridFormField size={6} name="dataLimit" type={"date"} componentProps={{disablePast: true}} required/>
     </Grid>
 }
 
@@ -32,7 +31,7 @@ const CambiarDataLimit = (props:any) => {
 
 const useCambiarDataLimit = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id:any, row:any) :void => {

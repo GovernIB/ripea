@@ -25,6 +25,10 @@ const columns = [
         flex: 1,
         valueFormatter: (value: any) => formatDate(value)
     },
+	{
+	    field: 'registreEstat',
+	    flex: 0.5,
+	},
 ]
 
 const useNotificacioInteressatGrid = (refresh?: () => void) => {

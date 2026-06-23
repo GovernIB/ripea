@@ -34,6 +34,7 @@ import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceReposit
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ApplicationHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.ContingutLogHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.MessageHelper;
@@ -44,6 +45,7 @@ import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerV
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.ExpedientTascaDto;
+import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientTascaValidacioDto;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
@@ -67,19 +69,21 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
 
     private final ExpedientTascaResourceRepository expedientTascaResourceRepository;
     private final MetaExpedientTascaResourceRepository metaExpedientTascaResourceRepository;
-
+    private final UsuariResourceRepository usuariResourceRepository;
+    
     private final ConfigHelper configHelper;
     private final TascaHelper tascaHelper;
     private final ExcepcioLogHelper excepcioLogHelper;
     private final EntityComprovarHelper entityComprovarHelper;
     private final MessageHelper messageHelper;
     private final ApplicationHelper applicationHelper;
-    private final UsuariResourceRepository usuariResourceRepository;
+    private final ContingutLogHelper contingutLogHelper;
     
 	@PostConstruct
 	public void init() {
 		register(ExpedientTascaResource.PERSPECTIVE_RESPONSABLES_CODE, new ResponsablesPerspectiveApplicator());
 		register(ExpedientTascaResource.PERSPECTIVE_AUDIT_CODE, new AuditoriaPerspectiveApplicator());
+		register(ExpedientTascaResource.PERSPECTIVE_CONTEXT_USUARI_CODE, new ContextUsuariPerspectiveApplicator());
 
         register(ExpedientTascaResource.ACTION_CHANGE_ESTAT_CODE, new ChangeEstatActionExecutor());
         register(ExpedientTascaResource.ACTION_CHANGE_PRIORITAT_CODE, new ChangePrioritatActionExecutor());
@@ -151,6 +155,22 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
     	return resource;
     }
     
+    protected void afterUpdateSave(ExpedientTascaResourceEntity entity, ExpedientTascaResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
+    	logProcedimentTascaAccio(entity, LogTipusEnumDto.MODIFICACIO);
+    }
+    
+    protected void afterDelete(ExpedientTascaResourceEntity entity, Map<String, AnswerRequiredException.AnswerValue> answers) {
+    	logProcedimentTascaAccio(entity, LogTipusEnumDto.ELIMINACIO);
+    }
+    
+    private void logProcedimentTascaAccio(ExpedientTascaResourceEntity entity, LogTipusEnumDto accio) {
+		contingutLogHelper.logTasca(
+			entity.getId(),
+			accio,
+			entity.getTitol()!=null?entity.getTitol():entity.getMetaExpedientTasca().getNom(),
+			entity.getResponsableActual()!=null?entity.getResponsableActual().getCodi():"Sense responsble actual.");
+    }
+    
     private ExpedientTascaDto toTascaDto(ExpedientTascaResource resource) {
     	ExpedientTascaDto resultat = new ExpedientTascaDto();
     	resultat.setMetaExpedientTascaId(resource.getMetaExpedientTasca().getId());
@@ -175,27 +195,6 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
         resource.setObservadors(entity.getObservadors()
                 .stream().map(obs->ResourceReference.<UsuariResource, String>toResourceReference(obs.getId(), obs.getCodiAndNom()))
                 .collect(Collectors.toList()));
-        String usuariActualCodi = SecurityContextHolder.getContext().getAuthentication().getName();
-        boolean usuariActualResponsable = false;
-        if (resource.getResponsables()!=null) {
-        	for (ResourceReference<UsuariResource,String> resp: resource.getResponsables()) {
-        		if (resp.getId().equals(usuariActualCodi)) {
-        			usuariActualResponsable = true;
-        			break;
-        		}
-        	}
-        }
-       	resource.setUsuariActualResponsable(usuariActualResponsable);
-        resource.setUsuariActualDelegat(resource.getDelegat()!=null && usuariActualCodi.equals(resource.getDelegat().getId()));
-        if (entity.getDataLimit()!=null) {
-	        if (entity.getDataLimit().before(Calendar.getInstance().getTime())) {
-	        	resource.setDataLimitExpirada(true);
-	        } else {
-	        	resource.setShouldNotifyAboutDeadline(tascaHelper.shouldNotifyAboutDeadline(entity.getDataLimit()));
-	        }
-        }
-        resource.setUsuariActualOnlyObservador(entity.isUsuariActualOnlyObservador(usuariActualCodi));
-        resource.setAgafadaUsuariActual(entity.getResponsableActual()!=null && entity.getResponsableActual().getId().equals(usuariActualCodi));
         resource.setResponsablesStr(entity.getResponsablesStr());
         resource.setObservadorsStr(entity.getObservadorsStr());
         if (entity.getResponsableActual()!=null) {
@@ -231,7 +230,34 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
         		resource.setLastModifiedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
         	}
         }
-    }	
+    }
+
+    private class ContextUsuariPerspectiveApplicator implements PerspectiveApplicator<ExpedientTascaResourceEntity, ExpedientTascaResource> {
+        @Override
+        public void applySingle(String code, ExpedientTascaResourceEntity entity, ExpedientTascaResource resource) throws PerspectiveApplicationException {
+            String usuariActualCodi = SecurityContextHolder.getContext().getAuthentication().getName();
+            boolean usuariActualResponsable = false;
+            if (resource.getResponsables() != null) {
+                for (ResourceReference<UsuariResource, String> resp : resource.getResponsables()) {
+                    if (resp.getId().equals(usuariActualCodi)) {
+                        usuariActualResponsable = true;
+                        break;
+                    }
+                }
+            }
+            resource.setUsuariActualResponsable(usuariActualResponsable);
+            resource.setUsuariActualDelegat(resource.getDelegat() != null && usuariActualCodi.equals(resource.getDelegat().getId()));
+            if (entity.getDataLimit() != null) {
+                if (entity.getDataLimit().before(Calendar.getInstance().getTime())) {
+                    resource.setDataLimitExpirada(true);
+                } else {
+                    resource.setShouldNotifyAboutDeadline(tascaHelper.shouldNotifyAboutDeadline(entity.getDataLimit()));
+                }
+            }
+            resource.setUsuariActualOnlyObservador(entity.isUsuariActualOnlyObservador(usuariActualCodi));
+            resource.setAgafadaUsuariActual(entity.getResponsableActual() != null && entity.getResponsableActual().getId().equals(usuariActualCodi));
+        }
+    }
 
     // OnChangeLogicProcessor
     private class MetaExpedientTascaOnchangeLogicProcessor implements OnChangeLogicProcessor<ExpedientTascaResource> {
@@ -258,12 +284,21 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
                                 resource.getResponsable().getCodi(),
                                 resource.getResponsable().getCodiAndNom()
                         ));
+                        List<ResourceReference<UsuariResource, String>> responsables = new ArrayList<>();
+                        responsables.add(ResourceReference.toResourceReference(
+                                resource.getResponsable().getCodi(),
+                                resource.getResponsable().getCodiAndNom()
+                        ));
+                        target.setResponsables(responsables);
+                    } else {
+                        target.setResponsables(new ArrayList<>());
                     }
                 });
             } else {
 //                target.setDuracio(null);
                 target.setPrioritat(PrioritatEnumDto.B_NORMAL);
                 target.setResponsableActual(null);
+                target.setResponsables(new ArrayList<>());
                 target.setMetaExpedientTascaDescription(null);
             }
         }
@@ -360,7 +395,12 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
 
         @Override
         public ExpedientTascaResource exec(String code, ExpedientTascaResourceEntity entity, ExpedientTascaResource.ChangePrioritatFormAction params) throws ActionExecutionException {
-            entity.setPrioritat(params.getPrioritat());
+            contingutLogHelper.logTasca(
+            		entity.getId(),
+            		LogTipusEnumDto.CANVI_PRIORITAT,
+            		entity.getPrioritat()!=null?entity.getPrioritat().toString():null,
+            		params.getPrioritat()!=null?params.getPrioritat().toString():null);
+        	entity.setPrioritat(params.getPrioritat());
             expedientTascaResourceRepository.save(entity);
             ExpedientTascaResource resultat = objectMappingHelper.newInstanceMap(entity, ExpedientTascaResource.class);
             resultat.setPrioritat(params.getPrioritat());

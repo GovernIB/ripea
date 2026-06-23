@@ -1,5 +1,5 @@
 import {Divider} from "@mui/material";
-import {useBaseAppContext, useConfirmDialogButtons,useResourceApiService} from "reactlib";
+import {useBaseAppContext,useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import useTascaDetail from "./TascaDetail.tsx";
 import useRebutjar from "../actions/Rebutjar.tsx";
@@ -11,6 +11,8 @@ import useCambiarPrioritat from "../actions/CambiarPrioritat.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import useRetomar from "../actions/Retomar.tsx";
 import {useNavigate} from "react-router-dom";
+import useHistoric, {HistoricContingutTipusEnum} from "../../Historic.tsx";
+import { useConfirmDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 export const useActions = (refresh?: () => void) => {
     const { t } = useTranslation();
@@ -55,6 +57,8 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
     const navigate = useNavigate();
     const {changeEstat, cancelar} = useActions(refresh)
     const { value: user } = useUserSession();
+
+    const {handleOpen: handleHistoricOpen, dialog: dialogHistoric} = useHistoric(HistoricContingutTipusEnum.TASCA);
     const {handleShow: handleRebutjar, content: rebutjarContent} = useRebutjar(refresh);
     const {handleShow: handleReassignar, content: reassignarContent} = useReassignar(refresh);
     const {handleShow: handleDelegar, content: delegarContent} = useDelegar(refresh);
@@ -70,9 +74,9 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
     const hiddenByEstat = (row: any): boolean => {
         return isInOptions(row?.estat, 'CANCELLADA', 'FINALITZADA', 'REBUTJADA');
     }
-    const nomesMostraDetalls = (row: any): boolean => {
-        return isInOptions(row?.estat, 'CANCELLADA', 'REBUTJADA');
-    }
+    // const nomesMostraDetalls = (row: any): boolean => {
+    //     return isInOptions(row?.estat, 'CANCELLADA', 'REBUTJADA');
+    // }
     const isInOptions = (value:string, ...options:string[]) => {
         return options.includes(value)
     }
@@ -85,15 +89,13 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
         {
             label: t('common.detail'),
             icon: "info",
-            //Les rebutjades i cancel·lades només es poden veure els detalls. També si ets només observador.
-            showInMenu: (row:any)=> !isOnlyObservador(row) && !nomesMostraDetalls(row) && entity?.potModificar,
+            showInMenu: true,
             onClick: handleOpen,
         },
         {
             label: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
             showInMenu: true,
             disabled: true,
-            hidden: (row: any) => isOnlyObservador(row) || nomesMostraDetalls(row) || !entity?.potModificar,
         },
         {
             label: t('page.tasca.action.tramitar.label'),
@@ -169,6 +171,12 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
             hidden: (row: any) => isOnlyObservador(row) || row?.usuariActualDelegat || hiddenByEstat(row) || !entity?.potModificar,
         },
         {
+            label: t('page.contingut.action.history.label'),
+            icon: "list",
+            showInMenu: true,
+            onClick: handleHistoricOpen,
+        },
+        {
             label: t('page.tasca.action.changeDataLimit.label'),
             icon: "schedule",
             showInMenu: true,
@@ -199,6 +207,7 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
         {cambiarPrioritatContent}
         {cambiarDataLimitContent}
         {retomarContent}
+        {dialogHistoric}
         {dialog}
     </>;
 

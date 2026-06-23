@@ -11,25 +11,25 @@ const EntitatGridForm = () => {
     const {t} = useTranslation()
     const {data} = useFormContext()
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name={'codi'} disabled={data?.id}/>
-        <GridFormField xs={12} name={'nom'}/>
-        <GridFormField xs={12} name={'cif'}/>
-        <GridFormField xs={12} name={'unitatArrel'}/>
-        <GridFormField xs={12} name={'permetreEnviamentPostal'}/>
+        <GridFormField name={'codi'} disabled={data?.id}/>
+        <GridFormField name={'nom'}/>
+        <GridFormField name={'cif'}/>
+        <GridFormField name={'unitatArrel'}/>
+        <GridFormField name={'permetreEnviamentPostal'}/>
 
-        <Grid item xs={12}><Typography sx={{ borderBottom: '1px solid gray', mt: 2, mb: 1 }}>{t('page.entitat.form.temaClar')}</Typography></Grid>
-        <FileFormField xs={12} name={'logoImgFile'}/>
-        <FileFormField xs={12} name={'faviconImgFile'}/>
-        <FileFormField xs={12} name={'menuImgFile'}/>
-        <GridFormField xs={12} name={'capsaleraColorFons'} type={'color'}/>
-        <GridFormField xs={12} name={'capsaleraColorLletra'} type={'color'}/>
+        <Grid size={12}><Typography sx={{ borderBottom: '1px solid gray', mt: 2, mb: 1 }}>{t('page.entitat.form.temaClar')}</Typography></Grid>
+        <FileFormField name={'logoImgFile'}/>
+        <FileFormField name={'faviconImgFile'}/>
+        <FileFormField name={'menuImgFile'}/>
+        <GridFormField name={'capsaleraColorFons'} type={'color'}/>
+        <GridFormField name={'capsaleraColorLletra'} type={'color'}/>
 
-        <Grid item xs={12}><Typography sx={{ borderBottom: '1px solid gray', mt: 2, mb: 1 }}>{t('page.entitat.form.temaFosc')}</Typography></Grid>
-        <FileFormField xs={12} name={'blackLogoImgFile'}/>
-        <FileFormField xs={12} name={'blackFaviconImgFile'}/>
-        <FileFormField xs={12} name={'blackMenuImgFile'}/>
-        <GridFormField xs={12} name={'blackCapsaleraColorFons'} type={'color'}/>
-        <GridFormField xs={12} name={'blackCapsaleraColorLletra'} type={'color'}/>
+        <Grid size={12}><Typography sx={{ borderBottom: '1px solid gray', mt: 2, mb: 1 }}>{t('page.entitat.form.temaFosc')}</Typography></Grid>
+        <FileFormField name={'blackLogoImgFile'}/>
+        <FileFormField name={'blackFaviconImgFile'}/>
+        <FileFormField name={'blackMenuImgFile'}/>
+        <GridFormField name={'blackCapsaleraColorFons'} type={'color'}/>
+        <GridFormField name={'blackCapsaleraColorLletra'} type={'color'}/>
     </Grid>
 }
 
@@ -82,7 +82,7 @@ export const EntitatGrid = () => {
 
     const {actions, components} = useEntitatActions(refresh)
 
-    return <GridPage disableMargins>
+    return <GridPage autoHeight>
         <CardPage title={t('navigate.entitat')}>
             <StyledMuiGrid
                 apiRef={apiRef}
@@ -94,7 +94,7 @@ export const EntitatGrid = () => {
                 popupEditCreateActive
                 popupEditFormContent={<EntitatGridForm/>}
                 rowAdditionalActions={actions}
-                toolbarHideQuickFilter={false}
+                toolbarShowQuickFilter
                 toolbarCreateTitle={t('page.entitat.action.new.label')}
                 onRefresh={refresh}
                 popupEditFormI18nKeys={{

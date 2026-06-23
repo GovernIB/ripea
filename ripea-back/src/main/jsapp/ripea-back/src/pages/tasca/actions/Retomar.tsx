@@ -1,13 +1,12 @@
-import {MuiFormDialogApi, useBaseAppContext} from "reactlib";
+import {useMuiFormDialogApiRef, useBaseAppContext} from "reactlib";
 import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
-import {useRef} from "react";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 
 const RetomarForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="motiu"/>
+        <GridFormField name="motiu"/>
     </Grid>
 }
 
@@ -30,7 +29,7 @@ const Retomar = (props:any) => {
 
 const useRetomar = (refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const handleShow = (id:any) :void => {

@@ -42,7 +42,8 @@ public class EntitatServiceImpl implements EntitatService {
 	@Autowired private PermisosEntitatHelper permisosEntitatHelper;
 	@Autowired private EntityComprovarHelper entityComprovarHelper;
 	@Autowired private ConfigHelper configHelper;
-	
+	@Autowired private TipusDocumentalHelper tipusDocumentalHelper;
+
 	@Transactional
 	@Override
 	@CacheEvict(value = "entitatsUsuari", allEntries = true)
@@ -66,8 +67,10 @@ public class EntitatServiceImpl implements EntitatService {
 				.blackCapsaleraColorFons(entitat.getBlackCapsaleraColorFons())
 				.blackCapsaleraColorLletra(entitat.getBlackCapsaleraColorLletra())
 				.build();
-		configHelper.crearConfigsEntitat(entitat.getCodi());
-		return conversioTipusHelper.convertir(entitatRepository.save(entity), EntitatDto.class);
+		EntitatEntity savedEntity = entitatRepository.save(entity);
+		configHelper.crearConfigsEntitat(savedEntity.getCodi());
+		tipusDocumentalHelper.crearTipusDocumentalsEntitat(savedEntity.getCodi());
+		return conversioTipusHelper.convertir(savedEntity, EntitatDto.class);
 	}
 
 	@Transactional
@@ -151,6 +154,7 @@ public class EntitatServiceImpl implements EntitatService {
 		logger.debug("Esborrant entitat (id=" + id +  ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(id, false, false, false, false, false);
 		configHelper.deleteConfigEntitat(entitat.getCodi());
+		tipusDocumentalHelper.deleteTipusDocumentalsEntitat(entitat.getCodi());
 		entitatRepository.delete(entitat);
 		permisosHelper.deleteAcl(entitat.getId(), EntitatEntity.class);
 		return conversioTipusHelper.convertir(entitat, EntitatDto.class);

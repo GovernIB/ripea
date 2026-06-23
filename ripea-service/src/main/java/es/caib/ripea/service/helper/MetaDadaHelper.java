@@ -19,6 +19,8 @@ import es.caib.ripea.persistence.repository.MetaDadaRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientTascaValidacioRepository;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ItemValidacioTascaEnum;
+import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
+import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDadaDto;
 import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
 import io.micrometer.core.instrument.Timer;
@@ -33,6 +35,7 @@ public class MetaDadaHelper {
 	@Autowired private MetaExpedientHelper metaExpedientHelper;
 	@Autowired private ApplicationHelper applicationHelper;
 	@Autowired private CacheHelper cacheHelper;
+	@Autowired private ContingutLogHelper contingutLogHelper;
 
 	public MetaDadaEntity findByMetaNodeAndCodi(MetaNodeEntity metaNode, String codi) {
 		return metaDadaRepository.findByMetaNodeAndCodi(metaNode, codi);
@@ -64,7 +67,7 @@ public class MetaDadaHelper {
 				valor = metaDada.getValorString();
 			}
 	
-			MetaDadaEntity entity = MetaDadaEntity.getBuilder(
+			MetaDadaEntity metaDadaEntity = MetaDadaEntity.getBuilder(
 					metaDada.getCodi(),
 					metaDada.getNom(),
 					metaDada.getTipus(),
@@ -93,7 +96,20 @@ public class MetaDadaHelper {
 			
 			evictValidacionsExpedients(entitat, metaNode, false);
 			
-			return metaDadaRepository.save(entity);
+			metaDadaEntity = metaDadaRepository.save(metaDadaEntity);
+			
+			if (metaNode instanceof MetaExpedientEntity) {
+				contingutLogHelper.logProcedimentObjecte(
+						metaNode.getId(),
+						LogTipusEnumDto.MODIFICACIO,
+						metaDadaEntity,
+						LogObjecteTipusEnumDto.METADADA,
+						LogTipusEnumDto.CREACIO,
+						metaDadaEntity.getCodi(),
+						metaDadaEntity.getNom());
+			}
+			
+			return metaDadaEntity;
 			
 		} catch (Exception e) {
 			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Procediment.metaDada", "resultado", "error");
@@ -135,16 +151,16 @@ public class MetaDadaHelper {
 		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(
 				entitat,
 				metaNodeId);
-		MetaDadaEntity entity = entityComprovarHelper.comprovarMetaDada(
+		MetaDadaEntity metaDadaEntity = entityComprovarHelper.comprovarMetaDada(
 				entitat,
 				metaNode,
 				metaDada.getId());
 
-		if (!metaDada.getMultiplicitat().equals(entity.getMultiplicitat())) {
+		if (!metaDada.getMultiplicitat().equals(metaDadaEntity.getMultiplicitat())) {
 			evictValidacionsExpedients(entitat, metaNode, false);
 		}
 		
-		entity.update(metaDada);
+		metaDadaEntity.update(metaDada);
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
 			Long metaExpedientId = null;
@@ -156,7 +172,18 @@ public class MetaDadaHelper {
 			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId, organId);
 		}
 		
-		return entity;
+		if (metaNode instanceof MetaExpedientEntity) {
+			contingutLogHelper.logProcedimentObjecte(
+					metaNode.getId(),
+					LogTipusEnumDto.MODIFICACIO,
+					metaDadaEntity,
+					LogObjecteTipusEnumDto.METADADA,
+					LogTipusEnumDto.MODIFICACIO,
+					metaDadaEntity.getCodi(),
+					metaDadaEntity.getNom());
+		}
+		
+		return metaDadaEntity;
 	}
 	
 	public MetaDadaEntity delete(
@@ -166,7 +193,7 @@ public class MetaDadaHelper {
 		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(entitat, metaNodeId);		
-		MetaDadaEntity metaDada = entityComprovarHelper.comprovarMetaDada(entitat, metaNode, id);
+		MetaDadaEntity metaDadaEntity = entityComprovarHelper.comprovarMetaDada(entitat, metaNode, id);
 		
 		//Eliminar les possibles validacions sobre la dada
 		List<MetaExpedientTascaValidacioEntity> validacionsDada = metaExpedientTascaValidacioRepository.findByItemValidacioAndItemId(
@@ -177,7 +204,7 @@ public class MetaDadaHelper {
 			metaExpedientTascaValidacioRepository.deleteAll(validacionsDada);
 		}
 		
-		metaDadaRepository.delete(metaDada);
+		metaDadaRepository.delete(metaDadaEntity);
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
 			Long metaExpedientId = null;
@@ -191,7 +218,18 @@ public class MetaDadaHelper {
 		
 		evictValidacionsExpedients(entitat, metaNode, false);		
 		
-		return metaDada;
+		if (metaNode instanceof MetaExpedientEntity) {
+			contingutLogHelper.logProcedimentObjecte(
+					metaNode.getId(),
+					LogTipusEnumDto.MODIFICACIO,
+					null,
+					LogObjecteTipusEnumDto.METADADA,
+					LogTipusEnumDto.ELIMINACIO,
+					metaDadaEntity.getCodi(),
+					metaDadaEntity.getNom());
+		}
+		
+		return metaDadaEntity;
 	}
 	
 	public MetaDadaEntity updateActiva(
@@ -205,11 +243,11 @@ public class MetaDadaHelper {
 		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(
 				entitat,
 				metaNodeId);
-		MetaDadaEntity metaDada = entityComprovarHelper.comprovarMetaDada(
+		MetaDadaEntity metaDadaEntity = entityComprovarHelper.comprovarMetaDada(
 				entitat,
 				metaNode,
 				id);
-		metaDada.updateActiva(activa);
+		metaDadaEntity.updateActiva(activa);
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
 			Long metaExpedientId = null;
@@ -221,7 +259,18 @@ public class MetaDadaHelper {
 			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId, organId);
 		}
 		
-		return metaDada;
+		if (metaNode instanceof MetaExpedientEntity) {
+			contingutLogHelper.logProcedimentObjecte(
+					metaNode.getId(),
+					LogTipusEnumDto.MODIFICACIO,
+					metaDadaEntity,
+					LogObjecteTipusEnumDto.METADADA,
+					activa?LogTipusEnumDto.ACTIVACIO:LogTipusEnumDto.DESACTIVACIO,
+					metaDadaEntity.getCodi(),
+					metaDadaEntity.getNom());
+		}
+		
+		return metaDadaEntity;
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(MetaDadaHelper.class);

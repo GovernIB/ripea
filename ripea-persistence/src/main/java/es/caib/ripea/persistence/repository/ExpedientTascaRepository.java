@@ -27,6 +27,8 @@ public interface ExpedientTascaRepository extends JpaRepository<ExpedientTascaEn
 
 	List<ExpedientTascaEntity> findByExpedient(ExpedientEntity expedient, Pageable pageable);
 
+	boolean existsByExpedientId(Long expedientId);
+
 	@Query("select " +
 		"    tasca " +
 		"from " +

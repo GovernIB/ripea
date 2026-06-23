@@ -166,7 +166,7 @@ public class CustomHalFormsPropertyFactory {
 					.withMaxLength(maxLength)
 					.withRegex(lookupRegex(metadata)) //
 					.withType(inputType) //
-					.withValue(options != null ? options.getSelectedValue() : values.get(metadata.getName())) //
+                    .withValue(options != null && options.getSelectedValue() != null ? options.getSelectedValue() : values.get(metadata.getName())) //
 					.withOptions(options);
 
 			if (options != null && options.getMaxItems() == null) {

@@ -10,12 +10,11 @@ import {
     ResourceApiProvider
 } from 'reactlib';
 import {SessionStorageProvider} from "./components/SessionStorageContext.tsx";
+import {RipeaAuthProvider} from "./components/RipeaAuthProvider.tsx";
 import SseProvider from "./components/SseClient.tsx";
 import {ThemeUserProvider} from "./components/ThemeUserProvider.tsx";
 
 dayjs.extend(duration);
-
-LicenseInfo.setLicenseKey('e0bde345c6cb2453171a44e15a0c58f5Tz0xMjQ4NTIsRT0xODAxMDk0Mzk5MDAwLFM9cHJvLExNPXN1YnNjcmlwdGlvbixQVj1pbml0aWFsLEtWPTI=');
 
 export const envVars = {
     VITE_API_URL: import.meta.env.VITE_API_URL,
@@ -25,7 +24,10 @@ export const envVars = {
     VITE_AUTH_KEYCLOAK_URL: import.meta.env.VITE_AUTH_KEYCLOAK_URL,
     VITE_AUTH_KEYCLOAK_REALM: import.meta.env.VITE_AUTH_KEYCLOAK_REALM,
     VITE_AUTH_KEYCLOAK_CLIENTID: import.meta.env.VITE_AUTH_KEYCLOAK_CLIENTID,
+    VITE_MLK: import.meta.env.VITE_MLK,
 }
+
+LicenseInfo.setLicenseKey(envVar('VITE_MLK', envVars));
 
 // const getAuthConfig = () => ({
 //     url: envVar('VITE_AUTH_KEYCLOAK_URL', envVars),
@@ -33,18 +35,21 @@ export const envVars = {
 //     clientId: envVar('VITE_AUTH_KEYCLOAK_CLIENTID', envVars),
 // });
 
+const toAbsoluteUrl = (url: string) =>
+    url.startsWith('/') ? window.location.origin + url : url;
+
 const getEnvApiUrl = () => {
     const envApiPublicUrl = envVar('VITE_API_PUBLIC_URL', envVars);
     const envApiUrl = envVar('VITE_API_URL', envVars);
     if (envApiPublicUrl || envApiUrl) {
-        return envApiPublicUrl ?? envApiUrl;
+        return toAbsoluteUrl(envApiPublicUrl ?? envApiUrl);
     } else {
         const envApiBaseUrl = envVar('VITE_API_BASE_URL', envVars);
         const envApiSuffix = envVar('VITE_API_SUFFIX', envVars) ?? '/api';
         if (envApiBaseUrl) {
-            return envApiBaseUrl + envApiSuffix;
+            return toAbsoluteUrl(envApiBaseUrl + envApiSuffix);
         } else {
-            return window.location.protocol + '//' + window.location.host + ':' + window.location.port + envApiSuffix;
+            return window.location.origin + envApiSuffix;
         }
     }
 }
@@ -54,14 +59,16 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         {/*<AuthProvider config={getAuthConfig()} mandatory everetAuthPatch>*/}
         <ResourceApiProvider apiUrl={getEnvApiUrl()} userSessionActive>
             <SessionStorageProvider>
-                <SseProvider>
-                    <ThemeUserProvider>
-                        {/*<CssBaseline />*/}
-                        <BrowserRouter basename={import.meta.env.BASE_URL}>
-                            <App />
-                        </BrowserRouter>
-                    </ThemeUserProvider>
-                </SseProvider>
+                <RipeaAuthProvider>
+                    <SseProvider>
+                        <ThemeUserProvider>
+                            {/*<CssBaseline />*/}
+                            <BrowserRouter basename={import.meta.env.BASE_URL}>
+                                <App />
+                            </BrowserRouter>
+                        </ThemeUserProvider>
+                    </SseProvider>
+                </RipeaAuthProvider>
             </SessionStorageProvider>
         </ResourceApiProvider>
         {/*</AuthProvider>*/}

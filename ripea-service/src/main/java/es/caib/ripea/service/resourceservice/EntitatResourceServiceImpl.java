@@ -21,6 +21,7 @@ import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.PermisosHelper;
+import es.caib.ripea.service.helper.TipusDocumentalHelper;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
@@ -40,6 +41,7 @@ public class EntitatResourceServiceImpl extends BaseMutableResourceService<Entit
 	private final CacheHelper cacheHelper;
 	private final ConfigHelper configHelper;
 	private final PermisosHelper permisosHelper;
+	private final TipusDocumentalHelper tipusDocumentalHelper;
 	
     @PostConstruct
     public void init() {
@@ -166,14 +168,16 @@ public class EntitatResourceServiceImpl extends BaseMutableResourceService<Entit
     }
     
     @Override
-    protected void afterDelete(EntitatResourceEntity entitat, Map<String, AnswerRequiredException.AnswerValue> answers) {
+    protected void beforeDelete(EntitatResourceEntity entitat, Map<String, AnswerRequiredException.AnswerValue> answers) {
     	configHelper.deleteConfigEntitat(entitat.getCodi());
+    	tipusDocumentalHelper.deleteTipusDocumentalsEntitat(entitat.getCodi());
     	permisosHelper.deleteAcl(entitat.getId(), EntitatEntity.class);
     }
     
     @Override
     protected void afterCreateSave(EntitatResourceEntity entitat, EntitatResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
     	configHelper.crearConfigsEntitat(entitat.getCodi());
+    	tipusDocumentalHelper.crearTipusDocumentalsEntitat(entitat.getCodi());
     }
 
 }

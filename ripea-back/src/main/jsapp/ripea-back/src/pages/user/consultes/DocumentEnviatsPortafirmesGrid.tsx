@@ -27,7 +27,7 @@ const useDetail = () => {
 
     const handleOpen = (id:any) => {
         if(apiIsReady && id){
-            apiGetOne(id)
+            apiGetOne(id, { perspectives: ['PORTAFIB_DETALL'] })
                 .then((app) => setEntity(app))
                 .catch((error) => {
                     handleClose()
@@ -75,11 +75,11 @@ const useDetail = () => {
 // Filter
 const DocumentEnviatsPortafirmesFilterForm = () => {
     return <>
-        <GridFormField xs={4} name="expedient"/>
-        <GridFormField xs={4} name="document"/>
-        <GridFormField xs={4} name="estat"/>
-        <GridFormField xs={4} name="dataEnviamentInici" type={"date"}/>
-        <GridFormField xs={4} name="dataEnviamentFi" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 4}} name="expedient"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 4}} name="document"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 4}} name="estat"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 4}} name="dataEnviamentInici" type={"date"}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 4}} name="dataEnviamentFi" type={"date"}/>
     </>
 }
 
@@ -106,7 +106,7 @@ const DocumentEnviatsPortafirmesFilter = (props: any) => {
 }
 
 // Grid
-const sortModel: any = [{field: 'dataEnviamentInici', sort: 'desc'}]
+const sortModel: any = [{field: 'enviatData', sort: 'desc'}]
 const columns = [
     {
         field: 'expedient',
@@ -152,12 +152,13 @@ const DocumentEnviatsPortafirmesGrid = () => {
         },
     ]
 
-    return <GridPage disableMargins>
+    return <GridPage autoHeight>
         <CardPage title={t('page.user.menu.portafib')}>
             <DocumentEnviatsPortafirmesFilter onSpringFilterChange={setSpringFilter}/>
 
             <StyledMuiGrid
                 resourceName={"documentPortafirmesResource"}
+				persistentStateKey={"documentPortafirmesResource_consulta"}
                 columns={columns}
                 filter={springFilter}
                 sortModel={sortModel}

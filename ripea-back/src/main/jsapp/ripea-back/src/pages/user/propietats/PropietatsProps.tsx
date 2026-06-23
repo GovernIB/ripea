@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import {Grid2 as Grid} from '@mui/material';
+import {Grid} from '@mui/material';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import List from '@mui/material/List';
@@ -18,6 +18,9 @@ import {
 import * as builder from "../../../util/springFilterUtils.ts";
 import {DetailCard} from "../../../components/CardData.tsx";
 import {usePropietatsDialog} from "./PropietatsDialog.tsx";
+import {DraggableGridRowHandler, DraggableItem} from "../../../components/DraggableContext.tsx";
+import {DndContext} from "@dnd-kit/core";
+import {dndScreenReaderInstructions} from "../../../util/dndAccessibility.tsx";
 
 const fieldPropType = (typeCode: string, typeValue?: string) => {
     if (typeValue != null) {
@@ -73,8 +76,9 @@ const PropsListItem: React.FC<{ item: any; highlight?: string, handleSaveClick: 
     };
     const {handleOpen, dialog} = usePropietatsDialog();
     return (
+        <DraggableItem id={item.id} data={item} style={{ width: '100%' }}>
         <Grid container spacing={2} sx={{ width: '100%' }}>
-            <Grid size={5}>
+            <Grid size={4.5}>
                 <TextHighlight text={item.description} match={highlight} ignoreCase />
             </Grid>
             <Grid size={6}>
@@ -90,8 +94,8 @@ const PropsListItem: React.FC<{ item: any; highlight?: string, handleSaveClick: 
                     componentProps={{ type: password ?'password' :field.type, placeholder: item.key, helperText: item.key }}
                 />
             </Grid>
-            <Grid size={1}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Grid size={1.5}>
+                <Box sx={{ display: 'flex', justifyContent: 'end' }}>
                      {(!disabled) && (<>
                         <IconButton
                             size="small"
@@ -100,14 +104,18 @@ const PropsListItem: React.FC<{ item: any; highlight?: string, handleSaveClick: 
                             <Icon fontSize="small">save</Icon>
                         </IconButton>
                          {(!item?.entitatCodi && !item?.organCodi) &&
-                             <IconButton size="small" onClick={() => handleOpen(item.id, {...item, value: changedValue})} sx={{ ml: 1 }}>
+                             <IconButton size="small" onClick={() => handleOpen(item.id, {...item, value: changedValue})}>
                                  <Icon sx={{m:0}} fontSize="small">settings</Icon>
                              </IconButton>}
                     </>)}
+                    {(!item?.entitatCodi && !item?.organCodi && !highlight) &&
+                        <DraggableGridRowHandler/>
+                    }
                 </Box>
             </Grid>
             {dialog}
         </Grid>
+        </DraggableItem>
     );
 };
 
@@ -141,25 +149,29 @@ export const PropietatsProps: React.FC<{ quickFilter?: string; entitatCodi?: str
     } = useResourceApiService('configResource');
     const { temporalMessageShow } = useBaseAppContext();
     const [configs, setConfigs] = React.useState<any[]>();
+
+    const refresh = () => {
+        const args = {
+            quickFilter,
+            filter: builder.and(
+                entitatCodi
+                    ? builder.eq('entitatCodi', `'${entitatCodi}'`)
+                    : builder.eq('entitatCodi', null),
+                builder.eq('organCodi', null),
+                builder.eq('group.key', `'${group.id}'`),
+            ),
+            namedQueries: entitatCodi ?[`BY_ENTITAT#${entitatCodi}`] :undefined,
+            sorts: ['position,asc'],
+            unpaged: true,
+        };
+        apiFind(args).then((response) => {
+            const configs = response.rows.filter(() => true);
+            setConfigs(configs);
+        });
+    }
     React.useEffect(() => {
         if (apiIsReady && group != null) {
-            const args = {
-                quickFilter,
-                filter: builder.and(
-                    entitatCodi
-                        ? builder.eq('entitatCodi', `'${entitatCodi}'`)
-                        : builder.eq('entitatCodi', null),
-                    builder.eq('organCodi', null),
-                    builder.eq('group.key', `'${group.id}'`),
-                ),
-                namedQueries: entitatCodi ?[`BY_ENTITAT#${entitatCodi}`] :undefined,
-                sorts: ['position,asc'],
-                unpaged: true,
-            };
-            apiFind(args).then((response) => {
-                const configs = response.rows.filter(() => true);
-                setConfigs(configs);
-            });
+            refresh();
         }
     }, [apiIsReady, quickFilter, group]);
 
@@ -174,12 +186,29 @@ export const PropietatsProps: React.FC<{ quickFilter?: string; entitatCodi?: str
             );
     };
 
+    const reordering = (key:any, position:number) => {
+        apiAction(undefined, { code: 'REORDER', data: {key, position} })
+            .then(() => refresh())
+            .catch((error) => {
+                temporalMessageShow(null, error?.message, 'error');
+            });
+    };
+
+    const handleDragEnd = (event: any) => {
+        const sourceData = event.active.data.current;
+        const targetData = event.over.data.current;
+        // console.log('>>> ', sourceData.id, '(', sourceData.position, ') ->', targetData.id, '(', targetData.position, ')')
+        if (sourceData.id != targetData.id) {
+            reordering(sourceData.id, targetData.position)
+        }
+    }
+
     return (
         group != null &&
         configs != null && (<>
             <Box sx={{ px: 3 }}>
                 <DetailCard title={group.description}>
-                    <Grid size={12}>
+                    <Grid size={12}><DndContext onDragEnd={handleDragEnd} accessibility={{screenReaderInstructions: dndScreenReaderInstructions}}>
                     <List component={Paper}>
                         {configs.length ? (
                             <MuiForm
@@ -211,7 +240,7 @@ export const PropietatsProps: React.FC<{ quickFilter?: string; entitatCodi?: str
                             </Box>
                         )}
                     </List>
-                    </Grid>
+                    </DndContext></Grid>
                 </DetailCard>
             </Box>
         </>)

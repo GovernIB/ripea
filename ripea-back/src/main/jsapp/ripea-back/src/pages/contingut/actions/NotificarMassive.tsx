@@ -1,7 +1,6 @@
-import {MuiFormDialogApi, useBaseAppContext, useFormContext} from "reactlib";
+import {useMuiFormDialogApiRef, useBaseAppContext, useFormContext} from "reactlib";
 import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
-import {useRef} from "react";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import useNotificar from "./Notificar.tsx";
@@ -12,9 +11,9 @@ const NotificarMassiveForm = () => {
     const filterMetaDocument = builder.eq('metaExpedient.id', data?.metaExpedient?.id)
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="metaDocument" filter={filterMetaDocument} required/>
-        <GridFormField xs={12} name="ntiOrigen" required/>
-        <GridFormField xs={12} name="ntiEstadoElaboracion" required/>
+        <GridFormField name="metaDocument" filter={filterMetaDocument} required/>
+        <GridFormField name="ntiOrigen" required/>
+        <GridFormField name="ntiEstadoElaboracion" required/>
     </Grid>
 }
 
@@ -36,7 +35,7 @@ const NotificarMassive = (props:any) => {
 
 const useNotificarMassive = (entity:any, refresh?: () => void) => {
     const { t } = useTranslation();
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
     const {handleShow: handleNotificar, content} = useNotificar(refresh)

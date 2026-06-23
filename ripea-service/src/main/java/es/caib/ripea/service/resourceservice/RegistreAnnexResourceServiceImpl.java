@@ -19,12 +19,14 @@ import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.resourceentity.ExpedientPeticioResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.RegistreAnnexResourceEntity;
+import es.caib.ripea.persistence.repository.ExecucioMassivaContingutRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.persistence.repository.RegistreAnnexRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
+import es.caib.ripea.service.helper.ExecucioMassivaHelper;
 import es.caib.ripea.service.helper.ExpedientHelper;
 import es.caib.ripea.service.helper.ExpedientPeticioHelper;
 import es.caib.ripea.service.helper.MessageHelper;
@@ -36,12 +38,14 @@ import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
-import es.caib.ripea.service.intf.dto.CodiValorDto;
+import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.ExpedientResource;
-import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.model.RegistreAnnexResource;
+import es.caib.ripea.service.intf.model.RegistreAnnexResource.ReintentarAnnexPendentForm;
 import es.caib.ripea.service.intf.model.RegistreResource;
 import es.caib.ripea.service.intf.resourceservice.RegistreAnnexResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
@@ -60,6 +64,8 @@ public class RegistreAnnexResourceServiceImpl extends BaseMutableResourceService
 	private final ExcepcioLogHelper excepcioLogHelper;
 	private final EntityComprovarHelper entityComprovarHelper;
 	private final ExpedientPeticioHelper expedientPeticioHelper;
+	private final ExecucioMassivaHelper execucioMassivaHelper;
+	private final ExecucioMassivaContingutRepository execucioMassivaContingutRepository;
 
 	private final RegistreAnnexRepository registreAnnexRepository;
 	private final OrganGestorRepository organGestorRepository;
@@ -69,6 +75,7 @@ public class RegistreAnnexResourceServiceImpl extends BaseMutableResourceService
     	register(RegistreAnnexResource.REPORT_DOWNLOAD_ANNEX, new DescarregarAnnexReportGenerator());
         register(RegistreAnnexResource.PERSPECTIVE_FIRMES, new AnnexFirmesPerspectiveApplicator());
         register(RegistreAnnexResource.PERSPECTIVE_REGISTRE, new AnnexRegistrePerspectiveApplicator());
+        register(RegistreAnnexResource.PERSPECTIVE_EN_PROCES_ADJUNTAR_ANNEXOS_CODE, new EnProcesAdjuntarAnnexosPerspectiveApplicator());
         register(RegistreAnnexResource.ACTION_REINTENTAR_CODE, new ReintentarArxiuActionExecutor());
     }
     
@@ -158,6 +165,16 @@ public class RegistreAnnexResourceServiceImpl extends BaseMutableResourceService
         }
     }
     
+    private class EnProcesAdjuntarAnnexosPerspectiveApplicator implements PerspectiveApplicator<RegistreAnnexResourceEntity, RegistreAnnexResource> {
+        @Override
+        public void applySingle(String code, RegistreAnnexResourceEntity entity, RegistreAnnexResource resource) throws PerspectiveApplicationException {
+            execucioMassivaContingutRepository
+                    .findFirstByElementIdAndElementTipusAndExecucioMassivaTipusAndExecucioMassivaDataFiNull(
+                            entity.getId(), ElementTipusEnumDto.ANNEX, ExecucioMassivaTipusDto.ADJUNTAR_ANNEXOS_PENDENTS)
+                    .ifPresent(contingut -> resource.setExecucioMassivaAdjuntarAnnexosId(contingut.getExecucioMassiva().getId()));
+        }
+    }
+
     private class DescarregarAnnexReportGenerator implements ReportGenerator<RegistreAnnexResourceEntity, Serializable, Serializable> {
 
 		@Override
@@ -180,21 +197,36 @@ public class RegistreAnnexResourceServiceImpl extends BaseMutableResourceService
 		}
     }
     
-    private class ReintentarArxiuActionExecutor implements ActionExecutor<RegistreAnnexResourceEntity, MassiveAction, Serializable> {
+    private class ReintentarArxiuActionExecutor implements ActionExecutor<RegistreAnnexResourceEntity, ReintentarAnnexPendentForm, Serializable> {
 
 		@Override
-		public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue,Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
+		public void onChange(Serializable id, ReintentarAnnexPendentForm previous, String fieldName, Object fieldValue,Map<String, AnswerValue> answers, String[] previousFieldNames, ReintentarAnnexPendentForm target) {}
 
 		@Override
-		public Serializable exec(String code, RegistreAnnexResourceEntity entity, MassiveAction params) throws ActionExecutionException {
+		public Serializable exec(String code, RegistreAnnexResourceEntity entity, ReintentarAnnexPendentForm params) throws ActionExecutionException {
 			try {
-				List<CodiValorDto> resultat = new ArrayList<>();
-				for (Long idAnn: params.getIds()) {
-					Exception errorReintentant = expedientHelper.moveDocumentArxiuNewTransaction(idAnn);
-					resultat.add(new CodiValorDto(idAnn.toString(), errorReintentant!=null?errorReintentant.getMessage():"OK"));
+				
+				if (!params.isMassivo()) {
+					expedientHelper.retryCreateDocFromAnnex(
+							params.getIds().get(0),
+							params.getMetaDocument().getId(),
+							configHelper.getRolActual());
+				} else {
+					ExecucioMassivaDto dto = new ExecucioMassivaDto();
+					dto.setTipus(ExecucioMassivaTipusDto.ADJUNTAR_ANNEXOS_PENDENTS);
+					dto.setContingutIds(params.getIds());
+					dto.setIdentificadorAuxiliar(params.getMetaDocument().getId());
+					dto.setRolActual(configHelper.getRolActual());
+					
+			        String entitatActualCodi = configHelper.getEntitatActualCodi();
+			        EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
+					
+					execucioMassivaHelper.crearExecucioMassiva(entitat.getId(), dto, ElementTipusEnumDto.ANNEX);
 				}
+
 				int numElem = params!=null && params.getIds()!=null?params.getIds().size():0;
 				return "{\"num\": \""+numElem+"\"}";
+				
 			} catch (Exception e) {
 				String ids = Utils.getIdsSeparatsComa(params.getIds());
 				excepcioLogHelper.addExcepcio("/annexPeticio/ReintentarArxiuActionExecutor",e,ids,"massiu="+params.isMassivo());
@@ -203,5 +235,4 @@ public class RegistreAnnexResourceServiceImpl extends BaseMutableResourceService
 			}
 		}
     }
-
 }

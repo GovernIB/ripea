@@ -16,6 +16,10 @@ export const or = (...options :any[]) :string => {
 export const like = (option :string, value :string) :string => {
     return `${option}~'%${value}%'`;
 }
+export const likeNormalized = (option :string, value :string) :string => {
+    const normalized = value ? value.normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase() : value;
+    return `${option}~'%${normalized}%'`;
+}
 export const neq = (option :string, value :any) :string => {
     return value===null ?`${option} is not null` :`${option}!${value}`;
 }

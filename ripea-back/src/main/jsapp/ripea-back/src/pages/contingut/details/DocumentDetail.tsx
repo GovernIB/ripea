@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {Alert, Box, Button, Grid, Icon, Typography, Link, Grid2} from "@mui/material";
+import {Alert, Box, Button, Grid, Icon, Typography, Link} from "@mui/material";
 import {GridPage, useResourceApiService, MuiDialog, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import TabComponent from "../../../components/TabComponent.tsx";
@@ -45,7 +45,7 @@ const Dada = (props:any) => {
         entity['potModificar'] = potModificar;
     }
 
-    return <GridPage>
+    return <GridPage autoHeight>
         <Box width={'100%'} height={110 + 52 * 4}>
             <MetaDadaGrid entity={entity} onRowCountChange={onRowCountChange} onRefresh={refresh}/>
         </Box>
@@ -57,7 +57,7 @@ const Versiones = (props:any) => {
     const { t } = useTranslation();
     const {descarregarVersio} = useActions()
 
-    return <Grid2 container flexDirection={"column"} columnSpacing={1} rowSpacing={1}>
+    return <Grid container flexDirection={"column"} columnSpacing={1} rowSpacing={1}>
         {entity?.versions?.map((version:any) =>
             <DetailCard key={version?.id} title={t('page.document.versio.title') + ' ' + version?.id}
                         header={entity?.documentTipus != 'FISIC' && <Box ml="auto">
@@ -70,7 +70,7 @@ const Versiones = (props:any) => {
                 <DetailCardContent title={t('page.document.versio.arxiuUuid')}>{version?.arxiuUuid}</DetailCardContent>
             </DetailCard>
         )}
-    </Grid2>;
+    </Grid>;
 }
 
 export const Firmes = (props:any) => {
@@ -80,10 +80,10 @@ export const Firmes = (props:any) => {
         {
             entity?.firmes?.map((firma:any, index:number) => {
                 return firma?.errorFirma
-                    ? <Grid item xs={12} key={index}><Alert severity={"error"}>{firma?.errorDesc}</Alert></Grid>
+                    ? <Grid size={12} key={index}><Alert severity={"error"}>{firma?.errorDesc}</Alert></Grid>
                     : <>
                         {firma?.detalls?.map((detall: any, i: number) =>
-                            <Grid item xs={12} key={`${index}-${i}`}>
+                            <Grid size={12} key={`${index}-${i}`}>
                                 <Icon>{icons.firma}</Icon> {detall?.responsableNom} - {detall?.responsableNif} - {formatDate(detall?.data)} - {detall?.emissorCertificat}
                             </Grid>
                         )}
@@ -93,7 +93,7 @@ export const Firmes = (props:any) => {
     </Grid>
 }
 
-const perspectives = ['VERSIONS', 'COUNT', 'FIRMES']
+const perspectives = ['VERSIONS', 'COUNT', 'FIRMES', 'RESUM']
 const useDocumentDetail = (expedient:any, refresh?: () => void) => {
     const { t } = useTranslation();
 

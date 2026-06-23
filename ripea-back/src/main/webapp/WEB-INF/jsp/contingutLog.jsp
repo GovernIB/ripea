@@ -114,12 +114,12 @@ $(document).ready(function() {
 									<c:when test="${log.secundari}">
 										<span class="fa fa-arrow-right" title="<spring:message code="contingut.log.title.secundari"/>"></span>
 										<c:if test="${not empty log.objecteLogTipus}">
-											<spring:message code="log.tipus.enum.${log.objecteLogTipus}"/>
+											<spring:message code="es.caib.ripea.service.intf.dto.LogTipusEnumDto.${log.objecteLogTipus}"/>
 										</c:if>
-										<spring:message code="log.objecte.tipus.enum.${log.objecteTipus}"/>#${log.objecteId}
+										<spring:message code="es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto.${log.objecteTipus}"/>#${log.objecteId}
 									</c:when>
 									<c:otherwise>
-										<spring:message code="log.tipus.enum.${log.tipus}"/>
+										<spring:message code="es.caib.ripea.service.intf.dto.LogTipusEnumDto.${log.tipus}"/>
 									</c:otherwise>
 								</c:choose>
 							</td>

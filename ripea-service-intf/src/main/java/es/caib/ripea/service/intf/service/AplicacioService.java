@@ -110,6 +110,15 @@ public interface AplicacioService {
 	@PreAuthorize("hasRole('IPA_SUPER')")
 	PaginaDto<IntegracioAccioDto> integracioFindDarreresAccionsByCodiPaginat(String codi, PaginacioParamsDto params, IntegracioFiltreDto filtre);
 
+	/**
+	 * Obté el detall d'una acció d'integració donat el seu identificador.
+	 *
+	 * @param id Identificador de l'acció.
+	 * @return L'acció d'integració, o null si no existeix.
+	 */
+	@PreAuthorize("hasRole('IPA_SUPER')")
+	IntegracioAccioDto integracioFindOne(Long id);
+
 	public List<IntegracioAccioDto> getLastIntegracions(IntegracioEnumDto codiIntegracio, int numElements);
 	
 	/**
@@ -132,11 +141,21 @@ public interface AplicacioService {
 
 	/**
 	 * Retorna una llista amb les darreres excepcions emmagatzemades.
-	 * 
+	 *
 	 * @return La llista amb les darreres excepcions.
 	 */
 	@PreAuthorize("hasRole('IPA_SUPER')")
 	public List<ExcepcioLogDto> excepcioFindAll();
+
+	/**
+	 * Retorna una pàgina d'excepcions emmagatzemades.
+	 *
+	 * @param params
+	 *             Paràmetres de paginació i ordenació.
+	 * @return La pàgina d'excepcions.
+	 */
+	@PreAuthorize("hasRole('IPA_SUPER')")
+	public PaginaDto<ExcepcioLogDto> excepcioFindPage(PaginacioParamsDto params);
 
 	/**
 	 * Retorna una llista amb els diferents rols els quals
@@ -279,7 +298,13 @@ public interface AplicacioService {
 	
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public List<Long> getAvisosComanda();
-	
+
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public String executeAvisComanda(Long expedientId) throws Exception;
+
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public List<Long> getEntitatsSenseTipusDocumentals();
+
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public String executeCrearTipusDocumentalsEntitat(Long entitatId) throws Exception;
 }

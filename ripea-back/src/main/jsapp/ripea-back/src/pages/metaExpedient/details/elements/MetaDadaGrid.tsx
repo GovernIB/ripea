@@ -1,17 +1,17 @@
 import {useTranslation} from "react-i18next";
 import {GridPage, useBaseAppContext, useFormContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
-import {CardPage} from "../../../../components/CardData.tsx";
-import {DndMuiGrid} from "../../../../components/StyledMuiGrid.tsx";
+import {CardPage} from "@src/components/CardData.tsx";
+import StyledMuiGrid from "@src/components/StyledMuiGrid.tsx";
 import {Grid, Icon, Divider, Button} from "@mui/material";
-import * as builder from "../../../../util/springFilterUtils.ts";
+import * as builder from "@src/util/springFilterUtils.ts";
 import {useNavigate, useParams} from "react-router-dom";
-import GridFormField from "../../../../components/GridFormField.tsx";
+import GridFormField from "@src/components/GridFormField.tsx";
 import {useEffect, useMemo, useState} from "react";
-import {setTitlePage} from "../../../../TitleHeaderConfigurator.tsx";
-import {useUserSession} from "../../../../components/Session.tsx";
-import {MultiplicitatStyled} from "../../../contingut/details/MetaExpedient.tsx";
+import {setTitlePage} from "@src/TitleHeaderConfigurator.tsx";
+import {useUserSession} from "@src/components/Session.tsx";
+import {MultiplicitatStyled} from "@src/pages/contingut/details/MetaExpedient.tsx";
 import useMetaDadaDetail from "./details/MetaDadaDetail.tsx";
-import {ErrorPage} from "../../../../components/ErrorPage.tsx";
+import {ErrorPage} from "@src/components/ErrorPage.tsx";
 
 const useActions = (refresh?: () => void) => {
     const {t} = useTranslation();
@@ -45,7 +45,6 @@ const useActions = (refresh?: () => void) => {
 
     const reordering = (id:any, ordre:number) => {
         apiAction(id, { code: 'REORDENAR', data: ordre })
-            .then(() => refresh?.())
             .catch((error) => {
                 temporalMessageShow(null, error?.message, 'error');
             });
@@ -55,27 +54,27 @@ const useActions = (refresh?: () => void) => {
 }
 
 // Form
-const MetaDocumentDadaForm = ({ enviable }:any) => {
+export const MetaDocumentDadaForm = ({ enviable }:any) => {
     const {data} = useFormContext()
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="codi"/>
-        <GridFormField xs={12} name="nom"/>
-        <GridFormField xs={12} name="tipus" disabled={!!data?.id} required/>
-        <GridFormField xs={12} name="multiplicitat" required/>
+        <GridFormField name="codi"/>
+        <GridFormField name="nom"/>
+        <GridFormField name="tipus" disabled={!!data?.id} required/>
+        <GridFormField name="multiplicitat" required/>
 
-        <GridFormField xs={12} name="valorString" hidden={data?.tipus!="TEXT"}/>
-        <GridFormField xs={12} name="valorData" type={"date"} hidden={data?.tipus!="DATA"}/>
-        <GridFormField xs={12} name="valorImport" decimalScale={2} hidden={data?.tipus!="IMPORT"}/>
-        <GridFormField xs={12} name="valorSencer" decimalScale={0} hidden={data?.tipus!="SENCER"}/>
-        <GridFormField xs={12} name="valorFlotant" hidden={data?.tipus!="FLOTANT"}/>
-        <GridFormField xs={12} name="valorBoolea" hidden={data?.tipus!="BOOLEA"}/>
-        <GridFormField xs={12} name="domini" hidden={data?.tipus!="DOMINI"}/>
-        <GridFormField xs={12} name="noAplica" hidden={data?.tipus!="DOMINI"}/>
+        <GridFormField name="valorString" hidden={data?.tipus!="TEXT"}/>
+        <GridFormField name="valorData" type={"date"} hidden={data?.tipus!="DATA"}/>
+        <GridFormField name="valorImport" decimalScale={2} hidden={data?.tipus!="IMPORT"}/>
+        <GridFormField name="valorSencer" decimalScale={0} hidden={data?.tipus!="SENCER"}/>
+        <GridFormField name="valorFlotant" hidden={data?.tipus!="FLOTANT"}/>
+        <GridFormField name="valorBoolea" hidden={data?.tipus!="BOOLEA"}/>
+        <GridFormField name="domini" hidden={data?.tipus!="DOMINI"}/>
+        <GridFormField name="noAplica" hidden={data?.tipus!="DOMINI"}/>
 
-        <GridFormField xs={12} name="descripcio" type={"textarea"}/>
+        <GridFormField name="descripcio" type={"textarea"}/>
 
-        <GridFormField xs={12} name="enviable" hidden={!enviable}/>
-        <GridFormField xs={12} name="metadadaArxiu" hidden={!enviable || !data?.enviable} required/>
+        <GridFormField name="enviable" hidden={!enviable}/>
+        <GridFormField name="metadadaArxiu" hidden={!enviable || !data?.enviable} required/>
     </Grid>
 }
 
@@ -107,7 +106,7 @@ const columns = [
     },
 ]
 
-export const MetDadaGrid = ({ id, enviable = false, readOnly, ...other }: any) => {
+export const MetDadaGrid = ({ id, enviable = false, readOnly, persistentStateKey = "metaDadaResource_procedimentTab", ...other }: any) => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
     const {value: user} = useUserSession()
@@ -159,23 +158,21 @@ export const MetDadaGrid = ({ id, enviable = false, readOnly, ...other }: any) =
         },
     ], [t, readOnly, apiIsReady])
 
-    const handleDragEnd = (event: any) => {
-        const sourceData = event.active.data.current;
-        const targetData = event.over.data.current;
-        // console.log('>>> ', sourceData.codi, '(', sourceData.ordre, ') ->', targetData.codi, '(', targetData.ordre, ')')
-        if (sourceData.id != targetData.id) {
-            reordering(sourceData.id, targetData.ordre)
+    const handleDragEnd = (params: any) => {
+        if (params.targetIndex != params.oldIndex) {
+            reordering(params.row.id, params.targetIndex)
         }
     }
 
-    return <><DndMuiGrid
+    return <><StyledMuiGrid
         apiRef={apiRef}
         resourceName={"metaDadaResource"}
+		persistentStateKey={persistentStateKey}
         popupEditUpdateActive
         popupEditFormDialogResourceTitle={t('page.metaDada.title')}
         popupEditFormContent={<MetaDocumentDadaForm enviable={enviable && user?.sessionScope?.isPropagarMetadades}/>}
         columns={columns}
-        toolbarHideQuickFilter={false}
+        toolbarShowQuickFilter
         filter={builder.eq("metaNode.id", id)}
         formAdditionalData={{ metaNode: {id} }}
         staticSortModel={sortModel}
@@ -183,7 +180,8 @@ export const MetDadaGrid = ({ id, enviable = false, readOnly, ...other }: any) =
         rowAdditionalActions={actions}
         {...other}
 
-        onDragEnd={handleDragEnd}
+        rowReordering={!readOnly}
+        onRowOrderChange={handleDragEnd}
 
         toolbarCreateTitle={t('page.metaDada.action.new.label')}
         popupEditFormI18nKeys={{
@@ -231,7 +229,7 @@ const MetaDadaGrid = () => {
     if (error)
         return <ErrorPage error={error}/>
 
-    return <GridPage disableMargins>
+    return <GridPage autoHeight>
         <CardPage title={t('page.user.menu.documentDada', {nom: metaDocument?.nom})}
                   header={<>
                       <Button
@@ -244,7 +242,7 @@ const MetaDadaGrid = () => {
                           {t('common.back')}
                       </Button>
                   </>}>
-            <MetDadaGrid id={id} readOnly={readOnly}/>
+            <MetDadaGrid id={id} readOnly={readOnly} persistentStateKey={"metaDadaResource_metaDocumentTab"}/>
         </CardPage>
     </GridPage>
 }

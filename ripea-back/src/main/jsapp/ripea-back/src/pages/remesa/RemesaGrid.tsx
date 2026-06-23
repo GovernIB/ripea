@@ -1,3 +1,4 @@
+import React from "react";
 import {useMuiDataGridApiRef} from "reactlib";
 import {Grid, Icon} from "@mui/material";
 import useRemesaActions from "./details/RemesaActions.tsx";
@@ -23,59 +24,49 @@ export const EstatMessage = (props:any) => {
 export const StyledEstat = (props:any) => {
     const { entity, children } = props;
 
+    let estatElement: React.ReactElement | null = null;
     switch (entity?.notificacioEstat) {
         case 'PENDENT':
-            return <>
-                { entity?.error &&
-                    <Icon fontSize={"inherit"} 
-                        title={entity.errorDescripcio} 
-                        sx={{ mr: children!=null  ?1 :0, color: 'error.light' }}>warning</Icon>
-                }            
-                <EstatMessage icon={"schedule"} color='warning'>{children}</EstatMessage>
-            </>
+            estatElement = <EstatMessage icon={"schedule"} color='warning'>{children}</EstatMessage>; break;
         case 'REGISTRADA':
-            if (entity?.error) {
-                return <EstatMessage icon={"warning"} color={'error'}>{children}</EstatMessage>
-            } else {
-                return <EstatMessage icon={"info"} color={'info'}>{children}</EstatMessage>
-            }
         case 'PROCESSADA':
         case 'ENVIADA':
-            return <EstatMessage icon={"info"} color={'info'}>{children}</EstatMessage>
+            estatElement = <EstatMessage icon={"info"} color={'info'}>{children}</EstatMessage>; break;
         case 'FINALITZADA':
-            return <EstatMessage icon={"check"} color={'success'}>{children}</EstatMessage>
+            estatElement = <EstatMessage icon={"check"} color={'success'}>{children}</EstatMessage>; break;
         case 'ENVIADA_AMB_ERRORS':
-            if (entity?.error) {
-                return <EstatMessage icon={"warning"} color={'error'}>{children}</EstatMessage>
-            } else {
-                return <EstatMessage icon={"check"} color={'success'}>{children}</EstatMessage>
-            }
+            estatElement = <EstatMessage icon={"check"} color={'success'}>{children}</EstatMessage>; break;
         case 'FINALITZADA_AMB_ERRORS':
-            if (entity?.error) {
-                return <EstatMessage icon={"warning"} color={'error'}>{children}</EstatMessage>
-            } else {
-                return <EstatMessage icon={"mail"} color={'info'}>{children}</EstatMessage>
-            }
+            estatElement = <EstatMessage icon={"mail"} color={'info'}>{children}</EstatMessage>; break;
     }
 
-    return <></>
+    if (!estatElement) return <></>;
+
+    return <>
+        {entity?.error &&
+            <Icon fontSize={"inherit"}
+                title={entity.errorDescripcio}
+                sx={{ mr: children != null ? 1 : 0, color: 'error.light' }}>warning</Icon>
+        }
+        {estatElement}
+    </>
 }
 
 const RemesaGridForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="tipus"/>
-        <GridFormField xs={12} name="estat" disabled readOnly/>
-        {/*<GridFormField xs={12} name="interessats" multiple/>*/}
-        <GridFormField xs={12} name="assumpte"/>
-        <GridFormField xs={12} name="serveiTipusEnum"/>
-        <GridFormField xs={12} name="observacions"/>
-        <GridFormField xs={12} name="dataProgramada" type={'date'}/>
+        <GridFormField name="tipus"/>
+        <GridFormField name="estat" disabled readOnly/>
+        {/*<GridFormField name="interessats" multiple/>*/}
+        <GridFormField name="assumpte"/>
+        <GridFormField name="serveiTipusEnum"/>
+        <GridFormField name="observacions"/>
+        <GridFormField name="dataProgramada" type={'date'}/>
 
-        {/*<GridFormField xs={12} name="caducitatDiesNaturals"/>*/}
-        <GridFormField xs={12} name="dataCaducitat" type={'date'}/>
+        {/*<GridFormField name="caducitatDiesNaturals"/>*/}
+        <GridFormField name="dataCaducitat" type={'date'}/>
 
-        <GridFormField xs={12} name="retard"/>
-        <GridFormField xs={12} name="entregaPostal" disabled/>
+        <GridFormField name="retard"/>
+        <GridFormField name="entregaPostal" disabled/>
     </Grid>
 }
 

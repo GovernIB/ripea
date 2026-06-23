@@ -12,8 +12,8 @@ import lombok.experimental.FieldNameConstants;
 @NoArgsConstructor
 @FieldNameConstants
 @ResourceConfig(
-        quickFilterFields = { "codi", "nom" },
-        descriptionField = "nom"
+        quickFilterFields = { "classname", "type" },
+        descriptionField = "classname"
 )
 public class AclClassResource extends BaseResource<Long> {
 

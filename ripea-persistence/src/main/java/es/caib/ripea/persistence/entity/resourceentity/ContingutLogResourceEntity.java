@@ -5,6 +5,7 @@ import es.caib.ripea.persistence.base.entity.ResourceEntity;
 import es.caib.ripea.persistence.entity.ContingutLogEntity;
 import es.caib.ripea.persistence.entity.ContingutMovimentEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.dto.LogContingutTipusEnumDto;
 import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.model.CarpetaResource;
@@ -37,10 +38,15 @@ public class ContingutLogResourceEntity extends BaseAuditableEntity<ContingutLog
     @Column(name = "objecte_id", length = 64)
     private String objecteId;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "contingut_id")
-    @org.hibernate.annotations.ForeignKey(name = BaseConfig.DB_PREFIX + "contingut_contlog_fk")
-    protected ContingutResourceEntity contingut;
+//    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+//    @JoinColumn(name = "contingut_id")
+//    @org.hibernate.annotations.ForeignKey(name = BaseConfig.DB_PREFIX + "contingut_contlog_fk")
+//    protected ContingutResourceEntity contingut;
+    @Column(name = "contingut_id", length = 64)
+    private Long contingutId;
+    @Column(name = "contingut_tipus", length = 64)
+    @Enumerated(EnumType.STRING)
+    private LogContingutTipusEnumDto contingutTipus;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "contmov_id")

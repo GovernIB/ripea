@@ -1,67 +1,65 @@
 package es.caib.ripea.service.helper;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
+import es.caib.ripea.persistence.entity.resourceentity.IntegracioResourceEntity;
+import es.caib.ripea.persistence.entity.resourcerepository.IntegracioResourceRepository;
 import es.caib.ripea.service.intf.dto.IntegracioAccioDto;
 import es.caib.ripea.service.intf.dto.IntegracioAccioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.IntegracioAccioTipusEnumDto;
+import es.caib.ripea.service.intf.dto.IntegracioCodiEnum;
 import es.caib.ripea.service.intf.dto.IntegracioDto;
 import es.caib.ripea.service.intf.dto.IntegracioFiltreDto;
 import es.caib.ripea.service.intf.utils.Utils;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class IntegracioHelper {
-	
-	@Autowired private CacheHelper cacheHelper;
-	@Autowired private ConfigHelper configHelper;
-	@Autowired private MessageHelper messageHelper;
 
-	public static final int DEFAULT_MAX_ACCIONS = 20;
+	private final IntegracioResourceRepository integracioResourceRepository;
+	private final CacheHelper cacheHelper;
+	private final ConfigHelper configHelper;
+	private final MessageHelper messageHelper;
 
-	public static final String INTCODI_USUARIS = "USUARIS";
-	public static final String INTCODI_UNITATS = "ORGANISMES";
-	public static final String INTCODI_CIUTADA = "CIUTADA"; //No implementat (Sede electrónica)
-	public static final String INTCODI_PFIRMA = "PORTAFIRMES";
-	public static final String INTCODI_FIRMASIMPLE = "FIRMA_SIMPLE_WEB";
-	public static final String INTCODI_ARXIU = "ARXIU";
-	public static final String INTCODI_CONCSV = "CONCSV";
-	public static final String INTCODI_PINBAL = "PINBAL";
-	public static final String INTCODI_CONVERT = "CONVERSIO";
-	public static final String INTCODI_CALLBACK = "CALLBACK";
-	public static final String INTCODI_DADESEXT = "DADESEXT";
-	public static final String INTCODI_VALIDASIG = "VALIDATE_SIGNATURE";
-	public static final String INTCODI_FIRMAAGIL = "FIRMA_AGIL";
-	public static final String INTCODI_NOTIFICACIO = "NOTIB";
-	public static final String INTCODI_GESDOC = "GES_DOC";
-	public static final String INTCODI_FIRMASERV = "FIRMA_SERVIDOR";
-	public static final String INTCODI_VIAFIRMA = "FIRMA_VIAFIRMA";
-	public static final String INTCODI_DIGITALITZACIO = "DIGITALITZACIO";
-	public static final String INTCODI_PROCEDIMENT = "GESCONADM";
-	public static final String INTCODI_SUMMARIZE = "SUMMARIZE";
-	public static final String INTCODI_DISTRIBUCIO = "DISTRIBUCIO";
-	public static final String INTCODI_COMANDA = "COMANDA";
-	public static final String INTCODI_REGISTRE = "REGISTRE";
-	
-	private Map<String, LinkedList<IntegracioAccioDto>> accionsIntegracio = Collections.synchronizedMap(new HashMap<String, LinkedList<IntegracioAccioDto>>());
-	private Map<String, Integer> maxAccionsIntegracio = new HashMap<String, Integer>();
+	public static final String INTCODI_USUARIS        = IntegracioCodiEnum.USUARIS.name();
+	public static final String INTCODI_UNITATS        = IntegracioCodiEnum.ORGANISMES.name();
+	public static final String INTCODI_CIUTADA        = IntegracioCodiEnum.CIUTADA.name();
+	public static final String INTCODI_PFIRMA         = IntegracioCodiEnum.PORTAFIRMES.name();
+	public static final String INTCODI_FIRMASIMPLE    = IntegracioCodiEnum.FIRMA_SIMPLE_WEB.name();
+	public static final String INTCODI_ARXIU          = IntegracioCodiEnum.ARXIU.name();
+	public static final String INTCODI_CONCSV         = IntegracioCodiEnum.CONCSV.name();
+	public static final String INTCODI_PINBAL         = IntegracioCodiEnum.PINBAL.name();
+	public static final String INTCODI_CONVERT        = IntegracioCodiEnum.CONVERSIO.name();
+	public static final String INTCODI_CALLBACK       = IntegracioCodiEnum.CALLBACK.name();
+	public static final String INTCODI_DADESEXT       = IntegracioCodiEnum.DADESEXT.name();
+	public static final String INTCODI_VALIDASIG      = IntegracioCodiEnum.VALIDATE_SIGNATURE.name();
+	public static final String INTCODI_FIRMAAGIL      = IntegracioCodiEnum.FIRMA_AGIL.name();
+	public static final String INTCODI_NOTIFICACIO    = IntegracioCodiEnum.NOTIB.name();
+	public static final String INTCODI_GESDOC         = IntegracioCodiEnum.GES_DOC.name();
+	public static final String INTCODI_FIRMASERV      = IntegracioCodiEnum.FIRMA_SERVIDOR.name();
+	public static final String INTCODI_VIAFIRMA       = IntegracioCodiEnum.FIRMA_VIAFIRMA.name();
+	public static final String INTCODI_DIGITALITZACIO = IntegracioCodiEnum.DIGITALITZACIO.name();
+	public static final String INTCODI_PROCEDIMENT    = IntegracioCodiEnum.GESCONADM.name();
+	public static final String INTCODI_SUMMARIZE      = IntegracioCodiEnum.SUMMARIZE.name();
+	public static final String INTCODI_DISTRIBUCIO    = IntegracioCodiEnum.DISTRIBUCIO.name();
+	public static final String INTCODI_COMANDA        = IntegracioCodiEnum.COMANDA.name();
+	public static final String INTCODI_REGISTRE       = IntegracioCodiEnum.REGISTRE.name();
 
-	private static final Object lock = new Object();
-	
 	public List<IntegracioDto> findAll() {
 		List<IntegracioDto> integracions = new ArrayList<IntegracioDto>();
 		integracions.add(novaIntegracio(INTCODI_PFIRMA));
@@ -88,33 +86,25 @@ public class IntegracioHelper {
 	}
 
 	public List<IntegracioAccioDto> findAccionsByIntegracioCodi(String integracioCodi, IntegracioFiltreDto filtre) {
-		synchronized(lock){
-
-			List<IntegracioAccioDto> listaAccions = getLlistaAccions(integracioCodi);
-			int index = 0;
-			LinkedList<IntegracioAccioDto> accionsFiltered = new LinkedList<>();
-			for(IntegracioAccioDto accio : listaAccions) {
-				
-				boolean shouldAddTList = true;
-				if (filtre != null) {
-					shouldAddTList = 
-							(Utils.isEmpty(filtre.getEntitatCodi()) || Utils.containsIgnoreCase(accio.getEntitatCodi(), filtre.getEntitatCodi())) &&
-							(filtre.getDataInici() == null || !filtre.getDataInici().after(accio.getData())) &&
-							(filtre.getDataFi() == null || !DateHelper.toDateFinalDia(filtre.getDataFi()).before(accio.getData())) &&
-							(filtre.getTipus() == null || filtre.getTipus() ==  accio.getTipus()) &&
-							(Utils.isEmpty(filtre.getDescripcio()) || Utils.containsIgnoreCase(accio.getDescripcio(), filtre.getDescripcio())) &&
-							(filtre.getEstat() == null || filtre.getEstat() ==  accio.getEstat());
-				}
-			
-				if (shouldAddTList) {
-					accio.setIndex(Long.valueOf(index++));
-					accionsFiltered.add(accio);
-				}
-			}
-			return accionsFiltered;
+		IntegracioCodiEnum codi;
+		try {
+			codi = IntegracioCodiEnum.valueOf(integracioCodi);
+		} catch (IllegalArgumentException e) {
+			log.warn("Codi d'integració desconegut: {}", integracioCodi);
+			return new ArrayList<>();
 		}
+		List<IntegracioResourceEntity> entities = integracioResourceRepository.findByCodiOrderByDataDesc(codi);
+		List<IntegracioAccioDto> result = new ArrayList<>();
+		for (IntegracioResourceEntity entity : entities) {
+			IntegracioAccioDto accio = toDto(entity);
+			if (matchesFiltre(accio, filtre)) {
+				result.add(accio);
+			}
+		}
+		return result;
 	}
 
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void addAccioOk(
 			String integracioCodi,
 			String descripcio,
@@ -122,18 +112,13 @@ public class IntegracioHelper {
 			Map<String, String> parametres,
 			IntegracioAccioTipusEnumDto tipus,
 			long tempsResposta) {
-		IntegracioAccioDto accio = new IntegracioAccioDto();
-		accio.setIntegracio(novaIntegracio(integracioCodi));
-		accio.setData(new Date());
-		accio.setDescripcio(descripcio);
-		accio.setEndpoint(endpoint);
-		accio.setParametres(parametres);
-		accio.setTipus(tipus);
-		accio.setTempsResposta(tempsResposta);
-		accio.setEstat(IntegracioAccioEstatEnumDto.OK);
-		addAccio(integracioCodi, accio);
+		IntegracioResourceEntity entity = buildEntity(integracioCodi, descripcio, endpoint, parametres, tipus, tempsResposta, IntegracioAccioEstatEnumDto.OK);
+		if (entity != null) {
+			integracioResourceRepository.save(entity);
+		}
 	}
 
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void addAccioError(
 			String integracioCodi,
 			String descripcio,
@@ -143,103 +128,102 @@ public class IntegracioHelper {
 			long tempsResposta,
 			String errorDescripcio,
 			Throwable throwable) {
-
-		IntegracioAccioDto accio = new IntegracioAccioDto();
-		accio.setIntegracio(novaIntegracio(integracioCodi));
-		accio.setData(new Date());
-		accio.setDescripcio(descripcio);
-		accio.setEndpoint(endpoint);
-		accio.setParametres(parametres);
-		accio.setTipus(tipus);
-		accio.setTempsResposta(tempsResposta);
-		accio.setEstat(IntegracioAccioEstatEnumDto.ERROR);
-		accio.setErrorDescripcio(errorDescripcio);
-		if (throwable != null) {
-			accio.setExcepcioMessage(ExceptionUtils.getMessage(throwable));
-			accio.setExcepcioStacktrace(ExceptionUtils.getStackTrace(throwable));
-		}
-		addAccio(integracioCodi, accio);
-	}
-
-	public LinkedList<IntegracioAccioDto> getLlistaAccions(
-			String integracioCodi) {
-			LinkedList<IntegracioAccioDto> accions = accionsIntegracio.get(integracioCodi);
-			if (accions == null) {
-				accions = new LinkedList<IntegracioAccioDto>();
-				accionsIntegracio.put(
-						integracioCodi,
-						accions);
-			} else {
-				int index = 0;
-				
-				Iterator<IntegracioAccioDto> iterator = accions.iterator();
-				while (iterator.hasNext()) {
-					IntegracioAccioDto accio = iterator.next();
-					accio.setIndex(Long.valueOf(index++));
-				}
+		IntegracioResourceEntity entity = buildEntity(integracioCodi, descripcio, endpoint, parametres, tipus, tempsResposta, IntegracioAccioEstatEnumDto.ERROR);
+		if (entity != null) {
+			entity.setErrorDescripcio(errorDescripcio);
+			if (throwable != null) {
+				entity.setExcepcioMessage(ExceptionUtils.getMessage(throwable));
+				entity.setExcepcioStacktrace(ExceptionUtils.getStackTrace(throwable));
 			}
-			return accions;
-	}
-
-	private int getMaxAccions(String integracioCodi) {
-		Integer max = maxAccionsIntegracio.get(integracioCodi);
-		if (max == null) {
-			max = Integer.valueOf(DEFAULT_MAX_ACCIONS);
-			maxAccionsIntegracio.put(integracioCodi, max);
-		}
-		return max.intValue();
-	}
-
-	private void addAccio(String integracioCodi, IntegracioAccioDto accio) {
-		synchronized(lock){
-			if (cacheHelper.mostrarLogsIntegracio()) 
-				log.info("Nova integracio en monitor: integracioCodi= " + integracioCodi + ", accio=" + accio);
-			afegirParametreUsuari(accio);
-			//#1544 Mostar informació de l'endpoint al monitor d'integracions
-			String entitatCodi = configHelper.getEntitatActualCodi();
-			accio.setEntitatCodi(entitatCodi);
-			LinkedList<IntegracioAccioDto> accions = getLlistaAccions(integracioCodi);
-			int max = getMaxAccions(integracioCodi);
-			while (accions.size() >= max) {
-				accions.remove(accions.size() - 1);
-			}
-			accio.setTimestamp(System.currentTimeMillis());
-			ensureUniqueTimestamp(accions, accio);
-			accions.add(0, accio);
+			integracioResourceRepository.save(entity);
 		}
 	}
 
-	private void ensureUniqueTimestamp(LinkedList<IntegracioAccioDto> accions, IntegracioAccioDto accio) {
-	    boolean exists = accions.stream()
-	            .anyMatch(a -> a.getTimestamp() != null && a.getTimestamp().equals(accio.getTimestamp()));
-	    if (exists) {
-	        accio.setTimestamp(accio.getTimestamp() + 1);
-	        ensureUniqueTimestamp(accions, accio);
-	    }
+	public IntegracioAccioDto findOne(Long id) {
+		return integracioResourceRepository.findById(id).map(this::toDto).orElse(null);
 	}
-	
-	private void afegirParametreUsuari(IntegracioAccioDto accio) {
 
-		String usuariNomCodi = null;
-		
+	public int esborrarAccionsMesAntigues3Mesos() {
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.MONTH, -3);
+		return integracioResourceRepository.deleteByDataBefore(cal.getTime());
+	}
+
+	private IntegracioResourceEntity buildEntity(
+			String integracioCodi,
+			String descripcio,
+			String endpoint,
+			Map<String, String> parametres,
+			IntegracioAccioTipusEnumDto tipus,
+			long tempsResposta,
+			IntegracioAccioEstatEnumDto estat) {
+		IntegracioCodiEnum codi;
+		try {
+			codi = IntegracioCodiEnum.valueOf(integracioCodi);
+		} catch (IllegalArgumentException e) {
+			log.warn("Codi d'integració desconegut, no es guarda l'acció: {}", integracioCodi);
+			return null;
+		}
+		if (cacheHelper.mostrarLogsIntegracio()) {
+			log.info("Nova integracio en monitor: integracioCodi={}, descripcio={}", integracioCodi, descripcio);
+		}
+		IntegracioResourceEntity entity = new IntegracioResourceEntity();
+		entity.setData(new Date());
+		entity.setCodi(codi);
+		entity.setDescripcio(descripcio);
+		entity.setEndpoint(endpoint);
+		entity.setParametres(afegirParametreUsuari(parametres));
+		entity.setTipus(tipus);
+		entity.setTempsResposta(tempsResposta);
+		entity.setEstat(estat);
+		entity.setEntitatCodi(configHelper.getEntitatActualCodi());
+		return entity;
+	}
+
+	private boolean matchesFiltre(IntegracioAccioDto accio, IntegracioFiltreDto filtre) {
+		if (filtre == null) return true;
+		return (Utils.isEmpty(filtre.getEntitatCodi()) || Utils.containsIgnoreCase(accio.getEntitatCodi(), filtre.getEntitatCodi())) &&
+			   (filtre.getDataInici() == null || !filtre.getDataInici().after(accio.getData())) &&
+			   (filtre.getDataFi() == null || !DateHelper.toDateFinalDia(filtre.getDataFi()).before(accio.getData())) &&
+			   (filtre.getTipus() == null || filtre.getTipus() == accio.getTipus()) &&
+			   (Utils.isEmpty(filtre.getDescripcio()) || Utils.containsIgnoreCase(accio.getDescripcio(), filtre.getDescripcio())) &&
+			   (filtre.getEstat() == null || filtre.getEstat() == accio.getEstat());
+	}
+
+	private IntegracioAccioDto toDto(IntegracioResourceEntity entity) {
+		IntegracioAccioDto dto = new IntegracioAccioDto();
+		dto.setId(entity.getId());
+		dto.setData(entity.getData());
+		dto.setDescripcio(entity.getDescripcio());
+		dto.setEndpoint(entity.getEndpoint());
+		dto.setParametres(entity.getParametres());
+		dto.setTipus(entity.getTipus());
+		dto.setTempsResposta(entity.getTempsResposta());
+		dto.setEstat(entity.getEstat());
+		dto.setEntitatCodi(entity.getEntitatCodi());
+		dto.setErrorDescripcio(entity.getErrorDescripcio());
+		dto.setExcepcioMessage(entity.getExcepcioMessage());
+		dto.setExcepcioStacktrace(entity.getExcepcioStacktrace());
+		if (entity.getCodi() != null) {
+			dto.setIntegracio(novaIntegracio(entity.getCodi().name()));
+		}
+		return dto;
+	}
+
+	private Map<String, String> afegirParametreUsuari(Map<String, String> parametres) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth != null) {
-			usuariNomCodi = auth.getName();
+		if (auth == null || auth.getName() == null) {
+			return parametres;
 		}
-
-		if (usuariNomCodi != null) {
-			if (accio.getParametres() == null) {
-				accio.setParametres(new HashMap<String, String>());
-			}
-			accio.getParametres().put("usuari", usuariNomCodi);
-		}
+		Map<String, String> result = parametres != null ? new HashMap<>(parametres) : new HashMap<>();
+		result.put("usuari", auth.getName());
+		return result;
 	}
 
-	//El endpoint nomes es carrega al guardar una acció (tant Ok com error), pero no en el findAll per carregar pes pipelles de Integracions
 	public IntegracioDto novaIntegracio(String codi) {
 		IntegracioDto integracio = new IntegracioDto();
 		integracio.setCodi(codi);
-		integracio.setNom(messageHelper.getMessage("sistema.extern.codi."+codi));		;
+		integracio.setNom(messageHelper.getMessage("sistema.extern.codi." + codi));
 		return integracio;
 	}
 }

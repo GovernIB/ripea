@@ -16,7 +16,6 @@ const Node = (props: any) => {
     const { children, backgroundColor, color, sx: sxProp } = props;
     return (
         <Grid
-            item
             sx={{
                 backgroundColor: backgroundColor ?? "white",
                 color: color ?? "black",
@@ -39,13 +38,13 @@ const Node = (props: any) => {
 const NodeGrup = (props: any) => {
     const { nodeKey, values, divider } = props;
     return (
-        <Grid container item xs={12} direction="row" wrap="nowrap" justifyContent={"space-around"} alignItems="center" columnSpacing={1} rowSpacing={1}>
+        <Grid container direction="row" wrap="nowrap" justifyContent={"space-around"} alignItems="center" columnSpacing={1} rowSpacing={1}>
             {nodeKey && <Node backgroundColor="#d6e9c6" color="black" minWidth="40% !important">
                 <Typography sx={{fontSize: '1rem', padding: '5px'}}>{`${nodeKey?.codi} - ${nodeKey.denominacioCooficial}`}</Typography>
             </Node>
             }
             {(divider || (nodeKey && values)) && (
-                <Grid item sx={{display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <Grid sx={{display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <Divider orientation="horizontal" flexItem sx={{ borderColor: "black", borderWidth: 2, width: 40 }}/>
                 </Grid>
             )}
@@ -138,7 +137,7 @@ const useActions = (refresh?: () => void) => {
 export const useOrganGestorSyncDialog = () => {
     const { t } = useTranslation();
     const [open, setOpen] = useState(false);
-    const ref = useRef();
+    const ref = useRef<HTMLDivElement | null>(null);
 
     const handleOpen = () => {
         getPrediccio();
@@ -166,15 +165,6 @@ export const useOrganGestorSyncDialog = () => {
             hidden: !prediccio || prediccio?.noCanvis,
         },
         {
-            value: 'close',
-            text: t('common.close'),
-            icon: 'close',
-            componentProps: {
-                variant: "outlined",
-            },
-            hidden: !prediccio,
-        },
-        {
             value: 'sync',
             text: t('page.organGestor.action.actualitzar.button'),
             icon: 'save',
@@ -184,6 +174,14 @@ export const useOrganGestorSyncDialog = () => {
             },
             hidden: !prediccio || prediccio?.noCanvis,
         },
+        {
+            value: 'close',
+            text: t('common.cancel'),
+            componentProps: {
+                variant: "outlined",
+            },
+            hidden: !prediccio,
+        },        
     ].filter((button:any)=>!button?.hidden), [t, prediccio])
 
     const dialog =
@@ -209,9 +207,9 @@ export const useOrganGestorSyncDialog = () => {
             }}
         >
             <Load value={prediccio}>
-                <Grid ref={ref} container item xs={12} direction="row" columnSpacing={1} rowSpacing={1}>
+                <Grid component={"div"} ref={ref} container direction="row" columnSpacing={1} rowSpacing={1}>
                     {prediccio?.noCanvis ?<>
-                        <Grid item xs={12}>
+                        <Grid size={12}>
                             <Alert severity={"info"}>{t('page.organGestor.action.actualitzar.tabs.empty')}</Alert>
                         </Grid>
                     </> :<>
@@ -232,11 +230,11 @@ export const useOrganGestorSyncDialog = () => {
                         </CardData>
                         <CardData title={t('page.organGestor.action.actualitzar.tabs.change')} rowSpacing={2} hidden={prediccio?.unitatsVigents?.length == 0}>
                             {prediccio?.unitatsVigents?.map?.((unitat:any) => <>
-                                <Grid container item xs={12} direction="row" wrap="nowrap" justifyContent={"space-around"} alignItems="center" columnSpacing={1} rowSpacing={1}>
+                                <Grid container direction="row" wrap="nowrap" justifyContent={"space-around"} alignItems="center" columnSpacing={1} rowSpacing={1}>
                                     <Node backgroundColor="#d6e9c6" color="black" minWidth="40% !important">
                                         <Typography sx={{fontSize: '1rem', padding: '5px'}}>{`${unitat?.codi} - ${unitat.oldDenominacio}`}</Typography>
                                     </Node>
-                                    <Grid item sx={{display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                    <Grid sx={{display: "flex", alignItems: "center", justifyContent: "center" }}>
                                         <Divider orientation="horizontal" flexItem sx={{ borderColor: "black", borderWidth: 2, width: 40 }}/>
                                     </Grid>
                                     <Node backgroundColor="#faebcc" color="black" minWidth="40% !important">
@@ -250,7 +248,7 @@ export const useOrganGestorSyncDialog = () => {
                         </CardData>
                         <CardData title={t('page.organGestor.action.actualitzar.tabs.del')} rowSpacing={2} hidden={prediccio?.unitatsExtingides?.length == 0}>
                             {prediccio?.unitatsExtingides?.map?.((unitat:any) =>
-                                <Grid container item xs={12} direction="row" wrap="nowrap" justifyContent={"space-around"} alignItems="center" columnSpacing={1} rowSpacing={1}>
+                                <Grid container direction="row" wrap="nowrap" justifyContent={"space-around"} alignItems="center" columnSpacing={1} rowSpacing={1}>
                                     <Node backgroundColor="#f8d7da" color="black" minWidth="40% !important">
                                         <Typography sx={{fontSize: '1rem', padding: '5px'}}>{`${unitat?.codi} - ${unitat.denominacioCooficial}`}</Typography>
                                     </Node>

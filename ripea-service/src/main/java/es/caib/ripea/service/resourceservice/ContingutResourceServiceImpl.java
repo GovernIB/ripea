@@ -1,10 +1,21 @@
 package es.caib.ripea.service.resourceservice;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.annotation.PostConstruct;
 
+import es.caib.ripea.persistence.entity.CarpetaEntity;
+import es.caib.ripea.persistence.entity.DocumentEntity;
+import es.caib.ripea.persistence.entity.resourcerepository.ContingutResourceRepository;
+import es.caib.ripea.persistence.repository.CarpetaRepository;
+import es.caib.ripea.persistence.repository.ContingutRepository;
+import es.caib.ripea.persistence.repository.DocumentRepository;
+import es.caib.ripea.service.helper.*;
+import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
 import org.springframework.stereotype.Service;
 
 import com.turkraft.springfilter.FilterBuilder;
@@ -14,11 +25,6 @@ import es.caib.ripea.persistence.entity.resourceentity.ContingutResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
-import es.caib.ripea.service.helper.ConfigHelper;
-import es.caib.ripea.service.helper.ContingutHelper;
-import es.caib.ripea.service.helper.EntityComprovarHelper;
-import es.caib.ripea.service.helper.ExcepcioLogHelper;
-import es.caib.ripea.service.helper.MessageHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
@@ -43,12 +49,18 @@ implements ContingutResourceService {
 	private final MessageHelper messageHelper;
 	private final EntityComprovarHelper entityComprovarHelper;
 	private final ContingutHelper contingutHelper;
-	
+    private final ContingutResourceRepository contingutResourceRepository;
+    private final DocumentRepository documentRepository;
+    private final CarpetaRepository carpetaRepository;
+    private final PluginHelper pluginHelper;
+    private final ContingutRepository contingutRepository;
+
     @PostConstruct
     public void init() {
     	register(ContingutResource.PERSPECTIVE_AUDIT_CODE, new AuditoriaPerspectiveApplicator());
         register(ContingutResource.ACTION_DELETE_CODE, new DeleteDefinitiuActionExecutor());
         register(ContingutResource.ACTION_RECUPERAR_CODE, new RecuperarActionExecutor());
+        register(ContingutResource.ACTION_REORDER, new ReorderActionExecutor());
     }
 	
     @Override
@@ -65,6 +77,59 @@ implements ContingutResourceService {
         );
         
         return filtreBase.generate();
+    }
+
+    @Override
+    protected List<ContingutResourceEntity<ContingutResource>> reorderFindLinesWithParentAndSorted(Serializable parentId) {
+        return contingutResourceRepository.findAllByPareIdAndEsborratOrderByOrdreAsc((Long)parentId, 0);
+    }
+
+    private class ReorderActionExecutor implements ActionExecutor<ContingutResourceEntity<ContingutResource>, ContingutResource.ReordenarForm, Serializable> {
+        @Override
+        public void onChange(Serializable id, ContingutResource.ReordenarForm previous, String fieldName, Object fieldValue,
+                             Map<String, AnswerValue> answers, String[] previousFieldNames, ContingutResource.ReordenarForm target) {}
+
+        @Override
+        public Serializable exec(String code, ContingutResourceEntity entity, ContingutResource.ReordenarForm resource) throws ActionExecutionException {
+            Long reorderPreviousSequence = reorderGetPreviousSequence(entity);
+            Long reorderPreviousParentId = reorderGetParentId(entity);
+            ContingutResource contingutResource = objectMappingHelper.newInstanceMap(entity, ContingutResource.class);
+            contingutResource.setOrdre(Math.toIntExact(resource.getOrdre()));
+            contingutResource.setPare(ResourceReference.toResourceReference(resource.getPare()));
+            Long reorderNewSequence = reorderGetNewSequence(contingutResource);
+            if (!Objects.equals(resource.getPare(), entity.getPare().getId())) {
+                entity.setPare(contingutResourceRepository.findById(resource.getPare()).get());
+            }
+            reorderIfReorderable(
+                    entity,
+                    reorderPreviousSequence,
+                    reorderNewSequence,
+                    reorderPreviousParentId,
+                    false);
+
+            boolean parentIdChanged = !Objects.equals(entity.getOrderParentId(), reorderPreviousParentId);
+            if (parentIdChanged) {
+                if (ContingutTipusEnumDto.DOCUMENT.equals(entity.getTipus())) {
+                    DocumentEntity documentActual = documentRepository.findById(entity.getId()).get();
+                    if (Utils.hasValue(documentActual.getArxiuUuid())) {
+	                    contingutHelper.arxiuDocumentPropagarMoviment(
+	                            entity.getArxiuUuid(),
+	                            documentActual.getPare(),
+	                            entity.getExpedient().getArxiuUuid());
+                    }
+                } else if (ContingutTipusEnumDto.CARPETA.equals(entity.getTipus())) {
+                    CarpetaEntity carpetaActual = carpetaRepository.findById(entity.getId()).get();
+                    //mourer també al arxiu
+                    if (Utils.hasValue(carpetaActual.getArxiuUuid())) {
+	                    pluginHelper.arxiuCarpetaMoure(
+	                            carpetaActual,
+	                            contingutRepository.findById(entity.getOrderParentId()).get().getArxiuUuid());
+                    }
+                }
+            }
+
+            return contingutResource;
+        }
     }
     
     private class AuditoriaPerspectiveApplicator implements PerspectiveApplicator<ContingutResourceEntity<ContingutResource>, ContingutResource> {

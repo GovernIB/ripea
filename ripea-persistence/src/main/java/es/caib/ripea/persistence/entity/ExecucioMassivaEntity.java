@@ -79,6 +79,9 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 	@Column(name = "exp_desti_id")
 	private Long expedientDestiId;
 	
+	@Column(name = "ID_AUX")
+	private Long identificadorAuxiliar;
+	
 	public ExecucioMassivaTipusDto getTipus() {
 		return tipus;
 	}
@@ -198,6 +201,12 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 	}
 	public Long getExpedientDestiId() {
 		return expedientDestiId;
+	}
+	public Long getIdentificadorAuxiliar() {
+		return identificadorAuxiliar;
+	}
+	public void setIdentificadorAuxiliar(Long identificadorAuxiliar) {
+		this.identificadorAuxiliar = identificadorAuxiliar;
 	}
 	public static Builder getBuilder(
 			ExecucioMassivaTipusDto tipus,

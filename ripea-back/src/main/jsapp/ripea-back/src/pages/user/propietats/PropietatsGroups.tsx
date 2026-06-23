@@ -59,12 +59,12 @@ export const PropietatsGroups: React.FC<{
                 const configGroups = response.rows;
                 setConfigGroups(configGroups);
                 if (configGroups.length) {
-                    const isSelectedGroupIdInConfigGroups = configGroups.find(
+                    const selectableGroups = configGroups.filter(g=>!g.childrens)
+                    const isSelectedGroupIdInConfigGroups = selectableGroups.find(
                         (g) => g.id === selectedGroupId
                     );
                     if (!isSelectedGroupIdInConfigGroups) {
-                        setSelectedGroupId(response.rows[0].id);
-                        setSelectedItems('' + response.rows[0].id);
+                        setSelectedGroupId(selectableGroups[0].id);
                     }
                 }
             });

@@ -1,6 +1,6 @@
-import {useRef, useState} from "react";
+import {useState} from "react";
 import {Grid} from "@mui/material";
-import {MuiFormDialogApi, useBaseAppContext} from "reactlib";
+import {useMuiFormDialogApiRef, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import GridFormField from "../../../components/GridFormField.tsx";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
@@ -10,7 +10,7 @@ import {useFirmaFinalitzadaSession} from "../../../components/SseClient.tsx";
 
 const FirmaNavegadorForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="motiu"/>
+        <GridFormField name="motiu"/>
     </Grid>
 }
 
@@ -32,7 +32,7 @@ const FirmaNavegador = (props: any) => {
 }
 
 export const useFirmaNavegador = (refresh?: () => void) => {
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
     const { onChange } = useFirmaFinalitzadaSession();
     const { value: user } = useUserSession();
@@ -71,7 +71,7 @@ export const useFirmaNavegador = (refresh?: () => void) => {
     }
 }
 export const useFirmaNavegadorMassive = (refresh?: () => void) => {
-    const apiRef = useRef<MuiFormDialogApi>();
+    const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
     const { onChange } = useFirmaFinalitzadaSession();
     const { value: user } = useUserSession();

@@ -1,0 +1,2 @@
+UPDATE IPA_CONFIG SET GROUP_CODE='ASPECTE' WHERE KEY IN ('es.caib.ripea.usuari.idioma.defecte', 'es.caib.ripea.interface.default', 'es.caib.ripea.app.maxresults.selects', 'es.caib.ripea.reactActivat', 'es.caib.ripea.index.logo');
+UPDATE IPA_CONFIG SET GROUP_CODE='CONTINGUT' WHERE KEY IN ('es.caib.ripea.permetre.obligar.interessat');

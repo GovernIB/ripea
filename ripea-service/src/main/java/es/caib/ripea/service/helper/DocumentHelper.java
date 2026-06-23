@@ -187,7 +187,7 @@ public class DocumentHelper {
 					ExpedientEntity.class,
 					"La multiplicitat del meta-document no permet crear nous documents a dins l'expedient (" +
 					"metaExpedientId=" + expedient.getMetaExpedient().getId() + ", " +
-					"metaDocumentId=" + document.getMetaDocument().getId() + ", " +
+					"metaDocumentId=" + metaDocument.getId() + ", " +
 					"metaDocumentMultiplicitat=" + metaDocument.getMultiplicitat() + ", " +
 					"expedientId=" + expedient.getId() + ")");
 		}
@@ -400,7 +400,7 @@ public class DocumentHelper {
             		ubicacio.iterator());
             
             String rutaCarpeta = String.join("/", ubicacio);
-            if (!progres.getCarpetesCreadesSet().contains(rutaCarpeta)) {
+            if (!progres.getCarpetesCreadesSet().contains(rutaCarpeta) && Utils.hasValue(rutaCarpeta)) {
                 progres.getCarpetesCreadesSet().add(rutaCarpeta);
                 progres.setCarpetesCreades(progres.getCarpetesCreades() + 1);
             }
@@ -1914,15 +1914,19 @@ public class DocumentHelper {
 		}
 		return documentsDto;
 	}
-
+	
 	public DocumentEntity findLastDocumentPujatArxiuByExtensio(List<String> contentTypes) {
+		return findLastDocumentPujatArxiuByExtensio(contentTypes, null);
+	}
+	
+	public DocumentEntity findLastDocumentPujatArxiuByExtensio(List<String> contentTypes, ArxiuEstatEnumDto arxiuEstat) {
 		Pageable pageable = PageRequest.of(0, 1);
 		List<DocumentEntity> l = null;
 		
 		if (contentTypes!=null && contentTypes.size()>0) {
-			l = documentRepository.findLastByUuid(contentTypes, pageable).getContent();
+			l = documentRepository.findLastByUuid(contentTypes, arxiuEstat, pageable).getContent();
 		} else {
-			l = documentRepository.findLastByUuid(pageable).getContent();
+			l = documentRepository.findLastByUuid(arxiuEstat, pageable).getContent();
 		}
 		
 		if (l!=null && l.size()>0) {

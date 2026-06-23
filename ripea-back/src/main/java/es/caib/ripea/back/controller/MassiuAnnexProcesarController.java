@@ -1,7 +1,6 @@
 package es.caib.ripea.back.controller;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,7 +30,6 @@ import es.caib.ripea.back.helper.RequestSessionHelper;
 import es.caib.ripea.back.helper.RolHelper;
 import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
 import es.caib.ripea.service.intf.dto.EntitatDto;
-import es.caib.ripea.service.intf.dto.ExecucioMassivaContingutDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
@@ -264,11 +262,6 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 		return "redirect:../procesarAnnexosPendents";
 	}
 	
-	
-	
-	
-	
-	
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/adjuntarExpedient", method = RequestMethod.GET)
 	public String adjuntarExpedientReintentar(
@@ -296,11 +289,8 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 					null, 
 					filtreCommand.getMetaExpedientId(),
 					false);
-		model.addAttribute(
-				"metaDocuments",
-				metaDocuments);
 		
-
+		model.addAttribute("metaDocuments", metaDocuments);
 		
 		RegistreAnnexCommand registreAnnexCommand = new RegistreAnnexCommand();
 		
@@ -314,12 +304,7 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 				registreAnnexCommand);
 
 		return "expedientPeticioReintentarMetaDocMassiu";
-
 	}
-	
-	
-	
-	
 	
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/adjuntarExpedient", method = RequestMethod.POST)
@@ -340,7 +325,7 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 		
 		try {
 			
-			int errors = 0;
+			/*int errors = 0;
 			int correctes = 0;
 			Date dataInici = new Date();
 			List<ExecucioMassivaContingutDto> execucioMassivaElements = new ArrayList<>();
@@ -387,19 +372,23 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 							RolHelper.getRolActual(request)),
 					execucioMassivaElements,
 					ElementTipusEnumDto.ANNEX);
+			*/
+
+			ExecucioMassivaDto dto = new ExecucioMassivaDto();
+			dto.setTipus(ExecucioMassivaTipusDto.ADJUNTAR_ANNEXOS_PENDENTS);
+			dto.setContingutIds(new ArrayList<Long>(seleccio));
+			dto.setIdentificadorAuxiliar(command.getMetaDocumentId());
+			dto.setRolActual(RolHelper.getRolActual(request));
 			
-			if (correctes > 0){
-				MissatgesHelper.success(request, getMessage(request, "massiu.controller.annex.procesar.correctes", new Object[]{correctes}));
-			} 
-			if (errors > 0) {
-				MissatgesHelper.error(request, getMessage(request, "massiu.controller.annex.procesar.errors", new Object[]{errors}), null);
-			} 
+			execucioMassivaService.crearExecucioMassiva(entitatActual.getId(), dto, ElementTipusEnumDto.ANNEX);
 			
 			seleccio.clear();
 			RequestSessionHelper.actualitzarObjecteSessio(
 					request,
 					SESSION_ATTRIBUTE_SELECCIO,
 					seleccio);
+			
+			MissatgesHelper.success(request, getMessage(request, "accio.massiva.creat.ok"));
 			
 			return modalUrlTancar();
 			
@@ -413,10 +402,6 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 					ex);
 		}
 	}
-	
-	
-	
-
 	
 	private String getSessionAttributeSelecio(HttpServletRequest request) {
 		return SESSION_ATTRIBUTE_SELECCIO;

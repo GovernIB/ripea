@@ -48,8 +48,12 @@ public class ExecucioMassivaResourceEntity extends BaseAuditableEntity<ExecucioM
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "pfirmes_datcad")
     private Date dataCaducitat;
+    // S'emmagatzema com a String separat per comes; el recurs l'exposa com a String[]
+    // (la conversió es fa a ExecucioMassivaResourceServiceImpl.afterConversion). El nom
+    // ha de ser diferent del camp del recurs per evitar que el mapeig genèric intenti
+    // assignar un String a un String[] (argument type mismatch).
     @Column(name = "pfirmes_responsables")
-    private String portafirmesResponsables;
+    private String portafirmesResponsablesString;
     @Column(name = "pfirmes_seqtipus")
     @Enumerated(EnumType.STRING)
     private MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus;

@@ -1,0 +1,2 @@
+--Estat del registre/assentament de l'enviament (Notib: registreEstat). Permet distingir "Oficio aceptado" / "Rechazada SIR" de "Enviada SIR"
+ALTER TABLE IPA_DOCUMENT_ENVIAMENT_INTER ADD COLUMN NOT_ENV_REGISTRE_ESTAT VARCHAR(20);

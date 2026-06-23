@@ -15,7 +15,7 @@ const MetaExpedientDetail = (props:any) => {
     return <MuiDetail entity={entity} fields={fields}>
         <DetailCard>
             {(entity?.revisioEstat == 'REVISAT' && isOrganAdmin) &&
-                <Grid xs={12}>
+                <Grid size={12}>
                     <Alert severity={'info'}>{t('page.metaExpedient.action.consultar.revisat')}</Alert>
                 </Grid>
             }

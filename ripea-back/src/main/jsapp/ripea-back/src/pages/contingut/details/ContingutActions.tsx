@@ -1,5 +1,5 @@
 import {Divider} from "@mui/material";
-import {MuiDataGridApiRef, useBaseAppContext, useConfirmDialogButtons, useResourceApiService} from "reactlib";
+import {MuiDataGridApiRef, useBaseAppContext, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {useUserSession} from "../../../components/Session.tsx";
 import useDocumentDetail from "./DocumentDetail.tsx";
@@ -22,6 +22,7 @@ import useImportar from "../actions/ImportarSgd.tsx";
 import useCarpetaActions from "../../carpeta/details/CarpetaActions.tsx";
 import useImportarExpedient from "../../expedient/actions/ImportarExpedient.tsx";
 import useImportarZip from "../actions/ImportarZip.tsx";
+import { useConfirmDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 export const useActions = (refresh?: () => void) => {
     const { t } = useTranslation();
@@ -144,15 +145,15 @@ export const useActions = (refresh?: () => void) => {
     }
 }
 
-export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refresh?: () => void) => {
+export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refresh?: () => void, contingutParentId?: string | number | null, contingutParentNom?: string | null) => {
     const { t } = useTranslation();
     const { value: user } = useUserSession();
 
     const {handleShow: handleDocPinbal, content: contentDocPinbal} = useDocPinbal(entity, refresh)
-    const {handleShow: handleCrearCarpeta, content: contentCrearCarpeta} = useCrearCarpeta(entity, refresh)
-    const {handleShow: handleImportar, content: contentImportar} = useImportar(entity, refresh)
+    const {handleShow: handleCrearCarpeta, content: contentCrearCarpeta} = useCrearCarpeta(entity, refresh, contingutParentId)
+    const {handleShow: handleImportar, content: contentImportar} = useImportar(entity, refresh, contingutParentId, contingutParentNom)
     const {handleOpen: handleImportarExpedient, dialog: dialogImportarExpedient} = useImportarExpedient(entity, refresh)
-	const {handleShow: handleImportarZip, content: contentImportarZip} = useImportarZip(entity, refresh)
+	const {handleShow: handleImportarZip, content: contentImportarZip} = useImportarZip(entity, refresh, contingutParentId)
 
     const {eliminar, apiDownload, getLinkCSV, definitiu, guardarArxiu} = useActions(refresh)
     const {handleOpen: handleDetallOpen, dialog: dialogDetall} = useDocumentDetail(entity, refresh);
@@ -197,9 +198,15 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
         {
             label: t('page.document.title')+"...",
             icon: "description",
-            onClick: () => apiRef?.current?.showCreateDialog?.(),
+            onClick: () => apiRef?.current?.triggerCreate?.(),
             hidden: !potModificarExpedientOrContingut,
         },
+		{
+		    label: t('page.document.action.importZip.label'),
+		    icon: "upload_file",
+		    onClick: handleImportarZip,
+			hidden: !potModificarExpedientOrContingut,
+		},
         {
             label: t('page.document.action.pinbal.label'),
             icon: "description",
@@ -220,12 +227,6 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             onClick: handleImportar,
             hidden: !(user?.sessionScope?.isMostrarImportacio && potModificarExpedientOrContingut),
         },
-		{
-		    label: t('page.document.action.importZip.label'),
-		    icon: "upload_file",
-		    onClick: handleImportarZip,
-			hidden: !potModificarExpedientOrContingut,
-		},
         {
             label: t('page.contingut.action.importarExpedient.label'),
             icon: "link",
@@ -248,6 +249,8 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             icon: "folder",
             showInMenu: true,
             onClick: handleDetallOpen,
+            disabled: (row:any) => !row?.arxiuUuid,
+            title: (row:any) => !row?.arxiuUuid ? t('page.document.action.detall.noUuid') : undefined,
         },
         {
             label: t('common.update')+'...',
@@ -314,7 +317,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             hidden: (row:any) => !isDigitalOrImportat(row) || !row?.gesDocOriginalId
         },
         {
-            label: t('page.document.action.firma.label'),
+            label: t('page.document.action.download.firma'),
             icon: "download",
             showInMenu: true,
 			onClick: (id:any) => apiDownload(id, 'firmaAdjunt', t('page.document.action.download.ok')),

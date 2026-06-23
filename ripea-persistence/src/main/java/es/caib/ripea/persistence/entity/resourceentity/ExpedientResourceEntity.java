@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.ConstraintMode;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -46,6 +47,8 @@ public class ExpedientResourceEntity extends NodeResourceEntity<ExpedientResourc
 			name = "metaexpedient_id",
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "metaexp_expedient_fk"))
 	private MetaExpedientResourceEntity metaExpedient;
+	@Column(name = "metaexpedient_id", insertable = false, updatable = false)
+	private Long metaExpedientId;
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "tancat_data")
 	protected Date tancatData;
@@ -88,6 +91,9 @@ public class ExpedientResourceEntity extends NodeResourceEntity<ExpedientResourc
 			name = "agafat_per_codi",
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "agafatper_expedient_fk"))
 	protected UsuariResourceEntity agafatPer;
+
+	@Column(name = "agafat_per_codi", insertable = false, updatable = false)
+	protected String agafatPerCodi;
 	@OneToMany(
 			mappedBy = "expedient",
 			fetch = FetchType.LAZY,
@@ -157,12 +163,15 @@ public class ExpedientResourceEntity extends NodeResourceEntity<ExpedientResourc
 			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "expestat_expedient_fk"))
 	private MetaExpedientEstatResourceEntity estatAdditional;
 
+	@Column(name = "expedient_estat_id", insertable = false, updatable = false)
+	private Long estatAdditionalId;
+
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(
 			name = BaseConfig.DB_PREFIX + "expedient_seguidor",
 			joinColumns = {@JoinColumn(name = "expedient_id", referencedColumnName = "id")},
 			inverseJoinColumns = {@JoinColumn(name = "seguidor_codi", referencedColumnName = "codi")},
-			foreignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "expedient_expseguidor_fk"))
+			foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	protected List<UsuariResourceEntity> seguidors = new ArrayList<>();
 
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)

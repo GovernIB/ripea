@@ -7,9 +7,9 @@ import GridFormField from "../../../components/GridFormField.tsx";
 
 const TipusDocumentalForm = () => {
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name="codi"/>
-        <GridFormField xs={12} name="nomEspanyol"/>
-        <GridFormField xs={12} name="nomCatala"/>
+        <GridFormField name="codi"/>
+        <GridFormField name="nomEspanyol"/>
+        <GridFormField name="nomCatala"/>
     </Grid>
 }
 
@@ -47,7 +47,7 @@ const TipusDocumentalGrid = () => {
         },
     ]
 
-    return <GridPage disableMargins>
+    return <GridPage autoHeight>
         <CardPage title={t('page.user.menu.nti')}>
             <StyledMuiGrid
                 resourceName={"tipusDocumentalResource"}
@@ -57,7 +57,7 @@ const TipusDocumentalGrid = () => {
                 columns={columns}
                 sortModel={sortModel}
                 rowAdditionalActions={actions}
-                toolbarHideQuickFilter={false}
+                toolbarShowQuickFilter
                 toolbarCreateTitle={t('page.tipusDocumental.action.new.label')}
                 popupEditFormI18nKeys={{
                     createSuccess: 'page.tipusDocumental.action.new.ok',

@@ -1,6 +1,7 @@
 package es.caib.ripea.service.intf.resourcevalidation;
 
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -17,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 @Component
 @RequiredArgsConstructor
 public class InteressatValidValidator implements ConstraintValidator<InteressatValid, InteressatResource> {
+
+    private static final Pattern CODI_POSTAL_PATTERN = Pattern.compile("^\\d{5}$");
 
     private void addViolation(ConstraintValidatorContext context, String field, String message) {
         context.buildConstraintViolationWithTemplate(message)
@@ -49,6 +52,11 @@ public class InteressatValidValidator implements ConstraintValidator<InteressatV
             }
         }
         if (InteressatTipusEnum.InteressatAdministracioEntity.equals(resource.getTipus())) {
+            if (resource.isEsRepresentant()) {
+                addViolation(context, InteressatResource.Fields.tipus,
+                        "{es.caib.ripea.service.intf.resourcevalidation.InteressatValid.repAdmin}");
+                valid = false;
+            }
             if (resource.getOrganCodi() == null) {
                 notNullViolation(context, InteressatResource.Fields.organCodi);
                 valid = false;
@@ -74,6 +82,13 @@ public class InteressatValidValidator implements ConstraintValidator<InteressatV
                     notNullViolation(context, InteressatResource.Fields.adressaNumCasa);
                     valid = false;
                 }
+            }
+
+            if (resource.getCodiPostal() != null && !resource.getCodiPostal().isBlank()
+                    && !CODI_POSTAL_PATTERN.matcher(resource.getCodiPostal()).matches()) {
+                addViolation(context, InteressatResource.Fields.codiPostal,
+                        "{es.caib.ripea.service.intf.resourcevalidation.InteressatValid.codiPostal}");
+                valid = false;
             }
 
             if (resource.getDocumentNum() == null || resource.getDocumentNum().isBlank()) {

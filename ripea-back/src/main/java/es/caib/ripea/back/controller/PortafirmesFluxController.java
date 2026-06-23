@@ -27,12 +27,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.back.helper.RequestSessionHelper;
-import es.caib.ripea.back.helper.RolHelper;
 import es.caib.ripea.back.helper.SessioHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.FluxFirmaUsuariDto;
-import es.caib.ripea.service.intf.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.service.intf.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.service.intf.dto.PortafirmesIniciFluxRespostaDto;
 import es.caib.ripea.service.intf.model.sse.CreacioFluxFinalitzatEvent;

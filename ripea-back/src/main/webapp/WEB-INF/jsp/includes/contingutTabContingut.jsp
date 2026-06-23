@@ -62,14 +62,15 @@
 		try {
 			if (documentDrag!=null) {
 				let vistaActiva = $('#vistes').children("a.active").attr('id');
+				let tascaParam = <c:choose><c:when test="${isTasca}">'?tascaId=${tascaId}'</c:when><c:otherwise>''</c:otherwise></c:choose>;
 				if (vistaActiva == 'vistaTreetablePerCarpetes') {
 					showLoadingModal('<spring:message code="contingut.moure.processant"/>');
 					let destiDocDrag = event.target.id;
-					window.location = documentDrag + "/moure/" + destiDocDrag;
+					window.location = documentDrag + "/moure/" + destiDocDrag + tascaParam;
 				} else if (vistaActiva == 'vistaGrid') {
 					showLoadingModal('<spring:message code="contingut.moure.processant"/>');
 					let destiDocDrag = event.target.id;
-					window.location = documentDrag + "/moure/" + destiDocDrag;
+					window.location = documentDrag + "/moure/" + destiDocDrag + tascaParam;
 					dropped = true;
 					$(event.target).addClass('dropped');
 				} else {
@@ -526,6 +527,7 @@
 
 	function expandAll() {
 		var $tableDocuments = $("#table-documents");
+
 		$tableDocuments.find("tbody tr:not(.isDocument)").each(function () {
 			var nodeId = $(this).data("node");
 			var attrId = $(this).attr("id");
@@ -555,18 +557,37 @@
 		// Mostrar carpeta
 		$selectedNode.show();
 
+		let vistaActiva = $('#vistes').children("a.active").attr('id');
 		// Cargar contenido del servidor
-		loadCurrentFolderFromServer(attrId, showAll);
+		if (vistaActiva == 'vistaTreetablePerCarpetes') {
+			loadCurrentFolderFromServer(attrId, showAll);
+		} else {
+			var $fillsCarpeta = $tableDocuments.find('tr[data-pnode="' + nodeId + '"]');
+			$fillsCarpeta.each(function (i, fill) {
+				$(fill).show();
+			});
+			$tableDocuments.find("tbody tr").each(function () {
+				setPadding($(this));
+			});
+		}
 	}
 
 	function hideCurrentNode(nodeId, attrId) {
+
 		var $tableDocuments = $("#table-documents");
 		var $fillsCarpeta = $tableDocuments.find('tr[data-pnode="' + nodeId + '"]');
+		let vistaActiva = $('#vistes').children("a.active").attr('id');
+		
 		sessionStorage.removeItem("nodeState-" + nodeId);
 		sessionStorage.setItem("nodeState-" + nodeId, "collapsed");
-
+		
 		$fillsCarpeta.each(function (i, fill) {
-			$(fill).remove();
+
+			if (vistaActiva == 'vistaTreetablePerCarpetes') {
+				$(fill).remove();
+			} else {
+				$(fill).hide();
+			}
 
 			// Ocultar de forma recursiva la carpeta
 			var selectedNodeId = $(fill).data('node');
@@ -1042,13 +1063,11 @@
 		var textNotificar = '<spring:message code="contingut.boto.menu.seleccio.multiple.notificar"/>';
 		var textNotificarNomesFirmats = '<spring:message code="contingut.boto.menu.seleccio.multiple.notificar.nomes.firmats"/>';
 
-
 		if (docsIdx != undefined && docsIdx.length > 0) { // if at least one row is selected
 
 			var isTotFirmat = true;
 			var isTotPdf = true;
 			var isTotGuardatEnArxiu = true;
-
 
 			if ($('#vistaGrid').hasClass('active')) { // if view grid
 				for (docId of docsIdx) {
@@ -1092,14 +1111,12 @@
 					$('#notificar-mult a.btn.btn-default').off();
 					$('#notificar-mult a').removeData('webutilModal');
 					$('#notificar-mult a').webutilModal();
-
 				} else { // if zip
 					// then show modal not maximized
 					$('#notificar-mult a').removeData('maximized');
 					$('#notificar-mult a.btn.btn-default').off();
 					$('#notificar-mult a').removeData('webutilModal');
 					$('#notificar-mult a').webutilModal();
-
 				}
 
 				$('#notificar-mult').prop('title', textNotificar);
@@ -1117,7 +1134,6 @@
 				$('#definitiu-mult a').removeClass("disabled");
 			}
 
-
 			$('#descarregar-mult a').removeClass("disabled");
 			$('#moure-mult a').removeClass("disabled");
 			$('#tipusdocumental-mult').removeClass("disabled");
@@ -1130,12 +1146,9 @@
 			$('#tipusdocumental-mult').addClass("disabled");
 		}
 
-
 		$('#table-documents').removeClass("disabled");
 		$('#grid-documents ').removeClass("disabled");
 		$('#loading').addClass('hidden');
-
-
 	}
 
 	function selectAll(docsIdx) {
@@ -1206,7 +1219,15 @@
 
 					var enviaments = notificacio.documentEnviamentInteressats;
 					for (i = 0; i < enviaments.length; i++) {
-						content += (enviaments[i].enviamentDatatEstat) ? notificacioEnviamentEstats[enviaments[i].enviamentDatatEstat] + ',' : '';
+						if (enviaments[i].registreEstat == 'OFICI_SIR') {
+							content += '<spring:message code="notificacio.registreEstat.enum.OFICI_SIR"/>' + ',';
+						} else if (enviaments[i].registreEstat == 'OFICI_ACCEPTAT') {
+							content += '<spring:message code="notificacio.registreEstat.enum.OFICI_ACCEPTAT"/>' + ',';
+						} else if (enviaments[i].registreEstat == 'REBUTJAT') {
+							content += '<spring:message code="notificacio.registreEstat.enum.REBUTJAT"/>' + ',';
+						} else {
+							content += (enviaments[i].enviamentDatatEstat) ? notificacioEnviamentEstats[enviaments[i].enviamentDatatEstat] + ',' : '';
+						}
 					}
 					if (content !== undefined && content != '') {
 						content = "(" + content.replace(/,\s*$/, "") + ")";
@@ -1286,11 +1307,13 @@
 	}
 
 	function loadCurrentFolderFromServer(carpetaId, showAll) {
+
 		var $tableDocuments = $("#table-documents");
 		var $selectedCarpeta = $tableDocuments.find('tr[id="' + carpetaId + '"]');
 		var currentState = sessionStorage.getItem("nodeState-treetable-" + carpetaId);
 
 		if (currentState === "expanded") {
+
 			showLoadingCurrentFolder(carpetaId);
 
 			$.ajax({

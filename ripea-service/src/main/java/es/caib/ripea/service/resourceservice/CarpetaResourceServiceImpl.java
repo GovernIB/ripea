@@ -21,10 +21,7 @@ import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.resourceentity.CarpetaResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.CarpetaRestriccioResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
-import es.caib.ripea.persistence.entity.resourcerepository.CarpetaResourceRepository;
-import es.caib.ripea.persistence.entity.resourcerepository.ContingutResourceRepository;
 import es.caib.ripea.persistence.repository.CarpetaRepository;
-import es.caib.ripea.persistence.repository.ContingutRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.CarpetaHelper;
@@ -32,7 +29,6 @@ import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ContingutHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
-import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
@@ -63,15 +59,11 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
 
 	private final EntitatRepository entitatRepository;
 	private final CarpetaRepository carpetaRepository;
-	private final ContingutRepository contingutRepository;
-	private final CarpetaResourceRepository carpetaResourceRepository;
-	private final ContingutResourceRepository contingutResourceRepository;
 	
 	private final ContingutHelper contingutHelper;
 	private final ExcepcioLogHelper excepcioLogHelper;
 	private final CarpetaHelper carpetaHelper;
 	private final ConfigHelper configHelper;
-	private final PluginHelper pluginHelper;
 	private final ContingutResourceHelper contingutResourceHelper;
 	private final EntityComprovarHelper entityComprovarHelper;
 
@@ -104,16 +96,19 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
     	try {
 			//La entitat ja es comprova a pinbalHelper
 			EntitatEntity entitatEntity = entitatRepository.findByCodi(configHelper.getEntitatActualCodi());
+			Long pareId = resource.getPare() != null && resource.getPare().getId() != null
+					? resource.getPare().getId()
+					: resource.getExpedient().getId();
 			CarpetaDto carpetaCreada = carpetaHelper.create(
 					entitatEntity.getId(),
-					resource.getExpedient().getId(),
+					pareId,
 					resource.getNom(),
 					false,
 					null,
 					false,
 					null, 
 					false, 
-					null, 
+					configHelper.getRolActual(), 
 					true);
 			resource.setId(carpetaCreada.getId());
 			
@@ -139,45 +134,22 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
     @Override
 	public CarpetaResource update(Long id, CarpetaResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
     	try {
-    		if (resource.isOrdrePatch()) {
-    			CarpetaEntity carpetaActual = carpetaRepository.findById(resource.getId()).get();
-    			CarpetaResourceEntity carpetaResourceActual = carpetaResourceRepository.findById(resource.getId()).get();
-    			Long reorderPreviousParentId = reorderGetParentId(carpetaResourceActual);
-    			Long reorderResourceSequence = reorderGetSequenceFromResourceOrEntity(resource, carpetaResourceActual);
-				if (!Objects.equals(resource.getPare().getId(), carpetaResourceActual.getPare().getId())) {
-					carpetaResourceActual.setPare(contingutResourceRepository.findById(resource.getPare().getId()).get());
-				}
-				reorderIfReorderable(
-						carpetaResourceActual,
-						reorderResourceSequence,
-						reorderPreviousParentId,
-						true,
-						false);
-				boolean parentIdChanged = !Objects.equals(carpetaResourceActual.getOrderParentId(), reorderPreviousParentId);
-				if (parentIdChanged) {
-    				//mourer també al arxiu
-    				pluginHelper.arxiuCarpetaMoure(
-    						(CarpetaEntity)carpetaActual,
-    						contingutRepository.findById(carpetaResourceActual.getOrderParentId()).get().getArxiuUuid());
-				}
-    		} else {
-        		//TODO: ara mateix falla arxiu al renombrar una carpeta
-    			carpetaHelper.modificarNomCarpeta(
-    					resource.getEntitat().getId(), 
-						id,
-						resource.getNom());
-    			
-    			List<String> usuaris = resource.getRestriccions().stream()
-	                    .map(ResourceReference::getId)
-	                    .collect(Collectors.toList());
-				
-				carpetaHelper.restringirCarpeta(
-						resource.getEntitat().getId(), 
-						id, 
-						resource.getRestringida(),
-						resource.getMotiuRestriccio(), 
-						usuaris);
-    		}
+            //TODO: ara mateix falla arxiu al renombrar una carpeta
+            carpetaHelper.modificarNomCarpeta(
+                    resource.getEntitat().getId(),
+                    id,
+                    resource.getNom());
+
+            List<String> usuaris = resource.getRestriccions().stream()
+                    .map(ResourceReference::getId)
+                    .collect(Collectors.toList());
+
+            carpetaHelper.restringirCarpeta(
+                    resource.getEntitat().getId(),
+                    id,
+                    resource.getRestringida(),
+                    resource.getMotiuRestriccio(),
+                    usuaris);
     	} catch (Exception ex) {
     		excepcioLogHelper.addExcepcio("/carpeta/"+resource.getId()+"/update", ex);
     	}
@@ -194,11 +166,6 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
     		throw new ResourceNotFoundException(getResourceClass(), ex.getMessage());
     	}
     }
-
-	@Override
-	protected List<CarpetaResourceEntity> reorderFindLinesWithParent(Serializable parentId) {
-		return carpetaResourceRepository.findAllByPareId((Long)parentId);
-	}
 
     private class PathPerspectiveApplicator implements PerspectiveApplicator<CarpetaResourceEntity, CarpetaResource> {
         @Override
@@ -335,7 +302,13 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
 				Long contingutDestiId = params.getCarpeta()!=null?params.getCarpeta().getId():params.getExpedient().getId();
 				switch (params.getAction()) {
 				case MOURE:
-					contingutHelper.move(entitatEntity.getId(), entity.getId(), contingutDestiId, params.getCarpetaNova(), configHelper.getRolActual());							
+					contingutHelper.move(
+							entitatEntity.getId(),
+							entity.getId(),
+							contingutDestiId,
+							null,
+							params.getCarpetaNova(),
+							configHelper.getRolActual());							
 					break;
 				case COPIAR:
 					contingutHelper.copy(entitatEntity.getId(), entity.getId(), contingutDestiId, false); //No recursiu

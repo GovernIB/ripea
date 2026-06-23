@@ -29,45 +29,48 @@ type ToolbarIconProps = {
     otherProps?: any;
 };
 
-export const toToolbarIcon = (icon: string, params?: ToolbarIconParams): React.ReactElement => <ToolbarIcon
-    icon={icon}
-    title={params?.title}
-    linkTo={params?.linkTo}
-    badge={params?.badge}
-    small={params?.small}
-    onClick={params?.onClick ?? undefined}
-    disabled={params?.disabled}
-    color={params?.color}
-    otherProps={{ sx: params?.sx }} />;
+export const toToolbarIcon = (icon: string, params?: ToolbarIconParams): React.ReactElement => (
+    <ToolbarIcon
+        icon={icon}
+        title={params?.title}
+        linkTo={params?.linkTo}
+        badge={params?.badge}
+        small={params?.small}
+        onClick={params?.onClick ?? undefined}
+        disabled={params?.disabled}
+        color={params?.color}
+        otherProps={{ sx: params?.sx }}
+    />
+);
 
 export const ToolbarIcon: React.FC<ToolbarIconProps> = (props) => {
-    const {
-        icon,
-        title,
-        linkTo,
-        badge,
-        onClick,
-        disabled,
-        small,
-        color,
-        otherProps
-    } = props;
+    const { icon, title, linkTo, badge, onClick, disabled, small, color, otherProps } = props;
     const { getLinkComponent } = useBaseAppContext();
     const ic = <Icon fontSize={small ? 'small' : undefined}>{icon}</Icon>;
-    const linkProps: any = linkTo ? {
-        component: getLinkComponent(),
-        to: linkTo,
-    } : null;
-    return <IconButton
-        title={title}
-        onClick={onClick}
-        disabled={disabled}
-        size={small ? 'small' : undefined}
-        color={color}
-        {...linkProps}
-        {...otherProps}>
-        {badge ? <Badge badgeContent={badge} color="primary">{ic}</Badge> : ic}
-    </IconButton>;
-}
+    const linkProps: any = linkTo
+        ? {
+              component: getLinkComponent(),
+              to: linkTo,
+          }
+        : null;
+    return (
+        <IconButton
+            title={title}
+            onClick={onClick}
+            disabled={disabled}
+            size={small ? 'small' : undefined}
+            color={color}
+            {...linkProps}
+            {...otherProps}>
+            {badge ? (
+                <Badge badgeContent={badge} color="primary">
+                    {ic}
+                </Badge>
+            ) : (
+                ic
+            )}
+        </IconButton>
+    );
+};
 
 export default ToolbarIcon;

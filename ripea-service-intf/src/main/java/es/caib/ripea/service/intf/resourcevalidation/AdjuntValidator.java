@@ -91,7 +91,6 @@ public class AdjuntValidator implements ConstraintValidator<AdjuntValid, Documen
         		&& resource.getHasFirma()
                 && DocumentFirmaTipusEnumDto.FIRMA_SEPARADA.equals(resource.getDocumentFirmaTipus())
                 && (resource.getFirmaAdjunt()==null || resource.getFirmaAdjunt().getContentLength()==null)
-		        && !resource.isOrdrePatch()
         ){
             valid = false;
             context

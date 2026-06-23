@@ -1,4 +1,5 @@
 import {useTranslation} from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { useUserSession } from "../../../components/Session.tsx";
 import {Divider} from "@mui/material";
 import useHistoric from "../../Historic.tsx";
@@ -79,6 +80,7 @@ const useActions = (refresh?:()=>void) => {
 
 const useCarpetaActions = (entity:any, refresh?: () => void) => {
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const { value: user, rol } = useUserSession()
 
     const { eliminar, exportarPDF, exportarEXCEL, guardarArxiu } = useActions(refresh)
@@ -101,6 +103,13 @@ const useCarpetaActions = (entity:any, refresh?: () => void) => {
 	    	isUsuariAmbPermis(row)));
 			
     const actions = [
+        {
+            label: t('common.detail'),
+            icon: 'folder_open',
+            showInMenu: true,
+            onClick: (id: any) => navigate(`/contingut/${id}`),
+            hidden: () => !user?.sessionScope?.isContingutCarpetaDetallAccesActiva,
+        },
         {
             label: t('page.contingut.action.guardarArxiu.label'),
             icon: 'autorenew',

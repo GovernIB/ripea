@@ -32,6 +32,14 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"  me.organGestor in (:organGestors) order by me.nom ASC")
 	List<Long> findByOrgansGestors(@Param("organGestors") List<OrganGestorEntity> organGestors);
 
+	@Query( "select " +
+			"	me.organGestor.codi " +
+			"from " +
+			"    MetaExpedientEntity me " +
+			"where " +
+			"  me.organGestor is not null and me.id in (:procedimentsIds)")
+	List<String> findOrgansGestorsOfProcediments(@Param("procedimentsIds") List<Long> procedimentsIds);
+	
 	@Query(	"from " +
 			"    MetaExpedientEntity me " +
 			"where " +
@@ -174,6 +182,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"from MetaExpedientEntity me " +
 			"	left outer join me.metaExpedientOrganGestors meog " +
 			"	left outer join me.organGestor og " +
+			"	left outer join me.grups g " +
 			"where me.entitat = :entitat " +
 			"	and (:esNullActiu = true or me.actiu = :actiu) " +
 			"	and (:revisioActiva = false or me.revisioEstat = 'REVISAT') " +
@@ -196,6 +205,9 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"						or meog.id in (:metaExpedientOrganIdPermesos1) " +
 			"						or meog.id in (:metaExpedientOrganIdPermesos2) " +
 			"						or meog.id in (:metaExpedientOrganIdPermesos3))) " +
+			// VIA 5: el grup vinculat al procediment dona acces, pero nomes per procediments SENSE permis directe.
+			// Els procediments amb permisDirecte=true nomes son seleccionables per la via de permis directe real (metaExpedientIdPermesos).
+			"     		or (:esNullIdsGrupsPermesos = false and g.id in (:idsGrupsPermesos) and me.permisDirecte = false) " +
 			"	  		or (:allComuns = true and og is null))) order by me.nom ASC")
 	List<MetaExpedientEntity> findByEntitatAndActiuAndFiltreAndPermes(
 			@Param("entitat") EntitatEntity entitat,
@@ -223,7 +235,9 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			@Param("revisioActiva") boolean revisioActiva,
 			@Param("organGestorIComu") boolean organGestorIComu,
 			@Param("organ") OrganGestorEntity organ,
-			@Param("allComuns") boolean allComuns);
+			@Param("allComuns") boolean allComuns,
+			@Param("esNullIdsGrupsPermesos") boolean esNullIdsGrupsPermesos,
+			@Param("idsGrupsPermesos") List<Long> idsGrupsPermesos);
 
 
 	@Query( "from " +

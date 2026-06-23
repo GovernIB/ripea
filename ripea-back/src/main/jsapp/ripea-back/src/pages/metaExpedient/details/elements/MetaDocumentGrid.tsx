@@ -6,12 +6,13 @@ import LinkIcon from "../../../../components/LinkIcon.tsx";
 import {useActions, useMetaDocumentActions} from "../../../metaDocument/details/MetaDocumentActions.tsx";
 import {MetaDocumentForm} from "../../../metaDocument/MetaDocumentGrid.tsx";
 import * as builder from "../../../../util/springFilterUtils.ts";
-import {DndMuiGrid} from "../../../../components/StyledMuiGrid.tsx";
+import StyledMuiGrid from "../../../../components/StyledMuiGrid.tsx";
 import useMetaDocumentDetail from "./details/MetaDocumentDetail.tsx";
 import {MultiplicitatStyled} from "../../../contingut/details/MetaExpedient.tsx";
 
 const sortModel: any = [{field: 'ordre', sort: 'asc'}]
 const perspectives = ["COUNT_METADADES"];
+const editPerspectives = ["PORTAFIRMES_RESPONSABLES"];
 const columns: any[] = [
     {
         field: 'codi',
@@ -90,7 +91,7 @@ export const MetaDocumentGrid = ({ entity, onRowCountChange, readOnly } :any) =>
     ], [t])
 
     const {apiIsReady, handleOpen, dialog} = useMetaDocumentDetail()
-    const {reordering} = useActions(refresh)
+    const {reordering} = useActions()
     const {actions} = useMetaDocumentActions(refresh);
     const additionalActions:any[] = useMemo(() => readOnly ?[
         {
@@ -103,32 +104,30 @@ export const MetaDocumentGrid = ({ entity, onRowCountChange, readOnly } :any) =>
         ...actions
     ], [t, actions, readOnly, apiIsReady])
 
-    const handleDragEnd = (event: any) => {
-        const sourceData = event.active.data.current;
-        const targetData = event.over.data.current;
-        // console.log('>>> ', sourceData.codi, '(', sourceData.ordre, ') ->', targetData.codi, '(', targetData.ordre, ')')
-        if (sourceData.id != targetData.id) {
-            reordering(sourceData.id, targetData.ordre)
+    const handleDragEnd = (params: any) => {
+        if (params.targetIndex != params.oldIndex) {
+            reordering(params.row.id, params.targetIndex)
         }
     }
 
-    return <><DndMuiGrid
+    return <><StyledMuiGrid
         apiRef={apiRef}
         resourceName={"metaDocumentResource"}
+		persistentStateKey={"metaDocumentResource_procedimentTab"}
         popupEditUpdateActive
         popupEditFormDialogResourceTitle={t('page.metaDocument.title')}
         popupEditFormContent={<MetaDocumentForm/>}
         columns={additionalColumns}
-        toolbarHideQuickFilter={false}
+        toolbarShowQuickFilter
         filter={builder.eq("metaExpedient.id", entity?.id)}
         formAdditionalData={{ metaExpedient: {id: entity?.id} }}
         staticSortModel={sortModel}
         perspectives={perspectives}
         rowAdditionalActions={additionalActions}
         onRowCountChange={onRowCountChange}
-
-        onDragEnd={handleDragEnd}
-
+        popupEditFormComponentProps={{ perspectives: editPerspectives }}
+        rowReordering={!readOnly}
+        onRowOrderChange={handleDragEnd}
         popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'lg' }}
         toolbarCreateTitle={t('page.metaDocument.action.new.label')}
         popupEditFormI18nKeys={{

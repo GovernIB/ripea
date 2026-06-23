@@ -43,7 +43,7 @@ export const FollowersDialog = (props:any) => {
     };
 	
     return <>
-		<IconButton aria-label="forum" color={"inherit"} onClick={handleOpen}>
+		<IconButton title={t('page.expedient.modal.seguidors.label')} aria-label="forum" color={"inherit"} onClick={handleOpen}>
 	        <Badge badgeContent={entity?.numSeguidors} color="primary" showZero>
 	            <Icon>people</Icon>
 	        </Badge>
@@ -52,7 +52,7 @@ export const FollowersDialog = (props:any) => {
 		<MuiDialog
 		    open={open}
 			closeCallback={handleClose}
-			title={t('page.expedient.modal.seguidors') +': '+ entity?.nom}
+			title={t('page.expedient.modal.seguidors.title') +': '+ entity?.nom}
 			key={entity?.id}
 		    componentProps={{ fullWidth: true, maxWidth: 'sm' }}
 		    buttons={[

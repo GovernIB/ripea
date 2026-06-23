@@ -7,8 +7,6 @@ import java.util.List;
 import javax.persistence.*;
 
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
-import org.hibernate.annotations.ForeignKey;
-
 import es.caib.ripea.persistence.base.entity.ResourceEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.model.ConfigResource;
@@ -49,7 +47,6 @@ public class ConfigResourceEntity implements ResourceEntity<ConfigResource, Stri
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "TYPE_CODE", updatable = false)
-    @ForeignKey(name = "NOT_CONFIG_TYPE_FK")
     private ConfigTypeResourceEntity type;
     
     @Column(name = "ENTITAT_CODI", length = 64)

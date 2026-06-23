@@ -5,11 +5,13 @@ import java.io.Serializable;
 import javax.persistence.Embeddable;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Embeddable
-@Getter 
+@Getter
+@EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
 public class CarpetaRestriccioUsuariResourceId implements Serializable {

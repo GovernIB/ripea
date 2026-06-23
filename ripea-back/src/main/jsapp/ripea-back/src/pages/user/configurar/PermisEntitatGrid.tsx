@@ -78,7 +78,7 @@ const PermisEntitatGrid = ()=> {
         },
     ]
 
-    return <GridPage disableMargins>
+    return <GridPage autoHeight>
         <CardPage
             title={t('page.user.menu.permisos')}
             header={ id &&
@@ -96,6 +96,7 @@ const PermisEntitatGrid = ()=> {
             <StyledMuiGrid
                 apiRef={gridApiRef}
                 resourceName={"aclSidResource"}
+                persistentStateActive={false}
                 popupEditUpdateActive
                 columns={columns}
                 sortModel={sortModel}

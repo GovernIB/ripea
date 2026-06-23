@@ -155,7 +155,7 @@ public class MassiuExpedientPeticioCanviEstatDistribucioController extends BaseU
 					"accio.massiva.seleccio.buida",
 					null);
 		}
-		
+		/*
 		int errors = 0;
 		int correctes = 0;
 		Date dataInici = new Date();
@@ -212,12 +212,22 @@ public class MassiuExpedientPeticioCanviEstatDistribucioController extends BaseU
 		if (errors > 0) {
 			MissatgesHelper.error(request, getMessage(request, "massiu.canvi.estat.anotacio.distribucio.errors", new Object[]{errors}), null);
 		} 
+		*/
+		
+		ExecucioMassivaDto dto = new ExecucioMassivaDto();
+		dto.setTipus(ExecucioMassivaTipusDto.ACTUALITZAR_ESTAT_ANOTACIONS);
+		dto.setContingutIds(new ArrayList<Long>(seleccio));
+		dto.setRolActual(RolHelper.getRolActual(request));
+		
+		execucioMassivaService.crearExecucioMassiva(entitatActual.getId(), dto, ElementTipusEnumDto.ANOTACIO);
 		
 		seleccio.clear();
 		RequestSessionHelper.actualitzarObjecteSessio(
 				request,
 				getSessionAttributeSelecio(request),
 				seleccio);
+		
+		MissatgesHelper.success(request, getMessage(request, "accio.massiva.creat.ok"));
 		
 		return "redirect:../expedientPeticioCanviEstatDistribucio";
 	}

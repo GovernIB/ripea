@@ -35,10 +35,40 @@ const translationEn = {
             update: "Modified on {{lastModifiedDate}} by '{{lastModifiedBy}}'.",
         },
         nouPermis: "New permission",
+        advancedSearch: "Advanced search",
+        advancedSearchOpen: "Open advanced search",
+        advancedSearchClose: "Close advanced search",
         error: {
-            status: "Código",
-            title: "Título",
-            message: "Mensaje",
+            status: "Error code",
+            title: "Title",
+            message: "Message",
+        },
+        dragdrop: "Reorder content",
+    },
+    buttons: {
+        answerRequired: {
+            accept: 'Accept',
+            cancel: 'Cancel',
+        },
+        confirm: {
+            accept: 'Accept',
+            cancel: 'Cancel',
+        },
+        form: {
+            save: 'Save',
+            cancel: 'Cancel',
+        },
+        action: {
+            exec: 'Execute',
+            cancel: 'Cancel',
+        },
+        report: {
+            generate: 'Generate',
+            cancel: 'Cancel',
+        },
+        misc: {
+            close: 'Close',
+            retry: 'Try again',
         },
     },
     enum: {
@@ -64,6 +94,20 @@ const translationEn = {
             FIRMAT: "Signed",
             REBUTJAT: "Rejected",
             PARCIAL: "Partial",
+        },
+        estatNotificacio: {
+            ENVIADA: "Sent",
+            ENVIADA_AMB_ERRORS: "Sent with errors",
+            FINALITZADA: "Completed",
+            FINALITZADA_AMB_ERRORS: "Completed with errors",
+            PENDENT: "Pending",
+            PROCESSADA: "Processed",
+            REGISTRADA: "Registered",
+        },
+        registreEstat: {
+            OFICI_SIR: "SIR office",
+            OFICI_ACCEPTAT: "Office accepted",
+            REBUTJAT: "Rejected SIR",
         },
         origen: {
             O0: "Citizen",
@@ -111,6 +155,7 @@ const translationEn = {
 		},
     },
     navigate: {
+        accessibilitat: "Accessibility",
         expedient: "Case search",
         expedientPeticio: "Registry entries search",
         usuariTasca: "Tasks",
@@ -133,6 +178,7 @@ const translationEn = {
     },
     page: {
         comment: {
+            label: "Comments",
             expedient: "Expedient Comments",
             tasca: "Task Comments",
             metaExpedient: "Procedure comments",
@@ -291,7 +337,7 @@ const translationEn = {
                 canviEstatDistribucio: {
                     label: "Change state to distribution",
                     ok: "Status has been successfully changed",
-                    massiveOk: "The status of '{{data.num}}' records has been updated",
+                    massiveOk: "Massive action scheduled to update the status of '{{data.num}}' records.",
                 },
                 descargarAnnex: {
                     label: "Download annex",
@@ -300,7 +346,7 @@ const translationEn = {
                 procesarAnnexosPendents: {
                     label: "Attach",
                     ok: "The annex has been processed successfully",
-                    massiveOk: " '{{data.num}}' attachments have been processed",
+                    massiveOk: "Massive action scheduled to process '{{data.num}}' pending attachments.",
                     info: "If an error occurred when accepting a record from the Records screen, causing some of the record’s documents not to be attached to the case file, from this list you can try attaching the document to the case file again.",
                 },
                 firma: {
@@ -312,6 +358,9 @@ const translationEn = {
                     ok: "The entry has been consulted and saved successfully",
                     massiveOk: "{{data.num}} entries have been consulted and saved successfully",
                 },
+                reintentar: {
+                    title: "Select document type for the pending annex/annexes",
+                }
             }
         },
         tasca: {
@@ -327,6 +376,17 @@ const translationEn = {
                 observadors: "Observers",
                 dataInici: "Start date",
                 duracio: "Duration",
+                duracioFormat: {
+                    expirada: "Deadline expired.",
+                    avui: "Today is the deadline.",
+                    falten: "{{count}} days remaining.",
+                    mateixDia: "Same day.",
+                    i: " and ",
+                    setmana_1: "1 week",
+                    setmana_n: "{{count}} weeks",
+                    dia_1: "1 day",
+                    dia_n: "{{count}} days",
+                },
                 dataLimit: "Deadline",
                 estat: "Status",
                 prioritat: "Priority",
@@ -454,6 +514,7 @@ const translationEn = {
                 exportar: {
                     label: "Export...",
                     ok: "Interested parties exported successfully",
+                    hint: "Select the interested parties you want to export.",
                 },
                 importSGD: {
                     label: "Import stakeholders from Registry...",
@@ -540,7 +601,7 @@ const translationEn = {
                 },
                 retornar: {
                     label: "Return",
-                    ok: "The case file '{{expedient}}' has been returned to user '{{user}}'",
+                    ok: "The case file '{{expedient}}' has been returned to the original manager '{{user}}'",
                 },
                 lliberar: {
                     label: "Release",
@@ -554,6 +615,7 @@ const translationEn = {
                     label: "Close...",
                     button: "Close",
                     title: "Close case file",
+                    titleMassive: "Closing {{num}} case files in bulk",
                     ok: "The case file '{{expedient}}' was closed successfully",
                 },
                 open: {
@@ -563,7 +625,7 @@ const translationEn = {
                 },
                 download: {
                     label: "Download documents...",
-                    button: "Download documents",
+                    button: "Download selected",
                     title: "Document selection",
                     ok: "Documents downloaded successfully",
                 },
@@ -572,7 +634,7 @@ const translationEn = {
                     ok: "Spreadsheet downloaded successfully",
                 },
                 exportZIP: {
-                    label: "Export ZIP index...",
+                    label: "Export ZIP index",
                     button: "Export ZIP index",
                     title: "Export documents to ZIP",
                     ok: "ZIP document downloaded successfully",
@@ -602,7 +664,7 @@ const translationEn = {
                     ok: "INSIDE document downloaded successfully",
                 },
                 exportDocs: {
-                    label: "Export selected files' documents",
+                    label: "Export selected cases documents...",
                     ok: "The documents have been exported successfully",
                 },
                 export: {
@@ -650,11 +712,19 @@ const translationEn = {
                     ok: "Interested parties exported successfully",
                 },
                 impDocMass: {
-                    label: "Import documents to selected case files",
+                    label: "Import documents into the selected cases...",
                     title: "Document import",
                     mssg: "The documents you attach will be added to the {{num}} selected case files",
                     warning: "The case files must belong to the same procedure.",
                 },
+                exportMass: {
+                    unic: "Export case...",
+                    label: "Export selected cases...",
+                    title: "Export selected cases",
+                    titleUni: "Export cases",
+                    info: "You can select various export formats. The export process will be executed in the background and you can track its progress in the massive actions list.",
+                    info2: "You can select various export formats. The export can take a few moments to finish, once completed, the download will start automatically.",
+                },                
                 comment: {
                     ok: "Comment added to the case '{{data.expedient.description}}'",
                 },
@@ -692,7 +762,10 @@ const translationEn = {
 				},
             },
             modal: {
-                seguidors: "Case file followers",
+                seguidors: {
+                    label: "Followers",
+                    title: "Case followers",
+                },
             },
             results: {
                 checkDelete: "Are you sure you want to delete this content? If it contained ongoing signatures, they will be canceled.",
@@ -707,7 +780,7 @@ const translationEn = {
                 fitxerNom: "File name",
                 serie: "Documentary series",
                 arxiuEstat: "File status",
-                document: "Document content",
+                dades: "General data of the content",
                 fitxerContentType: "MIME type",
                 metadata: "ENI metadata",
                 versions: "Version",
@@ -781,6 +854,7 @@ const translationEn = {
                 extensio: "Extension",
                 ruta: "Path",
                 mida: "Size",
+                tipusDocumentDefault: "Document type to apply to all files",
             },
             action: {
                 new: {
@@ -854,6 +928,7 @@ const translationEn = {
                 },
                 detall: {
                     label: "Details",
+                    noUuid: "The document is not synchronized with the archive",
                 },
                 imprimible: {
                     label: "Printable authentic copy",
@@ -864,10 +939,11 @@ const translationEn = {
                     ok: "Original document downloaded successfully",
                 },
                 download: {
+                    firma: "Download signature",
                     ok: "Document downloaded successfully",
                 },
                 firma: {
-                    label: "Download signature",
+                    label: "Sign from the browser...",
                     button: "Start signing process",
                     title: "Sign from the browser",
                     ok: "Document signed successfully",
@@ -1144,7 +1220,7 @@ const translationEn = {
                 notificacioDades: "Notification data",
                 notificacioDocument: "Notification document",
                 error: "Errors occurred while sending the notification",
-
+                fitxerNom: "File name",
                 notificacioEstat: "Status",
                 createdDate: "Sent on",
                 entregaPostal: "Postal delivery",
@@ -1158,6 +1234,7 @@ const translationEn = {
                 actualitzarEstat: {
                     label: "Update status",
                     ok: "Status has been updated successfully",
+                    massiveOk: "The massive execution has been created. You can check its status in the massive actions list.",
                 },
                 notificacioInteressat: {
                     label: "Deliveries",
@@ -1194,6 +1271,7 @@ const translationEn = {
                 entregaNif: "DEH NIF",
                 classificacio: "DEH procedure",
                 enviamentDatatEstat: "Status",
+                registreEstat: "Registry status",
             },
             action: {
                 ampliarPlac: {
@@ -1322,6 +1400,13 @@ const translationEn = {
         },
         metaExpedient: {
             title: "Procedure",
+            columnes: {
+                comu: "Common",
+                directe: "Direct",
+                grups: "Groups",
+                actiu: "Active",
+                estat: "Status",
+            },
             detall: {
                 elementsProc: "Procedure management: {{nom}}",
                 elementsServ: "Service management: {{nom}}",
@@ -1411,6 +1496,11 @@ const translationEn = {
                 },
                 export: {
                     ok: "Procedure exported successfully",
+                },
+                clonar: {
+                    label: "Clone",
+                    title: "Clone procedure",
+                    ok: "New cloned procedure: {{codi}}",
                 },
                 canviPendent: {
                     label: "Mark as pending of review",
@@ -1768,6 +1858,8 @@ const translationEn = {
                 noOrgans: "No managing body assigned",
             },
             menu: {
+                title: "Menu",
+
                 entitat: "Entities",
                 expedient: "Cases",
                 monitoritzar: "Monitor",
@@ -1831,8 +1923,9 @@ const translationEn = {
                 masives: {
                     label: "View massive actions",
                     title: "{{name}} mass executions",
-                    detail: "Detail of the mass action",
+                    detail: "Detail of the mass action: {{tipus}}",
                     ok: "The document has been downloaded successfully",
+                    pending: "This item is currently being processed",
                 },
             },
             perfil: {
@@ -1843,7 +1936,8 @@ const translationEn = {
                 generic: "General settings",
                 column: "Column configuration of case list",
                 vista: "Document view settings in cases",
-                moure: "Destination view settings when moving documents"
+                moure: "Destination view settings when moving documents",
+                interficie: "Default interface"
             }
         },
         alert: {
@@ -1851,6 +1945,7 @@ const translationEn = {
             action: {
                 read: {
                     label: "Mark as read",
+                    title: "Case alerts",
                     ok: "The alert has been marked as read",
                     massiveOk: "The alerts have been marked as read",
                 },
@@ -1863,7 +1958,92 @@ const translationEn = {
                 interessatObligatori: "An interested party is missing",
             },
         },
+        accesibilitat: {
+            title: "Accessibility Declaration",
+            intro: {
+                title: "Introduction",
+                p1Part1: "The Government of the Balearic Islands has committed to making its website and mobile application accessible, in accordance with",
+                p1LinkText: "Royal Decree 1112/2018",
+                p1Part2: ", of 7 September, on the accessibility of websites and mobile applications in the public sector.",
+                p2Part1: "This accessibility statement applies to the website",
+                p2Part2: "and excludes pages that lead to external links.",
+            },
+            compliment: {
+                title: "Compliance status",
+                introPart1: "This website is partially compliant with",
+                introLinkText: "Royal Decree 1112/2018",
+                introPart2: "due to the exceptions and non-conformity of the aspects listed below.",
+                criteri1: "Criterion A - 4.1.2 Name, Role, Value: Some icon buttons lacked an accessible text alternative. Solution applied: the \"title\" and \"aria-label\" attributes with descriptive text have been added to all buttons that did not have a visible label, ensuring screen readers can identify their function.",
+                criteri2: "Criterion A - 1.1.1 Non-text Content: Some informational images did not have alternative text. Solution applied: an audit of all graphic resources has been performed. Non-decorative images now include a descriptive and contextual \"alt\" attribute. Purely decorative images use empty \"alt\" or \"role=presentation\" to be ignored by assistive technologies.",
+                criteri3: "Criterion AA - 1.4.4 Resize Text: Text was truncated when scaling the interface to 200%. Solution applied: on reduced screen sizes, buttons display only the icon accompanied by a descriptive \"title\" attribute. The use of \"overflow: hidden\" in text containers has been removed, and it has been verified that all content remains accessible at 200% zoom.",
+                criteri4: "Criterion AA - 2.5.8 Target Size (Minimum): Certain interactive elements did not meet the minimum size of 24x24 pixels or the required spacing. Solution applied: the positioning and layout of components has been modified to ensure an adequate click area and a minimum spacing of 8 pixels between interactive elements, facilitating their use on touch devices and for people with mobility difficulties.",
+            },
+            noAccesible: {
+                title: "List of inaccessible content and explanation",
+                item1: {
+                    title: "Identification of the main language",
+                    desc1: "The language code used to identify the main language is not a valid code.",
+                    desc2: "In the generated source code, the lang attribute of the HTML node has the value \"ca\", which is valid as an IANA language code. The error may occur because there may be specific texts (those stored in the database and entered by the user) that do not match the indicated language, or because by architecture, language management is performed through the user session and the React application context, not through static HTML attributes. As a compensatory measure, the \"lang\" attribute is dynamically injected into the main container according to the language selected by the user.",
+                },
+                item2: {
+                    title: "Forms and labels",
+                    desc1: "Explicit association between controls and labels is not properly implemented.",
+                    desc2: "In selector-type form fields, the input identifier does not match the \"for\" attribute of the label. The validator used strictly reports the error, although the Material UI (MUI) library claims to comply with WCAG 2.1 accessibility standards; in this case it only partially complies by compensating with the \"aria-labelledby\" attribute, which provides a correct accessible name for screen readers.",
+                },
+                item3: {
+                    title: "Multiple navigation methods",
+                    desc1: "Absence of a link to the site map and a site search engine.",
+                    desc2: "Warning level for not providing any complementary navigation method such as a site map or a search option on the website.",
+                },
+            },
+            preparacio: {
+                title: "Preparation of this declaration",
+                elaborat: "This declaration has been prepared through a self-assessment conducted by the development team using the automated tool: Web Crawler of the Web Accessibility Observatory.",
+                dataPrep: "Preparation date: 01/05/2026",
+                darreraRevisio: "Last review: 05/05/2026",
+                properaRevisio: "Next scheduled review: 05/05/2027",
+                norma: "Reference standard: UNE-EN 301549:2022, levels A and AA",
+                resultatTitle: "Result",
+                puntuacioLabel: "Average website score",
+                puntuacioVal: "8.16",
+                nivellLabel: "Estimated adequacy level",
+                nivellVal: "A",
+                situacioLabel: "Estimated compliance status",
+                situacioVal: "Partially compliant",
+                responsive: "The website is designed for responsive display, so that it displays optimally on tablet and mobile devices.",
+            },
+            contacte: {
+                title: "Observations and contact details",
+                p1: "The Government of the Balearic Islands intends to continue improving and offer citizens the best possible service. You may submit communications regarding accessibility requirements (article 10.2.a) of RD 1112/2018, such as:",
+                li1: "Reporting any possible non-compliance by this website",
+                li2: "Reporting other difficulties accessing content",
+                li3: "Submitting any other query or suggestion for improvement regarding the accessibility of the website",
+                p2Part1: "Through the following",
+                p2LinkText: "contact form",
+                p2Part2: "or by calling 971177140. You may submit:",
+                li4: "A complaint regarding compliance with the requirements of RD 1112/2018, or",
+                li5: "A request for accessible information regarding:",
+                li5a: "Content excluded from the scope of RD 1112/2018 as established in article 3, paragraph 4, or",
+                li5b: "Content exempt from accessibility requirements due to disproportionate burden.",
+                p4Part1: "Through the following procedure:",
+                p4LinkText: "Requests for accessible information and complaints regarding the accessibility of websites and mobile applications.",
+            },
+            procediment: {
+                title: "Application procedure",
+                p1: "The complaint procedure set out in article 13 of RD 1112/2018 entered into force on 20 September 2020.",
+                p2: "If, after submitting a request for accessible information or a complaint, it has been dismissed, you disagree with the decision made, or the response does not meet the requirements set out in article 12.5, the interested party may initiate a complaint. A complaint may also be initiated if twenty working days have passed without receiving a response.",
+                p3Part1: "The complaint can be submitted through the procedure",
+                p3LinkText: "Complaints regarding the accessibility of websites and mobile applications",
+            },
+            opcional: {
+                title: "Optional content",
+                mesures: "Additional accessibility measures implemented: revised heading structure, labels added to fields that lacked them, correction of text blocks over 150 characters without text markup.",
+                config: "Recommended technical configuration: updated browsers (Chrome, Firefox, Edge, Safari in their last two versions), minimum resolution of 1280x720 pixels, and zoom support up to 200% without loss of content or functionality.",
+                recursos: "Resources of interest: W3C Web Accessibility Guide (https://www.w3.org/WAI/), automatic accessibility validators (https://achecker.ca/), and official documentation of Royal Decree 1112/2018.",
+            },
+        },
         notFound: "Not Found",
+        forbidden: "You do not have the appropriate role or permission to access this resource.",
     }
 };
 

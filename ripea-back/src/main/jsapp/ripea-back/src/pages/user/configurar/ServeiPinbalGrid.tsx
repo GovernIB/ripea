@@ -8,10 +8,10 @@ import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 const ServeiPinbalGridForm = () => {
     const {data} = useFormContext()
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField xs={12} name={'codi'} disabled={data?.id}/>
-        <GridFormField xs={12} name={'nom'} type={'textarea'}/>
-        <GridFormField xs={12} name={'pinbalServeiDocPermesEnum'} multiple/>
-        <GridFormField xs={12} name={'actiu'}/>
+        <GridFormField name={'codi'} disabled={data?.id}/>
+        <GridFormField name={'nom'} type={'textarea'}/>
+        <GridFormField name={'pinbalServeiDocPermesEnum'} multiple/>
+        <GridFormField name={'actiu'}/>
     </Grid>
 }
 
@@ -49,7 +49,7 @@ export const ServeiPinbalGrid = () => {
         },
     ]
 
-    return <GridPage disableMargins>
+    return <GridPage autoHeight>
         <CardPage title={t('page.user.menu.pinbal')}>
             <StyledMuiGrid
                 resourceName={"pinbalServeiResource"}
@@ -60,7 +60,7 @@ export const ServeiPinbalGrid = () => {
                 popupEditCreateActive
                 popupEditFormContent={<ServeiPinbalGridForm/>}
                 rowAdditionalActions={actions}
-                toolbarHideQuickFilter={false}
+                toolbarShowQuickFilter
                 toolbarHideCreate
                 popupEditFormI18nKeys={{
                     updateSuccess: 'page.entitat.action.update.ok',
