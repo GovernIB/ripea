@@ -30,6 +30,7 @@ public interface EventService {
     public void notifyErrorsValidacio(ErrorsValidacioChangedEvent errors);
     public AvisosActiusEvent getAvisosActiusEvent();
     public AvisosActiusEvent getAvisosActiusPerUsuari(String rol, Long entitatId);
+    public AvisosActiusEvent getAvisosActiusPerUsuariCodi(String usuariCodi);
     public long getAnotacionsPendents(UsuariAnotacioDto usuariCodi);
     public long getTasquesPendents(String usuariCodi);
     public List<ValidacioErrorDto> getValidacionsInicialsExpedient(Long expedientId);

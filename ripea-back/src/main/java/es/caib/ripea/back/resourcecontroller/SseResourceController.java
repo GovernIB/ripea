@@ -2,27 +2,20 @@ package es.caib.ripea.back.resourcecontroller;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
 
-import es.caib.ripea.persistence.entity.resourceentity.AvisResourceEntity;
-import es.caib.ripea.service.helper.CacheHelper;
-import es.caib.ripea.service.helper.ConfigHelper;
-import es.caib.ripea.service.helper.RolHelper;
-import es.caib.ripea.service.intf.dto.*;
-import es.caib.ripea.service.intf.model.AvisResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,6 +25,11 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.DigitalitzacioResultatDto;
+import es.caib.ripea.service.intf.dto.FirmaResultatDto;
+import es.caib.ripea.service.intf.dto.PortafirmesFluxRespostaDto;
+import es.caib.ripea.service.intf.dto.StatusEnumDto;
+import es.caib.ripea.service.intf.dto.UsuariAnotacioDto;
 import es.caib.ripea.service.intf.model.sse.AnotacionsPendentsEvent;
 import es.caib.ripea.service.intf.model.sse.AvisosActiusEvent;
 import es.caib.ripea.service.intf.model.sse.CreacioFluxFinalitzatEvent;
@@ -62,7 +60,6 @@ public class SseResourceController {
 
     private final EventService eventService;
     private final AplicacioService aplicacioService;
-    private final ConfigHelper configHelper;
 
     //Per cada usuari el emmiter es una llista, perque pot estar obert per varies connexions simultaniament (p.ex. diferents pestanyes del navegador).
     private final Map<String, List<SseEmitter>> clientsUsuaris = new ConcurrentHashMap<>();
@@ -150,29 +147,23 @@ public class SseResourceController {
     }
 
     private void sendToUsersFiltered() {
-        // Crear un usuari autenticat simulat. En portafib no es pot configurar una autenticació BASIC
-        User user = new User("SYSTEM", "SYSTEM", Collections.singletonList(new SimpleGrantedAuthority("tothom")));
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        try {
-//            for (String usuariCodi : new ArrayList<>(clientsUsuaris.keySet())) {
-            for (Map.Entry<String, List<SseEmitter>> entry : clientsUsuaris.entrySet()) {
-                String usuariCodi = entry.getKey();
-                try {
-                    var usuariDB = aplicacioService.findUsuariAmbCodi(usuariCodi);
-                    if (usuariDB == null) {
-                        logger.warn(">>> usuariDB NULL per a {}, s'omet.", usuariCodi);
-                        continue;
-                    }
-                    AvisosActiusEvent eventFiltrat = eventService.getAvisosActiusPerUsuari(usuariDB.getRolActual(), usuariDB.getEntitatActual());
-                    sendToUser(usuariCodi, SseEmitter.event().name(UserEventType.AVISOS.getEventName()).data(eventFiltrat));
-                } catch (Exception e) {
-                    logger.error(">>> ERROR processant avisos per a l'usuari {}: {}", usuariCodi, e.getMessage(), e);
+        // Iteram sobre una còpia de les claus: sendToUser() pot eliminar entrades de clientsUsuaris
+        // quan un usuari es queda sense emisors actius, i així la iteració queda totalment aïllada.
+        for (String usuariCodi : new ArrayList<>(clientsUsuaris.keySet())) {
+            try {
+                // Una sola crida EJB @PermitAll que resol rol/entitat de l'usuari i filtra els avisos.
+                // No cal autenticació simulada: el mètode és @PermitAll i només fa lectures de BBDD,
+                // de manera que la seguretat del contenidor EJB no bloqueja la crida des d'aquest fil
+                // de @JmsListener (sense petició web ni caller autenticat).
+                AvisosActiusEvent eventFiltrat = eventService.getAvisosActiusPerUsuariCodi(usuariCodi);
+                if (eventFiltrat == null) {
+                    logger.warn(">>> usuari {} no trobat a BBDD, s'omet l'enviament d'avisos.", usuariCodi);
+                    continue;
                 }
+                sendToUser(usuariCodi, SseEmitter.event().name(UserEventType.AVISOS.getEventName()).data(eventFiltrat));
+            } catch (Exception e) {
+                logger.error(">>> ERROR processant avisos per a l'usuari {}: {}", usuariCodi, e.getMessage(), e);
             }
-        } finally {
-            SecurityContextHolder.clearContext();
         }
     }
 

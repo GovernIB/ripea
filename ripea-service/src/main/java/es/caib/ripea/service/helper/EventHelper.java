@@ -54,12 +54,18 @@ public class EventHelper {
 	@Autowired private EmailHelper emailHelper;
 
     public void notifyAvisosActius() {
-    	try {
-	        log.debug("notifyAvisosActius a clients");
-	        jmsTemplate.convertAndSend("avisos", new AvisosActiusEvent(null, null));
-    	} catch (Exception ex) {
-    		log.error("Error al notifyAvisosActius a clients", ex);
-    	}
+    	// El missatge d'avisos viatja buit (és només un trigger): la data la re-consulta el consumidor
+    	// (handleEventAvisos -> getAvisosActiusPerUsuariCodi) en una transacció nova. Si publiquéssim el
+    	// missatge dins la transacció encara oberta del canvi d'avís, el consumidor podria llegir l'estat
+    	// antic (race condition). Per això diferim l'enviament a afterCommit, quan el canvi ja és visible.
+    	TransactionAfterCommitUtils.run(() -> {
+        	try {
+    	        log.debug("notifyAvisosActius a clients");
+    	        jmsTemplate.convertAndSend("avisos", new AvisosActiusEvent(null, null));
+        	} catch (Exception ex) {
+        		log.error("Error al notifyAvisosActius a clients", ex);
+        	}
+    	});
     }
 
     public void notifyAnotacionsPendents(Long anotacioId) {
@@ -248,6 +254,20 @@ public class EventHelper {
 				.avisosUsuari(avisos)
 				.avisosAdmin(obtenirAvisosAdmin())
 				.build();
+	}
+
+	/**
+	 * Resol el rol i l'entitat actuals de l'usuari a partir del seu codi i retorna els avisos filtrats.
+	 * Pensat per ser cridat des d'un fil de @JmsListener (sense petició web ni caller autenticat),
+	 * de manera que el controller no hagi de fer una crida EJB addicional a findUsuariAmbCodi.
+	 */
+	public AvisosActiusEvent getAvisosActiusPerUsuariCodi(String usuariCodi) {
+		UsuariEntity usuari = usuariRepository.findById(usuariCodi).orElse(null);
+		if (usuari == null) {
+			return null;
+		}
+		Long entitatId = usuari.getEntitatActual() != null ? usuari.getEntitatActual().getId() : null;
+		return getAvisosActiusPerUsuari(usuari.getRolActual(), entitatId);
 	}
 
 }

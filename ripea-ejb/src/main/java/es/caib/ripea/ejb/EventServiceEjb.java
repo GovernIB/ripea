@@ -8,6 +8,7 @@ import javax.ejb.Stateless;
 
 import es.caib.ripea.ejb.base.AbstractServiceEjb;
 import es.caib.ripea.service.intf.dto.ValidacioErrorDto;
+import es.caib.ripea.service.intf.model.sse.AvisosActiusEvent;
 import es.caib.ripea.service.intf.service.EventService;
 import lombok.experimental.Delegate;
 
@@ -24,5 +25,11 @@ public class EventServiceEjb extends AbstractServiceEjb<EventService> implements
 	@PermitAll
 	public List<ValidacioErrorDto> getValidacionsInicialsExpedient(Long expedientId) {
 		return delegateService.getValidacionsInicialsExpedient(expedientId);
+	}
+
+	// @PermitAll perquè es crida des d'un fil de @JmsListener (handleEventAvisos) sense petició web ni caller autenticat.
+	@PermitAll
+	public AvisosActiusEvent getAvisosActiusPerUsuariCodi(String usuariCodi) {
+		return delegateService.getAvisosActiusPerUsuariCodi(usuariCodi);
 	}
 }
