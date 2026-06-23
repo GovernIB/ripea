@@ -6,3 +6,20 @@ FROM IPA_REGISTRE_ANNEX ANN
    AND PET.registre_id=REG.id
    AND PET.EXPEDIENT_ID is not null; --Anotacio acceptada
    --AND ANN.DOCUMENT_ID is null; --Annex pendent de processar
+   
+--Annexos amb els seus documents relacionats i errors produits
+   
+SELECT ANN.ID
+    ,ANN.ESTAT
+    ,SUBSTR(ANN.ERROR, 0, 10)
+    ,ANN.UUID
+    ,ANN.NOM
+    ,DOC.ID
+    ,DOC.ESTAT
+    ,DOC.UUID_DISTRIBUCIO
+    ,DOC.ANNEX_ESTAT
+    ,DOC.ARXIU_ESTAT
+    ,CON.NOM
+    ,CON.ARXIU_UUID
+    ,CON.ARXIU_PROPAGAT
+FROM IPA_REGISTRE_ANNEX ANN, IPA_DOCUMENT DOC, IPA_CONTINGUT CON WHERE DOC.ID(+)=ANN.DOCUMENT_ID AND DOC.ID=CON.ID(+) AND ANN.REGISTRE_ID=28930;

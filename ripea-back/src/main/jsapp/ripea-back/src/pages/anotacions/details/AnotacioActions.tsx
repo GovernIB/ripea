@@ -7,6 +7,7 @@ import {useNavigate} from "react-router-dom";
 import {icons} from "../../user/UserHeadToolbar.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import useAcceptar from "../actions/Acceptar.tsx";
+import useSubsanarAnnexos from "../actions/SubsanarAnnexos.tsx";
 
 export const useActions = (refresh?: () => void) => {
     const { t } = useTranslation();
@@ -128,6 +129,7 @@ const useAnotacioActions = (refresh?: () => void) => {
     const { canviEstatDistribucio } = useActions(refresh)
     const {handleShow: handleRebutjar, content: contentRebutjar} = useRebutjar(refresh)
     const {handleShow: handleAcceptar, content: contentAcceptar} = useAcceptar(refresh)
+    const {handleShow: handleSubsanarAnnexos, content: contentSubsanarAnnexos} = useSubsanarAnnexos(refresh)
     const {handleOpen, dialog} = useAnotacioDetail();
 
     const actions = [
@@ -172,12 +174,20 @@ const useAnotacioActions = (refresh?: () => void) => {
             onClick: canviEstatDistribucio,
             hidden: (row:any) => !row?.pendentCanviEstatDistribucio || !rol?.isAdmin,
         },
+        {
+            label: t('page.anotacio.action.subsanarAnnexos.label'),
+            icon: "healing",
+            showInMenu: true,
+            onClick: handleSubsanarAnnexos,
+            hidden: (row:any) => !row?.teAnnexosAmbError,
+        },
     ];
 
     const components = <>
         {dialog}
         {contentRebutjar}
         {contentAcceptar}
+        {contentSubsanarAnnexos}
     </>;
 
     return {

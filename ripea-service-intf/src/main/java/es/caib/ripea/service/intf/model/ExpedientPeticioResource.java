@@ -80,6 +80,14 @@ import lombok.experimental.FieldNameConstants;
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientPeticioResource.ACTION_CONSULTAR_I_GUARDAR,
                         formClass = MassiveAction.class),
+                @ResourceArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
+                        code = ExpedientPeticioResource.PERSPECTIVE_ANNEXOS_ERROR_CODE),
+                @ResourceArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientPeticioResource.ACTION_SUBSANAR_ANNEXOS,
+                        formClass = ExpedientPeticioResource.SubsanarAnnexosForm.class,
+                        requiresId = true),
         }
 )
 public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
@@ -91,11 +99,13 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
     public static final String PERSPECTIVE_REGISTRE_CODE = "REGISTRE";
     public static final String PERSPECTIVE_ESTAT_VIEW_CODE = "ESTAT_VIEW";
     public static final String PERSPECTIVE_EN_PROCES_ACTUALITZAR_ESTAT_CODE = "EN_PROCES_ACTUALITZAR_ESTAT";
+    public static final String PERSPECTIVE_ANNEXOS_ERROR_CODE = "ANNEXOS_ERROR";
     public static final String REPORT_DOWNLOAD_JUSTIFICANT = "DOWNLOAD_JUSTIFICANT";
     public static final String ACTION_REBUTJAR_ANOTACIO = "REBUTJAR_ANOTACIO";
     public static final String ACTION_ACCEPTAR_ANOTACIO = "ACCEPTAR_ANOTACIO";
     public static final String ACTION_ESTAT_DISTRIBUCIO = "ESTAT_DISTRIBUCIO";
     public static final String ACTION_CONSULTAR_I_GUARDAR = "CONSULTAR_I_GUARDAR";
+    public static final String ACTION_SUBSANAR_ANNEXOS = "SUBSANAR_ANNEXOS";
 
 //    private Long id;
     private String identificador;
@@ -126,6 +136,7 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
     @Transient private boolean mostrarGrups = false;
     @Transient private ExpedientPeticioEstatViewEnumDto estatView;
     @Transient private Long execucioMassivaActualitzarEstatId;
+    @Transient private boolean teAnnexosAmbError;
 
     @Getter
     @Setter
@@ -203,5 +214,17 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
     public static class RebutjarAnotacioForm implements Serializable {
     	@NotNull
     	private String motiu;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @FieldNameConstants
+    public static class SubsanarAnnexosForm implements Serializable {
+        //Mapa amb clau l'id de l'annex en error i valor l'id del meta-document seleccionat
+        @NotNull @NotEmpty
+        private Map<Long, String> annexos = new HashMap<>();
+        @Transient @ResourceField(enumType = true)
+        private String tipusDocument;
     }
 }

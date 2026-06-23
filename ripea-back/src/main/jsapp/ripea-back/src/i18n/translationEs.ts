@@ -355,7 +355,14 @@ const translationEs = {
                 },
                 reintentar: {
                     title: "Selecciona tipo de documento para el anexo/anexos pendientes",
-                }                
+                },
+                subsanarAnnexos: {
+                    label: "Subsanar anexos con error",
+                    title: "Subsanar anexos con error",
+                    ok: "Los anexos se han subsanado correctamente",
+                    info: "Selecciona el tipo de documento para cada anexo que quedó con error al aceptar la anotación y vuelve a intentar adjuntarlo al expediente.",
+                    tipusDocument: "Tipus de document",
+                }
             }
         },
         tasca: {

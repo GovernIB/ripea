@@ -355,6 +355,13 @@ const translationCa = {
                 },
                 reintentar: {
                     title: "Selecciona tipus de document per a l'annex/annexos pendents",
+                },
+                subsanarAnnexos: {
+                    label: "Subsana annexos amb error",
+                    title: "Subsanar annexos amb error",
+                    ok: "Els annexos s'han subsanat correctament",
+                    info: "Selecciona el tipus de document per a cada annex que va quedar amb error en acceptar l'anotació i torna a intentar adjuntar-lo a l'expedient.",
+                    tipusDocument: "Tipus de document",
                 }
             }
         },

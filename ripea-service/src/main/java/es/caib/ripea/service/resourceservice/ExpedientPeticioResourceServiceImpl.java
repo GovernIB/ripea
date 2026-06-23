@@ -30,6 +30,7 @@ import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.resourceentity.ExpedientPeticioResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.RegistreAnnexResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.RegistreInteressatResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.RegistreResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientResourceRepository;
@@ -79,6 +80,7 @@ import es.caib.ripea.service.intf.dto.SiNoEnumDto;
 import es.caib.ripea.service.intf.model.ExpedientPeticioResource;
 import es.caib.ripea.service.intf.model.ExpedientPeticioResource.AcceptarAnotacioForm;
 import es.caib.ripea.service.intf.model.ExpedientPeticioResource.RebutjarAnotacioForm;
+import es.caib.ripea.service.intf.model.ExpedientPeticioResource.SubsanarAnnexosForm;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.model.RegistreAnnexResource;
@@ -132,7 +134,9 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
         register(ExpedientPeticioResource.ACTION_ACCEPTAR_ANOTACIO, new AcceptarAnotacioActionExecutor());
         register(ExpedientPeticioResource.ACTION_ESTAT_DISTRIBUCIO, new CanviEstatDistribucioActionExecutor());
         register(ExpedientPeticioResource.ACTION_CONSULTAR_I_GUARDAR, new ConsultarGuardarAnotacioPendentActionExecutor());
-        
+        register(ExpedientPeticioResource.PERSPECTIVE_ANNEXOS_ERROR_CODE, new AnnexosErrorPerspectiveApplicator());
+        register(ExpedientPeticioResource.ACTION_SUBSANAR_ANNEXOS, new SubsanarAnnexosActionExecutor());
+
         register(ExpedientPeticioResource.Fields.metaExpedient, new MetaExpedientOnchangeLogicProcessor());
         register(null, new InitialOnChangeDocumentResourceLogicProcessor());
     }
@@ -404,6 +408,17 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
         }
     }
 
+    private class AnnexosErrorPerspectiveApplicator implements PerspectiveApplicator<ExpedientPeticioResourceEntity, ExpedientPeticioResource> {
+        @Override
+        public void applySingle(String code, ExpedientPeticioResourceEntity entity, ExpedientPeticioResource resource) throws PerspectiveApplicationException {
+            //Només les anotacions acceptades (amb expedient associat) poden tenir annexos en error pendents de subsanar.
+            if (entity.getExpedient() != null && entity.getRegistre() != null) {
+                long annexosAmbError = registreAnnexResourceRepository.countAnnexosAmbErrorByRegistreId(entity.getRegistre().getId());
+                resource.setTeAnnexosAmbError(annexosAmbError > 0);
+            }
+        }
+    }
+
     private class AcceptarAnotacioActionExecutor implements ActionExecutor<ExpedientPeticioResourceEntity, AcceptarAnotacioForm, Serializable> {
 
         private Map<String, String> parseToMap(String input){
@@ -661,6 +676,95 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 		}
     }
     
+    private class SubsanarAnnexosActionExecutor implements ActionExecutor<ExpedientPeticioResourceEntity, SubsanarAnnexosForm, Serializable> {
+
+        private Map<String, String> parseToMap(String input) {
+            String[] tokens = input.split(",", -1); // split preservant buits
+            Map<String, String> map = new HashMap<>();
+            for (int i = 0; i < tokens.length - 1; i += 2) {
+                map.put(tokens[i].trim(), tokens[i + 1].trim());
+            }
+            return map;
+        }
+
+        @Override
+        public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
+            List<FieldOption> resultat = new ArrayList<>();
+            if (SubsanarAnnexosForm.Fields.tipusDocument.equals(fieldName)) {
+
+                String entitatActualCodi = configHelper.getEntitatActualCodi();
+                EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true, false);
+
+                String annex = requestParameterMap.get("annex")[0];
+                RegistreAnnexResourceEntity annexEntity = registreAnnexResourceRepository.findById(Long.parseLong(annex)).orElse(null);
+
+                //L'expedient ja existeix (anotació acceptada). Si l'annex ja té document creat (només va fallar el
+                //moviment a l'Arxiu) s'usen els meta-documents per a modificació, que inclouen el tipus actual del
+                //document encara que la multiplicitat l'excluiria. Si no, els disponibles per creació dins l'expedient.
+                List<MetaDocumentEntity> metaDocsPermesos;
+                if (annexEntity != null && annexEntity.getDocument() != null) {
+                    metaDocsPermesos = metaDocumentHelper.findActiusPerModificacio(entitat, annexEntity.getDocument().getId());
+                } else {
+                    Long expedientId = Long.parseLong(requestParameterMap.get("expedientId")[0]);
+                    metaDocsPermesos = metaDocumentHelper.findActiusPerCreacio(entitat, expedientId, null, false);
+                }
+
+                if (metaDocsPermesos != null) {
+                    //Rebem per paràmetre els ids dels meta-documents ja seleccionats per algun dels annexos
+                    Map<String, String> additionalOption = parseToMap(requestParameterMap.get("annexos")[0]);
+
+                    for (MetaDocumentEntity metaDoc : metaDocsPermesos) {
+                        if (metaDoc.isMultiple() ||
+                                (
+                                    !additionalOption.containsValue(String.valueOf(metaDoc.getId())) ||
+                                    String.valueOf(metaDoc.getId()).equals(additionalOption.get(annex))
+                                )
+                        ) {
+                            resultat.add(new FieldOption(metaDoc.getId().toString(), metaDoc.getNom()));
+                        }
+                    }
+                    resultat.sort(Comparator.comparing(FieldOption::getDescription));
+                }
+            }
+            return resultat;
+        }
+
+        @Override
+        public void onChange(Serializable id, SubsanarAnnexosForm previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, SubsanarAnnexosForm target) {}
+
+        @Override
+        public Serializable exec(String code, ExpedientPeticioResourceEntity entity, SubsanarAnnexosForm params) throws ActionExecutionException {
+            String rolActual = configHelper.getRolActual();
+            
+            //Si el expedient no s'ha creat al arxiu, ha de crear-se abans de res.
+            if (entity.getExpedient().getArxiuUuid()==null) {
+            	expedientHelper.guardarExpedientArxiu(entity.getExpedient().getId());
+            }
+            
+            Exception darrerError = null;
+            for (Map.Entry<Long, String> entry : params.getAnnexos().entrySet()) {
+                Long registreAnnexId = entry.getKey();
+                Long metaDocumentId = (entry.getValue() != null && !entry.getValue().isEmpty()) ? Long.parseLong(entry.getValue()) : null;
+                try {
+                    //Per als annexos que ja tenen document es modifica el tipus abans de tornar a intentar el moviment.
+                    Exception ex = expedientHelper.retryCreateDocFromAnnex(registreAnnexId, metaDocumentId, rolActual, true);
+                    if (ex != null) {
+                        darrerError = ex;
+                    }
+                } catch (Exception e) {
+                    //Cada annex es processa de manera aïllada: un error no atura la resta.
+                    darrerError = e;
+                }
+            }
+            if (darrerError != null) {
+                excepcioLogHelper.addExcepcio("/anotacio/" + entity.getId() + "/SubsanarAnnexosActionExecutor", darrerError);
+                String message = messageHelper.getMessage("message.common.action.error") + ": " + ExceptionUtils.getRootCauseMessage(darrerError);
+                throw new ActionExecutionException(getResourceClass(), entity.getId(), code, message);
+            }
+            return objectMappingHelper.newInstanceMap(entity, ExpedientPeticioResource.class);
+        }
+    }
+
     private class RebutjarAnotacioActionExecutor implements ActionExecutor<ExpedientPeticioResourceEntity, ExpedientPeticioResource.RebutjarAnotacioForm, Serializable> {
 
 		@Override

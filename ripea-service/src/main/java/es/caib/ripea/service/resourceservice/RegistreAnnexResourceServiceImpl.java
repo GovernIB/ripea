@@ -76,6 +76,7 @@ public class RegistreAnnexResourceServiceImpl extends BaseMutableResourceService
         register(RegistreAnnexResource.PERSPECTIVE_FIRMES, new AnnexFirmesPerspectiveApplicator());
         register(RegistreAnnexResource.PERSPECTIVE_REGISTRE, new AnnexRegistrePerspectiveApplicator());
         register(RegistreAnnexResource.PERSPECTIVE_EN_PROCES_ADJUNTAR_ANNEXOS_CODE, new EnProcesAdjuntarAnnexosPerspectiveApplicator());
+        register(RegistreAnnexResource.PERSPECTIVE_DOCUMENT_METADOC_CODE, new DocumentMetaDocPerspectiveApplicator());
         register(RegistreAnnexResource.ACTION_REINTENTAR_CODE, new ReintentarArxiuActionExecutor());
     }
     
@@ -165,6 +166,15 @@ public class RegistreAnnexResourceServiceImpl extends BaseMutableResourceService
         }
     }
     
+    private class DocumentMetaDocPerspectiveApplicator implements PerspectiveApplicator<RegistreAnnexResourceEntity, RegistreAnnexResource> {
+        @Override
+        public void applySingle(String code, RegistreAnnexResourceEntity entity, RegistreAnnexResource resource) throws PerspectiveApplicationException {
+            if (entity.getDocument() != null && entity.getDocument().getMetaDocument() != null) {
+                resource.setDocumentMetaDocumentId(entity.getDocument().getMetaDocument().getId());
+            }
+        }
+    }
+
     private class EnProcesAdjuntarAnnexosPerspectiveApplicator implements PerspectiveApplicator<RegistreAnnexResourceEntity, RegistreAnnexResource> {
         @Override
         public void applySingle(String code, RegistreAnnexResourceEntity entity, RegistreAnnexResource resource) throws PerspectiveApplicationException {

@@ -960,7 +960,31 @@ public class ExpedientHelper {
 
 		return exception;
 	}
-	
+
+	/**
+	 * Variant que, quan l'annex ja té document creat (només va fallar el moviment a l'Arxiu), actualitza el tipus
+	 * del document amb el meta-document seleccionat abans de tornar a intentar moure'l. Si l'annex encara no té
+	 * document, el meta-document s'usa, com fins ara, per crear-lo dins de {@link #retryCreateDocFromAnnex(Long, Long, String)}.
+	 */
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public Exception retryCreateDocFromAnnex(Long registreAnnexId, Long metaDocumentId, String rolActual, boolean actualitzarTipusDocumentExistent) {
+		if (actualitzarTipusDocumentExistent && metaDocumentId != null) {
+			RegistreAnnexEntity registreAnnexEntity = registreAnnexRepository.getOne(registreAnnexId);
+			DocumentEntity document = registreAnnexEntity.getDocument();
+			if (document != null
+					&& (document.getMetaDocument() == null || !metaDocumentId.equals(document.getMetaDocument().getId()))) {
+				documentHelper.updateTipusDocumentDocument(
+						document.getEntitat() != null ? document.getEntitat().getId() : null,
+						document,
+						metaDocumentId,
+						false);
+				//Al canviar de tipus de document, poden canviar les validacions.
+				cacheHelper.evictErrorsValidacioPerNode(document.getId());
+			}
+		}
+		return retryCreateDocFromAnnex(registreAnnexId, metaDocumentId, rolActual);
+	}
+
 	/**
 	 * Creates document from registre annex
 	 * @param expedientId 

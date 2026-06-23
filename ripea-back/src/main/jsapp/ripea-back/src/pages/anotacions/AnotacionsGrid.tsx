@@ -14,7 +14,7 @@ import useAnotacioDetail from "./details/AnotacioDetail.tsx";
 import {useUserSession} from "../../components/Session.tsx";
 
 const sortModel:any = [{field: 'registreInfo.data', sort: 'desc'}];
-const perspectives = ['REGISTRE', 'ESTAT_VIEW'];
+const perspectives = ['REGISTRE', 'ESTAT_VIEW', 'ANNEXOS_ERROR'];
 const namedQueries = ['LLISTAT_ANOTACIONS'];
 
 const AnotacionsGridForm = () => {

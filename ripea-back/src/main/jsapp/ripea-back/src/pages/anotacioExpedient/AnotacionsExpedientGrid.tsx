@@ -6,9 +6,10 @@ import * as builder from "../../util/springFilterUtils.ts";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
 import useAnotacioDetail from "../anotacions/details/AnotacioDetail.tsx";
 import {useMemo} from "react";
+import {useMuiDataGridApiRef} from "reactlib";
 
 const sortModel:any = [{field: 'registreInfo.data', sort: 'desc'}];
-const perspectives = ['REGISTRE', 'ESTAT_VIEW'];
+const perspectives = ['REGISTRE', 'ESTAT_VIEW', 'ANNEXOS_ERROR'];
 
 const AnotacionsExpedientGrid = (props:any) => {
     const { id } = props;
@@ -43,7 +44,12 @@ const AnotacionsExpedientGrid = (props:any) => {
         },
     ], [t]);
 
-    const {actions, components} = useAnotacioActions();
+    const apiRef = useMuiDataGridApiRef();
+    const refresh = () => {
+        apiRef?.current?.refresh?.();
+    }
+
+    const {actions, components} = useAnotacioActions(refresh);
     const {handleOpen, dialog} = useAnotacioDetail();
 
     return <>
@@ -55,6 +61,7 @@ const AnotacionsExpedientGrid = (props:any) => {
             perspectives={perspectives}
             columns={columns}
             rowAdditionalActions={actions}
+            apiRef={apiRef}
             paginationActive={false}
             autoHeight
             onRowClick={(params: any) => handleOpen(params?.row?.id, params?.row) }

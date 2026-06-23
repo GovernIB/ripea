@@ -355,6 +355,13 @@ const translationEn = {
                 },
                 reintentar: {
                     title: "Select document type for the pending annex/annexes",
+                },
+                subsanarAnnexos: {
+                    label: "Fix annexes with error",
+                    title: "Fix annexes with error",
+                    ok: "The annexes have been fixed successfully",
+                    info: "Select the document type for each annex that ended with an error when accepting the registry entry and retry attaching it to the file.",
+                    tipusDocument: "Tipus de document",
                 }
             }
         },
