@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>es.caib.ripea</groupId>
 		<artifactId>ripea</artifactId>
-		<version>1.0.5</version>
+		<version>1.0.6</version>
 	</parent>
 	<artifactId>ripea-service</artifactId>
 	<!-- Valors buits per defecte: quan JaCoCo no s'activa (perfil 'cobertura' inactiu)
