@@ -84,6 +84,7 @@ const MarcarDefinitiuGrid = () => {
                 persistentStateKey={"documentResource_massMarcarDefinitiu"}
                 columns={columns}
                 filter={springFilter}
+                toolbarShowFilterCount
                 perspectives={perspectives}
                 namedQueries={namedQueries}
                 sortModel={sortModel}

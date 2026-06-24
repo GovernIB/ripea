@@ -123,6 +123,7 @@ const AnotacionsGrid = () => {
                 <StyledMuiGrid
                     resourceName="expedientPeticioResource"
                     filter={springFilter}
+                    toolbarShowFilterCount
                     sortModel={sortModel}
                     perspectives={perspectives}
                     columns={columns}
@@ -132,7 +133,9 @@ const AnotacionsGrid = () => {
                     paginationActive
                     popupEditUpdateActive
                     popupEditFormContent={<AnotacionsGridForm/>}
-                    toolbarHide
+                    // toolbarHide
+                    readOnly
+                    toolbarHideRefresh
                     popupEditFormDialogTitle={t('page.anotacio.action.canviProcediment.title')}
                     popupEditFormComponentProps={{ initOnChangeRequest: true }}
                     popupEditFormI18nKeys={{

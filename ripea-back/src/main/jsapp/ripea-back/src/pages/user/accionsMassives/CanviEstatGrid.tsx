@@ -116,6 +116,7 @@ export const CanviEstatMuiGrid = (props:any) => {
         columns={columns}
         sortModel={sortModel}
         toolbarHideCreate
+        toolbarShowFilterCount
         {...props}
     />
 }

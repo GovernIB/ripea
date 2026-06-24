@@ -287,6 +287,7 @@ const ExpedientGrid = () => {
                         columns={columnsAddition}
 						rowActionsColumnProps={{ width: 55, minWidth: 55 }}
 						filter={springFilter}
+                        toolbarShowFilterCount
                         sortModel={sortModel}
                         perspectives={perspectives}
                         apiRef={apiRef}

@@ -15,7 +15,7 @@ import { useSmallScreen, useSmallHeader } from '../../util/useSmallScreen';
 
 export type MenuEntry = {
     id: string;
-    title?: string;
+    title?: string | React.ReactElement;
     description?: string;
     to?: string;
     icon: string;
@@ -46,7 +46,7 @@ type ListMenuContentProps = MenuProps & {
 
 type MenuItemProps = React.PropsWithChildren & {
     entry: MenuEntry;
-    primary: string;
+    primary: string | React.ReactElement;
     to?: string;
     icon?: string;
     level?: number;

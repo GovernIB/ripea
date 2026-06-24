@@ -29,6 +29,7 @@ const translationEs = {
         export: "Exportar",
         consult: "Consultar",
         filter: "Filtra",
+        filterCount: "{{num}} filtros aplicados",
         processing: "Procesando...",
         auditoria: {
             create: "Creado el {{createdDate}} por '{{createdBy}}'.",
@@ -197,6 +198,7 @@ const translationEs = {
             },
             tabs: {
                 contingut: "Contenido",
+                infoArxiu: "Información del archivo",
                 dades: "Datos",
                 interessats: "Interesados",
                 remeses: "Remesas",

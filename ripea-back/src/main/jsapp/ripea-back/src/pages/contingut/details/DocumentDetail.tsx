@@ -1,9 +1,9 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {Alert, Box, Button, Grid, Icon, Typography, Link} from "@mui/material";
 import {GridPage, useResourceApiService, MuiDialog, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import TabComponent from "../../../components/TabComponent.tsx";
-import {CardButton, DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
+import {CardButton, DetailCard, DetailCardContent, DetailExpandCard} from "../../../components/CardData.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import MetaDadaGrid from "../../dada/MetaDadaGrid.tsx";
 import Load from "../../../components/Load.tsx";
@@ -93,6 +93,101 @@ export const Firmes = (props:any) => {
     </Grid>
 }
 
+const InfoArxiu = (props:any) => {
+    const { id, arxiu, setArxiu } = props;
+    const { t } = useTranslation();
+    const {temporalMessageShow} = useBaseAppContext();
+
+    const {
+        isReady: apiIsReady,
+        getOne: appGetOne,
+    } = useResourceApiService('documentResource');
+
+    useEffect(() => {
+        if (!arxiu) {
+            if (apiIsReady && id) {
+                appGetOne(id, {perspectives: ['ARXIU_DOCUMENT']})
+                    .then((app) => {
+                        setArxiu(app?.arxiu)
+                    })
+                    .catch((error)=>{
+                        temporalMessageShow(null, error?.message, 'error');
+                    })
+            }
+        }
+    }, [id, apiIsReady]);
+
+    return <Load value={arxiu}>
+        <Grid container sx={{wordWrap: "break-word" }} direction={"row"} columnSpacing={1} rowSpacing={1}>
+
+            <DetailExpandCard title={t('page.arxiu.detall.dades')} expanded>
+                <DetailCardContent title={t('page.arxiu.detall.arxiuUuid')}>{arxiu?.identificador}</DetailCardContent>
+                <DetailCardContent title={t('page.arxiu.detall.fitxerNom')}>{arxiu?.nom}</DetailCardContent>
+                <DetailCardContent title={t('page.arxiu.detall.serie')}>{arxiu?.serieDocumental}</DetailCardContent>
+                <DetailCardContent title={t('page.arxiu.detall.arxiuEstat')} hiddenIfEmpty>{arxiu?.arxiuEstat}</DetailCardContent>
+                <DetailCardContent title={t('page.arxiu.detall.fitxerContentType')} hidden={!arxiu?.contingutTipusMime}>{arxiu?.contingutTipusMime}</DetailCardContent>
+                <DetailCardContent title={t('page.arxiu.detall.fitxerNom')} hidden={!arxiu?.contingutArxiuNom}>{arxiu?.contingutArxiuNom}</DetailCardContent>
+            </DetailExpandCard>
+
+            <DetailExpandCard title={t('page.arxiu.detall.metadata')} hidden={!arxiu?.eniIdentificador}>
+                <DetailCardContent title={t('page.arxiu.detall.versions')}>{arxiu?.eniVersio}</DetailCardContent>
+                <DetailCardContent title={t('page.arxiu.detall.identificador')}>{arxiu?.eniIdentificador}</DetailCardContent>
+                <DetailCardContent title={t('page.arxiu.detall.organ')}>{arxiu?.eniOrgans?.join(', ')}</DetailCardContent>
+                <DetailCardContent title={t('page.arxiu.detall.dataApertura')}>{formatDate(arxiu?.eniDataObertura)}</DetailCardContent>
+                <DetailCardContent title={t('page.arxiu.detall.clasificacion')}>{arxiu?.eniClassificacio}</DetailCardContent>
+                <DetailCardContent title={t('page.arxiu.detall.estat')} hidden={!arxiu?.eniEstat}>{t(`enum.estat.${arxiu?.eniEstat}`)}</DetailCardContent>
+                <DetailCardContent title={t('page.document.detall.csv')} hidden={!arxiu?.csv}>
+                    {arxiu?.csv} {arxiu?.csvLink &&
+                    <Link href={arxiu?.csvLink+arxiu?.csv} target={"_blank"} rel="noopener noreferrer"><Icon>launch</Icon></Link>}
+                </DetailCardContent>
+                <DetailCardContent title={t('page.arxiu.detall.dataTancament')}>{formatDate(arxiu?.eniDataTancament)}</DetailCardContent>
+                <DetailCardContent title={t('page.arxiu.detall.dataCaptura')}>{formatDate(arxiu?.eniDataCaptura)}</DetailCardContent>
+                <DetailCardContent title={t('page.arxiu.detall.origen')} hidden={!arxiu?.eniOrigen}>{t(`enum.origen.${arxiu?.eniOrigen}`)}</DetailCardContent>
+                <DetailCardContent title={t('page.arxiu.detall.estadoElaboracion')} hidden={!arxiu?.eniEstatElaboracio}>{t(`enum.estatElaboracio.${arxiu?.eniEstatElaboracio}`)}</DetailCardContent>
+                <DetailCardContent title={t('page.arxiu.detall.tipoDocumental')}>{arxiu?.eniTipusDocumental}</DetailCardContent>
+                <DetailCardContent title={t('page.arxiu.detall.tipoDocumental')}>{arxiu?.eniTipusDocumentalAddicional}</DetailCardContent>
+                <DetailCardContent title={t('page.arxiu.detall.format')}>{arxiu?.eniFormat}</DetailCardContent>
+                <DetailCardContent title={t('page.arxiu.detall.firmes')}>{arxiu?.firmes?.map((firma:any)=>firma?.tipus)?.join(', ')}</DetailCardContent>
+                <DetailCardContent title={t('page.arxiu.detall.interessats')}>{arxiu?.eniInteressats?.join(', ')}</DetailCardContent>
+                <DetailCardContent title={t('page.arxiu.detall.documentOrigen')}>{arxiu?.eniDocumentOrigenId}</DetailCardContent>
+            </DetailExpandCard>
+
+            <DetailExpandCard title={t('page.arxiu.tabs.fills')} hidden={!arxiu?.fills || arxiu?.fills?.length == 0}>
+                {
+                    arxiu?.fills?.map((cont:any)=> <DetailCardContent key={cont?.identificador} title={cont?.tipus}>{cont?.nom}</DetailCardContent>)
+                }
+            </DetailExpandCard>
+
+            <DetailExpandCard title={t('page.arxiu.tabs.firmes')} hidden={!arxiu?.firmes || arxiu?.firmes?.length == 0}>
+                {
+                    arxiu?.firmes?.map((firma:any) =>
+                        <DetailCard key={firma?.tipus} title={t('page.arxiu.firma.title') + ' ' + firma?.tipus}>
+                            <DetailCardContent title={t('page.arxiu.firma.perfil')} hiddenIfEmpty>{firma?.perfil}</DetailCardContent>
+                            <DetailCardContent title={t('page.arxiu.firma.fitxerNom')} hiddenIfEmpty>{firma?.fitxerNom}</DetailCardContent>
+                            <DetailCardContent title={t('page.arxiu.firma.tipusMime')} hiddenIfEmpty>{firma?.tipusMime}</DetailCardContent>
+                            <DetailCardContent title={t('page.arxiu.firma.contingut')} hidden={firma?.tipus!='CSV'}>{firma?.contingutComString}</DetailCardContent>
+                            <DetailCardContent title={t('page.arxiu.firma.csvRegulacio')} hiddenIfEmpty>{firma?.csvRegulacio}</DetailCardContent>
+                        </DetailCard>
+                    )
+                }
+            </DetailExpandCard>
+
+            <DetailExpandCard title={t('page.arxiu.tabs.data')} hidden={!arxiu?.metadadesAddicionals}>
+                {
+                    arxiu?.metadadesAddicionals && Object.entries(arxiu?.metadadesAddicionals).map(([key, value]:any[]) =>
+                        <DetailCardContent key={key} title={key} hiddenIfEmpty>
+                            {
+                                key.includes("fecha")
+                                    ?formatDate(value)
+                                    :value
+                            }
+                        </DetailCardContent>)
+                }
+            </DetailExpandCard>
+        </Grid>
+    </Load>
+}
+
 const perspectives = ['VERSIONS', 'COUNT', 'FIRMES', 'RESUM']
 const useDocumentDetail = (expedient:any, refresh?: () => void) => {
     const { t } = useTranslation();
@@ -106,6 +201,7 @@ const useDocumentDetail = (expedient:any, refresh?: () => void) => {
 
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
+    const [arxiu, setArxiu] = useState<any>();
     const [numDades, setNumDades] = useState<number>(entity?.numDades);
 
     const {apiDownload} = useActions()
@@ -135,6 +231,11 @@ const useDocumentDetail = (expedient:any, refresh?: () => void) => {
             value: 'resum',
             label: t('page.document.tabs.resum'),
             content: <Contenido entity={entity} fields={fields}/>,
+        },
+        {
+            value: "infoArxiu",
+            label: t('page.contingut.tabs.infoArxiu'),
+            content: <InfoArxiu id={entity?.id} arxiu={arxiu} setArxiu={setArxiu} />,
         },
         {
             value: "dades",
