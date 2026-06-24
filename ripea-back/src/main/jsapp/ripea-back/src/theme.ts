@@ -1,5 +1,14 @@
-import {ThemeOptions, createTheme, darken} from '@mui/material/styles';
+import {ThemeOptions, createTheme, darken, alpha} from '@mui/material/styles';
 import type {} from '@mui/x-data-grid/themeAugmentation';
+
+// Color principal per defecte: blau corporatiu equivalent al primary del tema
+// clar "clàssic". És també el valor per defecte de la columna IPA_USUARI.COLOR_PRINCIPAL.
+export const DEFAULT_PRIMARY_COLOR = '#337ab7';
+
+// Color secundari per defecte: gris molt clar (neutre). L'usuari pot triar el
+// seu propi color secundari. És també el valor per defecte de la columna
+// IPA_USUARI.COLOR_SECUNDARI.
+export const DEFAULT_SECONDARY_COLOR = '#f1efef';
 
 // Diagonal hatch pattern reproduced with CSS (no image asset).
 // Lines every 3px at 45deg. Colors are overridden per theme below.
@@ -264,19 +273,26 @@ const base: ThemeOptions = {
     }
 };
 
-const lightPalete = {
-    mode: 'light',
-    primary: {main: '#337ab7', light: '#90caf9', contrastText: "#fff"},
+const lightPalette = (main: string, secondary: string) => ({
+    mode: 'light' as const,
+    // Deixem que MUI derivi light/dark/contrastText a partir de `main`.
+    primary: {main},
+    secondary: {main: secondary},
     text: { disabled: '#555555 !important' },
     warning: {main: '#8a6d3b'},
     action: {
         disabled: 'rgba(81,81,81,0.49)',
-        selected: 'rgba(51, 122, 183, 0.28)',
+        // El color de selecció segueix el color principal (28% d'opacitat).
+        selected: alpha(main, 0.28),
         disabledBackground: 'rgba(231,229,229,0.6)',
     },
-}
+})
 
-export const lightTheme = createTheme(base, {
+const createLightTheme = (main: string, secondary: string) => {
+const lightPalete = lightPalette(main, secondary);
+// Sidebar/Drawer i capçaleres de marca: deriven del color principal.
+const drawerBg = darken(main, 0.35);
+return createTheme(base, {
     palette: { ...lightPalete },
     components: {
         MuiCssBaseline: {
@@ -289,7 +305,7 @@ export const lightTheme = createTheme(base, {
                     }
                 },
                 '.styledFilter': {
-                    backgroundColor: '#f5f5f5',
+                    backgroundColor: secondary,
                     border: '1px solid #e3e3e3'
                 },
                 '.myComment': {
@@ -301,12 +317,12 @@ export const lightTheme = createTheme(base, {
             },
         },
         MuiButtonGroup: {styleOverrides: {grouped: {'&.Mui-disabled': { backgroundColor: lightPalete.action.disabledBackground }}}},
-        MuiDialogTitle: {styleOverrides: {root: {backgroundColor: lightPalete.action.disabledBackground,}}},
+        MuiDialogTitle: {styleOverrides: {root: {backgroundColor: alpha(main, 0.5),}}},
         MuiCard: {styleOverrides: {root: {border: '1px solid #e3e3e3'}}},
         MuiCardHeader: {
             styleOverrides: {
                 root: {
-                    backgroundColor: lightPalete.action.disabledBackground,
+                    backgroundColor: secondary,
                     borderBottom: '1px solid #e3e3e3',
 
                     '&.detail': {
@@ -315,7 +331,7 @@ export const lightTheme = createTheme(base, {
                 }
             },
         },
-        MuiDrawer: {styleOverrides: {paper: {backgroundColor: '#004B99', color: '#fff'}}},
+        MuiDrawer: {styleOverrides: {paper: {backgroundColor: drawerBg, color: '#fff'}}},
         MuiAlert: {
             styleOverrides: {
                 standardWarning: {
@@ -328,8 +344,13 @@ export const lightTheme = createTheme(base, {
         MuiDataGrid: {
             styleOverrides: {
                 root: {
+                    // Files parells: color secundari amb alfa 0.5 (zebra striping).
+                    // Exclou les seleccionades perquè conservin el ressaltat de selecció.
+                    '& .MuiDataGrid-row.even:not(.Mui-selected)': {
+                        backgroundColor: alpha(secondary, 0.5),
+                    },
                     '& .MuiDataGrid-row:hover': {
-                        backgroundColor: `rgba(144, 202, 249, 0.66) !important`,
+                        backgroundColor: `${alpha(main, 0.4)} !important`,
                     },
                 },
                 row: {
@@ -344,12 +365,16 @@ export const lightTheme = createTheme(base, {
         },
     }
 });
+}
 
-const darkPalette = {
-    mode: 'dark',
+const darkPaletteObj = (main: string, secondary: string) => ({
+    mode: 'dark' as const,
     background: {default: '#121212', paper: '#1e1e1e'},
-    primary: {main: '#90caf9', contrastText: '#000000'},
-    secondary: {main: '#f48fb1', contrastText: '#000000'},
+    // En mode fosc el principal i el secundari són versions enfosquides dels
+    // colors triats per l'usuari (vegeu createDarkTheme); en mode clar s'usen
+    // tal qual.
+    primary: {main},
+    secondary: {main: secondary},
     error: {main: '#f44336'},
     warning: {main: '#ffa726'},
     info: {main: '#29b6f6'},
@@ -359,13 +384,36 @@ const darkPalette = {
     action: {
         active: '#ffffff',
         hover: '#333333',
-		selected: 'rgba(51, 122, 183, 0.28)',
+        selected: alpha(main, 0.28),
         disabled: '#555555',
         disabledBackground: '#2c2c2c'
     },
-}
+})
 
-export const darkTheme = createTheme(base, {
+// Quantitat d'enfosquiment aplicada als colors triats per l'usuari en mode
+// fosc (0 = sense canvi, 1 = negre). En tornar a mode clar es fa servir el
+// color original (cap transformació).
+const DARK_MODE_DARKEN = 0.4;
+
+// Si l'usuari NO ha modificat els colors per defecte, en mode fosc s'usen
+// aquests valors específics en lloc d'enfosquir els per defecte.
+const DARK_DEFAULT_PRIMARY = '#90caf9';
+const DARK_DEFAULT_SECONDARY = '#2e2e2e';
+
+const createDarkTheme = (mainRaw: string, secondaryRaw: string) => {
+// Adaptem els colors al mode fosc. Si encara són els per defecte, s'usen els
+// valors foscos predefinits; si l'usuari els ha personalitzat, s'enfosqueixen.
+// La resta del builder (paleta, sidebar, títols, files...) ja parteix d'aquí.
+const main = mainRaw.toLowerCase() === DEFAULT_PRIMARY_COLOR
+    ? DARK_DEFAULT_PRIMARY
+    : darken(mainRaw, DARK_MODE_DARKEN);
+const secondary = secondaryRaw.toLowerCase() === DEFAULT_SECONDARY_COLOR
+    ? DARK_DEFAULT_SECONDARY
+    : darken(secondaryRaw, DARK_MODE_DARKEN);
+const darkPalette = darkPaletteObj(main, secondary);
+// Sidebar/Drawer en mode fosc: fons fosc tintat amb el color principal.
+const drawerBg = darken(main, 0.55);
+return createTheme(base, {
     palette: { ...darkPalette },
     components: {
         MuiCssBaseline: {
@@ -381,6 +429,7 @@ export const darkTheme = createTheme(base, {
                     }
                 },
                 '.styledFilter': {
+                    backgroundColor: secondary,
                     border: '1px solid #e3e3e3'
                 },
                 '.myComment': {
@@ -404,16 +453,17 @@ export const darkTheme = createTheme(base, {
         MuiDialogTitle: {
             styleOverrides: {
                 root: {
-                    color: darkPalette.background.paper,
-                    backgroundColor: darkPalette.action.active,
+                    color: '#fff',
+                    backgroundColor: alpha(main, 0.5),
                 },
             }
         },
         MuiDataGrid: {
             styleOverrides: {
                 root: {
+					// Files parells: color secundari amb alfa 0.5 (zebra striping).
 					'& .MuiDataGrid-row.even.MuiDataGrid-row': {
-					    backgroundColor: '#464646',
+					    backgroundColor: alpha(secondary, 0.5),
 					},
                     '& .MuiDataGrid-row:hover': {
                         backgroundColor: `${darken(darkPalette.action.selected, 0.2)} !important`,
@@ -430,7 +480,7 @@ export const darkTheme = createTheme(base, {
             },
         },
         MuiCard: {styleOverrides: {root: {border: '1px solid white'}}},
-        MuiCardHeader: {styleOverrides: {root: {borderBottom: '1px solid white'}}},
+        MuiCardHeader: {styleOverrides: {root: {backgroundColor: secondary, borderBottom: '1px solid white'}}},
         MuiCardContent: {styleOverrides: {root: {backgroundColor: '#2d2d2d'}}},
         MuiInputLabel: {styleOverrides: {root: {color: '#fff'}}},
         MuiCheckbox: {
@@ -443,7 +493,7 @@ export const darkTheme = createTheme(base, {
             }
         },
         MuiButtonGroup: {styleOverrides: {grouped: {'&.Mui-disabled': {color: darkPalette.text.disabled}}}},
-        MuiDrawer: {styleOverrides: {paper: {backgroundColor: '#2d2d2d'}}},
+        MuiDrawer: {styleOverrides: {paper: {backgroundColor: drawerBg}}},
         MuiAlert: {
             styleOverrides: {
                 standardSuccess: {backgroundColor: '#4c5d3e'},
@@ -454,3 +504,17 @@ export const darkTheme = createTheme(base, {
         },
     },
 });
+}
+
+// Factoria de tema: a partir dels colors principal i secundari escollits per
+// l'usuari i el mode (clar/fosc) construeix el tema MUI complet, derivant
+// contrast i colors de marca (sidebar, capçaleres...).
+export const buildTheme = (
+    primary: string | undefined,
+    secondary: string | undefined,
+    mode: 'light' | 'dark',
+) => {
+    const main = primary || DEFAULT_PRIMARY_COLOR;
+    const sec = secondary || DEFAULT_SECONDARY_COLOR;
+    return mode === 'dark' ? createDarkTheme(main, sec) : createLightTheme(main, sec);
+};

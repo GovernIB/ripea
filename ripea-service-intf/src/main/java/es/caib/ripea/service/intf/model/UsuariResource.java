@@ -49,6 +49,10 @@ public class UsuariResource extends BaseResource<String> {
 	private ContingutVistaEnumDto vistaActual;
     @NotNull
     private boolean modeFosc = false;
+    @Size(max = 7)
+    private String colorPrincipal = "#337ab7";
+    @Size(max = 7)
+    private String colorSecundari = "#f1efef";
 
     @ResourceField(enumType = true)
 	private Long numElementsPagina;

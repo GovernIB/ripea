@@ -86,6 +86,10 @@ public class UsuariEntity implements Serializable {
 	private boolean expedientListGrup = false;
 	@Column(name = "mode_fosc")
 	private boolean modeFosc = false;
+	@Column(name = "color_principal", length = 7)
+	private String colorPrincipal = "#337ab7";
+	@Column(name = "color_secundari", length = 7)
+	private String colorSecundari = "#f1efef";
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "metaexpedient_id")

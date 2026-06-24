@@ -1944,7 +1944,11 @@ const translationEn = {
                 column: "Column configuration of case list",
                 vista: "Document view settings in cases",
                 moure: "Destination view settings when moving documents",
-                interficie: "Default interface"
+                interficie: "Default interface",
+                tema: "Theme customization",
+                colorPrincipal: "Primary color",
+                colorSecundari: "Secondary color",
+                colorReset: "Default"
             }
         },
         alert: {
