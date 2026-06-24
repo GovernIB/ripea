@@ -329,9 +329,11 @@ const TOKENS = {
 } as const;
 type TokenKey = keyof typeof TOKENS;
 
-// Enfosquiment aplicat a un color personalitzat per obtenir el seu valor en
-// foscor total. Si el color encara és el per defecte, s'usa el valor predefinit.
-const DARK_MODE_DARKEN = 0.4;
+// Enfosquiment màxim aplicat a un color personalitzat en foscor total (nivell
+// 100%). 0.9 = s'enfosqueix fins al 90%, mantenint un 10% del color original
+// (mai negre del tot). Si el color encara és el per defecte, s'usa el valor
+// predefinit en lloc d'enfosquir.
+const DARK_MODE_DARKEN = 0.9;
 const DARK_DEFAULT_PRIMARY = '#90caf9';
 const DARK_DEFAULT_SECONDARY = '#2e2e2e';
 const darkVariant = (color: string, def: string, darkDefault: string) =>
@@ -376,7 +378,13 @@ export const buildTheme = (
     // Text del títol de modal: contrast sobre el fons compost (superfície + primary 50%).
     const dialogTitleColor = onColor(mix(tk.surface, primaryMain, 0.5));
 
-    return createTheme(base, {
+    // IMPORTANT: la palette ha d'anar al PRIMER argument de createTheme perquè
+    // MUI n'augmenti els colors (calcula light/dark/contrastText a partir de
+    // `main`). Els arguments següents només es fusionen, sense augmentar: si la
+    // palette anés al segon argument, `primary.dark` (que fa servir el hover dels
+    // botons contained) es quedaria amb el valor per defecte de MUI.
+    return createTheme({
+        ...base,
         palette: {
             mode,
             primary: {main: primaryMain},
@@ -396,6 +404,7 @@ export const buildTheme = (
                 disabledBackground: tk.actionDisabledBg,
             },
         },
+    }, {
         components: {
             MuiCssBaseline: {
                 styleOverrides: {

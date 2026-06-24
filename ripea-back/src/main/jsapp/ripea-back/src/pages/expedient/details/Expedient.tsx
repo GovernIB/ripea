@@ -374,7 +374,7 @@ const Expedient = () => {
 
     const headerMain = <>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', columnGap: 1, rowGap: 0.5, width: '100%' }}>
-            <Icon sx={{ fontSize: '2rem', color: 'primary.light' }}>{icons.expedient}</Icon>
+            <Icon sx={{ fontSize: '2rem', color: 'text.primary' }}>{icons.expedient}</Icon>
             <Typography variant="h4" component="h1" sx={{ lineHeight: 1.2, flexShrink: 0 }}>
                 {isCarpetaUrl && expedient?.id != null ? (
                     <Link
