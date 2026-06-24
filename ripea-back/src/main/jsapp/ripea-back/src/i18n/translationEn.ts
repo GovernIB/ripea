@@ -1946,6 +1946,7 @@ const translationEn = {
                 moure: "Destination view settings when moving documents",
                 interficie: "Default interface",
                 tema: "Theme customization",
+                foscor: "Dark theme level",
                 colorPrincipal: "Primary color",
                 colorSecundari: "Secondary color",
                 colorReset: "Default"

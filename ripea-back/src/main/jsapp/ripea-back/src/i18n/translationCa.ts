@@ -1952,6 +1952,7 @@ const translationCa = {
                 moure: "Configuració vista destí al moure documents",
                 interficie: "Interfície per defecte",
                 tema: "Personalització del tema",
+                foscor: "Nivell de tema fosc",
                 colorPrincipal: "Color principal",
                 colorSecundari: "Color secundari",
                 colorReset: "Per defecte"

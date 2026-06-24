@@ -125,21 +125,24 @@ export const useEntitatSession = () => {
         }
     },[apiIsReady])
 
+    // El tema deixa de ser binari: considerem "fosc" a partir del punt mitjà del
+    // nivell de foscor (≥50) per triar la variant fosca de logos i colors de marca.
+    const isDark = (user?.conf?.nivellFosc ?? 0) >= 50;
     const logo = useMemo(() => {
-        return !(user?.conf?.modeFosc) ? value?.logoImgBytes : value?.blackLogoImgBytes
-    }, [value?.logoImgBytes, value?.blackLogoImgBytes, user?.conf?.modeFosc]);
+        return !isDark ? value?.logoImgBytes : value?.blackLogoImgBytes
+    }, [value?.logoImgBytes, value?.blackLogoImgBytes, isDark]);
     const favicon = useMemo(() => {
-        return !(user?.conf?.modeFosc) ? value?.faviconImgBytes : value?.blackFaviconImgBytes
-    }, [value?.faviconImgBytes, value?.blackFaviconImgBytes, user?.conf?.modeFosc]);
+        return !isDark ? value?.faviconImgBytes : value?.blackFaviconImgBytes
+    }, [value?.faviconImgBytes, value?.blackFaviconImgBytes, isDark]);
     const menuicon = useMemo(() => {
-        return !(user?.conf?.modeFosc) ? value?.menuImgBytes : value?.blackMenuImgBytes
-    }, [value?.menuImgBytes, value?.blackMenuImgBytes, user?.conf?.modeFosc]);
+        return !isDark ? value?.menuImgBytes : value?.blackMenuImgBytes
+    }, [value?.menuImgBytes, value?.blackMenuImgBytes, isDark]);
     const colorFons = useMemo(() => {
-        return (!(user?.conf?.modeFosc) ? value?.capsaleraColorFons : value?.blackCapsaleraColorFons) || "#FFFFFF"
-    }, [value?.capsaleraColorFons, value?.blackCapsaleraColorFons, user?.conf?.modeFosc]);
+        return (!isDark ? value?.capsaleraColorFons : value?.blackCapsaleraColorFons) || "#FFFFFF"
+    }, [value?.capsaleraColorFons, value?.blackCapsaleraColorFons, isDark]);
     const colorLletra = useMemo(() => {
-        return (!(user?.conf?.modeFosc) ? value?.capsaleraColorLletra : value?.blackCapsaleraColorLletra) || '#000'
-    }, [value?.capsaleraColorLletra, value?.blackCapsaleraColorLletra, user?.conf?.modeFosc]);
+        return (!isDark ? value?.capsaleraColorLletra : value?.blackCapsaleraColorLletra) || '#000'
+    }, [value?.capsaleraColorLletra, value?.blackCapsaleraColorLletra, isDark]);
 
     return { value : {...value, conf: {logo, favicon, menuicon, colorFons, colorLletra}}, remove }
 }

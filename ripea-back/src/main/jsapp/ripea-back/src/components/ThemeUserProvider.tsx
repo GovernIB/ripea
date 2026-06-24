@@ -10,8 +10,12 @@ import {buildTheme, DEFAULT_PRIMARY_COLOR, DEFAULT_SECONDARY_COLOR} from "../the
 export interface ThemePreview {
     primary?: string;
     secondary?: string;
-    modeFosc?: boolean;
+    // Nivell de foscor del tema, 0 (clar) a 100 (fosc).
+    foscor?: number;
 }
+
+// Nivell per defecte quan l'usuari encara no n'ha desat cap.
+export const DEFAULT_FOSCOR = 0;
 
 interface ThemeUserContextProps {
     preview: ThemePreview | undefined;
@@ -28,7 +32,7 @@ export const ThemeUserProvider = ({ children }: { children: React.ReactNode }) =
     // En carregar/refrescar la configuració persistida descartem la previsualització.
     useEffect(() => {
         setPreviewState(undefined)
-    }, [user?.conf?.modeFosc, user?.conf?.colorPrincipal, user?.conf?.colorSecundari]);
+    }, [user?.conf?.nivellFosc, user?.conf?.colorPrincipal, user?.conf?.colorSecundari]);
 
     const setPreview = (value: ThemePreview) =>
         setPreviewState(prev => ({ ...prev, ...value }))
@@ -37,8 +41,8 @@ export const ThemeUserProvider = ({ children }: { children: React.ReactNode }) =
     const theme = useMemo(() => {
         const primary = preview?.primary ?? user?.conf?.colorPrincipal ?? DEFAULT_PRIMARY_COLOR;
         const secondary = preview?.secondary ?? user?.conf?.colorSecundari ?? DEFAULT_SECONDARY_COLOR;
-        const modeFosc = preview?.modeFosc ?? user?.conf?.modeFosc ?? false;
-        return buildTheme(primary, secondary, modeFosc ? 'dark' : 'light');
+        const foscor = preview?.foscor ?? user?.conf?.nivellFosc ?? DEFAULT_FOSCOR;
+        return buildTheme(primary, secondary, foscor / 100);
     }, [preview, user]);
 
     return (

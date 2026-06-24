@@ -1,5 +1,5 @@
 import React, {useMemo, useState, useEffect, useRef, useCallback} from "react";
-import {Grid, Box, Button, Icon, Checkbox, FormControlLabel} from "@mui/material";
+import {Grid, Box, Button, Icon, Checkbox, FormControlLabel, Slider} from "@mui/material";
 import {MuiFormDialog, useBaseAppContext, useMuiFormDialogApiRef, useFormContext, DialogButton} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {CardData} from "../../../components/CardData.tsx";
@@ -81,6 +81,56 @@ const ThemeColorField = ({ fieldName, defaultColor, label, setPreview, previewKe
     );
 };
 
+// Control del nivell de foscor del tema (0 = clar, 100 = fosc). El thumb es mou
+// a l'instant (estat local) i la previsualització del tema s'aplica amb debounce
+// per no reconstruir el tema sencer a cada tick d'arrossegament. El desat al
+// formulari es fa en deixar anar el slider (onChangeCommitted).
+const ThemeLevelField = ({setPreview}: { setPreview: (value: ThemePreview) => void }) => {
+    const { data, apiRef } = useFormContext();
+    const { t } = useTranslation();
+    const value = Number(data?.nivellFosc) || 0;
+
+    const [localValue, setLocalValue] = useState<number>(value);
+    useEffect(() => { setLocalValue(value); }, [value]);
+
+    const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+    useEffect(() => () => { if (debounceRef.current) clearTimeout(debounceRef.current); }, []);
+
+    const handleChange = (_e: Event, v: number | number[]) => {
+        const val = Array.isArray(v) ? v[0] : v;
+        setLocalValue(val);
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        debounceRef.current = setTimeout(() => setPreview({ foscor: val }), COLOR_DEBOUNCE_MS);
+    };
+
+    const handleCommitted = (_e: React.SyntheticEvent | Event, v: number | number[]) => {
+        const val = Array.isArray(v) ? v[0] : v;
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        setPreview({ foscor: val });
+        apiRef?.current?.setFieldValue('nivellFosc', val);
+    };
+
+    return (
+        <Grid size={4}>
+            <Box display="flex" alignItems="center" gap={2} sx={{ height: '100%', px: 1 }}>
+                <Box component="label" htmlFor="nivellFoscSlider" sx={{ fontStyle: 'italic', fontSize: '14px', whiteSpace: 'nowrap' }}>
+                    {t('page.user.perfil.foscor')}
+                </Box>
+                <Slider
+                    id="nivellFoscSlider"
+                    value={localValue}
+                    min={0}
+                    max={100}
+                    onChange={handleChange}
+                    onChangeCommitted={handleCommitted}
+                    valueLabelDisplay="auto"
+                    aria-label={t('page.user.perfil.foscor')}
+                />
+            </Box>
+        </Grid>
+    );
+};
+
 const PerfilFrom = ({setPreview}: { setPreview: (value: ThemePreview) => void }) =>{
     const { data, fields, apiRef } = useFormContext();
     const { t } = useTranslation();
@@ -146,13 +196,7 @@ const PerfilFrom = ({setPreview}: { setPreview: (value: ThemePreview) => void })
             </CardData>
 
             <CardData title={t('page.user.perfil.tema')} icon="palette" >
-                <GridFormField
-                    name="modeFosc"
-                    size={4}
-                    onChange={(value) => {
-                        setPreview({ modeFosc: !!value });
-                    }}
-                />
+                <ThemeLevelField setPreview={setPreview} />
                 <ThemeColorField
                     fieldName="colorPrincipal"
                     defaultColor={DEFAULT_PRIMARY_COLOR}
@@ -204,6 +248,9 @@ const usePerfil = () => {
                 temporalMessageShow(null, t('page.user.perfil.ok', {nom: user.nom}), 'success');
             })
             .catch((error) => {
+                // Qualsevol tancament sense desar (cancel·lar, 'x', Escape) rebutja
+                // la promesa: revertim la previsualització del tema a la configuració desada.
+                removePreview();
                 if (error?.message)
                     temporalMessageShow(null, error?.message, 'error');
             });

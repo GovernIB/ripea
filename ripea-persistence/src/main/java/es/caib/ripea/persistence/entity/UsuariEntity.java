@@ -84,8 +84,8 @@ public class UsuariEntity implements Serializable {
 	private boolean expedientListComentaris = true;
 	@Column(name = "exp_list_grup")
 	private boolean expedientListGrup = false;
-	@Column(name = "mode_fosc")
-	private boolean modeFosc = false;
+	@Column(name = "nivell_fosc")
+	private int nivellFosc = 0;
 	@Column(name = "color_principal", length = 7)
 	private String colorPrincipal = "#337ab7";
 	@Column(name = "color_secundari", length = 7)
