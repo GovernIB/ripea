@@ -2,7 +2,7 @@ import {useTranslation} from "react-i18next";
 import {useState} from "react";
 import {MuiDialog} from "reactlib";
 import {Grid} from "@mui/material";
-import {CardData, ContenidoData, DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
+import {DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
 
 const AnnexFirma = (props:any) => {
     const {entity} = props;

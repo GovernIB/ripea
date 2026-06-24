@@ -198,6 +198,7 @@ const translationEs = {
             },
             tabs: {
                 contingut: "Contenido",
+                infoArxiu: "Información del archivo",
                 dades: "Datos",
                 interessats: "Interesados",
                 remeses: "Remesas",

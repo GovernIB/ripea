@@ -4,7 +4,6 @@ import {useTranslation} from "react-i18next";
 import {useUserSession} from "../../../components/Session.tsx";
 import useDocumentDetail from "./DocumentDetail.tsx";
 import useHistoric from "../../Historic.tsx";
-import useInformacioArxiu from "../../InformacioArxiu.tsx";
 import {iniciaDescargaBlob, useCommonActions} from "../../expedient/details/CommonActions.tsx";
 import {useMoure, useCopiar, useVincular} from "../actions/Moure.tsx";
 import useNotificar from "../actions/Notificar.tsx";
@@ -161,7 +160,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
     const {handleOpen: handleVisualitzarOpen, dialog: dialogVisualitzar, isValid} = useVisualitzar();
     const {handleOpen: handleSeguimentOpen, dialog: dialogSeguiment} = useSeguimentPortafirmes(entity?.potModificarContingut, refresh);
     const {handleOpen: handleSeguimentVfOpen, dialog: dialogSeguimentVf} = useSeguimentViafirma(entity?.potModificarContingut, refresh);
-    const {handleOpen: handleArxiuOpen, dialog: arxiuDialog} = useInformacioArxiu('documentResource', 'ARXIU_DOCUMENT');
+    // const {handleOpen: handleArxiuOpen, dialog: arxiuDialog} = useInformacioArxiu('documentResource', 'ARXIU_DOCUMENT');
     const {handleShow: handleMoureShow, content: contentMoure} = useMoure(refresh);
     const {handleShow: handleCopiarShow, content: contentCopiar} = useCopiar(refresh);
     const {handleShow: handleVincularShow, content: contentVincular} = useVincular(refresh);
@@ -423,13 +422,13 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             showInMenu: true,
             onClick: handleHistoricOpen,
         },
-        {
-            label: t('page.contingut.action.infoArxiu.label'),
-            icon: "info",
-            showInMenu: true,
-            onClick: handleArxiuOpen,
-            disabled: (row:any) => !row?.arxiuUuid,
-        },
+        // {
+        //     label: t('page.contingut.action.infoArxiu.label'),
+        //     icon: "info",
+        //     showInMenu: true,
+        //     onClick: handleArxiuOpen,
+        //     disabled: (row:any) => !row?.arxiuUuid,
+        // },
     ]
         .map(({ hidden, ...rest }) => ({
             ...rest,
@@ -445,7 +444,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
         {dialogDetall}
         {dialogHistoric}
         {dialogVisualitzar}
-        {arxiuDialog}
+        {/*{arxiuDialog}*/}
         {contentMoure}
         {contentCopiar}
         {contentVincular}

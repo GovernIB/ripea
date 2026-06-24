@@ -198,6 +198,7 @@ const translationCa = {
             },
             tabs: {
                 contingut: "Contingut",
+                infoArxiu: "Informació arxiu",
                 dades: "Dades",
                 interessats: "Interessats",
                 remeses: "Remeses",

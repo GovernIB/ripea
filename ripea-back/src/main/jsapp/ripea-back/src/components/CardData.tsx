@@ -1,5 +1,5 @@
-import {Box, Card, CardContent, CardHeader, Grid, Typography, Icon, IconButton} from "@mui/material";
-import React from "react";
+import {Box, Card, CardContent, CardHeader, Grid, Typography, Icon, IconButton, Collapse} from "@mui/material";
+import React, {useState} from "react";
 
 const iconButton = { p: 0.5, borderRadius: '5px', maxWidth: 'max-content', border: '1px solid grey' }
 
@@ -102,6 +102,52 @@ export const DetailCard = (props: DetailCardProps) => {
                         {children}
                     </Grid>
                 </CardContent>
+            </Card>
+        </Grid>
+    );
+};
+
+export const DetailExpandCard = (props: DetailCardProps) => {
+    const { icon, title, header, children, size = 12, hidden, cardProps = {}, headerProps = {}, variant = 'overline',
+        expanded = false, ...other } = props;
+    const [e, setE] = useState(expanded);
+
+    const handleExpandClick = () => {
+        setE(!e);
+    };
+
+    if (hidden) {
+        return <></>;
+    }
+
+    return (
+        <Grid size={size}>
+            <Card sx={cardProps}>
+                {(title || header) && (
+                    <CardHead icon={icon} className={'detail'} sx={{ py: 0, px: 2, ...headerProps }}
+                              componentProps={{width: '100%', display: 'flex', justifyContent: 'space-between'}} onClick={handleExpandClick}>
+                        {title && (<>
+                            <Typography mt={0.5} variant={variant}>
+                                {title}
+                            </Typography>
+
+                            <IconButton
+                                onClick={handleExpandClick}
+                            >
+                                <Icon>{e?'expand_more':'expand_less'}</Icon>
+                            </IconButton>
+                        </>)}
+                        {header}
+                    </CardHead>
+                )}
+
+                <Collapse in={e} timeout="auto" unmountOnExit>
+                    <CardContent sx={{ p: '0 !important' }}>
+                        <Grid container {...other} sx={{ ...(other?.sx ?? {}), ...(!(title || header) && { paddingTop: '0 !important' }) }}>
+                            {children}
+                        </Grid>
+                    </CardContent>
+                </Collapse>
             </Card>
         </Grid>
     );
