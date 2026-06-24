@@ -150,6 +150,7 @@ const EnviarPortafirmesGrid = () => {
                 persistentStateKey={"documentResource_massEnviarPortafirmes"}
                 columns={columns}
                 filter={springFilter}
+                toolbarShowFilterCount
                 perspectives={perspectives}
                 namedQueries={namedQueries}
                 sortModel={sortModel}

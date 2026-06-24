@@ -75,6 +75,7 @@ const CopiarEnllacCSVGrid = () => {
                 persistentStateKey={"documentResource_massCopiarEnllacCsv"}
                 columns={columns}
                 filter={springFilter}
+                toolbarShowFilterCount
                 perspectives={perspectives}
                 sortModel={sortModel}
                 namedQueries={namedQueriesCsv}

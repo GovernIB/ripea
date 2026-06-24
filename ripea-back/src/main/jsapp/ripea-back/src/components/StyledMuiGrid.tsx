@@ -1,5 +1,5 @@
 import React, {useEffect, useMemo, useState} from "react";
-import {Button, Icon, Tooltip, Typography} from "@mui/material";
+import {Button, Chip, Icon, Tooltip, Typography} from "@mui/material";
 import {useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro";
 import {MuiDataGridProps, MuiGrid, useMuiDataGridApiRef} from "reactlib";
 import {useTranslation} from "react-i18next";
@@ -30,6 +30,34 @@ export const ToolbarButton = (props:any) => {
     </Tooltip>
 }
 
+export const countTopLevel = (filter?: string): number => {
+    if (!filter || !filter?.trim()) return 0;
+    let str = filter.trim();
+
+    if (str.startsWith('(') && str.endsWith(')')) {
+        let bal = 0;
+        for (let i = 0; i < str.length; i++) {
+            bal += str[i] === '(' ? 1 : str[i] === ')' ? -1 : 0;
+            if (bal === 0 && i < str.length - 1) {
+                bal = 1; break;
+            }
+        }
+        if (bal === 0) str = str.slice(1, -1);
+    }
+
+    let depth = 0;
+    let flat = '';
+    for (let i = 0; i < str.length; i++) {
+        const c = str[i];
+        if (c === '(') depth++;
+        else if (c === ')') depth--;
+        else if (depth === 0) flat += c;
+    }
+
+    const matches = flat.match(/(?<=\s)(AND|OR)(?=\s)/gi);
+    return matches ? matches.length + 1 : 1;
+};
+
 type StyledMuiGridProps = Omit<MuiDataGridProps,
     'rowSelectionModel'
     | 'onRowSelectionModelChange'
@@ -37,6 +65,8 @@ type StyledMuiGridProps = Omit<MuiDataGridProps,
     | 'paginationActive'
     | 'persistentStateActive'
 > & {
+    filterCount?: number | ((num:number) => number),
+    toolbarShowFilterCount?: boolean,
     toolbarCreateTitle?: string,
     toolbarMassiveActions?: MassiveActionProps[],
     rowProps?: (row:any) => any,
@@ -64,6 +94,8 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
     const {
         resourceName,
         filter,
+        filterCount = countTopLevel(filter),
+        toolbarShowFilterCount = false,
         namedQueries,
         columns,
         apiRef = gridApiRef,
@@ -108,7 +140,13 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         datagridApiRef?.current?.setRowSelectionModel?.(toSelectionModel(value))
     }
 
+    const filterNum:number = ((typeof filterCount === 'function') ? filterCount?.(countTopLevel(filter)) : filterCount)
     const toolbarElements = [
+        {
+            position: 0,
+            element: <Chip label={t('common.filterCount', {num: filterNum})} size={"small"} />,
+            hidden: !toolbarShowFilterCount || !filterNum,
+        },
         {
             position: 1,
             element: <MassiveActionSelector

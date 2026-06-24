@@ -29,7 +29,8 @@ const translationEn = {
         export: "Export",
         consult: "Consult",
         filter: "Filter",
-		processing: "Processing...",
+        filterCount: "{{num}} filters applied",
+        processing: "Processing...",
         auditoria: {
             create: "Created on {{createdDate}} by '{{createdBy}}'.",
             update: "Modified on {{lastModifiedDate}} by '{{lastModifiedBy}}'.",

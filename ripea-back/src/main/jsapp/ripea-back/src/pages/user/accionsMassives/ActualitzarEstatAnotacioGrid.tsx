@@ -133,6 +133,7 @@ const ActualitzarEstatAnotacioGrid = () => {
 				persistentStateKey={"expedientPeticioResource_massActualitzarEstat"}
                 columns={columns}
                 filter={springFilter}
+                toolbarShowFilterCount
                 sortModel={sortModel}
                 perspectives={perspectives}
                 namedQueries={namedQuery}

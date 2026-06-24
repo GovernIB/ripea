@@ -158,6 +158,7 @@ const AdjuntarAnnexosPendentsGrid = () => {
 				persistentStateKey={"registreAnnexResource_massAdjuntarPendents"}
                 columns={columns}
                 filter={springFilter}
+                toolbarShowFilterCount
                 perspectives={perspectives}
                 namedQueries={namedQuery}
                 rowAdditionalActions={actions}

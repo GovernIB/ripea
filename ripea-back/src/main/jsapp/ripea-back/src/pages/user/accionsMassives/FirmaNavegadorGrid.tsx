@@ -88,6 +88,7 @@ const FirmaNavegadorGrid = () => {
                 persistentStateKey={"documentResource_massFirmaNavegador"}
                 columns={columns}
                 filter={springFilter}
+                toolbarShowFilterCount
                 perspectives={perspectives}
 				namedQueries={namedQueries}
                 sortModel={sortModel}

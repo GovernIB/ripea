@@ -127,6 +127,7 @@ const TasquesGrid = () => {
                     resourceName="expedientTascaResource"
                     columns={columns}
                     filter={springFilter}
+                    toolbarShowFilterCount
                     namedQueries={namedQueries}
                     sortModel={sortModel}
                     perspectives={perspectives}
@@ -156,8 +157,10 @@ const TasquesGrid = () => {
                                 'padding-left': '6px'
                             }
                     }}
-                    toolbarHide
+                    // toolbarHide
                     readOnly
+                    toolbarHideRefresh
+                    filterCount={(num) => num - 1}
                 />
                 {components}
                 {dialog}

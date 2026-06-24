@@ -138,6 +138,7 @@ const CustodiarExpedientsPendentsGrid = (props:any) => {
             persistentStateKey={"expedientResource_massCustodiarPendents"}
             columns={expedientColumns}
             filter={springFilter}
+            toolbarShowFilterCount
             sortModel={sortModel}
             perspectives={perspectivesExpedient}
             namedQueries={namedQueriesExpedient}
@@ -238,6 +239,7 @@ const CustodiarDocumentsPendentsGrid = (props:any) => {
             persistentStateKey={"documentResource_custodiarPendents"}
             columns={documentColumns}
             filter={springFilter}
+            toolbarShowFilterCount
             sortModel={sortModel}
             namedQueries={namedQueriesDocument}
             perspectives={perspectivesDocument}
@@ -337,6 +339,7 @@ const CustodiarInteressatsPendentsGrid = (props:any) => {
             persistentStateKey={"interessatResource_custodiarPendents"}
             columns={interessatColumns}
             filter={springFilter}
+            toolbarShowFilterCount
             sortModel={sortModel}
             perspectives={perspectivesInteressat}
             namedQueries={namedQueriesInteressat}

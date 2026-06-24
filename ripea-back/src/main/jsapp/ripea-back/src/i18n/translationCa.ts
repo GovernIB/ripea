@@ -29,6 +29,7 @@ const translationCa = {
         export: "Exporta",
         consult: "Consulta",
         filter: "Filtra",
+        filterCount: "{{num}} filtres aplicats",
         processing: "Processant...",
         auditoria: {
             create: "Creat el {{createdDate}} per '{{createdBy}}'.",
