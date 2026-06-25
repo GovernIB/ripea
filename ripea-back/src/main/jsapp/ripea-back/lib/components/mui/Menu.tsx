@@ -19,6 +19,7 @@ export type MenuEntry = {
     description?: string;
     to?: string;
     icon: string;
+    onClick?: () => void;
     children?: MenuEntry[];
     divider?: boolean;
 };
@@ -46,9 +47,6 @@ type ListMenuContentProps = MenuProps & {
 
 type MenuItemProps = React.PropsWithChildren & {
     entry: MenuEntry;
-    primary: string | React.ReactElement;
-    to?: string;
-    icon?: string;
     level?: number;
     selected?: boolean;
     shrink?: boolean;
@@ -149,9 +147,6 @@ const menuItemIconClassName = 'menu-item-icon';
 const MenuItem: React.FC<MenuItemProps> = (props) => {
     const {
         entry,
-        primary,
-        to,
-        icon,
         level = 0,
         selected,
         shrink,
@@ -195,11 +190,18 @@ const MenuItem: React.FC<MenuItemProps> = (props) => {
             fontWeight: boldPrimary ? 'bold' : undefined,
         },
     };
+    const primary = entry.title ?? '';
+    const to = entry.to;
+    const icon = entry.icon;
     const handleMenuItemClick = () => {
-        if (children != null) {
-            setExpanded((expanded) => !expanded);
+        if (entry.onClick) {
+            entry.onClick();
         } else {
-            onMenuItemClick?.(entry);
+            if (children != null) {
+                setExpanded((expanded) => !expanded);
+            } else {
+                onMenuItemClick?.(entry);
+            }
         }
     };
     const expandedIconComponent = children != null ? (
@@ -260,9 +262,6 @@ const ListMenuContent: React.FC<ListMenuContentProps> = (props) => {
                     <MenuItem
                         key={index}
                         entry={item}
-                        primary={item.title ?? ''}
-                        to={item.to}
-                        icon={item.icon}
                         level={level}
                         selected={selected}
                         shrink={shrink}
