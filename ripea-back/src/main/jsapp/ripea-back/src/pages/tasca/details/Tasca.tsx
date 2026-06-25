@@ -70,7 +70,7 @@ const Tasca = () => {
 
     const headerMain = <>
         <Box sx={{ display: 'flex', alignItems: 'center'}}>
-            <Icon sx={{ fontSize: '2rem', color: 'primary.light' }}>{icons.tasca}</Icon>
+            <Icon sx={{ fontSize: '2rem', color: 'text.primary' }}>{icons.tasca}</Icon>
             <Typography variant="h4" component="h1" sx={{ display: 'flex' }}>{tasca?.metaExpedientTasca?.description}</Typography>
         </Box>
         <Box>

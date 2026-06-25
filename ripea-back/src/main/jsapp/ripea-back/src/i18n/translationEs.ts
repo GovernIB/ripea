@@ -1952,7 +1952,12 @@ const translationEs = {
                 column: "Configuración de columnas del listado de expedientes",
                 vista: "Configuración vista de documentos de expedientes",
                 moure: "Configuración vista destino al mover documentos",
-                interficie: "Interfaz por defecto"
+                interficie: "Interfaz por defecto",
+                tema: "Personalización del tema",
+                foscor: "Nivel de tema oscuro",
+                colorPrincipal: "Color principal",
+                colorSecundari: "Color secundario",
+                colorReset: "Por defecto"
             }
         },
         alert: {

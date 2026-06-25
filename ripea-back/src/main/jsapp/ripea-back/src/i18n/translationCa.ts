@@ -1952,7 +1952,12 @@ const translationCa = {
                 column: "Configuració de columnes del llistat d'expedients",
                 vista: "Configuració vista de documents dels expedients",
                 moure: "Configuració vista destí al moure documents",
-                interficie: "Interfície per defecte"
+                interficie: "Interfície per defecte",
+                tema: "Personalització del tema",
+                foscor: "Nivell de tema fosc",
+                colorPrincipal: "Color principal",
+                colorSecundari: "Color secundari",
+                colorReset: "Per defecte"
             }
         },
         alert: {

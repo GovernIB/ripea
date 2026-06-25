@@ -1,5 +1,14 @@
-import {ThemeOptions, createTheme, darken} from '@mui/material/styles';
+import {ThemeOptions, createTheme, darken, alpha} from '@mui/material/styles';
 import type {} from '@mui/x-data-grid/themeAugmentation';
+
+// Color principal per defecte: blau corporatiu equivalent al primary del tema
+// clar "clàssic". És també el valor per defecte de la columna IPA_USUARI.COLOR_PRINCIPAL.
+export const DEFAULT_PRIMARY_COLOR = '#337ab7';
+
+// Color secundari per defecte: gris molt clar (neutre). L'usuari pot triar el
+// seu propi color secundari. És també el valor per defecte de la columna
+// IPA_USUARI.COLOR_SECUNDARI.
+export const DEFAULT_SECONDARY_COLOR = '#f1efef';
 
 // Diagonal hatch pattern reproduced with CSS (no image asset).
 // Lines every 3px at 45deg. Colors are overridden per theme below.
@@ -13,6 +22,9 @@ import type {} from '@mui/x-data-grid/themeAugmentation';
 const hatchPattern = (line: string) =>
     `repeating-linear-gradient(45deg, transparent 0, transparent 0.75px, ${line} 1.25px, transparent 1.75px, transparent 3px)`;
 
+// Estructura "base" del tema: tota la configuració NO cromàtica (radis,
+// espaiats, tipografia, layout...). Els colors es defineixen al tema paramètric
+// (buildTheme) i sobreescriuen el que calgui d'aquí.
 const base: ThemeOptions = {
     components: {
         MuiCssBaseline: {
@@ -41,9 +53,9 @@ const base: ThemeOptions = {
                 '.styledFilter': {
                     marginBottom: '16px',
                     paddingTop: '11px',
-					paddingBottom: '16px',
-					paddingLeft: '16px',
-					paddingRight: '16px',
+                    paddingBottom: '16px',
+                    paddingLeft: '16px',
+                    paddingRight: '16px',
                     borderRadius: '4px',
                     backgroundColor: 'inherit',
                 },
@@ -121,9 +133,9 @@ const base: ThemeOptions = {
                         marginRight: 0,
                     },
                 },
-				row: {
-					minHeight: '45px !important',
-				},
+                row: {
+                    minHeight: '45px !important',
+                },
                 cell: {
                     '&.MuiDataGrid-cell--withRenderer': {
                         alignItems: 'flex-start !important',
@@ -207,8 +219,7 @@ const base: ThemeOptions = {
                     paddingRight: '2px',
                     fontSize: '14px',
                     fontWeight: 200,
-                    color: 'black',
-                    '&.Mui-disabled': {fontStyle: 'italic', paddingRight: '2px', color: 'black'},
+                    '&.Mui-disabled': {fontStyle: 'italic', paddingRight: '2px'},
                     '&.Mui-focused': {fontStyle: 'italic', paddingRight: '2px'},
                 },
                 filled: {
@@ -216,8 +227,7 @@ const base: ThemeOptions = {
                     paddingRight: '2px',
                     fontSize: '14px',
                     fontWeight: 200,
-                    color: 'black',
-                    '&.Mui-disabled': {fontStyle: 'italic', paddingRight: '2px', color: 'black', opacity: 1},
+                    '&.Mui-disabled': {fontStyle: 'italic', paddingRight: '2px', opacity: 1},
                     '&.Mui-focused': {fontStyle: 'italic', paddingRight: '2px'},
                 },
             },
@@ -234,7 +244,6 @@ const base: ThemeOptions = {
         MuiDialogTitle: {
             styleOverrides: {
                 root: {
-                    borderBottom: "1px solid #e3e3e3",
                     padding: "5px 24px",
                     display: "flex",
                     justifyContent: "space-between",
@@ -252,8 +261,6 @@ const base: ThemeOptions = {
         MuiCardHeader: {
             styleOverrides: {
                 root: {
-                    backgroundColor: 'inherit',
-                    color: 'inherit',
                     paddingTop: '8px',
                     paddingBottom: '8px',
                     paddingLeft: '16px',
@@ -264,193 +271,230 @@ const base: ThemeOptions = {
     }
 };
 
-const lightPalete = {
-    mode: 'light',
-    primary: {main: '#337ab7', light: '#90caf9', contrastText: "#fff"},
-    text: { disabled: '#555555 !important' },
-    warning: {main: '#8a6d3b'},
-    action: {
-        disabled: 'rgba(81,81,81,0.49)',
-        selected: 'rgba(51, 122, 183, 0.28)',
-        disabledBackground: 'rgba(231,229,229,0.6)',
-    },
-}
+// ───────────────────────────────────────────────────────────────────────────
+// Tema paramètric
+// En lloc de dos temes (clar/fosc) hi ha un únic tema calculat a partir d'un
+// nivell de foscor (0 = clar exacte, 1 = fosc exacte) i dels colors principal i
+// secundari triats per l'usuari. Els colors "de base" (fons, superfícies,
+// vores, accions...) s'interpolen entre el valor clar i el fosc; el text es
+// calcula per contrast sobre el fons resultant.
+// ───────────────────────────────────────────────────────────────────────────
 
-export const lightTheme = createTheme(base, {
-    palette: { ...lightPalete },
-    components: {
-        MuiCssBaseline: {
-            styleOverrides: {
-                '.input': {
-                    color: 'black',
-                    backgroundColor: 'white',
-                    '& .MuiInputBase-root.Mui-disabled': {
-                        backgroundColor: lightPalete.action.disabledBackground,
-                    }
-                },
-                '.styledFilter': {
-                    backgroundColor: '#f5f5f5',
-                    border: '1px solid #e3e3e3'
-                },
-                '.myComment': {
-                    backgroundColor: '#a5d6a7',
-                },
-                '.otherComment': {
-                    backgroundColor: '#e0e0e0',
-                },
-            },
-        },
-        MuiButtonGroup: {styleOverrides: {grouped: {'&.Mui-disabled': { backgroundColor: lightPalete.action.disabledBackground }}}},
-        MuiDialogTitle: {styleOverrides: {root: {backgroundColor: lightPalete.action.disabledBackground,}}},
-        MuiCard: {styleOverrides: {root: {border: '1px solid #e3e3e3'}}},
-        MuiCardHeader: {
-            styleOverrides: {
-                root: {
-                    backgroundColor: lightPalete.action.disabledBackground,
-                    borderBottom: '1px solid #e3e3e3',
+const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 
-                    '&.detail': {
-                        backgroundColor: 'rgba(234,234,234,0.31)',
-                    }
-                }
-            },
-        },
-        MuiDrawer: {styleOverrides: {paper: {backgroundColor: '#004B99', color: '#fff'}}},
-        MuiAlert: {
-            styleOverrides: {
-                standardWarning: {
-                    color: lightPalete.warning.main,
-                    backgroundColor: "#fcf8e3",
-                    borderColor: "#faebcc"
-                }
-            }
-        },
-        MuiDataGrid: {
-            styleOverrides: {
-                root: {
-                    '& .MuiDataGrid-row:hover': {
-                        backgroundColor: `rgba(144, 202, 249, 0.66) !important`,
-                    },
-                },
-                row: {
-                    '&.Mui-selected': {
-                        backgroundColor: `${lightPalete.action.selected}`,
-                    },
-                    '&.Mui-selected:hover': {
-                        backgroundColor: `${darken(lightPalete.action.selected, 0.2)}`,
-                    },
-                },
-            },
-        },
-    }
-});
+const hexToRgb = (hex: string): [number, number, number] => {
+    let h = hex.replace('#', '');
+    if (h.length === 3) h = h.split('').map(c => c + c).join('');
+    const n = parseInt(h, 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+};
+const channelHex = (v: number) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0');
+const rgbToHex = (r: number, g: number, b: number) => `#${channelHex(r)}${channelHex(g)}${channelHex(b)}`;
 
-const darkPalette = {
-    mode: 'dark',
-    background: {default: '#121212', paper: '#1e1e1e'},
-    primary: {main: '#90caf9', contrastText: '#000000'},
-    secondary: {main: '#f48fb1', contrastText: '#000000'},
-    error: {main: '#f44336'},
-    warning: {main: '#ffa726'},
-    info: {main: '#29b6f6'},
-    success: {main: '#66bb6a'},
-    text: {primary: '#ffffff', secondary: '#bbbbbb', disabled: '#777777 !important'},
-    divider: '#ffffff',
-    action: {
-        active: '#ffffff',
-        hover: '#333333',
-		selected: 'rgba(51, 122, 183, 0.28)',
-        disabled: '#555555',
-        disabledBackground: '#2c2c2c'
-    },
-}
+// Interpola dos colors hex en sRGB. t=0 -> a, t=1 -> b.
+const mix = (a: string, b: string, t: number): string => {
+    const [ar, ag, ab] = hexToRgb(a);
+    const [br, bg, bb] = hexToRgb(b);
+    return rgbToHex(ar + (br - ar) * t, ag + (bg - ag) * t, ab + (bb - ab) * t);
+};
 
-export const darkTheme = createTheme(base, {
-    palette: { ...darkPalette },
-    components: {
-        MuiCssBaseline: {
-            styleOverrides: {
-                body: {
-                    backgroundColor: '#1c1c1c',
-                    backgroundImage: hatchPattern('#2a2a2a'),
+// Lluminositat relativa (WCAG) 0..1.
+const luminance = (hex: string): number => {
+    const [r, g, b] = hexToRgb(hex).map(v => {
+        const c = v / 255;
+        return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+};
+// Text d'alt contrast sobre un fons (negre o blanc). El llindar 0.179 és el punt
+// on negre i blanc ofereixen el mateix ràtio de contrast.
+const onColor = (bg: string): string => (luminance(bg) > 0.179 ? '#1e1e1e' : '#ffffff');
+
+// Tokens estructurals [valor clar, valor fosc]. S'interpolen segons el nivell.
+const TOKENS = {
+    pageBg:           ['#ffffff', '#1c1c1c'],
+    hatch:            ['#e1e1e1', '#2a2a2a'],
+    bgDefault:        ['#ffffff', '#121212'],
+    bgPaper:          ['#ffffff', '#1e1e1e'],
+    surface:          ['#ffffff', '#2d2d2d'],
+    border:           ['#e3e3e3', '#ffffff'],
+    divider:          ['#e0e0e0', '#ffffff'],
+    bodyText:         ['#666666', '#bbbbbb'],
+    textSecondary:    ['#666666', '#bbbbbb'],
+    textDisabled:     ['#555555', '#777777'],
+    actionActive:     ['#757575', '#ffffff'],
+    actionHover:      ['#f5f5f5', '#333333'],
+    actionDisabled:   ['#aaaaaa', '#555555'],
+    actionDisabledBg: ['#e7e5e5', '#2c2c2c'],
+} as const;
+type TokenKey = keyof typeof TOKENS;
+
+// Enfosquiment màxim aplicat a un color personalitzat en foscor total (nivell
+// 100%). 0.9 = s'enfosqueix fins al 90%, mantenint un 10% del color original
+// (mai negre del tot). Si el color encara és el per defecte, s'usa el valor
+// predefinit en lloc d'enfosquir.
+const DARK_MODE_DARKEN = 0.9;
+const DARK_DEFAULT_PRIMARY = '#90caf9';
+const DARK_DEFAULT_SECONDARY = '#2e2e2e';
+const darkVariant = (color: string, def: string, darkDefault: string) =>
+    color.toLowerCase() === def ? darkDefault : darken(color, DARK_MODE_DARKEN);
+
+// Corba d'enfosquiment dels colors principal/secundari (exponent > 1). Amb la
+// interpolació lineal en sRGB els colors es veuen perceptualment massa foscos a
+// nivells intermedis (efecte gamma). Amb aquesta corba els colors es mantenen
+// propers als triats per l'usuari durant gran part del recorregut i només
+// s'acosten al seu valor fosc a prop del 100%. Manté els extrems (0 i 1) intactes.
+const COLOR_DARKEN_EASE = 2;
+
+// Factoria de tema. level ∈ [0,1]: 0 = clar exacte, 1 = fosc exacte; valors
+// intermedis interpolen els colors de base i recalculen el text per contrast.
+export const buildTheme = (
+    primary: string | undefined,
+    secondary: string | undefined,
+    level: number,
+) => {
+    const t = clamp01(level || 0);
+
+    const tk = {} as Record<TokenKey, string>;
+    (Object.keys(TOKENS) as TokenKey[]).forEach(k => { tk[k] = mix(TOKENS[k][0], TOKENS[k][1], t); });
+
+    // palette.mode és binari a MUI: el fixem segons el punt mitjà del nivell.
+    const mode = t < 0.5 ? ('light' as const) : ('dark' as const);
+
+    const primaryColor = primary || DEFAULT_PRIMARY_COLOR;
+    const secondaryColor = secondary || DEFAULT_SECONDARY_COLOR;
+    // Els colors principal/secundari s'interpolen del valor triat (clar) al seu
+    // valor en foscor total (predefinit o enfosquit), però amb una corba suavitzada
+    // perquè a nivells intermedis no es vegin excessivament foscos. Els fons i la
+    // resta de tokens segueixen el nivell lineal `t`.
+    const colorT = Math.pow(t, COLOR_DARKEN_EASE);
+    const primaryMain = mix(primaryColor, darkVariant(primaryColor, DEFAULT_PRIMARY_COLOR, DARK_DEFAULT_PRIMARY), colorT);
+    const secondaryMain = mix(secondaryColor, darkVariant(secondaryColor, DEFAULT_SECONDARY_COLOR, DARK_DEFAULT_SECONDARY), colorT);
+
+    const textPrimary = onColor(tk.bgPaper);
+    const selected = alpha(primaryMain, 0.28);
+    const drawerBg = darken(primaryMain, 0.35 + 0.2 * t);
+    const dialogTitleBg = alpha(primaryMain, 0.5);
+    // Text del títol de modal: contrast sobre el fons compost (superfície + primary 50%).
+    const dialogTitleColor = onColor(mix(tk.surface, primaryMain, 0.5));
+
+    // IMPORTANT: la palette ha d'anar al PRIMER argument de createTheme perquè
+    // MUI n'augmenti els colors (calcula light/dark/contrastText a partir de
+    // `main`). Els arguments següents només es fusionen, sense augmentar: si la
+    // palette anés al segon argument, `primary.dark` (que fa servir el hover dels
+    // botons contained) es quedaria amb el valor per defecte de MUI.
+    return createTheme({
+        ...base,
+        palette: {
+            mode,
+            primary: {main: primaryMain},
+            secondary: {main: secondaryMain},
+            background: {default: tk.bgDefault, paper: tk.bgPaper},
+            text: {primary: textPrimary, secondary: tk.textSecondary, disabled: `${tk.textDisabled} !important`},
+            divider: tk.divider,
+            warning: {main: mix('#8a6d3b', '#ffa726', t)},
+            ...(mode === 'dark'
+                ? {error: {main: '#f44336'}, info: {main: '#29b6f6'}, success: {main: '#66bb6a'}}
+                : {}),
+            action: {
+                active: tk.actionActive,
+                hover: tk.actionHover,
+                selected,
+                disabled: tk.actionDisabled,
+                disabledBackground: tk.actionDisabledBg,
+            },
+        },
+    }, {
+        components: {
+            MuiCssBaseline: {
+                styleOverrides: {
+                    body: {
+                        backgroundColor: tk.pageBg,
+                        backgroundImage: hatchPattern(tk.hatch),
+                        color: tk.bodyText,
+                    },
+                    '.input': {
+                        '& .MuiInputBase-root, & .MuiPickersInputBase-root': {
+                            color: textPrimary,
+                            backgroundColor: tk.bgPaper,
+                        },
+                        '& .MuiInputBase-root.Mui-disabled': {
+                            backgroundColor: tk.actionDisabledBg,
+                        },
+                    },
+                    '.styledFilter': {
+                        backgroundColor: secondaryMain,
+                        border: `1px solid ${tk.border}`,
+                    },
+                    '.myComment': {color: 'black', backgroundColor: '#a5d6a7'},
+                    '.otherComment': {color: 'black', backgroundColor: '#e0e0e0'},
                 },
-                '.input': {
-                    '& .MuiInputBase-root, & .MuiPickersInputBase-root': {
-                        color: 'inherit',
-                        backgroundColor: darkPalette.background.paper,
-                    }
+            },
+            MuiOutlinedInput: {
+                styleOverrides: {
+                    input: {'&:-webkit-autofill': {WebkitBoxShadow: `0 0 0 100px ${tk.bgPaper} inset`}},
                 },
-                '.styledFilter': {
-                    border: '1px solid #e3e3e3'
+            },
+            MuiFormLabel: {styleOverrides: {root: {color: textPrimary}, filled: {color: textPrimary}}},
+            MuiInputLabel: {styleOverrides: {root: {color: textPrimary}}},
+            MuiButtonGroup: {
+                styleOverrides: {grouped: {'&.Mui-disabled': {backgroundColor: tk.actionDisabledBg, color: tk.textDisabled}}},
+            },
+            MuiDialogContent: {styleOverrides: {root: {backgroundColor: tk.surface}}},
+            MuiDialogTitle: {
+                styleOverrides: {root: {backgroundColor: dialogTitleBg, color: dialogTitleColor, borderBottom: `1px solid ${tk.border}`}},
+            },
+            MuiCard: {styleOverrides: {root: {border: `1px solid ${tk.border}`}}},
+            MuiCardHeader: {
+                styleOverrides: {
+                    root: {
+                        backgroundColor: secondaryMain,
+                        color: onColor(secondaryMain),
+                        borderBottom: `1px solid ${tk.border}`,
+                        '&.detail': {backgroundColor: alpha(secondaryMain, 0.5)},
+                    },
                 },
-                '.myComment': {
-                    color: 'black',
-                    backgroundColor: '#a5d6a7',
-                },
-                '.otherComment': {
-                    color: 'black',
-                    backgroundColor: '#e0e0e0',
+            },
+            MuiCardContent: {styleOverrides: {root: {backgroundColor: tk.surface}}},
+            MuiCheckbox: {
+                styleOverrides: {root: {color: textPrimary, '&.Mui-disabled': {color: tk.textDisabled}}},
+            },
+            MuiDrawer: {styleOverrides: {paper: {backgroundColor: drawerBg, color: onColor(drawerBg)}}},
+            MuiAlert: {
+                styleOverrides:
+                    mode === 'dark'
+                        ? {
+                            standardSuccess: {backgroundColor: '#4c5d3e'},
+                            standardInfo: {backgroundColor: '#2e4255'},
+                            standardWarning: {backgroundColor: '#554a3b'},
+                            standardError: {backgroundColor: '#4f3333'},
+                        }
+                        : {
+                            standardWarning: {color: '#8a6d3b', backgroundColor: '#fcf8e3', borderColor: '#faebcc'},
+                        },
+            },
+            MuiDataGrid: {
+                styleOverrides: {
+                    root: {
+                        // Files parells: color secundari amb alfa 0.5 (zebra striping).
+                        // Exclou les seleccionades perquè conservin el ressaltat de selecció.
+                        '& .MuiDataGrid-row.even:not(.Mui-selected)': {
+                            backgroundColor: alpha(secondaryMain, 0.5),
+                        },
+                        '& .MuiDataGrid-row:hover': {
+                            backgroundColor: `${alpha(primaryMain, 0.4)} !important`,
+                        },
+                    },
+                    row: {
+                        '&.Mui-selected': {
+                            backgroundColor: `${selected} !important`,
+                        },
+                        '&.Mui-selected:hover': {
+                            backgroundColor: `${alpha(primaryMain, 0.4)} !important`,
+                        },
+                    },
                 },
             },
         },
-        MuiOutlinedInput: {styleOverrides: {
-            input: {
-                '&:-webkit-autofill': {
-                    WebkitBoxShadow: `0 0 0 100px ${darkPalette.background.paper} inset`
-                }
-            }
-        }},
-        MuiDialogContent: {styleOverrides: {root: {backgroundColor: "#2d2d2d"}}},
-        MuiDialogTitle: {
-            styleOverrides: {
-                root: {
-                    color: darkPalette.background.paper,
-                    backgroundColor: darkPalette.action.active,
-                },
-            }
-        },
-        MuiDataGrid: {
-            styleOverrides: {
-                root: {
-					'& .MuiDataGrid-row.even.MuiDataGrid-row': {
-					    backgroundColor: '#464646',
-					},
-                    '& .MuiDataGrid-row:hover': {
-                        backgroundColor: `${darken(darkPalette.action.selected, 0.2)} !important`,
-                    },
-                },
-                row: {
-                    '&.MuiDataGrid-row.Mui-selected': {
-						backgroundColor: `${darkPalette.action.selected} !important`,
-                    },
-                    '&.MuiDataGrid-row.Mui-selected:hover': {
-						backgroundColor: `${darken(darkPalette.action.selected, 0.2)} !important`,                        
-                    },
-                },
-            },
-        },
-        MuiCard: {styleOverrides: {root: {border: '1px solid white'}}},
-        MuiCardHeader: {styleOverrides: {root: {borderBottom: '1px solid white'}}},
-        MuiCardContent: {styleOverrides: {root: {backgroundColor: '#2d2d2d'}}},
-        MuiInputLabel: {styleOverrides: {root: {color: '#fff'}}},
-        MuiCheckbox: {
-            styleOverrides: {
-                root: {
-                    color: 'inherit !important',
-                    // backgroundColor: 'inherit !important',
-                    '&.Mui-disabled': {color: darkPalette.text.disabled}
-                },
-            }
-        },
-        MuiButtonGroup: {styleOverrides: {grouped: {'&.Mui-disabled': {color: darkPalette.text.disabled}}}},
-        MuiDrawer: {styleOverrides: {paper: {backgroundColor: '#2d2d2d'}}},
-        MuiAlert: {
-            styleOverrides: {
-                standardSuccess: {backgroundColor: '#4c5d3e'},
-                standardInfo: {backgroundColor: '#2e4255'},
-                standardWarning: {backgroundColor: '#554a3b'},
-                standardError: {backgroundColor: '#4f3333'}
-            }
-        },
-    },
-});
+    });
+};

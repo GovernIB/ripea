@@ -47,8 +47,12 @@ public class UsuariResource extends BaseResource<String> {
 	@Size(max = 64)
 	private String rolActual;
 	private ContingutVistaEnumDto vistaActual;
-    @NotNull
-    private boolean modeFosc = false;
+    // Nivell de foscor del tema, 0 (clar) a 100 (fosc).
+    private int nivellFosc = 0;
+    @Size(max = 7)
+    private String colorPrincipal = "#337ab7";
+    @Size(max = 7)
+    private String colorSecundari = "#f1efef";
 
     @ResourceField(enumType = true)
 	private Long numElementsPagina;
