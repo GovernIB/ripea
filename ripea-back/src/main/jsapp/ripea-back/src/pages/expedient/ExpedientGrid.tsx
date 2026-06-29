@@ -59,22 +59,28 @@ export const StyledEstat = (props: any) => {
     }
 }
 
+export const COLOR_PRIORITAT: Record<string, string | undefined> = {
+    'D_MOLT_ALTA': '#d99b9d',
+    'C_ALTA': '#ffebae',
+    'B_NORMAL': undefined,
+    'A_BAIXA': '#c3e8d1',
+}
 export const StyledPrioritat = (props: any) => {
     const {entity: expedient, children} = props;
 
-    switch (expedient?.prioritat) {
-        case "D_MOLT_ALTA":
-            return <StyledLabel backgroundColor={'#d99b9d'}>{children}</StyledLabel>
-        case "C_ALTA":
-            return <StyledLabel backgroundColor={'#ffebae'}>{children}</StyledLabel>
-        case "B_NORMAL":
-            return <StyledLabel dashed>{children}</StyledLabel>
-        case "A_BAIXA":
-            return <StyledLabel backgroundColor={'#c3e8d1'}>{children}</StyledLabel>
+    const prioritat = expedient?.prioritat;
+
+    if (prioritat === 'B_NORMAL') {
+        return <StyledLabel dashed>{children}</StyledLabel>;
     }
 
-    return <></>
-}
+    const backgroundColor = COLOR_PRIORITAT[prioritat];
+    if (!backgroundColor) {
+        return <></>;
+    }
+
+    return <StyledLabel backgroundColor={backgroundColor}>{children}</StyledLabel>;
+};
 export const Avisos = (props: any) => {
     const {entity, hanldeErrorValidacio, handelAlert} = props;
     const {t} = useTranslation();

@@ -46,6 +46,7 @@ public class UsuariResource extends BaseResource<String> {
 	private boolean inicialitzat = false;
 	@Size(max = 64)
 	private String rolActual;
+	private boolean informacioExpedientExpandit = false;
 	private ContingutVistaEnumDto vistaActual;
     // Nivell de foscor del tema, 0 (clar) a 100 (fosc).
     private int nivellFosc = 0;

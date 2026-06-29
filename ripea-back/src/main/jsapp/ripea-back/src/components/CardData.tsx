@@ -38,7 +38,7 @@ type DetailCardContentProps = ContenidoDataProps & {
 }
 
 const CardHead = (props: any) => {
-    const { icon, children, componentProps, ...other } = props;
+    const { icon, children, componentProps, action, ...other } = props;
     return (
         <CardHeader
             title={
@@ -47,7 +47,11 @@ const CardHead = (props: any) => {
                 </Box>
             }
             avatar={icon ? <Icon sx={{fontSize: '20px'}}>{icon}</Icon> : undefined}
-            slotProps={{avatar: {sx: { mr: 1 }}}}
+            slotProps={{
+                avatar: { sx: { mr: 1 } },
+                action: { sx: { alignSelf: 'center', margin: 0, display: 'flex', alignItems: 'center' } },
+            }}
+            action={action}
             {...other}
         />
     );
@@ -77,7 +81,7 @@ const isEmpty = (value:any) => {
 }
 
 export const DetailCard = (props: DetailCardProps) => {
-    const { icon, title, header, children, size = 12, hidden, cardProps = {}, headerProps = {}, variant = 'overline', ...other } = props;
+    const { icon, title, header, actionHeader, children, size = 12, hidden, cardProps = {}, headerProps = {}, variant = 'overline', ...other } = props;
 
     if (hidden) {
         return <></>;
@@ -87,7 +91,7 @@ export const DetailCard = (props: DetailCardProps) => {
         <Grid size={size}>
             <Card sx={cardProps}>
                 {(title || header) && (
-                    <CardHead icon={icon} className={'detail'} sx={{ py: 0, px: 2, ...headerProps }}>
+                    <CardHead icon={icon} action={actionHeader} className={'detail'} sx={{ py: 0, px: 2, ...headerProps }}>
                         {title && (
                             <Typography mt={0.5} variant={variant}>
                                 {title}

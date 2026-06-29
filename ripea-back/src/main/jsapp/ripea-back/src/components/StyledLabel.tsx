@@ -1,6 +1,6 @@
-import { Typography, Icon, TypographyProps } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
-import { getContrastRatio } from "@mui/material/styles";
+import { Typography, Icon, TypographyProps } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import { getContrastRatio } from '@mui/material/styles';
 
 type ColorKey = 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success';
 
@@ -13,54 +13,28 @@ interface StyledLabelProps extends TypographyProps {
     children?: React.ReactNode;
 }
 
+export const getReadableTextColor = (bg?: string | null): string => {
+    if (!bg) return 'inherit';
+    try {
+        const contrast = getContrastRatio(bg, '#fff');
+        if (contrast >= 4.5) return '#fff';
+        if (contrast > 0) return '#000';
+        return 'inherit';
+    } catch {
+        return 'inherit';
+    }
+};
+
 export const StyledLabel = (props: StyledLabelProps) => {
+    const { title, icon, backgroundColor, color, sx = {}, dashed, children, ...other } = props;
     const theme = useTheme();
 
-    const {
-        title,
-        icon,
-        backgroundColor,
-        color,
-        sx = {},
-        dashed,
-        children,
-        ...other
-    } = props;
-
-    const resolvedBg =
-        backgroundColor
-            ? theme.palette[backgroundColor as ColorKey]?.main ?? backgroundColor
-            : backgroundColor;
-
-    let calculatedContrastColor = 'inherit';
-
-    if (resolvedBg && typeof resolvedBg === 'string') {
-        try {
-            const contrast = getContrastRatio(resolvedBg, "#fff");
-
-            // getContrastRatio devuelve -1 si no puede calcular la luminosidad
-            if (contrast >= 4.5) {
-                calculatedContrastColor = "#fff";
-            } else if (contrast > 0) {
-                calculatedContrastColor = "#000";
-            }
-        } catch (error) {
-            console.warn(`StyledLabel: El formato del backgroundColor '${resolvedBg}' no es válido.`, error);
-            calculatedContrastColor = 'inherit';
-        }
-    }
-
-    const resolvedColor = color ?? calculatedContrastColor;
+    const resolvedBg = backgroundColor ? (theme.palette[backgroundColor as ColorKey]?.main ?? backgroundColor) : backgroundColor;
+    const resolvedColor = color ?? getReadableTextColor(resolvedBg);
 
     if (dashed)
         return (
-            <Typography
-                title={title}
-                variant={"caption"}
-                className={"myLabel"}
-                sx={{ border: "1px dashed #AAA", ...sx }}
-                {...other}
-            >
+            <Typography title={title} variant={'caption'} className={'myLabel'} sx={{ border: '1px dashed #AAA', ...sx }} {...other}>
                 {children}
             </Typography>
         );
@@ -68,8 +42,8 @@ export const StyledLabel = (props: StyledLabelProps) => {
     return (
         <Typography
             title={title}
-            variant={"caption"}
-            className={"myLabel"}
+            variant={'caption'}
+            className={'myLabel'}
             sx={{
                 color: resolvedColor,
                 backgroundColor: resolvedBg,
@@ -78,7 +52,7 @@ export const StyledLabel = (props: StyledLabelProps) => {
             {...other}
         >
             {icon && (
-                <Icon fontSize={"inherit"} sx={{ mr: children != null ? 1 : 0 }}>
+                <Icon fontSize={'inherit'} sx={{ mr: children != null ? 1 : 0 }}>
                     {icon}
                 </Icon>
             )}

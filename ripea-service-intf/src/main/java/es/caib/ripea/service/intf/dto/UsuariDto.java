@@ -28,6 +28,7 @@ public class UsuariDto implements Serializable {
 	private String[] rols;
 	private boolean rebreEmailsAgrupats;
 	private String rolActual;
+	private boolean informacioExpedientExpandit = false;
 	private boolean rebreAvisosNovesAnotacions;
 	private boolean rebreEmailsCanviEstatRevisio;
 	private Long numElementsPagina;

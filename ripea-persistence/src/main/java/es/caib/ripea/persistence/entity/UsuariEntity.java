@@ -53,6 +53,9 @@ public class UsuariEntity implements Serializable {
 	
 	@Column(name="rol_actual", length = 64)
 	private String rolActual;
+
+	@Column(name = "informacio_expedient_expandit")
+	private boolean informacioExpedientExpandit = false;
 	
 	@Column(name="vista_actual", length = 64)
 	@Enumerated(EnumType.STRING)
@@ -208,6 +211,10 @@ public class UsuariEntity implements Serializable {
 
 	public void updateRolActual(String rolActual) {
 		this.rolActual = rolActual;
+	}
+
+	public void updateInformacioExpedientExpandit(boolean informacioExpedientExpandit) {
+		this.informacioExpedientExpandit = informacioExpedientExpandit;
 	}
 	/**
 	 * Obté el Builder per a crear objectes de tipus Usuari.

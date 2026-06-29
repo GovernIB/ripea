@@ -55,6 +55,8 @@ public class UsuariResourceEntity implements ResourceEntity<UsuariResource, Stri
 	private boolean inicialitzat = false;
 	@Column(name="rol_actual", length = 64)
 	private String rolActual;
+	@Column(name = "informacio_expedient_expandit")
+	private boolean informacioExpedientExpandit = false;
 	@Column(name="vista_actual")
 	@Enumerated(EnumType.STRING)
 	private ContingutVistaEnumDto vistaActual = ContingutVistaEnumDto.TREETABLE_PER_CARPETA;

@@ -5,7 +5,7 @@ import {useEffect, useState} from "react";
 import Load from "../../../components/Load.tsx";
 import {Button, Grid, Icon, Typography, Box, alpha} from "@mui/material";
 import {icons} from "../../user/UserHeadToolbar.tsx";
-import {ExpedientInfo} from "../../expedient/details/Expedient.tsx";
+import {ExpedientInfoExpandit} from "../../expedient/details/Expedient.tsx";
 import DocumentsGrid from "../../contingut/DocumentsGrid.tsx";
 import {TascaComment} from "../../CommentDialog.tsx";
 import {useActions} from "./TascaActions.tsx";
@@ -122,7 +122,7 @@ const Tasca = () => {
             <CardPage header={headerMain} componentProps={{ justifyContent: 'space-between' }}>
                 <Grid container spacing={2}>
                     <Grid size={3}>
-                        <ExpedientInfo title={tasca?.expedient?.description} entity={expedient} fields={fields} readOnly/>
+                        <ExpedientInfoExpandit title={tasca?.expedient?.description} entity={expedient} fields={fields} readOnly/>
                     </Grid>
                     <Grid size={9}>
                         <DocumentsGrid entity={{...expedient, potModificar: (expedient?.potModificar || tasca?.usuariActualResponsable || tasca?.usuariActualDelegat)}}/>

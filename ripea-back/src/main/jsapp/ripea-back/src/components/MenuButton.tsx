@@ -11,6 +11,7 @@ type MenuButtonProps = {
     arrowDown?: string;
     arrowUp?: string;
     hiddenIcon?: boolean,
+    ButtonComponent?: React.ElementType;
 }
 
 const MenuButton = (props:MenuButtonProps) => {
@@ -23,7 +24,8 @@ const MenuButton = (props:MenuButtonProps) => {
         menuProps,
         arrowDown = 'arrow_drop_down',
         arrowUp = 'arrow_drop_up',
-        hiddenIcon = false
+        hiddenIcon = false,
+        ButtonComponent = Button,
     } = props;
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
@@ -39,18 +41,21 @@ const MenuButton = (props:MenuButtonProps) => {
     }
 
     return(<>
-        <Button
+        <ButtonComponent
             id={`menu-button-${id}`}
             aria-controls={'demo-customized-menu'}
             aria-haspopup="true"
             aria-expanded={open ? 'true' : undefined}
             onClick={handleClick}
 
-            endIcon={!hiddenIcon && <Icon sx={{m: 0}}>{open ? arrowUp : arrowDown}</Icon>}
+             {...(!hiddenIcon && ButtonComponent === Button
+                ? { endIcon: <Icon sx={{ m: 0 }}>{open ? arrowUp : arrowDown}</Icon> }
+                : {})
+            }
             {...buttonProps}
         >
             {buttonLabel}
-        </Button>
+        </ButtonComponent>
         <Menu
             id={`menu-button-${id}`}
             MenuListProps={{

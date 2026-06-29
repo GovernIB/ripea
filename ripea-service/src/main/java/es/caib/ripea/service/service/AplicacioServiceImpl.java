@@ -330,6 +330,20 @@ public class AplicacioServiceImpl implements AplicacioService {
 
 	@Transactional
 	@Override
+	public void setInformacioExpedientExpandit(boolean informacioExpedientExpandit) {
+		try {
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			logger.debug("Actualitzant informacio_expedient_expandit de usuari actual");
+			UsuariEntity usuari = usuariRepository.getOne(auth.getName());
+			usuari.updateInformacioExpedientExpandit(informacioExpedientExpandit);
+		} catch (Exception ex) {
+			logger.error("Error actualitzant expedient expandit", ex);
+			throw ex;
+		}
+	}
+
+	@Transactional
+	@Override
 	public void setEntitatActual(Long entitatId) {
 		try {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();

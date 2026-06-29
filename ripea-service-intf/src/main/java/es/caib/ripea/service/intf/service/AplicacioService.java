@@ -200,6 +200,9 @@ public interface AplicacioService {
 	public void setRolUsuariActual(String rolActual);
 
 	@PreAuthorize("isAuthenticated()")
+	public void setInformacioExpedientExpandit(boolean informacioExpedientExpandit);
+
+	@PreAuthorize("isAuthenticated()")
 	public void setEntitatActual(Long entitatId);
 
 	@PreAuthorize("hasRole('IPA_ADMIN')")

@@ -147,6 +147,9 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         String canviEntitat = response.get("canviEntitat") != null ? String.valueOf(response.get("canviEntitat")) : null;
         String canviOrganGestor = response.get("canviOrganGestor") != null ? String.valueOf(response.get("canviOrganGestor")) : null;
         String canviRol = response.get("canviRol") != null ? String.valueOf(response.get("canviRol")) : null;
+        Boolean canviInformacioExpandit = response.get("canviInformacioExpandit") != null
+                ? Boolean.valueOf(String.valueOf(response.get("canviInformacioExpandit")))
+                : null;
 
         EntitatHelper.processarCanviEntitats(request, canviEntitat, entitatService, aplicacioService, organGestorService, eventService);
         EntitatHelper.findOrganismesEntitatAmbPermisCache(request, organGestorService);
@@ -154,6 +157,10 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         EntitatHelper.findEntitatsAccessibles(request, entitatService);
         RolHelper.processarCanviRols(request, canviRol, aplicacioService, organGestorService, eventService);
         RolHelper.setRolActualFromDb(request, aplicacioService);
+
+        if (canviInformacioExpandit != null) {
+            aplicacioService.setInformacioExpedientExpandit(canviInformacioExpandit);
+        }
 
         try {
             String usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
