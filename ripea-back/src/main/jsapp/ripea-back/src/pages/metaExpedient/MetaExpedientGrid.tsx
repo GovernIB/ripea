@@ -1,6 +1,6 @@
 import {useTranslation} from "react-i18next";
-import {useMemo, useState} from "react";
-import {GridPage, useFilterApiRef, useFormContext, useMuiDataGridApiRef} from "reactlib";
+import {useCallback, useMemo, useState} from "react";
+import {GridPage, useBaseAppContext, useFilterApiRef, useFormContext, useMuiDataGridApiRef} from "reactlib";
 import {CardPage} from "../../components/CardData.tsx";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 import {Alert, Badge, Chip, Grid, Icon, IconButton, MenuItem} from "@mui/material";
@@ -20,11 +20,30 @@ import {useImportFitxer} from "./actions/ImportFitxer.tsx";
 import useActualitzar from "./actions/Actualitzar.tsx";
 import {useSessionContext} from "../../components/SessionStorageContext.tsx";
 import Load from "../../components/Load.tsx";
+import {useConfirmDialogButtons} from "@src/util/buttonsOverride.tsx";
 
 // Form
 export const MetaExpedientForm = ({ isAdmin }: any) => {
     const { t } = useTranslation();
     const { data } = useFormContext();
+
+    const {messageDialogShow} = useBaseAppContext();
+    const confirmDialogButtons = [useConfirmDialogButtons().reverse()[0]];
+    const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
+
+    const procedimentComu = useCallback((value:boolean) => {
+        if (data.id != null) {
+            messageDialogShow(
+                null,
+                (value
+                    ?t('page.metaExpedient.alert.toComu')
+                    :t('page.metaExpedient.alert.toNoComu'))
+                + "\n " + t('page.metaExpedient.alert.permisos'),
+                confirmDialogButtons,
+                confirmDialogComponentProps
+            )
+        }
+    },[t, data.id])
 
     return (
         <Grid container direction={'row'} columnSpacing={1} rowSpacing={1} sx={{ pt: 1 }}>
@@ -41,7 +60,7 @@ export const MetaExpedientForm = ({ isAdmin }: any) => {
             <GridFormField name="nom" />
             <GridFormField name="descripcio" />
             <GridFormField name="serieDocumental" />
-            <GridFormField name="procedimentComu" size={4} />
+            <GridFormField name="procedimentComu" size={4} onChange={procedimentComu} />
             <GridFormField name="organGestor" size={8} required hidden={data?.procedimentComu} />
             <GridFormField name="expressioNumero" componentProps={{ helperText: t('page.metaExpedient.detall.expressioNumero') }} />
 
@@ -227,10 +246,10 @@ const MetaExpedientGrid = () => {
             renderCell: (params:any) => <LinkIcon
                 aria-label="key"
                 color="inherit"
-                title="Permisos"
+                title={params?.row?.errorPermisos ?t('page.metaExpedient.alert.errorPermisos') :"Permisos"}
                 to={`/metaExpedient/${params?.row?.id}/permis`}
             >
-                <Badge badgeContent={params?.row?.numPermisos} color="primary" showZero>
+                <Badge badgeContent={params?.row?.numPermisos} color={params?.row?.errorPermisos ?"error" :"primary"} showZero>
                     <Icon>key</Icon>
                 </Badge>
             </LinkIcon>
