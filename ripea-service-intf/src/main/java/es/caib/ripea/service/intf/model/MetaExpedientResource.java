@@ -190,6 +190,7 @@ public class MetaExpedientResource extends MetaNodeResource {
 
     @Transient private int numComentaris;
     @Transient private int numPermisos;
+    @Transient private boolean errorPermisos;
     @Transient private int numMetaDocument;
     @Transient private int numMetaDada;
     @Transient private int numEstat;

@@ -1525,6 +1525,10 @@ const translationEs = {
             },
             alert: {
                 pendentsRevisio: "Hay {{num}} procedimientos o servicios pendientes de revisar",
+                errorPermisos: "Hay permisos incorrectos pendientes de revisar",
+                toComu: "Al cambiar el tipo de procedimiento de NO COMÚN a COMÚN quedarán permisos incorrectos debido a que quedarán sin órgano.",
+                toNoComu: "Al cambiar el tipo de procedimiento de COMÚN a NO COMÚN quedarán permisos incorrectos debido a que quedarán vinculados a un órgano.",
+                permisos: "Es necesario revisar los permisos para eliminar estos permisos incorrectos y sustituirlos por los correctos, en caso necesario.",
             },
         },
         metaDocument: {

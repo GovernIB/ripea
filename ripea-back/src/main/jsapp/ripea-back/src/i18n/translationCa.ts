@@ -1525,6 +1525,10 @@ const translationCa = {
             },
             alert: {
                 pendentsRevisio: "Hi ha {{num}} procedimients o serveis pendents de revisar",
+                errorPermisos: "Hi ha permisos erronis pendents de revisar",
+                toComu: "En canviar el tipus de procediment de NO COMÚ a COMÚ, quedaran permisos incorrectes perquè quedaran sense òrgan.",
+                toNoComu: "En canviar el tipus de procediment de COMÚ a NO COMÚ, quedaran permisos incorrectes perquè quedaran vinculats a un òrgan.",
+                permisos: "Cal revisar els permisos per eliminar aquests permisos erronis i substituir-los pels correctes, si escau.",
             },
         },
         metaDocument: {

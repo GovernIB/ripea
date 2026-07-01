@@ -19,6 +19,7 @@ import java.util.Map;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -453,7 +454,7 @@ public class MetaExpedientHelper {
 
 		MetaExpedientEntity metaExpedient = null;
 		List<PermisDto> permisos = new ArrayList<PermisDto>();
-		MetaNodeEntity metaNode = metaNodeRepository.getOne(id);
+		MetaNodeEntity metaNode = (MetaNodeEntity)Hibernate.unproxy(metaNodeRepository.getOne(id));
 		if (metaNode instanceof MetaExpedientEntity) {
 			metaExpedient = (MetaExpedientEntity) metaNode;
 		} else if (metaNode instanceof MetaDocumentEntity){

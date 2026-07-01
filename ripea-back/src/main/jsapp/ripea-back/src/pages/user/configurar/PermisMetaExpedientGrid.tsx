@@ -19,7 +19,7 @@ import Load from "../../../components/Load.tsx";
 
 // MetaExpedientOrgan
 const PermisMetaExpedientOrganGrid = (props:any) => {
-    const { id } = props;
+    const { id, errorPermisos } = props;
     const {t} = useTranslation();
     const gridApiRef = useMuiDataGridApiRef();
 
@@ -88,12 +88,12 @@ const PermisMetaExpedientOrganGrid = (props:any) => {
                 procedimentId: id,
                 organGestor: row?.organGestor
             }),
-            hidden: (row:any) => !row?.pareId,
+            hidden: (row:any) => !row?.pareId || errorPermisos,
         },
         {
             label: t('common.delete'),
             icon: "delete",
-            showInMenu: true,
+            showInMenu: !errorPermisos,
             onClick: (_rowId:any, row:any) => eliminar(row?.originalId, {
                 classType: 'MET_EXP_ORG',
                 procedimentId: id,
@@ -107,7 +107,6 @@ const PermisMetaExpedientOrganGrid = (props:any) => {
         <StyledMuiGrid
             apiRef={gridApiRef}
             resourceName={"aclObjIdentityResource"}
-            popupEditUpdateActive
             columns={columnsOrgan}
             namedQueries={[`MET_EXP_ORG#${id}`]}
             perspectives={[`SID`]}
@@ -119,6 +118,7 @@ const PermisMetaExpedientOrganGrid = (props:any) => {
                     position: 3,
                     element: <ToolbarButton title={t('page.permision.action.new.label')} icon={'add'}
                                             onClick={()=>handelCreate(undefined, {}, {procedimentId: id})}
+                                            hidden={errorPermisos}
                                             color={'primary'}>{t('page.permision.action.new.label')}</ToolbarButton>,
                 },
             ]}
@@ -157,7 +157,7 @@ const PermisMetaExpedientOrganGrid = (props:any) => {
                 return !!row?.pareId ?[`${row?.pareId}`,`${row.id}`]:[`${row.id}`];
             }}
             isGroupExpandedByDefault={()=>true}
-            toolbarHideCreate
+            readOnly
         />
         {contentCreate}
         {contentModify}
@@ -207,7 +207,7 @@ const columnsNode = [
     },
 ]
 const PermisMetaExpedientNodeGrid = (props:any) => {
-    const { id } = props;
+    const { id, errorPermisos } = props;
     const {t} = useTranslation();
     const gridApiRef = useMuiDataGridApiRef();
 
@@ -224,11 +224,12 @@ const PermisMetaExpedientNodeGrid = (props:any) => {
             icon: "edit",
             showInMenu: true,
             onClick: (_rowId:any, row:any) => handelModify(id, row),
+            hidden: errorPermisos
         },
         {
             label: t('common.delete'),
             icon: "delete",
-            showInMenu: true,
+            showInMenu: !errorPermisos,
             onClick: (rowId:any) => eliminar(rowId, {
                 classType: 'MET_NOD',
                 objectId: id,
@@ -241,7 +242,6 @@ const PermisMetaExpedientNodeGrid = (props:any) => {
             apiRef={gridApiRef}
             resourceName={"aclSidResource"}
             persistentStateActive={false}
-            popupEditUpdateActive
             columns={columnsNode}
             sortModel={sortModelNode}
             namedQueries={[`MET_NOD#${id}`]}
@@ -255,16 +255,18 @@ const PermisMetaExpedientNodeGrid = (props:any) => {
                         title={t('page.permision.action.new.label')}
                         icon={'add'}
                         onClick={()=>handelCreate(id)}
+                        hidden={errorPermisos}
                         color={'primary'}>{t('page.permision.action.new.label')}</ToolbarButton>,
                 },
             ]}
-            toolbarHideCreate
+            readOnly
         />
         {contentCreate}
         {contentModify}
     </>
 }
 
+const perspectives = ["PERMISOS"];
 const PermisMetaExpedientGrid = ()=> {
     const {t} = useTranslation();
     const { id } = useParams();
@@ -278,7 +280,7 @@ const PermisMetaExpedientGrid = ()=> {
 
     useEffect(() => {
         if(apiIsReady && id){
-            apiGetOne(id)
+            apiGetOne(id, {perspectives})
                 .then((app) => setEntity(app))
             // .catch((error) => {
             //     handleClose()
@@ -297,6 +299,9 @@ const PermisMetaExpedientGrid = ()=> {
         <Load value={entity}>
             <CardPage title={t('page.user.menu.procedimentPermis', {nom: entity?.nom})}
                       header={<>
+                          {entity?.errorPermisos &&
+                              <Icon color={"error"} title={"Hi ha permisos erronis pendents de revisar"}>error</Icon>
+                          }
                           <Button
                               variant="outlined"
                               color={"inherit"}
@@ -307,10 +312,8 @@ const PermisMetaExpedientGrid = ()=> {
                               {t('common.back')}
                           </Button>
                       </>}>
-                {entity?.procedimentComu
-                    ?<PermisMetaExpedientOrganGrid id={id}/>
-                    :<PermisMetaExpedientNodeGrid id={id}/>
-                }
+                {(entity?.procedimentComu || entity?.errorPermisos) && <PermisMetaExpedientOrganGrid id={id} errorPermisos={entity?.errorPermisos}/>}
+                {(!entity?.procedimentComu || entity?.errorPermisos) && <PermisMetaExpedientNodeGrid id={id} errorPermisos={entity?.errorPermisos}/>}
             </CardPage>
         </Load>
     </GridPage>
