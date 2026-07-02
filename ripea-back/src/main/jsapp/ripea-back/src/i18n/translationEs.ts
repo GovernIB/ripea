@@ -1822,6 +1822,7 @@ const translationEs = {
         },
         permision: {
             title: "Permisos",
+            errorPermisosTitle: "Permisos erróneos",
             grid: {
                 organGestor: "Órgano gestor",
                 principal: "Tipo",

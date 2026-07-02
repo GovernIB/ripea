@@ -1827,6 +1827,7 @@ const translationEn = {
         },
         permision: {
             title: "Permissions",
+            errorPermisosTitle: "Wrong permissions",
             grid: {
                 organGestor: "Managing body",
                 principal: "Type",
