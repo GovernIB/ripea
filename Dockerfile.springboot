@@ -1,0 +1,31 @@
+ARG BASE_IMAGE=eclipse-temurin:11-jre-alpine
+ARG BASE_PLATFORM=linux/amd64
+
+FROM --platform=${BASE_PLATFORM} ${BASE_IMAGE}
+
+LABEL org.opencontainers.image.source="https://github.com/GovernIB/ripea"
+
+ARG VERSION=1.0.6
+
+# Directoris de treball amb permisos GID 0 per compatibilitat OpenShift (SCC anyuid/restricted)
+RUN mkdir -p /deployments/config /deployments/data \
+    && chown -R 1001:0 /deployments \
+    && chmod -R g+rwX /deployments
+
+# Artefacte Spring Boot executable (perfil 'ide' del build Maven)
+COPY --chown=1001:0 ripea-back/target/ripea-back-${VERSION}.war /deployments/ripea-back.war
+
+USER 1001
+
+# Spring Boot carrega automàticament tots els fitxers *.properties d'aquest directori.
+# En OpenShift: muntar ConfigMap i Secrets com a fitxers dins /deployments/config/
+# o bé injectar les propietats sensibles com a variables d'entorn.
+ENV SPRING_CONFIG_ADDITIONAL_LOCATION="file:/deployments/config/"
+
+EXPOSE 8080
+
+ENTRYPOINT ["java", \
+    "-Djava.security.egd=file:/dev/./urandom", \
+    "-XX:+UseContainerSupport", \
+    "-XX:MaxRAMPercentage=75.0", \
+    "-jar", "/deployments/ripea-back.war"]
