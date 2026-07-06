@@ -1,13 +1,14 @@
 import {useTranslation} from "react-i18next";
 import {useMemo, useState} from "react";
-import {GridPage, useFormContext} from "reactlib";
+import {GridPage, useFormContext, useMuiDataGridApiRef} from "reactlib";
 import {CardPage} from "../../components/CardData.tsx";
 import StyledMuiGrid, {ToolbarButton} from "../../components/StyledMuiGrid.tsx";
-import {Grid, Icon, Badge} from "@mui/material";
+import {Grid, Icon, Badge, IconButton} from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
 import {OrganGestorFilter} from "./OrganGestorFilter.tsx";
 import {useOrganGestorSyncDialog} from "./actions/OrganGestorSync.tsx";
-import LinkIcon from "../../components/LinkIcon.tsx";
+import {useSession} from "../../components/SessionStorageContext.tsx";
+import {useOrganGestorPermisDialog} from "../user/configurar/PermisOrganGestorGrid.tsx";
 
 const OrganGestorForm = () => {
     const {data} = useFormContext()
@@ -22,14 +23,17 @@ const OrganGestorForm = () => {
     </Grid>
 }
 
-const sortModel: any = [{field: 'nom', sort: 'asc'}]
-
 const OrganGestorGrid = () => {
     const {t} = useTranslation();
     const [springFilter, setSpringFilter] = useState<string>();
-    const [treeView, setTreeView] = useState<boolean>(false);
+    const {value: treeViewStored, save: saveTreeView} = useSession('organGestorTreeView');
+    const treeView = !!treeViewStored;
+
+    const gridApiRef = useMuiDataGridApiRef();
+    const refresh = () => gridApiRef?.current?.refresh?.();
 
     const {handleOpen, dialog} = useOrganGestorSyncDialog();
+    const {handleShow: handleShowPermis, dialog: permisDialog} = useOrganGestorPermisDialog(refresh);
     const actions = [
         {
             label: t('common.update'),
@@ -39,6 +43,9 @@ const OrganGestorGrid = () => {
         },
     ]
 
+    // Es recalcula en canviar de vista perquè, en tornar a la vista taula, es torni a aplicar
+    // l'ordenació per nom (en vista arbre no hi ha columna 'nom' i la graella neteja l'ordenació).
+    const sortModel: any = useMemo(() => (!treeView ? [{field: 'nom', sort: 'asc'}] : []), [treeView])
     const perspectives = useMemo(() => treeView?['PATH','COUNT_PERMISOS']:['COUNT_PERMISOS'], [treeView])
     const columns:any[] = useMemo(()=>[
         ...(!treeView ?[
@@ -64,20 +71,23 @@ const OrganGestorGrid = () => {
             flex: 0.5,
         },
         {
-            filed: 'permis',
+            field: 'permis',
             headerName: '',
             sortable: false,
             flex: 0.2,
-            renderCell: (params:any) => <LinkIcon
+            renderCell: (params:any) => <IconButton
                 aria-label="key"
                 color="inherit"
                 title="Permisos"
-                to={`/organgestor/${params?.row?.id}/permis`}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    handleShowPermis(params?.row?.id);
+                }}
             >
                 <Badge badgeContent={params?.row?.numPermisos} color="primary" showZero>
                     <Icon>key</Icon>
                 </Badge>
-            </LinkIcon>
+            </IconButton>
         }
     ], [treeView])
 
@@ -87,7 +97,9 @@ const OrganGestorGrid = () => {
                 <OrganGestorFilter onSpringFilterChange={setSpringFilter} />
 
                 <StyledMuiGrid
+                    apiRef={gridApiRef}
                     resourceName={'organGestorResource'}
+                    persistentStateKey={treeView ? 'organGestorResourceArbre' : 'organGestorResource'}
                     popupEditUpdateActive
                     popupEditFormDialogResourceTitle={t('page.organGestor.title')}
                     popupEditFormContent={<OrganGestorForm />}
@@ -111,7 +123,7 @@ const OrganGestorGrid = () => {
                                 <ToolbarButton
                                     icon={'visibility'}
                                     variant={treeView ? 'contained' : 'outlined'}
-                                    onClick={() => setTreeView((prev) => !prev)}
+                                    onClick={() => saveTreeView(!treeView)}
                                     color={'primary'}
                                 >
                                     {t('page.organGestor.action.vista')}
@@ -157,6 +169,7 @@ const OrganGestorGrid = () => {
                 />
             </CardPage>
             {dialog}
+            {permisDialog}
         </GridPage>
     );
 }

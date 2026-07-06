@@ -96,6 +96,7 @@ const usePermisDialog = ({
                         ? "page.permision.action.update.title"
                         : "page.permision.action.new.title"
                 )}
+                formDialogComponentProps={{ fullWidth: true, maxWidth: 'lg' }}
                 formDialogButtons={[
                     {
                         icon: "save",
@@ -184,18 +185,18 @@ const PermisOrganGestorCreateForm = () => {
         <GridFormField name="principal" required disabled={data?.id}/>
         <GridFormField name="sid" disabled={data?.id}/>
 
-        <CardData size={6} title={t("page.permision.tabs.expedient")}>
+        <CardData size={6} title={t("page.permision.tabs.expedient")} cardProps={{height: '100%'}}>
             <GridFormField name="all" disabled={!!data?.admin}/>
-            <Grid size={2}/><GridFormField size={10} name="read" disabled={!!data?.admin}/>
-            <Grid size={2}/><GridFormField size={10} name="create" disabled={!!data?.admin}/>
-            <Grid size={2}/><GridFormField size={10} name="write" disabled={!!data?.admin}/>
-            <Grid size={2}/><GridFormField size={10} name="delete" disabled={!!data?.admin}/>
+            <Grid size={2}/><GridFormField size={10} name="read" disabled={!!data?.admin} componentProps={{helperText: t("page.permision.help.read")}}/>
+            <Grid size={2}/><GridFormField size={10} name="create" disabled={!!data?.admin} componentProps={{helperText: t("page.permision.help.create")}}/>
+            <Grid size={2}/><GridFormField size={10} name="write" disabled={!!data?.admin} componentProps={{helperText: t("page.permision.help.write")}}/>
+            <Grid size={2}/><GridFormField size={10} name="delete" disabled={!!data?.admin} componentProps={{helperText: t("page.permision.help.delete")}}/>
         </CardData>
-        <CardData size={6} title={t("page.permision.tabs.admin")}>
-            <GridFormField name="procedimentsComuns"/>
-            <GridFormField name="admin" disabled={!!data?.adminComuns}/>
-            <GridFormField name="adminComuns"/>
-            <GridFormField name="disseny"/>
+        <CardData size={6} title={t("page.permision.tabs.admin")} cardProps={{height: '100%'}}>
+            <GridFormField name="procedimentsComuns" componentProps={{helperText: t("page.permision.help.procedimentsComuns")}}/>
+            <GridFormField name="admin" disabled={!!data?.adminComuns} componentProps={{helperText: t("page.permision.help.admin")}}/>
+            <GridFormField name="adminComuns" componentProps={{helperText: t("page.permision.help.adminComuns")}}/>
+            <GridFormField name="disseny" componentProps={{helperText: t("page.permision.help.disseny")}}/>
         </CardData>
     </Grid>
 }

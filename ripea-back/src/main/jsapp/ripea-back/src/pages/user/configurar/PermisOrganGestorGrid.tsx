@@ -1,6 +1,7 @@
 import {useTranslation} from "react-i18next";
 import {
     GridPage,
+    MuiDialog,
     useMuiDataGridApiRef, useResourceApiService,
 } from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
@@ -77,11 +78,11 @@ const columns = [
     },
 ]
 
-const PermisOrganGestorGrid = ()=> {
+// Contingut de la graella de permisos d'un òrgan gestor, reutilitzable tant en una pàgina
+// pròpia (ruta /organgestor/:id/permis) com dins d'una finestra modal.
+export const PermisOrganGestorContent = ({id, onEntityChange}: {id: string, onEntityChange?: (entity:any) => void}) => {
     const {t} = useTranslation();
-    const { id } = useParams();
     const gridApiRef = useMuiDataGridApiRef();
-    const navigate = useNavigate();
 
     const {
         isReady: apiIsReady,
@@ -93,14 +94,14 @@ const PermisOrganGestorGrid = ()=> {
         if(apiIsReady && id){
             apiGetOne(id)
                 .then((app) => setEntity(app))
-                // .catch((error) => {
-                //     handleClose()
-                //     temporalMessageShow(null, error?.message, 'error');
-                // });
         } else {
             setEntity(undefined)
         }
     }, [apiIsReady, id]);
+
+    useEffect(() => {
+        onEntityChange?.(entity)
+    }, [entity]);
 
     const refresh = () => {
         gridApiRef?.current?.refresh?.();
@@ -127,48 +128,91 @@ const PermisOrganGestorGrid = ()=> {
         },
     ]
 
+    return <Load value={entity}>
+        <StyledMuiGrid
+            apiRef={gridApiRef}
+            resourceName={"aclSidResource"}
+            persistentStateActive={false}
+            popupEditUpdateActive
+            columns={columns}
+            sortModel={sortModel}
+            namedQueries={[`ORGAN#${id}`]}
+            perspectives={[`PERMISION#ORGAN#${id}`]}
+            rowAdditionalActions={actions}
+            toolbarElementsWithPositions={[
+                {
+                    position: 3,
+                    element: <ToolbarButton title={t('common.create')} icon={'add'} onClick={()=>handelCreate(id)} color={'primary'}>
+                        {t('common.nouPermis')}
+                    </ToolbarButton>,
+                },
+            ]}
+            toolbarHideCreate
+        />
+        {contentCreate}
+        {contentModify}
+    </Load>
+}
+
+const PermisOrganGestorGrid = ()=> {
+    const {t} = useTranslation();
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const [entity, setEntity] = useState<any>();
+
     useEffect(() => {
         setTitlePage(t('page.user.menu.organPermis', {nom: entity?.nom}))
     }, [entity]);
 
     return <GridPage autoHeight>
-        <Load value={entity}>
-            <CardPage title={t('page.user.menu.organPermis', {nom: entity?.nom})}
-                      header={<>
-                          <Button
-                              variant="outlined"
-                              color={"inherit"}
-                              sx={{ borderRadius: '4px', padding: '0px 10px', marginLeft: "auto !important" }}
-                              onClick={()=>navigate('/organgestor')}
-                          >
-                              <Icon>arrow_back</Icon>
-                              {t('common.back')}
-                          </Button>
-                      </>}>
-                <StyledMuiGrid
-                    apiRef={gridApiRef}
-                    resourceName={"aclSidResource"}
-                    persistentStateActive={false}
-                    popupEditUpdateActive
-                    columns={columns}
-                    sortModel={sortModel}
-                    namedQueries={[`ORGAN#${id}`]}
-                    perspectives={[`PERMISION#ORGAN#${id}`]}
-                    rowAdditionalActions={actions}
-                    toolbarElementsWithPositions={[
-                        {
-                            position: 3,
-                            element: <ToolbarButton title={t('common.create')} icon={'add'} onClick={()=>handelCreate(id)} color={'primary'}>
-                                {t('common.nouPermis')}
-                            </ToolbarButton>,
-                        },
-                    ]}
-                    toolbarHideCreate
-                />
-            </CardPage>
-            {contentCreate}
-            {contentModify}
-        </Load>
+        <CardPage title={t('page.user.menu.organPermis', {nom: entity?.nom})}
+                  header={<>
+                      <Button
+                          variant="outlined"
+                          color={"inherit"}
+                          sx={{ borderRadius: '4px', padding: '0px 10px', marginLeft: "auto !important" }}
+                          onClick={()=>navigate('/organgestor')}
+                      >
+                          <Icon>arrow_back</Icon>
+                          {t('common.back')}
+                      </Button>
+                  </>}>
+            {id && <PermisOrganGestorContent id={id} onEntityChange={setEntity}/>}
+        </CardPage>
     </GridPage>
 }
 export default PermisOrganGestorGrid;
+
+// Finestra modal amb els permisos d'un òrgan gestor, per obrir-la sense sortir de la pantalla
+// de llistat (evita perdre la pàgina/vista/scroll en tornar).
+export const useOrganGestorPermisDialog = (refresh?: () => void) => {
+    const {t} = useTranslation();
+    const [organGestorId, setOrganGestorId] = useState<string>();
+    const [entity, setEntity] = useState<any>();
+
+    const handleShow = (id:string) => {
+        setEntity(undefined);
+        setOrganGestorId(id);
+    }
+    const handleClose = () => {
+        setOrganGestorId(undefined);
+        setEntity(undefined);
+        refresh?.();
+    }
+
+    const dialog =
+        <MuiDialog
+            open={!!organGestorId}
+            closeCallback={handleClose}
+            title={t('page.user.menu.organPermis', {nom: entity?.nom})}
+            componentProps={{ fullWidth: true, maxWidth: 'xl' }}
+        >
+            {organGestorId && <PermisOrganGestorContent id={organGestorId} onEntityChange={setEntity}/>}
+        </MuiDialog>
+
+    return {
+        handleShow,
+        handleClose,
+        dialog,
+    }
+}

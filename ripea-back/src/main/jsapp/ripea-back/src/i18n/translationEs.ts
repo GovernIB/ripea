@@ -1837,6 +1837,16 @@ const translationEs = {
                 expedient: "Gestión de expedientes",
                 admin: "Administración y diseño",
             },
+            help: {
+                read: "Consultar expedientes del órgano gestor actual.",
+                create: "Crear expedientes del órgano gestor actual.",
+                write: "Modificar expedientes del órgano gestor actual.",
+                delete: "Eliminar expedientes del órgano gestor actual.",
+                procedimentsComuns: "Puede ver expedientes de procedimientos sin órgano gestor (comunes).",
+                admin: "Puede administrar expedientes del órgano gestor actual.",
+                adminComuns: "Puede administrar expedientes de procedimientos sin órgano gestor (comunes).",
+                disseny: "Puede diseñar procedimientos de este órgano gestor (e hijos).",
+            },
             action: {
                 new: {
                     label: "Nuevo permiso",
