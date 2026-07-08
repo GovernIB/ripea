@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.ToDoubleFunction;
 import java.util.function.ToLongFunction;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -164,6 +165,7 @@ class MetaExpedientHelperTest {
     @Mock private HistoricInteressatRepository historicInteressatRepository;
     @Mock private HistoricUsuariRepository historicUsuariRepository;
     @Mock private UsuariRepository usuariRepository;
+    @Mock private ValidacioCacheEvictHelper validacioCacheEvictHelper;
 
     @InjectMocks
     private MetaExpedientHelper helper;
@@ -178,6 +180,11 @@ class MetaExpedientHelperTest {
         SecurityContext ctx = mock(SecurityContext.class);
         org.mockito.Mockito.lenient().when(ctx.getAuthentication()).thenReturn(auth);
         SecurityContextHolder.setContext(ctx);
+    }
+
+    @AfterEach
+    void netejarSecurityContext() {
+        SecurityContextHolder.clearContext();
     }
 
     // =========================================================================

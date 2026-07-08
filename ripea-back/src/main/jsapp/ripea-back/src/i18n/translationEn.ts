@@ -1836,6 +1836,7 @@ const translationEn = {
         },
         permision: {
             title: "Permissions",
+            errorPermisosTitle: "Wrong permissions",
             grid: {
                 organGestor: "Managing body",
                 principal: "Type",
@@ -1849,6 +1850,16 @@ const translationEn = {
             tabs: {
                 expedient: "Case management",
                 admin: "Administration and design",
+            },
+            help: {
+                read: "View cases of the current managing body.",
+                create: "Create cases of the current managing body.",
+                write: "Edit cases of the current managing body.",
+                delete: "Delete cases of the current managing body.",
+                procedimentsComuns: "Can view cases of procedures without a managing body (common).",
+                admin: "Can administer cases of the current managing body.",
+                adminComuns: "Can administer cases of procedures without a managing body (common).",
+                disseny: "Can design procedures of this managing body (and its children).",
             },
             action: {
                 new: {

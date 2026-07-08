@@ -1,2 +1,63 @@
-ripea-ear/target/docker
-ripea-ear/target/docker/**
+# ============================================================
+# Exclou tots els artefactes de compilació i re-inclou
+# únicament els necessaris per construir les imatges Docker.
+# ============================================================
+**/target/**
+!ripea-ear/target/ripea.ear
+!ripea-back/target/ripea-back-*.war
+
+# ============================================================
+# Mòduls Maven sense fitxers rellevants per a cap imatge.
+# Els seus artefactes ja estan empaquetats dins l'EAR o el WAR.
+# ============================================================
+ripea-service/
+ripea-service-intf/
+ripea-persistence/
+ripea-ejb/
+ripea-backend/
+ripea-api-interna/
+ripea-plugin/
+ripea-plugin-intf/
+
+# ============================================================
+# Codi font de ripea-back i ripea-ear no necessari a la imatge.
+# L'artefacte compilat (WAR/EAR) ja conté tot el bytecode,
+# els recursos estàtics i el frontend compilat.
+# ============================================================
+ripea-back/src/main/java/
+ripea-back/src/main/jsapp/
+ripea-back/src/main/webapp/
+ripea-back/src/test/
+ripea-back/pom.xml
+
+ripea-ear/src/main/java/
+
+# ============================================================
+# Dependències de Node.js (poden superar els 500 MB)
+# ============================================================
+**/node_modules/
+
+# ============================================================
+# Control de versions
+# ============================================================
+.git/
+
+# ============================================================
+# IDE i eines de desenvolupament
+# ============================================================
+.idea/
+**/*.iml
+.editorconfig
+.maven-wrapper/
+
+# ============================================================
+# Fitxers de l'entorn local i documentació
+# ============================================================
+.env
+.env.*
+*.profile
+doc/
+scripts/
+*.md
+CLAUDE.md
+.playwright-mcp

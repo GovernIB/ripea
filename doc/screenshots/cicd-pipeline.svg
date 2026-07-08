@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="900" viewBox="0 0 820 900" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#37474f"/>
+    </marker>
+    <style>
+      .band   { fill:#f5f7fa; stroke:#b0bec5; stroke-width:1.5; rx:14; }
+      .bandci { fill:#e8f0fe; stroke:#5b8def; }
+      .bandcd { fill:#e9f7ef; stroke:#3aa76d; }
+      .blabel { font-size:15px; font-weight:700; letter-spacing:.5px; }
+      .box    { fill:#ffffff; stroke:#546e7a; stroke-width:1.5; rx:8; }
+      .boxgo  { fill:#1b6ec2; stroke:#11528f; }
+      .opt    { fill:#ffffff; stroke:#90a4ae; stroke-width:1.5; stroke-dasharray:5 4; rx:8; }
+      .dia    { fill:#fff8e1; stroke:#c79100; stroke-width:1.5; }
+      .t      { font-size:13.5px; fill:#1f2d3d; text-anchor:middle; }
+      .tw     { font-size:13.5px; fill:#ffffff; font-weight:700; text-anchor:middle; }
+      .ti     { font-size:13.5px; fill:#37474f; text-anchor:middle; }
+      .edge   { stroke:#37474f; stroke-width:1.8; fill:none; marker-end:url(#arrow); }
+      .elab   { font-size:12px; fill:#37474f; }
+    </style>
+  </defs>
+
+  <!-- Trigger -->
+  <rect class="box" x="270" y="20" width="280" height="50" rx="8"/>
+  <text class="t" x="410" y="41">Crear <tspan font-style="italic">tag</tspan> / workflow_dispatch</text>
+  <text class="t" x="410" y="59" font-size="11.5" fill="#607d8b">(disparador del pipeline)</text>
+  <path class="edge" d="M410,70 L410,96"/>
+
+  <!-- ===== CI band ===== -->
+  <rect class="band bandci" x="30" y="100" width="760" height="330" rx="14"/>
+  <text class="blabel" x="52" y="126" fill="#1a4fa0">INTEGRACIÓ CONTÍNUA · CI</text>
+
+  <rect class="box" x="270" y="138" width="280" height="46" rx="8"/>
+  <text class="t" x="410" y="166">Clonar repositori i branca</text>
+  <path class="edge" d="M410,184 L410,206"/>
+
+  <rect class="box" x="270" y="208" width="280" height="46" rx="8"/>
+  <text class="t" x="410" y="230">Setup Java 11</text>
+  <text class="t" x="410" y="247" font-size="11.5" fill="#607d8b">+ cache Maven</text>
+  <path class="edge" d="M410,254 L410,276"/>
+
+  <!-- decision Tests? -->
+  <polygon class="dia" points="410,278 470,312 410,346 350,312"/>
+  <text class="ti" x="410" y="316">Tests?</text>
+
+  <!-- branch sí -> mvn test (right) -->
+  <path class="edge" d="M470,312 L600,312"/>
+  <text class="elab" x="528" y="305">sí</text>
+  <rect class="opt" x="600" y="289" width="170" height="46" rx="8"/>
+  <text class="t" x="685" y="316">mvn test</text>
+  <path class="edge" d="M685,335 L685,378 L552,378"/>
+
+  <!-- branch no -> build -->
+  <path class="edge" d="M410,346 L410,378"/>
+  <text class="elab" x="418" y="366">no</text>
+
+  <rect class="box" x="270" y="380" width="280" height="46" rx="8"/>
+  <text class="t" x="410" y="402">mvn clean package</text>
+  <text class="t" x="410" y="419" font-size="11.5" fill="#607d8b">build de l'EAR/WAR</text>
+
+  <!-- CI -> CD -->
+  <path class="edge" d="M410,430 L410,462"/>
+
+  <!-- ===== CD band ===== -->
+  <rect class="band bandcd" x="30" y="466" width="760" height="404" rx="14"/>
+  <text class="blabel" x="52" y="492" fill="#1f7a4d">LLIURAMENT CONTINU · CD</text>
+
+  <rect class="box" x="270" y="504" width="280" height="46" rx="8"/>
+  <text class="t" x="410" y="526">Generar release notes</text>
+  <text class="t" x="410" y="543" font-size="11.5" fill="#607d8b">+ publicar EAR/WAR</text>
+  <path class="edge" d="M410,550 L410,574"/>
+
+  <!-- decision Build Docker? -->
+  <polygon class="dia" points="410,576 480,612 410,648 340,612"/>
+  <text class="ti" x="410" y="608">Build</text>
+  <text class="ti" x="410" y="623">Docker?</text>
+
+  <!-- branch no -> Fi (right) -->
+  <path class="edge" d="M480,612 L630,612"/>
+  <text class="elab" x="548" y="605">no</text>
+  <rect class="opt" x="630" y="589" width="140" height="46" rx="8"/>
+  <text class="t" x="700" y="616">Fi</text>
+
+  <!-- branch sí -> docker build -->
+  <path class="edge" d="M410,648 L410,672"/>
+  <text class="elab" x="418" y="668">sí</text>
+
+  <rect class="box" x="270" y="674" width="280" height="46" rx="8"/>
+  <text class="t" x="410" y="696">docker build</text>
+  <text class="t" x="410" y="713" font-size="11.5" fill="#607d8b">BASE_IMAGE OpenShift</text>
+  <path class="edge" d="M410,720 L410,742"/>
+
+  <rect class="box" x="270" y="744" width="280" height="46" rx="8"/>
+  <text class="t" x="410" y="766">docker push a Quay</text>
+  <text class="t" x="410" y="783" font-size="11.5" fill="#607d8b">tag + latest</text>
+  <path class="edge" d="M410,790 L410,812"/>
+
+  <rect class="box boxgo" x="250" y="814" width="320" height="48" rx="8"/>
+  <text class="tw" x="410" y="843">Imatge llesta per a OpenShift</text>
+</svg>

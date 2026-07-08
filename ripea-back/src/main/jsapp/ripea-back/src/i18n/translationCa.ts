@@ -1836,6 +1836,7 @@ const translationCa = {
         },
         permision: {
             title: "Permisos",
+            errorPermisosTitle: "Permisos erronis",
             grid: {
                 organGestor: "Organ gestor",
                 principal: "Tipus",
@@ -1849,6 +1850,16 @@ const translationCa = {
             tabs: {
                 expedient: "Gestió d'expedients",
                 admin: "Administració i disseny",
+            },
+            help: {
+                read: "Consultar expedients de l'òrgan gestor actual.",
+                create: "Crear expedients de l'òrgan gestor actual.",
+                write: "Modificar expedients de l'òrgan gestor actual.",
+                delete: "Eliminar expedients de l'òrgan gestor actual.",
+                procedimentsComuns: "Pot veure expedients de procediments sense òrgan gestor (comuns).",
+                admin: "Pot administrar expedients de l'òrgan gestor actual.",
+                adminComuns: "Pot administrar expedients de procediments sense òrgan gestor (comuns).",
+                disseny: "Pot dissenyar procediments d'aquest òrgan gestor (i fills).",
             },
             action: {
                 new: {

@@ -17,7 +17,7 @@ public class HistoricInteressatEntity extends HistoricEntity {
 //	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 //	@JoinColumn(name = "interessat_id")
 //	@ForeignKey(name = BaseConfig.DB_PREFIX + "hist_exp_interessat_interessat_fk")
-	@Column(name = "interessat_doc_num" )
+	@Column(name = "interessat_doc_num", length = 36)
 	private String interessatDocNum;
 	
 	public HistoricInteressatEntity(Date data, HistoricTipusEnumDto tipus) {
