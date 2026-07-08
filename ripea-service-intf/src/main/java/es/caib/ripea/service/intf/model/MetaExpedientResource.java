@@ -23,6 +23,7 @@ import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ReglaDistribucioDto;
 import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
 import es.caib.ripea.service.intf.dto.TipusProcedimentServeiEnum;
+import es.caib.ripea.service.intf.resourcevalidation.MetaExpedientValid;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -32,6 +33,7 @@ import lombok.experimental.FieldNameConstants;
 @Setter
 @FieldNameConstants
 @NoArgsConstructor
+@MetaExpedientValid
 @ResourceConfig(
 		quickFilterFields = { "codi", "nom" },
 		descriptionField = "nomClassificacio",
