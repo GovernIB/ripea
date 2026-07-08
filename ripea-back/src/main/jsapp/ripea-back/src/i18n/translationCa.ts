@@ -1537,6 +1537,10 @@ const translationCa = {
             },
             alert: {
                 pendentsRevisio: "Hi ha {{num}} procedimients o serveis pendents de revisar",
+                errorPermisos: "Hi ha permisos erronis pendents de revisar",
+                toComu: "En canviar el tipus de procediment de NO COMÚ a COMÚ, quedaran permisos incorrectes perquè quedaran sense òrgan.",
+                toNoComu: "En canviar el tipus de procediment de COMÚ a NO COMÚ, quedaran permisos incorrectes perquè quedaran vinculats a un òrgan.",
+                permisos: "Cal revisar els permisos per eliminar aquests permisos erronis i substituir-los pels correctes, si escau.",
             },
         },
         metaDocument: {
@@ -1830,6 +1834,7 @@ const translationCa = {
         },
         permision: {
             title: "Permisos",
+            errorPermisosTitle: "Permisos erronis",
             grid: {
                 organGestor: "Organ gestor",
                 principal: "Tipus",
@@ -1843,6 +1848,16 @@ const translationCa = {
             tabs: {
                 expedient: "Gestió d'expedients",
                 admin: "Administració i disseny",
+            },
+            help: {
+                read: "Consultar expedients de l'òrgan gestor actual.",
+                create: "Crear expedients de l'òrgan gestor actual.",
+                write: "Modificar expedients de l'òrgan gestor actual.",
+                delete: "Eliminar expedients de l'òrgan gestor actual.",
+                procedimentsComuns: "Pot veure expedients de procediments sense òrgan gestor (comuns).",
+                admin: "Pot administrar expedients de l'òrgan gestor actual.",
+                adminComuns: "Pot administrar expedients de procediments sense òrgan gestor (comuns).",
+                disseny: "Pot dissenyar procediments d'aquest òrgan gestor (i fills).",
             },
             action: {
                 new: {

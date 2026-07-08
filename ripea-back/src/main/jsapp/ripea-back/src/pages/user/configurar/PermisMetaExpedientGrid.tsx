@@ -5,7 +5,7 @@ import {
 } from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid, {ToolbarButton} from "../../../components/StyledMuiGrid.tsx";
-import {Button, Icon} from "@mui/material";
+import {Box, Button, Icon, Typography} from "@mui/material";
 import {useEffect, useMemo, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import {setTitlePage} from "../../../TitleHeaderConfigurator.tsx";
@@ -19,7 +19,7 @@ import Load from "../../../components/Load.tsx";
 
 // MetaExpedientOrgan
 const PermisMetaExpedientOrganGrid = (props:any) => {
-    const { id } = props;
+    const { id, esErronea } = props;
     const {t} = useTranslation();
     const gridApiRef = useMuiDataGridApiRef();
 
@@ -88,12 +88,12 @@ const PermisMetaExpedientOrganGrid = (props:any) => {
                 procedimentId: id,
                 organGestor: row?.organGestor
             }),
-            hidden: (row:any) => !row?.pareId,
+            hidden: (row:any) => !row?.pareId || esErronea,
         },
         {
             label: t('common.delete'),
             icon: "delete",
-            showInMenu: true,
+            showInMenu: !esErronea,
             onClick: (_rowId:any, row:any) => eliminar(row?.originalId, {
                 classType: 'MET_EXP_ORG',
                 procedimentId: id,
@@ -107,7 +107,6 @@ const PermisMetaExpedientOrganGrid = (props:any) => {
         <StyledMuiGrid
             apiRef={gridApiRef}
             resourceName={"aclObjIdentityResource"}
-            popupEditUpdateActive
             columns={columnsOrgan}
             namedQueries={[`MET_EXP_ORG#${id}`]}
             perspectives={[`SID`]}
@@ -115,10 +114,18 @@ const PermisMetaExpedientOrganGrid = (props:any) => {
 
             rowAdditionalActions={actions}
             toolbarElementsWithPositions={[
+                ...(esErronea ? [{
+                    position: 0,
+                    element: <Box sx={{display: 'flex', alignItems: 'center', gap: 0.5, mr: 1}}>
+                        <Icon color={"error"} fontSize={"small"}>error</Icon>
+                        <Typography variant={"subtitle1"} color={"error"}>{t('page.permision.errorPermisosTitle')}</Typography>
+                    </Box>,
+                }] : []),
                 {
                     position: 3,
                     element: <ToolbarButton title={t('page.permision.action.new.label')} icon={'add'}
                                             onClick={()=>handelCreate(undefined, {}, {procedimentId: id})}
+                                            hidden={esErronea}
                                             color={'primary'}>{t('page.permision.action.new.label')}</ToolbarButton>,
                 },
             ]}
@@ -157,7 +164,7 @@ const PermisMetaExpedientOrganGrid = (props:any) => {
                 return !!row?.pareId ?[`${row?.pareId}`,`${row.id}`]:[`${row.id}`];
             }}
             isGroupExpandedByDefault={()=>true}
-            toolbarHideCreate
+            readOnly
         />
         {contentCreate}
         {contentModify}
@@ -207,7 +214,7 @@ const columnsNode = [
     },
 ]
 const PermisMetaExpedientNodeGrid = (props:any) => {
-    const { id } = props;
+    const { id, esErronea } = props;
     const {t} = useTranslation();
     const gridApiRef = useMuiDataGridApiRef();
 
@@ -224,11 +231,12 @@ const PermisMetaExpedientNodeGrid = (props:any) => {
             icon: "edit",
             showInMenu: true,
             onClick: (_rowId:any, row:any) => handelModify(id, row),
+            hidden: esErronea
         },
         {
             label: t('common.delete'),
             icon: "delete",
-            showInMenu: true,
+            showInMenu: !esErronea,
             onClick: (rowId:any) => eliminar(rowId, {
                 classType: 'MET_NOD',
                 objectId: id,
@@ -241,7 +249,6 @@ const PermisMetaExpedientNodeGrid = (props:any) => {
             apiRef={gridApiRef}
             resourceName={"aclSidResource"}
             persistentStateActive={false}
-            popupEditUpdateActive
             columns={columnsNode}
             sortModel={sortModelNode}
             namedQueries={[`MET_NOD#${id}`]}
@@ -249,22 +256,31 @@ const PermisMetaExpedientNodeGrid = (props:any) => {
 
             rowAdditionalActions={actions}
             toolbarElementsWithPositions={[
+                ...(esErronea ? [{
+                    position: 0,
+                    element: <Box sx={{display: 'flex', alignItems: 'center', gap: 0.5, mr: 1}}>
+                        <Icon color={"error"} fontSize={"small"}>error</Icon>
+                        <Typography variant={"subtitle1"} color={"error"}>{t('page.permision.errorPermisosTitle')}</Typography>
+                    </Box>,
+                }] : []),
                 {
                     position: 3,
                     element: <ToolbarButton
                         title={t('page.permision.action.new.label')}
                         icon={'add'}
                         onClick={()=>handelCreate(id)}
+                        hidden={esErronea}
                         color={'primary'}>{t('page.permision.action.new.label')}</ToolbarButton>,
                 },
             ]}
-            toolbarHideCreate
+            readOnly
         />
         {contentCreate}
         {contentModify}
     </>
 }
 
+const perspectives = ["PERMISOS"];
 const PermisMetaExpedientGrid = ()=> {
     const {t} = useTranslation();
     const { id } = useParams();
@@ -278,7 +294,7 @@ const PermisMetaExpedientGrid = ()=> {
 
     useEffect(() => {
         if(apiIsReady && id){
-            apiGetOne(id)
+            apiGetOne(id, {perspectives})
                 .then((app) => setEntity(app))
             // .catch((error) => {
             //     handleClose()
@@ -307,9 +323,13 @@ const PermisMetaExpedientGrid = ()=> {
                               {t('common.back')}
                           </Button>
                       </>}>
-                {entity?.procedimentComu
-                    ?<PermisMetaExpedientOrganGrid id={id}/>
-                    :<PermisMetaExpedientNodeGrid id={id}/>
+                {(entity?.procedimentComu || entity?.errorPermisos) &&
+                    <PermisMetaExpedientOrganGrid id={id} esErronea={!entity?.procedimentComu && entity?.errorPermisos}/>
+                }
+                {(!entity?.procedimentComu || entity?.errorPermisos) &&
+                    <Box sx={{mt: entity?.errorPermisos ? 3 : 0}}>
+                        <PermisMetaExpedientNodeGrid id={id} esErronea={entity?.procedimentComu && entity?.errorPermisos}/>
+                    </Box>
                 }
             </CardPage>
         </Load>

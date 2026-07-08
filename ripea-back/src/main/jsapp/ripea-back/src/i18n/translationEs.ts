@@ -1537,6 +1537,10 @@ const translationEs = {
             },
             alert: {
                 pendentsRevisio: "Hay {{num}} procedimientos o servicios pendientes de revisar",
+                errorPermisos: "Hay permisos incorrectos pendientes de revisar",
+                toComu: "Al cambiar el tipo de procedimiento de NO COMÚN a COMÚN quedarán permisos incorrectos debido a que quedarán sin órgano.",
+                toNoComu: "Al cambiar el tipo de procedimiento de COMÚN a NO COMÚN quedarán permisos incorrectos debido a que quedarán vinculados a un órgano.",
+                permisos: "Es necesario revisar los permisos para eliminar estos permisos incorrectos y sustituirlos por los correctos, en caso necesario.",
             },
         },
         metaDocument: {
@@ -1830,6 +1834,7 @@ const translationEs = {
         },
         permision: {
             title: "Permisos",
+            errorPermisosTitle: "Permisos erróneos",
             grid: {
                 organGestor: "Órgano gestor",
                 principal: "Tipo",
@@ -1843,6 +1848,16 @@ const translationEs = {
             tabs: {
                 expedient: "Gestión de expedientes",
                 admin: "Administración y diseño",
+            },
+            help: {
+                read: "Consultar expedientes del órgano gestor actual.",
+                create: "Crear expedientes del órgano gestor actual.",
+                write: "Modificar expedientes del órgano gestor actual.",
+                delete: "Eliminar expedientes del órgano gestor actual.",
+                procedimentsComuns: "Puede ver expedientes de procedimientos sin órgano gestor (comunes).",
+                admin: "Puede administrar expedientes del órgano gestor actual.",
+                adminComuns: "Puede administrar expedientes de procedimientos sin órgano gestor (comunes).",
+                disseny: "Puede diseñar procedimientos de este órgano gestor (e hijos).",
             },
             action: {
                 new: {

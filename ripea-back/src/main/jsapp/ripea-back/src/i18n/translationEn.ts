@@ -1022,6 +1022,11 @@ const translationEn = {
                             title: "One of the selected recipients is a SIR administration.",
                             warning: "ALL deliveries will be sent as COMMUNICATION type.",
                         },
+                        format: {
+                            document: "The current document format is: .{{extension}}",
+                            noSir: "Non-SIR channel: Supported formats are pdf and zip.",
+                            sir: "SIR channel: Supported formats are jpg, jpeg, odt, odp, ods, odg, docx, xlsx, pptx, pdf, png, rtf, svg, tiff, txt, xml and xsig.",
+                        },
                     }
                 },
                 notificarMasiva: {
@@ -1532,6 +1537,10 @@ const translationEn = {
             },
             alert: {
                 pendentsRevisio: "There are {{num}} procedures or services pending review",
+                errorPermisos: "There are invalid permissions pending review",
+                toComu: "When changing the procedure type from NON-COMMON to COMMON, some permissions will become invalid because they will no longer be associated with a body.",
+                toNoComu: "When changing the procedure type from COMMON to NON-COMMON, some permissions will become invalid because they will become associated with a body.",
+                permisos: "Review the permissions to remove these invalid permissions and replace them with the correct ones if necessary.",
             },
         },
         metaDocument: {
@@ -1825,6 +1834,7 @@ const translationEn = {
         },
         permision: {
             title: "Permissions",
+            errorPermisosTitle: "Wrong permissions",
             grid: {
                 organGestor: "Managing body",
                 principal: "Type",
@@ -1838,6 +1848,16 @@ const translationEn = {
             tabs: {
                 expedient: "Case management",
                 admin: "Administration and design",
+            },
+            help: {
+                read: "View cases of the current managing body.",
+                create: "Create cases of the current managing body.",
+                write: "Edit cases of the current managing body.",
+                delete: "Delete cases of the current managing body.",
+                procedimentsComuns: "Can view cases of procedures without a managing body (common).",
+                admin: "Can administer cases of the current managing body.",
+                adminComuns: "Can administer cases of procedures without a managing body (common).",
+                disseny: "Can design procedures of this managing body (and its children).",
             },
             action: {
                 new: {
@@ -1940,6 +1960,7 @@ const translationEn = {
                 ok: "The user's data '{{nom}}' has been successfully updated",
                 dades: "User data",
                 correu: "Email sending",
+                activarCorreu: "Enable all emails",
                 generic: "General settings",
                 column: "Column configuration of case list",
                 vista: "Document view settings in cases",
@@ -1948,7 +1969,8 @@ const translationEn = {
             }
         },
         alert: {
-            title: "Case validation errors",
+            titleExpedient: "Case validation errors",
+            titleDocument: "Document validation errors",
             action: {
                 read: {
                     label: "Mark as read",
@@ -1958,11 +1980,13 @@ const translationEn = {
                 },
             },
             errors: {
+                altresErrors: ", and {{restants}} other validation errors.",
+                unAltreError: ", and one other validation error.",
                 metaDada: "The following data is missing:",
                 metaDocument: "The following documents are missing:",
                 metaNode: "There are documents without an assigned document type",
-                noFinalitzades: "There are notifications with a non-final status",
-                interessatObligatori: "An interested party is missing",
+                noFinalitzades: "There are notifications whose status is not final",
+                interessatObligatori: "A required interested party is missing",
             },
         },
         accesibilitat: {

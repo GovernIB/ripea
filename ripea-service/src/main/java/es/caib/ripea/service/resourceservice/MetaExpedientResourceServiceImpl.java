@@ -531,7 +531,12 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 			resource.setNumPermisos(permisosProcediment!=null?permisosProcediment.size():0);
 */
 			List<PermisDto> permisosMetaNode = metaExpedientHelper.permisFind(entity.getId());
-			resource.setNumPermisos(permisosMetaNode!=null?permisosMetaNode.size():0);
+			resource.setNumPermisos(permisosMetaNode.size());
+            resource.setErrorPermisos(
+                    (entity.isComu())
+                            ?permisosMetaNode.stream().anyMatch(p -> !p.getAmbOrganGestor())
+                            :permisosMetaNode.stream().anyMatch(p -> p.getAmbOrganGestor())
+            );
 		}
     }
     
