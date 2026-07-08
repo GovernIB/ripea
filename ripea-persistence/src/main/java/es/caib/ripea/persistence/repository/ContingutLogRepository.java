@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 import es.caib.ripea.persistence.aggregation.ContingutLogCountAggregation;
 import es.caib.ripea.persistence.entity.ContingutLogEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
-import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.service.intf.dto.LogContingutTipusEnumDto;
 
 @Component
@@ -74,7 +73,7 @@ public interface ContingutLogRepository extends JpaRepository<ContingutLogEntity
 	        "     and log.createdDate <= :createdDateEnd " +
 	        "group by" +
 	        "     e.metaExpedient, log.createdBy, log.tipus")
-	List<ContingutLogCountAggregation<UsuariEntity>> findLogsExpedientBetweenCreatedDateGroupByCreatedByAndTipus(
+	List<ContingutLogCountAggregation<String>> findLogsExpedientBetweenCreatedDateGroupByCreatedByAndTipus(
 			@Param("createdDateIni") LocalDateTime createdDateIni,
 			@Param("createdDateEnd") LocalDateTime createdDateEnd);
 	
@@ -93,7 +92,7 @@ public interface ContingutLogRepository extends JpaRepository<ContingutLogEntity
 	        "     and log.createdDate <= :createdDateEnd " +
 	        "group by" +
 	        "     e.metaExpedient, log.createdBy, log.tipus")
-	List<ContingutLogCountAggregation<UsuariEntity>> findLogsExpedientBetweenCreatedDateGroupByCreatedByAndTipus(
+	List<ContingutLogCountAggregation<String>> findLogsExpedientBetweenCreatedDateGroupByCreatedByAndTipus(
 			@Param("createdDateEnd") LocalDateTime createdDateEnd);
 	
 	@Query( "select   " +

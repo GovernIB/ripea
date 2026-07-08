@@ -25,6 +25,7 @@ import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.repository.ContingutLogRepository;
 import es.caib.ripea.persistence.repository.ExpedientTascaRepository;
+import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.persistence.repository.historic.HistoricExpedientRepository;
 import es.caib.ripea.persistence.repository.historic.HistoricInteressatRepository;
 import es.caib.ripea.persistence.repository.historic.HistoricUsuariRepository;
@@ -45,6 +46,7 @@ public class HistoricHelper {
 	@Autowired private HistoricInteressatRepository historicInteressatRepository;
 	@Autowired private ContingutLogRepository contingutLogRepository;
 	@Autowired private ExpedientTascaRepository expedientTascaRepository;
+	@Autowired private UsuariRepository usuariRepository;
 	@Autowired private MetaExpedientHelper metaExpedientHelper;
 	
 	@Transactional
@@ -255,13 +257,13 @@ public class HistoricHelper {
 		Date startDate = getStartDate(date, tipusLog);
 		Date endDate = getEndDate(date, tipusLog);
 		
-		List<ContingutLogCountAggregation<UsuariEntity>> logsCount = contingutLogRepository.findLogsExpedientBetweenCreatedDateGroupByCreatedByAndTipus(
+		List<ContingutLogCountAggregation<String>> logsCount = contingutLogRepository.findLogsExpedientBetweenCreatedDateGroupByCreatedByAndTipus(
 				DateUtil.getLocalDateTimeFromDate(startDate, true, false),
 				DateUtil.getLocalDateTimeFromDate(endDate, false, true));
 		MapHistoricUsuaris mapHistorics = new MapHistoricUsuaris(startDate, tipusLog);
 		registreHistoricExpedients(logsCount, mapHistorics);
 
-		List<ContingutLogCountAggregation<UsuariEntity>> logsCountAccum = contingutLogRepository.findLogsExpedientBetweenCreatedDateGroupByCreatedByAndTipus(
+		List<ContingutLogCountAggregation<String>> logsCountAccum = contingutLogRepository.findLogsExpedientBetweenCreatedDateGroupByCreatedByAndTipus(
 				DateUtil.getLocalDateTimeFromDate(endDate));
 		registreHistoricExpedientsAcumulats(logsCountAccum, mapHistorics);
 
@@ -358,6 +360,10 @@ public class HistoricHelper {
 			LogTipusEnumDto tipusLog = countObject.getTipus();
 
 			HistoricEntity historic = mapHistorics.getHistoric(countObject);
+			// Pot ser null si l'agrupació és per codi d'usuari i aquest no té usuari associat
+			if (historic == null) {
+				continue;
+			}
 			switch (tipusLog) {
 			case CREACIO:
 				historic.setNumExpedientsCreats(countObject.getCount());
@@ -381,6 +387,10 @@ public class HistoricHelper {
 		for (ContingutLogCountAggregation countObject : logsCountAccum) {
 			LogTipusEnumDto tipusLog = countObject.getTipus();
 			HistoricEntity historic = mapHistorics.getHistoric(countObject);
+			// Pot ser null si l'agrupació és per codi d'usuari i aquest no té usuari associat
+			if (historic == null) {
+				continue;
+			}
 
 			switch (tipusLog) {
 			case CREACIO:
@@ -473,7 +483,7 @@ public class HistoricHelper {
 	 * 
 	 * @author bgalmes
 	 */
-	private class MapHistoricUsuaris implements IMapHistoric<UsuariEntity, HistoricUsuariEntity> {
+	private class MapHistoricUsuaris implements IMapHistoric<String, HistoricUsuariEntity> {
 
 		private Map<String, Map<Long, HistoricUsuariEntity>> mapHistorics;
 		private HistoricTipusEnumDto tipusLog;
@@ -486,11 +496,20 @@ public class HistoricHelper {
 		}
 
 		/**
-		 * Obté l'històric de l'usuari indicat per paràmetre
+		 * Obté l'històric de l'usuari indicat per paràmetre. L'agrupació es fa pel codi
+		 * d'auditoria (log.createdBy), de manera que cal resoldre l'usuari corresponent.
+		 * Retorna null si el codi no té cap usuari associat (p.ex. usuari eliminat), ja
+		 * que HistoricUsuariEntity.usuari és obligatori.
 		 */
-		public HistoricUsuariEntity getHistoric(ContingutLogCountAggregation<UsuariEntity> countLogs) {
-			UsuariEntity usuari = countLogs.getItemGrouped();
+		public HistoricUsuariEntity getHistoric(ContingutLogCountAggregation<String> countLogs) {
+			String usuariCodi = countLogs.getItemGrouped();
 			MetaExpedientEntity metaExpedient = countLogs.getMetaExpedient();
+
+			UsuariEntity usuari = usuariRepository.findByCodi(usuariCodi);
+			if (usuari == null) {
+				log.warn("No s'ha trobat cap usuari amb codi '{}'; s'omet el registre d'històric d'usuaris", usuariCodi);
+				return null;
+			}
 
 			return getHistoric(usuari, metaExpedient);
 		}
