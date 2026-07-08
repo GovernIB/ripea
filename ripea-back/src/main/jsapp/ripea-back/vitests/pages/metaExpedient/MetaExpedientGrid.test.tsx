@@ -12,6 +12,7 @@ vi.mock('react-i18next', () => ({
 
 vi.mock('reactlib', () => ({
     useFormContext: vi.fn(() => ({ data: {}, fields: [] })),
+    useBaseAppContext: () => ({ messageDialogShow: vi.fn() }),
     GridPage: ({ children }: any) => <div data-testid="grid-page">{children}</div>,
     useFilterApiRef: () => ({ current: null }),
     useFormApiRef: () => ({ current: null }),
