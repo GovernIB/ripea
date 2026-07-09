@@ -5,13 +5,14 @@ import TabComponent from "../../../components/TabComponent.tsx";
 import StyledMuiGrid, {ToolbarButton} from "../../../components/StyledMuiGrid.tsx";
 import {ContenidoData, DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
 import {LinearProgress, Grid, Box} from "@mui/material";
+import { usePreBaseAppContext } from "@src/components/PreBaseAppProvider.tsx";
 
 const useSistemAction = () => {
     const {
         isReady: apiIsReady,
         artifactAction: apiAction
     } = useResourceApiService('threadInfoResource');
-    const {temporalMessageShow} = useBaseAppContext();
+    const {temporalMessageShow} = usePreBaseAppContext();
     const [system, setSystem] = useState<any>();
 
 
@@ -227,11 +228,11 @@ const Tasques = () => {
 
 export const useSistemaDetail = () => {
     const { t } = useTranslation();
-
     const [open, setOpen] = useState(false);
+    const {system, apiSystem, apiIsReady} = useSistemAction();
 
-    const {system, apiSystem} = useSistemAction();
     const handleOpen = () => {
+        if(!apiIsReady) return;
         apiSystem()
         setOpen(true);
     }

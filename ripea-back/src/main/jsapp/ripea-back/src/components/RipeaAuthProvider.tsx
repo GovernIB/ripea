@@ -14,8 +14,8 @@ export const RipeaAuthProvider: React.FC<React.PropsWithChildren> = ({ children 
     };
 
     const context = {
-        isLoading: false,
-        isReady: true,
+        isLoading: !isAuthenticated,
+        isReady: isAuthenticated,
         isAuthenticated,
         bearerTokenActive: false,
         getToken: () => undefined,

@@ -1,4 +1,4 @@
-import {ThemeOptions, createTheme, darken, alpha} from '@mui/material/styles';
+import {ThemeOptions, createTheme, darken, alpha, lighten} from '@mui/material/styles';
 import type {} from '@mui/x-data-grid/themeAugmentation';
 
 // Color principal per defecte: blau corporatiu equivalent al primary del tema
@@ -181,8 +181,8 @@ const base: ThemeOptions = {
         MuiDrawer: {
             styleOverrides: {
                 paper: {
-                    right: 0,
-                    left: 'auto',
+                    right: 'auto',
+                    left: 0,
                 },
             },
         },
@@ -232,7 +232,7 @@ const base: ThemeOptions = {
                 },
             },
         },
-        MuiIcon: {styleOverrides: {root: {fontSize: '18px', marginRight: '4px'}}},
+        MuiIcon: {styleOverrides: {root: {fontSize: 'var(--toolbar-icon-size, 18px)', marginRight: '4px'}}},
         MuiChip: {
             styleOverrides: {
                 root: {
@@ -460,6 +460,48 @@ export const buildTheme = (
                 styleOverrides: {root: {color: textPrimary, '&.Mui-disabled': {color: tk.textDisabled}}},
             },
             MuiDrawer: {styleOverrides: {paper: {backgroundColor: drawerBg, color: onColor(drawerBg)}}},
+            MuiListItemButton: {
+                styleOverrides: {
+                    root: {
+                        '.MuiDrawer-paper &:hover': {
+                            backgroundColor:
+                                onColor(drawerBg) === '#ffffff'
+                                    ? lighten(drawerBg, 0.15)
+                                    : darken(drawerBg, 0.15),
+                        },
+                        '.MuiDrawer-paper &.Mui-selected': {
+                            backgroundColor: alpha(primaryMain, 0.30),
+                        },
+                        '.MuiDrawer-paper &.Mui-selected:hover': {
+                            backgroundColor: alpha(primaryMain, 0.45),
+                        },
+                    },
+                },
+            },
+            MuiListItemIcon: {
+                styleOverrides: {
+                    root: {
+                        '.MuiDrawer-paper &': {
+                            color: onColor(drawerBg),
+                        },
+                    },
+                },
+            },
+            MuiBadge: {
+                styleOverrides: {
+                    badge: {
+                        '.MuiDrawer-paper &': {
+                            // border: `2px solid ${onColor(drawerBg)}`,
+                            // right: -24,
+                            // top: 10,
+                            overflowWrap: 'normal',
+                            wordBreak: 'keep-all',
+                            whiteSpace: 'nowrap',
+                            padding: '0px 4px',
+                        },
+                    },
+                },
+            },
             MuiAlert: {
                 styleOverrides:
                     mode === 'dark'

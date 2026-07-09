@@ -4,10 +4,10 @@ import {useBaseAppContext, useResourceApiService} from "reactlib";
 import {iniciaDescargaBlob} from "../../expedient/details/CommonActions.tsx";
 import useRebutjar from "../actions/Rebutjar.tsx";
 import {useNavigate} from "react-router-dom";
-import {icons} from "../../user/UserHeadToolbar.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import useAcceptar from "../actions/Acceptar.tsx";
 import useSubsanarAnnexos from "../actions/SubsanarAnnexos.tsx";
+import { iconsAppMenu } from "@src/hooks/useMenu.tsx";
 
 export const useActions = (refresh?: () => void) => {
     const { t } = useTranslation();
@@ -162,7 +162,7 @@ const useAnotacioActions = (refresh?: () => void) => {
         },
         {
             label: t('page.expedient.title'),
-            icon: icons.expedient,
+            icon: iconsAppMenu.expedient,
             showInMenu: true,
             onClick: (_id:any, row:any) => navigate(`/contingut/${row?.expedient?.id}`),
             hidden: (row:any) => row?.estatView != 'ACCEPTAT' || !row?.expedient,

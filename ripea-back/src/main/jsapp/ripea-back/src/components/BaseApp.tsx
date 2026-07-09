@@ -29,6 +29,8 @@ import {useUserSession} from "./Session";
 import AlertExpand from "./AlertExpand.tsx";
 import {useSession} from "./SessionStorageContext.tsx";
 
+export const HEIGHT_FOOTER = 36;
+
 export type MenuEntryWithResource = MenuEntry & {
     resourceName?: string;
 }
@@ -41,7 +43,7 @@ export type HeaderBackgroundModuleItem = {
 export type BaseAppProps = React.PropsWithChildren & {
     code: string;
     logo?: string;
-    style?: any;
+    appbarStyle?: any;
     logoStyle?: any;
     title?: string | React.ReactElement;
     title_logo?: string;
@@ -77,7 +79,7 @@ const useBaseAppMenuEntries = (menuEntries?: MenuEntryWithResource[]) => {
     React.useEffect(() => {
         if (apiIsReady) {
             const apiLinks = apiIndex?.links.getAll();
-            const resourceNames = apiLinks?.map((l: any) => l.rel);
+            const resourceNames = apiLinks?.map((link: any) => link.rel);
             const processedMenuEntries = menuEntries?.
                 filter(e => e?.resourceName == null || resourceNames?.includes(e.resourceName)).
                 map(e => {
@@ -86,7 +88,7 @@ const useBaseAppMenuEntries = (menuEntries?: MenuEntryWithResource[]) => {
                 });
             setprocessedMenuEntries(processedMenuEntries);
         }
-    }, [apiIsReady, apiIndex]);
+    }, [apiIsReady, apiIndex, menuEntries]);
     return processedMenuEntries;
 }
 
@@ -143,13 +145,14 @@ const CustomLocalizationProvider = ({ children }: React.PropsWithChildren) => {
 const generateFooter = (version?:string) => {
     return (
         <>
-            {/*<div style={{ height: '36px', width: '100%' }} />*/}
+            {/*<div style={{ height: `${HEIGHT_FOOTER}px`, width: '100%' }} />*/}
             <Footer
                 title="RIPEA"
                 version={version}
                 logos={[drassana]}
                 backgroundColor="#5F5D5D"
-                style={{ height: '36px', width: '100%', zIndex: 999 }}
+                // style={{ position: 'fixed', bottom: 0, height: `${HEIGHT_FOOTER}px`, width: '100%', zIndex: 1200 }}
+                style={{ height: `${HEIGHT_FOOTER}px`, width: '100%' }}
             />
         </>
     );
@@ -159,7 +162,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
     const {
         code,
         logo,
-        style,
+        appbarStyle,
         logoStyle,
         title,
         version,
@@ -170,7 +173,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
     } = props;
     const navigate = useNavigate();
     const location = useLocation();
-    const baseAppMenuEntries = useBaseAppMenuEntries(menuEntries);
+    const baseAppMenuEntries = useBaseAppMenuEntries(menuEntries);    
     const {
         i18nUseTranslation,
         i18nCurrentLanguage,
@@ -198,7 +201,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
             headerLogo={logo}
             headerLogoStyle={logoStyle}
             headerVersion={version}
-            headerAppbarStyle={style}
+            headerAppbarStyle={appbarStyle}
             headerAppbarBackgroundColor={appbarBackgroundColor}
             headerAppbarBackgroundImg={appbarBackgroundImg}
             headerAdditionalComponents={
@@ -212,6 +215,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
                 </MuiBaseAppContext.Provider>
             }
             footer={generateFooter(version)}
+            // footerHeight={HEIGHT_FOOTER}
             persistentLanguage
             i18nUseTranslation={i18nUseTranslation}
             i18nCurrentLanguage={i18nCurrentLanguage}

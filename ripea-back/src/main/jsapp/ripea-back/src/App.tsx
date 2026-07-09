@@ -7,6 +7,9 @@ import AppRoutes from './AppRoutes';
 import {useEntitatSession} from "./components/Session.tsx";
 import TitleHeaderConfigurator from "./TitleHeaderConfigurator.tsx";
 import { useTranslation } from 'react-i18next';
+import { useCombinedMenu } from './hooks/useCombinedMenu.ts';
+import { useTheme } from '@mui/material';
+import { TemporalMessageBridge } from './components/PreBaseAppProvider.tsx';
 
 const changeFavicon = (faviconUrl:any) => {
     const link:any =
@@ -27,6 +30,8 @@ export const App: React.FC = () => {
     const version = '1.0.1';
     const { value: entitat } = useEntitatSession();
     const { i18n } = useTranslation();
+    const { sideMenuEntries: menuEntries, additionalContents: additionalContentsMenu } = useCombinedMenu();
+    const theme = useTheme();
 
     // Sincronizar lang del <html> con el idioma activo de i18next
     useEffect(() => {
@@ -37,23 +42,33 @@ export const App: React.FC = () => {
         changeFavicon(getImgFromBytes(entitat?.conf?.favicon) || favicon)
     }, [entitat?.conf?.favicon, favicon]);
     
-    return <BaseApp
-        code="cmd"
-        logo={getImgFromBytes(entitat?.conf?.logo) || governLogo}
-        style={{ height: '64px' }}
-        logoStyle={{
-            '& img': { height: '49px' },
-            pl: 2,
-            pr: 4,
-            mr: 4,
-            borderRight: `1px solid ${entitat?.conf?.colorLletra}`
-        }}
-        title={<img src={ripea_logo} alt={"logo_aplicacion"} style={{ height: '65px', paddingTop: '8px' }} />}
-        version={version}
-        appbarBackgroundColor={entitat?.conf?.colorFons}>
-        <TitleHeaderConfigurator/>
-        <AppRoutes/>
-    </BaseApp>;
+    return (
+        <BaseApp
+            code="cmd"
+            logo={getImgFromBytes(entitat?.conf?.logo) || governLogo}
+            logoStyle={{
+                '& img': { height: '49px' },
+                // pl: 2,
+                pr: 4,
+                mr: 4,
+                borderRight: `1px solid ${entitat?.conf?.colorLletra}`
+            }}
+            title={<img src={ripea_logo} alt={"logo_aplicacion"} style={{ height: '65px', paddingTop: '8px'}} />}
+            appbarStyle={{
+                height: '64px',
+                color: entitat?.conf?.colorFons ? theme.palette.getContrastText(entitat?.conf?.colorFons) : undefined,
+                '--toolbar-icon-size': '1.5rem'} as React.CSSProperties
+            }
+            version={version}
+            appbarBackgroundColor={entitat?.conf?.colorFons}
+            menuEntries={menuEntries}
+        >
+            <TitleHeaderConfigurator/>
+            <AppRoutes/>
+            <TemporalMessageBridge />
+            {additionalContentsMenu}
+        </BaseApp>
+    );
 }
 
 export default App;

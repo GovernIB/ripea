@@ -8,9 +8,9 @@ import {formatDate} from "../../../util/dateUtils.ts";
 import MetaDadaGrid from "../../dada/MetaDadaGrid.tsx";
 import Load from "../../../components/Load.tsx";
 import {useActions} from "./ContingutActions.tsx";
-import {icons} from "../../user/UserHeadToolbar.tsx";
 import useErrorValidacio, { getResumErrorsText } from "../../expedient/details/ErrorValidacio.tsx";
 import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
+import { iconsAppMenu } from "@src/hooks/useMenu.tsx";
 
 const Contenido = (props:any) => {
     const {entity, fields} = props;
@@ -84,7 +84,7 @@ export const Firmes = (props:any) => {
                     : <>
                         {firma?.detalls?.map((detall: any, i: number) =>
                             <Grid size={12} key={`${index}-${i}`}>
-                                <Icon>{icons.firma}</Icon> {detall?.responsableNom} - {detall?.responsableNif} - {formatDate(detall?.data)} - {detall?.emissorCertificat}
+                                <Icon>{iconsAppMenu.firma}</Icon> {detall?.responsableNom} - {detall?.responsableNif} - {formatDate(detall?.data)} - {detall?.emissorCertificat}
                             </Grid>
                         )}
                     </>

@@ -2,6 +2,9 @@ import React from 'react';
 import IconButton from '@mui/material/IconButton';
 import Icon from '@mui/material/Icon';
 import useSmallScreen from '../../util/useSmallScreen';
+import { usePersistentState } from '../../util/usePersistentState';
+
+export const PERSISTENT_MENU_SHRINK_MODE_KEY = 'menu-shrink-mode';
 
 type UseToolbarMenuIconReturnType = {
     shrink: boolean;
@@ -15,12 +18,17 @@ type ToolbarMenuIconProps = {
     handleClick: () => void;
 };
 
-export const useToolbarMenuIcon = (): UseToolbarMenuIconReturnType => {
+export const useToolbarMenuIcon = (appCode: string): UseToolbarMenuIconReturnType => {
+    const { persistentStateReady, persistentStateGet, persistentStateSet } =
+        usePersistentState(appCode);
     const smallScreen = useSmallScreen();
     const [shrink, setShrink] = React.useState<boolean>(false);
     const [iconClicked, setIconClicked] = React.useState<boolean>(false);
     const handleToolbarMenuIconClick = () => {
-        !smallScreen && setShrink((shrink) => !shrink);
+        if (!smallScreen) {
+            setShrink(!shrink);
+            persistentStateSet(PERSISTENT_MENU_SHRINK_MODE_KEY, !shrink ? 'shrink' : '');
+        }
         setIconClicked((c) => !c);
     };
     const buttonComponent = (
@@ -30,6 +38,16 @@ export const useToolbarMenuIcon = (): UseToolbarMenuIconReturnType => {
             handleClick={handleToolbarMenuIconClick}
         />
     );
+
+    React.useEffect(() => {
+        if (persistentStateReady) {
+            const shrinkMode = persistentStateGet(PERSISTENT_MENU_SHRINK_MODE_KEY);
+            if (shrinkMode === 'shrink') {
+                setShrink(true);
+            }
+        }
+    }, [persistentStateReady]);
+
     return {
         shrink,
         iconClicked,

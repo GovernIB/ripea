@@ -12,10 +12,12 @@ import Typography from '@mui/material/Typography';
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
 import { useBaseAppContext } from '../BaseAppContext';
 import { useSmallScreen, useSmallHeader } from '../../util/useSmallScreen';
+import { Badge } from '@mui/material';
 
 export type MenuEntry = {
     id: string;
-    title?: string | React.ReactElement;
+    title?: string;
+    badgeProps?: any;
     description?: string;
     to?: string;
     icon: string;
@@ -161,7 +163,7 @@ const MenuItem: React.FC<MenuItemProps> = (props) => {
     const itemButtonSx = {
         minHeight: 48,
         justifyContent: !shrink ? 'initial' : 'center',
-        '& :before':
+        '&>:before':
             level > 0 && !shrink
                 ? {
                       content: '""',
@@ -209,7 +211,7 @@ const MenuItem: React.FC<MenuItemProps> = (props) => {
     ) : null;
     const iconComponent = icon ? (
         <ListItemIcon className={menuItemIconClassName} sx={itemIconSx}>
-            <Icon fontSize={'small'}>{icon}</Icon>
+            {entry.badgeProps ? <Badge {...entry.badgeProps}><Icon fontSize={'small'}>{icon}</Icon></Badge> : <Icon fontSize={'small'}>{icon}</Icon>}
         </ListItemIcon>
     ) : null;
     return (
@@ -230,7 +232,7 @@ const MenuItem: React.FC<MenuItemProps> = (props) => {
                         paddingLeft: shrink ? '40px' : 24 + 16 * level + (level > 0 ? 8 : 0) + 'px',
                     }}>
                     {iconComponent}
-                    <ListItemText primary={primary} sx={itemTextSx} />
+                    {!shrink && <ListItemText primary={primary} sx={itemTextSx} />}
                     {expandedIconComponent}
                 </ListItemButton>
             )}

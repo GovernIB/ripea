@@ -71,7 +71,7 @@ export const Footer: React.FC<AppFootProps> = (props) => {
 
     const backgroundStyle = backgroundColor ? toolbarBackgroundStyle(backgroundColor, backgroundImg) : {};
     return <footer>
-        <Toolbar style={{ ...style, ...backgroundStyle }} sx={{minHeight: '36px !important', lineHeight: '0.5em'}}>
+        <Toolbar style={{ ...style, ...backgroundStyle }} sx={{minHeight: '36px !important', lineHeight: '0.5em', zIndex: (theme) => theme.zIndex.drawer + 100}}>
             <Typography
                 variant="caption"
                 component="div"

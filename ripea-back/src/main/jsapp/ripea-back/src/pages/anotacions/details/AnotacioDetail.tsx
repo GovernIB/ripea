@@ -12,7 +12,7 @@ import {useActions, useAnexxActions} from "./AnotacioActions.tsx";
 import useRegistreInteressatDetail from "./RegistreInteressatDetail.tsx";
 import useVisualitzar from "../actions/Visualitzar.tsx";
 import useAnnexFirma from "./AnnexFirma.tsx";
-import {icons} from "../../user/UserHeadToolbar.tsx";
+import { iconsAppMenu } from "@src/hooks/useMenu.tsx";
 
 const Resum = (props:any) => {
     const { entity, setNumInteressats, setNumAnnexos } = props;
@@ -295,7 +295,7 @@ const Justificant = (props:any) => {
             <DetailCardContent title={t('page.registre.justificant.titol')}             size={12}>{entity?.titol}</DetailCardContent>
         </DetailCard>
 
-        <DetailCard icon={icons.firma} title={t('page.arxiu.firma.title')}>
+        <DetailCard icon={iconsAppMenu.firma} title={t('page.arxiu.firma.title')}>
             <DetailCardContent title={t('page.registre.justificant.firmaTipus')}    size={6}>{entity?.firmaTipus}</DetailCardContent>
             <DetailCardContent title={t('page.registre.justificant.firmaPerfil')}   size={6}>{entity?.firmaPerfil}</DetailCardContent>
         </DetailCard>

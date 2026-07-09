@@ -4,7 +4,6 @@ import {useNavigate, useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import Load from "../../../components/Load.tsx";
 import {Button, Grid, Icon, Typography, Box, alpha} from "@mui/material";
-import {icons} from "../../user/UserHeadToolbar.tsx";
 import {ExpedientInfoExpandit} from "../../expedient/details/Expedient.tsx";
 import DocumentsGrid from "../../contingut/DocumentsGrid.tsx";
 import {TascaComment} from "../../CommentDialog.tsx";
@@ -12,6 +11,7 @@ import {useActions} from "./TascaActions.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import {CardPage} from "../../../components/CardData.tsx";
 import {ErrorPage} from "../../../components/ErrorPage.tsx";
+import { iconsAppMenu } from "@src/hooks/useMenu.tsx";
 
 const expedientPerspectives = ['COUNT', 'ESTAT', 'RELACIONAT', 'AMB_PINBAL', "META_EXPEDIENT", "PERMIS_CONTINGUT"]
 const expedientNamedQueries = ['WITHOUT_PERMISION_CHECK'];
@@ -70,7 +70,7 @@ const Tasca = () => {
 
     const headerMain = <>
         <Box sx={{ display: 'flex', alignItems: 'center'}}>
-            <Icon sx={{ fontSize: '2rem', color: 'text.primary' }}>{icons.tasca}</Icon>
+            <Icon sx={{ fontSize: '2rem', color: 'text.primary' }}>{iconsAppMenu.tasca}</Icon>
             <Typography variant="h4" component="h1" sx={{ display: 'flex' }}>{tasca?.metaExpedientTasca?.description}</Typography>
         </Box>
         <Box>

@@ -13,6 +13,7 @@ import {SessionStorageProvider} from "./components/SessionStorageContext.tsx";
 import {RipeaAuthProvider} from "./components/RipeaAuthProvider.tsx";
 import SseProvider from "./components/SseClient.tsx";
 import {ThemeUserProvider} from "./components/ThemeUserProvider.tsx";
+import { PreBaseAppProvider } from './components/PreBaseAppProvider.tsx';
 
 dayjs.extend(duration);
 
@@ -60,14 +61,16 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <ResourceApiProvider apiUrl={getEnvApiUrl()} userSessionActive>
             <SessionStorageProvider>
                 <RipeaAuthProvider>
-                    <SseProvider>
-                        <ThemeUserProvider>
-                            {/*<CssBaseline />*/}
-                            <BrowserRouter basename={import.meta.env.BASE_URL}>
-                                <App />
-                            </BrowserRouter>
-                        </ThemeUserProvider>
-                    </SseProvider>
+                    <PreBaseAppProvider>
+                        <SseProvider>
+                            <ThemeUserProvider>
+                                {/*<CssBaseline />*/}
+                                <BrowserRouter basename={import.meta.env.BASE_URL}>
+                                    <App />
+                                </BrowserRouter>
+                            </ThemeUserProvider>
+                        </SseProvider>
+                    </PreBaseAppProvider>
                 </RipeaAuthProvider>
             </SessionStorageProvider>
         </ResourceApiProvider>

@@ -161,6 +161,7 @@ const MuiComponentsConfigurer: React.FC = () => {
 };
 
 const useMenu = (
+    code: string,
     menuTitle: string | undefined,
     menuEntries: MenuEntry[] | undefined,
     menuOnTitleClose: (() => void) | undefined,
@@ -168,7 +169,7 @@ const useMenu = (
     menuFooterHeight: number | undefined,
     menuPanelWidth: number | undefined
 ) => {
-    const { shrink, iconClicked, buttonComponent: menuButton } = useToolbarMenuIcon();
+    const { shrink, iconClicked, buttonComponent: menuButton } = useToolbarMenuIcon(code);
     const menuComponent =
         menuEntries != null ? (
             <Menu
@@ -195,6 +196,7 @@ const useMenu = (
 
 export const MuiBaseApp: React.FC<MuiBaseAppProps> = (props) => {
     const {
+        code,
         headerTitle,
         headerVersion,
         headerLogo,
@@ -221,6 +223,7 @@ export const MuiBaseApp: React.FC<MuiBaseAppProps> = (props) => {
     } = props;
     const mergedFormFieldComponents = [...baseFormFieldComponents, ...(formFieldComponents ?? [])];
     const { menuButton, menuComponent } = useMenu(
+        code,
         menuTitle,
         menuEntries,
         menuOnTitleClose,
@@ -252,6 +255,7 @@ export const MuiBaseApp: React.FC<MuiBaseAppProps> = (props) => {
     };
     return (
         <BaseApp
+            code={code}
             formFieldComponents={mergedFormFieldComponents}
             detailFieldComponent={MuiDetailField}
             {...otherProps}
