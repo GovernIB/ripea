@@ -146,7 +146,7 @@ const ExpedientInfoContret = (props:any) => {
     );
 };
 
-export const ExpedientInfoExpandit = (props:any) => {
+const ExpedientInfoExpandit = (props:any) => {
     const {title, entity: expedient, fields, xs, readOnly, onCollapse, relacionats, eliminarRelacio} = props;
     const { t } = useTranslation();
     
@@ -201,7 +201,7 @@ export const ExpedientInfoExpandit = (props:any) => {
     );
 }
 
-const ExpedientInfo = (props: any) => {
+export const ExpedientInfo = (props: any) => {
     const { expanded, entity: expedient, fields, setExpanded } = props;
     const {
         isReady: apiIsReady,
