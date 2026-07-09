@@ -136,7 +136,7 @@ public class MetaExpedientResource extends MetaNodeResource {
     public static final String ACTION_CREAR_REGLA_CODE		= "CREAR_REGLA_ROLSAC";
     public static final String ACTION_UPDATE_ROLSAC_CODE	= "UPDATE_ROLSAC";
     public static final String ACTION_CANVIAR_DISSENY_CODE	= "CANVIAR_DISSENY";
-    public static final String ACTION_CANVIAR_PENDENT_CODE	= "CANVIAR_PENDENT";    
+    public static final String ACTION_CANVIAR_PENDENT_CODE	= "CANVIAR_PENDENT";
     public static final String ACTION_IMPORT_ROLSAC_CODE	= "IMPORT_ROLSAC";
     public static final String ACTION_IMPORT_FITXER_CODE	= "IMPORT_FITXER";
     public static final String ACTION_CLONAR_CODE			= "CLONAR";
@@ -152,7 +152,7 @@ public class MetaExpedientResource extends MetaNodeResource {
 	@ResourceField(onChangeActive = true)
 	private String classificacio;
 	@Transient private String msgSiaRolsac;
-	
+
 	@NotNull
 	@Size(max = 30)
 	private String serieDocumental;
@@ -166,12 +166,12 @@ public class MetaExpedientResource extends MetaNodeResource {
 	@Transient private MetaExpedientRevisioEstatEnumDto estatAnterior;
 	@Size(max = 1024)
 	private String revisioComentari;
-	
+
 	@Transient private boolean crearReglaDistribucio = true;
 	private CrearReglaDistribucioEstatEnumDto crearReglaDistribucioEstat;
 	@Size(max = 1024)
 	private String crearReglaDistribucioError;
-	
+
 	private boolean organNoSincronitzat;
 	private boolean interessatObligatori;
 
@@ -197,7 +197,7 @@ public class MetaExpedientResource extends MetaNodeResource {
     @Transient private int numTasca;
     @Transient private int numGrup;
     @Transient private int numCarpetes;
-    
+
     @Transient private ReglaDistribucioDto regla;
 
     public String getNomClassificacio() {
@@ -217,8 +217,9 @@ public class MetaExpedientResource extends MetaNodeResource {
         private MetaExpedientAmbitEnumDto ambit;
         private boolean permisDirecte;
         private TipusProcedimentServeiEnum tipus;
+        private boolean gestioAmbGrupsActiva;
     }
-    
+
     @Getter
     @Setter
     public static class RevisioChangeFormAction implements Serializable {
@@ -226,7 +227,7 @@ public class MetaExpedientResource extends MetaNodeResource {
 		private MetaExpedientRevisioEstatEnumDto revisioEstat;
         private String revisioComentari;
     }
-    
+
     @Getter
     @Setter
     @FieldNameConstants
@@ -237,26 +238,26 @@ public class MetaExpedientResource extends MetaNodeResource {
     	private ResourceReference<OrganGestorResource, Long> organGestor;
     	private boolean perDefecte;
     }
-    
+
     @Getter
     @Setter
     @FieldNameConstants
     public static class DesVincularGrupFormAction implements Serializable {
         private ResourceReference<GrupResource, Long> grup;
     }
-    
+
     @Getter
     @Setter
     public static class ToggleReglaRolsacFormAction implements Serializable {
         private boolean activa;
     }
-    
+
     @Getter
     @Setter
     public static class ToggleGrupDefecteFormAction implements Serializable {
         private Long grupId;
     }
-    
+
     @Getter
     @Setter
     public static class ClonarFormAction implements Serializable {
@@ -275,7 +276,7 @@ public class MetaExpedientResource extends MetaNodeResource {
 		@NotNull @NotEmpty
     	private String codiSia;
     }
-    
+
     @Getter
     @Setter
     @FieldNameConstants
@@ -286,7 +287,7 @@ public class MetaExpedientResource extends MetaNodeResource {
         @NotNull
 		@ResourceField(onChangeActive = true)
     	private FileReference importJson;
-		
+
 		@ResourceField(onChangeActive = true)
 		private ResourceReference<MetaExpedientResource, Long> procediment;
 
@@ -301,6 +302,6 @@ public class MetaExpedientResource extends MetaNodeResource {
         @Transient private ResourceReference<UsuariResource, String> responsable;
         @Transient private List<ResourceReference<UsuariResource, String>> portafirmesResponsables;
     }
-    
+
     private static final long serialVersionUID = -7526532893601431955L;
 }
