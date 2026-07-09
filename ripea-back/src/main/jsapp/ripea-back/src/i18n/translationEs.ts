@@ -575,6 +575,9 @@ const translationEs = {
             },
             detall: {
                 title: "Información del expediente",
+                procedimentServei: "Procedimiento o servicio: ",
+                estat: "Estado: ",
+                prioritat: "Prioritad: ",
                 agafatPer: "Cogido por",
                 avisos: "Avisos",
             },

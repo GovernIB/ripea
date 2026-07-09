@@ -24,12 +24,12 @@ import {useActions} from "./CommonActions.tsx";
 import useAlerta from "./Alerta.tsx";
 import useErrorValidacio, { getResumErrorsText } from "./ErrorValidacio.tsx";
 import SseExpedient, {useValidacioSession} from "../../../components/SseExpedient.tsx";
-import {icons} from "../../user/UserHeadToolbar.tsx";
 import {setTitlePage} from "../../../TitleHeaderConfigurator.tsx";
 import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
 import {ErrorPage} from "../../../components/ErrorPage.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import { getReadableTextColor } from '@src/components/StyledLabel.tsx';
+import { iconsAppMenu } from '@src/hooks/useMenu.tsx';
 
 const border= { border: '1px solid #e3e3e3', borderRadius: '4px' };
 
@@ -110,18 +110,18 @@ const ExpedientInfoContret = (props:any) => {
                 <Icon sx={{ mr: 0 }}>chevron_right</Icon>
             </IconButton>
             <Divider sx={{ width: '30px' }} />
-            <Tooltip title={expedient?.metaExpedient?.description} arrow placement="right">
-                <IconButton sx={{ ...iconButtonStyle }}>
+            <Tooltip title={t('page.expedient.detall.procedimentServei') + expedient?.metaExpedient?.description} arrow placement="right">
+                <IconButton sx={{ cursor: 'default', ...iconButtonStyle }}>
                     <Icon sx={{ ...iconStyle }}>assignment</Icon>
                 </IconButton>
             </Tooltip>
-            <Tooltip title={labelEstat} arrow placement="right">
-                <IconButton sx={{ ...iconButtonStyle, backgroundColor: colorEstat, '&:hover': { bgcolor: colorEstat}}}>
+            <Tooltip title={t('page.expedient.detall.estat') + labelEstat} arrow placement="right">
+                <IconButton sx={{ cursor: 'default',...iconButtonStyle, backgroundColor: colorEstat, '&:hover': { bgcolor: colorEstat}}}>
                     <Icon sx={{ color: iconColorEstat,...iconStyle }}>folder</Icon>
                 </IconButton>
             </Tooltip>
-            <Tooltip title={labelPrioritat} arrow placement="right">
-                <IconButton sx={{ ...iconButtonStyle, backgroundColor: colorPrioritat, '&:hover': { bgcolor: colorPrioritat } }}>
+            <Tooltip title={t('page.expedient.detall.prioritat') + labelPrioritat} arrow placement="right">
+                <IconButton sx={{ cursor: 'default', ...iconButtonStyle, backgroundColor: colorPrioritat, '&:hover': { bgcolor: colorPrioritat } }}>
                     <Icon sx={{ color: iconColorPrioritat, ...iconStyle }}>flag</Icon>
                 </IconButton>
             </Tooltip>
@@ -133,7 +133,7 @@ const ExpedientInfoContret = (props:any) => {
                     placement="right"
                 >
                     <Badge badgeContent={relacionats?.length} color="error">
-                        <IconButton sx={{ ...iconButtonStyle }}>
+                        <IconButton sx={{ cursor: 'default', ...iconButtonStyle }}>
                             <Icon sx={{ ...iconStyle }}>account_tree</Icon>
                         </IconButton>
                     </Badge>
@@ -339,7 +339,7 @@ const HeaderMain = (props: any) => {
         <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', columnGap: 1, rowGap: 0.5, width: '100%' }}>
-                    <Icon sx={{ fontSize: '2rem', color: 'text.primary' }}>{icons.expedient}</Icon>
+                    <Icon sx={{ fontSize: '2rem', color: 'text.primary' }}>{iconsAppMenu.expedient}</Icon>
                     <Typography variant="h4" component="h1" sx={{ lineHeight: 1.2, flexShrink: 0 }}>
                         {isCarpetaUrl && expedient?.id != null ? (
                             <Link
@@ -398,7 +398,7 @@ const HeaderMain = (props: any) => {
                             <Typography variant="body2" sx={{ fontWeight: 'bold', color: headerTextColor }}>
                                 {fields.find((field: any) => field?.name === camp.name)?.label}:&nbsp;
                                 <Typography component="span" variant="body2">
-                                    {camp.value}
+                                    {camp.value ?? '-'}
                                 </Typography>
                             </Typography>
                         </React.Fragment>

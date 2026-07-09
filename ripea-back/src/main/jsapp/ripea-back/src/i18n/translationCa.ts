@@ -575,6 +575,9 @@ const translationCa = {
             },
             detall: {
                 title: "Informació de l’expedient",
+                procedimentServei: "Procediment o servei: ",
+                estat: "Estat: ",
+                prioritat: "Prioritat: ",
                 agafatPer: "Agafat per",
                 avisos: "Avisos",
             },
