@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.persistence.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.config.ConfigEntity;
 import es.caib.ripea.persistence.entity.GrupEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
@@ -958,6 +959,31 @@ public class AplicacioServiceImpl implements AplicacioService {
 			return "Tipus documentals creats per a l'entitat " + entitat.getCodi();
 		} catch (Exception ex) {
 			throw new Exception("Error al crear els tipus documentals per a l'entitat amb id=" + entitatId + ": " + ex.getMessage());
+		}
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<String> getConfigsAmbEntitat() {
+		return configRepository.findKeysEntitatCodiNotNull();
+	}
+
+	@Override
+	@Transactional
+	public String executeEliminaConfigOrfe(String key) throws Exception {
+		try {
+			ConfigEntity config = configRepository.findByKey(key);
+			if (config == null) {
+				return "No existeix cap configuració amb la key=" + key;
+			}
+			String entitatCodi = config.getEntitatCodi();
+			if (entitatCodi != null && entitatRepository.findByCodi(entitatCodi) == null) {
+				configRepository.delete(config);
+				return "Eliminada la configuració " + key + " de l'entitat inexistent " + entitatCodi;
+			}
+			return "";
+		} catch (Exception ex) {
+			throw new Exception("Error al eliminar la configuració orfe amb key=" + key + ": " + ex.getMessage());
 		}
 	}
 }

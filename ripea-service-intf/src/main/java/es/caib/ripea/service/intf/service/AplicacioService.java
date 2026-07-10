@@ -310,4 +310,10 @@ public interface AplicacioService {
 
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public String executeCrearTipusDocumentalsEntitat(Long entitatId) throws Exception;
+
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public List<String> getConfigsAmbEntitat();
+
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public String executeEliminaConfigOrfe(String key) throws Exception;
 }
