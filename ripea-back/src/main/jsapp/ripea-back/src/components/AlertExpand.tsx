@@ -13,12 +13,11 @@ const AlertExpand = (props:any) => {
         <Alert
             {...other}
             sx={{
-                py: 0,
-                px: 1.5,
+                py: 0.75,
+                // px: 1.5,
                 fontSize: '0.85rem',
                 minHeight: 'unset',
                 lineHeight: 1.3,
-                padding: '6px',
                 ...sx, // permite sobrescribir desde fuera
             }}
             action={
