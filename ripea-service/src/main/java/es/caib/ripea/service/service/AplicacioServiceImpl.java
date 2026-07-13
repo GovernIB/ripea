@@ -227,10 +227,9 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Transactional
 	@Override
 	public void processarAutenticacioUsuari(boolean comprovaAmbUsuariPlugin) {
-		
+
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		String codiUsuariLowerCase = auth.getName().toLowerCase();
-		
 		logger.debug("Processant autenticació (usuariCodi=" + codiUsuariLowerCase + ")");
 		UsuariEntity usuari = usuariRepository.findById(codiUsuariLowerCase).orElse(null);
 
@@ -523,6 +522,13 @@ public class AplicacioServiceImpl implements AplicacioService {
 	public String propertyFindByNom(String nom) {
 		logger.debug("Consulta del valor del propertat amb nom");
 		return configHelper.getConfig(nom);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Properties getConfigs(List<String> keys) {
+		logger.debug("Consulta en bloc del valor de " + (keys != null ? keys.size() : 0) + " propietats");
+		return configHelper.getConfigs(keys);
 	}
 	
 	@Override
