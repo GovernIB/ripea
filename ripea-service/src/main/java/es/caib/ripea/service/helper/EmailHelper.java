@@ -77,9 +77,9 @@ public class EmailHelper {
     @Autowired private DocumentRepository documentRepository;
     @Autowired private UsuariRepository usuariRepository;
     @Autowired private DocumentHelper documentHelper;
-    
+
     @Autowired private EventService eventService;
-    
+
 	public void contingutAgafatPerAltreUsusari(
 			ContingutEntity contingut,
 			UsuariEntity usuariOriginal,
@@ -298,7 +298,7 @@ public class EmailHelper {
 
 		metaExpComnt.updateEmailEnviat(true);
 	}
-	
+
 	public boolean usuariJaDinsLlista(List<UsuariAnotacioDto> llista, String usuariCodi) {
 		if (llista!=null && usuariCodi!=null) {
 			for (UsuariAnotacioDto usuList: llista) {
@@ -307,24 +307,24 @@ public class EmailHelper {
 		}
 		return false;
 	}
-	
+
 	public List<UsuariAnotacioDto> dadesUsuarisAfectatsAnotacio(Long expedientPeticioId) {
 		ExpedientPeticioEntity expedientPeticio = expedientPeticioRepository.findById(expedientPeticioId).orElse(null);
 		return dadesUsuarisAfectatsAnotacio(expedientPeticio);
 	}
-	
+
 	public List<UsuariAnotacioDto> dadesUsuarisAfectatsAnotacio(ExpedientPeticioEntity expedientPeticio) {
 
 		long t2 = System.currentTimeMillis();
 		List<UsuariAnotacioDto> resultat = new ArrayList<UsuariAnotacioDto>();
-		
+
 		RegistreEntity registre = expedientPeticio.getRegistre();
 		MetaExpedientEntity metaExpedient = expedientPeticio.getMetaExpedient();
 		EntitatEntity entitat = registre.getEntitat();
 		OrganGestorEntity organ = organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), registre.getDestiCodi());
-		
+
 		if (metaExpedient != null) {
-			
+
 			List<DadesUsuari> dadesUsuarisAdminEntitat = pluginHelper.dadesUsuariFindAmbGrup("IPA_ADMIN");
 
 			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
@@ -343,10 +343,10 @@ public class EmailHelper {
 					}
 				}
 			}
-			
+
 			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
-				logger.info("dadesUsuariFindAmbGrup(IPA_ADMIN) time:  " + (System.currentTimeMillis() - t2) + " ms");			
-			
+				logger.info("dadesUsuariFindAmbGrup(IPA_ADMIN) time:  " + (System.currentTimeMillis() - t2) + " ms");
+
 			boolean isProcedimentNoComu = metaExpedient.getOrganGestor() != null;
 
 			long t3 = System.currentTimeMillis();
@@ -475,7 +475,7 @@ public class EmailHelper {
 				List<PermisDto> usuarisPermisGrup = permisosHelper.findPermisos(expedientPeticio.getGrup().getId(), GrupEntity.class);
 				usuarisAmbPermis.addAll(usuarisPermisGrup);
 			}
-			
+
 			for (PermisDto permisDto : usuarisAmbPermis) {
 				UsuariAnotacioDto aux = new UsuariAnotacioDto(permisDto.getPrincipalNom(), UsuariAnotacioDto.TipoUsuario.ADM_ORG_COMUN, null, metaExpedient.getId());
 				if (!usuariJaDinsLlista(resultat, permisDto.getPrincipalNom())) {
@@ -483,7 +483,7 @@ public class EmailHelper {
 				}
 			}
 		}
-		
+
 		return resultat;
 	}
 
@@ -497,13 +497,13 @@ public class EmailHelper {
 		//Usuaris per enviar mail
 		List<String> emailsNoAgrupats = new ArrayList<>();
 		List<String> emailsAgrupats = new ArrayList<>();
-		
+
 		ExpedientPeticioEntity expedientPeticio = expedientPeticioRepository.findById(expedientPeticioId).orElse(null);
 		RegistreEntity registre = expedientPeticio.getRegistre();
 		MetaExpedientEntity metaExpedient = expedientPeticio.getMetaExpedient();
 		EntitatEntity entitat = registre.getEntitat();
 		OrganGestorEntity organ = organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), registre.getDestiCodi());
-		
+
 		List<UsuariAnotacioDto> dadesUsuarisAfectatsAnotacio = dadesUsuarisAfectatsAnotacio(expedientPeticioId);
 
 		for (UsuariAnotacioDto userAnotacio: dadesUsuarisAfectatsAnotacio) {
@@ -539,7 +539,7 @@ public class EmailHelper {
 		}
 
 		eventService.notifyAnotacionsPendents(dadesUsuarisAfectatsAnotacio);
-		
+
 		sendOrSaveEmail(
 				emailsNoAgrupats,
 				emailsAgrupats,
@@ -552,7 +552,7 @@ public class EmailHelper {
 	}
 
 	public void canviEstatRevisioMetaExpedientEnviarAAdminOrganCreador(MetaExpedientEntity metaExpedientEntity, Long entitatId) {
-		
+
 		UsuariEntity organAdminCreador = usuariRepository.findById(metaExpedientEntity.getCreatedBy().get()).get();
 
         List<String> emailsNoAgrupats = new ArrayList<>();
@@ -684,7 +684,7 @@ public class EmailHelper {
 	}
 
 	public void canviEstatDocumentViaFirma(DocumentViaFirmaEntity documentViaFirma) {
-		
+
 		logger.debug("Enviant correu electrònic per a canvi d'estat de document a ViaFirma (documentViaFirma=" + documentViaFirma.getId() + ")");
 
 		DocumentEntity document = documentViaFirma.getDocument();
@@ -716,7 +716,7 @@ public class EmailHelper {
 	}
 
 	public void canviEstatNotificacio(DocumentNotificacioEntity documentNotificacio, DocumentNotificacioEstatEnumDto estatAnterior) {
-		
+
 		logger.debug("Enviant correu electrònic per a canvi d'estat de notificació (documentNotificacioId=" + documentNotificacio.getId() + ")");
 
 		DocumentEntity document = documentNotificacio.getDocument();
@@ -857,7 +857,7 @@ public class EmailHelper {
 				"\tComentari: " + comentari + "\n");
 		mailSender.send(missatge);
 	}
-	
+
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void avisarAdministradorsErrorTancament(List<ExpedientErrorTancamentDto> errors) {
 	    try {
@@ -881,7 +881,7 @@ public class EmailHelper {
 	            String to = admin.getEmail();
 	            if (Utils.isNotEmpty(to)) {
 	            	destinataris.add(to);
-	            	
+
 	                SimpleMailMessage msg = new SimpleMailMessage();
 	                msg.setFrom(from);
 	                msg.setTo(to);
@@ -1309,18 +1309,28 @@ public class EmailHelper {
 		boolean addDestinatari = false;
 		String email = null;
 		UsuariEntity usuari = usuariRepository.findById(codi).orElse(null);
-		if (usuari != null) {
-			email = getEmail(usuari);
-			if (Utils.isNotEmpty(email)) {
-                if (event == null || EventTipusEnumDto.ENVIAR_FICHERO.equals(event)) {
-                    addDestinatari = true;
-                } else if (EventTipusEnumDto.NOVA_ANOTACIO.equals(event)) {
-                    addDestinatari = usuari.isRebreAvisosNovesAnotacions();
-                } else if (EventTipusEnumDto.CANVI_ESTAT_REVISIO.equals(event)){
-                    addDestinatari = usuari.isRebreEmailsCanviEstatRevisio();
+        if (usuari != null) {
+            if (EventTipusEnumDto.ENVIAR_FICHERO.equals(event)) {
+                addDestinatari = true;
+            } else {
+                if (usuari.isRebreEmailsGlobal()) {
+                    if (event == null) {
+                        addDestinatari = true;
+                    } else if (EventTipusEnumDto.NOVA_ANOTACIO.equals(event)) {
+                        addDestinatari = usuari.isRebreAvisosNovesAnotacions();
+                    } else if (EventTipusEnumDto.CANVI_ESTAT_REVISIO.equals(event)) {
+                        addDestinatari = usuari.isRebreEmailsCanviEstatRevisio();
+                    }
                 }
-			}
-		}
+            }
+
+            if (addDestinatari) {
+                email = getEmail(usuari);
+                if (Utils.isEmpty(email)) {
+                    addDestinatari = false;
+                }
+            }
+        }
 
 		if (addDestinatari) {
 			if (usuari.isRebreEmailsAgrupats()) {

@@ -562,7 +562,7 @@ const translationCa = {
 					    check: "Esteu segur que voleu continuar amb aquesta acció?",
 					    description: "Un cop esborrat no es podrà recuperar",
 					    ok: "El grup {{data.nom}} s'ha esborrat correctament",
-					},                 
+					},
 				},
 			},
         },
@@ -1114,7 +1114,7 @@ const translationCa = {
 			restriccions: {
 				 title: "Selecciona els usuaris que tindran accés a la carpeta (d’entre els que ja tenen accés al procediment)",
 			     notEmpty: {
-				 		message: "S'ha de seleccionar com a mínim un usuari per crear la restricció"	
+				 		message: "S'ha de seleccionar com a mínim un usuari per crear la restricció"
 				 }
 			}
         },
@@ -1521,7 +1521,7 @@ const translationCa = {
                 canviDisseny: {
                     label: "Marca com a procés de disseny",
                     ok: "Procediment marcat com a procés de disseny",
-                },                
+                },
                 actualize: {
                     label: "Actualitza des de ROLSAC...",
                     button: "Actualitza",
@@ -1960,7 +1960,6 @@ const translationCa = {
                 ok: "Les dades de l'usuari '{{nom}}' s'han modificat correctament",
                 dades: "Dades d'usuari",
                 correu: "Enviament de correus",
-                activarCorreu: "Activar tots els correus",
                 generic: "Configuració genèrica",
                 column: "Configuració de columnes del llistat d'expedients",
                 vista: "Configuració vista de documents dels expedients",

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.ripea.persistence.entity;
 
@@ -19,7 +19,7 @@ import java.util.Set;
 
 /**
  * Classe de model de dades que conté la informació d'un usuari.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter
@@ -50,30 +50,33 @@ public class UsuariEntity implements Serializable {
 			joinColumns = {@JoinColumn(name = "ripea_user_codi", referencedColumnName = "codi")},
 			inverseJoinColumns = {@JoinColumn(name = "viafirma_user_codi", referencedColumnName = "codi")})
 	private Set<ViaFirmaUsuariEntity> viaFirmaUsuaris = new HashSet<ViaFirmaUsuariEntity>();
-	
+
 	@Column(name="rol_actual", length = 64)
 	private String rolActual;
-	
+
 	@Column(name="vista_actual", length = 64)
 	@Enumerated(EnumType.STRING)
 	private ContingutVistaEnumDto vistaActual = ContingutVistaEnumDto.TREETABLE_PER_CARPETA;
-	
+
 	@Column(name="num_elements_pagina")
 	private Long numElementsPagina;
-	
+
 	@Version
 	private long version = 0;
-	
-	
+
+
+    @Column(name = "emails_global")
+    private boolean rebreEmailsGlobal = true;
+
 	@Column(name = "emails_agrupats")
 	private boolean rebreEmailsAgrupats = true;
-	
+
 	@Column(name = "avisos_noves_anotacions")
 	private boolean rebreAvisosNovesAnotacions;
 
 	@Column(name = "emails_canvi_estat_revisio")
 	private boolean rebreEmailsCanviEstatRevisio = true;
-	
+
 	@Column(name = "exp_list_data_darrer_env")
 	private boolean expedientListDataDarrerEnviament = false;
 	@Column(name = "exp_list_agafat_per")
@@ -101,7 +104,7 @@ public class UsuariEntity implements Serializable {
 	@JoinColumn(name = "entitat_actual")
 	@ForeignKey(name = BaseConfig.DB_PREFIX + "usuari_entitat_actual_fk")
 	private EntitatEntity entitatActual;
-	
+
 	@Column(name = "expedient_expandit")
 	private boolean expedientExpandit = true;
 
@@ -112,23 +115,24 @@ public class UsuariEntity implements Serializable {
 	@Column(name="interficie_usuari", length = 5)
 	@Enumerated(EnumType.STRING)
 	private InterficieUsuariEnumDto interficieUsuari;
-	
+
 	public ContingutVistaEnumDto getVistaActual() {
 		return vistaActual;
 	}
-	
+
 	public String getCodiAndNom() {
 		return nom + " (" + codi + ")";
 	}
-	
+
 	public void updateVistaActual(ContingutVistaEnumDto vistaActual) {
 		this.vistaActual = vistaActual;
 	}
 
-	
+
 	public void update(
 			String emailAlternatiu,
 			String idioma,
+            boolean rebreEmailsGlobal,
 			boolean rebreEmailsAgrupats,
 			boolean rebreAvisosNovesAnotacions,
 			boolean rebreEmailsCanviEstatRevisio,
@@ -146,6 +150,7 @@ public class UsuariEntity implements Serializable {
 			InterficieUsuariEnumDto interficieUsuari) {
 		this.emailAlternatiu = emailAlternatiu;
 		this.idioma = idioma;
+        this.rebreEmailsGlobal = rebreEmailsGlobal;
 		this.rebreEmailsAgrupats = rebreEmailsAgrupats;
 		this.rebreAvisosNovesAnotacions = rebreAvisosNovesAnotacions;
 		this.rebreEmailsCanviEstatRevisio = rebreEmailsCanviEstatRevisio;
@@ -166,7 +171,7 @@ public class UsuariEntity implements Serializable {
 			String nom,
 			String nif,
 			String email) {
-		
+
 		this.nom = trimAndShorten(nom, 200);
 		this.email = trimAndShorten(email, 200);
 		this.nif = trimAndShortenNif(nif);
@@ -180,7 +185,7 @@ public class UsuariEntity implements Serializable {
 	public void removeEntitatPerDefecte() {
 		this.entitatPerDefecte = null;
 	}
-	
+
 	private static String trimAndShortenNif(String value) {
 		String valueProcessed = null;
 		if (value != null) {
@@ -190,24 +195,24 @@ public class UsuariEntity implements Serializable {
 
 		return valueProcessed;
 	}
-	
+
 	private static String trimAndShorten (String value, int endIndex){
 		String valueProcessed = null;
 		if (value != null) {
 			valueProcessed = value.trim();
 			valueProcessed = valueProcessed.substring(0, Math.min(endIndex, valueProcessed.length()));
 		}
-		
+
 		return valueProcessed;
 	}
-	
+
 
 	public void updateRolActual(String rolActual) {
 		this.rolActual = rolActual;
 	}
 	/**
 	 * Obté el Builder per a crear objectes de tipus Usuari.
-	 * 
+	 *
 	 * @param codi
 	 *            El codi de l'usuari.
 	 * @param nom
@@ -238,7 +243,7 @@ public class UsuariEntity implements Serializable {
 
 	/**
 	 * Builder per a crear noves instàncies d'aquesta entitat.
-	 * 
+	 *
 	 * @author Limit Tecnologies <limit@limit.es>
 	 */
 	public static class Builder {

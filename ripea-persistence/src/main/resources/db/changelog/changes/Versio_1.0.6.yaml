@@ -31,3 +31,19 @@ databaseChangeLog:
                splitStatements: true
                stripComments: true
                relativeToChangelogFile: true
+  - changeSet:
+        id: RIPEA_1.0.6_1746_1
+        author: limit
+        changes:
+            - sqlFile:
+                  dbms: oracle
+                  path: ../scripts/oracle/1.0.6/Versio_1.0.6_DDL_3.sql
+                  splitStatements: true
+                  stripComments: true
+                  relativeToChangelogFile: true
+            - sqlFile:
+                  dbms: postgresql
+                  path: ../scripts/postgres/1.0.6/Versio_1.0.6_DDL_3.sql
+                  splitStatements: true
+                  stripComments: true
+                  relativeToChangelogFile: true

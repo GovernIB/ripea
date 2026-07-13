@@ -62,6 +62,8 @@ public class UsuariResourceEntity implements ResourceEntity<UsuariResource, Stri
 	@Column(name="num_elements_pagina")
 	private Long numElementsPagina;
 
+    @Column(name = "emails_global")
+    private boolean rebreEmailsGlobal = true;
 	@Column(name = "emails_agrupats")
 	private boolean rebreEmailsAgrupats = true;
 	@Column(name = "avisos_noves_anotacions")
@@ -105,14 +107,14 @@ public class UsuariResourceEntity implements ResourceEntity<UsuariResource, Stri
 	@Column(name="vista_moure_actual", length = 16)
 	@Enumerated(EnumType.STRING)
 	private MoureDestiVistaEnumDto vistaMoureActual = MoureDestiVistaEnumDto.LLISTA;
-	
+
 	@Column(name="interficie_usuari", length = 5)
 	@Enumerated(EnumType.STRING)
 	private InterficieUsuariEnumDto interficieUsuari = InterficieUsuariEnumDto.REACT;
 
     @Column(name = "codi", insertable = false, updatable = false)
     private String id;
-    
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = BaseConfig.DB_PREFIX + "carpeta_usuari_rel",
@@ -122,7 +124,7 @@ public class UsuariResourceEntity implements ResourceEntity<UsuariResource, Stri
             inverseForeignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "carpeta_rel_usu_fk")
     )
     protected List<CarpetaResourceEntity> carpetes = new ArrayList<>();
-    
+
 	@Override
 	public String getId() {
 		return this.codi;
