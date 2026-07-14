@@ -70,7 +70,10 @@ const HomeRedirect = () => {
     switch (user?.rolActual) {
         case rols.SUPER:
             return <Navigate to="/integracio" replace />;
+        case rols.DISSENY:
         case rols.REVISIO:
+            // Rols de configuració (dissenyador d'òrgan i revisor): la seva pantalla per defecte és el
+            // llistat de procediments, no el d'expedients (que no estan autoritzats a consultar).
             return <Navigate to="/metaExpedient" replace />;
         default:
             return <Navigate to="/expedient" replace />;
@@ -80,11 +83,24 @@ const HomeRedirect = () => {
 const AppRoutes: React.FC = () => {
     return <Routes>
         <Route path="/" element={<HomeRedirect />} />
-        <Route path="expedient" element={<ExpedientGrid />}/>
-        <Route path="contingut/:id" element={<Expedient />} />
-        <Route path="contingut/:id/tasca/:tascaId" element={<Tasca />} />
-        <Route path="expedientPeticio" element={<AnotacionsGrid />} />
-        <Route path="usuariTasca" element={<TasquesGrid />} />
+
+        {/* Expedients (llistat i detall): rols operatius i administratius, no els de configuració
+            (DISSENY/REVISIO/SUPER), que no estan autoritzats a consultar-los ni pel menú ni per URL. */}
+        <Route element={<ProtectedRoute allowedRoles={[rols.ADMIN, rols.ADMIN_LECTURA, rols.ORGAN_ADMIN, rols.tothom]} />}>
+            <Route path="expedient" element={<ExpedientGrid />}/>
+            <Route path="contingut/:id" element={<Expedient />} />
+            <Route path="contingut/:id/tasca/:tascaId" element={<Tasca />} />
+        </Route>
+
+        {/* Anotacions: present al menú d'ADMIN, ORGAN_ADMIN i usuari (no a ADMIN_LECTURA). */}
+        <Route element={<ProtectedRoute allowedRoles={[rols.ADMIN, rols.ORGAN_ADMIN, rols.tothom]} />}>
+            <Route path="expedientPeticio" element={<AnotacionsGrid />} />
+        </Route>
+
+        {/* Tasques de l'usuari: només al menú d'usuari (tothom). */}
+        <Route element={<ProtectedRoute allowedRoles={[rols.tothom]} />}>
+            <Route path="usuariTasca" element={<TasquesGrid />} />
+        </Route>
 
         <Route element={<ProtectedRoute allowedRoles={[rols.SUPER]} />}>
             <Route path={"entitat"} element={<EntitatGrid />} />
