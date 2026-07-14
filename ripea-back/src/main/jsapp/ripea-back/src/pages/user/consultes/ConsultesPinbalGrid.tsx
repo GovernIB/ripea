@@ -33,7 +33,7 @@ const useConsultaPinbalActions = (refresh?: () => void) => {
     const actions = [
         {
             label: t('page.document.action.detall.label'),
-            icon: "folder",
+            icon: "info",
             showInMenu: true,
             onClick: (_id:any, row:any) => handleDetallOpen(row?.documentInfo?.id),
             hidden: (row:any) => row?.documentInfo == null
