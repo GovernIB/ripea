@@ -137,7 +137,6 @@ import es.caib.ripea.service.intf.model.ExpedientResource.TancarExpedientFormAct
 import es.caib.ripea.service.intf.model.ImportacioZipDocument;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientEstatResource;
-import es.caib.ripea.service.intf.model.MetaExpedientOrganGestorResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.model.UsuariResource;
@@ -548,18 +547,21 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	        }
     	}
 		
-    	/** (:esNullIdsOrgansPermesos = false and (meogp.organGestor.id in (:idsOrgansPermesos0))) */
-    	//Organs gestors permesos (nomes admin organ): Organ actual capçalera + fills
-    	//S'embolcalla amb exists(...) per navegar la col·leccio metaexpedientOrganGestorPares dins una subconsulta
-    	//correlada en comptes d'un INNER JOIN al FROM principal. Aixi un expedient amb 0 files a IPA_EXPEDIENT_ORGANPARE
-    	//no queda descartat pel join i pot fer match per altres vies (1/5), igual que el LEFT JOIN de la query JSP.
+    	/** (:esNullIdsOrgansPermesos = false and (e.organGestor.id in (:idsOrgansPermesos0))) */
+    	//Organs gestors permesos (nomes admin organ/dissenyador): Organ actual capçalera + fills.
+    	//idsOrgansPermesos ja ve expandit amb TOTS els descendents (getIdsOrgansFills, recursiu). Com que
+    	//organpare(E) = {organ directe + ancestres}, navegar la col·leccio per veure si un ancestre es permes
+    	//es EQUIVALENT a comprovar directament si l'organ de l'expedient hi es: (∃ ancestre ∈ L) ⟺ (organ ∈ L)
+    	//quan L es downward-closed. Per tant comprovem l'organ directe (to-one sobre l'arrel), evitant el exists()
+    	//correlat: pla set-based, usa l'index IPA_EXPEDIENT_ORGAN_FK_I i es immune a organpare buida (organGestor
+    	//es NOT NULL, no navega col·leccio ni descarta files germanes de l'OR).
     	Filter filtreOrgansPermesos = null;
-    	String campOrganId = ExpedientResource.Fields.metaexpedientOrganGestorPares + "." + MetaExpedientOrganGestorResource.Fields.organGestor + ".id";
+    	String campOrganId = ExpedientResource.Fields.organGestor + ".id";
 	    List<String> organsActualAndFillsClausulesIn = Utils.getIdsEnGruposMil(permisosPerExpedients.getIdsOrgansPermesos());
 	    if (organsActualAndFillsClausulesIn!=null) {
 	    	for (String aux: organsActualAndFillsClausulesIn) {
 	    		if (aux != null && !aux.isEmpty()) {
-	    			filtreOrgansPermesos = FilterBuilder.or(filtreOrgansPermesos, Filter.parse("exists(" + campOrganId + " IN (" + aux + "))"));
+	    			filtreOrgansPermesos = FilterBuilder.or(filtreOrgansPermesos, Filter.parse(campOrganId + " IN (" + aux + ")"));
 	    		}
 	    	}
 	    }
@@ -573,7 +575,10 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	    if (organsMetaExpClausulesIn!=null) {
 	    	for (String aux: organsMetaExpClausulesIn) {
 	    		if (aux != null && !aux.isEmpty()) {
-	    			//exists(...): veure comentari a filtreOrgansPermesos (immunitat al tipus de join sobre la col·leccio)
+	    			//Aquesta via matcheja per id de la parella (procediment,organ) —meogp.id—, no per l'organ,
+	    			//aixi que NO es reduible a l'organ directe de l'expedient com les vies 2/4. Es manté el exists(...)
+	    			//correlat (immune al tipus de join sobre la col·leccio, evita que un organpare buit descarti files
+	    			//germanes de l'OR). Pendent d'analitzar per separat.
 	    			filtreMetaExpedientOrganPairsPermesos = FilterBuilder.or(filtreMetaExpedientOrganPairsPermesos, Filter.parse("exists(" + campMetaExpOrganId + " IN (" + aux + "))"));
 	    		}
 	    	}
@@ -581,17 +586,19 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     	
     	//OrgansAmbProcedimentsComunsPermesos (nomes usuaris tothom): ExtendedPermission.COMU + ExtendedPermission.READ --> OrganGestorEntity.class
 	    //Permisos que s'han donat sobre OrganGestor
-	    /** (:esNullIdsOrgansAmbProcedimentsComunsPermesos = false and meogp.organGestor.id in (:idsOrgansAmbProcedimentsComunsPermesos) 
+	    /** (:esNullIdsOrgansComunsAndFills = false and e.organGestor.id in (:idsOrgansComunsAndFills)
 	     * 	and e.metaExpedient.id in (:idsProcedimentsComuns)) */
+    	//Mateixa equivalencia que filtreOrgansPermesos: comprovem l'organ directe de l'expedient en comptes del
+    	//exists(organpare...). AQUI cal la llista EXPANDIDA idsOrgansComunsAndFills (cada organ comu + els seus fills,
+    	//getIdsOrgansFills), NO la crua idsOrgansAmbProcedimentsComunsPermesos, perque el exists aconseguia la cascada
+    	//cap avall via la materialitzacio d'ancestres a organpare. La part metaExpedient.id IN (comuns) es queda igual.
     	Filter filtreOrgansAmbProcedimentsComunsPermesos = null;
-    	String campMetaExpOrganComuId = ExpedientResource.Fields.metaexpedientOrganGestorPares + "." + MetaExpedientOrganGestorResource.Fields.organGestor + ".id";
-	    List<String> organsMetaExpComunsClausulesIn = Utils.getIdsEnGruposMil(permisosPerExpedients.getIdsOrgansAmbProcedimentsComunsPermesos());
+    	String campMetaExpOrganComuId = ExpedientResource.Fields.organGestor + ".id";
+	    List<String> organsMetaExpComunsClausulesIn = Utils.getIdsEnGruposMil(permisosPerExpedients.getIdsOrgansComunsAndFills());
 	    if (organsMetaExpComunsClausulesIn!=null) {
 	    	for (String aux: organsMetaExpComunsClausulesIn) {
 	    		if (aux != null && !aux.isEmpty()) {
-	    			//exists(...) nomes sobre la part d'organ (col·leccio). El "metaExpedient.id IN (...)" de mes avall
-	    			//es to-one sobre l'arrel i es queda fora, combinat amb AND com fins ara.
-	    			filtreOrgansAmbProcedimentsComunsPermesos = FilterBuilder.or(filtreOrgansAmbProcedimentsComunsPermesos, Filter.parse("exists(" + campMetaExpOrganComuId + " IN (" + aux + "))"));
+	    			filtreOrgansAmbProcedimentsComunsPermesos = FilterBuilder.or(filtreOrgansAmbProcedimentsComunsPermesos, Filter.parse(campMetaExpOrganComuId + " IN (" + aux + ")"));
 	    		}
 	    	}
 	    	

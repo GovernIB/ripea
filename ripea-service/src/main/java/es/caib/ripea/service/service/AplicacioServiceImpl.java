@@ -6,8 +6,6 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Properties;
 
-import es.caib.ripea.persistence.entity.resourceentity.EntitatResourceEntity;
-import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +18,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.persistence.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
-import es.caib.ripea.persistence.entity.config.ConfigEntity;
 import es.caib.ripea.persistence.entity.GrupEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.UsuariEntity;
+import es.caib.ripea.persistence.entity.config.ConfigEntity;
 import es.caib.ripea.persistence.repository.AclSidRepository;
 import es.caib.ripea.persistence.repository.AlertaRepository;
 import es.caib.ripea.persistence.repository.AvisRepository;
@@ -551,6 +549,13 @@ public class AplicacioServiceImpl implements AplicacioService {
 	public String propertyFindByNom(String nom) {
 		logger.debug("Consulta del valor del propertat amb nom");
 		return configHelper.getConfig(nom);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Properties getConfigs(List<String> keys) {
+		logger.debug("Consulta en bloc del valor de " + (keys != null ? keys.size() : 0) + " propietats");
+		return configHelper.getConfigs(keys);
 	}
 
 	@Override

@@ -184,6 +184,13 @@ public interface AplicacioService {
 	@PreAuthorize("isAuthenticated()")
 	String propertyFindByNom(String nom);
 
+	/**
+	 * Resol en una sola crida (2 consultes batch a BD) un conjunt de propietats, amb la mateixa
+	 * semàntica de resolució (òrgan → entitat → general) que {@link #propertyFindByNom(String)}.
+	 */
+	@PreAuthorize("isAuthenticated()")
+	Properties getConfigs(List<String> keys);
+
 	List<UsuariDto> findUsuariAmbTextDades(String text);
 
 	UsuariDto findUsuariCarrecAmbCodiDades(String codi);

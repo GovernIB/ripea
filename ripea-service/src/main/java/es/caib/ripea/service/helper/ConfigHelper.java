@@ -235,6 +235,91 @@ public class ConfigHelper {
 		return value;
 	}
 
+    /**
+     * Resol en bloc un conjunt de claus de configuració amb la MATEIXA semàntica que
+     * {@link #getConfig(String)} (òrgan → entitat → general), però amb només 2 consultes batch a BD
+     * ({@code findAllById}) en lloc d'un {@code findById} per clau. Pensat per a punts que necessiten
+     * moltes propietats d'una sola vegada (p.ex. el securityInfo de React), per no fer una crida a BD
+     * (i una presa de connexió del pool) per propietat.
+     */
+    @Transactional(readOnly = true)
+    public Properties getConfigs(List<String> keys) {
+        return getConfigs(keys, getEntitatActualCodi(), getOrganActualCodi());
+    }
+
+    @Transactional(readOnly = true)
+    public Properties getConfigs(List<String> keys, String entitatCodi, String organCodi) {
+        Properties properties = new Properties();
+        if (keys == null || keys.isEmpty()) {
+            return properties;
+        }
+        // 1a consulta: totes les configuracions generals demanades.
+        Map<String, ConfigEntity> generals = new HashMap<>();
+        for (ConfigEntity config : configRepository.findAllById(keys)) {
+            generals.put(config.getKey(), config);
+        }
+        // Propietats per òrgan: mapa en memòria, inicialitzat de forma mandrosa i cachejat per entitat.
+        Map<String, Map<String, String>> propietatsPerOrgan = null;
+        if (!StringUtils.isEmpty(entitatCodi)) {
+            propietatsPerOrgan = propietatsPerEntitatOrgan.get(entitatCodi);
+            if (propietatsPerOrgan == null) {
+                inicialitzaPropietatsPerOrgan(entitatCodi);
+                propietatsPerOrgan = propietatsPerEntitatOrgan.get(entitatCodi);
+            }
+        }
+        // 2a consulta: overrides a nivell d'entitat, només per a les claus configurables per entitat.
+        Map<String, ConfigEntity> entitats = new HashMap<>();
+        if (!StringUtils.isEmpty(entitatCodi)) {
+            List<String> entitatKeys = new ArrayList<>();
+            for (ConfigEntity config : generals.values()) {
+                if (config.isConfigurableEntitatActiu()) {
+                    entitatKeys.add(getKeyEntitat(entitatCodi, config.getKey()));
+                }
+            }
+            if (!entitatKeys.isEmpty()) {
+                for (ConfigEntity config : configRepository.findAllById(entitatKeys)) {
+                    entitats.put(config.getKey(), config);
+                }
+            }
+        }
+        // Resolució per clau, idèntica a getConfig: òrgan (retorna encara que sigui null) → entitat → general.
+        for (String keyGeneral : keys) {
+            ConfigEntity config = generals.get(keyGeneral);
+            if (config == null) {
+                String env = getEnvironmentProperty(keyGeneral, null);
+                if (env != null) {
+                    properties.put(keyGeneral, env);
+                }
+                continue;
+            }
+            String value = null;
+            boolean resoltPerOrgan = false;
+            // Nivell òrgan (com a getConfig, si la clau té valor per l'òrgan atura la resolució, encara que sigui null).
+            if (config.isConfigurableOrganActiu() && !StringUtils.isEmpty(organCodi)
+                    && propietatsPerOrgan != null && propietatsPerOrgan.containsKey(keyGeneral)) {
+                Map<String, String> perOrgans = propietatsPerOrgan.get(keyGeneral);
+                if (perOrgans != null && perOrgans.containsKey(organCodi)) {
+                    value = perOrgans.get(organCodi);
+                    resoltPerOrgan = true;
+                }
+            }
+            if (!resoltPerOrgan) {
+                // Nivell entitat
+                if (config.isConfigurableEntitatActiu() && !StringUtils.isEmpty(entitatCodi)) {
+                    value = getValue(entitats.get(getKeyEntitat(entitatCodi, keyGeneral)));
+                }
+                // Nivell general
+                if (value == null) {
+                    value = getValue(config);
+                }
+            }
+            if (value != null) {
+                properties.put(keyGeneral, value);
+            }
+        }
+        return properties;
+    }
+
 	public String getValueForOrgan(String entitatCodi, String organCodi, String keyGeneral) {
 
         Map<String, Map<String, String>> propietatsPerOrgan = propietatsPerEntitatOrgan.get(entitatCodi);
