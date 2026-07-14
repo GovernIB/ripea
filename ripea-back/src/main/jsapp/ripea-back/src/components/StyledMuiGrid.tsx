@@ -285,8 +285,8 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
                     paddingBottom: '5px',
                 },
             }}
-            {...others}
             {...paginationProps}
+            {...others}
         />
     </div>
 }

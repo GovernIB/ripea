@@ -169,7 +169,7 @@ const Interessats = (props:any) => {
             toolbarHide
             disableColumnSorting
             readOnly
-            autoHeight
+            autoHeight={false}
             paginationActive={false}
             onRowCountChange={onRowCountChange}
             onRowClick={(params: any) => {
@@ -260,7 +260,7 @@ const Annexos = (props:any) => {
             disableColumnSorting
             rowAdditionalActions={actions}
             readOnly
-            autoHeight
+            autoHeight={false}
             paginationActive={false}
             onRowCountChange={onRowCountChange}
             onRowClick={(params: any) => {
@@ -365,6 +365,7 @@ const useAnotacioDetail = () => {
             closeCallback={handleClose}
             title={t('page.anotacio.detall.title')}
             componentProps={{ fullWidth: true, maxWidth: 'lg' }}
+            dialogContentProps={{ sx: { height: '100%', px: 2, py: 0 } }}
             buttons={[
                 {
                     value: 'close',
@@ -378,13 +379,15 @@ const useAnotacioDetail = () => {
                 }
             }}
         >
-            <TabComponent
-                indicatorColor={"primary"}
-                textColor={"primary"}
-                aria-label="scrollable force tabs"
-                tabs={tabs}
-                variant="scrollable"
-            />
+            <Box sx={{ height: '700px', minHeight: 0 }}>
+                <TabComponent
+                    indicatorColor={"primary"}
+                    textColor={"primary"}
+                    aria-label="scrollable force tabs"
+                    tabs={tabs}
+                    variant="scrollable"
+                />
+            </Box>
         </MuiDialog>
 
     return {

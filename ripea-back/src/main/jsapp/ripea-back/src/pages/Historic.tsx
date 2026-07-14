@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {Grid} from "@mui/material";
+import {Box, Grid} from "@mui/material";
 import {BasePage, MuiDialog} from "reactlib";
 import {useTranslation} from "react-i18next";
 import TabComponent from "../components/TabComponent.tsx";
@@ -242,6 +242,7 @@ const useHistoric = (contingutTipus:HistoricContingutTipus = HistoricContingutTi
             closeCallback={handleClose}
             title={t('page.contingut.action.history.label')}
             componentProps={{ fullWidth: true, maxWidth: 'xl'}}
+            dialogContentProps={{ sx: { px: 0, py: 0 } }}
             buttons={[
                 {
                     value: 'close',
@@ -256,13 +257,15 @@ const useHistoric = (contingutTipus:HistoricContingutTipus = HistoricContingutTi
             }}
         >
             <Load value={entity}>
-                <TabComponent
-                    indicatorColor={"primary"}
-                    textColor={"primary"}
-                    aria-label="scrollable force tabs"
-                    tabs={tabs}
-                    variant="scrollable"
-                />
+                <Box sx={{ height: '650px', minHeight: 0 }}>
+                    <TabComponent
+                        indicatorColor={"primary"}
+                        textColor={"primary"}
+                        aria-label="scrollable force tabs"
+                        tabs={tabs}
+                        variant="scrollable"
+                    />
+                </Box>
             </Load>
         </MuiDialog>
 

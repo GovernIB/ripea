@@ -116,6 +116,7 @@ const useNotificacioInteressatDetail = () => {
             closeCallback={handleClose}
             title={t('page.notificacioInteressat.detall.title')}
             componentProps={{ fullWidth: true, maxWidth: 'md'}}
+            dialogContentProps={{ sx: { height: '100%', px: 2, py: 0 }}}
             buttons={[
                 {
                     value: 'close',
@@ -129,13 +130,15 @@ const useNotificacioInteressatDetail = () => {
                 }
             }}
         >
-            <TabComponent
-                indicatorColor={"primary"}
-                textColor={"primary"}
-                aria-label="scrollable force tabs"
-                tabs={tabs}
-                variant="scrollable"
-            />
+            <Box sx={{ height: '700px', minHeight: 0 }}>
+                <TabComponent
+                    indicatorColor={"primary"}
+                    textColor={"primary"}
+                    aria-label="scrollable force tabs"
+                    tabs={tabs}
+                    variant="scrollable"
+                />
+            </Box>
         </MuiDialog>
 
     return {

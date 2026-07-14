@@ -1,5 +1,5 @@
 import {useEffect, useMemo, useState} from "react";
-import {Grid} from "@mui/material";
+import {Box, Grid} from "@mui/material";
 import {FormField, useMuiFormDialogApiRef, useBaseAppContext, useFormContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
@@ -262,8 +262,12 @@ const AcceptarForm = () => {
         },
     ]
 
-    return <TabComponent tabs={tabs}/>
-}
+    return (
+        <Box sx={{ height: '650px', minHeight: 0 }}>
+            <TabComponent tabs={tabs}/>
+        </Box>
+    );
+};
 
 const Acceptar = (props:any) => {
     const { t } = useTranslation();

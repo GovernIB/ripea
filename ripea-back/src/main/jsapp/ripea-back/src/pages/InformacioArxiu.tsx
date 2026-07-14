@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {Grid, Link, Icon} from "@mui/material";
+import {Grid, Link, Icon, Box} from "@mui/material";
 import {BasePage, useResourceApiService, MuiDialog, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {formatDate} from "../util/dateUtils.ts";
@@ -172,6 +172,7 @@ const useInformacioArxiu = (resourceName:string, perspective:string) => {
             closeCallback={handleClose}
             title={t('page.contingut.action.infoArxiu.title')}
             componentProps={{ fullWidth: true, maxWidth: 'md'}}
+            dialogContentProps={{ sx: { px: 2, py: 0 } }}
             buttons={[
                 {
                     value: 'close',
@@ -186,13 +187,15 @@ const useInformacioArxiu = (resourceName:string, perspective:string) => {
             }}
         >
             <Load value={entity}>
-                <TabComponent
-                    indicatorColor={"primary"}
-                    textColor={"primary"}
-                    aria-label="scrollable force tabs"
-                    tabs={tabs}
-                    variant="scrollable"
-                />
+                <Box sx={{ height: '700px', minHeight: 0 }}>
+                    <TabComponent
+                        indicatorColor={"primary"}
+                        textColor={"primary"}
+                        aria-label="scrollable force tabs"
+                        tabs={tabs}
+                        variant="scrollable"
+                    />
+                </Box>
             </Load>
         </MuiDialog>
 

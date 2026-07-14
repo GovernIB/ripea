@@ -8,7 +8,7 @@ import {
 } from "reactlib";
 import {CardPage} from "../../components/CardData.tsx";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
-import {Alert, Typography, Grid, Icon, Badge} from "@mui/material";
+import {Alert, Typography, Grid, Icon, Badge, Box} from "@mui/material";
 import GridFormField, {FileFormField, GridButton} from "../../components/GridFormField.tsx";
 import * as builder from "../../util/springFilterUtils.ts";
 import TabComponent from "../../components/TabComponent.tsx";
@@ -150,71 +150,84 @@ const PortafirmesMetaDocumentForm = () => {
 }
 
 export const MetaDocumentForm = () => {
-    const {t} = useTranslation();
-    const {fieldErrors} = useFormContext()
+    const { t } = useTranslation();
+    const { fieldErrors } = useFormContext();
 
     const tabs = [
         {
-            value: "dades",
+            value: 'dades',
             label: t('page.metaDocument.tabs.dades'),
-            content: <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-                <GridFormField name="codi"/>
-                <GridFormField name="nom"/>
-                <GridFormField name="descripcio" type={"textarea"}/>
-                <GridFormField name="multiplicitat" required/>
-                <FileFormField name="plantilla"/>
-            </Grid>,
-            error: ["codi", "nom"].some(field =>
-                fieldErrors?.some?.(error => error.field === field)
+            content: (
+                <Grid container direction={'row'} columnSpacing={1} rowSpacing={1}>
+                    <GridFormField name="codi" />
+                    <GridFormField name="nom" />
+                    <GridFormField name="descripcio" type={'textarea'} />
+                    <GridFormField name="multiplicitat" required />
+                    <FileFormField name="plantilla" />
+                </Grid>
             ),
+            error: ['codi', 'nom'].some((field) => fieldErrors?.some?.((error) => error.field === field)),
         },
         {
-            value: "nti",
+            value: 'nti',
             label: t('page.metaDocument.tabs.nti'),
-            content: <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-                <GridFormField name="ntiOrigen"/>
-                <GridFormField name="ntiTipoDocumental" required/>
-                <GridFormField name="ntiEstadoElaboracion"/>
-            </Grid>,
-            error: ["ntiOrigen", "ntiTipoDocumental"].some(field =>
-                fieldErrors?.some?.(error => error.field === field)
+            content: (
+                <Grid container direction={'row'} columnSpacing={1} rowSpacing={1}>
+                    <GridFormField name="ntiOrigen" />
+                    <GridFormField name="ntiTipoDocumental" required />
+                    <GridFormField name="ntiEstadoElaboracion" />
+                </Grid>
+            ),
+            error: ['ntiOrigen', 'ntiTipoDocumental'].some((field) => fieldErrors?.some?.((error) => error.field === field)),
+        },
+        {
+            value: 'portafirmes',
+            label: t('page.metaDocument.tabs.portafirmes'),
+            content: <PortafirmesMetaDocumentForm />,
+        },
+        {
+            value: 'navegador',
+            label: t('page.metaDocument.tabs.navegador'),
+            content: (
+                <Grid container direction={'row'} columnSpacing={1} rowSpacing={1}>
+                    <GridFormField name="firmaPassarelaActiva" />
+                </Grid>
             ),
         },
         {
-            value: "portafirmes",
-            label: t('page.metaDocument.tabs.portafirmes'),
-            content: <PortafirmesMetaDocumentForm/>,
-        },
-        {
-            value: "navegador",
-            label: t('page.metaDocument.tabs.navegador'),
-            content: <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-                <GridFormField name="firmaPassarelaActiva"/>
-            </Grid>,
-        },
-        {
-            value: "viaFirma",
+            value: 'viaFirma',
             label: t('page.metaDocument.tabs.viaFirma'),
-            content: <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-                <GridFormField name="firmaBiometricaActiva"/>
-                <GridFormField name="biometricaLectura"/>
-            </Grid>,
+            content: (
+                <Grid container direction={'row'} columnSpacing={1} rowSpacing={1}>
+                    <GridFormField name="firmaBiometricaActiva" />
+                    <GridFormField name="biometricaLectura" />
+                </Grid>
+            ),
         },
         {
-            value: "pinbal",
+            value: 'pinbal',
             label: t('page.metaDocument.tabs.pinbal'),
-            content: <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-                <Alert severity={"warning"}>Recordau que per poder realizar consultes a un servei concret de PINBAL en producció, s'ha de demanar permis a l'usuari d'integració de RIPEA per aquest procediment</Alert>
-                <GridFormField name="pinbalActiu"/>
-                <GridFormField name="pinbalServei" required/>
-                <GridFormField name="pinbalFinalitat" type={"textarea"} required/>
-                <GridFormField name="pinbalUtilitzarCifOrgan"/>
-            </Grid>,
+            content: (
+                <Grid container direction={'row'} columnSpacing={1} rowSpacing={1}>
+                    <Alert severity={'warning'}>
+                        Recordau que per poder realizar consultes a un servei concret de PINBAL en producció, s'ha de demanar permis a
+                        l'usuari d'integració de RIPEA per aquest procediment
+                    </Alert>
+                    <GridFormField name="pinbalActiu" />
+                    <GridFormField name="pinbalServei" required />
+                    <GridFormField name="pinbalFinalitat" type={'textarea'} required />
+                    <GridFormField name="pinbalUtilitzarCifOrgan" />
+                </Grid>
+            ),
         },
-    ]
+    ];
 
-    return <TabComponent tabs={tabs} scrollButtons/>
-}
+    return (
+        <Box sx={{ height: '550px', minHeight: 0 }}>
+            <TabComponent tabs={tabs} scrollButtons />
+        </Box>
+    );
+};
 
 // Grid
 const sortModel: any = [{field: 'nom', sort: 'asc'}]

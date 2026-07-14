@@ -121,7 +121,7 @@ const Fils = () => {
         columns={columnsFils}
         staticSortModel={sortModelFils}
         perspectives={perspectivesFils}
-        autoHeight
+        autoHeight={false}
         toolbarShowQuickFilter
         paginationActive={false}
         readOnly
@@ -219,7 +219,7 @@ const Tasques = () => {
         perspectives={perspectivesTasques}
         rowAdditionalActions={actions}
         toolbarMassiveActions={actionsMassive}
-        autoHeight
+        autoHeight={false}
         paginationActive={false}
         toolbarShowQuickFilter
         toolbarHideCreate
@@ -275,6 +275,7 @@ export const useSistemaDetail = () => {
             closeCallback={handleClose}
             title={t('page.user.menu.monitor')}
             componentProps={{ fullWidth: true, maxWidth: 'lg' }}
+            dialogContentProps={{ sx: { height: '100%', overflow: 'hidden', px: 2, py: 0 } }}
             buttons={buttons}
             buttonCallback={(value) => {
                 if (value === 'close') {
@@ -282,7 +283,9 @@ export const useSistemaDetail = () => {
                 }
             }}
         >
-            <TabComponent tabs={tabs} />
+            <Box sx={{ height: '700px', minHeight: 0 }}>
+                <TabComponent tabs={tabs} />
+            </Box>
         </MuiDialog>
 
     return {

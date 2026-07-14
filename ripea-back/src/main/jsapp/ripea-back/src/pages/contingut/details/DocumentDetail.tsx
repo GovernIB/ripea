@@ -282,6 +282,7 @@ const useDocumentDetail = (expedient:any, refresh?: () => void) => {
             closeCallback={handleClose}
             title={entity?.nom}
             componentProps={{ fullWidth: true, maxWidth: 'md' }}
+            dialogContentProps={{ sx: { height: '100%', px: 2, py: 0 } }}
             buttons={buttons}
             buttonCallback={(value: any): void => {
                 switch (value) {
@@ -323,13 +324,15 @@ const useDocumentDetail = (expedient:any, refresh?: () => void) => {
                         );
                     })()}
                 {dialogErrorValidacio}
-                <TabComponent
-                    indicatorColor={'primary'}
-                    textColor={'primary'}
-                    aria-label="scrollable force tabs"
-                    tabs={tabs}
-                    variant="scrollable"
-                />
+                <Box sx={{ height: '600px', minHeight: 0 }}>
+                    <TabComponent
+                        indicatorColor={'primary'}
+                        textColor={'primary'}
+                        aria-label="scrollable force tabs"
+                        tabs={tabs}
+                        variant="scrollable"
+                    />
+                </Box>
             </Load>
         </MuiDialog>
     );

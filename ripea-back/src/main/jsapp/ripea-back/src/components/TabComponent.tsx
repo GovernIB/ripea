@@ -25,13 +25,11 @@ const TabPanel = (props:any) => {
             hidden={value !== index}
             id={`simple-tabpanel-${index}`}
             aria-labelledby={`simple-tab-${index}`}
-            style={{height: '100%'}}
+            style={{ height: '100%', minHeight: 0, overflow: 'auto' }}
             {...other}
         >
             {value === index && (
-                <Box p={2} height={'100%'}>
-                    {children}
-                </Box>
+                <Box sx={{ pt: 1, height: '100%' }}>{children}</Box>
             )}
         </div>
     );
@@ -56,8 +54,8 @@ const TabComponent = (props :any) => {
     }, [tabs, value]);
 
     return <Load value={tabs?.length && value}>
-    <Box sx={{display: 'flex', flexDirection: 'column', height: '100%'}}>
-        <Box sx={{flexGrow: 1, display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%'}}>
+    <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <Box sx={{flexShrink: 0, display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%'}}>
             <Tabs
                 value={value}
                 onChange={handleChange}
