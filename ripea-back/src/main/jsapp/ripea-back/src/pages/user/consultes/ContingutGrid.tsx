@@ -6,11 +6,12 @@ import {
     useMuiDataGridApiRef,
     useFormContext,
     useResourceApiService,
-    useBaseAppContext
+    useBaseAppContext,
+    BasePage
 } from "reactlib";
-import {CardPage, DetailCard} from "../../../components/CardData.tsx";
+import {CardPage, DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import {Icon, Link} from "@mui/material";
+import {Grid, Icon, Link} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
@@ -20,7 +21,6 @@ import Load from "../../../components/Load.tsx";
 import {Link as RouterLink} from "react-router-dom";
 import useAssignar from "../../expedient/actions/Assignar.tsx";
 import {useSession} from "../../../components/SessionStorageContext.tsx";
-import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
 import Box from "@mui/material/Box";
 import { useConfirmDialogButtons } from "@src/util/buttonsOverride.tsx";
 
@@ -129,43 +129,96 @@ const useDetail = () => {
         {
             value: 'close',
             text: t('common.close'),
+            componentProps: { variant: 'outlined' }
         },
     ]
-
-    const dialog =
+    const getLabelByName = (fields: any, name:string) => {
+        const field = fields?.find((f: { name: string; label: string }) => f.name === name);
+        return field?.label ?? field?.name;
+    }
+    
+    const dialog = (
         <MuiDialog
             open={open}
             closeCallback={handleClose}
             title={t('page.contingut.detalle.title')}
-            componentProps={{ fullWidth: true, maxWidth: 'md' }}
+            componentProps={{ fullWidth: true, maxWidth: 'lg' }}
+            dialogContentProps={{ sx: { px: 1, py: 0 } }}
             buttons={buttons}
             buttonCallback={() => {
                 handleClose();
             }}
         >
             <Load value={entity}>
-                <MuiDetail entity={entity} fields={fields}>
-                    <DetailCard>
-                        <FieldData titleSize={4} textSize={8} field={"nom"} renderCell={(formattedValue:string) => (<Box display={'flex'} alignItems={'center'}>
-                            {entity?.tipus == "EXPEDIENT" && <Icon>folder_open</Icon>}
-                            {entity?.tipus == "CARPETA" && <Icon>folder</Icon>}
-                            {entity?.tipus == "DOCUMENT" && <Icon>description</Icon>}
-                            {formattedValue}
-                        </Box>)} hiddenIfEmpty/>
-                        <FieldData titleSize={4} textSize={8} field={"metaNode"} hiddenIfEmpty/>
-                        <FieldData titleSize={4} textSize={8} title={t('page.document.detall.createdDate')} field={"createdDate"} hidden={!entity?.createdDate}>{formatDate(entity?.createdDate)}</FieldData>
-                        <FieldData titleSize={4} textSize={8} field={"estat"} hiddenIfEmpty/>
-                        <FieldData titleSize={4} textSize={8} field={"ntiVersion"} hiddenIfEmpty/>
-                        <FieldData titleSize={4} textSize={8} field={"ntiIdentificador"} hiddenIfEmpty/>
-                        <FieldData titleSize={4} textSize={8} field={"ntiOrgano"} hiddenIfEmpty/>
-                        <FieldData titleSize={4} textSize={8} field={"dataCaptura"} hidden={!entity?.dataCaptura}>{formatDate(entity?.dataCaptura)}</FieldData>
-                        <FieldData titleSize={4} textSize={8} field={"ntiOrigen"} hiddenIfEmpty/>
-                        <FieldData titleSize={4} textSize={8} field={"ntiEstadoElaboracion"} hiddenIfEmpty/>
-                        <FieldData titleSize={4} textSize={8} field={"ntiTipoDocumental"} hiddenIfEmpty/>
-                    </DetailCard>
-                </MuiDetail>
+                <BasePage>
+                    <Grid container direction={'row'} columnSpacing={1} rowSpacing={1}>
+                        <DetailCard>
+                            {entity?.nom && (
+                                <DetailCardContent title={getLabelByName(fields, 'nom')} size={12}>
+                                    <Box display={'flex'} alignItems={'center'}>
+                                        {entity?.tipus == 'EXPEDIENT' && <Icon>folder_open</Icon>}
+                                        {entity?.tipus == 'CARPETA' && <Icon>folder</Icon>}
+                                        {entity?.tipus == 'DOCUMENT' && <Icon>description</Icon>}
+                                        {entity?.nom}
+                                    </Box>
+                                </DetailCardContent>
+                            )}
+                            {entity?.metaNode && (
+                                <DetailCardContent title={getLabelByName(fields, 'metaNode')} size={12}>
+                                    {entity?.metaNode?.description}
+                                </DetailCardContent>
+                            )}
+                            {entity?.createdDate && (
+                                <DetailCardContent title={t('page.document.detall.createdDate')} size={4}>
+                                    {formatDate(entity?.createdDate)}
+                                </DetailCardContent>
+                            )}
+                            {entity?.estat && (
+                                <DetailCardContent title={getLabelByName(fields, 'estat')} size={4}>
+                                    {entity?.estat}
+                                </DetailCardContent>
+                            )}
+                            {entity?.ntiVersion && (
+                                <DetailCardContent title={getLabelByName(fields, 'ntiVersion')} size={4}>
+                                    {entity?.ntiVersion}
+                                </DetailCardContent>
+                            )}
+                            {entity?.ntiIdentificador && (
+                                <DetailCardContent title={getLabelByName(fields, 'ntiIdentificador')} size={12}>
+                                    {entity?.ntiIdentificador}
+                                </DetailCardContent>
+                            )}
+                            {entity?.ntiOrgano && (
+                                <DetailCardContent title={getLabelByName(fields, 'ntiOrgano')} size={6}>
+                                    {entity?.ntiOrgano}
+                                </DetailCardContent>
+                            )}
+                            {entity?.dataCaptura && (
+                                <DetailCardContent title={getLabelByName(fields, 'dataCaptura')} size={6}>
+                                    {formatDate(entity?.dataCaptura)}
+                                </DetailCardContent>
+                            )}
+                            {entity?.ntiOrigen && (
+                                <DetailCardContent title={getLabelByName(fields, 'ntiOrigen')} size={4}>
+                                    {entity?.ntiOrigen}
+                                </DetailCardContent>
+                            )}
+                            {entity?.ntiEstadoElaboracion && (
+                                <DetailCardContent title={getLabelByName(fields, 'ntiEstadoElaboracion')} size={4}>
+                                    {entity?.ntiEstadoElaboracion}
+                                </DetailCardContent>
+                            )}
+                            {entity?.ntiTipoDocumental && (
+                                <DetailCardContent title={getLabelByName(fields, 'ntiTipoDocumental')} size={4}>
+                                    {entity?.ntiTipoDocumental}
+                                </DetailCardContent>
+                            )}
+                        </DetailCard>
+                    </Grid>
+                </BasePage>
             </Load>
         </MuiDialog>
+    );
 
     return {
         handleOpen,
