@@ -463,6 +463,10 @@ public class DocumentEntity extends NodeEntity {
 		return this.getExpedientPare().getPeticions() != null && !this.getExpedientPare().getPeticions().isEmpty() && this.getPare() instanceof CarpetaEntity && this.getPare().getNom().startsWith("Registre entrada:");
 	}
 	
+	public boolean isObligatori() {
+		return this.getMetaDocument()!=null && this.getMetaDocument().isObligatori();
+	}
+	
 	public static Builder getBuilder(
 			DocumentTipusEnumDto documentTipus,
 			DocumentEstatEnumDto estat,

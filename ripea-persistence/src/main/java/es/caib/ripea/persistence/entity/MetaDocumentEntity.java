@@ -210,6 +210,10 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 		return this.multiplicitat!=null && (MultiplicitatEnumDto.M_0_N.equals(this.multiplicitat) || MultiplicitatEnumDto.M_1_N.equals(this.multiplicitat));
 	}
 	
+	public boolean isObligatori() {
+		return this.multiplicitat!=null && (MultiplicitatEnumDto.M_1.equals(this.multiplicitat) || MultiplicitatEnumDto.M_1_N.equals(this.multiplicitat));
+	}
+	
 	public void update(
 			String codi,
 			String nom,
