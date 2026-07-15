@@ -4,6 +4,7 @@ const translationCa = {
         cancel: "Cancel·la",
         create: "Crea",
         copy: "Copia",
+        copyToClipboard: "Copiat al portapapers",
         update: "Modifica",
         actualize: "Actualitza",
         save: "Guarda",

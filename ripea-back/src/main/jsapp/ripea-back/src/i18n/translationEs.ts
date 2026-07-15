@@ -3,6 +3,7 @@ const translationEs = {
         close: "Cerrar",
         cancel: "Cancela",
         copy: "Copia",
+        copyToClipboard: "Copiado al portapapeles",
         create: "Crear",
         update: "Modificar",
         actualize: "Actualiza",
