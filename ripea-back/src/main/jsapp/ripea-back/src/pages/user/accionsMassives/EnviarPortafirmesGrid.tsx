@@ -1,8 +1,8 @@
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {GridPage, useFormContext, useMuiDataGridApiRef} from "reactlib";
 import {CardPage} from "../../../components/CardData.tsx";
-import {Alert, Link} from "@mui/material";
-import {Link as RouterLink } from 'react-router-dom';
+import {Alert} from "@mui/material";
+import ContingutLink from "../../../components/ContingutLink.tsx";
 import {useTranslation} from "react-i18next";
 import {useMemo, useState} from "react";
 import {useEnviarPortafirmes, useEnviarPortafirmesMassive} from "../../contingut/actions/EnviarPortafirmes.tsx";
@@ -78,7 +78,7 @@ const columns = [
     {
         field: 'expedient',
         flex: 0.6,
-        renderCell: (params:any) => <Link component={RouterLink} to={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</Link>,
+        renderCell: (params:any) => <ContingutLink id={params?.row?.expedient?.id}>{params?.formattedValue}</ContingutLink>,
     },
     {
         field: 'createdDate',

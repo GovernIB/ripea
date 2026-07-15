@@ -10,14 +10,14 @@ import {
 } from "reactlib";
 import {CardPage, DetailCard} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import {Icon, Link} from "@mui/material";
+import {Icon} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import useHistoric from "../../Historic.tsx";
 import Load from "../../../components/Load.tsx";
-import {Link as RouterLink} from "react-router-dom";
+import ContingutLink from "../../../components/ContingutLink.tsx";
 import useAssignar from "../../expedient/actions/Assignar.tsx";
 import {useSession} from "../../../components/SessionStorageContext.tsx";
 import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
@@ -239,14 +239,17 @@ const columns = [
     {
         field: 'numero',
         flex: 0.5,
+        sortable: false, // camp @Transient: no és una columna de BD, no es pot ordenar en servidor
     },
     {
         field: 'metaNode',
         flex: 1,
+        sortable: false, // camp @Transient (herència JOINED: metaExpedient/metaDocument en taules diferents)
     },
     {
         field: 'createdByFullName',
         flex: 0.8,
+        sortable: false, // camp @Transient: es resol el nom via perspectiva AUDITORIA, en BD només hi ha createdBy
     },
     {
         field: 'createdDate',
@@ -272,7 +275,7 @@ const ContingutGrid = () => {
             headerName: t('page.contingut.grid.path'),
             flex: 1.5,
             renderCell: (params:any) => <>
-                {!!params?.row?.expedient?.id && <>/<Link component={RouterLink} to={`/contingut/${params?.row?.expedient?.id}`} style={{ display: 'flex', alignItems: 'center' }}><Icon>folder_open</Icon>{params?.formattedValue}</Link></>}
+                {!!params?.row?.expedient?.id && <>/<ContingutLink id={params?.row?.expedient?.id} style={{ display: 'flex', alignItems: 'center' }}><Icon>folder_open</Icon>{params?.formattedValue}</ContingutLink></>}
                 {params?.row?.pare?.id != params?.row?.expedient?.id ?<>/.../<Icon>folder</Icon>{params?.row?.pare?.description}</> :"" }
                 {/*{!!params?.row?.fitxerNom && <>/<Icon>description</Icon>{params?.row?.fitxerNom}</>}*/}
                 /

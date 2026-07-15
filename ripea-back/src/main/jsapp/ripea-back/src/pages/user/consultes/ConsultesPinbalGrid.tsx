@@ -8,8 +8,7 @@ import {EstatMessage} from "../../remesa/RemesaGrid.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import GridFormField from "../../../components/GridFormField.tsx";
-import {Link as RouterLink} from "react-router-dom";
-import {Link} from "@mui/material";
+import ContingutLink from "../../../components/ContingutLink.tsx";
 import useDocumentDetail from "../../contingut/details/DocumentDetail.tsx";
 import {useActions} from "../../contingut/details/ContingutActions.tsx";
 import useVisualitzar from "../../contingut/actions/Visualitzar.tsx";
@@ -125,7 +124,7 @@ const columns = [
     {
         field: 'expedient',
         flex: 1,
-        renderCell: (params:any) => <Link component={RouterLink} to={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</Link>,
+        renderCell: (params:any) => <ContingutLink id={params?.row?.expedient?.id}>{params?.formattedValue}</ContingutLink>,
     },
     {
         field: 'metaExpedient',
