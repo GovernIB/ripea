@@ -1,11 +1,13 @@
 package es.caib.ripea.service.helper;
 
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import es.caib.ripea.service.intf.config.BaseConfig;
 import org.apache.commons.lang3.time.DateUtils;
@@ -20,14 +22,17 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.repository.AvisRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
+import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.service.intf.dto.AvisDto;
+import es.caib.ripea.service.intf.dto.AvisNivellEnumDto;
 import es.caib.ripea.service.intf.dto.UsuariAnotacioDto;
 import es.caib.ripea.service.intf.dto.ValidacioErrorDto;
 import es.caib.ripea.service.intf.model.sse.AnotacionsPendentsEvent;
@@ -43,15 +48,21 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class EventHelper {
 
+    private static final String CONFIG_DIES_AVIS_EXPEDIENT_ANTIC = "es.caib.ripea.dies.avis.expedient.antic";
+    private static final int CONFIG_DIES_AVIS_EXPEDIENT_ANTIC_DEFAULT = 90;
+
 	@Autowired private JmsTemplate jmsTemplate;
 	@Autowired private AvisRepository avisRepository;
 	@Autowired private UsuariRepository usuariRepository;
 	@Autowired private EntitatRepository entitatRepository;
 	@Autowired private OrganGestorRepository organGestorRepository;
 	@Autowired private MetaExpedientRepository metaExpedientRepository;
+    @Autowired private ExpedientRepository expedientRepository;
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private CacheHelper cacheHelper;
 	@Autowired private EmailHelper emailHelper;
+    @Autowired private ConfigHelper configHelper;
+    @Autowired private MessageHelper messageHelper;
 
     public void notifyAvisosActius() {
     	// El missatge d'avisos viatja buit (és només un trigger): la data la re-consulta el consumidor
@@ -71,9 +82,9 @@ public class EventHelper {
     public void notifyAnotacionsPendents(Long anotacioId) {
     	notifyAnotacionsPendents(emailHelper.dadesUsuarisAfectatsAnotacio(anotacioId));
     }
-    
+
     public void notifyAnotacionsPendents(List<UsuariAnotacioDto> usuarisAfectats) {
-    	//Aquesta funció es crida desde EmailHelper. Notificam als mateixos que rebràn el mail. TODO: ¿eliminar enviament de mail?  
+    	//Aquesta funció es crida desde EmailHelper. Notificam als mateixos que rebràn el mail. TODO: ¿eliminar enviament de mail?
     	//Grup, organ gestor i tenint en compte rols.
     	try {
     		log.debug("notifyAnotacionsPendents a clients");
@@ -89,7 +100,7 @@ public class EventHelper {
     		log.error("Error al notifyAnotacionsPendents a clients", ex);
     	}
     }
-    
+
     public void notifyErrorsValidacio(ErrorsValidacioChangedEvent errors) {
     	try {
     		log.debug("notifyErrorsValidacio a expedient");
@@ -98,11 +109,11 @@ public class EventHelper {
     		log.error("Error al notifyErrorsValidacio a expedient", ex);
     	}
     }
-    
+
     public List<ValidacioErrorDto> getValidacionsInicialsExpedient(Long expedientId) {
     	return cacheHelper.findErrorsValidacioPerNode(expedientId);
     }
-    
+
     public void notifyTasquesPendents(List<String> usuarisAfectats) {
     	try {
     		log.debug("notifyTasquesPendents a clients");
@@ -118,7 +129,7 @@ public class EventHelper {
     		log.error("Error al notifyTasquesPendents a clients", ex);
     	}
     }
-    
+
     public void notifyFluxFirmaFinalitzat(CreacioFluxFinalitzatEvent fluxEvent) {
     	try {
     		jmsTemplate.convertAndSend("flux", fluxEvent);
@@ -126,7 +137,7 @@ public class EventHelper {
     		log.error("Error al notifyFluxFirmaFinalitzat a expedients suscrits", ex);
     	}
     }
-    
+
     public void notifyFluxFirmaCreat(CreacioFluxFinalitzatEvent fluxEvent) {
     	try {
     		jmsTemplate.convertAndSend("fluxCreatEditat", fluxEvent);
@@ -134,7 +145,7 @@ public class EventHelper {
     		log.error("Error al notifyFluxFirmaFinalitzat a expedients suscrits", ex);
     	}
     }
-    
+
     public void notifyFirmaNavegadorFinalitzada(FirmaFinalitzadaEvent firmaEvent) {
     	try {
     		jmsTemplate.convertAndSend("firmaNavegadorFinalitzada", firmaEvent);
@@ -142,7 +153,7 @@ public class EventHelper {
     		log.error("Error al notifyFirmaNavegadorFinalitzada a usuaris suscrits", ex);
     	}
     }
-    
+
     public void notifyScanFinalitzat(ScanFinalitzatEvent scanEvent) {
     	try {
     		jmsTemplate.convertAndSend("scan", scanEvent);
@@ -150,17 +161,17 @@ public class EventHelper {
     		log.error("Error al notifyScanFinalitzat a expedients suscrits", ex);
     	}
     }
-    
+
 	public long getAnotacionsPendents(UsuariAnotacioDto usuariCodi) {
 		try {
 			EntitatEntity entitatEntity = null;
 			if (usuariCodi.getEntitatId()!=null) {
 				entitatEntity = entitatRepository.findById(usuariCodi.getEntitatId()).get();
 			} else {
-				entitatEntity = metaExpedientRepository.findById(usuariCodi.getMetaExpedientId()).get().getEntitat();				
+				entitatEntity = metaExpedientRepository.findById(usuariCodi.getMetaExpedientId()).get().getEntitat();
 			}
 			if (entitatEntity!=null) {
-				
+
 				OrganGestorEntity organGestorEntity = null;
 				if (usuariCodi.getOrganId()!=null)
 					organGestorEntity = organGestorRepository.findById(usuariCodi.getOrganId()).orElse(null);
@@ -191,7 +202,7 @@ public class EventHelper {
 				}
 			}
 		} catch (Exception ex) {}
-		
+
 		return 0l;
 	}
 
@@ -200,9 +211,9 @@ public class EventHelper {
 			return cacheHelper.countTasquesPendents(usuariCodi);
 		} catch (Exception ex) {
 			return 0l;
-		}			
+		}
 	}
-    
+
     public AvisosActiusEvent getAvisosActiusEvent() {
         var avisosUsuari = conversioTipusHelper.convertirList(
                 avisRepository.findActive(DateUtils.truncate(new Date(), Calendar.DATE)),
@@ -236,7 +247,52 @@ public class EventHelper {
 		return avisosAdmin;
 	}
 
-	public AvisosActiusEvent getAvisosActiusPerUsuari(String rol, Long entitatId) {
+    /**
+     * Calcula (sense persistir) un avís de tipus Warning si l'usuari actual té expedients agafats
+     * de fa més de X dies (propietat es.caib.ripea.dies.avis.expedient.antic) amb tots els documents
+     * obligatoris del procediment (multiplicitat M_1 / M_1_N) ja afegits.
+     */
+    private AvisDto getAvisExpedientsAntics(String usuariCodi) {
+        if (usuariCodi == null) {
+            return null;
+        }
+        try {
+            UsuariEntity usuari = usuariRepository.findById(usuariCodi).orElse(null);
+            if (usuari == null) {
+                return null;
+            }
+
+            if (configHelper.getEntitat() == null || configHelper.getEntitat().get() == null) {
+                return null;
+            }
+            Long entitatId = configHelper.getEntitat().get().getId();
+
+            int dies = configHelper.getAsInt(CONFIG_DIES_AVIS_EXPEDIENT_ANTIC, CONFIG_DIES_AVIS_EXPEDIENT_ANTIC_DEFAULT);
+            LocalDateTime dataLimit = LocalDateTime.now().minusDays(dies);
+
+            List<ExpedientEntity> expedientsAntics = expedientRepository.findExpedientsAntics(usuari, entitatId, dataLimit);
+            if (expedientsAntics == null || expedientsAntics.isEmpty()) {
+                return null;
+            }
+
+            String codisExpedients = expedientsAntics.stream()
+                .map(ExpedientEntity::getNomINumero)
+                .collect(Collectors.joining(", "));
+
+            AvisDto avis = new AvisDto();
+            avis.setAssumpte(messageHelper.getMessage("avis.expedients.antics.assumpte", new Object[]{expedientsAntics.size(), dies}));
+            avis.setMissatge(codisExpedients);
+            avis.setAvisNivell(AvisNivellEnumDto.WARNING);
+            avis.setActiu(true);
+            avis.setDataInici(new Date());
+            return avis;
+        } catch (Exception ex) {
+            log.error("Error calculant l'avis d'expedients antics per l'usuari " + usuariCodi, ex);
+            return null;
+        }
+    }
+
+	public AvisosActiusEvent getAvisosActiusPerUsuari(String rol, Long entitatId, String usuariCodi) {
 		List<AvisDto> avisos;
 		Date dataActual = DateUtils.truncate(new Date(), Calendar.DATE);
 
@@ -249,6 +305,11 @@ public class EventHelper {
 			avisos = conversioTipusHelper.convertirList(
 					avisRepository.findActivePerEntitat(dataActual, entitatId), AvisDto.class);
 		}
+
+        AvisDto avisExpedientsAntics = getAvisExpedientsAntics(usuariCodi);
+        if (avisExpedientsAntics != null) {
+            avisos.add(avisExpedientsAntics);
+        }
 
 		return AvisosActiusEvent.builder()
 				.avisosUsuari(avisos)
@@ -267,7 +328,7 @@ public class EventHelper {
 			return null;
 		}
 		Long entitatId = usuari.getEntitatActual() != null ? usuari.getEntitatActual().getId() : null;
-		return getAvisosActiusPerUsuari(usuari.getRolActual(), entitatId);
+		return getAvisosActiusPerUsuari(usuari.getRolActual(), entitatId, usuariCodi);
 	}
 
 }

@@ -40,27 +40,27 @@ public class EventServiceImpl implements EventService {
     public void notifyAnotacionsPendents(List<UsuariAnotacioDto> usuarisAfectats) {
     	eventHelper.notifyAnotacionsPendents(usuarisAfectats);
     }
-    
+
     @Override
     public void notifyTasquesPendents(List<String> usuarisAfectats) {
     	eventHelper.notifyTasquesPendents(usuarisAfectats);
     }
-    
+
     @Override
     public void notifyFluxFirmaFinalitzat(CreacioFluxFinalitzatEvent fluxEvent) {
     	eventHelper.notifyFluxFirmaFinalitzat(fluxEvent);
     }
-    
+
     @Override
     public void notifyFirmaNavegadorFinalitzada(FirmaFinalitzadaEvent firmaEvent) {
     	eventHelper.notifyFirmaNavegadorFinalitzada(firmaEvent);
     }
-    
+
     @Override
     public void notifyScanFinalitzat(ScanFinalitzatEvent scanEvent) {
     	eventHelper.notifyScanFinalitzat(scanEvent);
     }
-    
+
 	@Override
 	public long getAnotacionsPendents(UsuariAnotacioDto usuariCodi) {
 		return eventHelper.getAnotacionsPendents(usuariCodi);
@@ -68,17 +68,17 @@ public class EventServiceImpl implements EventService {
 
 	@Override
 	public long getTasquesPendents(String usuariCodi) {
-		return eventHelper.getTasquesPendents(usuariCodi);			
+		return eventHelper.getTasquesPendents(usuariCodi);
 	}
-    
+
     @Override
     public AvisosActiusEvent getAvisosActiusEvent() {
     	return eventHelper.getAvisosActiusEvent();
     }
 
 	@Override
-	public AvisosActiusEvent getAvisosActiusPerUsuari(String rol, Long entitatId) {
-		return eventHelper.getAvisosActiusPerUsuari(rol, entitatId);
+	public AvisosActiusEvent getAvisosActiusPerUsuari(String rol, Long entitatId, String usuariCodi) {
+		return eventHelper.getAvisosActiusPerUsuari(rol, entitatId, usuariCodi);
 	}
 
 	@Override

@@ -34,20 +34,20 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			ContingutEntity pare,
 			String nom,
 			int esborrat);
-	
+
 	List<ExpedientEntity> findByMetaExpedient(MetaExpedientEntity metaExpedient);
 
 	List<ExpedientEntity> findByEntitatOrderByNomAsc(EntitatEntity entitat);
 
 	@Query(	"select e.relacionatsPer from ExpedientEntity e where e.id = :expedientId")
 	List<ExpedientEntity> findRelacionatsPer(@Param("expedientId") Long expedientId);
-	
+
 	@Query(	"select e.relacionatsAmb from ExpedientEntity e where e.id = :expedientId")
 	List<ExpedientEntity> findRelacionatsAmb(@Param("expedientId") Long expedientId);
 
 	@Query("SELECT DISTINCT e.metaNode.id FROM ExpedientEntity e WHERE e.id IN :expedientIds")
     List<Long> findDistinctProcedimentIds(@Param("expedientIds") Set<Long> expedientIds);
-	
+
 	@Query(	"select " +
 			"    e.id " +
 			"from " +
@@ -60,7 +60,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 	@Query(	"from" +
 			"    ExpedientEntity e "
 			+ "where "
-			+ "	 e.entitat = :entitat " 
+			+ "	 e.entitat = :entitat "
 			+ "	and e.metaNode = :metaNode " +
 			"and e.numero = :numero")
 	ExpedientEntity findByEntitatAndMetaNodeAndNumero(
@@ -93,7 +93,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			// Un cop superada la select anterior, es procedeix a afinar per permisos per procediment:
 			// - Per admin i superadmin: es compleix la primera condicio = No filtra
 			// - Per la resta: el procediment no ha de requerir permis directe o en cas contrari, s'ha de tenir el permis directe de lectura.
-			"and (:isAdmin = true or :esNullIdsMetaExpedientsPermesos = true or e.metaExpedient.permisDirecte = false or ("+ 
+			"and (:isAdmin = true or :esNullIdsMetaExpedientsPermesos = true or e.metaExpedient.permisDirecte = false or ("+
 					"				e.metaExpedient.id in (:idsMetaExpedientsPermesos0)" +
 					"			or	e.metaExpedient.id in (:idsMetaExpedientsPermesos1)" +
 					"			or	e.metaExpedient.id in (:idsMetaExpedientsPermesos2)" +
@@ -121,28 +121,28 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:esNullInteressat = true " +
 			"		or  e.id in (" +
 			"			select interessat.expedient.id " +
-			"			from InteressatEntity interessat " +	
+			"			from InteressatEntity interessat " +
 			"			where interessat.esRepresentant = false " +
 			"				and (lower(interessat.documentNum||' '||interessat.nom||' '||interessat.llinatge1||' '||interessat.llinatge2) like lower('%'||:interessat||'%')" +
 			"					or lower(interessat.raoSocial) like lower('%'||:interessat||'%')" +
 			"					or lower(interessat.organNom) like lower('%'||:interessat||'%')))) " +
 			"and (:esNullMetaExpedientDominiValor = true " +
-			"		or  (select count(*) from DadaEntity dada " + 
-			"				where dada.metaDada.codi = :metaExpedientDominiCodi " + 
-			"				and dada.node = e.id " + 
-			"				and (" + 
-			"						dada.valor = :metaExpedientDominiValor" + 
-			"					 	or dada.valor like '%'  || :metaExpedientDominiValor || ',%'" + 
-			"						or dada.valor like '%,' || :metaExpedientDominiValor || ',%'" + 
-			"						or dada.valor like '%,' || :metaExpedientDominiValor || '%')"	+ 
+			"		or  (select count(*) from DadaEntity dada " +
+			"				where dada.metaDada.codi = :metaExpedientDominiCodi " +
+			"				and dada.node = e.id " +
+			"				and (" +
+			"						dada.valor = :metaExpedientDominiValor" +
+			"					 	or dada.valor like '%'  || :metaExpedientDominiValor || ',%'" +
+			"						or dada.valor like '%,' || :metaExpedientDominiValor || ',%'" +
+			"						or dada.valor like '%,' || :metaExpedientDominiValor || '%')"	+
 			"					 ) != 0) " +
 			"and (:noFiltreGrups = true or (e.grup is null or (:esNullIdsGrupsPermesos = false and e.grup.id in (:idsGrupsPermesos)))) " +
-			"and (:esFiltrarExpedientsAmbFirmaPendent != true " + 
-			"		or e.id in (" + 
-			"			select dp.expedient.id " + 
-			"			from DocumentPortafirmesEntity dp " + 
-			"			where (dp.estat = es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto.PENDENT or " + 
-			"				   dp.estat = es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto.ENVIAT) " + 
+			"and (:esFiltrarExpedientsAmbFirmaPendent != true " +
+			"		or e.id in (" +
+			"			select dp.expedient.id " +
+			"			from DocumentPortafirmesEntity dp " +
+			"			where (dp.estat = es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto.PENDENT or " +
+			"				   dp.estat = es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto.ENVIAT) " +
 			"				   and dp.error = false)) " +
 			"and (:esNullNumeroRegistre = true " +
 			"		or lower(e.registresImportats) like lower('%'||:numeroRegistre||'%'))" +
@@ -150,7 +150,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			)
 	Page<ExpedientEntity> findByEntitatAndPermesosAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
-			@Param("esNullIdsMetaExpedientsPermesos") boolean esNullIdsMetaExpedientsPermesos, 
+			@Param("esNullIdsMetaExpedientsPermesos") boolean esNullIdsMetaExpedientsPermesos,
 			@Param("idsMetaExpedientsPermesos0") List<Long> idsMetaExpedientsPermesos0,
 			@Param("idsMetaExpedientsPermesos1") List<Long> idsMetaExpedientsPermesos1,
 			@Param("idsMetaExpedientsPermesos2") List<Long> idsMetaExpedientsPermesos2,
@@ -162,7 +162,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("idsOrgansPermesos3") List<Long> idsOrgansPermesos3,
 			@Param("esNullIdsMetaExpedientOrganPairsPermesos") boolean esNullIdsMetaExpedientOrganPairsPermesos,
 			@Param("idsMetaExpedientOrganPairsPermesos") List<Long> idsMetaExpedientOrganPairsPermesos,
-			@Param("esNullIdsOrgansAmbProcedimentsComunsPermesos") boolean esNullIdsOrgansAmbProcedimentsComunsPermesos, 
+			@Param("esNullIdsOrgansAmbProcedimentsComunsPermesos") boolean esNullIdsOrgansAmbProcedimentsComunsPermesos,
 			@Param("idsOrgansAmbProcedimentsComunsPermesos") List<Long> idsOrgansAmbProcedimentsComunsPermesos,
 			@Param("idsProcedimentsComuns") List<Long> idsProcedimentsComuns,
 			@Param("esNullMetaNode") boolean esNullMetaNode,
@@ -194,7 +194,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("seguitPer") UsuariEntity seguitPer,
 			@Param("esNullTipusId") boolean esNullTipusId,
 			@Param("tipusId") Long tipusId,
-			@Param("esNullExpedientsToBeExcluded") boolean esNullExpedientsToBeExcluded, 
+			@Param("esNullExpedientsToBeExcluded") boolean esNullExpedientsToBeExcluded,
 			@Param("expedientsToBeExluded") List<ExpedientEntity> expedientsToBeExluded,
 			@Param("esNullInteressat") boolean esNullInteressat,
 			@Param("interessat") String interessat,
@@ -212,7 +212,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("grup") GrupEntity grup,
 			Pageable pageable);
 
-	
+
 	@Query(	"select " +
 			"    distinct e.id " +
 			"from " +
@@ -238,7 +238,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			// Un cop superada la select anterior, es procedeix a afinar per permisos per procediment:
 			// - Per admin i superadmin: es compleix la primera condicio = No filtra
 			// - Per la resta: el procediment no ha de requerir permis directe o en cas contrari, s'ha de tenir el permis directe de lectura.
-			"and (:isAdmin = true or :esNullIdsMetaExpedientsPermesos = true or e.metaExpedient.permisDirecte = false or ("+ 
+			"and (:isAdmin = true or :esNullIdsMetaExpedientsPermesos = true or e.metaExpedient.permisDirecte = false or ("+
 					"				e.metaExpedient.id in (:idsMetaExpedientsPermesos0)" +
 					"			or	e.metaExpedient.id in (:idsMetaExpedientsPermesos1)" +
 					"			or	e.metaExpedient.id in (:idsMetaExpedientsPermesos2)" +
@@ -266,28 +266,28 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:esNullInteressat = true " +
 			"		or  e.id in (" +
 			"			select interessat.expedient.id " +
-			"			from InteressatEntity interessat " +	
+			"			from InteressatEntity interessat " +
 			"			where interessat.esRepresentant = false " +
 			"				and (lower(interessat.documentNum||' '||interessat.nom||' '||interessat.llinatge1||' '||interessat.llinatge2) like lower('%'||:interessat||'%')" +
 			"					or lower(interessat.raoSocial) like lower('%'||:interessat||'%')" +
 			"					or lower(interessat.organNom) like lower('%'||:interessat||'%')))) " +
 			"and (:esNullMetaExpedientDominiValor = true " +
-			"		or  (select count(*) from DadaEntity dada " + 
-			"				where dada.metaDada.codi = :metaExpedientDominiCodi " + 
-			"				and dada.node = e.id " + 
-			"				and (" + 
-			"						dada.valor = :metaExpedientDominiValor" + 
-			"					 	or dada.valor like '%'  || :metaExpedientDominiValor || ',%'" + 
-			"						or dada.valor like '%,' || :metaExpedientDominiValor || ',%'" + 
-			"						or dada.valor like '%,' || :metaExpedientDominiValor || '%')"	+ 
+			"		or  (select count(*) from DadaEntity dada " +
+			"				where dada.metaDada.codi = :metaExpedientDominiCodi " +
+			"				and dada.node = e.id " +
+			"				and (" +
+			"						dada.valor = :metaExpedientDominiValor" +
+			"					 	or dada.valor like '%'  || :metaExpedientDominiValor || ',%'" +
+			"						or dada.valor like '%,' || :metaExpedientDominiValor || ',%'" +
+			"						or dada.valor like '%,' || :metaExpedientDominiValor || '%')"	+
 			"					 ) != 0) " +
 			"and (:noFiltreGrups = true or (e.grup is null or (:esNullIdsGrupsPermesos = false and e.grup.id in (:idsGrupsPermesos)))) " +
-			"and (:esFiltrarExpedientsAmbFirmaPendent != true " + 
-			"		or e.id in (" + 
-			"			select dp.expedient.id " + 
-			"			from DocumentPortafirmesEntity dp " + 
-			"			where (dp.estat = es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto.PENDENT or " + 
-			"				   dp.estat = es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto.ENVIAT) " + 
+			"and (:esFiltrarExpedientsAmbFirmaPendent != true " +
+			"		or e.id in (" +
+			"			select dp.expedient.id " +
+			"			from DocumentPortafirmesEntity dp " +
+			"			where (dp.estat = es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto.PENDENT or " +
+			"				   dp.estat = es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto.ENVIAT) " +
 			"				   and dp.error = false)) " +
 			"and (:esNullNumeroRegistre = true " +
 			"		or lower(e.registresImportats) like lower('%'||:numeroRegistre||'%'))" +
@@ -295,7 +295,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			)
 	List<Long> findIdsByEntitatAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
-			@Param("esNullIdsMetaExpedientsPermesos") boolean esNullIdsMetaExpedientsPermesos, 
+			@Param("esNullIdsMetaExpedientsPermesos") boolean esNullIdsMetaExpedientsPermesos,
 			@Param("idsMetaExpedientsPermesos0") List<Long> idsMetaExpedientsPermesos0,
 			@Param("idsMetaExpedientsPermesos1") List<Long> idsMetaExpedientsPermesos1,
 			@Param("idsMetaExpedientsPermesos2") List<Long> idsMetaExpedientsPermesos2,
@@ -307,7 +307,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("idsOrgansPermesos3") List<Long> idsOrgansPermesos3,
 			@Param("esNullIdsMetaExpedientOrganPairsPermesos") boolean esNullIdsMetaExpedientOrganPairsPermesos,
 			@Param("idsMetaExpedientOrganPairsPermesos") List<Long> idsMetaExpedientOrganPairsPermesos,
-			@Param("esNullIdsOrgansAmbProcedimentsComunsPermesos") boolean esNullIdsOrgansAmbProcedimentsComunsPermesos, 
+			@Param("esNullIdsOrgansAmbProcedimentsComunsPermesos") boolean esNullIdsOrgansAmbProcedimentsComunsPermesos,
 			@Param("idsOrgansAmbProcedimentsComunsPermesos") List<Long> idsOrgansAmbProcedimentsComunsPermesos,
 			@Param("idsProcedimentsComuns") List<Long> idsProcedimentsComuns,
 			@Param("esNullMetaNode") boolean esNullMetaNode,
@@ -339,7 +339,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("seguitPer") UsuariEntity seguitPer,
 			@Param("esNullTipusId") boolean esNullTipusId,
 			@Param("tipusId") Long tipusId,
-			@Param("esNullExpedientsToBeExcluded") boolean esNullExpedientsToBeExcluded, 
+			@Param("esNullExpedientsToBeExcluded") boolean esNullExpedientsToBeExcluded,
 			@Param("expedientsToBeExluded") List<ExpedientEntity> expedientsToBeExluded,
 			@Param("esNullInteressat") boolean esNullInteressat,
 			@Param("interessat") String interessat,
@@ -354,7 +354,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullNumeroRegistre") boolean esNullNumeroRegistre,
 			@Param("numeroRegistre") String numeroRegistre,
 			@Param("esNullGrup") boolean esNullGrup,
-			@Param("grup") GrupEntity grup);	
+			@Param("grup") GrupEntity grup);
 
 	static final String FIND_BY_RELACIONATS = "select " +
 			"    distinct e " +
@@ -409,7 +409,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 	List<ExpedientEntity> findByEntitatAndIdInOrderByIdAsc(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("ids") Collection<Long> id);
-	
+
 
 	List<ExpedientEntity> findByOrganGestorAndEstat(
 			OrganGestorEntity organGestor,
@@ -459,7 +459,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("usuariActual") UsuariEntity usuariActual,
 			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
-			@Param("metaExpedient") MetaNodeEntity metaExpedient,	
+			@Param("metaExpedient") MetaNodeEntity metaExpedient,
 			@Param("esNullExpedient") boolean esNullExpedient,
 			@Param("expedient") ExpedientEntity expedient,
 			@Param("esNullDataInici") boolean esNullDataInici,
@@ -469,7 +469,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullEstatEnum") boolean esNullEstatEnum,
 			@Param("estatEnum") ExpedientEstatEnumDto estatEnum,
 			@Param("esNullNom") boolean esNullNom,
-			@Param("nom") String nom,			
+			@Param("nom") String nom,
 			@Param("esNullEstat") boolean esNullEstat,
 			@Param("estat") ExpedientEstatEntity estat,
 			@Param("esNullPrioritat") boolean esNullPrioritat,
@@ -522,7 +522,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("usuariActual") UsuariEntity usuariActual,
 			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
-			@Param("metaExpedient") MetaNodeEntity metaExpedient,	
+			@Param("metaExpedient") MetaNodeEntity metaExpedient,
 			@Param("esNullExpedient") boolean esNullExpedient,
 			@Param("expedient") ExpedientEntity expedient,
 			@Param("esNullDataInici") boolean esNullDataInici,
@@ -552,7 +552,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:esNullDataFi = true or e.createdDate <= :dataFi) " +
 			"and (:esNullPrioritat = true or e.prioritat = :prioritatEnum) " +
 			"and (:esNullEstatEnum = true or (e.estat = :estatEnum and (e.estatAdditional is null or :esNullMetaExpedient = true))) " +
-			"and (:esNullEstat = true or e.estatAdditional = :estat) " +			
+			"and (:esNullEstat = true or e.estatAdditional = :estat) " +
 			"and (select count(document) from DocumentEntity document where " + // no documents en process de firma
 			"	document.expedient = e " +
 			"	and (document.estat = es.caib.ripea.service.intf.dto.DocumentEstatEnumDto.FIRMA_PENDENT " +
@@ -584,7 +584,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("usuariActual") UsuariEntity usuariActual,
 			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
-			@Param("metaExpedient") MetaNodeEntity metaExpedient,	
+			@Param("metaExpedient") MetaNodeEntity metaExpedient,
 			@Param("esNullNom") boolean esNullNom,
 			@Param("nom") String nom,
 			@Param("esNullDataInici") boolean esNullDataInici,
@@ -592,11 +592,11 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullDataFi") boolean esNullDataFi,
 			@Param("dataFi") LocalDateTime dataFi,
 			@Param("esNullEstatEnum") boolean esNullEstatEnum,
-			@Param("estatEnum") ExpedientEstatEnumDto estatEnum,	
+			@Param("estatEnum") ExpedientEstatEnumDto estatEnum,
 			@Param("esNullEstat") boolean esNullEstat,
-			@Param("estat") ExpedientEstatEntity estat,			
+			@Param("estat") ExpedientEstatEntity estat,
 			@Param("esNullPrioritat") boolean esNullPrioritat,
-			@Param("prioritatEnum") PrioritatEnumDto prioritatEnum,			
+			@Param("prioritatEnum") PrioritatEnumDto prioritatEnum,
 			Pageable pageable);
 
 	@Query(FIND_BY_TANCAMENT_MASSIU)
@@ -614,9 +614,9 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullDataFi") boolean esNullDataFi,
 			@Param("dataFi") Date dataFi,
 			@Param("esNullEstatEnum") boolean esNullEstatEnum,
-			@Param("estatEnum") ExpedientEstatEnumDto estatEnum,	
+			@Param("estatEnum") ExpedientEstatEnumDto estatEnum,
 			@Param("esNullEstat") boolean esNullEstat,
-			@Param("estat") ExpedientEstatEntity estat,			
+			@Param("estat") ExpedientEstatEntity estat,
 			@Param("esNullPrioritat") boolean esNullPrioritat,
 			@Param("prioritatEnum") PrioritatEnumDto prioritatEnum);
 
@@ -641,7 +641,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"		or document.estat = es.caib.ripea.service.intf.dto.DocumentEstatEnumDto.FIRMA_PARCIAL)) = 0 " +
 			"and (select count(document) from DocumentEntity document where document.expedient = e and document.esborrat = 0) > 0 " +   // at least one document no esborrat
 			"and (select count(document) from DocumentEntity document where " + // no documents sense metadocument
-			"	document.expedient = e and document.metaDocument is null) = 0 " +			
+			"	document.expedient = e and document.metaDocument is null) = 0 " +
 			"and (select " +
 			"	     	count(metaDada) " +
 			"	  from " +
@@ -658,7 +658,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"	  where " +
 			"			metaDocument.metaExpedient = e.metaExpedient " +
 			"			and (metaDocument.multiplicitat = 0 or metaDocument.multiplicitat = 3) " +
-			"			and metaDocument.id not in (select doc.metaNode.id from DocumentEntity doc where e.id = doc.expedient.id)) = 0"			
+			"			and metaDocument.id not in (select doc.metaNode.id from DocumentEntity doc where e.id = doc.expedient.id)) = 0"
 			)
 	public List<Long> findIdsExpedientsPerTancamentMassiu(
 			@Param("entitat") EntitatEntity entitat,
@@ -666,7 +666,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("usuariActual") UsuariEntity usuariActual,
 			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
-			@Param("metaExpedient") MetaNodeEntity metaExpedient,	
+			@Param("metaExpedient") MetaNodeEntity metaExpedient,
 			@Param("esNullNom") boolean esNullNom,
 			@Param("nom") String nom,
 			@Param("esNullDataInici") boolean esNullDataInici,
@@ -721,8 +721,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("creacioInici") LocalDateTime creacioInici,
 			@Param("esNullCreacioFi") boolean esNullCreacioFi,
 			@Param("creacioFi") LocalDateTime creacioFi);
-	
-	
+
+
 	@Query(	"select " +
 			"    e.id " +
 			"from " +
@@ -733,9 +733,9 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and e.esborrat = 0 " +
 			"and e.entitat = :entitat " +
 			"and (e.metaNode in (:metaExpedientsPermesos)) " +
-			"and (:nomesAgafats = false or e.agafatPer.codi = :usuariActual) " +			
+			"and (:nomesAgafats = false or e.agafatPer.codi = :usuariActual) " +
 			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
-			"and (:esNullMetaExpedient = true or e.metaExpedient = :metaExpedient) " + 
+			"and (:esNullMetaExpedient = true or e.metaExpedient = :metaExpedient) " +
 			"and (:esNullCreacioInici = true or e.createdDate >= :creacioInici) " +
 			"and (:esNullCreacioFi = true or e.createdDate <= :creacioFi) ")
 	public List<Long> findIdsArxiuPendents(
@@ -750,7 +750,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullCreacioInici") boolean esNullCreacioInici,
 			@Param("creacioInici") LocalDateTime creacioInici,
 			@Param("esNullCreacioFi") boolean esNullCreacioFi,
-			@Param("creacioFi") LocalDateTime creacioFi);	
+			@Param("creacioFi") LocalDateTime creacioFi);
 
 
 	@Query(	"select " +
@@ -779,7 +779,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			)
 	List<ExpedientEntity> findByTextAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
-			@Param("esNullIdsMetaExpedientsPermesos") boolean esNullIdsMetaExpedientsPermesos, 
+			@Param("esNullIdsMetaExpedientsPermesos") boolean esNullIdsMetaExpedientsPermesos,
 			@Param("idsMetaExpedientsPermesos0") List<Long> idsMetaExpedientsPermesos0,
 			@Param("idsMetaExpedientsPermesos1") List<Long> idsMetaExpedientsPermesos1,
 			@Param("idsMetaExpedientsPermesos2") List<Long> idsMetaExpedientsPermesos2,
@@ -791,7 +791,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("idsOrgansPermesos3") List<Long> idsOrgansPermesos3,
 			@Param("esNullIdsMetaExpedientOrganPairsPermesos") boolean esNullIdsMetaExpedientOrganPairsPermesos,
 			@Param("idsMetaExpedientOrganPairsPermesos") List<Long> idsMetaExpedientOrganPairsPermesos,
-			@Param("esNullIdsOrgansAmbProcedimentsComunsPermesos") boolean esNullIdsOrgansAmbProcedimentsComunsPermesos, 
+			@Param("esNullIdsOrgansAmbProcedimentsComunsPermesos") boolean esNullIdsOrgansAmbProcedimentsComunsPermesos,
 			@Param("idsOrgansAmbProcedimentsComunsPermesos") List<Long> idsOrgansAmbProcedimentsComunsPermesos,
 			@Param("idsProcedimentsComuns") List<Long> idsProcedimentsComuns,
 			@Param("text") String text,
@@ -812,7 +812,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 	List<ExpedientEntity> findByEntitatAndMetaExpedient(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaNode") MetaNodeEntity metaNode);
-	
+
 	@Query(	"select" +
 			"    e " +
 			"from" +
@@ -827,7 +827,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("entitat") EntitatEntity entitat,
 			@Param("organsCodisPermitted") List<String> organsCodisPermitted,
 			@Param("metaNode") MetaNodeEntity metaNode);
-	
+
 	@Query(	"select" +
 			"    max(e.sequencia) " +
 			"from" +
@@ -844,7 +844,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 
 	@Query(	"from" +
 			"    ExpedientEntity e "
-			+ "where " + 
+			+ "where " +
 			"e.esborrat = 0 " +
 			"and e.estat = :estat " +
 			"and e.entitat = :entitat " +
@@ -873,7 +873,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 
 	List<ExpedientEntity> findByEntitatAndMetaExpedientAndEstatAndEsborrat(
 			EntitatEntity entitat,
-			MetaExpedientEntity metaExpedient, 
+			MetaExpedientEntity metaExpedient,
 			ExpedientEstatEnumDto estat,
 			int esborrat);
 
@@ -895,34 +895,51 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"where e.esborrat = 0 and e.tancatData is null and e.createdDate >= :creacioInici"
 			)
 	public List<Long> findNotEsborratDarrersMesos(@Param("creacioInici") LocalDateTime creacioInici);
-	
+
+    @Query("select e from ExpedientEntity e " +
+        "where e.agafatPer = :usuari " +
+        "and e.entitat.id = :entitatId " +
+        "and e.esborrat = 0 " +
+        "and e.createdDate <= :dataLimit " +
+        "and (select count(metaDocument) " +
+        "     from MetaDocumentEntity metaDocument " +
+        "     where metaDocument.metaExpedient = e.metaExpedient " +
+        "     and (metaDocument.multiplicitat = 0 or metaDocument.multiplicitat = 3) " +
+        "     and metaDocument.id not in (" +
+        "         select doc.metaNode.id from DocumentEntity doc where e.id = doc.expedient.id and doc.esborrat = 0" +
+        "     )) = 0")
+    List<ExpedientEntity> findExpedientsAntics(
+        @Param("usuari") UsuariEntity usuari,
+        @Param("entitatId") Long entitatId,
+        @Param("dataLimit") LocalDateTime dataLimit);
+
 	/**
 	 * ACTUALITZACIO CODU USUARI
 	 */
-	
+
 	 @Modifying
      @Query(value = "UPDATE IPA_EXPEDIENT SET AGAFAT_PER_CODI = :codiNou WHERE AGAFAT_PER_CODI = :codiAntic", nativeQuery = true)
 	 public int updateAgaftPer(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
-	 
+
 	 @Modifying
 	 @Query(value = "UPDATE IPA_EXPEDIENT_TASCA " +
 	 			"SET RESPONSABLE_ACTUAL_CODI = CASE WHEN RESPONSABLE_ACTUAL_CODI = :codiAntic THEN :codiNou ELSE RESPONSABLE_ACTUAL_CODI END, " +
 	 			"    DELEGAT = CASE WHEN DELEGAT = :codiAntic THEN :codiNou ELSE DELEGAT END " +
 	 			"WHERE RESPONSABLE_ACTUAL_CODI = :codiAntic OR DELEGAT = :codiAntic", nativeQuery = true)
 	 public int updateExpTasca(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
-	 
+
 	 @Modifying
      @Query(value = "UPDATE IPA_EXPEDIENT_TASCA_RESP SET RESPONSABLE_CODI = :codiNou WHERE RESPONSABLE_CODI = :codiAntic", nativeQuery = true)
 	 public int updateExpTascaResponsable(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
-	 
+
 	 @Modifying
      @Query(value = "UPDATE IPA_EXPEDIENT_TASCA_OBSE SET OBSERVADOR_CODI = :codiNou WHERE OBSERVADOR_CODI = :codiAntic", nativeQuery = true)
 	 public int updateExpTascaObservador(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
-	 
+
 	 @Modifying
      @Query(value = "UPDATE IPA_EXPEDIENT_SEGUIDOR SET SEGUIDOR_CODI = :codiNou WHERE SEGUIDOR_CODI = :codiAntic", nativeQuery = true)
 	 public int updateExpSeguidorCodi(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
-	 
+
 	 @Modifying
      @Query(value = "UPDATE IPA_EXPEDIENT_PETICIO SET USUARI_ACTUALITZACIO = :codiNou WHERE USUARI_ACTUALITZACIO = :codiAntic", nativeQuery = true)
 	 public int updateExpPeticio(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);

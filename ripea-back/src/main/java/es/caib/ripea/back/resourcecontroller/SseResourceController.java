@@ -170,7 +170,7 @@ public class SseResourceController {
     public void actualitzarAvisosPerUsuari(String usuariCodi) {
         String rol = aplicacioService.getRolActualCodi();
         Long entitatId = aplicacioService.getEntitatActualId();
-        AvisosActiusEvent eventFiltrat = eventService.getAvisosActiusPerUsuari(rol, entitatId);
+        AvisosActiusEvent eventFiltrat = eventService.getAvisosActiusPerUsuari(rol, entitatId, usuariCodi);
 
         sendToUser(usuariCodi, SseEmitter.event()
                 .name(UserEventType.AVISOS.getEventName())
@@ -293,7 +293,7 @@ public class SseResourceController {
                     .data(eventService.getTasquesPendents(usuariCodi)));
 
             // Avisos filtrats
-            var event = eventService.getAvisosActiusPerUsuari(rol, entitatId);
+            var event = eventService.getAvisosActiusPerUsuari(rol, entitatId, usuariCodi);
             emitter.send(SseEmitter.event().name(UserEventType.AVISOS.getEventName()).data(event));
 
         } catch (IOException e) {
