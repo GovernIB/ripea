@@ -45,6 +45,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Strings;
 import com.itextpdf.text.pdf.AcroFields;
@@ -6592,6 +6594,7 @@ public class PluginHelper {
 		}
 	}
 	
+	@Transactional(propagation = Propagation.REQUIRED)
 	public void comandaAvisSend(ExpedientPeticioEntity expedientPeticioEntity) {
 		
 		if (configHelper.getAsBoolean(PropertyConfig.COMANDA_PLUGIN_ACTIU)) {

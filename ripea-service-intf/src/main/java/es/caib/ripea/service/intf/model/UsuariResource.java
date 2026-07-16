@@ -28,7 +28,7 @@ import java.util.List;
 public class UsuariResource extends BaseResource<String> {
 
 	private static final long serialVersionUID = -3198881636735062393L;
-	
+
 	@NotNull
 	@Size(max = 64)
 	private String codi;
@@ -65,6 +65,7 @@ public class UsuariResource extends BaseResource<String> {
         this.numElementsPagina = (value != null && !value.isEmpty()) ? Long.parseLong(value) : null;
     }
 
+    private boolean rebreEmailsGlobal = true;
 	private boolean rebreEmailsAgrupats = true;
 	private boolean rebreAvisosNovesAnotacions = true;
 	private boolean rebreEmailsCanviEstatRevisio = true;

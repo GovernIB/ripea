@@ -3,8 +3,7 @@ import { CardPage } from "../../../components/CardData.tsx";
 import {useTranslation} from "react-i18next";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {useState} from "react";
-import {Link} from "@mui/material";
-import {Link as RouterLink } from 'react-router-dom';
+import ContingutLink from "../../../components/ContingutLink.tsx";
 import {EnviarPortafirmesFilter} from "./EnviarPortafirmesGrid.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
 import {useActions} from "../../contingut/details/ContingutActions.tsx";
@@ -28,7 +27,7 @@ const columns = [
     {
         field: 'expedient',
         flex: 0.6,
-        renderCell: (params:any) => <Link component={RouterLink} to={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</Link>,
+        renderCell: (params:any) => <ContingutLink id={params?.row?.expedient?.id}>{params?.formattedValue}</ContingutLink>,
     },
     {
         field: 'createdDate',

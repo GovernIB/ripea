@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.ripea.service.intf.dto;
 
@@ -13,7 +13,7 @@ import es.caib.ripea.service.intf.utils.Utils;
 
 /**
  * Informació d'un usuari.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter @Setter
@@ -26,6 +26,7 @@ public class UsuariDto implements Serializable {
 	private String emailAlternatiu;
 	private String idioma;
 	private String[] rols;
+    private boolean rebreEmailsGlobal;
 	private boolean rebreEmailsAgrupats;
 	private String rolActual;
 	private boolean informacioExpedientExpandit = false;
@@ -44,8 +45,8 @@ public class UsuariDto implements Serializable {
 	private boolean expedientExpandit;
 	private MoureDestiVistaEnumDto vistaMoureActual;
 	private InterficieUsuariEnumDto interficieUsuari;
-	
-	
+
+
 	public String getCodiAndNom() {
 		if (codi!=null && codi.equals(nom)) {
 			return nom;
@@ -53,7 +54,7 @@ public class UsuariDto implements Serializable {
 			return nom + " (" + codi + ")";
 		}
 	}
-	
+
 	public String getNifOfuscat() {
 		return Utils.nifMask(nif);
 	}

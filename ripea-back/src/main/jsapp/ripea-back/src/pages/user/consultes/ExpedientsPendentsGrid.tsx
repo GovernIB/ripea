@@ -62,6 +62,9 @@ const ExpedientsPendentsGrid = () => {
             field: 'registreInfo.extracte',
             headerName: t('page.registre.grid.extracte'),
             flex: 1,
+            sortProcessor: (_field: string, sort: GridSortDirection) => {
+                return [{field: 'registre.extracte', sort}];
+            },
         },
         {
             field: 'metaExpedient',

@@ -6,8 +6,6 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Properties;
 
-import es.caib.ripea.persistence.entity.resourceentity.EntitatResourceEntity;
-import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +22,7 @@ import es.caib.ripea.persistence.entity.GrupEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.UsuariEntity;
+import es.caib.ripea.persistence.entity.config.ConfigEntity;
 import es.caib.ripea.persistence.repository.AclSidRepository;
 import es.caib.ripea.persistence.repository.AlertaRepository;
 import es.caib.ripea.persistence.repository.AvisRepository;
@@ -130,7 +129,7 @@ public class AplicacioServiceImpl implements AplicacioService {
     @Autowired private ExpedientRepository expedientRepository;
     @Autowired private HistoricUsuariRepository historicUsuariRepository;
     @Autowired private ConfigRepository configRepository;
-    
+
     @Autowired private AlertaRepository alertaRepository;
     @Autowired private AvisRepository avisRepository;
     @Autowired private ConsultaPinbalRepository consultaPinbalRepository;
@@ -147,7 +146,7 @@ public class AplicacioServiceImpl implements AplicacioService {
     @Autowired private ExpedientEstatRepository expedientEstatRepository; //IPA_EXPEDIENT_ESTAT i IPA_EXPEDIENT_FILTRE
     @Autowired private ExpedientOrganPareRepository expedientOrganPareRepository;
     @Autowired private ExpedientPeticioRepository expedientPeticioRepository;
-    @Autowired private ExpedientTascaRepository expedientTascaRepository; 
+    @Autowired private ExpedientTascaRepository expedientTascaRepository;
     @Autowired private ExpedientTascaComentariRepository expedientTascaComentariRepository;
     @Autowired private FluxFirmaUsuariRepository fluxFirmaUsuariRepository;
     @Autowired private InteressatRepository interessatRepository;
@@ -177,12 +176,12 @@ public class AplicacioServiceImpl implements AplicacioService {
 	public void actualitzarEntitatThreadLocal(EntitatDto entitat) {
 		ConfigHelper.setEntitat(entitat);
 	}
-	
+
 	@Override
 	public void actualitzarRolThreadLocal(String rol) {
 		ConfigHelper.setRol(rol);
 	}
-	
+
 	@Override
 	public void actualitzarOrganCodi(String organCodi) {
 		ConfigHelper.setOrganCodi(organCodi);
@@ -193,13 +192,13 @@ public class AplicacioServiceImpl implements AplicacioService {
     public String getEntitatActualCodi() {
         return configHelper.getEntitatActualCodi();
     }
-	
+
 	@Override
     @Transactional(readOnly = true)
     public String getOrganActualCodi() {
         return configHelper.getOrganActualCodi();
     }
-	
+
 	@Override
 	public Long getEntitatActualId() {
 		if (configHelper.getEntitatActualCodi()!=null) {
@@ -225,26 +224,26 @@ public class AplicacioServiceImpl implements AplicacioService {
 			return null;
 		}
 	}
-	
+
 	@Transactional
 	@Override
 	public void processarAutenticacioUsuari(boolean comprovaAmbUsuariPlugin) {
-		
+
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		String codiUsuariLowerCase = auth.getName().toLowerCase();
-		
+
 		logger.debug("Processant autenticació (usuariCodi=" + codiUsuariLowerCase + ")");
 		UsuariEntity usuari = usuariRepository.findById(codiUsuariLowerCase).orElse(null);
 
-		logger.debug("Consultant plugin de dades d'usuari (usuariCodi=" + codiUsuariLowerCase + ")");		
+		logger.debug("Consultant plugin de dades d'usuari (usuariCodi=" + codiUsuariLowerCase + ")");
 		DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(codiUsuariLowerCase);
-		
+
 		//Per si de cas s'ha quedat cacheat el null https://github.com/GovernIB/ripea/issues/1700
 		if (dadesUsuari==null) {
 			cacheHelper.evictUsuariAmbCodi(codiUsuariLowerCase);
 			dadesUsuari = cacheHelper.findUsuariAmbCodi(codiUsuariLowerCase);
 		}
-		
+
 		if (dadesUsuari != null) {
 			logger.debug("Dades usuari:");
 			logger.debug("Dades usuari getCodi: "+dadesUsuari.getCodi());
@@ -256,7 +255,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		} else {
 			logger.debug("Dades usuari es null.");
 		}
-		
+
 		if (usuari == null) {
 			if (dadesUsuari != null) {
 				logger.debug("GUARDAM NOU usuari a BBDD amb les dades de dadesUsuari.");
@@ -312,7 +311,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		return toUsuariDtoAmbRols(
 				usuariRepository.getOne(auth.getName()));
 	}
-	
+
 	@Transactional
 	@Override
 	public void setRolUsuariActual(String rolActual) {
@@ -365,16 +364,17 @@ public class AplicacioServiceImpl implements AplicacioService {
 			System.out.println(ex.getMessage());
 		}
 	}
-	
+
 	@Transactional
 	@Override
 	public UsuariDto updateUsuariActual(UsuariDto dto) {
 		logger.debug("Actualitzant configuració de usuari actual");
 		UsuariEntity usuari = usuariRepository.getOne(dto.getCodi());
-		
+
 		usuari.update(
 				dto.getEmailAlternatiu(),
 				dto.getIdioma(),
+                dto.isRebreEmailsGlobal(),
 				dto.isRebreEmailsAgrupats(),
 				dto.isRebreAvisosNovesAnotacions(),
 				dto.isRebreEmailsCanviEstatRevisio(),
@@ -390,7 +390,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 				dto.getEntitatPerDefecteId() != null ? entitatRepository.getOne(dto.getEntitatPerDefecteId()) : null,
 				dto.getVistaMoureActual(),
 				dto.getInterficieUsuari());
-		
+
 		return toUsuariDtoAmbRols(usuari);
 	}
 
@@ -407,13 +407,13 @@ public class AplicacioServiceImpl implements AplicacioService {
 		logger.debug("Consultant usuaris amb text (text=" + text + ")");
 		return usuariHelper.findUsuariAmbText(text);
 	}
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public UsuariDto findUsuariCarrecAmbCodiDades(String nifOrCarrec) {
 		return usuariHelper.findUsuariCarrecAmbCodiDades(nifOrCarrec);
 	}
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public UsuariDto findUsuariAmbCodiDades(String codi) {
@@ -474,7 +474,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		logger.debug("Consultant el detall d'una acció d'integració (id=" + id + ")");
 		return integracioHelper.findOne(id);
 	}
-	
+
 	@Override
 	public void excepcioSave(String uri, Throwable exception) {
 		try {
@@ -516,8 +516,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 	public List<String> permisosFindRolsDistinctAll() {
 		logger.debug("Consulta dels rols definits a les ACLs");
 		List<String> rolsAcls = cacheHelper.rolsDisponiblesEnAcls();
-		
-		
+
+
 		List<GrupEntity> grups = grupRepository.findAll();
 		List<String> grupRols = new ArrayList<>();
 		if (grups != null) {
@@ -533,7 +533,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		logger.debug("Evict rols disponibles en ACLs");
 		cacheHelper.evictRolsDisponiblesEnAcls();
 	}
-	
+
 	@Override
 	public void evictRolsPerUsuari(String usuariCodi) {
 		logger.debug("Evict rols per usuari");
@@ -564,31 +564,38 @@ public class AplicacioServiceImpl implements AplicacioService {
 		logger.debug("Consulta del valor del propertat amb nom");
 		return configHelper.getConfig(nom);
 	}
-	
+
+	@Override
+	@Transactional(readOnly = true)
+	public Properties getConfigs(List<String> keys) {
+		logger.debug("Consulta en bloc del valor de " + (keys != null ? keys.size() : 0) + " propietats");
+		return configHelper.getConfigs(keys);
+	}
+
 	@Override
 	public Boolean propertyBooleanFindByKey(String key) {
 		logger.debug("Consulta del valor del propietat boolea amb key");
 		return configHelper.getAsBoolean(key);
 	}
-	
+
 	@Override
 	@Deprecated
 	public boolean propertyBooleanFindByKey(String key, boolean defaultValueIfNull) {
 		logger.debug("Consulta del valor del propietat boolea amb key");
 		return configHelper.getAsBoolean(key);
 	}
-	
-	
+
+
 	@Override
 	public boolean mostrarLogsRendiment() {
 		return cacheHelper.mostrarLogsRendiment();
 	}
-	
+
 	@Override
 	public boolean mostrarLogsCercadorAnotacio() {
 		return cacheHelper.mostrarLogsCercadorAnotacio();
 	}
-	
+
 	@Override
 	public boolean getBooleanJbossProperty(
 			String key,
@@ -600,36 +607,36 @@ public class AplicacioServiceImpl implements AplicacioService {
 			return defaultValueIfNull;
 		}
 	}
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public Long getProcedimentPerDefecte(Long entitatId, String rolActual) {
-		
+
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		UsuariEntity usuari = usuariRepository.getOne(auth.getName());
-		
+
 		Long procId = null;
 		if (usuari.getProcediment() != null) {
 			List<MetaExpedientEntity> metaExpedientsEnt = metaExpedientHelper.findAmbPermis(
 					entitatId,
 					ExtendedPermission.READ,
 					true,
-					null, 
+					null,
 					"IPA_ADMIN".equals(rolActual),
 					"IPA_ORGAN_ADMIN".equals(rolActual),
-					null, 
-					false); 
-			
+					null,
+					false);
+
 			for (MetaExpedientEntity metaExpedientEntity : metaExpedientsEnt) {
 				if (metaExpedientEntity.getId().equals(usuari.getProcediment().getId())) {
 					procId = metaExpedientEntity.getId();
 				}
 			}
 		}
-		
+
 		return procId;
 	}
-	
+
 	private UsuariDto toUsuariDtoAmbRols(
 			UsuariEntity usuari) {
 		UsuariDto dto = conversioTipusHelper.convertir(
@@ -648,7 +655,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		dto.setEntitatPerDefecteId(usuari.getEntitatPerDefecte() != null ? usuari.getEntitatPerDefecte().getId() : null);
 		return dto;
 	}
-	
+
 	@Override
 	public boolean doesCurrentUserHasRol(String rolToCheck) {
 		return RolHelper.doesCurrentUserHasRol(rolToCheck);
@@ -657,7 +664,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	private String getIdiomaPerDefecte() {
 		return configHelper.getConfig(PropertyConfig.IDIOMA_DEFECTE);
 	}
-	
+
 	@Override
 	public List<String> findUsuarisCodisAmbRol(String rol) {
 		List<DadesUsuari> dadesUsuaris = pluginHelper.dadesUsuariFindAmbGrup(rol);
@@ -667,8 +674,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 		}
 		return codisUsuaris;
 	}
-	
-	
+
+
     @Override
     @Transactional
 	public String getValueForOrgan(
@@ -680,37 +687,37 @@ public class AplicacioServiceImpl implements AplicacioService {
 				organCodi,
 				keyGeneral);
 	}
-    
+
     @Override
     @Transactional(readOnly = true)
     public Properties getAllPropertiesOrganOrEntitatOrGeneral(String entitatCodi, String organCodi) {
         return configHelper.getAllPropertiesOrganOrEntitatOrGeneral(entitatCodi, organCodi);
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public Properties getAllPropertiesEntitatOrGeneral(String entitatCodi) {
         return configHelper.getAllPropertiesEntitatOrGeneral(entitatCodi);
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public Properties getGroupPropertiesEntitatOrGeneral(String groupCode, String entitatCodi) {
         return configHelper.getGroupPropertiesEntitatOrGeneral(groupCode, entitatCodi);
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public Properties getGroupPropertiesOrganOrEntitatOrGeneral(String groupCode, String entitatCodi, String organCodi) {
     	 return configHelper.getGroupPropertiesOrganOrEntitatOrGeneral(groupCode, entitatCodi, organCodi);
     }
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public GenericDto integracioDiagnostic(String codi, DiagnosticFiltreDto filtre) {
 		return pluginHelper.integracioDiagnostic(codi, filtre);
 	}
-	
+
 	 @Override
 	 @Transactional
 	 public Long updateUsuariCodi(String codiAntic, String codiNou) {
@@ -736,7 +743,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		 }
 		return registresModificats;
 	 }
-	 
+
 	 private Long updateUsuariAuditoria(String codiAntic, String codiNou) {
 		 Long registresModificats = 0l;
 		 registresModificats += alertaRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_ALERTA **
@@ -783,13 +790,13 @@ public class AplicacioServiceImpl implements AplicacioService {
 		 registresModificats += tipusDocumentalRepository.updateUsuariAuditoria(codiAntic, codiNou);//IPA_TIPUS_DOCUMENTAL **
 		 return registresModificats;
 	 }
-	 
+
 	 private Long updateUsuariPermisos(String codiAntic, String codiNou) {
 		 Long registresModificats = 0l;
 		 registresModificats += aclSidRepository.updateUsuariPermis(codiAntic, codiNou);
 	 	return registresModificats;
 	 }
-	 
+
 	 private Long updateUsuariReferencies(String codiAntic, String codiNou) {
 		 Long registresModificats = 0l;
 		 registresModificats += expedientRepository.updateAgaftPer(codiAntic, codiNou);
@@ -806,7 +813,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		 registresModificats += metaExpedientTascaRepository.updateUsuariResponsable(codiAntic, codiNou);
 		 return registresModificats;
 	 }
-	
+
 	 private String createOrUpdateUsuari(String codiNou, UsuariEntity usuariAntic) {
 		 Long t0 = System.currentTimeMillis();
 		 UsuariEntity usuariNou = usuariRepository.findByCodi(codiNou);
@@ -824,6 +831,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		 usuariNou.update(
 				 usuariAntic.getEmailAlternatiu(),
 				 usuariAntic.getIdioma(),
+                 usuariAntic.isRebreEmailsGlobal(),
 				 usuariAntic.isRebreEmailsAgrupats(),
 				 usuariAntic.isRebreAvisosNovesAnotacions(),
 				 usuariAntic.isRebreEmailsCanviEstatRevisio(),
@@ -839,11 +847,11 @@ public class AplicacioServiceImpl implements AplicacioService {
 				 usuariAntic.getEntitatPerDefecte(),
 				 usuariAntic.getVistaMoureActual(),
 				 usuariAntic.getInterficieUsuari());
-		 
+
 		 usuariNou.setInicialitzat(usuariAntic.isInicialitzat());
 		 usuariNou.setRolActual(usuariAntic.getRolActual());
 		 usuariNou.setVersion(usuariAntic.getVersion());
-		
+
 		 if (creat) {
 			return "<li>Creat nou usuari '"+codiNou+"' en "+(System.currentTimeMillis()-t0)+" ms.</li>";
 		 } else {
@@ -857,7 +865,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	public MeterRegistry getMeterRegistry() {
 		return applicationHelper.getMeterRegistry();
 	}
-	
+
 	@Override
     public String getMetriquesJSON() throws Exception {
 		return applicationHelper.getMetriquesJSON();
@@ -873,13 +881,13 @@ public class AplicacioServiceImpl implements AplicacioService {
 	public List<Long> getPortafirmesEliminats() {
 		return documentPortafirmesRepository.findFirmaPendentDocumentEliminat();
 	}
-	
+
 	@Override
 	@Transactional
 	public String executePortafirmesEliminat(Long portafirmesDocIs) throws Exception {
-		
+
 		String resultat = "";
-		
+
 		try {
 			DocumentPortafirmesEntity dpe = documentPortafirmesRepository.findById(portafirmesDocIs).get();
 			String rolActual = configHelper.getRolActual();
@@ -895,10 +903,10 @@ public class AplicacioServiceImpl implements AplicacioService {
 		} catch (Exception ex) {
 			throw new Exception("Error al cancelar la firma pendent del document esborrat="+portafirmesDocIs+": "+ex.getMessage());
 		}
-		
+
 		return resultat;
 	}
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public List<Long> getTasquesComanda() {
@@ -908,9 +916,9 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	@Transactional
 	public String executeTascaComanda(Long tascaId) throws Exception {
-		
+
 		String resultat = "";
-		
+
 		if (configHelper.getAsBoolean(PropertyConfig.COMANDA_PLUGIN_ACTIU)) {
 			try {
 				pluginHelper.comandaTascaSendNoLog(expedientTascaRepository.findById(tascaId).get());
@@ -921,10 +929,10 @@ public class AplicacioServiceImpl implements AplicacioService {
 		} else {
 			throw new Exception("El plugin de comanda no esta actiu.");
 		}
-		
+
 		return resultat;
 	}
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public List<Long> getAvisosComanda() {
@@ -933,7 +941,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		LocalDateTime ldt = LocalDateTime.ofInstant(cal.toInstant(), cal.getTimeZone().toZoneId());
 		return expedientRepository.findNotEsborratDarrersMesos(ldt);
 	}
-	
+
 	@Override
 	@Transactional
 	public String executeAvisComanda(Long expedientId) throws Exception {
@@ -953,7 +961,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		} else {
 			throw new Exception("El plugin de comanda no esta actiu.");
 		}
-		
+
 		return resultat;
 	}
 
@@ -972,6 +980,31 @@ public class AplicacioServiceImpl implements AplicacioService {
 			return "Tipus documentals creats per a l'entitat " + entitat.getCodi();
 		} catch (Exception ex) {
 			throw new Exception("Error al crear els tipus documentals per a l'entitat amb id=" + entitatId + ": " + ex.getMessage());
+		}
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<String> getConfigsAmbEntitat() {
+		return configRepository.findKeysEntitatCodiNotNull();
+	}
+
+	@Override
+	@Transactional
+	public String executeEliminaConfigOrfe(String key) throws Exception {
+		try {
+			ConfigEntity config = configRepository.findByKey(key);
+			if (config == null) {
+				return "No existeix cap configuració amb la key=" + key;
+			}
+			String entitatCodi = config.getEntitatCodi();
+			if (entitatCodi != null && entitatRepository.findByCodi(entitatCodi) == null) {
+				configRepository.delete(config);
+				return "Eliminada la configuració " + key + " de l'entitat inexistent " + entitatCodi;
+			}
+			return "";
+		} catch (Exception ex) {
+			throw new Exception("Error al eliminar la configuració orfe amb key=" + key + ": " + ex.getMessage());
 		}
 	}
 }

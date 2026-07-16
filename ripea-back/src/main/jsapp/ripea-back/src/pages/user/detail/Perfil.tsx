@@ -135,22 +135,7 @@ const PerfilFrom = ({setPreview}: { setPreview: (value: ThemePreview) => void })
     const { data, fields, apiRef } = useFormContext();
     const { t } = useTranslation();
     const { value: user } = useUserSession();
-    const [ correusActius, setCorreusActius ] = React.useState(!!(data?.rebreEmailsAgrupats && data?.rebreEmailsCanviEstatRevisio && data?.rebreAvisosNovesAnotacions));
-    
-    const handleGlobalCheckChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const checked = event.target.checked;
-
-        apiRef?.current?.setFieldValue("rebreEmailsAgrupats", checked);
-        apiRef?.current?.setFieldValue("rebreEmailsCanviEstatRevisio", checked);
-        apiRef?.current?.setFieldValue("rebreAvisosNovesAnotacions", checked);
-    };
-
-    React.useEffect(() => {
-        if (data?.rebreEmailsAgrupats && data?.rebreEmailsCanviEstatRevisio && data?.rebreAvisosNovesAnotacions)
-            setCorreusActius(true);
-        else
-            setCorreusActius(false);
-    },[data?.rebreEmailsAgrupats, data?.rebreEmailsCanviEstatRevisio, data?.rebreAvisosNovesAnotacions])
+    const rebreEmailsGlobal = data?.rebreEmailsGlobal;
 
     return (
         <Grid container columnSpacing={1} rowSpacing={2}>
@@ -177,14 +162,10 @@ const PerfilFrom = ({setPreview}: { setPreview: (value: ThemePreview) => void })
 
             <CardData title={t('page.user.perfil.correu')} icon="email">
                 <Grid size={12}>
-                    <FormControlLabel
-                        control={<Checkbox checked={correusActius} onChange={handleGlobalCheckChange} color="primary" />}
-                        label={t('page.user.perfil.activarCorreu')}
-                        labelPlacement="end"
-                    />
-                    <GridFormField name="rebreEmailsAgrupats" componentProps={{ sx: { ml: 2 } }} />
-                    <GridFormField name="rebreEmailsCanviEstatRevisio" componentProps={{ sx: { ml: 2 } }} />
-                    <GridFormField name="rebreAvisosNovesAnotacions" componentProps={{ sx: { ml: 2 } }} />
+                    <GridFormField name="rebreEmailsGlobal" componentProps={{ sx: { ml: -1 } }} />
+                    <GridFormField name="rebreEmailsAgrupats" componentProps={{ sx: { ml: 2 } }} disabled={!rebreEmailsGlobal} />
+                    <GridFormField name="rebreEmailsCanviEstatRevisio" componentProps={{ sx: { ml: 2 } }} disabled={!rebreEmailsGlobal} />
+                    <GridFormField name="rebreAvisosNovesAnotacions" componentProps={{ sx: { ml: 2 } }} disabled={!rebreEmailsGlobal} />
                 </Grid>
             </CardData>
 
@@ -231,7 +212,7 @@ const PerfilFrom = ({setPreview}: { setPreview: (value: ThemePreview) => void })
         </CardData> */}
         </Grid>
     );
-}
+};
 
 const usePerfil = () => {
     const { t } = useTranslation();
@@ -242,10 +223,11 @@ const usePerfil = () => {
     const {temporalMessageShow, t: tBase } = useBaseAppContext();
 
     const handleOpen = () => {
-        formApiRef.current?.show(user?.codi)
+        formApiRef.current
+            ?.show(user?.codi)
             .then(() => {
-                refresh?.()
-                temporalMessageShow(null, t('page.user.perfil.ok', {nom: user.nom}), 'success');
+                refresh?.();
+                temporalMessageShow(null, t('page.user.perfil.ok', { nom: user.nom }), 'success');
             })
             .catch((error) => {
                 // Qualsevol tancament sense desar (cancel·lar, 'x', Escape) rebutja
@@ -254,7 +236,7 @@ const usePerfil = () => {
                 if (error?.message)
                     temporalMessageShow(null, error?.message, 'error');
             });
-    }
+    };
 
     const dialogButtons = useMemo<DialogButton[]>(() => [
         {
@@ -276,7 +258,7 @@ const usePerfil = () => {
         },
     ], [formApiRef, removePreview, tBase]);
 
-    const dialog =
+    const dialog = (
         <MuiFormDialog
             resourceName={'usuariResource'}
             title={t('page.user.perfil.title')}
@@ -287,10 +269,11 @@ const usePerfil = () => {
         >
             <PerfilFrom setPreview={setPreview}/>
         </MuiFormDialog>
+    );
 
     return {
         handleOpen,
-        dialog
-    }
-}
+        dialog,
+    };
+};
 export default usePerfil;

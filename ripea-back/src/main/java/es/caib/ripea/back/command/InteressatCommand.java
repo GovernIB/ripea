@@ -86,6 +86,7 @@ public class InteressatCommand  {
 	@Size(max = 250, groups = {PersonaFisica.class, PersonaJuridica.class, Administracio.class}, message = "max.size")
 	protected String adresa;
 	@Size(max = 5, groups = {PersonaFisica.class, PersonaJuridica.class, Administracio.class}, message = "max.size")
+    @Pattern(regexp = "^[0-9]*$", groups = {PersonaFisica.class, PersonaJuridica.class, Administracio.class}, message = "only.numbers")
 	protected String codiPostal;
 	@Size(max = 160, groups = {PersonaFisica.class, PersonaJuridica.class, Administracio.class}, message = "max.size")
 	protected String email;

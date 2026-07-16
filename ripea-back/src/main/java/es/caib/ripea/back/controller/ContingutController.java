@@ -559,6 +559,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			@PathVariable Long contingutOrigenId,
 			@PathVariable Long contingutDestiId,
 			@RequestParam(value = "tascaId", required = false) Long tascaId,
+			@RequestParam(value = "posicio", required = false, defaultValue = "despres") String posicio,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ContingutDto contingutOrigen = contingutService.findAmbIdUser(
@@ -615,24 +616,38 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 
 			List<ContingutDto> contingutFillsDestiPare = contingutService.getFillsBasicInfo(destiId);
 
+			//Segons on s'ha amollat el punter dins la fila destí (meitat superior o inferior),
+			//l'element origen s'ha d'inserir abans o després d'aquesta. Sense distingir-ho, l'element
+			//s'inseria sempre darrere el destí i era impossible deixar-lo a la primera posició.
+			boolean insertarAbans = "abans".equals(posicio);
+
 			Map<Integer, Long> orderedElements = new HashMap<Integer, Long>();
 			if (contingutFillsDestiPare!=null) {
 				int ordreAssignat = 0;
+				boolean origenInserit = false;
 				for (ContingutDto fill: contingutFillsDestiPare) {
-					if (fill.getId().equals(contingutDestiId)) {
-						//Estam recorrent el element sobre el que hem amollat el cursor
-						//El element origen s'insertará darrera aquest.
-						orderedElements.put(ordreAssignat, fill.getId());
-						ordreAssignat++;
+					if (fill.getId().equals(contingutOrigenId)) {
+						//no feim res, l'inserim en el seu lloc corresponent en trobar contingutDestiId
+						continue;
+					}
+					if (fill.getId().equals(contingutDestiId) && insertarAbans) {
 						orderedElements.put(ordreAssignat, contingutOrigenId);
 						ordreAssignat++;
-					} else if (fill.getId().equals(contingutOrigenId)) {
-						//no feim res, ja l'hem insertat abans
-					} else {
-						//qualsevol altre element del pare
-						orderedElements.put(ordreAssignat, fill.getId());
-						ordreAssignat++;
+						origenInserit = true;
 					}
+					//qualsevol altre element del pare (incloent el destí)
+					orderedElements.put(ordreAssignat, fill.getId());
+					ordreAssignat++;
+					if (fill.getId().equals(contingutDestiId) && !insertarAbans) {
+						orderedElements.put(ordreAssignat, contingutOrigenId);
+						ordreAssignat++;
+						origenInserit = true;
+					}
+				}
+				if (!origenInserit) {
+					//El destí no s'ha trobat entre els fills (p.ex. s'ha amollat sobre la pròpia carpeta buida): afegim al final
+					orderedElements.put(ordreAssignat, contingutOrigenId);
+					ordreAssignat++;
 				}
 			}
 

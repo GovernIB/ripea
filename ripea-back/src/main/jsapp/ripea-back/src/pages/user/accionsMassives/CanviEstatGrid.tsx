@@ -3,8 +3,8 @@ import {GridPage, useFormContext, useMuiDataGridApiRef} from "reactlib";
 import {useMemo, useState} from "react";
 import { CardPage } from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import {Alert, Box, Link} from "@mui/material";
-import {Link as RouterLink } from 'react-router-dom';
+import {Alert, Box} from "@mui/material";
+import ContingutLink from "../../../components/ContingutLink.tsx";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import GridFormField from "../../../components/GridFormField.tsx";
@@ -80,7 +80,7 @@ const columns = [
     {
         field: 'nom',
         flex: 1,
-        renderCell: (params:any) => <Link component={RouterLink} to={`/contingut/${params?.id}`}>{params?.formattedValue}</Link>,
+        renderCell: (params:any) => <ContingutLink id={params?.id}>{params?.formattedValue}</ContingutLink>,
     },    
     {
         field: 'estat',

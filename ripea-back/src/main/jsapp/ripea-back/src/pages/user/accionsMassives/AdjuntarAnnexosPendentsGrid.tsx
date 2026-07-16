@@ -7,8 +7,8 @@ import {formatDate} from "../../../util/dateUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import GridFormField from "../../../components/GridFormField.tsx";
-import {Alert, Box, Link} from "@mui/material";
-import {Link as RouterLink } from 'react-router-dom';
+import {Alert, Box} from "@mui/material";
+import ContingutLink from "../../../components/ContingutLink.tsx";
 import {useSession} from "../../../components/SessionStorageContext.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
@@ -90,7 +90,7 @@ const AdjuntarAnnexosPendentsGrid = () => {
             headerName: t('page.expedient.title'),
             field: 'expedientInfo.nom',
             flex: 1,
-            renderCell: (params:any) => <Link component={RouterLink} to={`/contingut/${params?.row?.expedientInfo?.id}`}>{params?.formattedValue}</Link>,
+            renderCell: (params:any) => <ContingutLink id={params?.row?.expedientInfo?.id}>{params?.formattedValue}</ContingutLink>,
             // sortProcessor: (field: string, sort: GridSortDirection) => [{field: 'registre.expedientPeticions.expedient.createdDate', sort}],
             sortable: false,
         },

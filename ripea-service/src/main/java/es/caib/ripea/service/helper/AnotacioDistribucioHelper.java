@@ -34,6 +34,10 @@ public class AnotacioDistribucioHelper {
 	@Autowired private EmailHelper emailHelper;
 	@Autowired private PluginHelper pluginHelper;
 
+    /*
+	 * consultarIGuardarAnotacioPeticioPendent no es transaccional, pero es solo un orquestador. 
+	 * Cada paso real de trabajo lo delega a métodos de ExpedientPeticioHelper, y todos ellos están anotados @Transactional(REQUIRES_NEW):
+	 */
 	public void consultarIGuardarAnotacioPeticioPendent(
 			Long expedientPeticioId,
 			boolean throwException) throws Throwable {

@@ -1483,7 +1483,11 @@ public class ContingutHelper {
 			}
 		}
 		
-		if ((conteDocumentsDefinitius(contingut) && isPermesEsborrarFinals()) || !conteDocumentsDefinitius(contingut)) {
+		//O no es definitiu, o la propietat de esborrar definitius esta a true
+		boolean permetEsborrarPerDefinitiu = (conteDocumentsDefinitius(contingut) && isPermesEsborrarFinals()) || 
+				!conteDocumentsDefinitius(contingut);
+		
+		if (permetEsborrarPerDefinitiu) {
 			if (!conteDocumentsAnotacions(contingut)) {
 				//Marca el contingut i tots els seus fills com a esborrats de forma recursiva
 				marcarEsborrat(entitatId, contingut, rolActual);
@@ -1505,18 +1509,24 @@ public class ContingutHelper {
 		// Cancel·lar enviament si el document conté enviaments pendents
 		if (contingut instanceof DocumentEntity) {
 			if (expedientPare != null) {
-				cacheHelper.evictErrorsValidacioAndNotify(expedientPare.getId());
+				if (((DocumentEntity)contingut).isObligatori())	{
+					cacheHelper.evictErrorsValidacioAndNotify(expedientPare.getId());
+				}
 			}
-			DocumentEntity document = (DocumentEntity)contingut;
-			if (document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PENDENT)) {
-				documentFirmaPortafirmesHelper.portafirmesCancelar(
-						entitatId,
-						document, rolActual);
-			}
+			/**
+			 * Això ja es fa al mètode marcarEsborrat, que es crida unes linies mes adalt.
+			 * A més esta millora alla perque si el contingut es carpeta, ho fa recursiu per tots els fills.
+			 */
+//			DocumentEntity document = (DocumentEntity)contingut;
+//			if (document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PENDENT)) {
+//				documentFirmaPortafirmesHelper.portafirmesCancelar(
+//						entitatId,
+//						document, rolActual);
+//			}
 		}
 		
-		// Valida si conté documents definitius
-		if (!conteDocumentsDefinitius(contingut)) {
+		//O no es definitiu, o la propietat de esborrar definitius esta a true
+		if (permetEsborrarPerDefinitiu) {
 
 			// Si el contingut és un document guarda una còpia del fitxer esborrat
 			// per a poder recuperar-lo posteriorment

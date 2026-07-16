@@ -7,8 +7,7 @@ import {formatDate} from "../../../util/dateUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import GridFormField from "../../../components/GridFormField.tsx";
-import {Link as RouterLink} from "react-router-dom";
-import {Link} from "@mui/material";
+import ContingutLink from "../../../components/ContingutLink.tsx";
 import {SeguimentPortafirmes} from "../../contingut/actions/SeguimentPortafirmes.tsx";
 
 // Detail
@@ -111,7 +110,7 @@ const columns = [
     {
         field: 'expedient',
         flex: 1,
-        renderCell: (params:any) => <Link component={RouterLink} to={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</Link>,
+        renderCell: (params:any) => <ContingutLink id={params?.row?.expedient?.id}>{params?.formattedValue}</ContingutLink>,
     },
     {
         field: 'document',

@@ -5,8 +5,7 @@ import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import GridFormField from "../../../components/GridFormField.tsx";
-import {Link as RouterLink} from "react-router-dom";
-import {Link} from "@mui/material";
+import ContingutLink from "../../../components/ContingutLink.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import useTascaDetail from "../../tasca/details/TascaDetail.tsx";
@@ -28,7 +27,7 @@ const springFilterBuilder = (data:any) => {
         builder.eq('expedient.id', data?.expedient?.id),
         builder.eq('metaExpedientTasca.id', data?.metaExpedientTasca?.id),
         builder.eq('estat', `'${data?.estat}'`),
-        builder.eq("responsableActual.id", data?.responsable),
+        data?.responsable?.id && builder.exists(builder.eq("responsables.codi", `'${data?.responsable?.id}'`)),
         builder.betweenDates('dataInici', data?.dataInici, data?.dataFi),
     );
 }
@@ -53,7 +52,7 @@ const columns = [
     {
         field: 'expedient',
         flex: 1,
-        renderCell: (params:any) => <Link component={RouterLink} to={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</Link>,
+        renderCell: (params:any) => <ContingutLink id={params?.row?.expedient?.id}>{params?.formattedValue}</ContingutLink>,
     },
     {
         field: 'metaExpedientTasca',
@@ -66,10 +65,12 @@ const columns = [
     {
         field: 'responsablesStr',
         flex: 1,
+        sortable: false, // camp @Transient: es resol via perspectiva RESPONSABLES_RESUM/afterConversion, en BD no hi ha columna
     },
     {
         field: 'createdByFullName',
         flex: 0.75,
+        sortable: false, // camp @Transient: es resol el nom via perspectiva AUDITORIA, en BD només hi ha createdBy
     },
     {
         field: 'dataInici',

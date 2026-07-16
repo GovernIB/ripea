@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -185,38 +186,76 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         response.put("isCreacioFluxUsuariActiu", FluxFirmaHelper.isCreacioFluxUsuariActiu(request));
         response.put("teAccesEstadistiques", ExpedientHelper.teAccesEstadistiques(request));
         response.put("isMostrarSeguimentEnviamentsUsuariActiu", SeguimentEnviamentsUsuariHelper.isMostrarSeguimentEnviamentsUsuariActiu(request));
-        response.put("isConvertirDefinitiuActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CONVERSIO_DEFINITIU)));
-        response.put("isUrlValidacioDefinida", aplicacioService.propertyFindByNom(PropertyConfig.VALIDACIO_URL_IMPRIMIBLES)!=null);
-        response.put("isDocumentsGeneralsEnabled", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.DOCUMENTS_GENERALS_ACTIUS)));
-        response.put("isTipusDocumentsEnabled", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.TIPUS_DOCUMENT_ACTIUS)));       
-        response.put("isUrlInstruccioEnabled", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.GENERAR_URL_INSTRUCCIO)));
-        response.put("maxUploadFileSize", aplicacioService.propertyFindByNom(PropertyConfig.MAX_UPLOAD_FILE));
-        response.put("isDominisEnabled", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.DOMINIS_HABILITATS)));
-        response.put("isExportacioExcelActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.EXPORTACIO_EXCEL)));
-        response.put("isExportacioInsideActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.EXPORTACIO_INSIDE)));
-        response.put("imprimibleNoFirmats", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.IMPRIMIBLE_NO_FIRMAT_ACTIU)));
-        response.put("isMostrarPublicar", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.PUBLICAR_DOCUMENTS_ACTIVA)));
-        response.put("isMostrarCopiar", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MOURER_DOCUMENTS_ACTIU)));
-        response.put("isMostrarVincular", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.VINCULAR_DOCUMENTS_ACTIU)));
-        response.put("isReobrirPermes", aplicacioService.propertyBooleanFindByKey(PropertyConfig.REOBRIR_EXPEDIENT_TANCAT, true));
-        response.put("isTancamentLogicActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.TANCAMENT_LOGIC)));
-        response.put("isCreacioCarpetesLogica", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CARPETES_LOGIQUES_ACTIVES)));
-        response.put("isPermesModificarCustodiats", aplicacioService.propertyBooleanFindByKey(PropertyConfig.MODIFICAR_DOCUMENTS_CUSTODIATS, false));
-        response.put("isCreacioCarpetesActiva", aplicacioService.propertyBooleanFindByKey(PropertyConfig.CARPETES_CREACIO_ACTIVA, false));
-        response.put("isMostrarImportacio", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.IMPORTACIO_ACTIVA)));
-        response.put("isIncorporacioJustificantActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.INCORPORAR_JUSTIFICANT)));
-        response.put("isImportacioRelacionatsActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.IMPORTACIO_RELACIONATS_ACTIVA)));
-        response.put("isWsUsuariEntitatActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.PORTAFIB_PLUGIN_USUARISPF_WS)));
-        response.put("ordenacioContingutPermesa", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.ORDENACIO_CONTINGUT_ACTIU)));
-        response.put("isContingutCarpetaDetallAccesActiva", aplicacioService.propertyBooleanFindByKey(PropertyConfig.CARPETA_DETALL_ACCES_ACTIVA, false));
-        response.put("moureMateixExpedients", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MOURE_MATEIX_EXPEDIENTS)));
-        response.put("permesEsborrarFinals", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.PERMATRE_ESBORRAR_FINAL)));
-        response.put("isRevisioActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.METAEXPEDIENT_REVISIO_ACTIVA)));
-        response.put("isExpedientMoureTotActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MOURE_TOT)));
-        response.put("isPropagarMetadades", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.PROPAGAR_METADADES)));
-        response.put("isCarpetesDefecte", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CARPETES_PER_DEFECTE)));
-        response.put("isRestringirCarpetesActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CARPETES_RESTRINGIR_ACTIU)));
-        String maxResultsSelects = aplicacioService.propertyFindByNom(PropertyConfig.MAX_RESULTS_SELECT);
+
+        // Optimització: recuperam totes les propietats de configuració necessàries en una sola crida
+        // (2 consultes batch a BD, no una per propietat), amb la mateixa semàntica de resolució que
+        // propertyFindByNom (òrgan → entitat → general). Evita ~30 preses de connexió del pool per petició.
+        Properties props = aplicacioService.getConfigs(Arrays.asList(
+                PropertyConfig.CONVERSIO_DEFINITIU,
+                PropertyConfig.VALIDACIO_URL_IMPRIMIBLES,
+                PropertyConfig.DOCUMENTS_GENERALS_ACTIUS,
+                PropertyConfig.TIPUS_DOCUMENT_ACTIUS,
+                PropertyConfig.GENERAR_URL_INSTRUCCIO,
+                PropertyConfig.MAX_UPLOAD_FILE,
+                PropertyConfig.DOMINIS_HABILITATS,
+                PropertyConfig.EXPORTACIO_EXCEL,
+                PropertyConfig.EXPORTACIO_INSIDE,
+                PropertyConfig.IMPRIMIBLE_NO_FIRMAT_ACTIU,
+                PropertyConfig.PUBLICAR_DOCUMENTS_ACTIVA,
+                PropertyConfig.MOURER_DOCUMENTS_ACTIU,
+                PropertyConfig.VINCULAR_DOCUMENTS_ACTIU,
+                PropertyConfig.REOBRIR_EXPEDIENT_TANCAT,
+                PropertyConfig.TANCAMENT_LOGIC,
+                PropertyConfig.CARPETES_LOGIQUES_ACTIVES,
+                PropertyConfig.MODIFICAR_DOCUMENTS_CUSTODIATS,
+                PropertyConfig.CARPETES_CREACIO_ACTIVA,
+                PropertyConfig.IMPORTACIO_ACTIVA,
+                PropertyConfig.INCORPORAR_JUSTIFICANT,
+                PropertyConfig.IMPORTACIO_RELACIONATS_ACTIVA,
+                PropertyConfig.PORTAFIB_PLUGIN_USUARISPF_WS,
+                PropertyConfig.ORDENACIO_CONTINGUT_ACTIU,
+                PropertyConfig.CARPETA_DETALL_ACCES_ACTIVA,
+                PropertyConfig.MOURE_MATEIX_EXPEDIENTS,
+                PropertyConfig.PERMATRE_ESBORRAR_FINAL,
+                PropertyConfig.METAEXPEDIENT_REVISIO_ACTIVA,
+                PropertyConfig.MOURE_TOT,
+                PropertyConfig.PROPAGAR_METADADES,
+                PropertyConfig.CARPETES_PER_DEFECTE,
+                PropertyConfig.CARPETES_RESTRINGIR_ACTIU,
+                PropertyConfig.MAX_RESULTS_SELECT));
+
+        response.put("isConvertirDefinitiuActiu", Boolean.parseBoolean(props.getProperty(PropertyConfig.CONVERSIO_DEFINITIU)));
+        response.put("isUrlValidacioDefinida", props.getProperty(PropertyConfig.VALIDACIO_URL_IMPRIMIBLES)!=null);
+        response.put("isDocumentsGeneralsEnabled", Boolean.parseBoolean(props.getProperty(PropertyConfig.DOCUMENTS_GENERALS_ACTIUS)));
+        response.put("isTipusDocumentsEnabled", Boolean.parseBoolean(props.getProperty(PropertyConfig.TIPUS_DOCUMENT_ACTIUS)));       
+        response.put("isUrlInstruccioEnabled", Boolean.parseBoolean(props.getProperty(PropertyConfig.GENERAR_URL_INSTRUCCIO)));
+        response.put("maxUploadFileSize", props.getProperty(PropertyConfig.MAX_UPLOAD_FILE));
+        response.put("isDominisEnabled", Boolean.parseBoolean(props.getProperty(PropertyConfig.DOMINIS_HABILITATS)));
+        response.put("isExportacioExcelActiva", Boolean.parseBoolean(props.getProperty(PropertyConfig.EXPORTACIO_EXCEL)));
+        response.put("isExportacioInsideActiva", Boolean.parseBoolean(props.getProperty(PropertyConfig.EXPORTACIO_INSIDE)));
+        response.put("imprimibleNoFirmats", Boolean.parseBoolean(props.getProperty(PropertyConfig.IMPRIMIBLE_NO_FIRMAT_ACTIU)));
+        response.put("isMostrarPublicar", Boolean.parseBoolean(props.getProperty(PropertyConfig.PUBLICAR_DOCUMENTS_ACTIVA)));
+        response.put("isMostrarCopiar", Boolean.parseBoolean(props.getProperty(PropertyConfig.MOURER_DOCUMENTS_ACTIU)));
+        response.put("isMostrarVincular", Boolean.parseBoolean(props.getProperty(PropertyConfig.VINCULAR_DOCUMENTS_ACTIU)));
+        response.put("isReobrirPermes", Boolean.parseBoolean(props.getProperty(PropertyConfig.REOBRIR_EXPEDIENT_TANCAT)));
+        response.put("isTancamentLogicActiu", Boolean.parseBoolean(props.getProperty(PropertyConfig.TANCAMENT_LOGIC)));
+        response.put("isCreacioCarpetesLogica", Boolean.parseBoolean(props.getProperty(PropertyConfig.CARPETES_LOGIQUES_ACTIVES)));
+        response.put("isPermesModificarCustodiats", Boolean.parseBoolean(props.getProperty(PropertyConfig.MODIFICAR_DOCUMENTS_CUSTODIATS)));
+        response.put("isCreacioCarpetesActiva", Boolean.parseBoolean(props.getProperty(PropertyConfig.CARPETES_CREACIO_ACTIVA)));
+        response.put("isMostrarImportacio", Boolean.parseBoolean(props.getProperty(PropertyConfig.IMPORTACIO_ACTIVA)));
+        response.put("isIncorporacioJustificantActiva", Boolean.parseBoolean(props.getProperty(PropertyConfig.INCORPORAR_JUSTIFICANT)));
+        response.put("isImportacioRelacionatsActiva", Boolean.parseBoolean(props.getProperty(PropertyConfig.IMPORTACIO_RELACIONATS_ACTIVA)));
+        response.put("isWsUsuariEntitatActiu", Boolean.parseBoolean(props.getProperty(PropertyConfig.PORTAFIB_PLUGIN_USUARISPF_WS)));
+        response.put("ordenacioContingutPermesa", Boolean.parseBoolean(props.getProperty(PropertyConfig.ORDENACIO_CONTINGUT_ACTIU)));
+        response.put("isContingutCarpetaDetallAccesActiva", Boolean.parseBoolean(props.getProperty(PropertyConfig.CARPETA_DETALL_ACCES_ACTIVA)));
+        response.put("moureMateixExpedients", Boolean.parseBoolean(props.getProperty(PropertyConfig.MOURE_MATEIX_EXPEDIENTS)));
+        response.put("permesEsborrarFinals", Boolean.parseBoolean(props.getProperty(PropertyConfig.PERMATRE_ESBORRAR_FINAL)));
+        response.put("isRevisioActiva", Boolean.parseBoolean(props.getProperty(PropertyConfig.METAEXPEDIENT_REVISIO_ACTIVA)));
+        response.put("isExpedientMoureTotActiu", Boolean.parseBoolean(props.getProperty(PropertyConfig.MOURE_TOT)));
+        response.put("isPropagarMetadades", Boolean.parseBoolean(props.getProperty(PropertyConfig.PROPAGAR_METADADES)));
+        response.put("isCarpetesDefecte", Boolean.parseBoolean(props.getProperty(PropertyConfig.CARPETES_PER_DEFECTE)));
+        response.put("isRestringirCarpetesActiu", Boolean.parseBoolean(props.getProperty(PropertyConfig.CARPETES_RESTRINGIR_ACTIU)));
+        String maxResultsSelects = props.getProperty(PropertyConfig.MAX_RESULTS_SELECT);
         response.put("maxResultSelects", maxResultsSelects!=null?Integer.parseInt(maxResultsSelects):30);
 
         if ("IPA_ADMIN".equals(userPermissionInfo.getRolActual()) && userPermissionInfo.getEntitatActualId()!=null) {

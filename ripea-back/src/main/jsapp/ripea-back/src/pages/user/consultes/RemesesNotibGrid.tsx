@@ -8,8 +8,7 @@ import {StyledEstat} from "../../remesa/RemesaGrid.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import GridFormField, {GridButtonField} from "../../../components/GridFormField.tsx";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
-import {Link as RouterLink} from "react-router-dom";
-import {Link} from "@mui/material";
+import ContingutLink from "../../../components/ContingutLink.tsx";
 import {useActions} from "../../remesa/details/RemesaActions.tsx";
 
 // Filter
@@ -87,7 +86,7 @@ const columns: any[] = [
     {
         field: 'expedient',
         flex: 1,
-        renderCell: (params:any) => <Link component={RouterLink} to={`/contingut/${params?.row?.expedient?.id}`}>{params?.formattedValue}</Link>,
+        renderCell: (params:any) => <ContingutLink id={params?.row?.expedient?.id}>{params?.formattedValue}</ContingutLink>,
     },
     {
         field: 'assumpte',

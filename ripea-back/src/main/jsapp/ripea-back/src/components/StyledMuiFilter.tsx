@@ -2,7 +2,7 @@ import {Grid, Typography} from "@mui/material";
 import {MuiFilter, useFilterApiRef} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {useSession} from "./SessionStorageContext.tsx";
-import {useEffect, useMemo} from "react";
+import {useEffect, useMemo, useRef} from "react";
 import {CombinedIcon, GridButton, GridButtonField} from "./GridFormField.tsx";
 
 const filterStyle = { className: "styledFilter" };
@@ -69,6 +69,10 @@ const StyledMuiFilter = (props:any) => {
         ...other
     } = props
 
+    // Marca que la propera notificació de dades prové d'un "netejar", per re-aplicar
+    // el filtre buit només quan el formulari no té camps per defecte (vegeu onDataChange).
+    const netejarPendingRef = useRef(false);
+
     const cercar = ()=> {
         apiRef?.current?.filter?.()
     }
@@ -76,6 +80,7 @@ const StyledMuiFilter = (props:any) => {
         if (sessionKey) {
             saveFilterData(null)
         }
+        netejarPendingRef.current = true;
         apiRef?.current?.clear?.()
     }
 
@@ -119,9 +124,17 @@ const StyledMuiFilter = (props:any) => {
         springFilterBuilder={springFilterBuilder}
         onSpringFilterChange={handleSpringFilterChange}
         onDataChange={(data:any) => {
-            if (data && Object.keys(data).length > 0 && (!!sessionKey && !filterData)) {
+            const hasData = data && Object.keys(data).length > 0;
+            if (hasData && (!!sessionKey && !filterData)) {
+                // Auto-cerca inicial (i "netejar" amb camps per defecte, que deixen dades).
+                cercar()
+            } else if (netejarPendingRef.current && !hasData) {
+                // "Netejar" sense camps per defecte: el revert deixa les dades buides,
+                // així que el branch d'auto-cerca no s'activa i cal re-aplicar el filtre
+                // buit aquí. Amb camps per defecte no s'hi entra → sense doble cerca.
                 cercar()
             }
+            netejarPendingRef.current = false;
             externalOnDataChange?.(data);
         }}
         {...other}

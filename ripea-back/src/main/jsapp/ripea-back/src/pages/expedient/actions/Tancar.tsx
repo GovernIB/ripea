@@ -65,6 +65,7 @@ const TancarForm = () => {
                     'DOCUMENTS_OBLIGATORIS_TANCAR',// documentObligatorisAlTancar
                     'NOTIFICACIONS_CADUCADES',// conteNotificacionsCaducades
                     'DOCUMENTS_NO_MOGUTS',// conteDocumentsDeAnotacionesNoMogutsASerieFinal
+                    'AVISOS',// valid + errors (evita el triangle groc fals a la fila de l'expedient)
                     'AUDITORIA'
                 ]
             })

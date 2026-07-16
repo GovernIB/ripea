@@ -325,6 +325,35 @@ public class AjaxUserController extends BaseUserController {
 		}
 	}
 
+	/**
+	 * Eliminar configuracions d'entitats inexistents
+	 */
+	@RequestMapping(value = "/initEliminaConfigsOrfes", method = RequestMethod.GET)
+	public String initEliminaConfigsOrfes(HttpServletRequest request, Model model) {
+		model.addAttribute("titolProces", "Eliminar configuracions d'entitats inexistents");
+		model.addAttribute("urlTotalIteracions", "getConfigsAmbEntitat");
+		model.addAttribute("urlInteracioIndividual", "executeEliminaConfigOrfe");
+		return "util/processAjax";
+	}
+	@RequestMapping(value = "/getConfigsAmbEntitat", method = RequestMethod.GET)
+	@ResponseBody
+	public List<String> getConfigsAmbEntitat(HttpServletRequest request, Model model) {
+		return aplicacioService.getConfigsAmbEntitat();
+	}
+	@RequestMapping(value = "/executeEliminaConfigOrfe/{key}", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<String> executeEliminaConfigOrfe(
+			HttpServletRequest request,
+			@PathVariable String key,
+			Model model) {
+		try {
+			String resultat = aplicacioService.executeEliminaConfigOrfe(key);
+			return ResponseEntity.ok(resultat); // HTTP 200
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // HTTP 500
+		}
+	}
+
 	private static final Logger logger = LoggerFactory.getLogger(AjaxUserController.class);
 
 }

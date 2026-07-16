@@ -75,7 +75,17 @@ public class SessioHelper {
 				}
 			}
 			if (usuariActual == null) {
-				usuariActual = aplicacioService.getUsuariActual();
+				// OPTIMITZACIÓ: a les peticions posteriors a la primera de la sessió (típicament les crides
+				// /api de React) reutilitzam l'usuari ja cachejat a la sessió en lloc de tornar a consultar-lo
+				// a BD en CADA petició. getUsuariActual() obria una transacció + connexió del pool per petició,
+				// i per petició només se'n fa servir l'idioma (més avall). El cache de sessió s'actualitza a la
+				// primera petició i quan l'usuari canvia el seu perfil (UsuariController -> setUsuariActual).
+				usuariActual = getUsuariActual(request);
+				if (usuariActual == null) {
+					// Fallback defensiu: si per algun motiu no hi és a la sessió, el carregam una vegada i el cachejam.
+					usuariActual = aplicacioService.getUsuariActual();
+					setUsuariActual(request, usuariActual);
+				}
 			}
 			if (entitatActual == null) {
 				entitatActual = EntitatHelper.getEntitatActual(request, entitatService);
@@ -87,6 +97,7 @@ public class SessioHelper {
                 habilitarTipusDocument = aplicacioService.propertyBooleanFindByKey(PropertyConfig.TIPUS_DOCUMENT_ACTIUS, false);
                 habilitarDocumentsGenerals = aplicacioService.propertyBooleanFindByKey(PropertyConfig.DOCUMENTS_GENERALS_ACTIUS, false);
                 habilitarDominis = aplicacioService.propertyBooleanFindByKey(PropertyConfig.DOMINIS_HABILITATS);
+                isReactActiu = aplicacioService.propertyBooleanFindByKey(PropertyConfig.REACT_ACTIU);
 				propietatsInicialitzades = true;
 			}
 			String idioma_usuari = usuariActual.getIdioma();
@@ -97,7 +108,7 @@ public class SessioHelper {
 			request.getSession().setAttribute("SessionHelper.isTipusDocumentsEnabled", habilitarTipusDocument);
 			request.getSession().setAttribute("SessionHelper.isDocumentsGeneralsEnabled", habilitarDocumentsGenerals);
 			request.getSession().setAttribute("SessionHelper.isDominisEnabled", habilitarDominis);
-			request.getSession().setAttribute("SessionHelper.isReactActiu", aplicacioService.propertyBooleanFindByKey(PropertyConfig.REACT_ACTIU));
+			request.getSession().setAttribute("SessionHelper.isReactActiu", isReactActiu);
 			request.getSession().setAttribute(SESSION_ATTRIBUTE_IDIOMA_USUARI, idioma_usuari);
 			aplicacioService.actualitzarEntitatThreadLocal(entitatActual);
 			Object rolActualSessio = request.getSession().getAttribute(RolHelper.SESSION_ATTRIBUTE_ROL_ACTUAL);
