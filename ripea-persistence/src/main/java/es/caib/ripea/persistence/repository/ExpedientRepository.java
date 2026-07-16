@@ -93,11 +93,18 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			// Un cop superada la select anterior, es procedeix a afinar per permisos per procediment:
 			// - Per admin i superadmin: es compleix la primera condicio = No filtra
 			// - Per la resta: el procediment no ha de requerir permis directe o en cas contrari, s'ha de tenir el permis directe de lectura.
-			"and (:isAdmin = true or :esNullIdsMetaExpedientsPermesos = true or e.metaExpedient.permisDirecte = false or ("+ 
+			// Son permis directe sobre el procediment (issue #1633): el permis sobre el MetaExpedient (VIA 1) i el
+			// permis sobre la parella procediment-organ (VIA 3, procediments comuns amb organ). NO ho es el permis
+			// sobre l'organ gestor (vies 2/4), que es precisament el cas que aquesta restriccio ha de tallar.
+			// Es el mateix criteri que aplica EntityComprovarHelper.comprovarPermisExpedient al detall de l'expedient.
+			// Amb les llistes buides el filtre NO es desactiva: nomes passen els procediments sense permisDirecte.
+			"and (:isAdmin = true or e.metaExpedient.permisDirecte = false " +
+					"	or (:esNullIdsMetaExpedientsPermesos = false and ("+
 					"				e.metaExpedient.id in (:idsMetaExpedientsPermesos0)" +
 					"			or	e.metaExpedient.id in (:idsMetaExpedientsPermesos1)" +
 					"			or	e.metaExpedient.id in (:idsMetaExpedientsPermesos2)" +
 					"			or	e.metaExpedient.id in (:idsMetaExpedientsPermesos3)))" +
+					"	or (:esNullIdsMetaExpedientOrganPairsPermesos = false and meogp.id in (:idsMetaExpedientOrganPairsPermesos)))" +
 			"and (:esNullMetaNode = true or e.metaNode = :metaNode) " +
 			"and (:esNullMetaExpedientIdDomini = true or e.metaExpedient.id in (:metaExpedientIdDomini)) " +
 			"and (:esNullOrganGestor = true or e.organGestor = :organGestor) " + //Organ gestor del filtre
@@ -238,11 +245,18 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			// Un cop superada la select anterior, es procedeix a afinar per permisos per procediment:
 			// - Per admin i superadmin: es compleix la primera condicio = No filtra
 			// - Per la resta: el procediment no ha de requerir permis directe o en cas contrari, s'ha de tenir el permis directe de lectura.
-			"and (:isAdmin = true or :esNullIdsMetaExpedientsPermesos = true or e.metaExpedient.permisDirecte = false or ("+ 
+			// Son permis directe sobre el procediment (issue #1633): el permis sobre el MetaExpedient (VIA 1) i el
+			// permis sobre la parella procediment-organ (VIA 3, procediments comuns amb organ). NO ho es el permis
+			// sobre l'organ gestor (vies 2/4), que es precisament el cas que aquesta restriccio ha de tallar.
+			// Es el mateix criteri que aplica EntityComprovarHelper.comprovarPermisExpedient al detall de l'expedient.
+			// Amb les llistes buides el filtre NO es desactiva: nomes passen els procediments sense permisDirecte.
+			"and (:isAdmin = true or e.metaExpedient.permisDirecte = false " +
+					"	or (:esNullIdsMetaExpedientsPermesos = false and ("+
 					"				e.metaExpedient.id in (:idsMetaExpedientsPermesos0)" +
 					"			or	e.metaExpedient.id in (:idsMetaExpedientsPermesos1)" +
 					"			or	e.metaExpedient.id in (:idsMetaExpedientsPermesos2)" +
 					"			or	e.metaExpedient.id in (:idsMetaExpedientsPermesos3)))" +
+					"	or (:esNullIdsMetaExpedientOrganPairsPermesos = false and meogp.id in (:idsMetaExpedientOrganPairsPermesos)))" +
 			"and (:esNullMetaNode = true or e.metaNode = :metaNode) " +
 			"and (:esNullMetaExpedientIdDomini = true or e.metaExpedient.id in (:metaExpedientIdDomini)) " +
 			"and (:esNullOrganGestor = true or e.organGestor = :organGestor) " + //Organ gestor del filtre
