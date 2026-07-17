@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -50,6 +51,7 @@ import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.helper.EmailHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.ExceptionHelper;
 import es.caib.ripea.service.helper.ExecucioMassivaHelper;
 import es.caib.ripea.service.helper.ExpedientHelper;
@@ -94,6 +96,13 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
     @Autowired private ApplicationHelper applicationHelper;
 	@Autowired private UsuariHelper usuariHelper;
 	@Autowired private ContingutMovimentRepository contenidorMovimentRepository;
+	@Autowired private ExcepcioLogHelper excepcioLogHelper;
+	//Referència a un mateix a través del proxy: cridar executarExecucioMassiva() amb this ignoraria el REQUIRES_NEW
+	@Lazy @Autowired private ExecucioMassivaServiceImpl self;
+
+	private static final int ERROR_TAMANY = 2046;
+	//Codi de la tasca a SchedulingConfig, usat com a uri al monitor d'excepcions
+	private static final String TASCA_CODI = "execucioAccionsMassives";
 
 	private final Map<Long, Object> locks = new ConcurrentHashMap<>();
 	
@@ -168,121 +177,143 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 		return dtos;
 	}
 
-	@Transactional
 	@Override
 	public void executeNextMassiveScheduledTask() {
-		
+
 		Timer.Sample sample = Timer.start(applicationHelper.getMeterRegistry());
 		logger.trace("Execució tasca periòdica: Execucions massives");
 
+		Long execucioMassivaId = execucioMassivaHelper.getIdExecucioMassivaPerProcessar(new Date());
+		if (execucioMassivaId == null) {
+			return;
+		}
+
+		String error = null;
 		try {
-			List<ExecucioMassivaEntity> massives = execucioMassivaRepository.getMassivesPerProcessar(new Date());
-
-			if (massives != null && massives.size()>0) {
-				
-				ExecucioMassivaEntity execucioMassiva = massives.get(0);
-				EntitatDto entitat = conversioTipusHelper.convertir(execucioMassiva.getEntitat(), EntitatDto.class);
-				ConfigHelper.setEntitat(entitat);
-				List<DocumentAmbTipusDto> documents = new ArrayList<DocumentAmbTipusDto>();
-				
-				if (execucioMassiva.getContinguts() != null) {
-					
-					//Cas especific de importació massiva de documents, els quals s'han guardat temporalment a disc.
-					//Per nomes llegir-ho una vegada i no per cada expedient, els obtenim ara, y els passam a executarExecucioMassivaContingutNewTransaction
-					if (ExecucioMassivaTipusDto.IMPORTAR_DOCS.equals(execucioMassiva.getTipus()) && Utils.hasValue(execucioMassiva.getDocumentNom())) {
-						
-						ByteArrayOutputStream streamZipDocs = new ByteArrayOutputStream();
-						pluginHelper.gestioDocumentalGet(
-								execucioMassiva.getDocumentNom(),
-								PluginHelper.GESDOC_AGRUPACIO_DOCS_ESBORRANYS,
-								streamZipDocs);
-						
-						//Extreurer els documents del ZIP
-						ByteArrayInputStream bais = new ByteArrayInputStream(streamZipDocs.toByteArray());
-			            ZipInputStream zipIn = new ZipInputStream(bais);
-			            ObjectMapper objectMapper = new ObjectMapper();
-			            
-			            ZipEntry entry;
-			            while ((entry = zipIn.getNextEntry()) != null) {
-			                if (!entry.isDirectory() && entry.getName().endsWith(".json")) {
-			                    // Leer el contenido del archivo JSON
-			                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			                    byte[] buffer = new byte[1024];
-			                    int len;
-			                    while ((len = zipIn.read(buffer)) > 0) {
-			                        baos.write(buffer, 0, len);
-			                    }
-
-			                    String json = baos.toString("UTF-8");
-
-			                    // Convertir el JSON al objeto
-			                    DocumentAmbTipusDto doc = objectMapper.readValue(json, DocumentAmbTipusDto.class);
-			                    documents.add(doc);
-			                }
-			                zipIn.closeEntry();
-			            }
-					}
-
-					if (ExecucioMassivaTipusDto.EXPORTAR_ZIP.equals(execucioMassiva.getTipus())) {
-						//Cas de exportació a ZIP, no es individual per cada expedient, s'ha de executar per tots els expedients
-						generaZipDocumentsExpedients(execucioMassiva);
-					} else if (ExecucioMassivaTipusDto.EXPORTAR_INDEX_ZIP.equals(execucioMassiva.getTipus()) ||
-							ExecucioMassivaTipusDto.EXPORTAR_INDEX_PDF.equals(execucioMassiva.getTipus())||
-							ExecucioMassivaTipusDto.EXPORTAR_GENERIC.equals(execucioMassiva.getTipus())||
-							ExecucioMassivaTipusDto.EXPORTAR_INDEX_EXCEL.equals(execucioMassiva.getTipus()) ||
-							ExecucioMassivaTipusDto.EXPORTAR_ENI.equals(execucioMassiva.getTipus()) || 
-							ExecucioMassivaTipusDto.EXPORTAR_INSIDE.equals(execucioMassiva.getTipus()) ||
-							ExecucioMassivaTipusDto.EXPORTAR_EXCEL.equals(execucioMassiva.getTipus()) || 
-							ExecucioMassivaTipusDto.EXPORTAR_CSV.equals(execucioMassiva.getTipus())) {
-						exportarExpedients(execucioMassiva);
-					} else if (ExecucioMassivaTipusDto.MOURE_EXPEDIENT.equals(execucioMassiva.getTipus())) {
-						moureEntreExpedients(execucioMassiva);
-					} else {
-						
-						for (ExecucioMassivaContingutEntity execucioMassivaItemEntity : execucioMassiva.getContinguts()) {
-							
-							String throwable = execucioMassivaHelper.executarExecucioMassivaContingutNewTransaction(
-									execucioMassivaItemEntity.getId(),
-									documents);
-							
-							if (throwable != null) {
-								alertaHelper.crearAlerta(
-										messageHelper.getMessage(
-												"alertes.segon.pla.executar.execucio.massiva.error",
-												new Object[] {execucioMassivaItemEntity.getId()}),
-										throwable,
-										false,
-										execucioMassivaItemEntity.getElementId());
-							}
-						}
-					}
-				}
-				
-				//Esborram el fitxer temporal ZIP amb els Json dels documents del disc
-				if (ExecucioMassivaTipusDto.IMPORTAR_DOCS.equals(execucioMassiva.getTipus()) && Utils.hasValue(execucioMassiva.getDocumentNom())) {
-					pluginHelper.gestioDocumentalDelete(
-							execucioMassiva.getDocumentNom(),
-							PluginHelper.GESDOC_AGRUPACIO_DOCS_ESBORRANYS);
-					execucioMassiva.setDocumentNom(null);
-				}
-				
-				execucioMassiva.updateDataFi(new Date());
-				execucioMassivaRepository.save(execucioMassiva);
-				
-				if (execucioMassiva.getEnviarCorreu()!=null && execucioMassiva.getEnviarCorreu().booleanValue()) {
-					try {
-						emailHelper.execucioMassivaFinalitzada(execucioMassiva);
-					} catch (Exception e) {
-						logger.error("No s'ha pogut enviar el correu de finalització d'accio massiva", e);
-					}
-				}
-				
-				applicationHelper.stopTimer(sample, "METRICS@Subsystem_Background.userMassiveAction", "resultado", "exito");
+			//La feina va en una transacció pròpia: si peta o expira, no s'emporta per davant el tancament de sota.
+			self.executarExecucioMassiva(execucioMassivaId);
+		} catch (Throwable th) {
+			logger.error("Error al fer execucio massiva (id=" + execucioMassivaId + ")", th);
+			error = ExecucioMassivaHelper.getExceptionString(ExceptionHelper.getRootCauseOrItself(th), ERROR_TAMANY);
+			//L'excepció no arriba mai al catch de SchedulingConfig, així que s'ha de registrar aquí perquè
+			//consti al monitor d'excepcions.
+			try {
+				excepcioLogHelper.addExcepcio(TASCA_CODI + "/" + execucioMassivaId, th);
+			} catch (Throwable th2) {
+				logger.error("No s'ha pogut registrar l'excepció de l'execució massiva (id=" + execucioMassivaId + ")", th2);
 			}
-			
-		} catch (Exception e) {
-			logger.error("Error al fer execucio massiva", e);
-			applicationHelper.stopTimer(sample, "METRICS@Subsystem_Background.userMassiveAction", "resultado", "error");		
+		} finally {
+			//Passi el que passi, l'execució s'ha de tancar en una transacció nova i aïllada. Si la data de fi no
+			//queda escrita, aquesta mateixa execució torna a ser la primera de la cua a cada cicle i bloqueja
+			//indefinidament totes les posteriors.
+			try {
+				execucioMassivaHelper.finalitzarExecucioMassiva(execucioMassivaId, error);
+			} catch (Throwable th) {
+				logger.error("No s'ha pogut tancar l'execució massiva (id=" + execucioMassivaId + "): bloquejarà la cua "
+						+ "fins que se li informi la data de fi", th);
+			}
+			applicationHelper.stopTimer(
+					sample,
+					"METRICS@Subsystem_Background.userMassiveAction",
+					"resultado",
+					error == null ? "exito" : "error");
+		}
+	}
+
+	/**
+	 * Processa una execució massiva. No informa la data de fi: d'això se n'encarrega sempre
+	 * {@link ExecucioMassivaHelper#finalitzarExecucioMassiva(Long, String)} des del mètode cridador.
+	 */
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void executarExecucioMassiva(Long execucioMassivaId) throws Exception {
+
+		ExecucioMassivaEntity execucioMassiva = execucioMassivaRepository.findById(execucioMassivaId).orElse(null);
+		if (execucioMassiva == null)
+			throw new NotFoundException(execucioMassivaId, ExecucioMassivaEntity.class);
+
+		EntitatDto entitat = conversioTipusHelper.convertir(execucioMassiva.getEntitat(), EntitatDto.class);
+		ConfigHelper.setEntitat(entitat);
+		List<DocumentAmbTipusDto> documents = new ArrayList<DocumentAmbTipusDto>();
+
+		if (execucioMassiva.getContinguts() != null) {
+
+			//Cas especific de importació massiva de documents, els quals s'han guardat temporalment a disc.
+			//Per nomes llegir-ho una vegada i no per cada expedient, els obtenim ara, y els passam a executarExecucioMassivaContingutNewTransaction
+			if (ExecucioMassivaTipusDto.IMPORTAR_DOCS.equals(execucioMassiva.getTipus()) && Utils.hasValue(execucioMassiva.getDocumentNom())) {
+
+				ByteArrayOutputStream streamZipDocs = new ByteArrayOutputStream();
+				pluginHelper.gestioDocumentalGet(
+						execucioMassiva.getDocumentNom(),
+						PluginHelper.GESDOC_AGRUPACIO_DOCS_ESBORRANYS,
+						streamZipDocs);
+
+				//Extreurer els documents del ZIP
+				ByteArrayInputStream bais = new ByteArrayInputStream(streamZipDocs.toByteArray());
+	            ZipInputStream zipIn = new ZipInputStream(bais);
+	            ObjectMapper objectMapper = new ObjectMapper();
+
+	            ZipEntry entry;
+	            while ((entry = zipIn.getNextEntry()) != null) {
+	                if (!entry.isDirectory() && entry.getName().endsWith(".json")) {
+	                    // Leer el contenido del archivo JSON
+	                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	                    byte[] buffer = new byte[1024];
+	                    int len;
+	                    while ((len = zipIn.read(buffer)) > 0) {
+	                        baos.write(buffer, 0, len);
+	                    }
+
+	                    String json = baos.toString("UTF-8");
+
+	                    // Convertir el JSON al objeto
+	                    DocumentAmbTipusDto doc = objectMapper.readValue(json, DocumentAmbTipusDto.class);
+	                    documents.add(doc);
+	                }
+	                zipIn.closeEntry();
+	            }
+			}
+
+			if (ExecucioMassivaTipusDto.EXPORTAR_ZIP.equals(execucioMassiva.getTipus())) {
+				//Cas de exportació a ZIP, no es individual per cada expedient, s'ha de executar per tots els expedients
+				generaZipDocumentsExpedients(execucioMassiva);
+			} else if (ExecucioMassivaTipusDto.EXPORTAR_INDEX_ZIP.equals(execucioMassiva.getTipus()) ||
+					ExecucioMassivaTipusDto.EXPORTAR_INDEX_PDF.equals(execucioMassiva.getTipus())||
+					ExecucioMassivaTipusDto.EXPORTAR_GENERIC.equals(execucioMassiva.getTipus())||
+					ExecucioMassivaTipusDto.EXPORTAR_INDEX_EXCEL.equals(execucioMassiva.getTipus()) ||
+					ExecucioMassivaTipusDto.EXPORTAR_ENI.equals(execucioMassiva.getTipus()) ||
+					ExecucioMassivaTipusDto.EXPORTAR_INSIDE.equals(execucioMassiva.getTipus()) ||
+					ExecucioMassivaTipusDto.EXPORTAR_EXCEL.equals(execucioMassiva.getTipus()) ||
+					ExecucioMassivaTipusDto.EXPORTAR_CSV.equals(execucioMassiva.getTipus())) {
+				exportarExpedients(execucioMassiva);
+			} else if (ExecucioMassivaTipusDto.MOURE_EXPEDIENT.equals(execucioMassiva.getTipus())) {
+				moureEntreExpedients(execucioMassiva);
+			} else {
+
+				for (ExecucioMassivaContingutEntity execucioMassivaItemEntity : execucioMassiva.getContinguts()) {
+
+					String throwable = execucioMassivaHelper.executarExecucioMassivaContingutNewTransaction(
+							execucioMassivaItemEntity.getId(),
+							documents);
+
+					if (throwable != null) {
+						alertaHelper.crearAlerta(
+								messageHelper.getMessage(
+										"alertes.segon.pla.executar.execucio.massiva.error",
+										new Object[] {execucioMassivaItemEntity.getId()}),
+								throwable,
+								false,
+								execucioMassivaItemEntity.getElementId());
+					}
+				}
+			}
+		}
+
+		if (execucioMassiva.getEnviarCorreu()!=null && execucioMassiva.getEnviarCorreu().booleanValue()) {
+			try {
+				emailHelper.execucioMassivaFinalitzada(execucioMassiva);
+			} catch (Exception e) {
+				logger.error("No s'ha pogut enviar el correu de finalització d'accio massiva", e);
+			}
 		}
 	}
 
@@ -296,7 +327,8 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 		return resultat;
 	}
 	
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	//Sense @Transactional: és un mètode privat cridat des de dins de la mateixa classe, l'anotació no s'aplicaria mai.
+	//S'executa dins la transacció de executarExecucioMassiva().
 	private void exportarExpedients(ExecucioMassivaEntity execucioMassiva) {
 		
 		try {
@@ -350,7 +382,8 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 		}
 	}	
 	
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	//Sense @Transactional: és un mètode privat cridat des de dins de la mateixa classe, l'anotació no s'aplicaria mai.
+	//S'executa dins la transacció de executarExecucioMassiva().
 	private void generaZipDocumentsExpedients(ExecucioMassivaEntity execucioMassiva) {
 
 		ExecucioMassivaContingutEntity execMassivaItem = null;
@@ -587,5 +620,5 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 	    return Math.round(value * 100 / total);
 	}
 
-	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(ExecucioMassivaServiceImpl.class);
 }
