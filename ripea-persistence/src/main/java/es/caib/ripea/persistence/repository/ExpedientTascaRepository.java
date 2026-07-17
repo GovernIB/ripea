@@ -70,7 +70,7 @@ public interface ExpedientTascaRepository extends JpaRepository<ExpedientTascaEn
 		@Param("metaExpedient") MetaExpedientEntity metaExpedient,
 		Pageable pageable);
 
-	/*select * 
+	/*select *
 	  from IPA_EXPEDIENT_TASCA TASCA
 	     , IPA_EXPEDIENT_TASCA_RESP responsable
 	     , IPA_EXPEDIENT EXP
@@ -83,7 +83,7 @@ public interface ExpedientTascaRepository extends JpaRepository<ExpedientTascaEn
 	  AND CONT.esborrat = 0
 	  AND TASCA.estat in ('FINALITZADA', 'CANCELLADA')
 	  and (TASCA.DELEGAT=:usuariCodi OR observador.OBSERVADOR_CODI=:usuariCodi OR responsable.RESPONSABLE_CODI=:usuariCodi);*/
-	
+
 	@Query("select " +
 		"    tasca " +
 		"from " +
@@ -153,12 +153,12 @@ public interface ExpedientTascaRepository extends JpaRepository<ExpedientTascaEn
 		"	and (tasca.estat='PENDENT' or tasca.estat='INICIADA' or tasca.estat='AGAFADA') " +
 		"	and (tasca.expedient.esborrat = 0) ")
 	long countTasquesPendents(@Param("responsable") UsuariEntity responsable);
-	
+
 	@Query("select tasca.id from ExpedientTascaEntity tasca " +
 		"where (tasca.estat='PENDENT' or tasca.estat='INICIADA' or tasca.estat='AGAFADA') " +
 		"  and (tasca.expedient.esborrat = 0) ")
 	List<Long> findTasquesPendents();
-	
+
 	@Query("select " +
 			"    count(tasca) " +
 			"from " +
@@ -202,4 +202,22 @@ public interface ExpedientTascaRepository extends JpaRepository<ExpedientTascaEn
  			"WHERE CREATEDBY_CODI = :codiAntic OR LASTMODIFIEDBY_CODI = :codiAntic",
  			nativeQuery = true)
 	public int updateUsuariAuditoria(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+
+    @Query("select " +
+        "    tasca " +
+        "from " +
+        "    ExpedientTascaEntity tasca " +
+        "where " +
+        "    (:responsable MEMBER OF tasca.responsables or :responsable MEMBER OF tasca.observadors or :responsable = tasca.delegat) " +
+        "and (tasca.estat in (:estats)) " +
+        "and (tasca.expedient.esborrat = 0) " +
+        "and (tasca.expedient.entitat.id = :entitatId) " +
+        "and (tasca.dataLimit is not null) " +
+        "and (tasca.dataLimit >= :avui) "
+    )
+    List<ExpedientTascaEntity> findTasquesAmbDataLimitProperaPerUsuari(
+        @Param("responsable") UsuariEntity responsable,
+        @Param("estats") TascaEstatEnumDto[] estats,
+        @Param("entitatId") Long entitatId,
+        @Param("avui") Date avui);
 }

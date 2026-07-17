@@ -173,7 +173,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
     } = props;
     const navigate = useNavigate();
     const location = useLocation();
-    const baseAppMenuEntries = useBaseAppMenuEntries(menuEntries);    
+    const baseAppMenuEntries = useBaseAppMenuEntries(menuEntries);
     const {
         i18nUseTranslation,
         i18nCurrentLanguage,
@@ -192,7 +192,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         }
     }
     const { value } = useAlertesSession();
-    const { value: read, save } = useSession('readAlerts')
+    const { value: read, save } = useSession('readAlerts');
 
     return (
         <MuiBaseApp
@@ -243,6 +243,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
                                     onClose={() => {
                                         save([...(read ?? []), avis.id]);
                                     }}
+                                    linkChildren={avis?.expedients}
                                 >
                                     {avis.missatge}
                                 </AlertExpand>

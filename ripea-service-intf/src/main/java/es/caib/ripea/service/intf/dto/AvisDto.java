@@ -2,7 +2,9 @@ package es.caib.ripea.service.intf.dto;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
+import es.caib.ripea.service.intf.base.model.ResourceReference;
 import lombok.Data;
 
 @Data
@@ -17,4 +19,5 @@ public class AvisDto implements Serializable {
 	private AvisNivellEnumDto avisNivell;
 	private Boolean avisAdministrador;
 	private Long entitatId;
+    private List<GenericDto> expedients;
 }

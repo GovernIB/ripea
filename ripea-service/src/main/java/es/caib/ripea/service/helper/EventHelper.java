@@ -9,7 +9,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import es.caib.ripea.persistence.entity.*;
+import es.caib.ripea.persistence.repository.*;
 import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.*;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
@@ -20,21 +24,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
+import org.joda.time.DateTime;
 
-import es.caib.ripea.persistence.entity.EntitatEntity;
-import es.caib.ripea.persistence.entity.ExpedientEntity;
-import es.caib.ripea.persistence.entity.OrganGestorEntity;
-import es.caib.ripea.persistence.entity.UsuariEntity;
-import es.caib.ripea.persistence.repository.AvisRepository;
-import es.caib.ripea.persistence.repository.EntitatRepository;
-import es.caib.ripea.persistence.repository.ExpedientRepository;
-import es.caib.ripea.persistence.repository.MetaExpedientRepository;
-import es.caib.ripea.persistence.repository.OrganGestorRepository;
-import es.caib.ripea.persistence.repository.UsuariRepository;
-import es.caib.ripea.service.intf.dto.AvisDto;
-import es.caib.ripea.service.intf.dto.AvisNivellEnumDto;
-import es.caib.ripea.service.intf.dto.UsuariAnotacioDto;
-import es.caib.ripea.service.intf.dto.ValidacioErrorDto;
 import es.caib.ripea.service.intf.model.sse.AnotacionsPendentsEvent;
 import es.caib.ripea.service.intf.model.sse.AvisosActiusEvent;
 import es.caib.ripea.service.intf.model.sse.CreacioFluxFinalitzatEvent;
@@ -43,12 +34,14 @@ import es.caib.ripea.service.intf.model.sse.FirmaFinalitzadaEvent;
 import es.caib.ripea.service.intf.model.sse.ScanFinalitzatEvent;
 import es.caib.ripea.service.intf.model.sse.TasquesPendentsEvent;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
+
+import static es.caib.ripea.service.intf.config.PropertyConfig.CONFIG_DIES_AVIS_EXPEDIENT_ANTIC;
 
 @Slf4j
 @Component
 public class EventHelper {
 
-    private static final String CONFIG_DIES_AVIS_EXPEDIENT_ANTIC = "es.caib.ripea.dies.avis.expedient.antic";
     private static final int CONFIG_DIES_AVIS_EXPEDIENT_ANTIC_DEFAULT = 90;
 
 	@Autowired private JmsTemplate jmsTemplate;
@@ -63,6 +56,7 @@ public class EventHelper {
 	@Autowired private EmailHelper emailHelper;
     @Autowired private ConfigHelper configHelper;
     @Autowired private MessageHelper messageHelper;
+    @Autowired private ExpedientTascaRepository expedientTascaRepository;
 
     public void notifyAvisosActius() {
     	// El missatge d'avisos viatja buit (és només un trigger): la data la re-consulta el consumidor
@@ -267,7 +261,7 @@ public class EventHelper {
             }
             Long entitatId = configHelper.getEntitat().get().getId();
 
-            int dies = configHelper.getAsInt(CONFIG_DIES_AVIS_EXPEDIENT_ANTIC, CONFIG_DIES_AVIS_EXPEDIENT_ANTIC_DEFAULT);
+            int dies = configHelper.getAsInt(PropertyConfig.CONFIG_DIES_AVIS_EXPEDIENT_ANTIC, CONFIG_DIES_AVIS_EXPEDIENT_ANTIC_DEFAULT);
             LocalDateTime dataLimit = LocalDateTime.now().minusDays(dies);
 
             List<ExpedientEntity> expedientsAntics = expedientRepository.findExpedientsAntics(usuari, entitatId, dataLimit);
@@ -275,16 +269,22 @@ public class EventHelper {
                 return null;
             }
 
-            String codisExpedients = expedientsAntics.stream()
-                .map(ExpedientEntity::getNomINumero)
-                .collect(Collectors.joining(", "));
+            List<GenericDto> expedientsDto = expedientsAntics.stream()
+                .map(expedient -> {
+                    GenericDto dto = new GenericDto();
+                    dto.setId(expedient.getId());
+                    dto.setTexte(expedient.getNom());
+                    dto.setCodi("(" + expedient.getNumero() + ")");
+                    return dto;
+                }).collect(Collectors.toList());
 
             AvisDto avis = new AvisDto();
             avis.setAssumpte(messageHelper.getMessage("avis.expedients.antics.assumpte", new Object[]{expedientsAntics.size(), dies}));
-            avis.setMissatge(codisExpedients);
+            avis.setExpedients(expedientsDto);
             avis.setAvisNivell(AvisNivellEnumDto.WARNING);
             avis.setActiu(true);
             avis.setDataInici(new Date());
+            avis.setId(-1L);
             return avis;
         } catch (Exception ex) {
             log.error("Error calculant l'avis d'expedients antics per l'usuari " + usuariCodi, ex);
@@ -292,6 +292,7 @@ public class EventHelper {
         }
     }
 
+    @Transactional(readOnly = true)
 	public AvisosActiusEvent getAvisosActiusPerUsuari(String rol, Long entitatId, String usuariCodi) {
 		List<AvisDto> avisos;
 		Date dataActual = DateUtils.truncate(new Date(), Calendar.DATE);
@@ -311,6 +312,11 @@ public class EventHelper {
             avisos.add(avisExpedientsAntics);
         }
 
+        AvisDto avisTasquesDataLimit = getAvisTasquesDataLimitPropera(usuariCodi);
+        if (avisTasquesDataLimit != null) {
+            avisos.add(avisTasquesDataLimit);
+        }
+
 		return AvisosActiusEvent.builder()
 				.avisosUsuari(avisos)
 				.avisosAdmin(obtenirAvisosAdmin())
@@ -322,7 +328,8 @@ public class EventHelper {
 	 * Pensat per ser cridat des d'un fil de @JmsListener (sense petició web ni caller autenticat),
 	 * de manera que el controller no hagi de fer una crida EJB addicional a findUsuariAmbCodi.
 	 */
-	public AvisosActiusEvent getAvisosActiusPerUsuariCodi(String usuariCodi) {
+    @Transactional(readOnly = true)
+    public AvisosActiusEvent getAvisosActiusPerUsuariCodi(String usuariCodi) {
 		UsuariEntity usuari = usuariRepository.findById(usuariCodi).orElse(null);
 		if (usuari == null) {
 			return null;
@@ -331,4 +338,79 @@ public class EventHelper {
 		return getAvisosActiusPerUsuari(usuari.getRolActual(), entitatId, usuariCodi);
 	}
 
+    private static final TascaEstatEnumDto[] ESTATS_TASCA_PENDENT = {
+        TascaEstatEnumDto.PENDENT, TascaEstatEnumDto.INICIADA, TascaEstatEnumDto.AGAFADA
+    };
+
+    /**
+     * Calcula (sense persistir) un avís de tipus Warning si l'usuari actual té tasques assignades
+     * (com a responsable, observador o delegat) on la data límit de les quals s'acosta, segons el
+     * mateix criteri que TascaHelper.shouldNotifyAboutDeadline (propietat TASCA_PREAVIS_DATA_LIMIT).
+     */
+    private AvisDto getAvisTasquesDataLimitPropera(String usuariCodi) {
+        if (usuariCodi == null) {
+            return null;
+        }
+        try {
+            UsuariEntity usuari = usuariRepository.findById(usuariCodi).orElse(null);
+            if (usuari == null) {
+                return null;
+            }
+
+            if (configHelper.getEntitat() == null || configHelper.getEntitat().get() == null) {
+                return null;
+            }
+            Long entitatId = configHelper.getEntitat().get().getId();
+
+            List<ExpedientTascaEntity> tasquesAmbDataLimit = expedientTascaRepository.findTasquesAmbDataLimitProperaPerUsuari(
+                usuari, ESTATS_TASCA_PENDENT, entitatId, new Date());
+
+            if (tasquesAmbDataLimit == null || tasquesAmbDataLimit.isEmpty()) {
+                return null;
+            }
+
+            List<ExpedientTascaEntity> tasquesProperes = tasquesAmbDataLimit.stream()
+                .filter(tasca -> shouldNotifyAboutDeadline(tasca.getDataLimit()))
+                .collect(Collectors.toList());
+
+            if (tasquesProperes.isEmpty()) {
+                return null;
+            }
+
+            List<GenericDto> expedientsDto = tasquesProperes.stream()
+                .map(tasca -> {
+                    GenericDto dto = new GenericDto();
+                    dto.setId(tasca.getExpedient().getId());
+                    String titol = tasca.getTitol() != null ? tasca.getTitol() : tasca.getMetaTasca().getNom();
+                    dto.setTexte(titol + ": ");
+                    dto.setCodi(tasca.getExpedient().getNomINumero());
+                    return dto;
+                }).collect(Collectors.toList());
+
+            AvisDto avis = new AvisDto();
+            avis.setAssumpte(messageHelper.getMessage("avis.tasques.datalimit.propera.assumpte",new Object[]{tasquesProperes.size()}));
+            avis.setExpedients(expedientsDto);
+            avis.setAvisNivell(AvisNivellEnumDto.WARNING);
+            avis.setActiu(true);
+            avis.setDataInici(new Date());
+            avis.setId(-2L);
+            return avis;
+        } catch (Exception ex) {
+            log.error("Error calculant l'avis de tasques amb data limit propera per l'usuari " + usuariCodi, ex);
+            return null;
+        }
+    }
+
+    private boolean shouldNotifyAboutDeadline(Date expedientTascaDataLimit) {
+        try {
+            if (expedientTascaDataLimit == null) {
+                return false;
+            }
+            int preavisDataLimitEnDies = configHelper.getAsInt(PropertyConfig.TASCA_PREAVIS_DATA_LIMIT, 3);
+            return new Date().after(new DateTime(expedientTascaDataLimit).minusDays(preavisDataLimitEnDies).toDate());
+        } catch (Exception ex) {
+            log.error("Error comprovant si cal notificar la data limit de la tasca", ex);
+            return false;
+        }
+    }
 }
