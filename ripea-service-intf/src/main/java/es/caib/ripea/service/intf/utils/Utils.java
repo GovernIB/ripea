@@ -66,8 +66,29 @@ public class Utils {
 		return newValue;
 	}
 	
-	public static String abbreviate(String value, int maxWidth) { 
+	public static String abbreviate(String value, int maxWidth) {
 		return StringUtils.abbreviate(value, maxWidth);
+	}
+
+    /**
+     * <p>Retalla un string als primers <code>maxLength</code> caràcters, sense afegir-hi res.
+     * A diferència de {@link #abbreviate(String, int)}, no afegeix punts suspensius, i per tant
+     * és el que cal fer servir per truncar identificadors.</p>
+     *
+     * <pre>
+     * Utils.left(null, 3)    = null
+     * Utils.left("", 3)      = ""
+     * Utils.left("abcdef", 3) = "abc"
+     * Utils.left("ab", 5)    = "ab"
+     * Utils.left("abc", -1)  = ""
+     * </pre>
+     *
+     * @param value  the String to truncate, may be null
+     * @param maxLength  the maximum length of the result
+     * @return the leftmost characters, <code>null</code> if null input
+     */
+	public static String left(String value, int maxLength) {
+		return StringUtils.left(value, maxLength);
 	}
 	
 	public static boolean isNotNullAndEquals(String object1, String object2) {
