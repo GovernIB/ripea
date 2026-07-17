@@ -47,6 +47,12 @@ const translationEs = {
         },
         dragdrop: "Reordena el contenido",
     },
+    calendar: {
+        today: "Hoy",
+        week: "Semana",
+        month: "Mes",
+        year: "Año",
+    },
     buttons: {
         answerRequired: {
             accept: 'Acepta',
@@ -375,6 +381,10 @@ const translationEs = {
         },
         tasca: {
             title: "Tarea",
+            view: {
+                table: "Tabla",
+                calendar: "Calendario",
+            },
             detall: {
                 title: "Detalles de la tarea",
                 metaExpedientTasca: "Tipo de tarea",

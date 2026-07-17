@@ -12,9 +12,11 @@ import {StyledPrioritat} from "../expedient/ExpedientGrid.tsx";
 import {TascaComment} from "../CommentDialog.tsx";
 import StyledMuiGrid from '../../components/StyledMuiGrid.tsx';
 import useTascaDetail from "./details/TascaDetail.tsx";
-import {StyledDate} from "./TasquesGrid.tsx";
+import {StyledDate, TascaView, TascaViewSelector} from "./TasquesGrid.tsx";
+import {useState} from "react";
+import {TascaCalendar} from "@src/pages/tasca/TascaCalendar.tsx";
 
-const TasquesGridForm = () => {
+export const TasquesGridForm = () => {
     const { data } = useFormContext();
 
     const metaTascaFilter: string = builder.and(
@@ -109,36 +111,57 @@ const TasquesExpedientGrid = (props: any) => {
     const { actions, components } = useTascaActions(entity, refresh);
     const { handleOpen, dialog } = useTascaDetail();
 
-    return <>
-        <StyledMuiGrid
-            apiRef={apiRef}
-            resourceName="expedientTascaResource"
-			persistentStateKey={"expedientTascaResource_expedientTab"}
-            popupEditFormDialogResourceTitle={t('page.tasca.title')}
-            columns={additionalColumns}
-            paginationActive={false}
-            autoHeight
-            filter={builder.eq('expedient.id', entity?.id)}
-            perspectives={perspectives}
-            sortModel={sortModel}
-            onRowCountChange={onRowCountChange}
-            popupEditCreateActive
-			toolbarCreateTitle={t('page.tasca.action.new.label')}
-            toolbarShowQuickFilter
-            popupEditFormContent={<TasquesGridForm/>}
-            popupEditFormComponentProps={{ perspectives: ["RESPONSABLES_RESUM"] }}
-            formAdditionalData={{
-                expedient: {id: entity?.id},
-                metaExpedient: entity?.metaExpedient,
-            }}
-            rowAdditionalActions={actions}
-            toolbarShowCreate={entity?.potModificar}
+    const filter = builder.eq('expedient.id', entity?.id)
 
-            onRowClick={(params: any) => handleOpen(params?.row?.id) }
-            popupEditFormI18nKeys={{
-                createSuccess: 'page.tasca.action.new.ok',
-            }}
-        />
+    const [vista, setVista] = useState<TascaView>(TascaView.table);
+    const viewSelector = <TascaViewSelector value={vista} onChange={setVista}/>
+
+    return <>
+        {vista == TascaView.calendar && <>
+            <Grid container display={'flex'} justifyContent={'end'} mb={1}>{viewSelector}</Grid>
+            <TascaCalendar actions={actions} filter={filter} perspectives={perspectives}
+                           headerToolbar={{
+                               start: 'prev,next,today new',
+                           }}
+            />
+        </>}
+
+        {vista == TascaView.table &&
+            <StyledMuiGrid
+                apiRef={apiRef}
+                resourceName="expedientTascaResource"
+                persistentStateKey={"expedientTascaResource_expedientTab"}
+                popupEditFormDialogResourceTitle={t('page.tasca.title')}
+                columns={additionalColumns}
+                paginationActive={false}
+                autoHeight
+                filter={filter}
+                perspectives={perspectives}
+                sortModel={sortModel}
+                onRowCountChange={onRowCountChange}
+                popupEditCreateActive
+                toolbarCreateTitle={t('page.tasca.action.new.label')}
+                toolbarShowQuickFilter
+                popupEditFormContent={<TasquesGridForm/>}
+                popupEditFormComponentProps={{perspectives: ["RESPONSABLES_RESUM"]}}
+                formAdditionalData={{
+                    expedient: {id: entity?.id},
+                    metaExpedient: entity?.metaExpedient,
+                }}
+                rowAdditionalActions={actions}
+                toolbarElementsWithPositions={[
+                    {
+                        position: 1,
+                        element: viewSelector,
+                    }
+                ]}
+                toolbarShowCreate={entity?.potModificar}
+
+                onRowClick={(params: any) => handleOpen(params?.row?.id)}
+                popupEditFormI18nKeys={{
+                    createSuccess: 'page.tasca.action.new.ok',
+                }}
+            />}
         {components}
         {dialog}
     </>

@@ -47,6 +47,12 @@ const translationCa = {
         },
         dragdrop: "Reordena el contingut",
     },
+    calendar: {
+        today: "Avui",
+        week: "Setmana",
+        month: "Mes",
+        year: "Any",
+    },
     buttons: {
         answerRequired: {
             accept: 'Accepta',
@@ -375,6 +381,10 @@ const translationCa = {
         },
         tasca: {
             title: "Tasca",
+            view: {
+                table: "Taula",
+                calendar: "Calendari",
+            },
             detall: {
                 title: "Detalls de la tasca",
                 metaExpedientTasca: "Tipus de tasca",
