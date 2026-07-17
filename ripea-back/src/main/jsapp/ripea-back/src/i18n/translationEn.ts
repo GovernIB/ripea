@@ -4,6 +4,7 @@ const translationEn = {
         cancel: "Cancel",
         create: "Create",
         copy: "Copy",
+        copyToClipboard: "Copied to clipboard",
         update: "Update",
         actualize: "Actualiza",
         save: "Save",
@@ -45,6 +46,12 @@ const translationEn = {
             message: "Message",
         },
         dragdrop: "Reorder content",
+    },
+    calendar: {
+        today: "Today",
+        week: "Week",
+        month: "Month",
+        year: "Year",
     },
     buttons: {
         answerRequired: {
@@ -374,6 +381,10 @@ const translationEn = {
         },
         tasca: {
             title: "Task",
+            view: {
+                table: "Table",
+                calendar: "Calendar",
+            },
             detall: {
                 title: "Task details",
                 metaExpedientTasca: "Task type",
@@ -574,9 +585,12 @@ const translationEn = {
                 title: "Case file search"
             },
             detall: {
-                title: "Case file information",
-                agafatPer: "Taken by",
-                avisos: "Warnings",
+                title: "Case information",
+                procedimentServei: "Procedure or service: ",
+                estat: "Status: ",
+                prioritat: "Priority: ",
+                agafatPer: "Assigned to",
+                avisos: "Alerts",
             },
             action: {
                 new: {
@@ -733,7 +747,7 @@ const translationEn = {
                     titleUni: "Export cases",
                     info: "You can select various export formats. The export process will be executed in the background and you can track its progress in the massive actions list.",
                     info2: "You can select various export formats. The export can take a few moments to finish, once completed, the download will start automatically.",
-                },                
+                },
                 comment: {
                     ok: "Comment added to the case '{{data.expedient.description}}'",
                 },
@@ -1116,7 +1130,7 @@ const translationEn = {
 			restriccions: {
 				 title: "Select the users who will have access to the folder (from those who already have access to the procedure)",
 			     notEmpty: {
-				 		message: "At least one user must be selected to create the restriction"	
+				 		message: "At least one user must be selected to create the restriction"
 				 }
 			}
         },
@@ -1519,7 +1533,7 @@ const translationEn = {
                 canviPendent: {
                     label: "Mark as pending of review",
                     ok: "Procedure marked as pending of review",
-                },                
+                },
                 canviDisseny: {
                     label: "Mark as design process",
                     ok: "Procedure marked as a design process",

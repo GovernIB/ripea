@@ -88,16 +88,8 @@ type MenuActionButtonProps = MenuButtonProps & {
     actions: any[];
     entity?: any;
 }
-export const MenuActionButton = (props:MenuActionButtonProps) => {
-    const {
-        entity,
-        actions,
-        children,
-        ...other
-    } = props;
-
-    return <MenuButton {...other}>
-        {actions.map((action:any, index:number) =>
+export const actionToItem = (entity:any, actions:any[]) => {
+    return actions.map((action:any, index:number) =>
             !(typeof action.hidden === 'function' ? action.hidden(entity) : action.hidden)
             && (!action?.linkTo && !action?.clickShowUpdateDialog)
             && <div key={`action-${index}`} title={ typeof action.title == 'function' ?action.title?.(entity) :action.title}>
@@ -109,7 +101,18 @@ export const MenuActionButton = (props:MenuActionButtonProps) => {
                     {action.icon && <Icon>{action.icon}</Icon>}{action.label}
                 </MenuItem>
             </div>
-        )}
+    )
+}
+export const MenuActionButton = (props:MenuActionButtonProps) => {
+    const {
+        entity,
+        actions,
+        children,
+        ...other
+    } = props;
+
+    return <MenuButton {...other}>
+        {actionToItem(entity, actions)}
         {children}
     </MenuButton>
 }

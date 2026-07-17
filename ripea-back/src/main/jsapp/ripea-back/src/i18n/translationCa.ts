@@ -47,6 +47,12 @@ const translationCa = {
         },
         dragdrop: "Reordena el contingut",
     },
+    calendar: {
+        today: "Avui",
+        week: "Setmana",
+        month: "Mes",
+        year: "Any",
+    },
     buttons: {
         answerRequired: {
             accept: 'Accepta',
@@ -375,6 +381,10 @@ const translationCa = {
         },
         tasca: {
             title: "Tasca",
+            view: {
+                table: "Taula",
+                calendar: "Calendari",
+            },
             detall: {
                 title: "Detalls de la tasca",
                 metaExpedientTasca: "Tipus de tasca",
@@ -565,7 +575,7 @@ const translationCa = {
 					    check: "Esteu segur que voleu continuar amb aquesta acció?",
 					    description: "Un cop esborrat no es podrà recuperar",
 					    ok: "El grup {{data.nom}} s'ha esborrat correctament",
-					},                 
+					},
 				},
 			},
         },
@@ -1120,7 +1130,7 @@ const translationCa = {
 			restriccions: {
 				 title: "Selecciona els usuaris que tindran accés a la carpeta (d’entre els que ja tenen accés al procediment)",
 			     notEmpty: {
-				 		message: "S'ha de seleccionar com a mínim un usuari per crear la restricció"	
+				 		message: "S'ha de seleccionar com a mínim un usuari per crear la restricció"
 				 }
 			}
         },
@@ -1527,7 +1537,7 @@ const translationCa = {
                 canviDisseny: {
                     label: "Marca com a procés de disseny",
                     ok: "Procediment marcat com a procés de disseny",
-                },                
+                },
                 actualize: {
                     label: "Actualitza des de ROLSAC...",
                     button: "Actualitza",

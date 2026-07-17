@@ -47,6 +47,12 @@ const translationEs = {
         },
         dragdrop: "Reordena el contenido",
     },
+    calendar: {
+        today: "Hoy",
+        week: "Semana",
+        month: "Mes",
+        year: "Año",
+    },
     buttons: {
         answerRequired: {
             accept: 'Acepta',
@@ -375,6 +381,10 @@ const translationEs = {
         },
         tasca: {
             title: "Tarea",
+            view: {
+                table: "Tabla",
+                calendar: "Calendario",
+            },
             detall: {
                 title: "Detalles de la tarea",
                 metaExpedientTasca: "Tipo de tarea",
@@ -737,7 +747,7 @@ const translationEs = {
                     titleUni: "Exportar expediente",
                     info: "Puede seleccionar varios formatos de exportación a la vez. La exportación se realizará en segundo plano, y una vez finalizada, podrá descargar el documento generado desde el listado de acciones masivas.",
                     info2: "Puede seleccionar varios formatos de exportación a la vez. La exportacion puede tardar unos instantos, una vez finalizada, se iniciará la descarga automáticamente.",
-                },                
+                },
                 comment: {
                     ok: "Comentario añadido al expediente '{{data.expedient.description}}'",
                 },
@@ -1120,7 +1130,7 @@ const translationEs = {
 			restriccions: {
 				 title: "Selecciona los usuarios que tendrán acceso a la carpeta (de entre los que ya tienen acceso al procedimiento)",
 			     notEmpty: {
-				 		message: "Se debe seleccionar al menos un usuario para crear la restricción"	
+				 		message: "Se debe seleccionar al menos un usuario para crear la restricción"
 				 }
 			}
         },
@@ -1523,7 +1533,7 @@ const translationEs = {
                 canviPendent: {
                     label: "Marca como pendiente de revisión",
                     ok: "Procedimiento marcado como pendiente de revisión",
-                },                
+                },
                 canviDisseny: {
                     label: "Marca como proceso de diseño",
                     ok: "Procedimiento marcado como proceso de diseño",
