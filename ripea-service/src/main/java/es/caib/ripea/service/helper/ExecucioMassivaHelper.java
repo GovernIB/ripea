@@ -511,6 +511,57 @@ public class ExecucioMassivaHelper {
 		return execucioMassivaElements;
 	}
 	
+	/** Id de la següent execució massiva a processar, o null si no n'hi ha cap de pendent. */
+	@Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
+	public Long getIdExecucioMassivaPerProcessar(Date ara) {
+		return execucioMassivaRepository.getMinExecucioMassiva(ara);
+	}
+
+	/**
+	 * Tanca l'execució massiva en una transacció nova i aïllada, hagi anat bé o hagi fallat.
+	 * S'ha de cridar sempre: la cua es calcula amb el min(id) de les execucions sense data de fi, així que una
+	 * execució que no arribi a tenir-la torna a ser la primera a cada cicle i bloqueja totes les posteriors.
+	 *
+	 * @param error missatge de l'error que ha aturat l'execució, o null si ha acabat correctament. Si s'informa,
+	 *              els elements que no s'hagin arribat a processar queden marcats en estat d'error.
+	 */
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void finalitzarExecucioMassiva(Long execucioMassivaId, String error) {
+
+		ExecucioMassivaEntity execucioMassiva = execucioMassivaRepository.findById(execucioMassivaId).orElse(null);
+		if (execucioMassiva == null) {
+			logger.error("No s'ha trobat l'execució massiva a finalitzar (id=" + execucioMassivaId + ")");
+			return;
+		}
+
+		Date ara = new Date();
+
+		if (error != null) {
+			for (ExecucioMassivaContingutEntity emc : execucioMassiva.getContinguts()) {
+				if (emc.getEstat() == null || ExecucioMassivaEstatDto.ESTAT_PENDENT.equals(emc.getEstat())) {
+					emc.updateError(ara, error);
+				}
+			}
+		}
+
+		//Esborram el fitxer temporal ZIP amb els Json dels documents del disc. Si no es pot esborrar només queda
+		//un fitxer orfe: no pot impedir que l'execució es tanqui.
+		if (ExecucioMassivaTipusDto.IMPORTAR_DOCS.equals(execucioMassiva.getTipus()) && Utils.hasValue(execucioMassiva.getDocumentNom())) {
+			try {
+				pluginHelper.gestioDocumentalDelete(
+						execucioMassiva.getDocumentNom(),
+						PluginHelper.GESDOC_AGRUPACIO_DOCS_ESBORRANYS);
+			} catch (Exception e) {
+				logger.error("No s'ha pogut esborrar el fitxer temporal de l'execució massiva (id=" + execucioMassivaId
+						+ ", documentNom=" + execucioMassiva.getDocumentNom() + ")", e);
+			}
+			execucioMassiva.setDocumentNom(null);
+		}
+
+		execucioMassiva.updateDataFi(ara);
+		execucioMassivaRepository.save(execucioMassiva);
+	}
+
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
  	public String executarExecucioMassivaContingutNewTransaction(Long execucioMassivaContingutId, List<DocumentAmbTipusDto> documents) {
 		
@@ -521,7 +572,7 @@ public class ExecucioMassivaHelper {
 		if (emc == null)
 			throw new NotFoundException(execucioMassivaContingutId, ExecucioMassivaContingutEntity.class);
 		
-		if (!ExecucioMassivaEstatDto.ESTAT_FINALITZAT.equals(emc.getEstat())) {
+		if (emc.getEstat() == null || ExecucioMassivaEstatDto.ESTAT_PENDENT.equals(emc.getEstat())) {
 		
 			ExecucioMassivaEntity exm = emc.getExecucioMassiva();
 			ExecucioMassivaTipusDto tipus = exm.getTipus();
