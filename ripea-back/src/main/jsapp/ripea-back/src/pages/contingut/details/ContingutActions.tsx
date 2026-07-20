@@ -245,7 +245,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
         },
         {
             label: t('page.document.action.detall.label'),
-            icon: "folder",
+            icon: "info",
             showInMenu: true,
             onClick: handleDetallOpen,
             disabled: (row:any) => !row?.arxiuUuid,
