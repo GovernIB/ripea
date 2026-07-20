@@ -1499,7 +1499,7 @@ public class ContingutHelper {
 			throw new ValidationException(
 					contingut.getId(),
 					ContingutEntity.class,
-					"Un contingut definitiu no es pot esborrar, verificau la propitat "+PropertyConfig.PERMATRE_ESBORRAR_FINAL);
+					"Un contingut definitiu no es pot esborrar, verificau la propietat "+PropertyConfig.PERMATRE_ESBORRAR_FINAL);
 		}
 		
 		// Cancel·lar enviament si el document conté enviaments pendents

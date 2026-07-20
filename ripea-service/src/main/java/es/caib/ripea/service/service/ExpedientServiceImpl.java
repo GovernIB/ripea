@@ -186,6 +186,16 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 		boolean expCreatArxiuOk = expedientHelper.arxiuPropagarExpedientAmbInteressatsNewTransaction(expedientId);
 
+		// Carpetes per defecte del procediment: només si l'expedient s'ha propagat correctament a
+		// l'Arxiu (ja té UUID). Un error creant-les no ha de fer fallar la creació de l'expedient.
+		if (expCreatArxiuOk) {
+			try {
+				expedientHelper.crearCarpetesMetaExpedientNewTransaction(entitatId, expedientId);
+			} catch (Exception e) {
+				logger.error("No s'han pogut crear les carpetes per defecte de l'expedient " + expedientId, e);
+			}
+		}
+
 		ExpedientEntity expedient = expedientRepository.getOne(expedientId);
 		if (cacheHelper.mostrarLogsCreacioContingut())
 			logger.info(

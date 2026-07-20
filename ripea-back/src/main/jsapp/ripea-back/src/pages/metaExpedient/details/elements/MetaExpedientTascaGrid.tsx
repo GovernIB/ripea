@@ -9,6 +9,7 @@ import LinkIcon from "../../../../components/LinkIcon.tsx";
 import { StyledBadge } from "../../../../components/StyledBadge.tsx";
 import {useMemo} from "react";
 import useMetaExpTascaDetail from "./details/MetaExpTascaDetail.tsx";
+import {icons} from "@src/util/icons.ts";
 
 const useActions = (refresh?: () => void) => {
     const {t} = useTranslation();
@@ -128,7 +129,7 @@ export const MetaExpedientTascaGrid = ({ entity, onRowCountChange, readOnly } :a
     const actions:any[] = useMemo(() => readOnly ?[
         {
             label: t('page.metaExpedient.action.consultar.label'),
-            icon: "search",
+            icon: icons.detall,
             showInMenu: false,
             onClick: handleOpen,
         },

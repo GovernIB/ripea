@@ -1446,7 +1446,7 @@ const translationEs = {
                 consultar: {
                     title: "Detalle del procedimiento",
                     label: "Consulta",
-                    revisat: "Este procedimiento no se puede modificar ya que se encuentra en estado revisado",
+                    revisat: "Este procedimiento no se puede modificar ya que se encuentra en estado revisado.",
                 },
                 canviEstat: {
                     label: "Cambia el estado de revisión...",

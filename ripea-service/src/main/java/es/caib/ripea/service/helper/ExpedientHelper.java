@@ -398,8 +398,10 @@ public class ExpedientHelper {
 				pluginHelper.comandaAvisDelete(expedientPeticioEntity);
 			}
 			
-			// crear carpetes per defecte del procediment
-			crearCarpetesMetaExpedient(entitatId, metaExpedient, expedient);
+			// Les carpetes per defecte del procediment ja NO es creen aquí: cal fer-ho després
+			// de propagar l'expedient a l'Arxiu (crearCarpetesMetaExpedientNewTransaction), quan
+			// l'expedient ja disposa d'UUID. Si es fes ara, l'Arxiu rebutjaria l'agrupació
+			// documental per manca de pare (COD_099).
 			
 			boolean throwExcepcion = false;//throwExcepcion = true;
 			if (throwExcepcion) {
@@ -435,6 +437,18 @@ public class ExpedientHelper {
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public boolean arxiuPropagarExpedientAmbInteressatsNewTransaction(Long expedientId) {
 		return arxiuPropagarExpedientAmbInteressats(expedientId);
+	}
+
+	/**
+	 * Crea les carpetes per defecte del procediment en una transacció nova (REQUIRES_NEW),
+	 * pensada per a ser cridada un cop l'expedient ja s'ha propagat a l'Arxiu i disposa d'UUID.
+	 * Fer-ho durant la creació de l'expedient provocava un error a l'Arxiu (COD_099) perquè
+	 * l'agrupació documental encara no tenia un pare vàlid.
+	 */
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void crearCarpetesMetaExpedientNewTransaction(Long entitatId, Long expedientId) {
+		ExpedientEntity expedient = expedientRepository.getOne(expedientId);
+		crearCarpetesMetaExpedient(entitatId, expedient.getMetaExpedient(), expedient);
 	}
 	
 	public boolean arxiuPropagarExpedientAmbInteressats(Long expedientId) {

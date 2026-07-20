@@ -1446,7 +1446,7 @@ const translationCa = {
                 consultar: {
                     title: "Detall del procediment",
                     label: "Consulta",
-                    revisat: "Aquest procediment no es pot modificar ja que es troba en estat revisat",
+                    revisat: "Aquest procediment no es pot modificar ja que es troba en estat revisat.",
                 },
                 canviEstat: {
                     label: "Canvia l'estat de revisió...",

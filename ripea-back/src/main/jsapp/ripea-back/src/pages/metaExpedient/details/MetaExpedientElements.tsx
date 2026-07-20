@@ -13,7 +13,7 @@ import {MetaExpedientEstatGrid} from "./elements/MetaExpedientEstatGrid.tsx";
 import {setTitlePage} from "../../../TitleHeaderConfigurator.tsx";
 import {MetaExpedientCarpetaGrid} from "./elements/MetaExpedientCarpetaGrid.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
-import {Button, Icon} from "@mui/material";
+import {Alert, Button, Icon} from "@mui/material";
 import {ErrorPage} from "../../../components/ErrorPage.tsx";
 
 const perspectives :string[] = ["ELEMENTS_COUNT"]
@@ -128,6 +128,11 @@ export const MetaExpedientElements = () => {
                               {t('common.back')}
                           </Button>
                       </>}>
+                {metaExpedient?.revisioEstat === 'REVISAT' && rol?.isOrganAdmin &&
+                    <Alert severity={'info'} sx={{mb: 1}}>
+                        {t('page.metaExpedient.action.consultar.revisat')}
+                    </Alert>
+                }
                 <TabComponent defaultValue={element} tabs={tabs}/>
             </CardPage>
         </Load>

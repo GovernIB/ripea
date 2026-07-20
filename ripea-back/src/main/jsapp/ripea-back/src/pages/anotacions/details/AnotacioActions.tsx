@@ -4,7 +4,7 @@ import {useBaseAppContext, useResourceApiService} from "reactlib";
 import {iniciaDescargaBlob} from "../../expedient/details/CommonActions.tsx";
 import useRebutjar from "../actions/Rebutjar.tsx";
 import {useNavigate} from "react-router-dom";
-import {icons} from "../../user/UserHeadToolbar.tsx";
+import {icons} from "@src/util/icons.ts";
 import {useUserSession} from "../../../components/Session.tsx";
 import useAcceptar from "../actions/Acceptar.tsx";
 

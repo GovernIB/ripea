@@ -10,6 +10,7 @@ import {Divider} from "@mui/material";
 import {useMemo} from "react";
 import useHistoric, {HistoricContingutTipusEnum} from "../../Historic.tsx";
 import useClonarProcediment from "../actions/ClonarProcediment.tsx";
+import {icons} from "@src/util/icons.ts";
 
 export const useActions = (refresh?: () => void) => {
     const {t} = useTranslation()
@@ -151,14 +152,14 @@ export const useMetaExpedientActions = (refresh?: () => void) => {
     const actions:any[] = useMemo(() => [
         {
             label: t('page.metaExpedient.action.consultar.label'),
-            icon: "search",
+            icon: icons.detall,
             showInMenu: true,
             onClick: handleDetail,
             hidden: !(rol?.isRevisor || rol?.isAdminLectura),
         },
         {
-            label: t('common.update'),
-            icon: "edit",
+            label: t('common.detail'),
+            icon: icons.detall,
             showInMenu: true,
             onClick: handleDetail,
             hidden: (row:any) => !(row?.revisioEstat == 'REVISAT' && rol?.isOrganAdmin),

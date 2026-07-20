@@ -8,7 +8,7 @@ import {formatDate} from "../../../util/dateUtils.ts";
 import MetaDadaGrid from "../../dada/MetaDadaGrid.tsx";
 import Load from "../../../components/Load.tsx";
 import {useActions} from "./ContingutActions.tsx";
-import {icons} from "../../user/UserHeadToolbar.tsx";
+import {icons} from "@src/util/icons.ts";
 import useErrorValidacio from "../../expedient/details/ErrorValidacio.tsx";
 import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
 
