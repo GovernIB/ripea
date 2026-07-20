@@ -16,14 +16,7 @@ import {getImgFromBytes} from "../../App.tsx";
 import goib_escut_logo from "../../assets/goib_escut_logo.png"
 import {useSistemaDetail} from "./monitor/SistemaDetail.tsx";
 import {useTheme, useMediaQuery} from "@mui/material";
-
-export const icons = {
-    expedient: 'folder',
-    anotacio: 'email',
-    tasca: 'assignment_turned_in',
-    consulta: 'search',
-    firma: 'draw',
-}
+import {icons} from "@src/util/icons.ts";
 
 export const useToProgramaAntic = () => {
     const { apiUrl } = useResourceApiContext();

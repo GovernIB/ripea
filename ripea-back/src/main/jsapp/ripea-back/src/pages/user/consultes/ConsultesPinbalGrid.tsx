@@ -9,6 +9,7 @@ import {formatDate} from "../../../util/dateUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
 import GridFormField from "../../../components/GridFormField.tsx";
 import ContingutLink from "../../../components/ContingutLink.tsx";
+import {icons} from "@src/util/icons.ts";
 import useDocumentDetail from "../../contingut/details/DocumentDetail.tsx";
 import {useActions} from "../../contingut/details/ContingutActions.tsx";
 import useVisualitzar from "../../contingut/actions/Visualitzar.tsx";
@@ -47,7 +48,7 @@ const useConsultaPinbalActions = (refresh?: () => void) => {
         {
             label: t('page.document.action.view.label'),
             title: t('page.document.alert.view'),
-            icon: "search",
+            icon: icons.visualitza,
             showInMenu: true,
             onClick: (_id:any, row:any) => handleVisualitzarOpen(row?.documentInfo?.id),
             disabled: (row:any) => !isValid(row?.documentInfo),

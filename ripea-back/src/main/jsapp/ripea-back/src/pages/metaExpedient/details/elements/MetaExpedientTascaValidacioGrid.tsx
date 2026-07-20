@@ -10,6 +10,7 @@ import {useEffect, useMemo, useState} from "react";
 import Load from "../../../../components/Load.tsx";
 import {useUserSession} from "../../../../components/Session.tsx";
 import useMetaExpTasaValidacioDetail from "./details/MetaExpTasaValidacioDetail.tsx";
+import {icons} from "@src/util/icons.ts";
 import {ErrorPage} from "../../../../components/ErrorPage.tsx";
 
 const useActions = (refresh?: () => void) => {
@@ -111,7 +112,7 @@ const MetaExpedientTascaValidacioGrid = () => {
     const actions:any[] = useMemo(() => readOnly ?[
         {
             label: t('page.metaExpedient.action.consultar.label'),
-            icon: "search",
+            icon: icons.detall,
             showInMenu: false,
             onClick: handleOpen
         },

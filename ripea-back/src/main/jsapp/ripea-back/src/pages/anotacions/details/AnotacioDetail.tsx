@@ -12,7 +12,7 @@ import {useActions, useAnexxActions} from "./AnotacioActions.tsx";
 import useRegistreInteressatDetail from "./RegistreInteressatDetail.tsx";
 import useVisualitzar from "../actions/Visualitzar.tsx";
 import useAnnexFirma from "./AnnexFirma.tsx";
-import {icons} from "../../user/UserHeadToolbar.tsx";
+import {icons} from "@src/util/icons.ts";
 
 const Resum = (props:any) => {
     const { entity, setNumInteressats, setNumAnnexos } = props;
@@ -227,7 +227,7 @@ const Annexos = (props:any) => {
     const actions = [
         {
             label: t('page.document.action.view.label'),
-            icon: "search",
+            icon: icons.visualitza,
             showInMenu: true,
             onClick: handleVisualitzar,
             hidden: (row:any) => !isValid(row),

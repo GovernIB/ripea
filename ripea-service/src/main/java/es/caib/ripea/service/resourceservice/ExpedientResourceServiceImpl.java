@@ -704,8 +704,19 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 					resource.getPrioritatMotiu(),
 					resource.isAsignarSeguidor()?SiNoEnumDto.SI:SiNoEnumDto.NO);
 			
-			expedientHelper.arxiuPropagarExpedientAmbInteressatsNewTransaction(expedientId);
-			
+			boolean expCreatArxiuOk = expedientHelper.arxiuPropagarExpedientAmbInteressatsNewTransaction(expedientId);
+
+			// Carpetes per defecte del procediment: només si l'expedient s'ha propagat correctament a
+			// l'Arxiu (ja té UUID). Un error creant-les no ha de fer fallar la creació de l'expedient.
+			if (expCreatArxiuOk) {
+				try {
+					expedientHelper.crearCarpetesMetaExpedientNewTransaction(entitatEntity.getId(), expedientId);
+				} catch (Exception e) {
+					excepcioLogHelper.addExcepcio("/expedient/" + expedientId + "/crearCarpetesMetaExpedient", e);
+					log.error("No s'han pogut crear les carpetes per defecte de l'expedient " + expedientId, e);
+				}
+			}
+
 			ExpedientResource resultat = new ExpedientResource();
 			resultat.setId(expedientId);
 			resultat.setNom(resource.getNom());

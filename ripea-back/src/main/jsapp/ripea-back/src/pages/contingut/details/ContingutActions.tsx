@@ -11,6 +11,7 @@ import useNotificar from "../actions/Notificar.tsx";
 import usePublicar from "../actions/Publicar.tsx";
 import {useEnviarPortafirmes} from "../actions/EnviarPortafirmes.tsx";
 import useVisualitzar from "../actions/Visualitzar.tsx";
+import {icons} from "@src/util/icons.ts";
 import useEnviarViaEmail from "../actions/EnviarViaEmail.tsx";
 import useSeguimentPortafirmes from "../actions/SeguimentPortafirmes.tsx";
 import useSeguimentViafirma from "../actions/SeguimentViafirma.tsx";
@@ -326,7 +327,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
         {
             label: t('page.document.action.view.label'),
             title: t('page.document.alert.view'),
-            icon: "search",
+            icon: icons.visualitza,
             showInMenu: true,
             onClick: handleVisualitzarOpen,
             disabled: (row:any) => !isValid(row),

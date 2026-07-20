@@ -24,7 +24,7 @@ import {useActions} from "./CommonActions.tsx";
 import useAlerta from "./Alerta.tsx";
 import useErrorValidacio, { getResumErrorsText } from "./ErrorValidacio.tsx";
 import SseExpedient, {useValidacioSession} from "../../../components/SseExpedient.tsx";
-import {icons} from "../../user/UserHeadToolbar.tsx";
+import {icons} from "@src/util/icons.ts";
 import {setTitlePage} from "../../../TitleHeaderConfigurator.tsx";
 import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
 import {ErrorPage} from "../../../components/ErrorPage.tsx";

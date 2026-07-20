@@ -9,6 +9,7 @@ import * as builder from "../../../../util/springFilterUtils.ts";
 import StyledMuiGrid from "../../../../components/StyledMuiGrid.tsx";
 import useMetaDocumentDetail from "./details/MetaDocumentDetail.tsx";
 import {MultiplicitatStyled} from "../../../contingut/details/MetaExpedient.tsx";
+import {icons} from "@src/util/icons.ts";
 
 const sortModel: any = [{field: 'ordre', sort: 'asc'}]
 const perspectives = ["COUNT_METADADES"];
@@ -96,7 +97,7 @@ export const MetaDocumentGrid = ({ entity, onRowCountChange, readOnly } :any) =>
     const additionalActions:any[] = useMemo(() => readOnly ?[
         {
             label: t('page.metaExpedient.action.consultar.label'),
-            icon: "search",
+            icon: icons.detall,
             showInMenu: false,
             onClick: handleOpen,
         },

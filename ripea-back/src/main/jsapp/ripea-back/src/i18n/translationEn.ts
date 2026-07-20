@@ -1458,7 +1458,7 @@ const translationEn = {
                 consultar: {
                     title: "Procedure details",
                     label: "View",
-                    revisat: "This procedure cannot be modified because it is in a reviewed state",
+                    revisat: "This procedure cannot be modified because it is in a reviewed state.",
                 },
                 canviEstat: {
                     label: "Change review status...",

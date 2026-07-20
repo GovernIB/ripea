@@ -7,6 +7,7 @@ import {useFormContext} from "reactlib";
 import {GridTreeDataGroupingCell} from "@mui/x-data-grid-pro";
 import {useMemo} from "react";
 import useMetaExpCarpetaDetail from "./details/MetaExpCarpetaDetail.tsx";
+import {icons} from "@src/util/icons.ts";
 
 export const MetaExpedientCarpetaForm = () => {
     const {data} = useFormContext()
@@ -41,7 +42,7 @@ export const MetaExpedientCarpetaGrid = ({ entity, onRowCountChange, readOnly } 
     const actions = useMemo(() => readOnly ?[
         {
             label: t('page.metaExpedient.action.consultar.label'),
-            icon: "search",
+            icon: icons.detall,
             showInMenu: false,
             onClick: handleOpen
         },

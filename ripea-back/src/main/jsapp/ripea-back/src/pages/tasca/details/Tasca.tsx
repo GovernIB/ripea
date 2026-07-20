@@ -4,7 +4,7 @@ import {useNavigate, useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import Load from "../../../components/Load.tsx";
 import {Button, Grid, Icon, Typography, Box, alpha} from "@mui/material";
-import {icons} from "../../user/UserHeadToolbar.tsx";
+import {icons} from "@src/util/icons.ts";
 import {ExpedientInfo} from "../../expedient/details/Expedient.tsx";
 import DocumentsGrid from "../../contingut/DocumentsGrid.tsx";
 import {TascaComment} from "../../CommentDialog.tsx";

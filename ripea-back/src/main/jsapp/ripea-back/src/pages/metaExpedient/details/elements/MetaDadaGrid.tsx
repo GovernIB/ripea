@@ -12,6 +12,7 @@ import {useUserSession} from "@src/components/Session.tsx";
 import {MultiplicitatStyled} from "@src/pages/contingut/details/MetaExpedient.tsx";
 import useMetaDadaDetail from "./details/MetaDadaDetail.tsx";
 import {ErrorPage} from "@src/components/ErrorPage.tsx";
+import {icons} from "@src/util/icons.ts";
 
 const useActions = (refresh?: () => void) => {
     const {t} = useTranslation();
@@ -120,7 +121,7 @@ export const MetDadaGrid = ({ id, enviable = false, readOnly, persistentStateKey
     const actions:any[] = useMemo(() => readOnly ?[
         {
             label: t('page.metaExpedient.action.consultar.label'),
-            icon: "search",
+            icon: icons.detall,
             showInMenu: false,
             onClick: handleOpen,
         },

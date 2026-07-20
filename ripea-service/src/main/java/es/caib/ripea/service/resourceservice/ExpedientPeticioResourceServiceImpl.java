@@ -604,6 +604,18 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 				//Crea l'expedient a arxiu amb les metadades dels interessats.
 				expCreatArxiuOk = expedientHelper.arxiuPropagarExpedientAmbInteressatsNewTransaction(expedientId);
 
+				// Carpetes per defecte del procediment: només en l'acció de crear (no en incorporar a un
+				// expedient existent) i només si l'expedient s'ha propagat correctament a l'Arxiu (ja té
+				// UUID). Un error creant-les no ha de fer fallar el processament de l'anotació.
+				if (expCreatArxiuOk && ExpedientPeticioAccioEnumDto.CREAR.equals(params.getAccio())) {
+					try {
+						expedientHelper.crearCarpetesMetaExpedientNewTransaction(entitatEntity.getId(), expedientId);
+					} catch (Exception e) {
+						excepcioLogHelper.addExcepcio("/expedient/" + expedientId + "/crearCarpetesMetaExpedient", e);
+						log.error("No s'han pogut crear les carpetes per defecte de l'expedient " + expedientId, e);
+					}
+				}
+
 				if (expCreatArxiuOk) {
 
 					expedientHelper.inicialitzarExpedientsWithImportacio();
