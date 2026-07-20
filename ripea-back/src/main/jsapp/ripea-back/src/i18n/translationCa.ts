@@ -117,6 +117,14 @@ const translationCa = {
             OFICI_ACCEPTAT: "Ofici acceptat",
             REBUTJAT: "Rebutjada SIR",
         },
+        tascaEstat: {
+            PENDENT: "Pendent",
+            INICIADA: "Iniciada",
+            FINALITZADA: "Finalitzada",
+            CANCELLADA: "Cancel·lada",
+            REBUTJADA: "Rebutjada",
+            AGAFADA: "Agafada",
+        },
         origen: {
             O0: "Ciutadà",
             O1: "Administració",
@@ -384,6 +392,12 @@ const translationCa = {
             view: {
                 table: "Taula",
                 calendar: "Calendari",
+                kanban: "Kanban",
+            },
+            kanban: {
+                todo: "Per fer",
+                progress: "En progrés",
+                done: "Completat",
             },
             detall: {
                 title: "Detalls de la tasca",

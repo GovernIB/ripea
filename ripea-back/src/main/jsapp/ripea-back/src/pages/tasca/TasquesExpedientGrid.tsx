@@ -15,6 +15,7 @@ import useTascaDetail from "./details/TascaDetail.tsx";
 import {StyledDate, TascaView, TascaViewSelector} from "./TasquesGrid.tsx";
 import {useState} from "react";
 import {TascaCalendar} from "@src/pages/tasca/TascaCalendar.tsx";
+import {TascaKanban} from "@src/pages/tasca/TascaKanban.tsx";
 
 export const TasquesGridForm = () => {
     const { data } = useFormContext();
@@ -117,13 +118,14 @@ const TasquesExpedientGrid = (props: any) => {
     const viewSelector = <TascaViewSelector value={vista} onChange={setVista}/>
 
     return <>
-        {vista == TascaView.calendar && <>
+        {vista != TascaView.table && <>
             <Grid container display={'flex'} justifyContent={'end'} mb={1}>{viewSelector}</Grid>
-            <TascaCalendar actions={actions} filter={filter} perspectives={perspectives}
-                           headerToolbar={{
-                               start: 'prev,next,today new',
-                           }}
-            />
+            {vista == TascaView.kanban && <TascaKanban actions={actions} filter={filter} perspectives={perspectives} readOnly={!entity?.potModificar} />}
+            {vista == TascaView.calendar && <TascaCalendar actions={actions} filter={filter} perspectives={perspectives}
+                                                           headerToolbar={entity?.potModificar?{
+                                                               start: 'prev,next,today new',
+                                                           }:undefined}
+            />}
         </>}
 
         {vista == TascaView.table &&

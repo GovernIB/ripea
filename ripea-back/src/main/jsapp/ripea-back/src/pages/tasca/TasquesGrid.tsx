@@ -15,6 +15,7 @@ import {useNavigate} from "react-router-dom";
 import useTascaDetail from "./details/TascaDetail.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
 import {TascaCalendar} from "@src/pages/tasca/TascaCalendar.tsx";
+import {TascaKanban} from "@src/pages/tasca/TascaKanban.tsx";
 
 export const StyledDate = (props: any) => {
     const {entity, children} = props;
@@ -32,6 +33,7 @@ export const StyledDate = (props: any) => {
 export enum TascaView {
     table = 'TABLE',
     calendar = 'CALENDAR',
+    kanban = 'KANBAN',
 }
 export const TascaViewSelector = (props: { value: any, onChange: (value: any) => void }) => {
     const { value, onChange } = props;
@@ -48,6 +50,7 @@ export const TascaViewSelector = (props: { value: any, onChange: (value: any) =>
             >
                 <MenuItem value={TascaView.table}>{t('page.tasca.view.table')}</MenuItem>
                 <MenuItem value={TascaView.calendar}>{t('page.tasca.view.calendar')}</MenuItem>
+                <MenuItem value={TascaView.kanban}>{t('page.tasca.view.kanban')}</MenuItem>
             </Select>
         </FormControl>
     </Grid>
@@ -149,11 +152,12 @@ const TasquesGrid = () => {
             />
 
             <Load value={load} noEffect>
-                {vista == TascaView.calendar && <>
+                {vista != TascaView.table && <>
                     <Grid container display={'flex'} justifyContent={'end'} mb={1}>
                         <TascaViewSelector value={vista} onChange={setVista}/>
                     </Grid>
-                    <TascaCalendar actions={actions} filter={springFilter} namedQueries={namedQueries} perspectives={perspectives} />
+                    {vista == TascaView.kanban && <TascaKanban actions={actions} filter={springFilter} namedQueries={namedQueries} perspectives={perspectives} readOnly />}
+                    {vista == TascaView.calendar && <TascaCalendar actions={actions} filter={springFilter} namedQueries={namedQueries} perspectives={perspectives} />}
                 </>}
 
                 {vista == TascaView.table &&

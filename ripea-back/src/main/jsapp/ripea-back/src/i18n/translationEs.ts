@@ -117,6 +117,14 @@ const translationEs = {
             OFICI_ACCEPTAT: "Oficio aceptado",
             REBUTJAT: "Rechazada SIR",
         },
+        tascaEstat: {
+            PENDENT: "Pendiente",
+            INICIADA: "Iniciada",
+            FINALITZADA: "Finalizada",
+            CANCELLADA: "Cancelada",
+            REBUTJADA: "Rechazada",
+            AGAFADA: "Asignada",
+        },
         origen: {
             O0: "Ciudadano",
             O1: "Administración",
@@ -384,6 +392,12 @@ const translationEs = {
             view: {
                 table: "Tabla",
                 calendar: "Calendario",
+                kanban: "Kanban",
+            },
+            kanban: {
+                todo: "Por hacer",
+                progress: "En progreso",
+                done: "Completado",
             },
             detall: {
                 title: "Detalles de la tarea",

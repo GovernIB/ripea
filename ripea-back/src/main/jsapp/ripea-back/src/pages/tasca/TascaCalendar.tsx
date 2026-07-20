@@ -19,7 +19,6 @@ export const TascaCalendar = (props:any) => {
     const { t } = useTranslation();
     const [tasques, setTasques] = useState<any[]>();
     const {value: view, save: setView} = useSession('calendarView');
-    console.log("view", view)
 
     const {
         isReady: apiIsReady,
