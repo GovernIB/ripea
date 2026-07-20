@@ -36,6 +36,9 @@ const ActualitzarEstatAnotacioFilterFrom = () => {
 
 const springFilterBuilder = (data: any) => {
     return builder.and(
+        builder.eq("metaExpedient.id", data?.procediment?.id),
+        builder.eq("grup.id", data?.grup?.id),
+        builder.eq("expedient.id", data?.expedient?.id),
         builder.like("identificador", data?.numero),
         builder.betweenDates("dataAlta", data?.dataAltaInici, data?.dataAltaFi),
         builder.eq("estat", `'${data?.estat}'`),

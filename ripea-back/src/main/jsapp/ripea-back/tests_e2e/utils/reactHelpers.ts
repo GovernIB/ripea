@@ -83,10 +83,17 @@ export const waitApiGet = async (page: Page, urlMatcher: string | ((url: string)
 // IMPORTANT: cridar ABANS de l'acció que obre el diàleg de modificació.
 export const waitApiEntityLoad = (page: Page, id: string | null) =>
     page.waitForResponse(
-        resp => !!id &&
-                resp.url().endsWith(`/${id}`) &&
-                resp.request().method() === 'GET' &&
-                resp.status() === 200,
+        resp => {
+            if (!id) return false;
+            // Comparar pel pathname, no per la URL completa: algunes entitats (p.ex.
+            // metaDocument) carreguen amb query string (?perspectives=...), i un
+            // endsWith(`/${id}`) sobre la URL sencera no hi coincidiria.
+            let pathname: string;
+            try { pathname = new URL(resp.url()).pathname; } catch { return false; }
+            return pathname.endsWith(`/${id}`) &&
+                   resp.request().method() === 'GET' &&
+                   resp.status() === 200;
+        },
         { timeout: 10_000 }
     );
 
