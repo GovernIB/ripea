@@ -320,7 +320,7 @@ const translationCa = {
                 acceptar: {
                     label: "Accepta...",
                     button: "Accepta",
-                    title: "Acceptar expedient",
+                    title: "Acceptar anotació",
                     ok: "L'anotació s'ha acceptat correctament",
                 },
                 rebutjar: {
@@ -352,6 +352,22 @@ const translationCa = {
                 firma: {
                     label: "Signatures",
                     title: "Signatures",
+                    firmaTitol: "Firma",
+                    firmaTipus: "Tipus firma",
+                    firmaPerfil: "Perfil firma",
+                    fitxer: "Fitxer",
+                    descarregar: "Descarrega el fitxer de firma",
+                    firmaCsvRegulacio: "CSV regulació",
+                    autoFirma: "Firmat per RIPEA",
+                    autoFirmaInfo: "RIPEA ha afegit automàticament aquesta firma a l'annex de l'anotació de registre per desar-lo com a definitiu a l'arxiu",
+                    firmaDetalls: "Detalls dels firmants",
+                    detalls: {
+                        data: "Data",
+                        dataNd: "N/D",
+                        nif: "NIF",
+                        nom: "Nom",
+                        emissor: "Emissor",
+                    },
                 },
                 consultar: {
                     label: "Consulta",
@@ -958,6 +974,7 @@ const translationCa = {
                 view: {
                     label: "Visualitza",
                     title: "Visualitzar",
+                    error: "No s'ha pogut previsualitzar el document.",
                 },
                 csv: {
                     label: "Copia enllaç CSV",

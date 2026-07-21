@@ -1276,7 +1276,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 				if (expedientNumero != null && !expedientNumero.isEmpty()) {
 					expedient = expedientPeticioService.findByEntitatAndMetaExpedientAndExpedientNumero(entitat.getId(), expedientPeticioDto.getMetaExpedientId(), expedientNumero);
 					if (expedient == null) {
-						MissatgesHelper.warning(request, getMessage(request, "expedient.peticio.form.acceptar.expedient.noTorbat"));
+						MissatgesHelper.warning(request, getMessage(request, "expedient.peticio.form.acceptar.expedient.noTorbat")+": "+expedientNumero);
 					}
 				}
 			}

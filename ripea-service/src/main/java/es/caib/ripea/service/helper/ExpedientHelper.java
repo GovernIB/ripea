@@ -608,14 +608,11 @@ public class ExpedientHelper {
 		for (RegistreInteressatEntity interessatDistribucio : expedientPeticioEntity.getRegistre().getInteressats()) {
 
 			// Si l'interessat no té document, no s'incorpora a l'expedient
-			if (interessatDistribucio.getDocumentNumero() == null) {
+			InteressatAssociacioAccioEnum accioARealitzar = interessatsAccionsMap.get(interessatDistribucio.getDocumentNumero());
+			if (interessatDistribucio.getDocumentNumero() == null || accioARealitzar==null || InteressatAssociacioAccioEnum.NO_ASSOCIAR.equals(accioARealitzar)) {
 				continue;
 			}
-			// Si hi ha algun problema obtenint l'acció a realitzar, per defecte s'asocia l'interessat
-			InteressatAssociacioAccioEnum accioARealitzar = interessatsAccionsMap.get(interessatDistribucio.getDocumentNumero());
-			if (accioARealitzar == null) {
-				accioARealitzar = InteressatAssociacioAccioEnum.ASSOCIAR;
-			}
+			
 			RegistreInteressatEntity representantDistribucio = interessatDistribucio.getRepresentant();
 			boolean hasRepresentantDistribucio = representantDistribucio != null;
 

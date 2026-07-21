@@ -320,7 +320,7 @@ const translationEs = {
                 acceptar: {
                     label: "Acepta...",
                     button: "Acepta",
-                    title: "Aceptar expediente",
+                    title: "Aceptar anotación",
                     ok: "La anotación se ha aceptado correctamente",
                 },
                 rebutjar: {
@@ -352,6 +352,22 @@ const translationEs = {
                 firma: {
                     label: "Firmas",
                     title: "Firmas",
+                    firmaTitol: "Firma",
+                    firmaTipus: "Tipo firma",
+                    firmaPerfil: "Perfil firma",
+                    fitxer: "Fichero",
+                    descarregar: "Descarga el fichero de firma",
+                    firmaCsvRegulacio: "CSV regulación",
+                    autoFirma: "Firmado para RIPEA",
+                    autoFirmaInfo: "RIPEA ha añadido automáticamente esta firma al anexo de la anotación de registro para guardarlo como definitivo en el archivo",
+                    firmaDetalls: "Detalles de los firmantes",
+                    detalls: {
+                        data: "Fecha",
+                        dataNd: "N/D",
+                        nif: "NIF",
+                        nom: "Nombre",
+                        emissor: "Emisor",
+                    },
                 },
                 consultar: {
                     label: "Consulta",
@@ -958,6 +974,7 @@ const translationEs = {
                 view: {
                     label: "Visualiza",
                     title: "Visualizar",
+                    error: "No se ha podido previsualizar el documento.",
                 },
                 csv: {
                     label: "Copia enlace CSV",

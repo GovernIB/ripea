@@ -320,7 +320,7 @@ const translationEn = {
                 acceptar: {
                     label: "Accept...",
                     button: "Accept",
-                    title: "Accept case file",
+                    title: "Accept record",
                     ok: "The record has been successfully accepted",
                 },
                 rebutjar: {
@@ -352,6 +352,22 @@ const translationEn = {
                 firma: {
                     label: "Signatures",
                     title: "Signatures",
+                    firmaTitol: "Signature",
+                    firmaTipus: "Signature type",
+                    firmaPerfil: "Signature profile",
+                    fitxer: "File",
+                    descarregar: "Download signature file",
+                    firmaCsvRegulacio: "CSV regulation",
+                    autoFirma: "Signed by RIPEA",
+                    autoFirmaInfo: "RIPEA automatically added this signature to the registry record annex in order to store it as final in the archive",
+                    firmaDetalls: "Signers details",
+                    detalls: {
+                        data: "Date",
+                        dataNd: "N/A",
+                        nif: "ID",
+                        nom: "Name",
+                        emissor: "Issuer",
+                    },
                 },
                 consultar: {
                     label: "Consult",
@@ -958,6 +974,7 @@ const translationEn = {
                 view: {
                     label: "View",
                     title: "View",
+                    error: "The document could not be previewed.",
                 },
                 csv: {
                     label: "Copy CSV link",

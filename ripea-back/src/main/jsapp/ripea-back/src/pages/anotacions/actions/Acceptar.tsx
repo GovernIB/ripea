@@ -1,5 +1,5 @@
 import {useEffect, useMemo, useState} from "react";
-import {Grid} from "@mui/material";
+import {Grid, Alert} from "@mui/material";
 import {FormField, useMuiFormDialogApiRef, useBaseAppContext, useFormContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
@@ -263,7 +263,11 @@ const AcceptarForm = () => {
         },
     ]
 
-    return <TabComponent tabs={tabs}/>
+    return <>
+        {data?.expedientNoTrobatMissatge &&
+            <Alert severity="warning" sx={{ mb: 2 }}>{data.expedientNoTrobatMissatge}</Alert>}
+        <TabComponent tabs={tabs}/>
+    </>
 }
 
 const Acceptar = (props:any) => {
