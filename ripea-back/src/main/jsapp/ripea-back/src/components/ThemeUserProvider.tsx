@@ -1,52 +1,70 @@
 import React, {createContext, useContext, useEffect, useMemo, useState} from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
+import { useMediaQuery } from '@mui/material';
 import {useUserSession} from "./Session.tsx";
-import {buildTheme, DEFAULT_PRIMARY_COLOR, DEFAULT_SECONDARY_COLOR} from "../theme.ts";
+import {lightTheme, darkTheme, draculaTheme} from "../theme.ts";
 
-// Previsualització transitòria del tema mentre l'usuari edita el seu perfil.
-// Es fusiona amb la configuració persistida (user.conf); si l'usuari cancel·la
-// es descarta i es torna al valor desat.
-export interface ThemePreview {
-    primary?: string;
-    secondary?: string;
-    // Nivell de foscor del tema, 0 (clar) a 100 (fosc).
-    foscor?: number;
+export enum TemaAplicacio {
+    CLAR = "CLAR",
+    OBSCUR = "OBSCUR",
+    DRACULA = "DRACULA",
+    SISTEMA = "SISTEMA",
 }
 
-// Nivell per defecte quan l'usuari encara no n'ha desat cap.
-export const DEFAULT_FOSCOR = 0;
+export enum EstilMenuProp {
+    theme = "TEMA",
+    inverse = "TEMA_INVERTIT",
+    footer = "PEU"
+}
 
+interface PreviewProps {
+    temaAplicacio: TemaAplicacio | undefined;
+    estilMenu: EstilMenuProp | undefined;
+}
 interface ThemeUserContextProps {
-    preview: ThemePreview | undefined;
-    setPreview: (value: ThemePreview) => void;
-    removePreview: () => void;
+    preview: PreviewProps | undefined;
+    setPreview: (value: PreviewProps) => void;
+    remove: () => void;
 }
 
 const ThemeUserContext = createContext<ThemeUserContextProps | undefined>(undefined);
 
 export const ThemeUserProvider = ({ children }: { children: React.ReactNode }) => {
     const { value: user } = useUserSession()
-    const [preview, setPreviewState] = useState<ThemePreview | undefined>()
+    const [preview, setPreview] = useState<PreviewProps | undefined>()
+    const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
-    // En carregar/refrescar la configuració persistida descartem la previsualització.
     useEffect(() => {
-        setPreviewState(undefined)
-    }, [user?.conf?.nivellFosc, user?.conf?.colorPrincipal, user?.conf?.colorSecundari]);
+        remove()
+    }, [user?.conf?.temaAplicacio, user?.conf?.estilMenu]);
 
-    const setPreview = (value: ThemePreview) =>
-        setPreviewState(prev => ({ ...prev, ...value }))
-    const removePreview = () => setPreviewState(undefined)
+    const remove = () => {
+        setPreview({
+            temaAplicacio: user?.conf?.temaAplicacio,
+            estilMenu: user?.conf?.estilMenu,
+        })
+    }
 
     const theme = useMemo(() => {
-        const primary = preview?.primary ?? user?.conf?.colorPrincipal ?? DEFAULT_PRIMARY_COLOR;
-        const secondary = preview?.secondary ?? user?.conf?.colorSecundari ?? DEFAULT_SECONDARY_COLOR;
-        const foscor = preview?.foscor ?? user?.conf?.nivellFosc ?? DEFAULT_FOSCOR;
-        return buildTheme(primary, secondary, foscor / 100);
-    }, [preview, user]);
+        const systemTheme = prefersDarkMode ? darkTheme : lightTheme;
+        const temaAplicacio = preview?.temaAplicacio || user?.conf?.temaAplicacio;
+
+        switch (temaAplicacio) {
+            case TemaAplicacio.CLAR:
+                return lightTheme;
+            case TemaAplicacio.OBSCUR:
+                return darkTheme;
+            case TemaAplicacio.DRACULA:
+                return draculaTheme;
+            case TemaAplicacio.SISTEMA:
+            default:
+                return systemTheme;
+        }
+    }, [preview?.temaAplicacio, user]);
 
     return (
-        <ThemeUserContext.Provider value={{ preview, setPreview, removePreview }}>
+        <ThemeUserContext.Provider value={{ preview, setPreview, remove }}>
             <ThemeProvider theme={theme}>
                 <CssBaseline />
                 {children}

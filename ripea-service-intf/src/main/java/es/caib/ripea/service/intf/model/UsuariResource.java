@@ -4,10 +4,7 @@ import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.BaseResource;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
-import es.caib.ripea.service.intf.dto.ContingutVistaEnumDto;
-import es.caib.ripea.service.intf.dto.IdiomaEnumDto;
-import es.caib.ripea.service.intf.dto.InterficieUsuariEnumDto;
-import es.caib.ripea.service.intf.dto.MoureDestiVistaEnumDto;
+import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -48,12 +45,9 @@ public class UsuariResource extends BaseResource<String> {
 	private String rolActual;
 	private boolean informacioExpedientExpandit = false;
 	private ContingutVistaEnumDto vistaActual;
-    // Nivell de foscor del tema, 0 (clar) a 100 (fosc).
-    private int nivellFosc = 0;
-    @Size(max = 7)
-    private String colorPrincipal = "#337ab7";
-    @Size(max = 7)
-    private String colorSecundari = "#f1efef";
+
+    private TemaAplicacioEnum temaAplicacio;
+    private MenuEstilEnum estilMenu;
 
     @ResourceField(enumType = true)
 	private Long numElementsPagina;

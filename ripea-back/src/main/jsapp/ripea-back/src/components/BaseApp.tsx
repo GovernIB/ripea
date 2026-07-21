@@ -28,6 +28,8 @@ import {useAlertesSession} from "./SseClient.tsx";
 import {useUserSession} from "./Session";
 import AlertExpand from "./AlertExpand.tsx";
 import {useSession} from "./SessionStorageContext.tsx";
+import {Box, useTheme} from "@mui/material";
+import {EstilMenuProp} from "@src/components/ThemeUserProvider.tsx";
 
 export const HEIGHT_FOOTER = 36;
 
@@ -49,6 +51,7 @@ export type BaseAppProps = React.PropsWithChildren & {
     title_logo?: string;
     version: string;
     menuEntries?: MenuEntryWithResource[];
+    menuAppearance?: EstilMenuProp;
     appbarBackgroundColor?: string;
     appbarBackgroundImg?: string;
 };
@@ -158,6 +161,47 @@ const generateFooter = (version?:string) => {
     );
 };
 
+const getMenuColorSet = (
+    theme: any,
+    appearance: EstilMenuProp = EstilMenuProp.theme,
+): any | undefined => {
+    // `theme` no sobreescriu colors: el menú reutilitza directament la paleta activa de MUI.
+    if (appearance === EstilMenuProp.footer) {
+        return {
+            background: '#5F5D5D',
+            textPrimary: '#F6F6F6',
+            textSecondary: '#E5E5E5',
+            divider: '#807D7D',
+            accent: '#FFFFFF',
+            selectedBackground: 'rgba(255, 255, 255, 0.12)',
+            hoverBackground: 'rgba(255, 255, 255, 0.08)',
+        };
+    }
+    if (appearance !== EstilMenuProp.inverse) {
+        return undefined;
+    }
+    if (theme.palette.mode === 'dark') {
+        return {
+            background: '#FFFFFF',
+            textPrimary: '#1F2937',
+            textSecondary: '#4B5563',
+            divider: '#D1D5DB',
+            accent: '#1976D2',
+            selectedBackground: 'rgba(25, 118, 210, 0.12)',
+            hoverBackground: 'rgba(0, 0, 0, 0.04)',
+        };
+    }
+    return {
+        background: '#1E293B',
+        textPrimary: '#F8FAFC',
+        textSecondary: '#CBD5E1',
+        divider: '#475569',
+        accent: '#60A5FA',
+        selectedBackground: 'rgba(96, 165, 250, 0.18)',
+        hoverBackground: 'rgba(255, 255, 255, 0.08)',
+    };
+};
+
 export const BaseApp: React.FC<BaseAppProps> = (props) => {
     const {
         code,
@@ -167,11 +211,13 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         title,
         version,
         menuEntries,
+        menuAppearance,
         appbarBackgroundColor,
         appbarBackgroundImg,
         children
     } = props;
     const navigate = useNavigate();
+    const theme = useTheme();
     const location = useLocation();
     const baseAppMenuEntries = useBaseAppMenuEntries(menuEntries);
     const {
@@ -193,8 +239,44 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
     }
     const { value } = useAlertesSession();
     const { value: read, save } = useSession('readAlerts');
+    const menuColorSet = getMenuColorSet(theme, menuAppearance);
+    const menuColorSetSx = {
+        '& nav .MuiDrawer-root': {
+            '& .MuiPaper-root, & .MuiList-root': {
+                backgroundColor: menuColorSet?.background,
+                color: menuColorSet?.textPrimary,
+                '& > div .MuiBox-root': {
+                    backgroundColor: menuColorSet?.background,
+                    borderColor: menuColorSet?.divider,
+                },
+                '& > div > .MuiBox-root': {
+                    borderLeft: `1px solid ${menuColorSet?.divider}`,
+                },
+                '& p': {
+                    color: menuColorSet?.textPrimary,
+                },
+                '& h6': {
+                    color: menuColorSet?.accent,
+                },
+            },
+            '& .menu-item-icon': {
+                color: menuColorSet?.textSecondary,
+            },
+            '& .MuiListItemButton-root': {
+                '&.Mui-selected': {
+                    backgroundColor: menuColorSet?.selectedBackground,
+                },
+                '&.Mui-selected:hover': {
+                    backgroundColor: menuColorSet?.selectedBackground,
+                },
+                '&:hover': {
+                    backgroundColor: menuColorSet?.hoverBackground,
+                },
+            },
+        },
+    };
 
-    return (
+    return (<Box sx={menuColorSet ? menuColorSetSx : undefined}>
         <MuiBaseApp
             code={code}
             headerTitle={title}
@@ -254,7 +336,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
                 </div>
             </CustomLocalizationProvider>
         </MuiBaseApp>
-    );
+    </Box>);
 }
 
 export default BaseApp;

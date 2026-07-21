@@ -1,5 +1,5 @@
-import React, {useMemo, useState, useEffect, useRef, useCallback} from "react";
-import {Grid, Box, Button, Icon,  Slider} from "@mui/material";
+import React, {useMemo} from "react";
+import {Grid, Box, Icon, Typography, ToggleButtonGroup, ToggleButton} from "@mui/material";
 import {MuiFormDialog, useBaseAppContext, useMuiFormDialogApiRef, useFormContext, DialogButton} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {CardData} from "../../../components/CardData.tsx";
@@ -8,131 +8,102 @@ import {useUserSession} from "../../../components/Session.tsx";
 import * as builder from '../../../util/springFilterUtils';
 import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
 import {StyledLabel} from "../../../components/StyledLabel.tsx";
-import {ThemePreview, useThemeUserContext} from "../../../components/ThemeUserProvider.tsx";
-import {DEFAULT_PRIMARY_COLOR, DEFAULT_SECONDARY_COLOR} from "../../../theme.ts";
+import {EstilMenuProp, TemaAplicacio, useThemeUserContext} from "../../../components/ThemeUserProvider.tsx";
 
-// Selector d'un color del tema (principal o secundari). El valor visible del
-// picker s'actualitza a l'instant (estat local) per no perdre resposta mentre
-// s'arrossega, però l'aplicació del tema (setPreview -> reconstrucció del tema +
-// re-render global) i el desat al formulari es fan amb debounce de 200ms: el
-// <input type="color"> dispara onChange contínuament durant l'arrossegament i
-// reconstruir el tema a cada esdeveniment alenteix molt l'execució.
-const COLOR_DEBOUNCE_MS = 200;
-
-type ThemeColorFieldProps = {
-    fieldName: 'colorPrincipal' | 'colorSecundari';
-    defaultColor: string;
-    label: string;
-    setPreview: (value: ThemePreview) => void;
-    // Clau de previsualització a actualitzar (primary/secondary).
-    previewKey: 'primary' | 'secondary';
-};
-
-const ThemeColorField = ({ fieldName, defaultColor, label, setPreview, previewKey }: ThemeColorFieldProps) => {
-    const { data, apiRef } = useFormContext();
-    const { t } = useTranslation();
-    const color = data?.[fieldName] || defaultColor;
-
-    // Valor mostrat pel picker (immediat).
-    const [localColor, setLocalColor] = useState<string>(color);
-    // Sincronitza si el valor canvia des de fora (p. ex. càrrega del formulari).
-    useEffect(() => { setLocalColor(color); }, [color]);
-
-    const debounceRef = useRef<ReturnType<typeof setTimeout>>();
-    useEffect(() => () => { if (debounceRef.current) clearTimeout(debounceRef.current); }, []);
-
-    const commit = useCallback((value: string) => {
-        apiRef?.current?.setFieldValue(fieldName, value);
-        setPreview(previewKey === 'primary' ? { primary: value } : { secondary: value });
-    }, [apiRef, fieldName, previewKey, setPreview]);
-
-    const handlePick = (value: string) => {
-        setLocalColor(value);
-        if (debounceRef.current) clearTimeout(debounceRef.current);
-        debounceRef.current = setTimeout(() => commit(value), COLOR_DEBOUNCE_MS);
+export const TemaObscurSelector: React.FC = () => {
+    const { data, apiRef, fields } = useFormContext();
+    const temaAplicacioField = fields?.find?.(f => f.name == "temaAplicacio")
+    const handleChange = (_event: React.MouseEvent<HTMLElement>, newValue: any | null) => {
+        if (newValue !== null) {
+            apiRef?.current?.setFieldValue("temaAplicacio", newValue);
+        }
     };
-
-    const handleReset = () => {
-        if (debounceRef.current) clearTimeout(debounceRef.current);
-        setLocalColor(defaultColor);
-        commit(defaultColor);
-    };
-
-    const pickerId = `${fieldName}Picker`;
     return (
-        <Grid size={4}>
-            <Box display="flex" alignItems="center" gap={1} sx={{ height: '100%' }}>
-                <Box component="label" htmlFor={pickerId} sx={{ fontStyle: 'italic', fontSize: '14px' }}>
-                    {label}
-                </Box>
-                <input
-                    id={pickerId}
-                    type="color"
-                    value={localColor}
-                    onChange={(e) => handlePick(e.target.value)}
-                    aria-label={label}
-                    style={{ width: 48, height: 32, padding: 0, border: 'none', background: 'none', cursor: 'pointer' }}
-                />
-                <Button size="small" variant="outlined" startIcon={<Icon>restart_alt</Icon>} onClick={handleReset}>
-                    {t('page.user.perfil.colorReset')}
-                </Button>
-            </Box>
-        </Grid>
+        <>
+            <Typography component="label" sx={{
+                display: 'block',
+                ml: 1.75,
+                mb: 0.75,
+                fontSize: '0.75rem',
+                lineHeight: 1,
+                color: 'text.secondary',
+            }}>
+                {temaAplicacioField.label}
+            </Typography>
+            <ToggleButtonGroup
+                value={data?.temaAplicacio ?? "SISTEMA"}
+                exclusive
+                onChange={handleChange}
+                size="small"
+                sx={{
+                    display: 'flex',
+                    width: '100%',
+                    justifyContent: 'center',
+                }}
+            >
+                <ToggleButton value={TemaAplicacio.CLAR} sx={{ flex: 1, gap: 1 }}>
+                    <Icon>light_mode</Icon> {temaAplicacioField.options[TemaAplicacio.CLAR]}
+                </ToggleButton>
+                <ToggleButton value={TemaAplicacio.OBSCUR} sx={{ flex: 1, gap: 1 }}>
+                    <Icon>dark_mode</Icon> {temaAplicacioField.options[TemaAplicacio.OBSCUR]}
+                </ToggleButton>
+                <ToggleButton value={TemaAplicacio.DRACULA} sx={{ flex: 1, gap: 1 }}>
+                    <Icon>auto_awesome</Icon> {temaAplicacioField.options[TemaAplicacio.DRACULA]}
+                </ToggleButton>
+                <ToggleButton value={TemaAplicacio.SISTEMA} sx={{ flex: 1, gap: 1 }}>
+                    <Icon>settings_brightness</Icon> {temaAplicacioField.options[TemaAplicacio.SISTEMA]}
+                </ToggleButton>
+            </ToggleButtonGroup>
+        </>
+    );
+};
+export const EstilMenuSelector: React.FC = () => {
+    const { data, apiRef, fields } = useFormContext();
+    const estilMenuField = fields?.find?.(f => f.name == "estilMenu")
+    const handleChange = (_event: React.MouseEvent<HTMLElement>, newValue: any | null) => {
+        if (newValue !== null) {
+            apiRef?.current?.setFieldValue("estilMenu", newValue);
+        }
+    };
+    return (
+        <>
+            <Typography component="label" sx={{
+                display: 'block',
+                ml: 1.75,
+                mb: 0.75,
+                fontSize: '0.75rem',
+                lineHeight: 1,
+                color: 'text.secondary',
+            }}>
+                {estilMenuField.label}
+            </Typography>
+            <ToggleButtonGroup
+                value={data?.estilMenu ?? "TEMA"}
+                exclusive
+                onChange={handleChange}
+                size="small"
+                sx={{
+                    display: 'flex',
+                    width: '100%',
+                    justifyContent: 'center',
+                }}
+            >
+                <ToggleButton value={EstilMenuProp.theme} sx={{ flex: 1, gap: 1 }}>
+                    <Icon>palette</Icon> {estilMenuField.options[EstilMenuProp.theme]}
+                </ToggleButton>
+                <ToggleButton value={EstilMenuProp.inverse} sx={{ flex: 1, gap: 1 }}>
+                    <Icon>invert_colors</Icon> {estilMenuField.options[EstilMenuProp.inverse]}
+                </ToggleButton>
+                <ToggleButton value={EstilMenuProp.footer} sx={{ flex: 1, gap: 1 }}>
+                    <Icon>vertical_align_bottom</Icon> {estilMenuField.options[EstilMenuProp.footer]}
+                </ToggleButton>
+            </ToggleButtonGroup>
+        </>
     );
 };
 
-// Control del nivell de foscor del tema (0 = clar, 100 = fosc). El thumb es mou
-// a l'instant (estat local) i la previsualització del tema s'aplica amb debounce
-// per no reconstruir el tema sencer a cada tick d'arrossegament. El desat al
-// formulari es fa en deixar anar el slider (onChangeCommitted).
-const ThemeLevelField = ({setPreview}: { setPreview: (value: ThemePreview) => void }) => {
-    const { data, apiRef } = useFormContext();
-    const { t } = useTranslation();
-    const value = Number(data?.nivellFosc) || 0;
-
-    const [localValue, setLocalValue] = useState<number>(value);
-    useEffect(() => { setLocalValue(value); }, [value]);
-
-    const debounceRef = useRef<ReturnType<typeof setTimeout>>();
-    useEffect(() => () => { if (debounceRef.current) clearTimeout(debounceRef.current); }, []);
-
-    const handleChange = (_e: Event, v: number | number[]) => {
-        const val = Array.isArray(v) ? v[0] : v;
-        setLocalValue(val);
-        if (debounceRef.current) clearTimeout(debounceRef.current);
-        debounceRef.current = setTimeout(() => setPreview({ foscor: val }), COLOR_DEBOUNCE_MS);
-    };
-
-    const handleCommitted = (_e: React.SyntheticEvent | Event, v: number | number[]) => {
-        const val = Array.isArray(v) ? v[0] : v;
-        if (debounceRef.current) clearTimeout(debounceRef.current);
-        setPreview({ foscor: val });
-        apiRef?.current?.setFieldValue('nivellFosc', val);
-    };
-
-    return (
-        <Grid size={4}>
-            <Box display="flex" alignItems="center" gap={2} sx={{ height: '100%', px: 1 }}>
-                <Box component="label" htmlFor="nivellFoscSlider" sx={{ fontStyle: 'italic', fontSize: '14px', whiteSpace: 'nowrap' }}>
-                    {t('page.user.perfil.foscor')}
-                </Box>
-                <Slider
-                    id="nivellFoscSlider"
-                    value={localValue}
-                    min={0}
-                    max={100}
-                    onChange={handleChange}
-                    onChangeCommitted={handleCommitted}
-                    valueLabelDisplay="auto"
-                    aria-label={t('page.user.perfil.foscor')}
-                />
-            </Box>
-        </Grid>
-    );
-};
-
-const PerfilFrom = ({setPreview}: { setPreview: (value: ThemePreview) => void }) =>{
-    const { data, fields, apiRef } = useFormContext();
+const PerfilFrom = () =>{
+    const { data, fields } = useFormContext();
     const { t } = useTranslation();
     const { value: user } = useUserSession();
     const rebreEmailsGlobal = data?.rebreEmailsGlobal;
@@ -177,21 +148,8 @@ const PerfilFrom = ({setPreview}: { setPreview: (value: ThemePreview) => void })
             </CardData>
 
             <CardData title={t('page.user.perfil.tema')} icon="palette" >
-                <ThemeLevelField setPreview={setPreview} />
-                <ThemeColorField
-                    fieldName="colorPrincipal"
-                    defaultColor={DEFAULT_PRIMARY_COLOR}
-                    label={t('page.user.perfil.colorPrincipal')}
-                    setPreview={setPreview}
-                    previewKey="primary"
-                />
-                <ThemeColorField
-                    fieldName="colorSecundari"
-                    defaultColor={DEFAULT_SECONDARY_COLOR}
-                    label={t('page.user.perfil.colorSecundari')}
-                    setPreview={setPreview}
-                    previewKey="secondary"
-                />
+                <TemaObscurSelector />
+                <EstilMenuSelector />
             </CardData>
 
             <CardData title={t('page.user.perfil.column')} icon="checklist" >
@@ -217,7 +175,7 @@ const PerfilFrom = ({setPreview}: { setPreview: (value: ThemePreview) => void })
 const usePerfil = () => {
     const { t } = useTranslation();
     const { value: user, refresh } = useUserSession();
-    const {setPreview, removePreview} = useThemeUserContext()
+    const {setPreview, remove} = useThemeUserContext()
 
     const formApiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow, t: tBase } = useBaseAppContext();
@@ -232,7 +190,7 @@ const usePerfil = () => {
             .catch((error) => {
                 // Qualsevol tancament sense desar (cancel·lar, 'x', Escape) rebutja
                 // la promesa: revertim la previsualització del tema a la configuració desada.
-                removePreview();
+                remove();
                 if (error?.message)
                     temporalMessageShow(null, error?.message, 'error');
             });
@@ -245,7 +203,7 @@ const usePerfil = () => {
             componentProps: {
                 variant: 'outlined',
                 onClick: () => {
-                    removePreview();
+                    remove();
                     formApiRef.current?.close();
                 },
             },
@@ -256,7 +214,7 @@ const usePerfil = () => {
             icon: 'save',
             componentProps: { variant: 'contained' },
         },
-    ], [formApiRef, removePreview, tBase]);
+    ], [formApiRef, remove, tBase]);
 
     const dialog = (
         <MuiFormDialog
@@ -266,8 +224,16 @@ const usePerfil = () => {
             dialogButtons={dialogButtons}
             apiRef={formApiRef}
             dialogComponentProps={{ fullWidth: true, maxWidth: 'lg'}}
+            formComponentProps={{
+                onDataChange: (data: any) => {
+                    setPreview({
+                        temaAplicacio: data?.temaAplicacio,
+                        estilMenu: data?.estilMenu,
+                    });
+                },
+            }}
         >
-            <PerfilFrom setPreview={setPreview}/>
+            <PerfilFrom/>
         </MuiFormDialog>
     );
 

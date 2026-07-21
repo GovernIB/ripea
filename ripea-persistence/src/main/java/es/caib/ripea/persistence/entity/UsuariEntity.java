@@ -5,11 +5,10 @@ package es.caib.ripea.persistence.entity;
 
 import es.caib.ripea.persistence.entity.resourceentity.EntitatResourceEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
-import es.caib.ripea.service.intf.dto.ContingutVistaEnumDto;
-import es.caib.ripea.service.intf.dto.InterficieUsuariEnumDto;
-import es.caib.ripea.service.intf.dto.MoureDestiVistaEnumDto;
+import es.caib.ripea.service.intf.dto.*;
 import lombok.Getter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.hibernate.annotations.Comment;
 import org.hibernate.annotations.ForeignKey;
 
 import javax.persistence.*;
@@ -90,12 +89,13 @@ public class UsuariEntity implements Serializable {
 	private boolean expedientListComentaris = true;
 	@Column(name = "exp_list_grup")
 	private boolean expedientListGrup = false;
-	@Column(name = "nivell_fosc")
-	private int nivellFosc = 0;
-	@Column(name = "color_principal", length = 7)
-	private String colorPrincipal = "#337ab7";
-	@Column(name = "color_secundari", length = 7)
-	private String colorSecundari = "#f1efef";
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tema_aplicacio", length = 16)
+    private TemaAplicacioEnum temaAplicacio;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estil_menu", length = 16, nullable = false, columnDefinition = "VARCHAR(16) DEFAULT 'TEMA'")
+    private MenuEstilEnum estilMenu;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "metaexpedient_id")

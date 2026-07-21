@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { useCombinedMenu } from './hooks/useCombinedMenu.ts';
 import { useTheme } from '@mui/material';
 import { TemporalMessageBridge } from './components/PreBaseAppProvider.tsx';
+import {useThemeUserContext} from "@src/components/ThemeUserProvider.tsx";
 
 const changeFavicon = (faviconUrl:any) => {
     const link:any =
@@ -32,6 +33,7 @@ export const App: React.FC = () => {
     const { i18n } = useTranslation();
     const { sideMenuEntries: menuEntries, additionalContents: additionalContentsMenu } = useCombinedMenu();
     const theme = useTheme();
+    const {preview} = useThemeUserContext()
 
     // Sincronizar lang del <html> con el idioma activo de i18next
     useEffect(() => {
@@ -41,7 +43,7 @@ export const App: React.FC = () => {
     useEffect(() => {
         changeFavicon(getImgFromBytes(entitat?.conf?.favicon) || favicon)
     }, [entitat?.conf?.favicon, favicon]);
-    
+
     return (
         <BaseApp
             code="cmd"
@@ -62,6 +64,7 @@ export const App: React.FC = () => {
             version={version}
             appbarBackgroundColor={entitat?.conf?.colorFons}
             menuEntries={menuEntries}
+            menuAppearance={preview?.estilMenu}
         >
             <TitleHeaderConfigurator/>
             <AppRoutes/>
