@@ -191,6 +191,10 @@ const DocumentsGrid = (props: any) => {
     const [expand, setExpand] = useState<boolean>(user?.conf?.expedientExpandit);
     const [vista, setVista] = useState<View>(getFolderExpand("vista") ?? user?.conf?.vistaActual);
     const [disabled, setDisabled] = useState<boolean>(false);
+    // Es posa a true quan la graella ha carregat files (via onRowCountChange), moment en
+    // què el seu apiRef ja està inicialitzat. S'usa per disparar la subscripció a 'rowDragEnd'
+    // amb l'api ja llest (l'efecte de DocumentsGrid pot córrer abans que la graella munti).
+    const [gridApiReady, setGridApiReady] = useState<boolean>(false);
     const {
         isReady,
         carpetes,
@@ -237,6 +241,11 @@ const DocumentsGrid = (props: any) => {
     const onDrop = React.useCallback((adjunt: any) => {
         apiRef?.current?.triggerCreate?.(null, { adjunt })
     }, [apiRef])
+
+    const handleRowCountChange = React.useCallback((count: any) => {
+        setGridApiReady(true);
+        onRowCountChange?.(count);
+    }, [onRowCountChange])
 
     const toggleCarpetaExpansion = useCallback((rowId: any) => {
         const api = dataApiRef.current;
@@ -296,6 +305,84 @@ const DocumentsGrid = (props: any) => {
         return canReorder;
     }
 
+    /**
+     * Fix moure un document DINS d'una carpeta quan el grid no té cap anidament previ.
+     *
+     * MUI x-data-grid-pro tracta la graella com a "plana" quan la profunditat màxima
+     * de l'arbre és 1 (cap fila niada, p.ex. una carpeta buida amb tota la resta a l'arrel).
+     * En aquest mode el seu setRowPosition rebutja la posició 'inside' llançant un error
+     * que queda empassat dins el try/catch intern de useGridRowReorder → no es publica mai
+     * l'event 'rowOrderChange' i, per tant, no s'executa handleDragEnd ni es dispara REORDER
+     * (sense resposta a la UI, sense petició, sense error a consola).
+     *
+     * Aquí escoltam el 'rowDragEnd' de MUI i, NOMÉS en aquest cas pla, disparam el REORDER
+     * nosaltres a partir del destí ('dropTarget') que MUI ja ha calculat i validat. Quan ja
+     * existeix anidament, MUI ho gestiona via onRowOrderChange (handleDragEnd) i aquí no feim res.
+     */
+    useEffect(() => {
+        const api = dataApiRef.current;
+        if (!api || typeof api.subscribeEvent !== 'function') {
+            return;
+        }
+        const handleNativeDragEnd = () => {
+            const reorderState: any = api.state?.rowReorder;
+            const dropTarget = reorderState?.dropTarget;
+            const draggedRowId = reorderState?.draggedRowId;
+            if (!dropTarget || dropTarget.position !== 'inside' || draggedRowId == null) {
+                return;
+            }
+            // Rèplica de gridRowMaximumTreeDepthSelector: MUI usa el setRowPosition "pla"
+            // (que no admet 'inside') quan cap profunditat amb files és > 0.
+            const treeDepths: any = api.state?.rows?.treeDepths ?? {};
+            const maxDepth = Object.entries(treeDepths)
+                .filter(([, nodeCount]: any) => nodeCount > 0)
+                .map(([depth]) => Number(depth))
+                .sort((a, b) => b - a)[0] ?? 0;
+            const isFlatTree = maxDepth <= 0;
+            if (!isFlatTree) {
+                return;
+            }
+            const sourceRow = api.getRow(draggedRowId);
+            const targetRow = api.getRow(dropTarget.rowId);
+            if (sourceRow?.tipus !== 'DOCUMENT' || targetRow?.tipus !== 'CARPETA') {
+                return;
+            }
+            // No movem documents sense 'expedient' (dada anòmala): en canviar el 'pare' a la carpeta,
+            // sense 'expedient' el document cauria del filtre del llistat (expedient.id OR pare.id)
+            // i desapareixeria. Preferim que el reorder no funcioni i així poder detectar aquests casos.
+            if (sourceRow?.expedient?.id == null) {
+                console.warn(
+                    '[Contingut][Reorder] Document sense expedient: no es mou dins la carpeta per evitar que desaparegui del llistat.',
+                    {
+                        documentId: draggedRowId,
+                        nom: sourceRow?.nom ?? sourceRow?.descripcio,
+                        tipus: sourceRow?.tipus,
+                        expedient: sourceRow?.expedient ?? null,
+                        pare: sourceRow?.pare ?? null,
+                        carpetaDestiId: dropTarget?.rowId,
+                    },
+                );
+                return;
+            }
+            if (String(sourceRow?.pare?.id ?? '') === String(dropTarget.rowId)) {
+                return;
+            }
+            if (!apiContingutIsReady) {
+                console.error('Servei de l\'API pels documents no disponible');
+                refresh();
+                return;
+            }
+            apiAction(draggedRowId, { code: 'REORDER', data: { pare: dropTarget.rowId, ordre: 1 } })
+                .then(() => {
+                    addFolderExpand(String(dropTarget.rowId), true);
+                    refresh();
+                })
+                .catch(() => refresh());
+        };
+        const unsubscribe = api.subscribeEvent('rowDragEnd', handleNativeDragEnd);
+        return () => unsubscribe?.();
+    }, [dataApiRef, gridApiReady, apiContingutIsReady, apiAction, contingutScopeId, entity?.id]);
+
     useEffect(() => {
         addFolderExpand("vista", vista)
     }, [vista]);
@@ -343,7 +430,7 @@ const DocumentsGrid = (props: any) => {
                         apiRef={apiRef}
                         datagridApiRef={dataApiRef}
                         rowAdditionalActions={actions}
-                        onRowCountChange={onRowCountChange}
+                        onRowCountChange={handleRowCountChange}
                         onRefresh={refresh}
 
                         groupingColDef={{
@@ -481,6 +568,26 @@ const DocumentsGrid = (props: any) => {
                             }
                         }}
                         setTreeDataPath={(path, row) => {
+                            // Si un document té 'expedient' nul (dada anòmala, p.ex. una prova que va
+                            // sortir malament), NO el movem: si el moguéssim, el 'pare' passaria a ser la
+                            // carpeta i, sense 'expedient', cauria del filtre del llistat
+                            // (expedient.id OR pare.id = expedient) i desapareixeria (el back no li
+                            // reconstrueix l'expedient). Llançam un error (MUI l'empassa dins el seu
+                            // try/catch → reorder no-op) i el registram per consola per poder detectar-ho.
+                            // Guard equivalent al handler de 'rowDragEnd' (cas carpeta buida / arbre pla).
+                            if (row?.expedient?.id == null) {
+                                console.warn(
+                                    '[Contingut][Reorder] Document sense expedient: no es reordena per evitar que desaparegui del llistat.',
+                                    {
+                                        documentId: row?.id,
+                                        nom: row?.nom ?? row?.descripcio,
+                                        tipus: row?.tipus,
+                                        expedient: row?.expedient ?? null,
+                                        pare: row?.pare ?? null,
+                                    },
+                                );
+                                throw new Error(`Document ${row?.id} sense expedient: reorder no permès`);
+                            }
                             const treePath = [row.expedient.id, ...(path.map(p => parseInt(p)))];
                             return { ...row, treePath };
                         }}
