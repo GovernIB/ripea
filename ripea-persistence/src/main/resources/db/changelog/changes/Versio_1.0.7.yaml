@@ -48,7 +48,7 @@ databaseChangeLog:
             stripComments: true
             relativeToChangelogFile: true
   - changeSet:
-      id: RIPEA_1.0.7_1851_1
+      id: RIPEA_1.0.7_1851_3
       author: limit
       changes:
         - sqlFile:
@@ -76,6 +76,34 @@ databaseChangeLog:
             - sqlFile:
                   dbms: postgresql
                   path: ../scripts/postgres/1.0.7/Versio_1.0.7_DML_1.sql
+                  splitStatements: true
+                  stripComments: true
+                  relativeToChangelogFile: true
+  - changeSet:
+        id: RIPEA_1.0.7_1796_1
+        author: limit
+        changes:
+            - sqlFile:
+                  dbms: oracle
+                  path: ../scripts/oracle/1.0.7/Versio_1.0.7_DDL_1796_1.sql
+                  splitStatements: true
+                  stripComments: true
+                  relativeToChangelogFile: true
+            - sqlFile:
+                  dbms: postgresql
+                  path: ../scripts/postgres/1.0.7/Versio_1.0.7_DDL_1796_1.sql
+                  splitStatements: true
+                  stripComments: true
+                  relativeToChangelogFile: true
+            - sqlFile:
+                  dbms: oracle
+                  path: ../scripts/oracle/1.0.7/Versio_1.0.7_DML_1796_1.sql
+                  splitStatements: true
+                  stripComments: true
+                  relativeToChangelogFile: true
+            - sqlFile:
+                  dbms: postgresql
+                  path: ../scripts/postgres/1.0.7/Versio_1.0.7_DML_1796_1.sql
                   splitStatements: true
                   stripComments: true
                   relativeToChangelogFile: true

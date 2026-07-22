@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * Informació d'una tasca d'un meta-expedient.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Data
@@ -21,6 +21,7 @@ public class MetaExpedientTascaDto implements Serializable {
 	private Long id;
 	private String codi;
 	private String nom;
+    private int ordre;
 	private String descripcio;
 	private String responsable;
 	private boolean activa;
@@ -37,7 +38,7 @@ public class MetaExpedientTascaDto implements Serializable {
 	private Long estatIdFinalitzarTasca;
 	private String estatNomFinalitzarTasca;
 	private String estatColorFinalitzarTasca;
-	
+
 	private List<MetaExpedientTascaValidacioDto> validacions;
 
 	public String getDataLimitString() {
@@ -56,6 +57,6 @@ public class MetaExpedientTascaDto implements Serializable {
 			return getDataLimitString();
 		}
 	}
-	
+
 	private static final long serialVersionUID = -139254994389509932L;
 }

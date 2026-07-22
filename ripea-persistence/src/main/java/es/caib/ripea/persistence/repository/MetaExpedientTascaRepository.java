@@ -26,9 +26,9 @@ public interface MetaExpedientTascaRepository extends JpaRepository<MetaExpedien
 			"and (:esNullFiltre = true or lower(met.codi) like lower('%'||:filtre||'%') or lower(met.nom) like lower('%'||:filtre||'%')) ")
 	Page<MetaExpedientTascaEntity> findByEntitatAndMetaExpedientAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
-			@Param("metaExpedient") MetaExpedientEntity metaExpedient, 
+			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
 			@Param("esNullFiltre") boolean esNullFiltre,
-			@Param("filtre") String filtre,	
+			@Param("filtre") String filtre,
 			Pageable pageable);
 
 	int deleteByCodi(String codi);
@@ -37,16 +37,22 @@ public interface MetaExpedientTascaRepository extends JpaRepository<MetaExpedien
 
 	List<MetaExpedientTascaEntity> findByMetaExpedientAndActivaTrue(MetaExpedientEntity metaExpedient);
 
+    List<MetaExpedientTascaEntity> findByMetaExpedientOrderByOrdreAsc(MetaExpedientEntity metaExpedient);
+    List<MetaExpedientTascaEntity> findByMetaExpedientAndActivaTrueOrderByOrdreAsc(MetaExpedientEntity metaExpedient);
+
+    @Query("SELECT COALESCE(MAX(met.ordre), -1) FROM MetaExpedientTascaEntity met WHERE met.metaExpedient.id = :metaExpedientId")
+    int findMaxOrdreByMetaExpedientId(@Param("metaExpedientId") Long metaExpedientId);
+
 	boolean existsByMetaExpedientIdAndActivaTrue(Long metaExpedientId);
 
 	List<MetaExpedientTascaEntity> findByActivaTrue();
-	
+
 	MetaExpedientTascaEntity findByMetaExpedientAndCodi(MetaExpedientEntity metaExpedient, String codi);
-	
+
 	int countByMetaExpedient(MetaExpedientEntity metaExpedient);
-	
+
 	int countByEstatCrearTascaOrEstatFinalitzarTasca(ExpedientEstatEntity estatCrearTasca, ExpedientEstatEntity estatFinalitzarTasca);
-	
+
 	@Modifying
  	@Query(value = "UPDATE IPA_METAEXP_TASCA " +
  			"SET CREATEDBY_CODI = CASE WHEN CREATEDBY_CODI = :codiAntic THEN :codiNou ELSE CREATEDBY_CODI END, " +

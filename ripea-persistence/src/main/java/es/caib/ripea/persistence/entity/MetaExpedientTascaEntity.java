@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.ripea.persistence.entity;
 
@@ -34,7 +34,7 @@ import lombok.Setter;
 
 /**
  * Classe del model de dades que representa una tasca d'un meta-expedient.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Entity
@@ -51,6 +51,8 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 	private String codi;
 	@Column(name = "nom", length = 256, nullable = false)
 	private String nom;
+    @Column(name = "ordre", nullable = false)
+    private int ordre;
 	@Column(name = "descripcio", length = 1024, nullable = false)
 	private String descripcio;
 	@Column(name = "responsable", length = 64)
@@ -65,11 +67,11 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 	@Column(name = "PRIORITAT", length = 16)
 	@Enumerated(EnumType.STRING)
 	private PrioritatEnumDto prioritat;
-	
+
 	@ManyToOne
 	@JoinColumn(name = "estat_crear_tasca_id")
 	private ExpedientEstatEntity estatCrearTasca;
-	
+
 	@ManyToOne
 	@JoinColumn(name = "estat_finalitzar_tasca_id")
 	private ExpedientEstatEntity estatFinalitzarTasca;
@@ -78,17 +80,18 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 	@JoinColumn(name = "meta_expedient_id")
 	@ForeignKey(name = BaseConfig.DB_PREFIX + "metaexp_metaexptas_fk")
 	private MetaExpedientEntity metaExpedient;
-	
+
 	@OneToMany(
 			mappedBy = "metaExpedientTasca",
 			cascade = CascadeType.ALL,
 			fetch = FetchType.LAZY,
 			orphanRemoval = true)
 	private List<MetaExpedientTascaValidacioEntity> validacions = new ArrayList<MetaExpedientTascaValidacioEntity>();
-	
+
 	public void update(
 			String codi,
 			String nom,
+            int ordre,
 			String descripcio,
 			String responsable,
 			Date dataLimit,
@@ -98,6 +101,7 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 			ExpedientEstatEntity estatFinalitzarTasca) {
 		this.codi = codi;
 		this.nom = nom;
+        this.ordre = ordre;
 		this.descripcio = descripcio;
 		this.responsable = responsable;
 		this.dataLimit = dataLimit;
@@ -119,6 +123,7 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 	public static Builder getBuilder(
 			String codi,
 			String nom,
+            int ordre,
 			String descripcio,
 			String responsable,
 			MetaExpedientEntity metaExpedient,
@@ -130,6 +135,7 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 		return new Builder(
 				codi,
 				nom,
+                ordre,
 				descripcio,
 				responsable,
 				metaExpedient,
@@ -144,6 +150,7 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 		Builder(
 				String codi,
 				String nom,
+                Integer ordre,
 				String descripcio,
 				String responsable,
 				MetaExpedientEntity metaExpedient,
@@ -155,6 +162,7 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 			built = new MetaExpedientTascaEntity();
 			built.codi = codi;
 			built.nom = nom;
+            built.ordre = ordre;
 			built.descripcio = descripcio;
 			built.responsable = responsable;
 			built.metaExpedient = metaExpedient;
@@ -186,7 +194,7 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

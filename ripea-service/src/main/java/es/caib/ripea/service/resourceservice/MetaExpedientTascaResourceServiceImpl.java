@@ -1,9 +1,15 @@
 package es.caib.ripea.service.resourceservice;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientEstatResourceEntity;
+import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.helper.TascaHelper;
+import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import org.springframework.stereotype.Service;
 
 import com.turkraft.springfilter.FilterBuilder;
@@ -39,23 +45,26 @@ public class MetaExpedientTascaResourceServiceImpl extends BaseMutableResourceSe
 	private final MetaExpedientTascaValidacioResourceRepository metaExpedientTascaValidacioResourceRepository;
 	private final MetaExpedientTascaRepository metaExpedientTascaRepository;
 	private final ExpedientResourceRepository expedientResourceRepository;
-	
+    private final EntityComprovarHelper entityComprovarHelper;
+    private final TascaHelper tascaHelper;
+
     @PostConstruct
     public void init() {
     	register(MetaExpedientTascaResource.PERSPECTIVE_COUNT_VALIDACIONS,	new CountValidacionsTascaPerspectiveApplicator());
     	register(MetaExpedientTascaResource.PERSPECTIVE_REVISIO_ESTAT,	new RevisioEstatPerspectiveApplicator());
+        register(MetaExpedientTascaResource.ACTION_REORDENAR_CODE, new ReordenarTascaActionExecutor());
     }
-	
+
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
-    	
+
         String entitatActualCodi = configHelper.getEntitatActualCodi();
-    	
+
         Filter filtreBase = FilterBuilder.and(
                 (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
-                FilterBuilder.equal(MetaExpedientTascaResource.Fields.metaExpedient + "." + MetaNodeResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
+                FilterBuilder.equal(MetaExpedientTascaResource.Fields.metaExpedient + "." + MetaNodeResource.Fields.entitat + "." + EntitatResource.Fields.codi,
                 		entitatActualCodi != null?entitatActualCodi:"................................................................................")
         );
-        
+
         Map<String, String> mapaNamedQueries = Utils.namedQueriesToMap(namedQueries);
     	if (mapaNamedQueries.size()>0) {
     		/**
@@ -70,10 +79,10 @@ public class MetaExpedientTascaResourceServiceImpl extends BaseMutableResourceSe
     			}
     		}
     	}
-        
+
         return filtreBase.generate();
     }
-    
+
     private class CountValidacionsTascaPerspectiveApplicator implements PerspectiveApplicator<MetaExpedientTascaResourceEntity, MetaExpedientTascaResource> {
 		@Override
 		public void applySingle(String code, MetaExpedientTascaResourceEntity entity, MetaExpedientTascaResource resource) throws PerspectiveApplicationException {
@@ -100,18 +109,24 @@ public class MetaExpedientTascaResourceServiceImpl extends BaseMutableResourceSe
         }
     }
 
+    @Override
+    protected void beforeCreateSave(MetaExpedientTascaResourceEntity entity, MetaExpedientTascaResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
+        int nouOrdre = metaExpedientTascaRepository.findMaxOrdreByMetaExpedientId(entity.getMetaExpedient().getId()) + 1;
+        entity.setOrdre(nouOrdre);
+    }
+
     protected void afterCreateSave(MetaExpedientTascaResourceEntity entity, MetaExpedientTascaResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
     	logProcedimentTascaAccio(entity, LogTipusEnumDto.CREACIO);
     }
-    
+
     protected void afterUpdateSave(MetaExpedientTascaResourceEntity entity, MetaExpedientTascaResource resource, Map<String, AnswerRequiredException.AnswerValue> answers, boolean anyOrderChanged) {
     	logProcedimentTascaAccio(entity, LogTipusEnumDto.MODIFICACIO);
     }
-    
+
     protected void afterDelete(MetaExpedientTascaResourceEntity entity, Map<String, AnswerRequiredException.AnswerValue> answers) {
     	logProcedimentTascaAccio(entity, LogTipusEnumDto.ELIMINACIO);
     }
-    
+
     private void logProcedimentTascaAccio(MetaExpedientTascaResourceEntity entity, LogTipusEnumDto accio) {
     	contingutLogHelper.logProcedimentObjecte(
     			entity.getMetaExpedient().getId(),
@@ -121,5 +136,18 @@ public class MetaExpedientTascaResourceServiceImpl extends BaseMutableResourceSe
     			accio,
     			entity.getCodi(),
     			entity.getNom());
+    }
+
+    private class ReordenarTascaActionExecutor implements ActionExecutor<MetaExpedientTascaResourceEntity, Integer, Serializable> {
+        @Override
+        public void onChange(Serializable id, Integer previous, String fieldName, Object fieldValue,
+                             Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, Integer target) {
+        }
+        @Override
+        public Serializable exec(String code, MetaExpedientTascaResourceEntity entity, Integer params) throws ActionExecutionException {
+            EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+            tascaHelper.moveTo(entitatEntity.getId(), entity.getMetaExpedient().getId(), entity.getId(), params, configHelper.getRolActual());
+            return "{\"resultado\": \"OK\"}";
+        }
     }
 }

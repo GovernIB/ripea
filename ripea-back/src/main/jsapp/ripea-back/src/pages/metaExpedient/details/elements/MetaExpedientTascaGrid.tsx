@@ -14,6 +14,7 @@ const useActions = (refresh?: () => void) => {
     const {t} = useTranslation();
     const {
         patch: apiPatch,
+        artifactAction: apiAction,
     } = useResourceApiService('metaExpedientTascaResource');
     const {temporalMessageShow} = useBaseAppContext();
 
@@ -39,7 +40,15 @@ const useActions = (refresh?: () => void) => {
             });
     }
 
-    return {active, desactive}
+    const reordering = (id:any, ordre:number) => {
+        apiAction(id, { code: 'REORDENAR', data: ordre })
+            .then(() => refresh?.())
+            .catch((error) => {
+                temporalMessageShow(null, error?.message, 'error');
+            });
+    }
+
+    return {active, desactive, reordering}
 }
 const MetaExpedientTascaForm = () => {
     const {t} = useTranslation()
@@ -59,7 +68,7 @@ const MetaExpedientTascaForm = () => {
     </Grid>
 }
 
-const sortModel: any = [{field: 'codi', sort: 'asc'}]
+const sortModel: any = [{field: 'ordre', sort: 'asc'}]
 const perspectives: string[] = ['COUNT_VALIDACIONS'];
 const columns = [
     {
@@ -123,7 +132,13 @@ export const MetaExpedientTascaGrid = ({ entity, onRowCountChange, readOnly } :a
         apiRef?.current?.refresh?.();
     }
 
-    const {active, desactive} = useActions(refresh)
+    const handleDragEnd = (params: any) => {
+        if (params.targetIndex != params.oldIndex) {
+            reordering(params.row.id, params.targetIndex)
+        }
+    }
+
+    const {active, desactive, reordering} = useActions(refresh)
     const {apiIsReady, handleOpen, dialog} = useMetaExpTascaDetail()
     const actions:any[] = useMemo(() => readOnly ?[
         {
@@ -157,7 +172,7 @@ export const MetaExpedientTascaGrid = ({ entity, onRowCountChange, readOnly } :a
             label: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
             showInMenu: true,
             disabled: true,
-        },        
+        },
         {
             label: t('common.delete'),
             icon: "delete",
@@ -166,28 +181,34 @@ export const MetaExpedientTascaGrid = ({ entity, onRowCountChange, readOnly } :a
         },
     ], [t, readOnly, apiIsReady]);
 
-    return <><StyledMuiGrid
-        apiRef={apiRef}
-        resourceName={'metaExpedientTascaResource'}
-        popupEditUpdateActive
-        popupEditFormDialogResourceTitle={t('page.metaExpedientTasca.title')}
-        popupEditFormContent={<MetaExpedientTascaForm/>}
-        columns={columns}
-        toolbarShowQuickFilter
-        filter={builder.eq("metaExpedient.id", entity?.id)}
-        formAdditionalData={{ metaExpedient: {id: entity?.id} }}
-        sortModel={sortModel}
-        perspectives={perspectives}
-        rowAdditionalActions={actions}
-        onRowCountChange={onRowCountChange}
-
-        popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'lg' }}
-        toolbarCreateTitle={t('page.metaExpedientTasca.action.new.label')}
-        popupEditFormI18nKeys={{
-            createSuccess: 'page.metaExpedientTasca.action.new.ok',
-            updateSuccess: 'page.metaExpedientTasca.action.update.ok',
-            deleteSuccess: 'page.metaExpedientTasca.action.delete.ok',
-        }}
-        readOnly={readOnly}
-    />{dialog}</>
+    return (
+        <>
+            <StyledMuiGrid
+                apiRef={apiRef}
+                resourceName={'metaExpedientTascaResource'}
+                popupEditUpdateActive
+                popupEditFormDialogResourceTitle={t('page.metaExpedientTasca.title')}
+                popupEditFormContent={<MetaExpedientTascaForm />}
+                columns={columns}
+                toolbarShowQuickFilter
+                filter={builder.eq('metaExpedient.id', entity?.id)}
+                formAdditionalData={{ metaExpedient: { id: entity?.id } }}
+                staticSortModel={sortModel}
+                perspectives={perspectives}
+                rowAdditionalActions={actions}
+                onRowCountChange={onRowCountChange}
+                rowReordering={!readOnly}
+                onRowOrderChange={handleDragEnd}
+                popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'lg' }}
+                toolbarCreateTitle={t('page.metaExpedientTasca.action.new.label')}
+                popupEditFormI18nKeys={{
+                    createSuccess: 'page.metaExpedientTasca.action.new.ok',
+                    updateSuccess: 'page.metaExpedientTasca.action.update.ok',
+                    deleteSuccess: 'page.metaExpedientTasca.action.delete.ok',
+                }}
+                readOnly={readOnly}
+            />
+            {dialog}
+        </>
+    );
 }

@@ -34,14 +34,21 @@ import lombok.experimental.FieldNameConstants;
 				@ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = MetaExpedientTascaResource.PERSPECTIVE_REVISIO_ESTAT),
+                @ResourceArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = MetaExpedientTascaResource.ACTION_REORDENAR_CODE,
+                        formClass = Integer.class,
+                        requiresId = true),
         })
 public class MetaExpedientTascaResource extends BaseAuditableResource<Long> {
 
 	public static final String PERSPECTIVE_COUNT_VALIDACIONS = "COUNT_VALIDACIONS";
 	public static final String PERSPECTIVE_REVISIO_ESTAT = "REVISIO_ESTAT";
+    public static final String ACTION_REORDENAR_CODE = "REORDENAR";
 
     @NotNull private String codi;
     @NotNull private String nom;
+    @NotNull private int ordre;
     @NotNull private String descripcio;
     private ResourceReference<UsuariResource, String> responsable;
     private boolean activa = true;
@@ -61,9 +68,9 @@ public class MetaExpedientTascaResource extends BaseAuditableResource<Long> {
     @Transient private String estatColorCrearTasca;
     @Transient private String estatColorFinalitzarTasca;
     @Transient private MetaExpedientRevisioEstatEnumDto metaExpedientRevisioEstat;
-    
+
     //Nomes per importacio de procediments
     private List<MetaExpedientTascaValidacioResource> validacionsImportacio = new ArrayList<>();
-    
+
     @Transient private boolean importar = true;
 }

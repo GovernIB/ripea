@@ -36,6 +36,8 @@ public class MetaExpedientTascaResourceEntity extends BaseAuditableEntity<MetaEx
     private String codi;
     @Column(name = "nom", length = 256, nullable = false)
     private String nom;
+    @Column(name = "ordre", nullable = false)
+    private int ordre;
     @Column(name = "descripcio", length = 1024, nullable = false)
     private String descripcio;
 

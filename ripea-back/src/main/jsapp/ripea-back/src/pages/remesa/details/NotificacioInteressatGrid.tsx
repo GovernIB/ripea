@@ -39,7 +39,6 @@ const useNotificacioInteressatGrid = (refresh?: () => void) => {
     const {actions, components} = useNotificacioInteressatActions(entity, refresh);
 
     const handleOpen = (id:any, row:any) => {
-        console.log(id, row)
         setEntity(row);
         setOpen(true);
     }
