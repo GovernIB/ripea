@@ -4,7 +4,7 @@ import {
     DragOverlay,
     useDraggable,
     useDroppable,
-    closestCorners
+    pointerWithin
 } from '@dnd-kit/core';
 import {Card, CardContent, Typography, Box, Chip, Grid, Menu, Icon, IconButton} from '@mui/material';
 import {actionToItem} from "@src/components/MenuButton.tsx";
@@ -208,7 +208,7 @@ const KanbanBoard = ({
             <DndContext
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
-                collisionDetection={closestCorners}
+                collisionDetection={pointerWithin}
             >
                 <Grid container spacing={1}>
                     {columns.map((col, i) => (
