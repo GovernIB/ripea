@@ -6,6 +6,7 @@ const CreateForm = (props:any) => {
     return <MuiFormDialog
         resourceName={"expedientTascaResource"}
         onClose={(reason?: string) => reason !== 'backdropClick'}
+        formI18nKeys={{createSuccess: 'page.tasca.action.new.ok'}}
         {...props}
     >
         <TasquesGridForm/>
@@ -20,7 +21,6 @@ const useCreate = (refresh?: () => void) => {
         apiRef.current?.show(undefined, additionalData)
             .then(() => {
                 refresh?.();
-                temporalMessageShow(null, t('page.tasca.action.new.ok'), 'success');
             })
             .catch((error:any) => {
                 if (error?.message)

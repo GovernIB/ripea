@@ -3,9 +3,8 @@ import {useTranslation} from "react-i18next";
 import {useBaseAppContext, useResourceApiService} from "reactlib";
 import KanbanBoard from "@src/components/KanbanBoard.tsx";
 import {formatDate} from "@src/util/dateUtils.ts";
-import useCreate from "@src/pages/tasca/actions/Create.tsx";
 
-export const TascaKanban = ({actions, filter, namedQueries, perspectives, readOnly}:any) => {
+export const TascaKanban = ({actions, filter, namedQueries, perspectives, reloadTrigger}:any) => {
     const { t } = useTranslation();
     const [tasques, setTasques] = useState<any[]>([]);
 
@@ -65,7 +64,7 @@ export const TascaKanban = ({actions, filter, namedQueries, perspectives, readOn
     }
     useEffect(() => {
         refresh()
-    }, [filter, apiIsReady]);
+    }, [filter, apiIsReady, reloadTrigger]);
 
     const handleDragEnd = (origen:any, desti:any, tasca:any) => {
         console.log("handleDragEnd", origen, desti, tasca);
@@ -77,9 +76,7 @@ export const TascaKanban = ({actions, filter, namedQueries, perspectives, readOn
             });
     };
 
-    const {handleShow, content} = useCreate(refresh)
-
-    return <>
+    return (
         <KanbanBoard
             elements={tasques}
             columns={[
@@ -97,9 +94,7 @@ export const TascaKanban = ({actions, filter, namedQueries, perspectives, readOn
                 ]}
             ]}
             actions={actions}
-            onCreate={readOnly ?undefined :() => handleShow(undefined)}
             handleDragEnd={handleDragEnd}
         />
-        {content}
-    </>;
+    );
 };

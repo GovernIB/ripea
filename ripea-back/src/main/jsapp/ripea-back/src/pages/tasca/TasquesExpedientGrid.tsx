@@ -10,12 +10,13 @@ import { formatDate } from "../../util/dateUtils.ts";
 import useTascaActions from "./details/TascaActions.tsx";
 import {StyledPrioritat} from "../expedient/ExpedientGrid.tsx";
 import {TascaComment} from "../CommentDialog.tsx";
-import StyledMuiGrid from '../../components/StyledMuiGrid.tsx';
+import StyledMuiGrid, {ToolbarButton} from '../../components/StyledMuiGrid.tsx';
 import useTascaDetail from "./details/TascaDetail.tsx";
 import {StyledDate, TascaView, TascaViewSelector} from "./TasquesGrid.tsx";
 import {useState} from "react";
 import {TascaCalendar} from "@src/pages/tasca/TascaCalendar.tsx";
 import {TascaKanban} from "@src/pages/tasca/TascaKanban.tsx";
+import useCreate from "@src/pages/tasca/actions/Create.tsx";
 
 export const TasquesGridForm = () => {
     const { data } = useFormContext();
@@ -113,19 +114,34 @@ const TasquesExpedientGrid = (props: any) => {
     const { handleOpen, dialog } = useTascaDetail();
 
     const filter = builder.eq('expedient.id', entity?.id)
+    const createAdditionalData = {
+        expedient: {id: entity?.id},
+        metaExpedient: entity?.metaExpedient,
+    };
 
     const [vista, setVista] = useState<TascaView>(TascaView.table);
     const viewSelector = <TascaViewSelector value={vista} onChange={setVista}/>
 
+    const [reload, setReload] = useState(0);
+    const { handleShow: handleCreate, content: createContent } = useCreate(() => setReload((v) => v + 1));
+    const createButton = entity?.potModificar
+        ? <ToolbarButton
+            title={t('common.create')}
+            icon={'add'}
+            color={'primary'}
+            onClick={() => handleCreate(createAdditionalData)}
+        >{t('page.tasca.action.new.label')}</ToolbarButton>
+        : null;
+
     return <>
         {vista != TascaView.table && <>
-            <Grid container display={'flex'} justifyContent={'end'} mb={1}>{viewSelector}</Grid>
-            {vista == TascaView.kanban && <TascaKanban actions={actions} filter={filter} perspectives={perspectives} readOnly={!entity?.potModificar} />}
-            {vista == TascaView.calendar && <TascaCalendar actions={actions} filter={filter} perspectives={perspectives}
-                                                           headerToolbar={entity?.potModificar?{
-                                                               start: 'prev,next,today new',
-                                                           }:undefined}
-            />}
+            <Grid container display={'flex'} justifyContent={'end'} alignItems={'center'} columnGap={1} mb={1}>
+                {viewSelector}
+                {createButton}
+            </Grid>
+            {vista == TascaView.kanban && <TascaKanban actions={actions} filter={filter} perspectives={perspectives} reloadTrigger={reload} />}
+            {vista == TascaView.calendar && <TascaCalendar actions={actions} filter={filter} perspectives={perspectives} reloadTrigger={reload} />}
+            {createContent}
         </>}
 
         {vista == TascaView.table &&
@@ -146,10 +162,7 @@ const TasquesExpedientGrid = (props: any) => {
                 toolbarShowQuickFilter
                 popupEditFormContent={<TasquesGridForm/>}
                 popupEditFormComponentProps={{perspectives: ["RESPONSABLES_RESUM"]}}
-                formAdditionalData={{
-                    expedient: {id: entity?.id},
-                    metaExpedient: entity?.metaExpedient,
-                }}
+                formAdditionalData={createAdditionalData}
                 rowAdditionalActions={actions}
                 toolbarElementsWithPositions={[
                     {

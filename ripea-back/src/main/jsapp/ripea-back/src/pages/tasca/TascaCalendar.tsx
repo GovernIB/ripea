@@ -12,10 +12,9 @@ import {actionToItem} from "@src/components/MenuButton.tsx";
 import {Menu} from "@mui/material";
 import {useTranslation} from "react-i18next";
 import {useSession} from "@src/components/SessionStorageContext.tsx";
-import useCreate from "@src/pages/tasca/actions/Create.tsx";
 
 export const TascaCalendar = (props:any) => {
-    const {actions, filter, namedQueries, perspectives, ...other} = props;
+    const {actions, filter, namedQueries, perspectives, reloadTrigger, ...other} = props;
     const { t } = useTranslation();
     const [tasques, setTasques] = useState<any[]>();
     const {value: view, save: setView} = useSession('calendarView');
@@ -40,9 +39,7 @@ export const TascaCalendar = (props:any) => {
     }
     useEffect(() => {
         refresh()
-    }, [filter, apiIsReady]);
-
-    const {handleShow, content} = useCreate(refresh)
+    }, [filter, apiIsReady, reloadTrigger]);
 
     const renderEvent = (tasca:any) :any => ({
         id: tasca.id,
@@ -84,12 +81,6 @@ export const TascaCalendar = (props:any) => {
             monthText={t('calendar.month')}
             yearText={t('calendar.year')}
             datesSet={(info) => setView(info.view.type)}
-            buttons={{
-                new: {
-                    text: t('page.tasca.action.new.label'),
-                    click: () => handleShow?.(),
-                }
-            }}
             {...other}
             headerToolbar={{
                 // start: 'prevYear,prev,next,nextYear',
@@ -109,6 +100,5 @@ export const TascaCalendar = (props:any) => {
         >
             {selectedTask && actionToItem(selectedTask, actions)}
         </Menu>}
-        {content}
     </>
 }
