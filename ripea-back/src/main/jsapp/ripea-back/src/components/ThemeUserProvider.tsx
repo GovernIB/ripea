@@ -61,7 +61,7 @@ export const ThemeUserProvider = ({ children }: { children: React.ReactNode }) =
             default:
                 return systemTheme;
         }
-    }, [preview?.temaAplicacio, user]);
+    }, [prefersDarkMode, preview?.temaAplicacio, user?.conf?.temaAplicacio]);
 
     return (
         <ThemeUserContext.Provider value={{ preview, setPreview, remove }}>

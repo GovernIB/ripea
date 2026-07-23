@@ -22,7 +22,6 @@ export const TemaObscurSelector: React.FC = () => {
         <>
             <Typography component="label" sx={{
                 display: 'block',
-                ml: 1.75,
                 mb: 0.75,
                 fontSize: '0.75rem',
                 lineHeight: 1,
@@ -69,7 +68,6 @@ export const EstilMenuSelector: React.FC = () => {
         <>
             <Typography component="label" sx={{
                 display: 'block',
-                ml: 1.75,
                 mb: 0.75,
                 fontSize: '0.75rem',
                 lineHeight: 1,

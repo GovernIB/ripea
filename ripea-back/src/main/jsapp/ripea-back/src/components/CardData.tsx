@@ -160,32 +160,45 @@ export const DetailExpandCard = (props: DetailCardProps) => {
 export const DetailCardContent = (props:DetailCardContentProps) => {
     const {title, children, isObject, size = 12, titleSize = 12, textSize = 12, componentTitleProps, componentTextProps, hidden, hiddenIfEmpty, ...other} = props;
 
-    if (hidden || (hiddenIfEmpty && isEmpty(children))){
-        return <></>
+    if (hidden || (hiddenIfEmpty && isEmpty(children))) {
+        return <></>;
     }
 
-    return <Grid size={size} container direction={"row"}
-                  {...other}
-                  sx={{
-                      p: 1,
-                      borderLeft: "1px solid",
-                      borderTop: "1px solid",
-                      ...(other?.sx ?? {}),
-                      borderColor: other?.sx?.borderColor || "divider",
-                  }}>
-        <Grid size={titleSize}><Typography variant={"body1"} color={'primary'} sx={componentTitleProps}>{title}</Typography></Grid>
-        <Grid size={textSize}>
-            {isEmpty(children) ? (
-                " - "
-            ) : isObject ? (
-                children
-            ) : (
-                <Typography variant="inherit" color="textSecondary" sx={componentTextProps}>
-                    {children}
+    return (
+        <Grid
+            size={size}
+            container
+            direction={'row'}
+            {...other}
+            sx={{
+                p: 1,
+                borderLeft: '1px solid',
+                borderTop: '1px solid',
+                ...(other?.sx ?? {}),
+                borderColor: other?.sx?.borderColor || 'divider',
+            }}
+        >
+            <Grid size={titleSize}>
+                <Typography
+                    variant={'body1'}
+                    sx={{ color: (theme) => (theme.palette.mode === 'dark' ? 'primary.light' : 'primary.main'), ...componentTitleProps }}
+                >
+                    {title}
                 </Typography>
-            )}
+            </Grid>
+            <Grid size={textSize}>
+                {isEmpty(children) ? (
+                    ' - '
+                ) : isObject ? (
+                    children
+                ) : (
+                    <Typography variant="inherit" color="textSecondary" sx={componentTextProps}>
+                        {children}
+                    </Typography>
+                )}
+            </Grid>
         </Grid>
-    </Grid>
+    );
 }
 
 export const CardData = (props:CardDataProps) => {
