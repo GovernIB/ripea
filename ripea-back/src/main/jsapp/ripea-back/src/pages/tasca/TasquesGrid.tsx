@@ -17,6 +17,7 @@ import useTascaDetail from "./details/TascaDetail.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
 import {TascaCalendar} from "@src/pages/tasca/TascaCalendar.tsx";
 import {TascaKanban} from "@src/pages/tasca/TascaKanban.tsx";
+import {useSession} from "@src/components/SessionStorageContext.tsx";
 
 export const StyledDate = (props: any) => {
     const {entity, children} = props;
@@ -57,6 +58,16 @@ export const TascaViewSelector = (props: { value: any, onChange: (value: any) =>
     </Grid>
 }
 
+// Persisteix el tipus de vista seleccionat (taula/calendari/kanban) a la sessió del
+// navegador amb la clau indicada, de manera que es manté en tornar a la pantalla.
+export const useTascaView = (sessionKey: string) => {
+    const { value, save } = useSession(sessionKey);
+    return {
+        vista: (value as TascaView) ?? TascaView.table,
+        setVista: (v: TascaView) => save(v),
+    };
+}
+
 
 const sortModel:any = [{field: 'dataInici', sort: 'desc'}];
 const namedQueries:any = ['USUARI_RELACIONAT'];
@@ -69,7 +80,7 @@ const TasquesGrid = () => {
 
     const [springFilter, setSpringFilter] = useState<string>();
     const [load, setLoad] = useState<boolean>(false);
-    const [vista, setVista] = useState<TascaView>(TascaView.table);
+    const { vista, setVista } = useTascaView('usuariTascaView');
 
     const refresh = useCallback(() => {
         apiRef?.current?.refresh?.();

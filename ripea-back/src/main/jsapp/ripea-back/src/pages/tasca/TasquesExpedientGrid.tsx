@@ -12,7 +12,7 @@ import {StyledPrioritat} from "../expedient/ExpedientGrid.tsx";
 import {TascaComment} from "../CommentDialog.tsx";
 import StyledMuiGrid, {ToolbarButton} from '../../components/StyledMuiGrid.tsx';
 import useTascaDetail from "./details/TascaDetail.tsx";
-import {StyledDate, TascaView, TascaViewSelector} from "./TasquesGrid.tsx";
+import {StyledDate, TascaView, TascaViewSelector, useTascaView} from "./TasquesGrid.tsx";
 import {useState} from "react";
 import {TascaCalendar} from "@src/pages/tasca/TascaCalendar.tsx";
 import {TascaKanban} from "@src/pages/tasca/TascaKanban.tsx";
@@ -119,7 +119,7 @@ const TasquesExpedientGrid = (props: any) => {
         metaExpedient: entity?.metaExpedient,
     };
 
-    const [vista, setVista] = useState<TascaView>(TascaView.table);
+    const { vista, setVista } = useTascaView('expedientTascaView');
     const viewSelector = <TascaViewSelector value={vista} onChange={setVista}/>
 
     const [reload, setReload] = useState(0);

@@ -53,18 +53,18 @@ export const TascaCalendar = (props:any) => {
                 :'#81c784',
     })
 
-    const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+    const [anchorPosition, setAnchorPosition] = useState<{top: number, left: number} | null>(null);
     const [selectedTask, setSelectedTask] = useState<any>(null);
     const eventClick = useCallback((eventInfo: any) => {
         const task = tasques?.find((t) => t.id == eventInfo.event.id);
         if (task) {
             setSelectedTask(task);
-            setAnchorEl(eventInfo.el);
+            setAnchorPosition({top: eventInfo.jsEvent.clientY, left: eventInfo.jsEvent.clientX});
         }
     }, [tasques]);
 
     const handleMenuClose = () => {
-        setAnchorEl(null);
+        setAnchorPosition(null);
         setSelectedTask(null);
     };
 
@@ -92,11 +92,10 @@ export const TascaCalendar = (props:any) => {
         />
 
         {actions && <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
+            anchorReference="anchorPosition"
+            anchorPosition={anchorPosition ?? undefined}
+            open={Boolean(anchorPosition)}
             onClose={handleMenuClose}
-            anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
-            transformOrigin={{vertical: 'top', horizontal: 'right'}}
         >
             {selectedTask && actionToItem(selectedTask, actions)}
         </Menu>}
