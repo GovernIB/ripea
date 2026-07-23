@@ -12,7 +12,7 @@ import * as builder from '../../../util/springFilterUtils.ts';
 import { CardPage } from '../../../components/CardData.tsx';
 import { ErrorPage } from '../../../components/ErrorPage.tsx';
 import { useUserSession } from '@src/components/Session.tsx';
-import { iconsAppMenu } from '@src/hooks/useMenu.tsx';
+import { icons as iconsAppMenu } from '@src/util/icons';
 import { formatDate } from '@src/util/dateUtils.ts';
 
 const expedientPerspectives = ['COUNT', 'ESTAT', 'RELACIONAT', 'AMB_PINBAL', 'META_EXPEDIENT', 'PERMIS_CONTINGUT'];

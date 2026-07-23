@@ -137,6 +137,7 @@ import es.caib.ripea.service.intf.model.ExpedientResource.TancarExpedientFormAct
 import es.caib.ripea.service.intf.model.ImportacioZipDocument;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaExpedientEstatResource;
+import es.caib.ripea.service.intf.model.MetaExpedientOrganGestorResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.model.UsuariResource;
@@ -460,22 +461,43 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 				filtrePermisosVaris = getFiltrePermisos(permisosPerExpedients);
 
 				//APLICA FILTRE PERMIS DIRECTE A PROCEDIMENTS
-				if (!rolActual.equals("IPA_ADMIN") && !rolActual.equals("IPA_SUPER") && !rolActual.equals("IPA_ADMIN_LECTURA") && 
-					permisosPerExpedients.getIdsMetaExpedientsPermesos()!=null) {
-					
+				//Son permis directe sobre el procediment (issue #1633): el permis sobre el MetaExpedient (VIA 1) i el
+				//permis sobre la parella procediment-organ (VIA 3, procediments comuns amb organ). NO ho es el permis
+				//sobre l'organ gestor (vies 2/4), que es precisament el cas que aquesta restriccio ha de tallar.
+				//Es el mateix criteri que aplica EntityComprovarHelper.comprovarPermisExpedient al detall de l'expedient.
+				//Amb les llistes buides el filtre NO es desactiva: nomes passen els procediments sense permisDirecte.
+				if (!rolActual.equals("IPA_ADMIN") && !rolActual.equals("IPA_SUPER") && !rolActual.equals("IPA_ADMIN_LECTURA")) {
+
 					String campPermisDir = ExpedientResource.Fields.metaExpedient + "." + MetaExpedientResource.Fields.permisDirecte;
 					String procedimentId = ExpedientResource.Fields.metaExpedient + ".id";
-					
+
 					Filter filtreProcedimentPermisDirecte = Filter.parse(campPermisDir + "!true");
 					Filter filtreProcediments = null;
 			    	List<String> permesosClausulesIn = Utils.getIdsEnGruposMil(permisosPerExpedients.getIdsMetaExpedientsPermesos());
-			        for (String aux: permesosClausulesIn) {
-				        if (aux != null && !aux.isEmpty()) {
-				        	filtreProcediments = FilterBuilder.or(filtreProcediments, Filter.parse(procedimentId + " IN (" + aux + ")"));
+			    	if (permesosClausulesIn!=null) {
+				        for (String aux: permesosClausulesIn) {
+					        if (aux != null && !aux.isEmpty()) {
+					        	filtreProcediments = FilterBuilder.or(filtreProcediments, Filter.parse(procedimentId + " IN (" + aux + ")"));
+					        }
 				        }
-			        }
-			        
-			        filtreProcedimentsDirectes = FilterBuilder.or(filtreProcedimentPermisDirecte, filtreProcediments);
+			    	}
+
+			    	//Parelles procediment-organ permeses: compten com a permis directe sobre el procediment.
+			    	//exists(...) correlat, igual que la VIA 3 de getFiltrePermisos.
+			    	String campParellaId = ExpedientResource.Fields.metaexpedientOrganGestorPares + ".id";
+			    	Filter filtreParelles = null;
+			    	List<String> parellesClausulesIn = Utils.getIdsEnGruposMil(permisosPerExpedients.getIdsMetaExpedientOrganPairsPermesos());
+			    	if (parellesClausulesIn!=null) {
+			    		for (String aux: parellesClausulesIn) {
+			    			if (aux != null && !aux.isEmpty()) {
+			    				filtreParelles = FilterBuilder.or(filtreParelles, Filter.parse("exists(" + campParellaId + " IN (" + aux + "))"));
+			    			}
+			    		}
+			    	}
+
+			        filtreProcedimentsDirectes = FilterBuilder.or(
+			        		filtreProcedimentPermisDirecte,
+			        		FilterBuilder.or(filtreProcediments, filtreParelles));
 				}
 				
 				//APLICA FILTRE DE GRUPS
@@ -586,19 +608,25 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     	
     	//OrgansAmbProcedimentsComunsPermesos (nomes usuaris tothom): ExtendedPermission.COMU + ExtendedPermission.READ --> OrganGestorEntity.class
 	    //Permisos que s'han donat sobre OrganGestor
-	    /** (:esNullIdsOrgansComunsAndFills = false and e.organGestor.id in (:idsOrgansComunsAndFills)
+	    /** (:esNullIdsOrgansAmbProcedimentsComunsPermesos = false and meogp.organGestor.id in (:idsOrgansAmbProcedimentsComunsPermesos)
 	     * 	and e.metaExpedient.id in (:idsProcedimentsComuns)) */
-    	//Mateixa equivalencia que filtreOrgansPermesos: comprovem l'organ directe de l'expedient en comptes del
-    	//exists(organpare...). AQUI cal la llista EXPANDIDA idsOrgansComunsAndFills (cada organ comu + els seus fills,
-    	//getIdsOrgansFills), NO la crua idsOrgansAmbProcedimentsComunsPermesos, perque el exists aconseguia la cascada
-    	//cap avall via la materialitzacio d'ancestres a organpare. La part metaExpedient.id IN (comuns) es queda igual.
+    	//exists(...) correlat sobre la col·leccio, IDENTIC al predicat de la query JSP.
+    	//NO es reduible a l'organ directe de l'expedient amb una llista expandida (getIdsOrgansFills): aquella llista
+    	//es calcula sobre l'organigrama de VIGENTS (CacheHelper.findOrganigramaByEntitat nomes carrega estat='V' i talla
+    	//el subarbre al primer organ no vigent), mentre que organpare materialitza la cadena d'ancestres de BD del dia
+    	//de la creacio, sense filtrar per estat. Amb un organ intermedi extingit -cas real despres d'una sincronitzacio
+    	//DIR3, on nomes els expedients OBERTS es reassignen al successor (OrganGestorHelper.actualitzarExpedientsOberts
+    	//AmbOrgansObsolets)- la llista expandida perd l'expedient i el JSP no. Verificat en local: extingint un organ
+    	//intermedi amb les dues taules congruents, REACT deixava de mostrar l'expedient i JSP el seguia mostrant.
     	Filter filtreOrgansAmbProcedimentsComunsPermesos = null;
-    	String campMetaExpOrganComuId = ExpedientResource.Fields.organGestor + ".id";
-	    List<String> organsMetaExpComunsClausulesIn = Utils.getIdsEnGruposMil(permisosPerExpedients.getIdsOrgansComunsAndFills());
+    	String campMetaExpOrganComuId = ExpedientResource.Fields.metaexpedientOrganGestorPares + "." + MetaExpedientOrganGestorResource.Fields.organGestor + ".id";
+	    List<String> organsMetaExpComunsClausulesIn = Utils.getIdsEnGruposMil(permisosPerExpedients.getIdsOrgansAmbProcedimentsComunsPermesos());
 	    if (organsMetaExpComunsClausulesIn!=null) {
 	    	for (String aux: organsMetaExpComunsClausulesIn) {
 	    		if (aux != null && !aux.isEmpty()) {
-	    			filtreOrgansAmbProcedimentsComunsPermesos = FilterBuilder.or(filtreOrgansAmbProcedimentsComunsPermesos, Filter.parse(campMetaExpOrganComuId + " IN (" + aux + ")"));
+	    			//exists(...) nomes sobre la part d'organ (col·leccio). El "metaExpedient.id IN (...)" de mes avall
+	    			//es to-one sobre l'arrel i es queda fora, combinat amb AND com fins ara.
+	    			filtreOrgansAmbProcedimentsComunsPermesos = FilterBuilder.or(filtreOrgansAmbProcedimentsComunsPermesos, Filter.parse("exists(" + campMetaExpOrganComuId + " IN (" + aux + "))"));
 	    		}
 	    	}
 	    	
@@ -676,8 +704,19 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 					resource.getPrioritatMotiu(),
 					resource.isAsignarSeguidor()?SiNoEnumDto.SI:SiNoEnumDto.NO);
 			
-			expedientHelper.arxiuPropagarExpedientAmbInteressatsNewTransaction(expedientId);
-			
+			boolean expCreatArxiuOk = expedientHelper.arxiuPropagarExpedientAmbInteressatsNewTransaction(expedientId);
+
+			// Carpetes per defecte del procediment: només si l'expedient s'ha propagat correctament a
+			// l'Arxiu (ja té UUID). Un error creant-les no ha de fer fallar la creació de l'expedient.
+			if (expCreatArxiuOk) {
+				try {
+					expedientHelper.crearCarpetesMetaExpedientNewTransaction(entitatEntity.getId(), expedientId);
+				} catch (Exception e) {
+					excepcioLogHelper.addExcepcio("/expedient/" + expedientId + "/crearCarpetesMetaExpedient", e);
+					log.error("No s'han pogut crear les carpetes per defecte de l'expedient " + expedientId, e);
+				}
+			}
+
 			ExpedientResource resultat = new ExpedientResource();
 			resultat.setId(expedientId);
 			resultat.setNom(resource.getNom());

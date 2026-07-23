@@ -1,5 +1,5 @@
 import {useEffect, useMemo, useState} from "react";
-import {Box, Grid} from "@mui/material";
+import {Box, Grid, Alert} from "@mui/material";
 import {FormField, useMuiFormDialogApiRef, useBaseAppContext, useFormContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
@@ -11,6 +11,7 @@ import useVisualitzar from "./Visualitzar.tsx";
 import useRegistreInteressatDetail from "../details/RegistreInteressatDetail.tsx";
 import {useUserSession} from "@src/components/Session.tsx";
 import {useIframeDialog} from "@src/components/Iframe.tsx";
+import {icons} from "@src/util/icons.ts";
 
 const AcceptarTabExpedient = () => {
 
@@ -109,14 +110,14 @@ const AcceptarTabAnnexos = () => {
     const actions = [
         {
             label: t('page.document.action.view.label'),
-            icon: "search",
+            icon: icons.visualitza,
             showInMenu: false,
             onClick: handleOpen,
             hidden: (row:any) => !isValid(row) || row?.justificant,
         },
         {
             label: t('page.document.action.view.label'),
-            icon: "search",
+            icon: icons.visualitza,
             showInMenu: false,
             onClick: (_id:any, row:any) => handleIframeOpen(`expedientPeticio/descarregarJustificant/${row?.registreId}`),
             hidden: (row:any) => !(['pdf', 'odt', 'docx'].includes(row?.fitxerExtension) && row?.justificant),
@@ -264,10 +265,12 @@ const AcceptarForm = () => {
 
     return (
         <Box sx={{ height: '650px', minHeight: 0 }}>
+            {data?.expedientNoTrobatMissatge &&
+                <Alert severity="warning" sx={{ mb: 2 }}>{data.expedientNoTrobatMissatge}</Alert>}
             <TabComponent tabs={tabs}/>
         </Box>
-    );
-};
+    )
+}
 
 const Acceptar = (props:any) => {
     const { t } = useTranslation();

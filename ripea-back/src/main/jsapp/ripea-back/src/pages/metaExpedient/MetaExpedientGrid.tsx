@@ -311,9 +311,14 @@ const MetaExpedientGrid = () => {
                 <Alert severity={'info'} sx={{mb:1}}>
                     {t('page.metaExpedient.alert.pendentsRevisio', {num: user?.sessionScope?.numProcsPendentsRevisio})}
                     <IconButton sx={{ml: 1, p: 0}} onClick={() => {
+                        // setFieldValue nomes despatxa un canvi al reducer del formulari:
+                        // getData() encara retornaria les dades antigues, aixi que passem
+                        // les dades explicitament a filter() per evitar la cursa i aplicar
+                        // realment el filtre PENDENT. No cal setLoad(true): filter() dispara
+                        // onSpringFilterChange de forma sincrona i el propi grid gestiona el
+                        // seu indicador de carrega en refer la peticio.
                         filterRef.current?.setFieldValue?.('revisioEstat', 'PENDENT')
-                        filterRef.current?.filter()
-                        setLoad(true)
+                        filterRef.current?.filter?.({ ...filterRef.current?.getData?.(), revisioEstat: 'PENDENT' })
                         setRevisioEstatMssg(true)
                     }}>
                         <Icon>open_in_new</Icon>

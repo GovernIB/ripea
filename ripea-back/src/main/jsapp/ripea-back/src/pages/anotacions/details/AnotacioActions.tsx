@@ -7,7 +7,7 @@ import {useNavigate} from "react-router-dom";
 import {useUserSession} from "../../../components/Session.tsx";
 import useAcceptar from "../actions/Acceptar.tsx";
 import useSubsanarAnnexos from "../actions/SubsanarAnnexos.tsx";
-import { iconsAppMenu } from "@src/hooks/useMenu.tsx";
+import { icons as iconsAppMenu } from '@src/util/icons';
 
 export const useActions = (refresh?: () => void) => {
     const { t } = useTranslation();

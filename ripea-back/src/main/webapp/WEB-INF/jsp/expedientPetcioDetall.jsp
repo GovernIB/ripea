@@ -68,7 +68,7 @@ tr.clicable {
 	opacity: 0.4;
 }
 
-.invalid-format td:nth-child(7), .invalid-format td:nth-child(8) {
+.invalid-format td:nth-child(8), .invalid-format td:nth-child(9) {
 	opacity: 1;
 }
 
@@ -516,10 +516,12 @@ tr.clicable {
 											</a>
 										</td>												
 										<td>
+											<c:if test="${annex.ambFirma}">
 											<button type="button" class="btn btn-default desplegable" href="#detalls_resum_annexos_${status.index}" data-toggle="collapse" aria-expanded="false" aria-controls="detalls_resum_annexos_${status.index}">
 												<span class="fa fa-caret-down"></span>
 											</button>
-										</td>	
+											</c:if>
+										</td>
 									</tr>	
 									<tr class="collapse detall" id="detalls_resum_annexos_${status.index}">
 									

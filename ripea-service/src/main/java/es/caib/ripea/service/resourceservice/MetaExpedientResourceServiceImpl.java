@@ -1533,9 +1533,34 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 				return "{\"codi\": \"" + params.getCodi() + "\"}";
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/metaExpedient/"+entity.getId()+"/ClonarActionExecutor", e);
-				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("message.common.action.error")+": "+e.getMessage());
+				String missatge;
+				if (esViolacioClassificacioUnica(e)) {
+					// Cas molt habitual: el clon manté la mateixa classificació (codi SIA) que un procediment ja existent.
+					missatge = messageHelper.getMessage("metaexpedient.import.form.validation.codisia.repetit");
+				} else {
+					missatge = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
+				}
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, missatge);
 			}
 		}
+    }
+
+    /**
+     * Determina si l'excepció (o alguna de les seves causes) correspon a la violació de la
+     * restricció d'unicitat de la classificació (codi SIA) del procediment
+     * ({@code IPA_METAEXPEDIENT_CLASIF_UK}). Es recorre tota la cadena de causes perquè la
+     * restricció de BD acostuma a arribar embolcallada per Hibernate/Spring i, segons el motor
+     * (Oracle/PostgreSQL), el nom de la restricció apareix en majúscules o minúscules.
+     */
+    private boolean esViolacioClassificacioUnica(Throwable t) {
+    	while (t != null) {
+    		String msg = t.getMessage();
+    		if (msg != null && msg.toUpperCase().contains("IPA_METAEXPEDIENT_CLASIF_UK")) {
+    			return true;
+    		}
+    		t = t.getCause();
+    	}
+    	return false;
     }
 
     private class ExportJsonGenerator implements ReportGenerator<MetaExpedientResourceEntity, Serializable, Serializable> {

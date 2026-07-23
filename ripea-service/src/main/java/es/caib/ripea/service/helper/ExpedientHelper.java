@@ -394,11 +394,13 @@ public class ExpedientHelper {
 						interessatsAccionsMap);
 			}
 
-			// crear carpetes per defecte del procediment
-			crearCarpetesMetaExpedient(entitatId, metaExpedient, expedient);
-
             // Crear automàticament les tasques actives del procediment
             tascaHelper.crearTasquesExpedient(expedient);
+			
+			// Les carpetes per defecte del procediment ja NO es creen aquí: cal fer-ho després
+			// de propagar l'expedient a l'Arxiu (crearCarpetesMetaExpedientNewTransaction), quan
+			// l'expedient ja disposa d'UUID. Si es fes ara, l'Arxiu rebutjaria l'agrupació
+			// documental per manca de pare (COD_099).
 
 			boolean throwExcepcion = false;//throwExcepcion = true;
 			if (throwExcepcion) {
@@ -434,6 +436,18 @@ public class ExpedientHelper {
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public boolean arxiuPropagarExpedientAmbInteressatsNewTransaction(Long expedientId) {
 		return arxiuPropagarExpedientAmbInteressats(expedientId);
+	}
+
+	/**
+	 * Crea les carpetes per defecte del procediment en una transacció nova (REQUIRES_NEW),
+	 * pensada per a ser cridada un cop l'expedient ja s'ha propagat a l'Arxiu i disposa d'UUID.
+	 * Fer-ho durant la creació de l'expedient provocava un error a l'Arxiu (COD_099) perquè
+	 * l'agrupació documental encara no tenia un pare vàlid.
+	 */
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void crearCarpetesMetaExpedientNewTransaction(Long entitatId, Long expedientId) {
+		ExpedientEntity expedient = expedientRepository.getOne(expedientId);
+		crearCarpetesMetaExpedient(entitatId, expedient.getMetaExpedient(), expedient);
 	}
 
 	public boolean arxiuPropagarExpedientAmbInteressats(Long expedientId) {
@@ -598,14 +612,11 @@ public class ExpedientHelper {
 		for (RegistreInteressatEntity interessatDistribucio : expedientPeticioEntity.getRegistre().getInteressats()) {
 
 			// Si l'interessat no té document, no s'incorpora a l'expedient
-			if (interessatDistribucio.getDocumentNumero() == null) {
+			InteressatAssociacioAccioEnum accioARealitzar = interessatsAccionsMap.get(interessatDistribucio.getDocumentNumero());
+			if (interessatDistribucio.getDocumentNumero() == null || accioARealitzar==null || InteressatAssociacioAccioEnum.NO_ASSOCIAR.equals(accioARealitzar)) {
 				continue;
 			}
-			// Si hi ha algun problema obtenint l'acció a realitzar, per defecte s'asocia l'interessat
-			InteressatAssociacioAccioEnum accioARealitzar = interessatsAccionsMap.get(interessatDistribucio.getDocumentNumero());
-			if (accioARealitzar == null) {
-				accioARealitzar = InteressatAssociacioAccioEnum.ASSOCIAR;
-			}
+			
 			RegistreInteressatEntity representantDistribucio = interessatDistribucio.getRepresentant();
 			boolean hasRepresentantDistribucio = representantDistribucio != null;
 
@@ -2247,7 +2258,6 @@ public class ExpedientHelper {
 		List<Long> procedimentsComunsIds = null;
 		List<Long> idsOrgansAmbProcedimentsComunsPermesos = null;
 		List<Long> idsGrupsPermesos = null;
-		List<Long> organsComunsAndFills = null;
 
 		if (rolActual.equals(BaseConfig.ROLE_ADMIN) || rolActual.equals(BaseConfig.ROLE_ADMIN_LECTURA)) {
 
@@ -2324,17 +2334,6 @@ public class ExpedientHelper {
 					ExtendedPermission.COMU,
 					ExtendedPermission.READ));
 
-
-			if (idsOrgansAmbProcedimentsComunsPermesos!=null && idsOrgansAmbProcedimentsComunsPermesos.size()>0) {
-				organsComunsAndFills = new ArrayList<Long>();
-				for (Long organComu: idsOrgansAmbProcedimentsComunsPermesos) {
-					organsComunsAndFills.addAll(
-							organGestorCacheHelper.getIdsOrgansFills(
-									entitat.getCodi(),
-									organGestorRepository.findById(organComu).get().getCodi()));
-				}
-			}
-
 			procedimentsComunsIds = metaExpedientRepository.findProcedimentsComunsActiveIds(entitat);
 
 			idsGrupsPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
@@ -2348,7 +2347,6 @@ public class ExpedientHelper {
 		permisosPerExpedientsDto.setIdsOrgansAmbProcedimentsComunsPermesos(idsOrgansAmbProcedimentsComunsPermesos);
 		permisosPerExpedientsDto.setIdsProcedimentsComuns(procedimentsComunsIds);
 		permisosPerExpedientsDto.setIdsGrupsPermesos(idsGrupsPermesos);
-		permisosPerExpedientsDto.setIdsOrgansComunsAndFills(organsComunsAndFills);
 
         if (cacheHelper.mostrarLogsPermisos()) {
             logger.info(rolActual+" - findPermisosPerExpedients > idsOrgansPermesos (" + (idsOrgansPermesos!=null?idsOrgansPermesos.toString():"NULL") + ")");

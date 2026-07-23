@@ -196,6 +196,7 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
     	private Long sequencia;
         @Transient boolean gestioAmbGrupsActiva;
         @Transient private boolean disableOrganGestor = false;
+        @Transient private String expedientNoTrobatMissatge;
         private ResourceReference<GrupResource, Long> grup;
     	private boolean associarInteressats = true;
     	private boolean agafarExpedient = true;

@@ -16,16 +16,6 @@ export const useActions = (refresh?: () => void) => {
     } = useResourceApiService('documentNotificacioResource');
     const {temporalMessageShow} = useBaseAppContext();
 
-    const report = (id:any, code:any, mssg:any, fileType:any) => {
-        apiReport(id, {code, fileType})
-            .then((result) => {
-                iniciaDescargaBlob(result);
-                temporalMessageShow(null, mssg, 'success');
-            })
-            .catch((error) => {
-                temporalMessageShow(null, error.message, 'error');
-            });
-    }
     const reportMassivo = (id:any, code:any, mssg:any, fileType:any) => {
         apiReport(undefined, {code, data: { ids: [id], massivo: false }, fileType})
             .then((result) => {
@@ -38,7 +28,7 @@ export const useActions = (refresh?: () => void) => {
     }
 
     const justificant = (id: any) => reportMassivo(id, 'DESCARREGAR_JUSTIFICANT', t('page.notificacio.action.justificant.ok'), 'ZIP');
-    const descarregarDocumentEnviat = (id: any) => report(id, 'DESCARREGAR_DOC_ENVIAT', t('page.notificacio.action.documentEnviat.ok'), 'ZIP');
+    const descarregarDocumentEnviat = (id: any) => reportMassivo(id, 'DESCARREGAR_DOC_ENVIAT', t('page.notificacio.action.documentEnviat.ok'), 'ZIP');
 
     const actualitzarEstat = (id: any) => {
         apiAction(undefined, {code: 'ACTUALITZAR_ESTAT', data:{ids: [id], massivo: false}})

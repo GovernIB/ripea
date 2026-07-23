@@ -8,6 +8,7 @@ import {useMemo} from "react";
 import useGrupDetail from "./details/GrupDetail.tsx";
 import Load from "../../../../components/Load.tsx";
 import {useMuiDataGridApiRef} from "reactlib";
+import {icons} from "@src/util/icons.ts";
 
 const sortModel: any = [{field: 'codi', sort: 'asc'}]
 const perspectives: string[] = [];
@@ -47,7 +48,7 @@ export const GrupGrid = ({ entity, refresh: refreshEntity, onRowCountChange, rea
     const actions = useMemo(() => readOnly ?[
         {
             label: t('page.metaExpedient.action.consultar.label'),
-            icon: "search",
+            icon: icons.detall,
             showInMenu: false,
             onClick: handleOpen
         },

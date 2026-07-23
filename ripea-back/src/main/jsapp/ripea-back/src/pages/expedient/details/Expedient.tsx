@@ -29,7 +29,7 @@ import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
 import {ErrorPage} from "../../../components/ErrorPage.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import { getReadableTextColor } from '@src/components/StyledLabel.tsx';
-import { iconsAppMenu } from '@src/hooks/useMenu.tsx';
+import { icons as iconsAppMenu } from '@src/util/icons';
 
 const border= { border: '1px solid #e3e3e3', borderRadius: '4px' };
 

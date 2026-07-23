@@ -103,6 +103,6 @@ const DocumentIcon = (props:any) => {
 
 const CarpetaIcon = () => {
     const { t } = useTranslation();
-    return <Icon title={t('page.carpeta.title')}>folder</Icon>
+    return <Icon baseClassName={"material-icons-outlined"} title={t('page.carpeta.title')}>folder_open</Icon>
 }
 export default ContingutIcon;

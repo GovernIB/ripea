@@ -43,7 +43,7 @@ import lombok.Setter;
             @ResourceArtifact(
                     type = ResourceArtifactType.REPORT,
                     code = DocumentNotificacioResource.ACTION_DESCARREGAR_DOC_ENVIAT,
-                    requiresId = true),
+                    formClass = DocumentNotificacioResource.MassiveAction.class),
             @ResourceArtifact(
                     type = ResourceArtifactType.FILTER,
                     code = DocumentNotificacioResource.FILTER_ENVIATS_NOTIB_CODE,

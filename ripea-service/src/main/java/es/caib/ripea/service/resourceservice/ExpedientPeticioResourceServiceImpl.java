@@ -23,6 +23,7 @@ import com.turkraft.springfilter.parser.Filter;
 import es.caib.plugins.arxiu.api.ContingutOrigen;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.ExpedientPeticioEntity;
 import es.caib.ripea.persistence.entity.GrupEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentEntity;
@@ -39,6 +40,7 @@ import es.caib.ripea.persistence.entity.resourcerepository.RegistreAnnexResource
 import es.caib.ripea.persistence.entity.resourcerepository.RegistreResourceRepository;
 import es.caib.ripea.persistence.repository.ExecucioMassivaContingutRepository;
 import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
+import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
@@ -116,6 +118,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 	private final OrganGestorRepository organGestorRepository;
 	private final MetaExpedientRepository metaExpedientRepository;
 	private final ExpedientPeticioRepository expedientPeticioRepository;
+	private final ExpedientRepository expedientRepository;
 	private final RegistreResourceRepository registreResourceRepository;
 	private final GrupHelper grupHelper;
 
@@ -541,6 +544,36 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
                 if (previous.getMetaExpedient() != null) {
                     onChange(id, previous, AcceptarAnotacioForm.Fields.metaExpedient, previous.getMetaExpedient(), answers, previousFieldNames, target);
                 }
+                comprovarExpedientReferenciat(id, target);
+            }
+        }
+
+        /**
+         * Si l'anotació porta informat un número d'expedient de referència, cerca l'expedient
+         * amb aquest número dins el procediment de l'anotació. Si no el troba, deixa un missatge
+         * d'avís al formulari perquè el front el mostri (equival al warning del JSP a
+         * {@code ExpedientPeticioController.omplirModel}).
+         */
+        private void comprovarExpedientReferenciat(Serializable id, AcceptarAnotacioForm target) {
+            if (id == null) {
+                return;
+            }
+            ExpedientPeticioEntity expedientPeticio = expedientPeticioRepository.findById(Long.valueOf(id.toString())).orElse(null);
+            if (expedientPeticio == null || expedientPeticio.getMetaExpedient() == null || expedientPeticio.getRegistre() == null) {
+                return;
+            }
+            String expedientNumero = expedientPeticio.getRegistre().getExpedientNumero();
+            if (expedientNumero == null || expedientNumero.isEmpty()) {
+                return;
+            }
+            EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+            ExpedientEntity expedient = expedientRepository.findByEntitatAndMetaNodeAndNumero(
+                    entitat,
+                    expedientPeticio.getMetaExpedient(),
+                    expedientNumero);
+            if (expedient == null) {
+                target.setExpedientNoTrobatMissatge(
+                        messageHelper.getMessage("expedient.peticio.form.acceptar.expedient.noTorbat") + ": " + expedientNumero);
             }
         }
 
@@ -561,6 +594,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
                 		for(RegistreInteressatResourceEntity registreInteressatResourceEntity: entity.getRegistre().getInteressats()) {
                 			if (registreInteressatResourceEntity.getId().equals(interessatId)) {
                 				interessatsAccionsMap.put(registreInteressatResourceEntity.getDocumentNumero(), InteressatAssociacioAccioEnum.ASSOCIAR);
+                				break;
                 			}
                 		}
                 	}
@@ -603,6 +637,18 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 
 				//Crea l'expedient a arxiu amb les metadades dels interessats.
 				expCreatArxiuOk = expedientHelper.arxiuPropagarExpedientAmbInteressatsNewTransaction(expedientId);
+
+				// Carpetes per defecte del procediment: només en l'acció de crear (no en incorporar a un
+				// expedient existent) i només si l'expedient s'ha propagat correctament a l'Arxiu (ja té
+				// UUID). Un error creant-les no ha de fer fallar el processament de l'anotació.
+				if (expCreatArxiuOk && ExpedientPeticioAccioEnumDto.CREAR.equals(params.getAccio())) {
+					try {
+						expedientHelper.crearCarpetesMetaExpedientNewTransaction(entitatEntity.getId(), expedientId);
+					} catch (Exception e) {
+						excepcioLogHelper.addExcepcio("/expedient/" + expedientId + "/crearCarpetesMetaExpedient", e);
+						log.error("No s'han pogut crear les carpetes per defecte de l'expedient " + expedientId, e);
+					}
+				}
 
 				if (expCreatArxiuOk) {
 

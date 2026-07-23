@@ -1404,7 +1404,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 				getReadonlyResourceService().artifactFindAll(null);
 		return thisArtifactsAll.stream().
 				filter(a -> a.getType() == ResourceArtifactType.REPORT && a.getRequiresId() != null && a.getRequiresId()).
-				map(a -> buildReportLink(a, id)).
+				map(a -> buildReportLinkWithAffordances(a, id)).
 				collect(Collectors.toList());
 	}
 

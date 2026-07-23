@@ -34,6 +34,10 @@ export default defineConfig({
             name: 'setup-admin',
             testMatch: /auth[\/\\]admin\.setup\.ts/,
 			workers: 1,
+            // Força el català al detector d'idioma de i18next (navigator.language),
+            // perquè la sessió desada quedi en català i coincideixi amb les etiquetes
+            // del frontend (common.filter, common.clear...) i amb els selectors dels tests.
+            use: { locale: 'ca-ES' },
         },
         {
             name: 'setup-user',
@@ -53,6 +57,9 @@ export default defineConfig({
                 ...devices['Desktop Chrome'],
                 // Usa el Chrome instal·lat al sistema en lloc del Chromium de Playwright
                 channel: 'chrome',
+                // Força el català perquè la UI del frontend (i18next) coincideixi amb els
+                // selectors del test; sense això, Chrome arrenca en anglès.
+                locale: 'ca-ES',
                 storageState: 'tests_e2e/.auth/admin.json',
             },
             testMatch: '**/*.admin.spec.ts',

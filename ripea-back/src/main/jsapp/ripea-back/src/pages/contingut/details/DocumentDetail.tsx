@@ -10,7 +10,7 @@ import Load from "../../../components/Load.tsx";
 import {useActions} from "./ContingutActions.tsx";
 import useErrorValidacio, { getResumErrorsText } from "../../expedient/details/ErrorValidacio.tsx";
 import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
-import { iconsAppMenu } from "@src/hooks/useMenu.tsx";
+import { icons as iconsAppMenu } from '@src/util/icons';
 
 const Contenido = (props:any) => {
     const {entity, fields} = props;

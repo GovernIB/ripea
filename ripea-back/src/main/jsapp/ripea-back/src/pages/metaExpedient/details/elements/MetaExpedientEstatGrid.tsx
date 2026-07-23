@@ -7,6 +7,7 @@ import * as builder from "../../../../util/springFilterUtils.ts";
 import {useBaseAppContext, useResourceApiService} from "reactlib";
 import {useMemo} from "react";
 import useMetaExpEstatDetail from "./details/MetaExpEstatDetail.tsx";
+import {icons} from "@src/util/icons.ts";
 
 const useActions = (refresh?: () => void) => {
     const {
@@ -69,7 +70,7 @@ export const MetaExpedientEstatGrid = ({ entity, onRowCountChange, readOnly } :a
     const actions:any[] = useMemo(() => readOnly ?[
         {
             label: t('page.metaExpedient.action.consultar.label'),
-            icon: "search",
+            icon: icons.detall,
             showInMenu: false,
             onClick: handleOpen,
         },

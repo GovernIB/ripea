@@ -13,12 +13,22 @@ export const or = (...options :any[]) :string => {
     return joinedValues.includes(' OR ') ? `(${joinedValues})` : joinedValues;
 }
 
+// Escapa els caràcters reservats de Spring Filter dins del valor d'una cadena.
+// El literal es delimita amb cometa simple, així que una cometa dins del valor
+// (p. ex. "Expedients d'ajuts") tancaria el literal abans d'hora i faria petar el
+// lexer (BadFilterSyntaxException: token recognition error). Spring Filter escapa
+// la cometa amb barra invertida (\'), tal com fa el servidor pel quickFilter a
+// BaseReadonlyResourceService.cleanReservedFilterCharacters(). Repliquem aquí el
+// mateix per al filtre avançat, que construeix la cadena al client.
+const escapeFilterValue = (value :any) :any =>
+    value == null ? value : String(value).replace(/'/g, "\\'");
+
 export const like = (option :string, value :string) :string => {
-    return `${option}~'%${value}%'`;
+    return `${option}~'%${escapeFilterValue(value)}%'`;
 }
 export const likeNormalized = (option :string, value :string) :string => {
     const normalized = value ? value.normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase() : value;
-    return `${option}~'%${normalized}%'`;
+    return `${option}~'%${escapeFilterValue(normalized)}%'`;
 }
 export const neq = (option :string, value :any) :string => {
     return value===null ?`${option} is not null` :`${option}!${value}`;

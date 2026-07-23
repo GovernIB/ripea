@@ -11,6 +11,7 @@ import { CardPage } from "../../components/CardData.tsx";
 import {useUserSession} from "../../components/Session.tsx";
 import {FormControl, Grid, Icon, MenuItem, Select, Typography} from "@mui/material";
 import useTascaActions from "./details/TascaActions.tsx";
+import ContingutLink from "../../components/ContingutLink.tsx";
 import {useNavigate} from "react-router-dom";
 import useTascaDetail from "./details/TascaDetail.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
@@ -78,6 +79,10 @@ const TasquesGrid = () => {
         {
             field: 'expedient',
             flex: 0.5,
+            renderCell: (params: any) => <ContingutLink
+                id={params?.row?.expedient?.id}
+                onClick={(e: any) => e.stopPropagation()}
+            >{params?.formattedValue}</ContingutLink>,
         },
         {
             field: 'metaExpedientTasca',

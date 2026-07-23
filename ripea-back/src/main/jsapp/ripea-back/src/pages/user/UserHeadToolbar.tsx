@@ -1,11 +1,15 @@
-import React, { useCallback } from 'react';
-import { Grid, Button, Icon } from '@mui/material';
-import { useEntitatSession } from '../../components/Session.tsx';
-import { useTranslation } from 'react-i18next';
-import { useResourceApiContext } from 'reactlib';
-import { Link as RouterLink, LinkProps as RouterLinkProps, useLocation } from 'react-router-dom';
-import { useTheme, useMediaQuery } from '@mui/material';
-import { StyledBadge } from '../../components/StyledBadge.tsx';
+import React, {useCallback} from "react";
+import {Grid, Button, Icon} from "@mui/material";
+import {StyledBadge} from "../../components/StyledBadge.tsx";
+import {useEntitatSession} from "../../components/Session.tsx";
+import {useTranslation} from "react-i18next";
+import {useResourceApiContext} from "reactlib";
+import {
+    Link as RouterLink,
+    LinkProps as RouterLinkProps,
+    useLocation,
+} from 'react-router-dom';
+import {useTheme, useMediaQuery} from "@mui/material";
 
 export const useToProgramaAntic = () => {
     const { apiUrl } = useResourceApiContext();

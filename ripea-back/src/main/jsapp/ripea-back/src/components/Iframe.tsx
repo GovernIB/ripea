@@ -7,10 +7,12 @@ import {useState} from "react";
 import {MuiDialog} from "reactlib";
 import { Viewer, Worker } from "@react-pdf-viewer/core";
 import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
+import { Alert } from "@mui/material";
 
 const commonProps = { width: '100%', height: '500px', border: '1px solid lightgray', borderRadius: '4px' }
 
 const Iframe = (props:any) => {
+    const { t } = useTranslation();
     const { src, hidden, style, isPDF = false, ...other } = props
 
     if(!src || hidden) {
@@ -28,6 +30,11 @@ const Iframe = (props:any) => {
                 <Viewer
                     fileUrl={src}   // tu PDF (en public/ o desde una URL)
                     plugins={[defaultLayoutPluginInstance]}
+                    renderError={() => (
+                        <Alert severity="warning" sx={{ m: 2 }}>
+                            {t('page.document.action.view.error')}
+                        </Alert>
+                    )}
                     {...other}
                 />
             </Worker>

@@ -3,16 +3,9 @@ import { useNotificacionsSession, useTasquesSession } from '@src/components/SseC
 import useExecucioMassiva from '@src/pages/user/actions/ExecucioMassivaGrid';
 import { useSistemaDetail } from '@src/pages/user/monitor/SistemaDetail';
 import { useToProgramaAntic } from '@src/pages/user/UserHeadToolbar';
+import { icons as iconsAppMenu } from '@src/util/icons';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-
-export const iconsAppMenu = {
-    expedient: 'folder',
-    anotacio: 'email',
-    tasca: 'assignment_turned_in',
-    consulta: 'search',
-    firma: 'draw',
-};
 
 export const useMenuSupAdmin = () => {
     const { t } = useTranslation();

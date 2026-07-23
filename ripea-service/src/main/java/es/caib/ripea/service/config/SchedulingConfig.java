@@ -61,7 +61,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
     private final Map<String, ScheduledFuture<?>> scheduledTasks = new HashMap<>();
 
     private final String codiTancarExpedientsEnArxiu = "tancarExpedientsEnArxiu";
-    private final String codiEnviarDocumentsAlPortafirmes = "enviarDocumentsAlPortafirmes";
+    private final String codiExecucioAccionsMassives = "execucioAccionsMassives";
     private final String codiConsultarIGuardarAnotacionsPendents = "consultarIGuardarAnotacionsPendents";
     private final String codiCanviarEstatEnDistribucio = "canviarEstatEnDistribucio";
     private final String codiEnviarEmailsInformantDeNouComentariPerProcediment = "enviarEmailsInformantDeNouComentariPerProcediment";
@@ -92,8 +92,8 @@ public class SchedulingConfig implements SchedulingConfigurer {
             if (codiTancarExpedientsEnArxiu.equals(taskCodi) || "totes".equals(taskCodi)) {
                 rescheduleTask("tancarExpedientsEnArxiu", getTrigger(codiTancarExpedientsEnArxiu));
             }
-            if (codiEnviarDocumentsAlPortafirmes.equals(taskCodi) || "totes".equals(taskCodi)) {
-                rescheduleTask("enviarDocumentsAlPortafirmes", getTrigger(codiEnviarDocumentsAlPortafirmes));
+            if (codiExecucioAccionsMassives.equals(taskCodi) || "totes".equals(taskCodi)) {
+                rescheduleTask(codiExecucioAccionsMassives, getTrigger(codiExecucioAccionsMassives));
             }
             if (codiConsultarIGuardarAnotacionsPendents.equals(taskCodi) || "totes".equals(taskCodi)) {
                 rescheduleTask("consultarIGuardarAnotacionsPendents", getTrigger(codiConsultarIGuardarAnotacionsPendents));
@@ -168,24 +168,24 @@ public class SchedulingConfig implements SchedulingConfigurer {
     	this.taskRegistrar = taskRegistrar;
 
         addTask(
-                codiEnviarDocumentsAlPortafirmes,
+                codiExecucioAccionsMassives,
                 new Runnable() {
                     @SneakyThrows
                     @Override
                     public void run() {
-                        monitorTasquesService.inici(codiEnviarDocumentsAlPortafirmes);
+                        monitorTasquesService.inici(codiExecucioAccionsMassives);
                         try {
                         	createAuthenticationContext();
                             execucioMassivaService.executeNextMassiveScheduledTask();
-                            monitorTasquesService.fi(codiEnviarDocumentsAlPortafirmes);
+                            monitorTasquesService.fi(codiExecucioAccionsMassives);
                         } catch (Throwable th) {
-                            tractarErrorTascaSegonPla(th, codiEnviarDocumentsAlPortafirmes);
+                            tractarErrorTascaSegonPla(th, codiExecucioAccionsMassives);
                         } finally {
                         	SecurityContextHolder.clearContext();
                         }
                     }
                 },
-                getTrigger(codiEnviarDocumentsAlPortafirmes)
+                getTrigger(codiExecucioAccionsMassives)
         );
 
         addTask(
@@ -688,7 +688,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     return nextExecution;
                 }
             };
-        } else if (taskCodi.equals(codiEnviarDocumentsAlPortafirmes)) {
+        } else if (taskCodi.equals(codiExecucioAccionsMassives)) {
             return new Trigger() {
                 @Override
                 public Date nextExecutionTime(TriggerContext triggerContext) {
@@ -711,7 +711,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     trigger.setInitialDelay(registrarEnviamentsPendentsInitialDelayLong);
                     Date nextExecution = trigger.nextExecutionTime(triggerContext);
                     Long longNextExecution = nextExecution.getTime() - System.currentTimeMillis();
-                    monitorTasquesService.updateProperaExecucio(codiEnviarDocumentsAlPortafirmes, longNextExecution);
+                    monitorTasquesService.updateProperaExecucio(codiExecucioAccionsMassives, longNextExecution);
                     return nextExecution;
                 }
             };
