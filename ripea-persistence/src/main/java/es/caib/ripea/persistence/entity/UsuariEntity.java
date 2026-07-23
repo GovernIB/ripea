@@ -95,7 +95,7 @@ public class UsuariEntity implements Serializable {
     private TemaAplicacioEnum temaAplicacio;
     @Enumerated(EnumType.STRING)
     @Column(name = "estil_menu", length = 16, nullable = false, columnDefinition = "VARCHAR(16) DEFAULT 'TEMA'")
-    private MenuEstilEnum estilMenu;
+    private MenuEstilEnum estilMenu = MenuEstilEnum.TEMA;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "metaexpedient_id")

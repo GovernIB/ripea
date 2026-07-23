@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -862,8 +863,8 @@ class MetaExpedientHelperTest {
         MetaExpedientTascaEntity resultat = helper.tascaUpdate(tascaEntity, tascaDto);
 
         assertThat(resultat).isSameAs(tascaEntity);
-        // update(codi, nom, descripcio, responsable, dataLimit, duracio, prioritat, estatCrear, estatFinalitzar)
-        verify(tascaEntity).update(any(), any(), any(), any(), any(), any(), any(), any(), any());
+        // update(codi, nom, ordre, descripcio, responsable, dataLimit, duracio, prioritat, estatCrear, estatFinalitzar)
+        verify(tascaEntity).update(any(), any(), anyInt(), any(), any(), any(), any(), any(), any(), any());
         verify(metaExpedientTascaValidacioRepository, never()).save(any());
     }
 

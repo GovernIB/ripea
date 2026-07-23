@@ -36,8 +36,6 @@ import es.caib.ripea.service.intf.model.sse.TasquesPendentsEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 
-import static es.caib.ripea.service.intf.config.PropertyConfig.CONFIG_DIES_AVIS_EXPEDIENT_ANTIC;
-
 @Slf4j
 @Component
 public class EventHelper {
@@ -256,10 +254,10 @@ public class EventHelper {
                 return null;
             }
 
-            if (configHelper.getEntitat() == null || configHelper.getEntitat().get() == null) {
+            if (ConfigHelper.getEntitat() == null || ConfigHelper.getEntitat().get() == null) {
                 return null;
             }
-            Long entitatId = configHelper.getEntitat().get().getId();
+            Long entitatId = ConfigHelper.getEntitat().get().getId();
 
             int dies = configHelper.getAsInt(PropertyConfig.CONFIG_DIES_AVIS_EXPEDIENT_ANTIC, CONFIG_DIES_AVIS_EXPEDIENT_ANTIC_DEFAULT);
             LocalDateTime dataLimit = LocalDateTime.now().minusDays(dies);
@@ -357,10 +355,10 @@ public class EventHelper {
                 return null;
             }
 
-            if (configHelper.getEntitat() == null || configHelper.getEntitat().get() == null) {
+            if (ConfigHelper.getEntitat() == null || ConfigHelper.getEntitat().get() == null) {
                 return null;
             }
-            Long entitatId = configHelper.getEntitat().get().getId();
+            Long entitatId = ConfigHelper.getEntitat().get().getId();
 
             List<ExpedientTascaEntity> tasquesAmbDataLimit = expedientTascaRepository.findTasquesAmbDataLimitProperaPerUsuari(
                 usuari, ESTATS_TASCA_PENDENT, entitatId, new Date());

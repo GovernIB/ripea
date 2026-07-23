@@ -181,6 +181,7 @@ public class TestDataFactory {
                                 MetaExpedientTascaEntity.getBuilder(
                                         String.format("TASCA_%d_%d", i, j),
                                         "Tasca " + i + "." + j,
+                                        j,
                                         "Descripció de la tasca " + i + "." + j,
                                         null,   // responsable
                                         savedMetaExp,
