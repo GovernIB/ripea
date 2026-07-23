@@ -45,11 +45,11 @@ const Resum = (props:any) => {
             </DetailCard>
 
             <DetailCard title={t('page.registre.detall.interessats')}>
-                <Interessats entity={registre} onRowCountChange={setNumInteressats}/>
+                <Interessats entity={registre} onRowCountChange={setNumInteressats} autoHeight/>
             </DetailCard>
 
             <DetailCard title={t('page.registre.detall.annexos')}>
-                <Annexos entity={registre} onRowCountChange={setNumAnnexos}/>
+                <Annexos entity={registre} onRowCountChange={setNumAnnexos} autoHeight/>
             </DetailCard>
         </Grid>
     </BasePage>
@@ -143,7 +143,7 @@ const interessatsColumns = [
 const interessatsPerspectives:any[] = ['REPRESENTANT']
 const interessatsSortModel:any = [{field: 'id', sort: 'asc'}];
 const Interessats = (props:any) => {
-    const { entity, onRowCountChange } = props;
+    const { entity, onRowCountChange, autoHeight = false } = props;
     const { t } = useTranslation()
 
     const {handleOpen, dialog} = useRegistreInteressatDetail();
@@ -170,7 +170,7 @@ const Interessats = (props:any) => {
             toolbarHide
             disableColumnSorting
             readOnly
-            autoHeight={false}
+            autoHeight={autoHeight}
             paginationActive={false}
             onRowCountChange={onRowCountChange}
             onRowClick={(params: any) => {
@@ -218,7 +218,7 @@ const annexosColumns = [
 const annexosPerspective = ['FIRMES'];
 const annexosSortModel:any = [{field: 'id', sort: 'asc'}];
 const Annexos = (props:any) => {
-    const { entity, onRowCountChange } = props;
+    const { entity, onRowCountChange, autoHeight = false } = props;
     const { t } = useTranslation();
 
     const { handleOpen: handleAnnexFirma, dialog: dialogAnnexFirma } = useAnnexFirma();
@@ -261,7 +261,7 @@ const Annexos = (props:any) => {
             disableColumnSorting
             rowAdditionalActions={actions}
             readOnly
-            autoHeight={false}
+            autoHeight={autoHeight}
             paginationActive={false}
             onRowCountChange={onRowCountChange}
             onRowClick={(params: any) => {

@@ -414,6 +414,9 @@ const translationCa = {
                 todo: "Per fer",
                 progress: "En progrés",
                 done: "Completat",
+                changeEstat: {
+                    motiu: "Canvi d'estat des de la vista kanban",
+                },
             },
             detall: {
                 title: "Detalls de la tasca",

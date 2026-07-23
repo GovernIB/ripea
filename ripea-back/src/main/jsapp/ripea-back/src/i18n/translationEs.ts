@@ -414,6 +414,9 @@ const translationEs = {
                 todo: "Por hacer",
                 progress: "En progreso",
                 done: "Completado",
+                changeEstat: {
+                    motiu: "Cambio de estado desde la vista kanban",
+                },
             },
             detall: {
                 title: "Detalles de la tarea",

@@ -368,11 +368,11 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
 		if (validacionsPendents==null || validacionsPendents.isEmpty()) {
 			tascaHelper.canviarEstatTasca(entity.getId(), estat, motiu, configHelper.getRolActual());
 		} else {
-			String message = messageHelper.getMessage("expedientTasca.changeEstat.reject.validacionsPendents");
+			String message = messageHelper.getMessage("expedientTasca.changeEstat.reject.validacionsPendents")+": ";
             for (MetaExpedientTascaValidacioDto validacio : validacionsPendents) {
                 String itemValidacio  = messageHelper.getMessage("metaexpedient.tasca.validacio.tipus." + validacio.getItemValidacio());
                 String tipusValidacio = messageHelper.getMessage("metaexpedient.tasca.validacio.enum." + validacio.getTipusValidacio());
-                message += "<br/>&nbsp;-&nbsp;" + itemValidacio + " <b>" + validacio.getItemNom() + "</b>: " + tipusValidacio;
+                message += itemValidacio + " " + validacio.getItemNom() + " " + tipusValidacio +", ";
             }
 			throw new ActionExecutionException(getResourceClass(), entity.getId(), null, message);
 		}
@@ -385,7 +385,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
     private class ChangeEstatActionExecutor implements ActionExecutor<ExpedientTascaResourceEntity, ExpedientTascaResource.ChangeEstatFormAction, ExpedientTascaResource> {
         @Override
         public ExpedientTascaResource exec(String code, ExpedientTascaResourceEntity entity, ExpedientTascaResource.ChangeEstatFormAction params) throws ActionExecutionException {
-            return changeEstat(entity, params.getEstat(), null);
+            return changeEstat(entity, params.getEstat(), params.getMotiu());
         }
         @Override
         public void onChange(Serializable id, ExpedientTascaResource.ChangeEstatFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, ExpedientTascaResource.ChangeEstatFormAction target) {}

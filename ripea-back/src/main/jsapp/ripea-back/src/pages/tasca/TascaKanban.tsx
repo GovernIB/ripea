@@ -70,7 +70,7 @@ export const TascaKanban = ({actions, filter, namedQueries, perspectives, readOn
     const handleDragEnd = (origen:any, desti:any, tasca:any) => {
         console.log("handleDragEnd", origen, desti, tasca);
 
-        apiAction(tasca.id,{code:'CHANGE_ESTAT', data:{estat: desti}})
+        apiAction(tasca.id,{code:'CHANGE_ESTAT', data:{estat: desti, motiu: t('page.tasca.kanban.changeEstat.motiu')}})
             .catch((error) => {
                 refresh?.()
                 temporalMessageShow(null, error.message, 'error');

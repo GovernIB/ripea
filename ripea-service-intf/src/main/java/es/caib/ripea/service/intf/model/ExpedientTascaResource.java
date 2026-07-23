@@ -152,6 +152,7 @@ public class ExpedientTascaResource extends BaseAuditableResource<Long> {
     public static class ChangeEstatFormAction implements Serializable {
         @NotNull
         private TascaEstatEnumDto estat;
+        private String motiu;
     }
     
     @Getter
