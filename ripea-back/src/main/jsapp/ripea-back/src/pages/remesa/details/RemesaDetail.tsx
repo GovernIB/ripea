@@ -34,14 +34,11 @@ const RemesaDetail = (props:any) => {
             <FieldData field={'entregaPostal'} title={t('page.notificacio.detall.entregaPostal')}>{t(`enum.siNO.${entity?.entregaPostal}`)}</FieldData>
         </DetailCard>
         <DetailCard title={t('page.notificacio.detall.notificacioDocument')}
-                  buttons={[
-                      {
-                          text: t('page.notificacio.action.documentEnviat.label'),
-                          icon: 'download',
-                          onClick: ()=>{descarregarDocumentEnviat(entity?.id)},
-                          flex: 2,
-                      },
-                  ]}
+                    header={<Box ml="auto">
+                        <CardButton icon={'download'}
+                                    text={t('page.notificacio.action.documentEnviat.label')}
+                                    onClick={()=>descarregarDocumentEnviat(entity?.id)}/>
+                    </Box>}
         >
             <FieldData field={'fitxerNom'} title={t('page.notificacio.detall.fitxerNom')} size={10}/>
         </DetailCard>

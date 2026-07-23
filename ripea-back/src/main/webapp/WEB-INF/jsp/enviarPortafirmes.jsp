@@ -327,10 +327,14 @@
 
 		function adjustModalPerFlux(amagar) {
 			let $iframe = $(window.frameElement);
-			$iframe.css('height', '100%');
-			$iframe.css('min-height', amagar ? '370px' : '100%');
-			$iframe.find('body').css('min-height', amagar ? '370px' : '100%');
-			$iframe.parent().css('height', '600px');
+			// El '.modal-body' del document pare té "height: auto !important", de manera que
+			// les alçades en percentatge d'aquest iframe no es poden resoldre contra un pare
+			// d'alçada automàtica i l'iframe col·lapsa a l'alçada per defecte (150px), amagant
+			// el flux. Cal fixar una alçada concreta en píxels perquè la modal creixi.
+			var alcada = Math.max(600, Math.round($(window.top).height() * 0.9));
+			$iframe.css('height', alcada + 'px');
+			$iframe.css('min-height', alcada + 'px');
+			$iframe.parent().css('height', alcada + 'px');
 			$iframe.closest('div.modal-content').css('height',  'auto');
 			$iframe.closest('div.modal-dialog').css({
 				//'height':'auto',

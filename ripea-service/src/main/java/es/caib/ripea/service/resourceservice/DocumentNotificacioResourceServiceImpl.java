@@ -244,40 +244,41 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
 		}
     }
 
-    private class DescarregarDocEnviatReportGenerator implements ReportGenerator<DocumentNotificacioResourceEntity, Serializable, Serializable> {
+    private class DescarregarDocEnviatReportGenerator implements ReportGenerator<DocumentNotificacioResourceEntity, DocumentNotificacioResource.MassiveAction, Serializable> {
 
 		@Override
-		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {}
+		public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
 
 		@Override
-		public List<Serializable> generateData(String code, DocumentNotificacioResourceEntity entity, Serializable params) throws ReportGenerationException {
+		public List<Serializable> generateData(String code, DocumentNotificacioResourceEntity entity, MassiveAction params) throws ReportGenerationException {
 			List<Serializable> parametres = new ArrayList<Serializable>();
-			parametres.add(entity!=null?entity.getDocument().getId():0l);
+			parametres.add(!params.getIds().isEmpty() ?params.getIds().get(0) :0l);
 			return parametres;
 		}
-		
+
 		@Override
 		public DownloadableFile generateFile(String code, List<?> data, ReportFileType fileType, OutputStream out) {
-			Long documentId = data.get(0)!=null?(Long)data.get(0):null;
+			Long documentNotificacioId = data.get(0)!=null?(Long)data.get(0):null;
 			try {
 				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+				DocumentNotificacioResourceEntity documentNotificacioResourceEntity = documentNotificacioResourceRepository.findById(documentNotificacioId).get();
 	        	DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
 	        			entitatEntity.getId(),
-	        			documentId,
+	        			documentNotificacioResourceEntity.getDocument().getId(),
 						true,
 						false);
 
 	        	FitxerDto fitxerDto = documentHelper.getFitxerAssociat(document, null);
-				
+
             	return new DownloadableFile(
             			fitxerDto.getNom(),
             			fitxerDto.getContentType(),
             			fitxerDto.getContingut());
 			} catch (Exception ex) {
-				excepcioLogHelper.addExcepcio("/documentEnviament/"+documentId+"/DescarregarDocEnviatReportGenerator", ex);
+				excepcioLogHelper.addExcepcio("/documentEnviament/"+documentNotificacioId+"/DescarregarDocEnviatReportGenerator", ex);
 				throw new ReportGenerationException(
-						getResourceClass(), 
-						documentId,
+						getResourceClass(),
+						documentNotificacioId,
 						code,
                         messageHelper.getMessage("documentNotificacio.docEnviat.reject", new Object[]{ex.getMessage()}));
 			}
