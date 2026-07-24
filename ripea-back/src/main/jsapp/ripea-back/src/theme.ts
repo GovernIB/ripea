@@ -267,7 +267,6 @@ const baseComponentStyles: ThemeOptions['components'] = {
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                // El color de fons (dialogTitleBg) es defineix a cada tema.
             },
         },
     },
@@ -275,7 +274,6 @@ const baseComponentStyles: ThemeOptions['components'] = {
         styleOverrides: {
             root: {
                 borderRadius: '4px',
-                // El border de color es defineix a cada tema.
             },
         },
     },
@@ -286,7 +284,6 @@ const baseComponentStyles: ThemeOptions['components'] = {
                 paddingBottom: '8px',
                 paddingLeft: '16px',
                 paddingRight: '16px',
-                // El color de fons (secondaryMain) es defineix a cada tema.
             },
         },
     },
@@ -298,15 +295,24 @@ const baseComponentStyles: ThemeOptions['components'] = {
     },
 };
 
-// ── 1. TEMA CLAR (LIGHT) ────────────────────────────────────────────────────
+// ── TEMA CLAR (LIGHT) ────────────────────────────────────────────────────
+const LIGHT_PRIMARY_MAIN = '#004B99';
+const LIGHT_PRIMARY_CONTRAST_TEXT = '#fff';
+const LIGHT_SECONDARY_MAIN = '#2E2E2E';
+const LIGHT_BACKGROUND_DEFAULT = '#ffffff';
+const LIGHT_BACKGROUND_PAPER = '#ffffff';
+const LIGHT_TEXT_PRIMARY = '#1e1e1e';
+const LIGHT_TEXT_SECONDARY = '#666666';
+const LIGHT_DIVIDER = '#e0e0e0';
+
 export const lightTheme = createTheme({
     palette: {
         mode: 'light',
-        primary: { main: '#004B99', contrastText: '#fff' },
-        secondary: { main: '#2E2E2E' },
-        background: { default: '#ffffff', paper: '#ffffff' },
-        text: { primary: '#1e1e1e', secondary: '#666666' },
-        divider: '#e0e0e0',
+        primary: { main: lighten(LIGHT_PRIMARY_MAIN, 0.2), contrastText: LIGHT_PRIMARY_CONTRAST_TEXT },
+        secondary: { main: LIGHT_SECONDARY_MAIN },
+        background: { default: LIGHT_BACKGROUND_DEFAULT, paper: LIGHT_BACKGROUND_PAPER },
+        text: { primary: LIGHT_TEXT_PRIMARY, secondary: LIGHT_TEXT_SECONDARY },
+        divider: LIGHT_DIVIDER,
     },
     components: {
         ...baseComponentStyles,
@@ -316,185 +322,175 @@ export const lightTheme = createTheme({
                 body: {
                     backgroundColor: '#ffffff',
                     backgroundImage: hatchPattern('#e1e1e1'),
-                    color: '#666666',
+                    color: LIGHT_TEXT_SECONDARY,
                 },
-                // '.styledFilter': {
-                //     backgroundColor: '#2E2E2E',
-                //     border: '1px solid #e3e3e3',
-                // },
-                // // TODO: revisar més endavant si `.input` es fa servir realment.
-                // '.input': {
-                //     '& .MuiInputBase-root, & .MuiPickersInputBase-root': {
-                //         color: '#1e1e1e',
-                //         backgroundColor: '#ffffff',
-                //     },
-                //     '& .MuiInputBase-root.Mui-disabled': {
-                //         backgroundColor: '#e7e5e5',
-                //     },
-                // },
             },
         },
         MuiOutlinedInput: {
             styleOverrides: {
-                input: { '&:-webkit-autofill': { WebkitBoxShadow: '0 0 0 100px #ffffff inset' } },
+                input: { '&:-webkit-autofill': { WebkitBoxShadow: `0 0 0 100px ${LIGHT_BACKGROUND_PAPER} inset` } },
             },
         },
-        // TODO: confirmar si es manté o es lleva del tot. Recuperat de la
-        // versió anterior (dialogTitleBg = alpha(primaryMain, 0.5)).
+        MuiDialog: {
+            styleOverrides: {
+                paper: {
+                    '& .MuiIconButton-root .MuiIcon-root': {
+                        color: LIGHT_PRIMARY_CONTRAST_TEXT,
+                    },
+                },
+            },
+        },
         MuiDialogTitle: {
             styleOverrides: {
                 root: {
-                    backgroundColor: lighten('#004B99', 0.2),
-                    color: '#ffffff',
+                    ...(baseComponentStyles.MuiDialogTitle?.styleOverrides?.root as object),
+                    backgroundColor: lighten(LIGHT_PRIMARY_MAIN, 0.2),
+                    color: LIGHT_PRIMARY_CONTRAST_TEXT,
                     // borderBottom: '1px solid #e3e3e3',
                 },
             },
         },
         MuiCard: {
             styleOverrides: {
-                root: { border: '1px solid #e3e3e3' },
-            },
-        },
-        // TODO: no queda be
-        MuiCardHeader: {
-            styleOverrides: {
                 root: {
-                    backgroundColor: '#f1f1f1',
-                    color: '#000000',
-                    // borderBottom: '1px solid #e3e3e3',
-                    '&.detail': { backgroundColor: alpha('#2E2E2E', 0.5) },
+                    ...(baseComponentStyles.MuiCard?.styleOverrides?.root as object),
+                    border: '1px solid #e3e3e3'
                 },
             },
         },
-        // TODO: confirmar si es manté o es lleva del tot. Recuperat de la
-        // versió anterior (drawerBg = darken(primaryMain, 0.35)).
-        // MuiDrawer: {
-        //     styleOverrides: {
-        //         paper: {
-        //             right: 'auto',
-        //             left: 0,
-        //             backgroundColor: '#00305e',
-        //             color: '#ffffff',
-        //         },
-        //     },
-        // },
-        // MuiListItemIcon: {
-        //     styleOverrides: {
-        //         root: { '.MuiDrawer-paper &': { color: '#ffffff' } },
-        //     },
-        // },
-        // MuiListItemButton: {
-        //     styleOverrides: {
-        //         root: {
-        //             '.MuiDrawer-paper &:hover': { backgroundColor: '#003d7a' },
-        //             '.MuiDrawer-paper &.Mui-selected': { backgroundColor: alpha('#004B99', 0.3) },
-        //             '.MuiDrawer-paper &.Mui-selected:hover': { backgroundColor: alpha('#004B99', 0.45) },
-        //         },
-        //     },
-        // },
-        // MuiAlert: {
-        //     styleOverrides: {
-        //         standardWarning: { color: '#8a6d3b', backgroundColor: '#fce3e3', borderColor: '#faebcc' },
-        //     },
-        // },
+        MuiCardHeader: {
+            styleOverrides: {
+                root: {
+                    ...(baseComponentStyles.MuiCardHeader?.styleOverrides?.root as object),
+                    backgroundColor: darken(LIGHT_BACKGROUND_PAPER, 0.03),
+                    color: LIGHT_SECONDARY_MAIN,
+                    // borderBottom: '1px solid #e3e3e3',
+                    '&.detail': { backgroundColor: darken(LIGHT_BACKGROUND_PAPER, 0.03) },
+                },
+            },
+        },
+        MuiListItemButton: {
+            styleOverrides: {
+                root: {
+                    '.MuiDrawer-paper &:hover': { backgroundColor: alpha(LIGHT_PRIMARY_MAIN, 0.2)},
+                    '.MuiDrawer-paper &.Mui-selected': { backgroundColor: alpha(LIGHT_PRIMARY_MAIN, 0.15) },
+                    '.MuiDrawer-paper &.Mui-selected:hover': { backgroundColor: alpha(LIGHT_PRIMARY_MAIN, 0.25) },
+                },
+            },
+        },
         MuiDataGrid: {
             styleOverrides: {
                 root: {
                     ...(baseComponentStyles.MuiDataGrid?.styleOverrides?.root as object),
                     '& .MuiDataGrid-row.even:not(.Mui-selected)': {
-                        backgroundColor: alpha('#2E2E2E', 0.08),
+                        backgroundColor: alpha(LIGHT_SECONDARY_MAIN, 0.08),
                     },
                     '& .MuiDataGrid-row:hover': {
-                        backgroundColor: `${alpha('#004B99', 0.15)} !important`,
+                        backgroundColor: `${alpha(LIGHT_PRIMARY_MAIN, 0.15)} !important`,
                     },
                 },
                 row: {
-                    '&.Mui-selected': { backgroundColor: `${alpha('#004B99', 0.28)} !important` },
-                    '&.Mui-selected:hover': { backgroundColor: `${alpha('#004B99', 0.4)} !important` },
+                    ...(baseComponentStyles.MuiDataGrid?.styleOverrides?.row as object),
+                    '&.Mui-selected': { backgroundColor: `${alpha(LIGHT_PRIMARY_MAIN, 0.28)} !important` },
+                    '&.Mui-selected:hover': { backgroundColor: `${alpha(LIGHT_PRIMARY_MAIN, 0.4)} !important` },
+                },
+            },
+        },
+        MuiTab: {
+            styleOverrides: {
+                root: {
+                    ...(baseComponentStyles.MuiTab?.styleOverrides?.root as object),
+                    color: LIGHT_TEXT_PRIMARY,
+                    '&.Mui-selected': { color: LIGHT_PRIMARY_MAIN },
                 },
             },
         },
     },
 });
 
-// ── 2. TEMA FOSC (DARK) ─────────────────────────────────────────────────────
-const DARK_PRIMARY_COLOR = '#004B99';
+// ── TEMA FOSC (DARK) ─────────────────────────────────────────────────────
+const DARK_PRIMARY_LIGHT = '#5ea6f3';
+const DARK_PRIMARY_MAIN = '#004B99';
+const DARK_PRIMARY_CONTRAST_TEXT = '#fff';
+const DARK_SECONDARY_MAIN = '#F6F6F6';
+const DARK_BACKGROUND_DEFAULT = '#121212';
+const DARK_BACKGROUND_PAPER = '#1e1e1e';
+const DARK_TEXT_PRIMARY = '#ffffff';
+const DARK_TEXT_SECONDARY = '#bbbbbb';
+const DARK_DIVIDER = '#ffffff';
+const DARK_ERROR_MAIN = '#f44336';
+const DARK_INFO_MAIN = '#29b6f6';
+const DARK_SUCCESS_MAIN = '#66bb6a';
+
 export const darkTheme = createTheme({
     palette: {
         mode: 'dark',
-        primary: { light: '#5ea6f3', main: lighten(DARK_PRIMARY_COLOR, 0.2), contrastText: '#fff' },
-        secondary: { main: '#F6F6F6' },
-        background: { default: '#121212', paper: '#1e1e1e' },
-        text: { primary: '#ffffff', secondary: '#bbbbbb' },
-        divider: '#ffffff',
-        error: { main: '#f44336' },
-        info: { main: '#29b6f6' },
-        success: { main: '#66bb6a' },
+        primary: { light: DARK_PRIMARY_LIGHT, main: lighten(DARK_PRIMARY_MAIN, 0.2), contrastText: DARK_PRIMARY_CONTRAST_TEXT },
+        secondary: { main: DARK_SECONDARY_MAIN },
+        background: { default: DARK_BACKGROUND_DEFAULT, paper: DARK_BACKGROUND_PAPER },
+        text: { primary: DARK_TEXT_PRIMARY, secondary: DARK_TEXT_SECONDARY },
+        divider: DARK_DIVIDER,
+        error: { main: DARK_ERROR_MAIN },
+        info: { main: DARK_INFO_MAIN },
+        success: { main: DARK_SUCCESS_MAIN },
     },
     components: {
         ...baseComponentStyles,
         MuiCssBaseline: {
-            styleOverrides: (theme) => ({
+            styleOverrides: {
                 ...(baseComponentStyles.MuiCssBaseline?.styleOverrides as object),
                 body: {
                     backgroundColor: '#1c1c1c',
                     backgroundImage: hatchPattern('#2a2a2a'),
-                    color: theme.palette.text.secondary,
+                    color: DARK_TEXT_SECONDARY,
                 },
-            }),
+            },
         },
         MuiOutlinedInput: {
             styleOverrides: {
-                input: ({ theme }: { theme: any }) => ({
-                    '&:-webkit-autofill': { 
-                        WebkitBoxShadow: `0 0 0 100px ${theme.palette.background.paper} inset`,
+                input: {
+                    '&:-webkit-autofill': {
+                        WebkitBoxShadow: `0 0 0 100px ${DARK_BACKGROUND_PAPER} inset`,
                     },
-                }),
+                },
+            },
+        },
+        MuiDialog: {
+            styleOverrides: {
+                paper: {
+                    '& .MuiIconButton-root .MuiIcon-root': {
+                        color: DARK_PRIMARY_CONTRAST_TEXT,
+                    },
+                },
             },
         },
         MuiDialogTitle: {
             styleOverrides: {
-                root: ({ theme }: { theme: any }) => ({
-                    backgroundColor: alpha(darken(DARK_PRIMARY_COLOR, 0.2), 0.5),
-                    color: theme.palette.text.primary,
+                root: {
+                    ...(baseComponentStyles.MuiDialogTitle?.styleOverrides?.root as object),
+                    backgroundColor: darken(DARK_PRIMARY_MAIN, 0.2),
+                    color: DARK_TEXT_PRIMARY,
                     borderBottom: '1px solid #949494',
-                }),
+                },
             },
         },
         MuiCardHeader: {
             styleOverrides: {
-                root: ({ theme }: { theme: any }) => ({
-                    backgroundColor: theme.palette.background.paper,
-                    color: theme.palette.secondary.main,
+                root: {
+                    ...(baseComponentStyles.MuiCardHeader?.styleOverrides?.root as object),
+                    backgroundColor: DARK_BACKGROUND_PAPER,
+                    color: DARK_SECONDARY_MAIN,
                     borderBottom: '1px solid #949494',
-                    '&.detail': { backgroundColor: alpha(theme.palette.background.paper, 0.5) },
-                }),
+                    '&.detail': { backgroundColor: alpha(DARK_BACKGROUND_PAPER, 0.5) },
+                },
             },
         },
-        // TODO: confirmar si es manté o es lleva del tot. Recuperat de la
-        // versió anterior (drawerBg = darken(primaryMain, 0.35)).
-        // MuiDrawer: {
-        //     styleOverrides: {
-        //         paper: {
-        //             right: 'auto',
-        //             left: 0,
-        //             backgroundColor: '#00305e',
-        //             color: '#ffffff',
-        //         },
-        //     },
-        // },
-        // MuiListItemIcon: {
-        //     styleOverrides: {
-        //         root: { '.MuiDrawer-paper &': { color: '#ffffff' } },
-        //     },
-        // },
-        // TODO: Confirmar si es manté o es lleva del tot aquests colors
         MuiListItemButton: {
             styleOverrides: {
                 root: {
-                    '.MuiDrawer-paper &:hover': { backgroundColor: alpha(DARK_PRIMARY_COLOR, 0.5)},
-                    '.MuiDrawer-paper &.Mui-selected': { backgroundColor: alpha(DARK_PRIMARY_COLOR, 0.4) },
-                    '.MuiDrawer-paper &.Mui-selected:hover': { backgroundColor: alpha(DARK_PRIMARY_COLOR, 0.5) },
+                    '.MuiDrawer-paper &:hover': { backgroundColor: alpha(DARK_PRIMARY_MAIN, 0.5)},
+                    '.MuiDrawer-paper &.Mui-selected': { backgroundColor: alpha(DARK_PRIMARY_MAIN, 0.4) },
+                    '.MuiDrawer-paper &.Mui-selected:hover': { backgroundColor: alpha(DARK_PRIMARY_MAIN, 0.5) },
                 },
             },
         },
@@ -514,57 +510,72 @@ export const darkTheme = createTheme({
                         backgroundColor: lighten('#2e2e2e', 0.05),
                     },
                     '& .MuiDataGrid-row:hover': {
-                        backgroundColor: `${alpha(DARK_PRIMARY_COLOR, 0.15)} !important`,
+                        backgroundColor: `${alpha(DARK_PRIMARY_MAIN, 0.15)} !important`,
                     },
                 },
                 row: {
-                    '&.Mui-selected': { backgroundColor: `${alpha(DARK_PRIMARY_COLOR, 0.28)} !important` },
-                    '&.Mui-selected:hover': { backgroundColor: `${alpha(DARK_PRIMARY_COLOR, 0.5)} !important` },
+                    ...(baseComponentStyles.MuiDataGrid?.styleOverrides?.row as object),
+                    '&.Mui-selected': { backgroundColor: `${alpha(DARK_PRIMARY_MAIN, 0.28)} !important` },
+                    '&.Mui-selected:hover': { backgroundColor: `${alpha(DARK_PRIMARY_MAIN, 0.5)} !important` },
                 },
             },
         },
         MuiButton: {
             styleOverrides: {
-                root:  ({ theme }: { theme: any }) => ({
+                root: {
                     ...(baseComponentStyles.MuiButton?.styleOverrides?.root as object),
                     variants: [
                         {
                             props: ({ color, variant }: any) =>
                                 variant === 'outlined' && color === 'primary',
                             style: {
-                                color: theme.palette.secondary.main,
-                                borderColor: theme.palette.secondary.main,
+                                color: DARK_SECONDARY_MAIN,
+                                borderColor: DARK_SECONDARY_MAIN,
                             },
                         },
                     ],
-                }),
+                },
             },
         },
         MuiTab: {
             styleOverrides: {
-                root: ({ theme }: { theme: any }) => ({
+                root: {
                     ...(baseComponentStyles.MuiTab?.styleOverrides?.root as object),
-                    color: theme.palette.text.primary,
-                    '&.Mui-selected': { color: theme.palette.primary.light },
-                }),
+                    color: DARK_TEXT_PRIMARY,
+                    '&.Mui-selected': { color: DARK_PRIMARY_LIGHT },
+                },
             },
         },
     },
 });
 
-// ── 3. TEMA DRÀCULA ────────────────────────────────────────────────────────
+// ── TEMA DRÀCULA ────────────────────────────────────────────────────────
+const DRACULA_PRIMARY_LIGHT = '#caabf7';
+const DRACULA_PRIMARY_MAIN = '#BD93F9';
+const DRACULA_PRIMARY_CONTRAST_TEXT = '#fff';
+const DRACULA_SECONDARY_MAIN = '#F8F8F2';
+const DRACULA_BACKGROUND_DEFAULT = '#282A36';
+const DRACULA_BACKGROUND_PAPER = '#303341';
+const DRACULA_TEXT_PRIMARY = '#F8F8F2';
+const DRACULA_TEXT_SECONDARY = '#D6D6C2';
+const DRACULA_DIVIDER = '#7a7d8b';
+const DRACULA_ERROR_MAIN = '#FF5555';
+const DRACULA_WARNING_MAIN = '#FFB86C';
+const DRACULA_SUCCESS_MAIN = '#50FA7B';
+const DRACULA_INFO_MAIN = '#8BE9FD';
+
 export const draculaTheme = createTheme({
     palette: {
         mode: 'dark',
-        primary: {light: '#caabf7', main: '#BD93F9', contrastText: '#282A36' },
-        secondary: { main: '#F8F8F2' },
-        background: { default: '#282A36', paper: '#303341' },
-        text: { primary: '#F8F8F2', secondary: '#D6D6C2' },
-        divider: '#44475A',
-        error: { main: '#FF5555' },
-        warning: { main: '#FFB86C' },
-        success: { main: '#50FA7B' },
-        info: { main: '#8BE9FD' },
+        primary: {light: DRACULA_PRIMARY_LIGHT, main: DRACULA_PRIMARY_MAIN, contrastText: DRACULA_PRIMARY_CONTRAST_TEXT },
+        secondary: { main: DRACULA_SECONDARY_MAIN },
+        background: { default: DRACULA_BACKGROUND_DEFAULT, paper: DRACULA_BACKGROUND_PAPER },
+        text: { primary: DRACULA_TEXT_PRIMARY, secondary: DRACULA_TEXT_SECONDARY },
+        divider: DRACULA_DIVIDER,
+        error: { main: DRACULA_ERROR_MAIN },
+        warning: { main: DRACULA_WARNING_MAIN },
+        success: { main: DRACULA_SUCCESS_MAIN },
+        info: { main: DRACULA_INFO_MAIN },
     },
     components: {
         ...baseComponentStyles,
@@ -574,30 +585,59 @@ export const draculaTheme = createTheme({
                 body: {
                     backgroundColor: '#282A36',
                     backgroundImage: hatchPattern('#44475A'),
-                    color: '#F8F8F2',
+                    color: DRACULA_TEXT_PRIMARY,
                 },
             },
         },
         MuiOutlinedInput: {
             styleOverrides: {
-                input: { '&:-webkit-autofill': { WebkitBoxShadow: '0 0 0 100px #3b3d4b inset' } },
+                input: { '&:-webkit-autofill': { WebkitBoxShadow: `0 0 0 100px ${DRACULA_BACKGROUND_PAPER} inset` } },
+            },
+        },
+        MuiDialog: {
+            styleOverrides: {
+                paper: {
+                    '& .MuiIconButton-root .MuiIcon-root': {
+                        color: DRACULA_PRIMARY_CONTRAST_TEXT,
+                    },
+                },
+            },
+        },
+        MuiDialogTitle: {
+            styleOverrides: {
+                root: {
+                    ...(baseComponentStyles.MuiDialogTitle?.styleOverrides?.root as object),
+                    backgroundColor: darken(DRACULA_PRIMARY_MAIN, 0.2),
+                    color: DRACULA_TEXT_PRIMARY,
+                },
+            },
+        },
+        MuiCardHeader: {
+            styleOverrides: {
+                root: {
+                    ...(baseComponentStyles.MuiCardHeader?.styleOverrides?.root as object),
+                    backgroundColor: DRACULA_BACKGROUND_PAPER,
+                    color: DRACULA_SECONDARY_MAIN,
+                    borderBottom: '1px solid #949494',
+                    '&.detail': { backgroundColor: alpha(DRACULA_BACKGROUND_PAPER, 0.5) },
+                },
             },
         },
         MuiListItemButton: {
             styleOverrides: {
                 root: {
-                    '.MuiDrawer-paper &:hover': { backgroundColor: alpha('#BD93F9', 0.35)},
-                    '.MuiDrawer-paper &.Mui-selected': { backgroundColor: alpha('#BD93F9', 0.3) },
-                    '.MuiDrawer-paper &.Mui-selected:hover': { backgroundColor: alpha('#BD93F9', 0.4) },
+                    '.MuiDrawer-paper &:hover': { backgroundColor: alpha(DRACULA_PRIMARY_MAIN, 0.35)},
+                    '.MuiDrawer-paper &.Mui-selected': { backgroundColor: alpha(DRACULA_PRIMARY_MAIN, 0.3) },
+                    '.MuiDrawer-paper &.Mui-selected:hover': { backgroundColor: alpha(DRACULA_PRIMARY_MAIN, 0.4) },
                 },
             },
         },
         MuiAlert: {
             styleOverrides: {
-                standardWarning: { backgroundColor: '#3e2f20' },
-                standardError: { backgroundColor: '#401c1c' },
-                standardInfo: { backgroundColor: '#26373c' },
-                standardSuccess: { backgroundColor: '#1c4024' },
+                standardWarning: { backgroundColor: darken(DRACULA_WARNING_MAIN,0.6) },
+                standardError: { backgroundColor: darken(DRACULA_ERROR_MAIN,0.7) },
+                standardInfo: { backgroundColor: darken(DRACULA_INFO_MAIN,0.7) },
+                standardSuccess: { backgroundColor: darken(DRACULA_SUCCESS_MAIN,0.75) },
             },
         },
         MuiDataGrid: {
@@ -608,12 +648,13 @@ export const draculaTheme = createTheme({
                         backgroundColor: lighten('#282A36', 0.05),
                     },
                     '& .MuiDataGrid-row:hover': {
-                        backgroundColor: `${alpha('#BD93F9', 0.15)} !important`,
+                        backgroundColor: `${alpha(DRACULA_PRIMARY_MAIN, 0.15)} !important`,
                     },
                 },
                 row: {
-                    '&.Mui-selected': { backgroundColor: `${alpha('#BD93F9', 0.2)} !important` },
-                    '&.Mui-selected:hover': { backgroundColor: `${alpha('#BD93F9', 0.3)} !important` },
+                    ...(baseComponentStyles.MuiDataGrid?.styleOverrides?.row as object),
+                    '&.Mui-selected': { backgroundColor: `${alpha(DRACULA_PRIMARY_MAIN, 0.2)} !important` },
+                    '&.Mui-selected:hover': { backgroundColor: `${alpha(DRACULA_PRIMARY_MAIN, 0.3)} !important` },
                 },
             },
         },
@@ -627,7 +668,7 @@ export const draculaTheme = createTheme({
                                 variant === 'outlined' && color === 'primary',
                             style: {
                                 color: '#F8F8F2',
-                                borderColor: '#BD93F9',
+                                borderColor: DRACULA_PRIMARY_MAIN,
                             },
                         },
                     ],
@@ -636,11 +677,11 @@ export const draculaTheme = createTheme({
         },
         MuiTab: {
             styleOverrides: {
-                root: ({ theme }: { theme: any }) => ({
+                root: {
                     ...(baseComponentStyles.MuiTab?.styleOverrides?.root as object),
-                    color: theme.palette.text.primary,
-                    '&.Mui-selected': { color: theme.palette.primary.light },
-                }),
+                    color: DRACULA_TEXT_PRIMARY,
+                    '&.Mui-selected': { color: DRACULA_PRIMARY_LIGHT },
+                },
             },
         },
     },

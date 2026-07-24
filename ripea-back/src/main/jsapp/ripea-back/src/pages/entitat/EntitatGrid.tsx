@@ -20,14 +20,12 @@ const EntitatGridForm = () => {
         <Grid size={12}><Typography sx={{ borderBottom: '1px solid gray', mt: 2, mb: 1 }}>{t('page.entitat.form.temaClar')}</Typography></Grid>
         <FileFormField name={'logoImgFile'}/>
         <FileFormField name={'faviconImgFile'}/>
-        <FileFormField name={'menuImgFile'}/>
         <GridFormField name={'capsaleraColorFons'} type={'color'}/>
         <GridFormField name={'capsaleraColorLletra'} type={'color'}/>
 
         <Grid size={12}><Typography sx={{ borderBottom: '1px solid gray', mt: 2, mb: 1 }}>{t('page.entitat.form.temaFosc')}</Typography></Grid>
         <FileFormField name={'blackLogoImgFile'}/>
         <FileFormField name={'blackFaviconImgFile'}/>
-        <FileFormField name={'blackMenuImgFile'}/>
         <GridFormField name={'blackCapsaleraColorFons'} type={'color'}/>
         <GridFormField name={'blackCapsaleraColorLletra'} type={'color'}/>
     </Grid>

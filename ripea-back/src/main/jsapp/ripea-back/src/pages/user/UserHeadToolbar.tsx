@@ -82,7 +82,7 @@ const UserHeadToolbar = () => {
             id: 'recargar',
             title: t('page.user.menu.backVersio'),
             icon: 'fast_rewind',
-            componentProps: { color: '#ff9523' },
+            // componentProps: { color: '#ff9523' },
             onClick: () => {
                 if (location.pathname.includes('/tasca/')) {
                     const url = location.pathname.replace('/tasca/', '?tascaId=') + '&origenTasques=true';

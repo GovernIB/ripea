@@ -1,4 +1,4 @@
-import {Box, Card, CardContent, CardHeader, Grid, Typography, Icon, IconButton, Collapse} from "@mui/material";
+import {Box, Card, CardContent, CardHeader, Grid, Typography, Icon, IconButton, Collapse, darken} from "@mui/material";
 import React, {useState} from "react";
 
 const iconButton = { p: 0.5, borderRadius: '5px', maxWidth: 'max-content', border: '1px solid grey' }
@@ -174,8 +174,9 @@ export const DetailCardContent = (props:DetailCardContentProps) => {
                 p: 1,
                 borderLeft: '1px solid',
                 borderTop: '1px solid',
-                ...(other?.sx ?? {}),
+                borderRight: size === 12 ? '1px solid' : undefined,
                 borderColor: other?.sx?.borderColor || 'divider',
+                ...(other?.sx ?? {}),
             }}
         >
             <Grid size={titleSize}>
@@ -241,9 +242,10 @@ export const CardPage = (props:CardPageProps) => {
         {(title || header) &&
             <CardHead icon={icon} sx={(theme: any) => ({
                 // Banner de cabecera de pantalla (solo afecta a CardPage, que lleva el h1)
-                bgcolor: theme.palette.primary.main,
+                // bgcolor: theme.palette.primary.main,
                 borderBottom: 'none',
-                '& h1': { color: theme.palette.mode === 'dark' ? '#464646' : theme.palette.primary.contrastText, fontWeight: 600 },
+                '& h1': { color: theme.palette.primary.contrastText, fontWeight: 600 },
+                backgroundColor: theme.palette.mode === 'dark' ? darken(theme.palette.primary.main, 0.3) : theme.palette.primary.main,
                 ...headerProps,
             })} {...other}>
                 {title && <Typography mt={0.5} variant={"h4"} component={"h1"}>{title}</Typography>}

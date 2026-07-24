@@ -38,7 +38,7 @@ const ExpedientsRelacionats = (props:any) => {
     const { t } = useTranslation();
 
     return <Load value={relacionats.length > 0} noEffect>
-        <Grid size={12} p={1} my={1}>
+        <Grid size={12} my={1}>
         <DetailCard title={t('page.contingut.action.importarExpedient.title')} display={'flex'} flexDirection={'column'} sx={{ px: 1 }} hidden={relacionats?.length==0}>
             {
                 relacionats?.map((relacionat:any) =>
@@ -47,14 +47,14 @@ const ExpedientsRelacionats = (props:any) => {
                             <Icon sx={{ fontSize: "1.3rem", paddingTop: "4px" }}>drive_file_move</Icon>
                         </Grid>
                         <Grid size={10}>
-                            <Link sx={{ fontSize: "0.9rem" }} href={`./${relacionat?.id}`}>{relacionat?.nom}</Link>
+                            <Link sx={{ fontSize: "0.9rem", color: (theme) => (theme.palette.mode === 'dark' ? 'primary.light' : 'primary.main') }} href={`./${relacionat?.id}`}>{relacionat?.nom}</Link>
                         </Grid>
                         <Grid size={1}>
                             {expedient?.potModificar &&
                                 <IconButton
                                     onClick={()=>eliminarRelacio(expedient?.id, expedient, relacionat?.id)}
                                     title={t('page.expedient.action.eliminarRelacio.label')}
-                                    sx={{ color: 'black'}}>
+                                    sx={{ color: (theme) => (theme.palette.mode === 'dark' ? 'primary.contrastText' : 'text.primary')}}>
                                     <Icon sx={{ fontSize: "1.3rem" }}>link_off</Icon>
                                 </IconButton>
                             }
@@ -77,7 +77,7 @@ const ExpedientInfoContret = (props:any) => {
         bgcolor: 'background.paper',
     };
     const iconStyle = { mr: 0, fontSize: '22px' };
-    
+
     // Estat
     const labelEstat =
         expedient?.estatAdditionalInfo?.nom ?? fields.find((field: any) => field.name === 'estat')?.options?.[expedient?.estat];
@@ -92,7 +92,7 @@ const ExpedientInfoContret = (props:any) => {
     const colorPrioritat = COLOR_PRIORITAT[expedient?.prioritat];
     const iconColorPrioritat = getReadableTextColor(colorPrioritat);
     const labelPrioritat = fields.find((field: any) => field.name === 'prioritat')?.options?.[expedient?.prioritat];
-    
+
     return (
         <Paper
             elevation={2}
@@ -126,10 +126,10 @@ const ExpedientInfoContret = (props:any) => {
                 </IconButton>
             </Tooltip>
 
-            {relacionats.length > 0 && 
-                <Tooltip 
-                    title={`${t('page.contingut.action.importarExpedient.title')}: ${relacionats.map((relacionat: any) => relacionat.nom).join(', ')}`} 
-                    arrow 
+            {relacionats.length > 0 &&
+                <Tooltip
+                    title={`${t('page.contingut.action.importarExpedient.title')}: ${relacionats.map((relacionat: any) => relacionat.nom).join(', ')}`}
+                    arrow
                     placement="right"
                 >
                     <Badge badgeContent={relacionats?.length} color="error">
@@ -149,7 +149,7 @@ const ExpedientInfoContret = (props:any) => {
 const ExpedientInfoExpandit = (props:any) => {
     const {title, entity: expedient, fields, xs, readOnly, onCollapse, relacionats, eliminarRelacio} = props;
     const { t } = useTranslation();
-    
+
     const buttonExpand = (
         <IconButton
             size="small"
@@ -169,27 +169,26 @@ const ExpedientInfoExpandit = (props:any) => {
         <MuiDetail entity={expedient} fields={fields}>
             <DetailCard title={title ?? t('page.expedient.detall.title')} size={xs} actionHeader={buttonExpand}>
                 <FieldData size={8} field={'numero'} />
-                <FieldData size={4} field={'ntiClasificacionSia'} />
+                <FieldData size={4} field={'ntiClasificacionSia'} sx={{ borderRight: '1px solid' }} />
                 <FieldData field={'nom'} />
                 <FieldData field={'metaExpedient'} />
                 <FieldData field={'organGestor'} />
                 <FieldData field={'ntiFechaApertura'}>{formatDate(expedient?.ntiFechaApertura)}</FieldData>
                 <FieldData
                     size={8}
-                    sx={{ borderBottom: '1px solid' }}
                     field={'estat'}
                     renderCell={(formattedValue: string) => <StyledEstat entity={expedient}>{formattedValue}</StyledEstat>}
                 />
                 <FieldData
                     size={4}
-                    sx={{ borderBottom: '1px solid' }}
+                    sx={{ borderRight: '1px solid' }}
                     field={'prioritat'}
                     renderCell={(formattedValue: string) => <StyledPrioritat entity={expedient}>{formattedValue}</StyledPrioritat>}
                 />
 
-                {expedient?.grup && <FieldData field={'grup'} />}
+                {expedient?.grup && <FieldData field={'grup'} sx={{ borderBottom: '1px solid' }} />}
 
-                <ExpedientsRelacionats entity={expedient} relacionats={relacionats} eliminarRelacio={eliminarRelacio}/>
+                <ExpedientsRelacionats entity={expedient} relacionats={relacionats} eliminarRelacio={eliminarRelacio} />
 
                 {!readOnly && (
                     <Grid size={12} display={'flex'} justifyContent={'end'} p={1}>
@@ -209,8 +208,6 @@ export const ExpedientInfo = (props: any) => {
     } = useResourceApiService('expedientResource');
     const {temporalMessageShow} = useBaseAppContext();
     const [relacionats, setRelacionats] = useState<any[]>([]);
-    
-    
 
     const findRelacionats = () => {
         apiFind({
@@ -288,19 +285,19 @@ const ExpedientAlert = (props:any) => {
                    }
             >{t('page.expedient.alert.alert')}</Alert>
         }
-        { 
+        {
         ((!expedient?.valid && validacio?.errorsValidacio == null) || (validacio?.errorsValidacio?.length > 0)) && (
             (() => {
-                const llistaErrors = validacio?.errorsValidacio?.length > 0 
-                    ? validacio.errorsValidacio 
+                const llistaErrors = validacio?.errorsValidacio?.length > 0
+                    ? validacio.errorsValidacio
                     : (expedient?.errors || []);
 
-                const textAlerta = llistaErrors.length > 0 
+                const textAlerta = llistaErrors.length > 0
                     ? getResumErrorsText(llistaErrors, t)
                     : t('page.expedient.alert.validation');
 
                 return (
-                    <Alert 
+                    <Alert
                         severity="warning"
                         action={
                             <Button sx={{py: 0}} variant="outlined"
@@ -325,7 +322,7 @@ const HeaderMain = (props: any) => {
     const { expedient, fields, isCarpetaUrl, alliberar, user, carpetaNode, expanded } = props;
     const { t } = useTranslation();
     const theme = useTheme();
-    const headerTextColor = theme.palette.mode === 'dark' ? '#464646' : theme.palette.primary.contrastText;
+    const headerTextColor = theme.palette.primary.contrastText;
 
     const campsExpedientContret = [
         { name: 'numero', value: expedient?.numero },
@@ -339,8 +336,8 @@ const HeaderMain = (props: any) => {
         <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', columnGap: 1, rowGap: 0.5, width: '100%' }}>
-                    <Icon sx={{ fontSize: '2rem', color: 'text.primary' }}>{iconsAppMenu.expedient}</Icon>
-                    <Typography variant="h4" component="h1" sx={{ lineHeight: 1.2, flexShrink: 0 }}>
+                    <Icon sx={{ fontSize: '2rem', color: 'primary.contrastText' }}>{iconsAppMenu.expedient}</Icon>
+                    <Typography variant="h4" component="h1" sx={{ lineHeight: 1.2, flexShrink: 0, color: 'primary.contrastText' }}>
                         {isCarpetaUrl && expedient?.id != null ? (
                             <Link
                                 component={RrLink}
@@ -518,7 +515,7 @@ const Expedient = () => {
     const handleToggle = () => {
         const nouValor = !expanded;
         setExpanded(nouValor);
-        
+
         apiSave({ canviInformacioExpandit: nouValor });
     };
 

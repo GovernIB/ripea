@@ -2,6 +2,7 @@ import axios from "axios";
 import {useEffect, useMemo} from "react";
 import {useSession, useSessionContext} from "./SessionStorageContext.tsx";
 import {useResourceApiService, useResourceApiContext} from "reactlib";
+import { useTheme } from "@mui/material";
 
 const userkey :string = 'usuario';
 const entitatKey = 'entitat';
@@ -96,6 +97,8 @@ export const useUserSession = () => {
 export const useEntitatSession = () => {
     const { value, isInitialized, save, remove } = useSession(entitatKey)
     const { value: user } = useUserSession();
+    const theme = useTheme();
+    const isDark = theme.palette.mode === 'dark';
 
     const {
         isReady: apiIsReady,
@@ -125,21 +128,22 @@ export const useEntitatSession = () => {
         }
     },[apiIsReady])
 
-    // El tema deixa de ser binari: considerem "fosc" a partir del punt mitjà del
-    // nivell de foscor (≥50) per triar la variant fosca de logos i colors de marca.
-    const isDark = (user?.conf?.nivellFosc ?? 0) >= 50;
     const logo = useMemo(() => {
         return !isDark ? value?.logoImgBytes : value?.blackLogoImgBytes
     }, [value?.logoImgBytes, value?.blackLogoImgBytes, isDark]);
+
     const favicon = useMemo(() => {
         return !isDark ? value?.faviconImgBytes : value?.blackFaviconImgBytes
     }, [value?.faviconImgBytes, value?.blackFaviconImgBytes, isDark]);
+
     const menuicon = useMemo(() => {
         return !isDark ? value?.menuImgBytes : value?.blackMenuImgBytes
     }, [value?.menuImgBytes, value?.blackMenuImgBytes, isDark]);
+
     const colorFons = useMemo(() => {
         return (!isDark ? value?.capsaleraColorFons : value?.blackCapsaleraColorFons) || "#FFFFFF"
     }, [value?.capsaleraColorFons, value?.blackCapsaleraColorFons, isDark]);
+
     const colorLletra = useMemo(() => {
         return (!isDark ? value?.capsaleraColorLletra : value?.blackCapsaleraColorLletra) || '#000'
     }, [value?.capsaleraColorLletra, value?.blackCapsaleraColorLletra, isDark]);
