@@ -857,16 +857,22 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         @Override
         public DocumentResource exec(String code, DocumentResourceEntity entity, DocumentResource.EnviarViaEmailFormAction params) throws ActionExecutionException {
 
-            if (!params.getEmail().isEmpty() || !params.getResponsables().isEmpty()) {
-                List<String> emails = Arrays.asList(params.getEmail().split(","));
-                List<String> desinataris = params.getResponsables().stream()
-                        .map(ResourceReference::getId)
-                        .collect(Collectors.toList());
-
-                emailHelper.enviarDocument(entity.getId(), emails, desinataris, params.getVersioDocument());
-            }
-
-            return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
+        	try {
+	            if ((params.getEmail()!=null && !params.getEmail().isEmpty()) || 
+	            	(params.getResponsables()!=null && !params.getResponsables().isEmpty())) {
+	                List<String> emails = Arrays.asList(params.getEmail().split(","));
+	                List<String> desinataris = params.getResponsables().stream()
+	                        .map(ResourceReference::getId)
+	                        .collect(Collectors.toList());
+	
+	                emailHelper.enviarDocument(entity.getId(), emails, desinataris, params.getVersioDocument());
+	            }
+	
+	            return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/expedient/EnviarViaEmailActionExecutor", e);
+				throw new ActionExecutionException(DocumentResource.class, null, code, e.getMessage());
+			}
         }
 
         @Override

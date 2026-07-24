@@ -1240,7 +1240,8 @@ public class EmailHelper {
                 text,
                 EventTipusEnumDto.ENVIAR_FICHERO,
                 document,
-                versioDocument);
+                versioDocument,
+                true);
     }
 
     private void sendOrSaveEmail(
@@ -1266,7 +1267,27 @@ public class EmailHelper {
 			String text,
 			EventTipusEnumDto eventTipus,
 			DocumentEntity document,
-            VersioDocumentEnum versioDocument) {
+			VersioDocumentEnum versioDocument) {
+		sendOrSaveEmail(
+				destinatarisNoAgrupats,
+				destinatarisAgrupats,
+				subject,
+				text,
+				eventTipus,
+				document,
+				versioDocument,
+				false);
+	}
+
+	private void sendOrSaveEmail(
+			List<String> destinatarisNoAgrupats,
+			List<String> destinatarisAgrupats,
+			String subject,
+			String text,
+			EventTipusEnumDto eventTipus,
+			DocumentEntity document,
+            VersioDocumentEnum versioDocument,
+            boolean propagarError) {
 
 		// remove duplicats
 		destinatarisNoAgrupats = new ArrayList<>(new HashSet<>(destinatarisNoAgrupats));
@@ -1312,6 +1333,9 @@ public class EmailHelper {
                 mailSender.send(message);
             } catch (Exception e) {
                 logger.error("No s'ha pogut enviar el correu electrònic (subject=" + subject + ")", e);
+                if (propagarError) {
+                    throw new RuntimeException("No s'ha pogut enviar el correu electrònic (subject=" + subject + ")", e);
+                }
             }
 		}
 
