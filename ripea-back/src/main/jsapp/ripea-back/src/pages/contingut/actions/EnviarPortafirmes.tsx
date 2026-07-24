@@ -147,7 +147,7 @@ const EnviarPortafirmesForm = forwardRef((_props, ref) => {
         {dialog}
 
         <GridFormField name="dataInici" hidden={!data?.massivo} type={"date"}/>
-        <GridFormField name="enviarCorreu" hidden={!data?.massivo}/>
+{/*        <GridFormField name="enviarCorreu" hidden={!data?.massivo}/> */}
         <GridFormField name="motiu"/>
         <GridFormField name="prioritat" required/>
 

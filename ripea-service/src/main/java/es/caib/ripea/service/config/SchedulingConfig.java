@@ -257,6 +257,8 @@ public class SchedulingConfig implements SchedulingConfigurer {
 						monitorTasquesService.inici(codiEnviarEmailsInformantDeNouComentariPerProcediment);
 						try {
 							createAuthenticationContext();
+							//Envia un correu al revisor i administradors del procediment
+							//Pero NO al usuari mencionat si es que s'ha mencionat a algú, això es fa en el moment que es crea el comentari.
 	                        segonPlaService.enviarEmailPerComentariMetaExpedient();
 							monitorTasquesService.fi(codiEnviarEmailsInformantDeNouComentariPerProcediment);
 						} catch (Throwable th) {

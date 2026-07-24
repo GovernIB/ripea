@@ -74,10 +74,16 @@ public class UsuariEntity implements Serializable {
 	private boolean rebreEmailsAgrupats = true;
 
 	@Column(name = "avisos_noves_anotacions")
-	private boolean rebreAvisosNovesAnotacions;
+	private boolean rebreAvisosNovesAnotacions = true;
 
 	@Column(name = "emails_canvi_estat_revisio")
 	private boolean rebreEmailsCanviEstatRevisio = true;
+
+	@Column(name = "emails_accio_massiva")
+	private boolean rebreEmailsAccioMassiva = true;
+
+	@Column(name = "emails_mencio_comentari")
+	private boolean rebreEmailsMencioComentari = true;
 
 	@Column(name = "exp_list_data_darrer_env")
 	private boolean expedientListDataDarrerEnviament = false;

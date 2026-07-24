@@ -308,13 +308,13 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 			}
 		}
 
-		if (execucioMassiva.getEnviarCorreu()!=null && execucioMassiva.getEnviarCorreu().booleanValue()) {
-			try {
-				emailHelper.execucioMassivaFinalitzada(execucioMassiva);
-			} catch (Exception e) {
-				logger.error("No s'ha pogut enviar el correu de finalització d'accio massiva", e);
-			}
+//		if (execucioMassiva.getEnviarCorreu()!=null && execucioMassiva.getEnviarCorreu().booleanValue()) {
+		try {
+			emailHelper.execucioMassivaFinalitzada(execucioMassiva);
+		} catch (Exception e) {
+			logger.error("No s'ha pogut enviar el correu de finalització d'accio massiva", e);
 		}
+//		}
 	}
 
 	private Set<Long> contingutsToLongList(List<ExecucioMassivaContingutEntity> continguts) {

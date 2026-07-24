@@ -79,6 +79,7 @@ import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientFiltreDto;
 import es.caib.ripea.service.intf.dto.ExpedientSelectorDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.GenericDto;
 import es.caib.ripea.service.intf.dto.InteressatAssociacioAccioEnum;
 import es.caib.ripea.service.intf.dto.MoureDestiVistaEnumDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
@@ -483,9 +484,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 	@Transactional
 	@Override
 	public RespostaPublicacioComentariDto<ExpedientComentariDto> publicarComentariPerExpedient(Long entitatId, Long expedientId, String text, String rolActual) {
-		logger.debug(
-				"Obtenint els comentaris pel contingut (" + "entitatId=" + entitatId + ", " + "nodeId=" + expedientId +
-						")");
+		
+		logger.debug("Obtenint els comentaris pel contingut (" + "entitatId=" + entitatId + ", " + "nodeId=" + expedientId +")");
+		
 		RespostaPublicacioComentariDto<ExpedientComentariDto> resposta = new RespostaPublicacioComentariDto<ExpedientComentariDto>();
 		entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
@@ -496,46 +497,21 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				rolActual);
-		// truncam a 1024 caracters
-		if (text.length() > 1024)
-			text = text.substring(0, 1024);
 		
-		String origianlText = text;
-		String[] textArr = text.split(" ");
-		for (String paraula: textArr) {
-			if (paraula.startsWith("@")) {
-				String codiUsuari = paraula.substring(paraula.indexOf("@") + 1, paraula.length());
-				UsuariEntity usuariActual = usuariHelper.getUsuariAutenticat();
-				UsuariEntity usuariMencionat = usuariRepository.findByCodi(codiUsuari);
-				if (usuariMencionat == null) {
-					resposta.getErrorsDescripcio().add(
-							messageHelper.getMessage(
-									"expedient.publicar.comentari.error.notfound", 
-									new Object[] {codiUsuari}));
-				} else if (usuariMencionat != null && usuariMencionat.getEmail() == null) {
-					resposta.getErrorsDescripcio().add(
-							messageHelper.getMessage(
-									"expedient.publicar.comentari.error.email", 
-									new Object[] {codiUsuari}));
-				} else {
-					emailHelper.sendEmailAvisMencionatComentari(
-						usuariMencionat.getEmail(),
-						usuariActual, 
-						expedient, 
-						origianlText);
-				}
-				text = text.replace(paraula, "<span class='codi_usuari'>" + paraula + "</span>");
-			}
-		}
+		ExpedientComentariEntity comentari = ExpedientComentariEntity.getBuilder(
+				expedient,
+				(text.length() > 1024)?text.substring(0, 1024):text
+			).build();
 		
-		if (!resposta.getErrorsDescripcio().isEmpty()) {
-			resposta.setError(true);
-		}
-		
-		ExpedientComentariEntity comentari = ExpedientComentariEntity.getBuilder(expedient, text).build();
 		expedientComentariRepository.save(comentari);
 		
 		resposta.setPublicat(true);
+		
+		emailHelper.sendEmailAvisMencionatComentari(
+				usuariHelper.getUsuariAutenticat(),
+				new GenericDto(expedient.getId(), " d'un expedient ", expedient.getNom()),
+				text);
+		
 		return resposta;
 	}
 

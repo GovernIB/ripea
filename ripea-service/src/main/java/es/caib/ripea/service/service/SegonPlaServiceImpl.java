@@ -200,20 +200,17 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	public void testEmailsAgrupats() {
 		testHelper.testCanviEstatDocumentPortafirmes();
 		testHelper.testCanviEstatNotificacio();
-
 	}
 	
 	@Override
 	@Transactional
 	public void enviarEmailPerComentariMetaExpedient() {
+		
 		long t1 = System.currentTimeMillis();
+		
 		if (cacheHelper.mostrarLogsSegonPla())
 			logger.info("Execució tasca periòdica: Enviar email per comentari metaexpedient");
 
-//		Calendar cal = Calendar.getInstance();
-//		cal.setTime(new Date());
-//		cal.add(Calendar.DATE, -7);
-//		Date dateNowMinus7Days = cal.getTime();
 		LocalDateTime dateNowMinus7Days = LocalDateTime.now().minusDays(7);
 		List<MetaExpedientComentariEntity> metaExpComnts = metaExpedientComentariRepository.findByEmailEnviatFalseAndCreatedDateGreaterThan(dateNowMinus7Days);
 		
@@ -228,7 +225,6 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		if (cacheHelper.mostrarLogsSegonPla())
 			logger.info("Fin de tasca periòdica: Enviar email per comentari metaexpedient :  " + (System.currentTimeMillis() - t1) + " ms");
 	}
-	
 	
 	@Override
 	@Transactional
@@ -317,32 +313,60 @@ public class SegonPlaServiceImpl implements SegonPlaService {
             for (Map.Entry<EventTipusEnumDto, List<EmailPendentEnviarEntity>> entry : eventTipos.entrySet()) {
 
                 String header = "";
-                if (entry.getKey() == EventTipusEnumDto.AGAFAT_ALTRE_USUARI) {
-                    header = "Elements de l'escriptori agafats per un altre usuari";
-                } else if (entry.getKey() == EventTipusEnumDto.CANVI_ESTAT_PORTAFIRMES) {
-                    header = "Canvi d'estat de documents enviat a portafirmes";
-                } else if(entry.getKey() == EventTipusEnumDto.CANVI_ESTAT_NOTIFICACIO) {
-                    header = "Canvi d'estat de notificacions";
-                } else if(entry.getKey() == EventTipusEnumDto.CANVI_ESTAT_TASCA) {
-                    header = "Canvi d'estat de tasques";
-                } else if(entry.getKey() == EventTipusEnumDto.CANVI_ESTAT_VIAFIRMA) {
-                    header = "Canvi d'estat de documents enviat a ViaFirma";
-                } else if(entry.getKey() == EventTipusEnumDto.CANVI_ESTAT_REVISIO) {
-                    header = "Canvi d'estat de revisió de procediments";
-                } else if(entry.getKey() == EventTipusEnumDto.PROCEDIMENT_COMENTARI) {
-                    header = "Nous comentaris en els procediments";
-                } else if (entry.getKey() == EventTipusEnumDto.NOVA_ANOTACIO) {
-                    header = "Noves anotacions pendents";
-                } else if (entry.getKey() == EventTipusEnumDto.CANVI_RESPONSABLES_TASCA) {
-                    header = "Canvi de responsables de tasques";
-                } else if (entry.getKey() == EventTipusEnumDto.ALLIBERAT) {
-                    header = "Elements de l'escriptori alliberats";
-                } else if (entry.getKey() == EventTipusEnumDto.MODIFICACIO_DATALIMIT_TASCA) {
-                    header = "Modificació data límit de tasques";
-                } else if (entry.getKey() == EventTipusEnumDto.DELEGAT_TASCA) {
-                    header = "Assignació delegat de tasques";
-                } else if (entry.getKey() == EventTipusEnumDto.CANCELAR_DELEGACIO_TASCA) {
-                    header = "Cancel·lació delegat de tasques";
+                switch (entry.getKey()) {
+                    case AGAFAT_ALTRE_USUARI:
+                        header = "Elements de l'escriptori agafats per un altre usuari";
+                        break;
+                    case CANVI_ESTAT_PORTAFIRMES:
+                        header = "Canvi d'estat de documents enviat a portafirmes";
+                        break;
+                    case FIRMA_PARCIAL_PORTAFIB:
+                        header = "Firma parcial de documents enviat a portafirmes";
+                        break;
+                    case CANVI_ESTAT_NOTIFICACIO:
+                        header = "Canvi d'estat de notificacions";
+                        break;
+                    case CANVI_ESTAT_TASCA:
+                        header = "Canvi d'estat de tasques";
+                        break;
+                    case CANVI_ESTAT_VIAFIRMA:
+                        header = "Canvi d'estat de documents enviat a ViaFirma";
+                        break;
+                    case CANVI_ESTAT_REVISIO:
+                        header = "Canvi d'estat de revisió de procediments";
+                        break;
+                    case PROCEDIMENT_COMENTARI:
+                        header = "Nous comentaris en els procediments";
+                        break;
+                    case MENCIO_COMENTARI:
+                        header = "Mencions en comentaris";
+                        break;
+                    case NOVA_ANOTACIO:
+                        header = "Noves anotacions pendents";
+                        break;
+                    case CANVI_RESPONSABLES_TASCA:
+                        header = "Canvi de responsables de tasques";
+                        break;
+                    case ALLIBERAT:
+                        header = "Elements de l'escriptori alliberats";
+                        break;
+                    case MODIFICACIO_DATALIMIT_TASCA:
+                        header = "Modificació data límit de tasques";
+                        break;
+                    case DELEGAT_TASCA:
+                        header = "Assignació delegat de tasques";
+                        break;
+                    case CANCELAR_DELEGACIO_TASCA:
+                        header = "Cancel·lació delegat de tasques";
+                        break;
+                    case EXEC_MASSIVA_FINALITZADA:
+                        header = "Execucions massives finalitzades";
+                        break;
+                    case AVIS_ERROR_TANCAMENT_ARXIU:
+                        header = "Errors en el tancament d'expedients a l'arxiu";
+                        break;
+                    default:
+                        break;
                 }
 
                 text += header + "\n";
@@ -367,13 +391,16 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 
             mailSender.send(message);
         } catch (MessagingException e) {
-            e.printStackTrace();
+            // Es propaga perquè el bucle que invoca aquest mètode aplica la lògica
+            // de reintent/retenció; així no s'esborren correus que no s'han enviat.
+            throw new RuntimeException("No s'ha pogut muntar o enviar el correu agrupat al destinatari " + emailDestinatari, e);
         }
-		
+
+		// Només s'esborren els pendents un cop s'ha enviat el correu correctament.
 		for (EmailPendentEnviarEntity emailPendent : emailPendents) {
 			emailPendentEnviarRepository.delete(emailPendent);
 		}
-		
+
 	}
 
 	@Override

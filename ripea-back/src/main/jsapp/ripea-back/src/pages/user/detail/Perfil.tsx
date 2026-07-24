@@ -135,6 +135,8 @@ const PerfilFrom = () =>{
                     <GridFormField name="rebreEmailsAgrupats" componentProps={{ sx: { ml: 2 } }} disabled={!rebreEmailsGlobal} />
                     <GridFormField name="rebreEmailsCanviEstatRevisio" componentProps={{ sx: { ml: 2 } }} disabled={!rebreEmailsGlobal} />
                     <GridFormField name="rebreAvisosNovesAnotacions" componentProps={{ sx: { ml: 2 } }} disabled={!rebreEmailsGlobal} />
+                    <GridFormField name="rebreEmailsAccioMassiva" componentProps={{ sx: { ml: 2 } }} disabled={!rebreEmailsGlobal} />
+                    <GridFormField name="rebreEmailsMencioComentari" componentProps={{ sx: { ml: 2 } }} disabled={!rebreEmailsGlobal} />
                 </Grid>
             </CardData>
 

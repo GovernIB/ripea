@@ -375,7 +375,7 @@ public class ExecucioMassivaHelper {
 					dto.getPortafirmesFluxId(),
 					dto.getPortafirmesTransaccioId(),
 					dto.getDataCaducitat(), 
-					dto.getEnviarCorreu(),
+					dto.getEnviarCorreu(), //Aquest camp no aplica, s'enviará el correu si el usuari ho té configurat al perfil.
 					entitat,
 					dto.getRolActual(),
 					dto.getPortafirmesAvisFirmaParcial(),
