@@ -73,6 +73,7 @@ public class IntegracioHelper {
 		integracions.add(novaIntegracio(INTCODI_DISTRIBUCIO));
 		integracions.add(novaIntegracio(INTCODI_USUARIS));
 		integracions.add(novaIntegracio(INTCODI_CONVERT));
+		integracions.add(novaIntegracio(INTCODI_UNITATS));
 		integracions.add(novaIntegracio(INTCODI_DADESEXT));
 		integracions.add(novaIntegracio(INTCODI_NOTIFICACIO));
 		integracions.add(novaIntegracio(INTCODI_VIAFIRMA));

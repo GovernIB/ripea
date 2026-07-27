@@ -16,8 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class UnitatsOrganitzativesRestClient extends RestClient{
 
-
-
 	public UnitatsOrganitzativesRestClient() {}
 	public UnitatsOrganitzativesRestClient(
 			String baseUrl,
@@ -40,7 +38,6 @@ public class UnitatsOrganitzativesRestClient extends RestClient{
 		this.password = password;
 		this.autenticacioBasic = autenticacioBasic;
 	}
-
 
 	public List<UnidadRest> obtenerArbolUnidades(String codigo, String fechaActualizacion, String fechaSincronizacion) {
 		try {
@@ -77,11 +74,5 @@ public class UnitatsOrganitzativesRestClient extends RestClient{
 			throw new RuntimeException(ex);
 		}
 	}
-	
-
-	
-
-	
-
 
 }

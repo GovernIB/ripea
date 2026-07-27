@@ -90,6 +90,7 @@ import es.caib.ripea.persistence.entity.DocumentEnviamentInteressatEntity;
 import es.caib.ripea.persistence.entity.DocumentNotificacioEntity;
 import es.caib.ripea.persistence.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.persistence.entity.DocumentViaFirmaEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.ExpedientPeticioEntity;
 import es.caib.ripea.persistence.entity.ExpedientTascaEntity;
@@ -107,6 +108,7 @@ import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.repository.DocumentEnviamentInteressatRepository;
 import es.caib.ripea.persistence.repository.DocumentPortafirmesRepository;
 import es.caib.ripea.persistence.repository.DocumentRepository;
+import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
 import es.caib.ripea.persistence.repository.FluxFirmaUsuariRepository;
 import es.caib.ripea.persistence.repository.MetaDocumentFluxPortafibRepository;
@@ -305,6 +307,7 @@ public class PluginHelper {
 	@Autowired private UsuariRepository usuariRepository;
 	@Autowired private DocumentPortafirmesRepository documentPortafirmesRepository;
 	@Autowired private DocumentRepository documentRepository;
+	@Autowired private EntitatRepository entitatRepository;
 
 	public List<String> rolsUsuariFindAmbCodi(String usuariCodi) {
 
@@ -7526,8 +7529,11 @@ public class PluginHelper {
 	}
 
 	private UnitatsOrganitzativesPlugin getUnitatsOrganitzativesPlugin() {
+		return getUnitatsOrganitzativesPlugin(configHelper.getEntitatActualCodi());
+	}
 
-		String entitatCodi = configHelper.getEntitatActualCodi();
+	private UnitatsOrganitzativesPlugin getUnitatsOrganitzativesPlugin(String entitatCodi) {
+
 		if (StringUtils.isEmpty(entitatCodi)) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
@@ -9095,6 +9101,13 @@ public class PluginHelper {
 				} else {
 					return new GenericDto("integracio.diag.conv.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic.getMessage()}, resultatDiagnostic);
 				}
+			} else if (codi.equals(IntegracioHelper.INTCODI_UNITATS)) {
+				Exception resultatDiagnostic = unitatsOrganitzativesDiagnostic(filtre);
+				if (resultatDiagnostic==null) {
+					return new GenericDto("integracio.diag.uo.ok", "fa fa-check verd", new Object[] {codi});
+				} else {
+					return new GenericDto("integracio.diag.uo.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic.getMessage()}, resultatDiagnostic);
+				}
 			} else if (codi.equals(IntegracioHelper.INTCODI_DADESEXT)) {
 				Exception resultatDiagnostic = dadesExternesDiagnostic(filtre);
 				if (resultatDiagnostic==null) {
@@ -9344,6 +9357,25 @@ public class PluginHelper {
 		}	
 	}
 	
+	public Exception unitatsOrganitzativesDiagnostic(DiagnosticFiltreDto filtre) {
+		try {
+			EntitatEntity entitat = entitatRepository.findByCodi(filtre.getEntitatCodi());
+			String codiDir3 = entitat != null && Utils.hasValue(entitat.getUnitatArrel()) ? entitat.getUnitatArrel() : filtre.getOrganCodi();
+			if (!Utils.hasValue(codiDir3)) {
+				return new Exception("L'entitat no té definida la unitat arrel DIR3.");
+			}
+			UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin = getUnitatsOrganitzativesPlugin(filtre.getEntitatCodi());
+			// Consulta d'una única unitat (la més lleugera del plugin). S'utilitza la sobrecàrrega amb dates
+			// a null perquè no comprova la vigència de la unitat i retorna null en lloc de llançar excepció.
+			if (unitatsOrganitzativesPlugin.findAmbCodi(codiDir3, null, null) == null) {
+				return new Exception("La consulta no ha retornat cap unitat organitzativa (codi=" + codiDir3 + ").");
+			}
+			return null;
+		} catch (Exception ex) {
+			return ex;
+		}
+	}
+
 	public Exception dadesExternesDiagnostic(DiagnosticFiltreDto filtre) {
 		try {
 			DadesExternesPlugin dadesExternesPlugin = getDadesExternesPlugin(filtre.getEntitatCodi(), filtre.getOrganCodi());
