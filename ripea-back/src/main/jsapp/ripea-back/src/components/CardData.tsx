@@ -203,7 +203,7 @@ export const DetailCardContent = (props:DetailCardContentProps) => {
 }
 
 export const CardData = (props:CardDataProps) => {
-    const {icon, title, header, children, size = 12, hidden, hiddenIfEmpty, buttons, cardProps, headerProps, variant = "h4", ...other} = props;
+    const {icon, title, header, children, size = 12, hidden, hiddenIfEmpty, buttons, cardProps, headerProps, variant = "h6", ...other} = props;
 
     if (hidden || (hiddenIfEmpty && isEmpty(children))){
         return <></>

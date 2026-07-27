@@ -267,6 +267,7 @@ const baseComponentStyles: ThemeOptions['components'] = {
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
+                fontSize: '1.5rem',
             },
         },
     },
