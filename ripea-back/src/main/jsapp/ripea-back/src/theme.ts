@@ -294,6 +294,18 @@ const baseComponentStyles: ThemeOptions['components'] = {
     MuiOutlinedInput: {
         styleOverrides: {},
     },
+    MuiBadge: {
+        styleOverrides: {
+            badge: {
+                '.MuiDrawer-paper &': {
+                    overflowWrap: 'normal',
+                    wordBreak: 'keep-all',
+                    whiteSpace: 'nowrap',
+                    padding: '0px 4px',
+                },
+            },
+        },
+    },
 };
 
 // ── TEMA CLAR (LIGHT) ────────────────────────────────────────────────────

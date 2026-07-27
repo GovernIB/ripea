@@ -821,6 +821,7 @@ const translationEn = {
                 seguidors: {
                     label: "Followers",
                     title: "Case followers",
+                    noResults: "This case file has no followers.",
                 },
             },
             results: {

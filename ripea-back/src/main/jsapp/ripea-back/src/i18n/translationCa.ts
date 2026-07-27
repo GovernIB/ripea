@@ -821,6 +821,7 @@ const translationCa = {
                 seguidors: {
                     label: "Seguidors",
                     title: "Seguidors de l’expedient",
+                    noResults: "Aquest expedient no te seguidors.",
                 },
             },
             results: {

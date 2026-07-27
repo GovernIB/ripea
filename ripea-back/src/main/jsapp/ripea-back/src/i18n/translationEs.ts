@@ -821,6 +821,7 @@ const translationEs = {
                 seguidors: {
                     label: "Seguidores",
                     title: "Seguidores del expediente",
+                    noResults: "Este expediente no tiene seguidores.",
                 },
             },
             results: {
