@@ -771,6 +771,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedientTasca.getDataLimit(),
 				metaExpedientTasca.getDuracio(),
 				metaExpedientTasca.getPrioritat(),
+                entity.isInicialitzarAutomaticament(),
 				estatCrearTasca,
 				estatFinalitzarTasca);
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {

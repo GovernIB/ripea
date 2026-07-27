@@ -666,6 +666,7 @@ public class MetaExpedientHelper {
 				metaExpedientTasca.getDataLimit(),
 				metaExpedientTasca.getDuracio(),
 				metaExpedientTasca.getPrioritat(),
+                metaExpedientTasca.isInicialitzarAutomaticament(),
 				estatCrearTasca,
 				estatFinalitzarTasca);
 
@@ -721,6 +722,7 @@ public class MetaExpedientHelper {
 					metaExpedientTasca.getDataLimit(),
 					metaExpedientTasca.getDuracio(),
 					metaExpedientTasca.getPrioritat(),
+                    false,
 					estatCrearTasca,
 					estatFinalitzarTasca).build();
 			if (rolActual.equals("IPA_ORGAN_ADMIN")) {

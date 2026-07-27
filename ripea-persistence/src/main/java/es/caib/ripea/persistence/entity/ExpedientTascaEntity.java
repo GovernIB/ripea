@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.ripea.persistence.entity;
 
@@ -34,7 +34,7 @@ import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
 
 /**
  * Classe del model de dades que representa una tasca del expedient.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Entity
@@ -47,17 +47,17 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 	@JoinColumn(name = "expedient_id")
 	@ForeignKey(name = BaseConfig.DB_PREFIX + "exp_exptasc_fk")
 	private ExpedientEntity expedient;
-	
+
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "metaexp_tasca_id")
 	@ForeignKey(name = BaseConfig.DB_PREFIX + "metaexptasca_exptasc_fk")
 	private MetaExpedientTascaEntity metaExpedientTasca;
-	
+
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "responsable_actual_codi")
 	@ForeignKey(name = BaseConfig.DB_PREFIX + "usuari_exptasc_fk")
 	private UsuariEntity responsableActual;
-	
+
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(
 			name = BaseConfig.DB_PREFIX + "expedient_tasca_resp",
@@ -66,11 +66,11 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 			foreignKey = @javax.persistence.ForeignKey(name = BaseConfig.DB_PREFIX + "expedient_tasca_fk"),
 			inverseForeignKey = @javax.persistence.ForeignKey(name = BaseConfig.DB_PREFIX + "expedient_tascaresp_fk"))
 	private List<UsuariEntity> responsables = new ArrayList<UsuariEntity>();
-	
+
 	@OneToOne
 	@JoinColumn(name = "delegat")
 	private UsuariEntity delegat;
-	
+
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(
 			name = BaseConfig.DB_PREFIX + "expedient_tasca_obse",
@@ -79,11 +79,11 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 			foreignKey = @javax.persistence.ForeignKey(name = BaseConfig.DB_PREFIX + "expedient_obse_tasca_fk"),
 			inverseForeignKey = @javax.persistence.ForeignKey(name = BaseConfig.DB_PREFIX + "expedient_tascaobse_fk"))
 	private List<UsuariEntity> observadors = new ArrayList<UsuariEntity>();
-	
+
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "data_inici", nullable = false)
 	private Date dataInici;
-	
+
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "data_fi")
 	private Date dataFi;
@@ -91,7 +91,7 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 	@Column(name = "estat", length = 20, nullable = false)
 	@Enumerated(EnumType.STRING)
 	private TascaEstatEnumDto estat;
-	
+
 	@Column(name = "motiu_rebuig", length = 1024)
 	private String motiuRebuig;
 
@@ -115,13 +115,13 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 			orphanRemoval = true)
 	@OrderBy("createdDate")
 	private List<ExpedientTascaComentariEntity> comentaris = new ArrayList<>();
-	
+
 	@Column(name = "titol", length = 255)
 	private String titol;
-	
+
 	@Column(name = "observacions", length = 1024)
 	private String observacions;
-	
+
 	public static Builder getBuilder(
 			ExpedientEntity expedient,
 			MetaExpedientTascaEntity metaExpedientTasca,
@@ -143,7 +143,7 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 				prioritat,
 				observacions);
 	}
-	
+
 	public static class Builder {
 		ExpedientTascaEntity built;
 		Builder(
@@ -177,7 +177,7 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 	public void updateResponsableActual(UsuariEntity responsableActual) {
 		this.responsableActual = responsableActual;
 	}
-	
+
 	public void updateEstat(TascaEstatEnumDto estat) {
 		this.estat = estat;
 		if (estat == TascaEstatEnumDto.FINALITZADA) {
@@ -194,7 +194,10 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 		this.motiuRebuig = motiuRebuig;
 		this.estat = TascaEstatEnumDto.REBUTJADA;
 	}
-	
+    public void updateDataInici(Date dataInici) {
+        this.dataInici = dataInici;
+    }
+
 	public ExpedientEntity getExpedient() {
 		return expedient;
 	}
@@ -257,7 +260,7 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 	public String getObservacions() {
 		return observacions;
 	}
-	
+
 	public Integer getDuracio() { return duracio; }
 	public void setDuracio(Integer duracio) { this.duracio = duracio; }
 	public PrioritatEnumDto getPrioritat() { return prioritat; }

@@ -25,6 +25,7 @@ public class MetaExpedientTascaDto implements Serializable {
 	private String descripcio;
 	private String responsable;
 	private boolean activa;
+    private boolean inicialitzarAutomaticament;
 	private Date dataLimit;
 	@SuppressWarnings("unused")
 	private String dataLimitString;

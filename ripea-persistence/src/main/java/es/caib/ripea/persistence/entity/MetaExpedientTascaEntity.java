@@ -59,6 +59,8 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 	private String responsable;
 	@Column(name = "activa", nullable = false)
 	private boolean activa;
+    @Column(name = "inicialitzar_automaticament", nullable = false)
+    private boolean inicialitzarAutomaticament;
 	@Temporal(TemporalType.DATE)
 	@Column(name = "data_limit")
 	private Date dataLimit;
@@ -97,6 +99,7 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 			Date dataLimit,
 			Integer duracio,
 			PrioritatEnumDto prioritat,
+            boolean inicialitzarAutomaticament,
 			ExpedientEstatEntity estatCrearTasca,
 			ExpedientEstatEntity estatFinalitzarTasca) {
 		this.codi = codi;
@@ -111,7 +114,8 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 			cal.add(Calendar.DAY_OF_YEAR, duracio);
 			this.dataLimit = cal.getTime();
 		}
-		this.prioritat = prioritat != null ? prioritat : PrioritatEnumDto.B_NORMAL;
+        this.prioritat = prioritat != null ? prioritat : PrioritatEnumDto.B_NORMAL;
+        this.inicialitzarAutomaticament = inicialitzarAutomaticament;
 		this.estatCrearTasca = estatCrearTasca;
 		this.estatFinalitzarTasca = estatFinalitzarTasca;
 	}
@@ -130,6 +134,7 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 			Date dataLimit,
 			Integer duracio,
 			PrioritatEnumDto prioritat,
+            boolean inicialitzarAutomaticament,
 			ExpedientEstatEntity estatCrearTasca,
 			ExpedientEstatEntity estatFinalitzarTasca) {
 		return new Builder(
@@ -142,6 +147,7 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 				dataLimit,
 				duracio,
 				prioritat,
+                inicialitzarAutomaticament,
 				estatCrearTasca,
 				estatFinalitzarTasca);
 	}
@@ -157,6 +163,7 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 				Date dataLimit,
 				Integer duracio,
 				PrioritatEnumDto prioritat,
+                boolean inicialitzarAutomaticament,
 				ExpedientEstatEntity estatCrearTasca,
 				ExpedientEstatEntity estatFinalitzarTasca) {
 			built = new MetaExpedientTascaEntity();
@@ -174,6 +181,7 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 				built.dataLimit = cal.getTime();
 			}
 			built.prioritat = prioritat != null ? prioritat : PrioritatEnumDto.B_NORMAL;
+            built.inicialitzarAutomaticament = inicialitzarAutomaticament;
 			built.estatCrearTasca = estatCrearTasca;
 			built.estatFinalitzarTasca = estatFinalitzarTasca;
 		}

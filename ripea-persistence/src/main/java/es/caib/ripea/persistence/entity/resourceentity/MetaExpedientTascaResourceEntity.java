@@ -46,6 +46,8 @@ public class MetaExpedientTascaResourceEntity extends BaseAuditableEntity<MetaEx
     protected UsuariResourceEntity responsable;
     @Column(name = "activa", nullable = false)
     private boolean activa;
+    @Column(name = "inicialitzar_automaticament", nullable = false)
+    private boolean inicialitzarAutomaticament;
     @Temporal(TemporalType.DATE)
     @Column(name = "data_limit")
     private Date dataLimit;

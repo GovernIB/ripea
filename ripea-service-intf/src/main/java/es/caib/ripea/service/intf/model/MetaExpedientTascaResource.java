@@ -52,6 +52,7 @@ public class MetaExpedientTascaResource extends BaseAuditableResource<Long> {
     @NotNull private String descripcio;
     private ResourceReference<UsuariResource, String> responsable;
     private boolean activa = true;
+    private boolean inicialitzarAutomaticament;
     private Date dataLimit;
     @SuppressWarnings("unused")
     private String dataLimitString;
