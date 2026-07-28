@@ -144,7 +144,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
     const toolbarElements = [
         {
             position: 0,
-            element: <Chip label={t('common.filterCount', {num: filterNum})} size={"small"} />,
+            element: <Chip label={t('common.filterCount', {num: filterNum})} size={"small"} icon={<Icon>filter_alt</Icon>} color={"primary"} sx={{px: 0.5}} />,
             hidden: !toolbarShowFilterCount || !filterNum,
         },
         {

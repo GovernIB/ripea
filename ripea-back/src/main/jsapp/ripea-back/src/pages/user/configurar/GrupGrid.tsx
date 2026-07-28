@@ -118,6 +118,7 @@ const GrupGrid = () => {
                 popupEditFormContent={<GrupForm/>}
                 columns={columns}
                 filter={springFilter}
+                toolbarShowFilterCount
                 sortModel={sortModel}
                 perspectives={perspectives}
                 rowAdditionalActions={actions}

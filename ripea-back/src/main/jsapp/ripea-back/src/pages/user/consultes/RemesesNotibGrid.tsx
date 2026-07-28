@@ -173,6 +173,7 @@ const RemesesNotibGrid = () => {
 				persistentStateKey={"documentNotificacioResource_remesesEnviades"}
                 columns={columns}
                 filter={springFilter}
+                toolbarShowFilterCount
                 sortModel={sortModel}
                 rowAdditionalActions={actions}
                 toolbarMassiveActions={massiveActions}

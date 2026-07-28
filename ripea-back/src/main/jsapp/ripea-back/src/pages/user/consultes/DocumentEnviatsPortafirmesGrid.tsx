@@ -160,6 +160,7 @@ const DocumentEnviatsPortafirmesGrid = () => {
 				persistentStateKey={"documentPortafirmesResource_consulta"}
                 columns={columns}
                 filter={springFilter}
+                toolbarShowFilterCount
                 sortModel={sortModel}
                 rowAdditionalActions={actions}
                 readOnly

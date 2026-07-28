@@ -36,21 +36,15 @@ const baseComponentStyles: ThemeOptions['components'] = {
                 alignItems: 'baseline !important',
                 whiteSpace: 'break-spaces !important',
             },
-            // Fons neutre per defecte. Cada tema el pot sobreescriure amb el
-            // color secundari corresponent (veure comentari a cada tema).
             '.styledFilter': {
                 marginBottom: '16px',
                 paddingTop: '11px',
                 paddingBottom: '16px',
-                paddingLeft: '16px',
-                paddingRight: '16px',
+                // paddingLeft: '16px',
+                // paddingRight: '16px',
                 borderRadius: '4px',
                 backgroundColor: 'inherit',
             },
-            // TODO: revisar més endavant si `.input` es fa servir realment
-            // (classe aplicada a MuiInputBase-root / MuiPickersInputBase-root
-            // en algun formulari). Recuperat de la versió amb buildTheme; si
-            // no es fa servir enlloc, simplement no farà res.
             '.input': {
                 '& .MuiInputBase-root, & .MuiPickersInputBase-root': {
                     backgroundColor: 'inherit',
@@ -137,10 +131,6 @@ const baseComponentStyles: ThemeOptions['components'] = {
                 '& .MuiDataGrid-treeDataGroupingCellToggle': {
                     marginRight: 0,
                 },
-                // Recuperat: ratllat de files parells (zebra striping) i hover
-                // en color primari. El color concret (secondary/primary main)
-                // es defineix a cada tema perquè depèn de la palette pròpia.
-
             },
             row: {
                 minHeight: '45px !important',
@@ -196,8 +186,6 @@ const baseComponentStyles: ThemeOptions['components'] = {
             paper: {
                 right: 'auto',
                 left: 0,
-                // El color de fons (drawerBg) es defineix a cada tema, ja que
-                // depèn del primary de cada palette.
             },
         },
     },

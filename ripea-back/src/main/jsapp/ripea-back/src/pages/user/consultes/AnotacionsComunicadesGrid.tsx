@@ -233,6 +233,7 @@ const AnotacionsComunicadesGrid = () => {
                     persistentStateKey={'expedientPeticioResource_anotacionsComunicades'}
                     columns={columns}
                     filter={springFilter}
+                    toolbarShowFilterCount
                     sortModel={sortModel}
                     namedQueries={namedQueries}
                     rowAdditionalActions={actions}
