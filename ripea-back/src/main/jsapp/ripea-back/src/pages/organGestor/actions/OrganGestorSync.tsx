@@ -1,11 +1,18 @@
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import {Grid, Divider, Typography, Alert} from "@mui/material";
+import {Grid, Divider, Typography, Alert, Theme} from "@mui/material";
 import {useMemo, useRef, useState} from "react";
 import {MuiDialog, useBaseAppContext, useResourceApiService} from "reactlib";
 import {CardData} from "../../../components/CardData.tsx";
 import Load from "../../../components/Load.tsx";
 import {useTranslation} from "react-i18next";
+
+const LIGHT_BACKGROUND_GREEN = "#d6e9c6";
+const LIGHT_BACKGROUND_YELLOW = "#faebcc";
+const LIGHT_BACKGROUND_RED = "#f8d7da";
+const DARK_BACKGROUND_GREEN = "#485c48";
+const DARK_BACKGROUND_YELLOW = "#756c44";
+const DARK_BACKGROUND_RED = "#6e0202";
 
 /*
 He aplicado un parche en OrganGestorGrid.tsx para que Node no haga spread de todas las props dentro de sx
@@ -23,7 +30,8 @@ const Node = (props: any) => {
                 borderRadius: 2,
                 fontWeight: "bold",
                 boxShadow: 2,
-                minWidth: 50,
+                width: 650,
+                flexShrink: 0,
                 flexGrow: 0,
                 paddingLeft: '0 !important',
                 paddingTop: '0 !important',
@@ -38,20 +46,45 @@ const Node = (props: any) => {
 const NodeGrup = (props: any) => {
     const { nodeKey, values, divider } = props;
     return (
-        <Grid container direction="row" wrap="nowrap" justifyContent={"space-around"} alignItems="center" columnSpacing={1} rowSpacing={1}>
-            {nodeKey && <Node backgroundColor="#d6e9c6" color="black" minWidth="40% !important">
-                <Typography sx={{fontSize: '1rem', padding: '5px'}}>{`${nodeKey?.codi} - ${nodeKey.denominacioCooficial}`}</Typography>
-            </Node>
-            }
+        <Grid
+            container
+            direction="row"
+            wrap="nowrap"
+            justifyContent={'space-between'}
+            alignItems="center"
+            columnSpacing={1}
+            rowSpacing={1}
+            sx={{ width: '100%' }}
+        >
+            {nodeKey && (
+                <Node
+                    backgroundColor={(theme: Theme) => (theme.palette.mode === 'dark' ? DARK_BACKGROUND_GREEN : LIGHT_BACKGROUND_GREEN)}
+                    color="text.primary"
+                >
+                    <Typography
+                        sx={{ fontSize: '1rem', padding: '5px' }}
+                    >{`${nodeKey?.codi} - ${nodeKey.denominacioCooficial}`}</Typography>
+                </Node>
+            )}
             {(divider || (nodeKey && values)) && (
-                <Grid sx={{display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <Divider orientation="horizontal" flexItem sx={{ borderColor: "black", borderWidth: 2, width: 40 }}/>
+                <Grid sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Divider orientation="horizontal" flexItem sx={{ borderColor: 'text.primary', borderWidth: 2, width: 100 }} />
                 </Grid>
             )}
-            {values?.map((value:any) => <Node backgroundColor="#faebcc" color="black" minWidth="40% !important">
-                <Typography sx={{fontSize: '1rem', padding: '5px'}}>{`${value?.codi} - ${value.denominacioCooficial}`}</Typography>
-            </Node>)
-            }
+            <Grid container direction="column" spacing={1}>
+                {values?.map((value: any) => (
+                    <Node
+                        backgroundColor={(theme: Theme) =>
+                            theme.palette.mode === 'dark' ? DARK_BACKGROUND_YELLOW : LIGHT_BACKGROUND_YELLOW
+                        }
+                        color="text.primary"
+                    >
+                        <Typography
+                            sx={{ fontSize: '1rem', padding: '5px' }}
+                        >{`${value?.codi} - ${value.denominacioCooficial}`}</Typography>
+                    </Node>
+                ))}
+            </Grid>
         </Grid>
     );
 };
@@ -189,7 +222,7 @@ export const useOrganGestorSyncDialog = () => {
             open={open}
             closeCallback={handleClose}
             title={t('page.organGestor.action.actualitzar.title')}
-            componentProps={{ fullWidth: true, maxWidth: 'lg' }}
+            componentProps={{ fullWidth: true, maxWidth: 'xl' }}
             buttons={buttons}
             buttonCallback={(value :any) :void => {
                 switch (value){
@@ -230,30 +263,36 @@ export const useOrganGestorSyncDialog = () => {
                         </CardData>
                         <CardData title={t('page.organGestor.action.actualitzar.tabs.change')} rowSpacing={2} hidden={prediccio?.unitatsVigents?.length == 0}>
                             {prediccio?.unitatsVigents?.map?.((unitat:any) => <>
-                                <Grid container direction="row" wrap="nowrap" justifyContent={"space-around"} alignItems="center" columnSpacing={1} rowSpacing={1}>
-                                    <Node backgroundColor="#d6e9c6" color="black" minWidth="40% !important">
+                                <Grid container direction="row" wrap="nowrap" justifyContent={"space-between"} alignItems="center" columnSpacing={1} rowSpacing={1} sx={{width: "100%"}}>
+                                    <Node backgroundColor={(theme: Theme) => theme.palette.mode === 'dark' ? DARK_BACKGROUND_GREEN : LIGHT_BACKGROUND_GREEN} color="text.primary">
                                         <Typography sx={{fontSize: '1rem', padding: '5px'}}>{`${unitat?.codi} - ${unitat.oldDenominacio}`}</Typography>
                                     </Node>
                                     <Grid sx={{display: "flex", alignItems: "center", justifyContent: "center" }}>
-                                        <Divider orientation="horizontal" flexItem sx={{ borderColor: "black", borderWidth: 2, width: 40 }}/>
+                                        <Divider orientation="horizontal" flexItem sx={{ borderColor: "text.primary", borderWidth: 2, width: 100 }}/>
                                     </Grid>
-                                    <Node backgroundColor="#faebcc" color="black" minWidth="40% !important">
+                                    <Node backgroundColor={(theme: Theme) => theme.palette.mode === 'dark' ? DARK_BACKGROUND_YELLOW : LIGHT_BACKGROUND_YELLOW} color="text.primary" >
                                         <Typography sx={{fontSize: '1rem', padding: '5px'}}>{`${unitat?.codi} - ${unitat.denominacioCooficial}`}</Typography>
                                     </Node>
                                 </Grid>
                             </>)}
                         </CardData>
                         <CardData title={t('page.organGestor.action.actualitzar.tabs.new')} rowSpacing={2} hidden={prediccio?.unitatsNew?.length == 0}>
-                            {prediccio?.unitatsNew?.map?.((unitat:any) => <NodeGrup nodeKey={unitat}/>)}
-                        </CardData>
-                        <CardData title={t('page.organGestor.action.actualitzar.tabs.del')} rowSpacing={2} hidden={prediccio?.unitatsExtingides?.length == 0}>
-                            {prediccio?.unitatsExtingides?.map?.((unitat:any) =>
-                                <Grid container direction="row" wrap="nowrap" justifyContent={"space-around"} alignItems="center" columnSpacing={1} rowSpacing={1}>
-                                    <Node backgroundColor="#f8d7da" color="black" minWidth="40% !important">
+                            <Grid container direction="row"  justifyContent={"space-between"} alignItems="center" columnSpacing={1} rowSpacing={1} sx={{width: "100%"}}>
+                                {prediccio?.unitatsNew?.map?.((unitat:any) =>
+                                    <Node backgroundColor={(theme: Theme) => theme.palette.mode === 'dark' ? DARK_BACKGROUND_GREEN : LIGHT_BACKGROUND_GREEN} color="text.primary">
                                         <Typography sx={{fontSize: '1rem', padding: '5px'}}>{`${unitat?.codi} - ${unitat.denominacioCooficial}`}</Typography>
                                     </Node>
-                                </Grid>
+                                )}
+                            </Grid>
+                        </CardData>
+                        <CardData title={t('page.organGestor.action.actualitzar.tabs.del')} rowSpacing={2} hidden={prediccio?.unitatsExtingides?.length == 0}>
+                            <Grid container direction="row"  justifyContent={"space-between"} alignItems="center" columnSpacing={1} rowSpacing={1} sx={{width: "100%"}}>
+                            {prediccio?.unitatsExtingides?.map?.((unitat:any) =>
+                                <Node backgroundColor={(theme: Theme) => theme.palette.mode === 'dark' ? DARK_BACKGROUND_RED : LIGHT_BACKGROUND_RED} color="text.primary">
+                                    <Typography sx={{fontSize: '1rem', padding: '5px'}}>{`${unitat?.codi} - ${unitat.denominacioCooficial}`}</Typography>
+                                </Node>
                             )}
+                            </Grid>
                         </CardData>
                     </>}
                     </>}
