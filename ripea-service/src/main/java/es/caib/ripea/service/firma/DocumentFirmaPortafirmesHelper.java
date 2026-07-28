@@ -35,6 +35,7 @@ import es.caib.ripea.service.helper.ContingutLogHelper;
 import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.helper.DocumentHelper;
 import es.caib.ripea.service.helper.EmailHelper;
+import es.caib.ripea.service.helper.EventHelper;
 import es.caib.ripea.service.helper.ExceptionHelper;
 import es.caib.ripea.service.helper.OrganGestorHelper;
 import es.caib.ripea.service.helper.PluginHelper;
@@ -59,6 +60,7 @@ import es.caib.ripea.service.intf.dto.PortafirmesBlockDto;
 import es.caib.ripea.service.intf.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.service.intf.dto.PortafirmesPrioritatEnumDto;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
+import es.caib.ripea.service.intf.model.sse.FirmaEstatCanviatEvent;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.utils.Utils;
 
@@ -79,6 +81,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 	@Autowired private ContingutHelper contingutHelper;
 	@Autowired private OrganGestorHelper organGestorHelper;
     @Autowired private ConfigHelper configHelper;
+    @Autowired private EventHelper eventHelper;
 	
 	public void portafirmesEnviar(
 			Long entitatId,
@@ -291,9 +294,15 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 	 */
 	public Exception portafirmesProcessar(
 			DocumentPortafirmesEntity documentPortafirmes) {
-		
+
+		// Es declaren fora del try per poder notificar el canvi d'estat al finally, tant si el
+		// processament ha anat bé com si ha fallat: l'error també es reflecteix a les icones
+		// de la graella de contingut (errorEnviamentPortafirmes).
+		DocumentEntity document = null;
+		DocumentEstatEnumDto estatInicial = null;
 		try {
-			DocumentEntity document = documentPortafirmes.getDocument();
+			document = documentPortafirmes.getDocument();
+			estatInicial = document.getEstat();
 			organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(document.getId()));
 			DocumentEstatEnumDto documentEstatAnterior = document.getEstat();
 			PortafirmesCallbackEstatEnumDto callbackEstat = documentPortafirmes.getCallbackEstat();
@@ -415,10 +424,40 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 			return null;
 		} catch (Exception e) {
 			return e;
+		} finally {
+			notificarCanviEstatFirma(document, estatInicial);
 		}
 	}
-	
-	
+
+	/**
+	 * Notifica per SSE als usuaris que tenen obert l'expedient que l'estat de firma del document ha
+	 * canviat, perquè la graella de contingut refresqui les icones (ContingutIcon). L'enviament real
+	 * el difereix EventHelper fins després del commit, ja que el client hi reacciona rellegint de BBDD.
+	 *
+	 * Només s'envia si l'estat del document ha canviat realment: un callback PARCIAL d'un flux amb
+	 * diversos firmants no altera res del que es veu a la graella i no ha de provocar cap refresc.
+	 * Els casos d'error del processament sí que hi arriben, perquè quan es marca l'error de
+	 * l'enviament l'estat del document ja s'havia modificat.
+	 *
+	 * Mai no ha de fer fallar el processament de la firma: qualsevol error només es registra.
+	 */
+	private void notificarCanviEstatFirma(DocumentEntity document, DocumentEstatEnumDto estatInicial) {
+		if (document == null) {
+			return;
+		}
+		try {
+			if (document.getExpedient() == null || estatInicial == document.getEstat()) {
+				return;
+			}
+			eventHelper.notifyFirmaEstatCanviat(new FirmaEstatCanviatEvent(
+					document.getExpedient().getId(),
+					document.getId(),
+					document.getEstat()));
+		} catch (Exception ex) {
+			logger.error("Error notificant per SSE el canvi d'estat de firma del document " + document.getId(), ex);
+		}
+	}
+
 	private void actualitzarInfoDocumentPortafirmesGuardatArxiu(
 			DocumentPortafirmesEntity documentPortafirmes,
 			DocumentEstatEnumDto documentEstatAnterior) {

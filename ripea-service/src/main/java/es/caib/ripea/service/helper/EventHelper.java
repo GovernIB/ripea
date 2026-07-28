@@ -30,7 +30,9 @@ import es.caib.ripea.service.intf.model.sse.AnotacionsPendentsEvent;
 import es.caib.ripea.service.intf.model.sse.AvisosActiusEvent;
 import es.caib.ripea.service.intf.model.sse.CreacioFluxFinalitzatEvent;
 import es.caib.ripea.service.intf.model.sse.ErrorsValidacioChangedEvent;
+import es.caib.ripea.service.intf.model.sse.FirmaEstatCanviatEvent;
 import es.caib.ripea.service.intf.model.sse.FirmaFinalitzadaEvent;
+import es.caib.ripea.service.intf.model.sse.NotificacioEstatCanviatEvent;
 import es.caib.ripea.service.intf.model.sse.ScanFinalitzatEvent;
 import es.caib.ripea.service.intf.model.sse.TasquesPendentsEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -100,6 +102,40 @@ public class EventHelper {
     	} catch (Exception ex) {
     		log.error("Error al notifyErrorsValidacio a expedient", ex);
     	}
+    }
+
+    /**
+     * Notifica als clients subscrits a l'expedient que ha canviat l'estat de firma d'un document.
+     *
+     * A diferència de notifyErrorsValidacio (que viatja amb les dades ja calculades dins la mateixa
+     * transacció), aquest event és només un senyal: el client hi reacciona refrescant la graella, és a dir,
+     * tornant a llegir de BBDD. Per això l'enviament es difereix a afterCommit, com a notifyAvisosActius;
+     * si el publicàssim amb la transacció encara oberta, el refresc podria llegir l'estat anterior.
+     */
+    public void notifyFirmaEstatCanviat(FirmaEstatCanviatEvent firmaEvent) {
+    	TransactionAfterCommitUtils.run(() -> {
+        	try {
+        		log.debug("notifyFirmaEstatCanviat a expedients suscrits");
+        		jmsTemplate.convertAndSend("firmaEstat", firmaEvent);
+        	} catch (Exception ex) {
+        		log.error("Error al notifyFirmaEstatCanviat a expedients suscrits", ex);
+        	}
+    	});
+    }
+
+    /**
+     * Notifica als clients subscrits a l'expedient que ha canviat l'estat d'una notificació.
+     * Es difereix a afterCommit pel mateix motiu que notifyFirmaEstatCanviat.
+     */
+    public void notifyNotificacioEstatCanviat(NotificacioEstatCanviatEvent notificacioEvent) {
+    	TransactionAfterCommitUtils.run(() -> {
+        	try {
+        		log.debug("notifyNotificacioEstatCanviat a expedients suscrits");
+        		jmsTemplate.convertAndSend("notificacioEstat", notificacioEvent);
+        	} catch (Exception ex) {
+        		log.error("Error al notifyNotificacioEstatCanviat a expedients suscrits", ex);
+        	}
+    	});
     }
 
     public List<ValidacioErrorDto> getValidacionsInicialsExpedient(Long expedientId) {

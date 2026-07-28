@@ -1,5 +1,6 @@
-import React from "react";
+import React, {RefObject} from "react";
 import {useMuiDataGridApiRef} from "reactlib";
+import {GridApiPro, useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro";
 import {Grid, Icon} from "@mui/material";
 import useRemesaActions from "./details/RemesaActions.tsx";
 import GridFormField from "../../components/GridFormField.tsx";
@@ -9,6 +10,8 @@ import * as builder from "../../util/springFilterUtils.ts";
 import {useTranslation} from "react-i18next";
 import useRemesaDetail from "./details/RemesaDetail.tsx";
 import {StyledLabel} from "../../components/StyledLabel.tsx";
+import {useNotificacioEstatSession} from "../../components/SseExpedient.tsx";
+import useRowRefresh from "../../hooks/useRowRefresh.ts";
 
 export const EstatMessage = (props:any) => {
     const {title, icon, color, children} = props;
@@ -111,7 +114,17 @@ const RemesaGrid = (props:any) => {
     const { t } = useTranslation()
 
     const apiRef = useMuiDataGridApiRef()
+    const dataApiRef: RefObject<GridApiPro | null> = useMuiDatagridApiRef()
     const refresh = () => { apiRef?.current?.refresh?.(); }
+
+    // L'estat de les notificacions l'actualitza NOTIB de forma asíncrona (consulta o callback): quan
+    // canvia, rellegim només la fila afectada perquè la columna notificacioEstat, les dates d'enviament
+    // i finalització i l'icona d'error quedin al dia sense haver de tornar a demanar tot el llistat.
+    const refreshNotificacioRow = useRowRefresh('documentNotificacioResource', dataApiRef, {fallback: refresh});
+    const {onChange: onNotificacioEstatChange} = useNotificacioEstatSession();
+    onNotificacioEstatChange((event: any) => {
+        if (event?.expedientId == entity?.id) refreshNotificacioRow(event?.notificacioId);
+    });
 
     const {actions, components} = useRemesaActions(entity, refresh);
     const {handleOpen, dialog} = useRemesaDetail();
@@ -127,6 +140,7 @@ const RemesaGrid = (props:any) => {
             columns={columns}
             rowAdditionalActions={actions}
             apiRef={apiRef}
+            datagridApiRef={dataApiRef}
             onRowCountChange={onRowCountChange}
             disableColumnSorting
             toolbarHideCreate

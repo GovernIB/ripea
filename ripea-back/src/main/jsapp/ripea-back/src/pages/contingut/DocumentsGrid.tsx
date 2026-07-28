@@ -13,6 +13,8 @@ import * as builder from '../../util/springFilterUtils.ts';
 import { useUserSession } from "../../components/Session.tsx";
 import { useSessionList } from "../../components/SessionStorageContext.tsx";
 import DropZone from "../../components/DropZone.tsx";
+import {useFirmaEstatSession, useNotificacioEstatSession} from "../../components/SseExpedient.tsx";
+import useRowRefresh from "../../hooks/useRowRefresh.ts";
 import DocumentsGridForm from "./DocumentGridForm.tsx";
 import MetaExpedient, {formatMultiplicitat, MultiplicitatStyled} from "./details/MetaExpedient.tsx";
 import useVisualitzar from "./actions/Visualitzar.tsx";
@@ -222,6 +224,22 @@ const DocumentsGrid = (props: any) => {
             apiRef?.current?.refresh?.();
         }
     }
+
+    /**
+     * Canvis d'estat que arriben de fora de la sessió de l'usuari (callback del portafirmes i de NOTIB).
+     * Només rellegim la fila del document afectat: la perspectiva RESUM s'aplica fila a fila (errors de
+     * validació, darrera notificació, error d'enviament...), de manera que refrescar tot el llistat per
+     * repintar una icona costaria una consulta per document de l'expedient.
+     */
+    const refreshDocumentRow = useRowRefresh('documentResource', dataApiRef, {perspectives, fallback: refresh});
+    const {onChange: onFirmaEstatChange} = useFirmaEstatSession();
+    const {onChange: onNotificacioEstatChange} = useNotificacioEstatSession();
+    onFirmaEstatChange((event: any) => {
+        if (event?.expedientId == entity?.id) refreshDocumentRow(event?.documentId);
+    });
+    onNotificacioEstatChange((event: any) => {
+        if (event?.expedientId == entity?.id) refreshDocumentRow(event?.documentId);
+    });
 
     useEffect(() => {
         if (entity?.id == null) {

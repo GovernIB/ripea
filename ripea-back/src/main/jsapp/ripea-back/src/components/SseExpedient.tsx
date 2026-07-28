@@ -11,6 +11,8 @@ const sseExpedientKey = 'sseExpedient';
 const fluxCreateKey = 'flux_creat';
 const scanFinalitzatKey = 'scan_finalitzat';
 const validacioChangeKey = 'validacio_change';
+const firmaEstatKey = 'firma_estat';
+const notificacioEstatKey = 'notificacio_estat';
 const sseConnectedKey = 'exp_connect';
 
 // Bus en memòria amb la mateixa API de llista (get/save/remove/removeAll) que abans donava useSessionList,
@@ -59,9 +61,41 @@ const useTempSession = (key:string) => {
     };
 }
 
+/**
+ * Igual que useTempSession, però pensat per a events amb MÉS D'UN consumidor.
+ *
+ * useTempSession marca l'event com a processat mutant l'objecte compartit (value.processada), de manera
+ * que només el primer component que reacciona el processa. Aquí, en canvi, cada consumidor recorda
+ * localment quina instància d'event ja ha tractat, així tots hi reaccionen exactament una vegada.
+ * Cada event SSE arriba d'un JSON.parse nou, per tant la comparació per identitat és suficient.
+ */
+const useSharedTempSession = (key: string) => {
+    const { get } = useSseExpedientSession();
+    const onChangeRef = useRef<((newValue?: any) => void) | null>(null);
+    const processatRef = useRef<any>(null);
+    const value = get(key);
+
+    useEffect(() => {
+        if (value && processatRef.current !== value) {
+            processatRef.current = value;
+            onChangeRef?.current?.(value);
+        }
+    }, [value]);
+
+    return {
+        value,
+        onChange: (callback: (newValue?: any) => void) => {
+            onChangeRef.current = callback;
+        },
+    };
+}
+
 export const useFluxCreateSession = () => useTempSession(fluxCreateKey);
 export const useScanFinalitzatSession = () => useTempSession(scanFinalitzatKey);
 export const useValidacioSession = () => useTempSession(validacioChangeKey);
+// Canvis d'estat asíncrons (callback de portafirmes / NOTIB): els consumeixen les graelles per refrescar-se.
+export const useFirmaEstatSession = () => useSharedTempSession(firmaEstatKey);
+export const useNotificacioEstatSession = () => useSharedTempSession(notificacioEstatKey);
 
 /**
  * Component que gestiona la connexió SSE amb el servidor
@@ -114,6 +148,10 @@ export const SseExpedient: React.FC<any> = (props:any) => {
 
 			// Gestionar l'esdeveniment de validació d'expedient
 			addEventListener(eventSource, validacioChangeKey)
+
+			// Gestionar els canvis d'estat de firma i de notificació dels documents de l'expedient
+			addEventListener(eventSource, firmaEstatKey)
+			addEventListener(eventSource, notificacioEstatKey)
 
             // Gestionar errors
             eventSource.onerror = (error) => {

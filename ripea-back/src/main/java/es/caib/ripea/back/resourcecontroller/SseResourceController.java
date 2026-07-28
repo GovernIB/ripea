@@ -35,7 +35,9 @@ import es.caib.ripea.service.intf.model.sse.AvisosActiusEvent;
 import es.caib.ripea.service.intf.model.sse.CreacioFluxFinalitzatEvent;
 import es.caib.ripea.service.intf.model.sse.ErrorsValidacioChangedEvent;
 import es.caib.ripea.service.intf.model.sse.ErrorsValidacioEvictEvent;
+import es.caib.ripea.service.intf.model.sse.FirmaEstatCanviatEvent;
 import es.caib.ripea.service.intf.model.sse.FirmaFinalitzadaEvent;
+import es.caib.ripea.service.intf.model.sse.NotificacioEstatCanviatEvent;
 import es.caib.ripea.service.intf.model.sse.ScanFinalitzatEvent;
 import es.caib.ripea.service.intf.model.sse.TasquesPendentsEvent;
 import es.caib.ripea.service.intf.service.AplicacioService;
@@ -73,7 +75,7 @@ public class SseResourceController {
     }
 
     private enum ExpedientEventType {
-        EXP_CONNECT, FLUX_CREAT, SCAN_FINALITZAT, VALIDACIO_CHANGE;
+        EXP_CONNECT, FLUX_CREAT, SCAN_FINALITZAT, VALIDACIO_CHANGE, FIRMA_ESTAT, NOTIFICACIO_ESTAT;
         public String getEventName() { return name().toLowerCase(); }
         public static ExpedientEventType fromEventName(String name) { return ExpedientEventType.valueOf(name.toUpperCase()); }
     }
@@ -479,6 +481,34 @@ public class SseResourceController {
     		logger.debug("Actualització de ScanFinalitzatEvent a expedients...");
     		sendToExpedient(scanEvent.getExpedientId(),
     				SseEmitter.event().name(ExpedientEventType.SCAN_FINALITZAT.getEventName()).data(scanEvent.getResposta()));
+    	}
+    }
+
+    /**
+     * Canvi d'estat de firma d'un document (callback del portafirmes). S'envia sencer al client, que
+     * només l'usa com a senyal per refrescar la graella de contingut i tornar a pintar les icones.
+     */
+    @Async
+    @JmsListener(destination = "firmaEstat")
+    public void handleEventFirmaEstat(FirmaEstatCanviatEvent firmaEvent) {
+    	if (firmaEvent != null && firmaEvent.getExpedientId() != null) {
+    		logger.debug("Actualització de FirmaEstatCanviatEvent a expedients...");
+    		sendToExpedient(firmaEvent.getExpedientId(),
+    				SseEmitter.event().name(ExpedientEventType.FIRMA_ESTAT.getEventName()).data(firmaEvent));
+    	}
+    }
+
+    /**
+     * Canvi d'estat d'una notificació (consulta/callback de NOTIB). Igual que l'anterior: senyal perquè
+     * el client refresqui la graella de remeses i les icones de notificació de la de contingut.
+     */
+    @Async
+    @JmsListener(destination = "notificacioEstat")
+    public void handleEventNotificacioEstat(NotificacioEstatCanviatEvent notificacioEvent) {
+    	if (notificacioEvent != null && notificacioEvent.getExpedientId() != null) {
+    		logger.debug("Actualització de NotificacioEstatCanviatEvent a expedients...");
+    		sendToExpedient(notificacioEvent.getExpedientId(),
+    				SseEmitter.event().name(ExpedientEventType.NOTIFICACIO_ESTAT.getEventName()).data(notificacioEvent));
     	}
     }
 }

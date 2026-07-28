@@ -195,6 +195,7 @@ import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioDto;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
+import es.caib.ripea.service.intf.model.sse.NotificacioEstatCanviatEvent;
 import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
@@ -292,6 +293,7 @@ public class PluginHelper {
 	@Autowired private PinbalHelper pinbalHelper;
 	@Autowired private OrganGestorHelper organGestorHelper;
 	@Autowired private CacheHelper cacheHelper;
+	@Autowired private EventHelper eventHelper;
 	@Autowired private ContingutLogHelper contingutLogHelper;
 	@Autowired private MetaDocumentRepository metaDocumentRepository;
 	@Autowired private EmailHelper emailHelper;
@@ -5416,6 +5418,9 @@ public class PluginHelper {
 		ExpedientEntity expedient = notificacio.getExpedient();
 		DocumentEntity document = notificacio.getDocument();
 		DocumentNotificacioEstatEnumDto estatAnterior = notificacio.getNotificacioEstat();
+		// Es guarda també el flag d'error perquè una notificació pot passar a error (o deixar-ne de tenir)
+		// mantenint el mateix estat, i això també canvia el que es pinta a la graella de remeses.
+		boolean errorAnterior = notificacio.isError();
 		ConfigHelper.setEntitat(conversioTipusHelper.convertir(expedient.getEntitat(), EntitatDto.class));
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedient.getId()));
 
@@ -5501,7 +5506,14 @@ public class PluginHelper {
 
 			cacheHelper.evictErrorsValidacioAndNotify(expedient.getId());
 			cacheHelper.evictNotificacionsPendentsPerExpedient(expedient);
-			
+
+			// Només notificam si realment ha canviat alguna cosa: aquest mètode també es crida en bucle
+			// des de processos en segon pla (p.ex. actualitzaEstatNotificacionsCaducades) i, si no,
+			// generaríem un refresc a les graelles per cada consulta encara que l'estat fos el mateix.
+			if (estatAnterior != notificacio.getNotificacioEstat() || errorAnterior != notificacio.isError()) {
+				notificarCanviEstatNotificacio(expedient, document, notificacio);
+			}
+
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_NOTIFICACIO,
 					"Consulta d'estat d'una notificació electrònica",
@@ -5525,6 +5537,29 @@ public class PluginHelper {
 					ex);
 			applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_NOTIFICACIO,"Error al accedir al plugin de notificacions", ex);
+		}
+	}
+
+	/**
+	 * Notifica per SSE als usuaris que tenen obert l'expedient que l'estat d'una notificació ha canviat,
+	 * perquè es refresquin la columna d'estat de la graella de remeses i les icones de notificació de la
+	 * graella de contingut. L'enviament real el difereix EventHelper fins després del commit, ja que el
+	 * client hi reacciona rellegint de BBDD.
+	 *
+	 * Mai no ha de fer fallar la consulta d'estat: qualsevol error només es registra.
+	 */
+	private void notificarCanviEstatNotificacio(
+			ExpedientEntity expedient,
+			DocumentEntity document,
+			DocumentNotificacioEntity notificacio) {
+		try {
+			eventHelper.notifyNotificacioEstatCanviat(new NotificacioEstatCanviatEvent(
+					expedient.getId(),
+					document != null ? document.getId() : null,
+					notificacio.getId(),
+					notificacio.getNotificacioEstat()));
+		} catch (Exception ex) {
+			logger.error("Error notificant per SSE el canvi d'estat de la notificació " + notificacio.getId(), ex);
 		}
 	}
 
