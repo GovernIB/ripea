@@ -1,6 +1,6 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {Grid} from "@mui/material";
-import {BasePage, MuiDialog} from "reactlib";
+import {BasePage, MuiDialog, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import TabComponent from "../components/TabComponent.tsx";
 import {formatDate} from "../util/dateUtils.ts";
@@ -168,9 +168,58 @@ const Moviment = (props:any) => {
         />
     </BasePage>;
 }
+const AUDITORIA_PERSPECTIVE = 'AUDITORIA';
+
+/**
+ * El nom complet de l'usuari (Nom (codi)) només el resol la perspectiva AUDITORIA. Els llistats no
+ * la demanen -perquè no pinten aquestes columnes i costa una lectura d'usuari per fila-, així que la
+ * fila arriba amb el codi de l'usuari com a valor per defecte i la pipella d'auditoria mostrava el
+ * codi en lloc del nom.
+ *
+ * Quan la fila ja porta el nom resolt (detall de l'expedient, llistats que sí demanen AUDITORIA) es
+ * fa servir tal qual; si no, es rellegeix el recurs amb la perspectiva, i només quan s'obre la
+ * pipella, que és quan es munta aquest component.
+ */
+const useAuditoriaEntity = (entity: any, resourceName?: string) => {
+    const { isReady: apiIsReady, getOne: apiGetOne } = useResourceApiService(resourceName);
+    const [auditoriaEntity, setAuditoriaEntity] = useState<any>();
+
+    const id = entity?.id;
+    // El back retorna el codi de l'usuari com a valor per defecte del nom complet: si són iguals, el
+    // nom no s'ha resolt. Un usuari sense codi (createdBy buit) no té res a resoldre.
+    const isResolt = (codi?: string, nomComplet?: string) => !codi || codi !== nomComplet;
+    const necessitaCarrega = id != null && resourceName != null &&
+        (!isResolt(entity?.createdBy, entity?.createdByFullName) ||
+            !isResolt(entity?.lastModifiedBy, entity?.lastModifiedByFullName));
+
+    useEffect(() => {
+        if (!necessitaCarrega || !apiIsReady) {
+            return;
+        }
+        let cancelled = false;
+        apiGetOne(id, {perspectives: [AUDITORIA_PERSPECTIVE]})
+            .then((resource: any) => {
+                if (!cancelled) {
+                    setAuditoriaEntity(resource);
+                }
+            })
+            // Si falla es continua mostrant el que porta la fila (el codi de l'usuari): la pipella
+            // és informativa i val més ensenyar el codi que no un error.
+            .catch(() => {});
+        return () => {
+            cancelled = true;
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [necessitaCarrega, apiIsReady, id]);
+
+    // Es compara l'id perquè, si es reobre l'històric d'un altre element, no es mostrin les dades de
+    // l'anterior mentre no arribi la nova lectura.
+    return auditoriaEntity?.id === id ? auditoriaEntity : entity;
+}
 const Auditoria = (props:any) => {
-    const { entity } = props;
+    const { entity: rowEntity, resourceName } = props;
     const { t } = useTranslation();
+    const entity = useAuditoriaEntity(rowEntity, resourceName);
 
     return <BasePage>
         <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -192,7 +241,13 @@ export const HistoricContingutTipusEnum = {
     TASCA: "TASCA",
 } as const;
 type HistoricContingutTipus = keyof typeof HistoricContingutTipusEnum;
-const useHistoric = (contingutTipus:HistoricContingutTipus = HistoricContingutTipusEnum.CONTINGUT) => {
+/**
+ * @param contingutTipus tipus de contingut del que es llisten les accions.
+ * @param auditResourceName recurs del que s'ha de rellegir l'auditoria quan la fila no porta el nom
+ *        complet de l'usuari resolt. Només s'hi pot posar un recurs que declari la perspectiva
+ *        AUDITORIA; si s'omet, la pipella mostra el que porti la fila.
+ */
+const useHistoric = (contingutTipus:HistoricContingutTipus = HistoricContingutTipusEnum.CONTINGUT, auditResourceName?: string) => {
     const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
@@ -232,7 +287,7 @@ const useHistoric = (contingutTipus:HistoricContingutTipus = HistoricContingutTi
         {
             value: "auditoria",
             label: t('page.contingut.tabs.auditoria'),
-            content: <Auditoria entity={entity}/>,
+            content: <Auditoria entity={entity} resourceName={auditResourceName}/>,
         },
     ]
 
