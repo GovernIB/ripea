@@ -419,6 +419,7 @@ const ContingutGrid = () => {
 				persistentStateKey={"contingutResource_consulta"}
                 columns={additionalColumns}
                 filter={springFilter}
+                toolbarShowFilterCount
                 sortModel={sortModel}
                 perspectives={perspectives}
                 rowAdditionalActions={actions}

@@ -447,7 +447,7 @@ const translationEn = {
             action: {
                 new: {
                     label: "New Task",
-                    ok: "The task {{data.titol}} was created successfully",
+                    ok: "The task {{data.metaExpedientTasca.description}} was created successfully",
                 },
                 tramitar: {
                     label: "Process",
@@ -508,7 +508,7 @@ const translationEn = {
                     ok: "The task has been successfully reopened",
                 },
                 comment: {
-                    ok: "Comment added to the task '{{data.expedientTasca.description}}'",
+                    ok: "Comment added to the task",
                 },
             },
         },
@@ -821,6 +821,7 @@ const translationEn = {
                 seguidors: {
                     label: "Followers",
                     title: "Case followers",
+                    noResults: "This case file has no followers.",
                 },
             },
             results: {

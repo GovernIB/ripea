@@ -37,6 +37,8 @@ const AdjuntarAnnexosPendentsFilterFrom = () => {
 }
 
 const springFilterBuilder = (data: any) => {
+    console.log(data);
+    
     return builder.and(
         builder.like("titol", data?.nom),
         builder.like("registre.identificador", data?.numero),
@@ -45,7 +47,7 @@ const springFilterBuilder = (data: any) => {
                 builder.eq("registre.expedientPeticions.expedient.id", data.expedient?.id),
                 builder.eq("registre.expedientPeticions.expedient.grup.id", data.grup?.id),
                 builder.eq("registre.expedientPeticions.expedient.metaExpedient.id", data.procediment?.id),
-                builder.betweenDates("registre.expedientPeticions.expedient.createdDate", data?.dataAltaInici, data?.dataAltaFi),
+                builder.betweenDates("registre.expedientPeticions.expedient.createdDate", data?.dataInici, data?.dataFi),
             )
         ),
     );

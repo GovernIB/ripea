@@ -340,6 +340,7 @@ const MetaExpedientGrid = () => {
                 popupEditFormContent={<MetaExpedientForm isAdmin={rol?.isAdmin}/>}
                 columns={additionalColumns}
                 filter={springFilter}
+                toolbarShowFilterCount
                 perspectives={perspectives}
                 sortModel={sortModel}
                 rowAdditionalActions={actions}

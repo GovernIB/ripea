@@ -256,66 +256,73 @@ const ExpedientAlert = (props:any) => {
     const {handleOpen: handelAlert, dialog: dialogAlert, count} = useAlerta();
     const {handleOpen: hanldeErrorValidacio, dialog: dialogErrorValidacio} = useErrorValidacio();
 
-    return <>
-        {expedient?.agafatPer?.id != user?.codi && expedient?.usuariActualWrite && !rol?.isAdminLectura && user?.rolActual != 'IPA_ADMIN' &&
-            <Alert severity="info"
-                   action={
-                       <Button sx={{py:0}}
-                       onClick={()=>agafar(expedient?.id, expedient)} variant="outlined">
-                           <Icon>lock</Icon>
-						   <Typography variant={"subtitle2"} component="span">{t('page.expedient.action.agafar.label')}</Typography>
-                       </Button>
-                   }
-            >{t('page.expedient.alert.owner')}</Alert>
-        }
-        { expedient?.estat == "OBERT" && expedient?.hasEsborranys && user?.sessionScope?.isConvertirDefinitiuActiu &&
-            <Alert severity="info">{t('page.expedient.alert.esborranys')}</Alert>
-        }
-		{ expedient?.estat == "OBERT" && expedient?.pendentExecucioMassiva &&
-		    <Alert severity="warning">{t('page.expedient.alert.moureTot.info')}</Alert>
-		}
-        { expedient?.numAlert!=0 && (count === null || count !== 0) &&
-            <Alert severity="warning"
-                   action={
-                       <Button sx={{py: 0}} variant="outlined"
-                               onClick={() => handelAlert(expedient?.id, expedient)}>
-                            <Icon>search</Icon>
-                           <Typography variant={"subtitle2"} component="span">{t('common.consult')}</Typography>
-                       </Button>
-                   }
-            >{t('page.expedient.alert.alert')}</Alert>
-        }
-        {
-        ((!expedient?.valid && validacio?.errorsValidacio == null) || (validacio?.errorsValidacio?.length > 0)) && (
-            (() => {
-                const llistaErrors = validacio?.errorsValidacio?.length > 0
-                    ? validacio.errorsValidacio
-                    : (expedient?.errors || []);
-
-                const textAlerta = llistaErrors.length > 0
-                    ? getResumErrorsText(llistaErrors, t)
-                    : t('page.expedient.alert.validation');
-
-                return (
+    return (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1}}>
+            {expedient?.agafatPer?.id != user?.codi &&
+                expedient?.usuariActualWrite &&
+                !rol?.isAdminLectura &&
+                user?.rolActual != 'IPA_ADMIN' && (
                     <Alert
-                        severity="warning"
+                        severity="info"
                         action={
-                            <Button sx={{py: 0}} variant="outlined"
-                                    onClick={() => hanldeErrorValidacio(expedient?.id, expedient)}>
-                                <Icon>search</Icon>
-                                <Typography variant={"subtitle2"} component="span">{t('common.consult')}</Typography>
+                            <Button sx={{ py: 0 }} onClick={() => agafar(expedient?.id, expedient)} variant="outlined">
+                                <Icon>lock</Icon>
+                                <Typography variant={'subtitle2'} component="span">
+                                    {t('page.expedient.action.agafar.label')}
+                                </Typography>
                             </Button>
                         }
                     >
-                        {textAlerta}
+                        {t('page.expedient.alert.owner')}
                     </Alert>
-                );
-            })()
-        )
-    }
-        {dialogAlert}
-        {dialogErrorValidacio}
-    </>
+                )}
+            {expedient?.estat == 'OBERT' && expedient?.hasEsborranys && user?.sessionScope?.isConvertirDefinitiuActiu && (
+                <Alert severity="info">{t('page.expedient.alert.esborranys')}</Alert>
+            )}
+            {expedient?.estat == 'OBERT' && expedient?.pendentExecucioMassiva && (
+                <Alert severity="warning">{t('page.expedient.alert.moureTot.info')}</Alert>
+            )}
+            {expedient?.numAlert != 0 && (count === null || count !== 0) && (
+                <Alert
+                    severity="warning"
+                    action={
+                        <Button sx={{ py: 0 }} variant="outlined" onClick={() => handelAlert(expedient?.id, expedient)}>
+                            <Icon>search</Icon>
+                            <Typography variant={'subtitle2'} component="span">
+                                {t('common.consult')}
+                            </Typography>
+                        </Button>
+                    }
+                >
+                    {t('page.expedient.alert.alert')}
+                </Alert>
+            )}
+            {((!expedient?.valid && validacio?.errorsValidacio == null) || validacio?.errorsValidacio?.length > 0) &&
+                (() => {
+                    const llistaErrors = validacio?.errorsValidacio?.length > 0 ? validacio.errorsValidacio : expedient?.errors || [];
+
+                    const textAlerta = llistaErrors.length > 0 ? getResumErrorsText(llistaErrors, t) : t('page.expedient.alert.validation');
+
+                    return (
+                        <Alert
+                            severity="warning"
+                            action={
+                                <Button sx={{ py: 0 }} variant="outlined" onClick={() => hanldeErrorValidacio(expedient?.id, expedient)}>
+                                    <Icon>search</Icon>
+                                    <Typography variant={'subtitle2'} component="span">
+                                        {t('common.consult')}
+                                    </Typography>
+                                </Button>
+                            }
+                        >
+                            {textAlerta}
+                        </Alert>
+                    );
+                })()}
+            {dialogAlert}
+            {dialogErrorValidacio}
+        </Box>
+    );
 }
 
 const HeaderMain = (props: any) => {

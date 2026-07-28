@@ -104,6 +104,7 @@ const AssignacioTasquesGrid = () => {
 				persistentStateKey={"expedientTascaResource_assignacioTasques"}
                 columns={columns}
                 filter={springFilter}
+                toolbarShowFilterCount
                 perspectives={perspectives}
                 sortModel={sortModel}
                 rowAdditionalActions={actions}

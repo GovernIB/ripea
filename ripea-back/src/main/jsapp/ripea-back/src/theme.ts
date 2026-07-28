@@ -36,21 +36,15 @@ const baseComponentStyles: ThemeOptions['components'] = {
                 alignItems: 'baseline !important',
                 whiteSpace: 'break-spaces !important',
             },
-            // Fons neutre per defecte. Cada tema el pot sobreescriure amb el
-            // color secundari corresponent (veure comentari a cada tema).
             '.styledFilter': {
                 marginBottom: '16px',
                 paddingTop: '11px',
                 paddingBottom: '16px',
-                paddingLeft: '16px',
-                paddingRight: '16px',
+                // paddingLeft: '16px',
+                // paddingRight: '16px',
                 borderRadius: '4px',
                 backgroundColor: 'inherit',
             },
-            // TODO: revisar més endavant si `.input` es fa servir realment
-            // (classe aplicada a MuiInputBase-root / MuiPickersInputBase-root
-            // en algun formulari). Recuperat de la versió amb buildTheme; si
-            // no es fa servir enlloc, simplement no farà res.
             '.input': {
                 '& .MuiInputBase-root, & .MuiPickersInputBase-root': {
                     backgroundColor: 'inherit',
@@ -137,10 +131,6 @@ const baseComponentStyles: ThemeOptions['components'] = {
                 '& .MuiDataGrid-treeDataGroupingCellToggle': {
                     marginRight: 0,
                 },
-                // Recuperat: ratllat de files parells (zebra striping) i hover
-                // en color primari. El color concret (secondary/primary main)
-                // es defineix a cada tema perquè depèn de la palette pròpia.
-
             },
             row: {
                 minHeight: '45px !important',
@@ -196,8 +186,6 @@ const baseComponentStyles: ThemeOptions['components'] = {
             paper: {
                 right: 'auto',
                 left: 0,
-                // El color de fons (drawerBg) es defineix a cada tema, ja que
-                // depèn del primary de cada palette.
             },
         },
     },
@@ -267,6 +255,7 @@ const baseComponentStyles: ThemeOptions['components'] = {
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
+                fontSize: '1.5rem',
             },
         },
     },
@@ -292,6 +281,18 @@ const baseComponentStyles: ThemeOptions['components'] = {
     // perquè ha de coincidir amb `background.paper` de la palette.
     MuiOutlinedInput: {
         styleOverrides: {},
+    },
+    MuiBadge: {
+        styleOverrides: {
+            badge: {
+                '.MuiDrawer-paper &': {
+                    overflowWrap: 'normal',
+                    wordBreak: 'keep-all',
+                    whiteSpace: 'nowrap',
+                    padding: '0px 4px',
+                },
+            },
+        },
     },
 };
 
@@ -323,6 +324,16 @@ export const lightTheme = createTheme({
                     backgroundColor: '#ffffff',
                     backgroundImage: hatchPattern('#e1e1e1'),
                     color: LIGHT_TEXT_SECONDARY,
+                },
+                '.myComment': {
+                    ...((baseComponentStyles.MuiCssBaseline?.styleOverrides as any)['.myComment']),
+                    backgroundColor: '#a5d6a7',
+                    color: LIGHT_TEXT_PRIMARY,
+                },
+                '.otherComment': {
+                    ...((baseComponentStyles.MuiCssBaseline?.styleOverrides as any)['.otherComment']),
+                    color: LIGHT_SECONDARY_MAIN,
+                    backgroundColor: LIGHT_DIVIDER,
                 },
             },
         },
@@ -443,6 +454,16 @@ export const darkTheme = createTheme({
                     backgroundColor: '#1c1c1c',
                     backgroundImage: hatchPattern('#2a2a2a'),
                     color: DARK_TEXT_SECONDARY,
+                },
+                '.myComment': {
+                    ...((baseComponentStyles.MuiCssBaseline?.styleOverrides as any)['.myComment']),
+                    backgroundColor: '#436d44',
+                    color: DARK_PRIMARY_CONTRAST_TEXT,
+                },
+                '.otherComment': {
+                    ...((baseComponentStyles.MuiCssBaseline?.styleOverrides as any)['.otherComment']),
+                    color: DARK_PRIMARY_CONTRAST_TEXT,
+                    backgroundColor: DARK_BACKGROUND_PAPER,
                 },
             },
         },
@@ -586,6 +607,16 @@ export const draculaTheme = createTheme({
                     backgroundColor: '#282A36',
                     backgroundImage: hatchPattern('#44475A'),
                     color: DRACULA_TEXT_PRIMARY,
+                },
+                '.myComment': {
+                    ...((baseComponentStyles.MuiCssBaseline?.styleOverrides as any)['.myComment']),
+                    backgroundColor: '#436d44',
+                    color: DRACULA_PRIMARY_CONTRAST_TEXT,
+                },
+                '.otherComment': {
+                    ...((baseComponentStyles.MuiCssBaseline?.styleOverrides as any)['.otherComment']),
+                    color: DRACULA_PRIMARY_CONTRAST_TEXT,
+                    backgroundColor: DRACULA_BACKGROUND_PAPER,
                 },
             },
         },

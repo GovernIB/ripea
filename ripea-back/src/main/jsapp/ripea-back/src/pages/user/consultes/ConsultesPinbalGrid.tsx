@@ -177,6 +177,7 @@ const ConsultesPinbalGrid = () => {
 				persistentStateKey={"consultaPinbalResource_consulta"}
                 columns={columns}
                 filter={springFilter}
+                toolbarShowFilterCount
                 perspectives={perspectives}
                 sortModel={sortModel}
                 rowAdditionalActions={actions}

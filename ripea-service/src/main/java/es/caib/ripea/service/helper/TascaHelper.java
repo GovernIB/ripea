@@ -614,15 +614,17 @@ public class TascaHelper {
     }
 
     /**
-     * Crea automàticament totes les tasques actives del procediment quan es crea un expedient.
-     * Creació silenciosa: no envia emails, no genera comentaris ni notifica events.
-     */
+    * Crea automàticament les tasques del procediment marcades com "actives" i "inicialitzar automàticament" quan es crea un expedient.
+    * Creació silenciosa: no envia emails, no genera comentaris ni notifica events.
+    * Cada tasca comença (dataInici) on acaba (dataLimit) la tasca anterior; la primera comença avui.
+    */
     @Transactional
     public void crearTasquesExpedient(ExpedientEntity expedient) {
 
         MetaExpedientEntity metaExpedient = expedient.getMetaExpedient();
 
-        List<MetaExpedientTascaEntity> metaTasques = metaExpedientTascaRepository.findByMetaExpedientAndActivaTrueOrderByOrdreAsc(metaExpedient);
+        List<MetaExpedientTascaEntity> metaTasques = metaExpedientTascaRepository
+            .findByMetaExpedientAndActivaTrueOrderByOrdreAsc(metaExpedient);
 
         if (metaTasques == null || metaTasques.isEmpty()) {
             return;
@@ -634,7 +636,14 @@ public class TascaHelper {
 
         int diesPerDefecte = configHelper.getAsInt(PropertyConfig.TASCA_DURACIO_DEFAULT, 10);
 
+        // Data d'inici de la primera tasca de la cadena: avui
+        Date dataIniciSeguent = new Date();
+
         for (MetaExpedientTascaEntity metaTasca : metaTasques) {
+
+            if (!metaTasca.isInicialitzarAutomaticament()) {
+                continue;
+            }
 
             // Responsable: el de la meta-tasca (procediment) si existeix, sinó l'usuari creador de l'expedient
             UsuariEntity responsable = null;
@@ -650,15 +659,14 @@ public class TascaHelper {
                 responsables.add(responsable);
             }
 
-            /**
-             * TODO: Pot ser s'ha de modificar i posar aquest valor per defecte de dies al acabar l'anterior tasca.
-             * Es a dir, la primera tasca es fins dia 10(dies per defecte), la segona se li sumen 10 dies, per tant fins el dia 20, la següent 10 mes, etc.
-             */
-            // Data límit: durada de la meta-tasca si en té, sinó dies per defecte de configuració
+            // Durada: la de la meta-tasca si en té, sinó dies per defecte de configuració
             Integer duracio = metaTasca.getDuracio();
             int diesDuracio = (duracio != null) ? duracio : diesPerDefecte;
 
+            Date dataInici = dataIniciSeguent;
+
             Calendar cal = Calendar.getInstance();
+            cal.setTime(dataInici);
             cal.add(Calendar.DAY_OF_YEAR, diesDuracio);
             Date dataLimit = cal.getTime();
 
@@ -674,7 +682,13 @@ public class TascaHelper {
                 null // observacions
             ).build();
 
+            // Com que el builder assigna dataInici=new Date() interalment, la corregim aquí a la data de la cadena
+            expedientTascaEntity.updateDataInici(dataInici);
+
             expedientTascaRepository.save(expedientTascaEntity);
+
+            // La següent tasca de la cadena començarà on acaba aquesta
+            dataIniciSeguent = dataLimit;
         }
     }
 }

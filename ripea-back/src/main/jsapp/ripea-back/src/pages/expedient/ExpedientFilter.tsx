@@ -65,7 +65,6 @@ const ExpedientFilterForm = () => {
 
 export const springFilterBuilder = (data: any, user?: any, rol?: any): string => {
     let filterStr: string = '';
-//	console.log('>>> data:', JSON.stringify(data, null, 2));
     filterStr += builder.and(
         builder.like("numero", data.numero),
         builder.like("nom", data.nom),
@@ -115,26 +114,26 @@ export const springFilterBuilder = (data: any, user?: any, rol?: any): string =>
             )
         )
     )
-//    console.log('>>> springFilterBuilder:', filterStr)
+
     return filterStr;
 }
 
 const ExpedientFilter = (props: any) => {
-    const {onSpringFilterChange} = props;
-    const {value: user, rol} = useUserSession();
-    return <StyledMuiFilter
-        resourceName={"expedientResource"}
-        code={"EXPEDIENT_FILTER"}
-        springFilterBuilder={(data: any)=> (
-            springFilterBuilder(data, user, rol)
-        )}
-        onSpringFilterChange={onSpringFilterChange}
-        advancedSearch
-        buttonGridProps={{size: {xs: 12, sm: 6, md: 2}}}
-        buttonIconOnlyBreakpoint={FILTER_ADVANCED_ICON_ONLY_BREAKPOINT}
-    >
-        <ExpedientFilterForm/>
-    </StyledMuiFilter>
-}
+    const { onSpringFilterChange } = props;
+    const { value: user, rol } = useUserSession();
+    return (
+        <StyledMuiFilter
+            resourceName={'expedientResource'}
+            code={'EXPEDIENT_FILTER'}
+            springFilterBuilder={(data: any) => springFilterBuilder(data, user, rol)}
+            onSpringFilterChange={onSpringFilterChange}
+            advancedSearch
+            buttonGridProps={{ size: { xs: 12, sm: 6, md: 2 } }}
+            buttonIconOnlyBreakpoint={FILTER_ADVANCED_ICON_ONLY_BREAKPOINT}
+        >
+            <ExpedientFilterForm />
+        </StyledMuiFilter>
+    );
+};
 
 export default ExpedientFilter;

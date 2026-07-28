@@ -447,7 +447,7 @@ const translationCa = {
             action: {
                 new: {
                     label: "Nova tasca",
-                    ok: "La tasca {{data.titol}} s'ha creat correctament",
+                    ok: "La tasca {{data.metaExpedientTasca.description}} s'ha creat correctament",
                 },
                 tramitar: {
                     label: "Tramita",
@@ -508,7 +508,7 @@ const translationCa = {
                     ok: "La tasca s'ha reobert correctament",
                 },
                 comment: {
-                    ok: "Comentari afegit a la tasca '{{data.expedientTasca.description}}'",
+                    ok: "Comentari afegit a la tasca",
                 },
             },
         },
@@ -821,6 +821,7 @@ const translationCa = {
                 seguidors: {
                     label: "Seguidors",
                     title: "Seguidors de l’expedient",
+                    noResults: "Aquest expedient no te seguidors.",
                 },
             },
             results: {

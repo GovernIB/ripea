@@ -105,6 +105,7 @@ const OrganGestorGrid = () => {
                     popupEditFormContent={<OrganGestorForm />}
                     columns={columns}
                     filter={springFilter}
+                    toolbarShowFilterCount
                     perspectives={perspectives}
                     sortModel={sortModel}
                     rowAdditionalActions={actions}

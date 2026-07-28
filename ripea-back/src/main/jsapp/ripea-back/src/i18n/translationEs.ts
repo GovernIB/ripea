@@ -447,7 +447,7 @@ const translationEs = {
             action: {
                 new: {
                     label: "Nueva Tarea",
-                    ok: "La tarea {{data.titol}} se ha creado correctamente",
+                    ok: "La tarea {{data.metaExpedientTasca.description}} se ha creado correctamente",
                 },
                 tramitar: {
                     label: "Tramita",
@@ -508,7 +508,7 @@ const translationEs = {
                     ok: "La tarea se ha reabierto correctamente",
                 },
                 comment: {
-                    ok: "Comentario añadido a la tarea '{{data.expedientTasca.description}}'",
+                    ok: "Comentario añadido a la tarea",
                 },
             },
         },
@@ -821,6 +821,7 @@ const translationEs = {
                 seguidors: {
                     label: "Seguidores",
                     title: "Seguidores del expediente",
+                    noResults: "Este expediente no tiene seguidores.",
                 },
             },
             results: {

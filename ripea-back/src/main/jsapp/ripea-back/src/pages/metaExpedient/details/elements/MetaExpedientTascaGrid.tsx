@@ -65,7 +65,8 @@ const MetaExpedientTascaForm = () => {
         <GridFormField name="prioritat" required/>
         <GridFormField name="estatCrearTasca" filter={builder.eq("metaExpedient.id", data?.metaExpedient?.id)}/>
         <GridFormField name="estatFinalitzarTasca" filter={builder.eq("metaExpedient.id", data?.metaExpedient?.id)}/>
-        <GridFormField name="activa"/>
+        <GridFormField name="activa" size={6}/>
+        <GridFormField name="inicialitzarAutomaticament" size={6}/>
     </Grid>
 }
 
@@ -107,6 +108,11 @@ const columns = [
         field: 'activa',
         flex: 0.5,
         renderCell: (params:any) => (params?.row?.activa && <Icon>check</Icon>),
+    },
+    {
+        field: 'inicialitzarAutomaticament',
+        flex: 0.5,
+        renderCell: (params:any) => (params?.row?.inicialitzarAutomaticament && <Icon>check</Icon>),
     },
     {
         field: 'numValidacio',

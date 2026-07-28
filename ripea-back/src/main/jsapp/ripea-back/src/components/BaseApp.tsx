@@ -313,7 +313,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
             menuEntries={baseAppMenuEntries}
         >
             <CustomLocalizationProvider>
-                <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', gap: '8px' }}>
                     {value?.avisosUsuari?.map((avis: any) => {
                         if (!read?.includes?.(avis.id)) {
                             return (
