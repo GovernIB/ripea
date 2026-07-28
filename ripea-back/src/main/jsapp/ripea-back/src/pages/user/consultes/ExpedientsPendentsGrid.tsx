@@ -50,7 +50,7 @@ const ExpedientsPendentsFilter = (props: any) => {
 // Grid
 const sortModel: any = [{ field: 'registreInfo.data', sort: 'desc' }];
 const perspectives = ['REGISTRE'];
-const namedQueries = ['LLISTAT_ANOTACIONS'];
+const namedQueries = ['LLISTAT_ANOTACIONS','ESTAT_PENDENT'];
 
 const ExpedientsPendentsGrid = () => {
     const { t } = useTranslation();

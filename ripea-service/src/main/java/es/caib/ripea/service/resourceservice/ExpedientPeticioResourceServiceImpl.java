@@ -215,6 +215,11 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
         }
 
     	if (!mapaNamedQueries.isEmpty()) {
+    		
+    		if (mapaNamedQueries.containsKey("ESTAT_PENDENT")) {
+    			filters.add(FilterBuilder.equal(ExpedientPeticioResource.Fields.estat, ExpedientPeticioEstatEnumDto.PENDENT));
+    		}
+    		
     		if (mapaNamedQueries.containsKey("LLISTAT_ANOTACIONS")) {
 
     			String organActualCodi	 = configHelper.getOrganActualCodi();
@@ -222,8 +227,6 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 
     			boolean isAdmin 		= "IPA_ADMIN".equals(rolActual);
     			boolean isAdminOrgan 	= "IPA_ORGAN_ADMIN".equals(rolActual);
-
-                filters.add(FilterBuilder.equal(ExpedientPeticioResource.Fields.estat, ExpedientPeticioEstatEnumDto.PENDENT));
 
     			//Admin no aplica filtres de permisos
     			if (!isAdmin) {
