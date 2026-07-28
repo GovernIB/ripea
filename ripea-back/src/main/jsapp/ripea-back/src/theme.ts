@@ -337,6 +337,16 @@ export const lightTheme = createTheme({
                     backgroundImage: hatchPattern('#e1e1e1'),
                     color: LIGHT_TEXT_SECONDARY,
                 },
+                '.myComment': {
+                    ...((baseComponentStyles.MuiCssBaseline?.styleOverrides as any)['.myComment']),
+                    backgroundColor: '#a5d6a7',
+                    color: LIGHT_TEXT_PRIMARY,
+                },
+                '.otherComment': {
+                    ...((baseComponentStyles.MuiCssBaseline?.styleOverrides as any)['.otherComment']),
+                    color: LIGHT_SECONDARY_MAIN,
+                    backgroundColor: LIGHT_DIVIDER,
+                },
             },
         },
         MuiOutlinedInput: {
@@ -456,6 +466,16 @@ export const darkTheme = createTheme({
                     backgroundColor: '#1c1c1c',
                     backgroundImage: hatchPattern('#2a2a2a'),
                     color: DARK_TEXT_SECONDARY,
+                },
+                '.myComment': {
+                    ...((baseComponentStyles.MuiCssBaseline?.styleOverrides as any)['.myComment']),
+                    backgroundColor: '#436d44',
+                    color: DARK_PRIMARY_CONTRAST_TEXT,
+                },
+                '.otherComment': {
+                    ...((baseComponentStyles.MuiCssBaseline?.styleOverrides as any)['.otherComment']),
+                    color: DARK_PRIMARY_CONTRAST_TEXT,
+                    backgroundColor: DARK_BACKGROUND_PAPER,
                 },
             },
         },
@@ -599,6 +619,16 @@ export const draculaTheme = createTheme({
                     backgroundColor: '#282A36',
                     backgroundImage: hatchPattern('#44475A'),
                     color: DRACULA_TEXT_PRIMARY,
+                },
+                '.myComment': {
+                    ...((baseComponentStyles.MuiCssBaseline?.styleOverrides as any)['.myComment']),
+                    backgroundColor: '#436d44',
+                    color: DRACULA_PRIMARY_CONTRAST_TEXT,
+                },
+                '.otherComment': {
+                    ...((baseComponentStyles.MuiCssBaseline?.styleOverrides as any)['.otherComment']),
+                    color: DRACULA_PRIMARY_CONTRAST_TEXT,
+                    backgroundColor: DRACULA_BACKGROUND_PAPER,
                 },
             },
         },
