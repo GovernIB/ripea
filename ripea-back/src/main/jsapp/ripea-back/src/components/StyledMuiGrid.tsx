@@ -85,11 +85,16 @@ type StyledMuiGridProps = Omit<MuiDataGridProps,
     persistentStateActive?: boolean,
 }
 
+/** Marge mínim entre el menú contextual i les vores de la finestra. */
+const CONTEXT_MENU_VIEWPORT_MARGIN = 8;
+
 const StyledMuiGrid = (props:StyledMuiGridProps) => {
     const { value: user } = useUserSession();
     const gridApiRef = useMuiDataGridApiRef();
     const dataApiRef = useMuiDatagridApiRef();
     const { t } = useTranslation();
+    const containerRef = React.useRef<HTMLDivElement>(null);
+    const contextMenuButtonRef = React.useRef<any>(null);
 
     const {
         resourceName,
@@ -187,6 +192,25 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         }
     }, [datagridApiRef]);
 
+    // Torna a deixar el botó d'accions de la fila amb el seu rectangle original (veure
+    // onRowContextMenu). Si es rep un botó, només es restaura si és el que s'havia
+    // substituït: quan s'obre el menú d'una altra fila el menú anterior es tanca després,
+    // i sense la comprovació es desfaria la substitució del menú que s'acaba d'obrir.
+    const restoreContextMenuButton = (button?: any) => {
+        const patchedButton = contextMenuButtonRef.current;
+        if (patchedButton && (button == null || button === patchedButton)) {
+            delete patchedButton.getBoundingClientRect;
+            contextMenuButtonRef.current = null;
+        }
+    };
+    React.useEffect(() => {
+        if (datagridApiRef.current && Object.keys(datagridApiRef.current).length > 0) {
+            return datagridApiRef.current.subscribeEvent('menuClose', (params: any) =>
+                restoreContextMenuButton(params?.target));
+        }
+    }, [datagridApiRef]);
+    React.useEffect(() => () => restoreContextMenuButton(), []);
+
     // Custom row styling with colored bar
     const getRowClassName = (params: any) :string =>
         `row-with-color-${params.row.id} ${params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'}`;
@@ -226,7 +250,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         }
     }, [user?.conf?.numElementsPagina])
 
-    return <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
+    return <div ref={containerRef} style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
         <style>{rowStyles}</style>
 
         <MuiGrid
@@ -290,14 +314,32 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
 
             onRowContextMenu={(event:any, row:any) => {
                 event.preventDefault();
-                const rowElement = document.querySelector(`.MuiDataGrid-row[data-id="${row.id}"]`);
-
-                if (rowElement) {
-                    const menuButton:any = rowElement.querySelector('button[role="menuitem"]');
-                    if (menuButton) {
-                        menuButton?.click?.();
-                    }
+                const rowElement = containerRef.current?.querySelector(`.MuiDataGrid-row[data-id="${row.id}"]`);
+                const menuButton:any = rowElement?.querySelector('button[role="menuitem"]');
+                if (!menuButton) {
+                    return;
                 }
+                restoreContextMenuButton();
+                const { clientX, clientY } = event;
+                // El menú d'accions de la fila és un Popper de MUI X ancorat al botó "⋮" amb
+                // placement 'bottom-end', que no es pot configurar des d'aquí. Per obrir-lo al
+                // punt del clic se substitueix el rectangle del botó per un de situat al cursor:
+                // amb l'amplada del menú, la vora dreta (l'"end" de l'ancoratge) cau a
+                // clientX + amplada i el menú queda amb la cantonada superior esquerra al cursor.
+                // L'alçada evita que surti per sota de la finestra. La mida es llegeix amb
+                // offsetWidth/offsetHeight perquè getBoundingClientRect la retornaria escalada
+                // per l'animació d'obertura (Grow). Es restaura en tancar el menú.
+                menuButton.getBoundingClientRect = () => {
+                    const menuPaper:any = document.querySelector('.MuiDataGrid-menu .MuiPaper-root');
+                    const menuWidth = menuPaper?.offsetWidth ?? 0;
+                    const menuHeight = menuPaper?.offsetHeight ?? 0;
+                    const top = Math.max(
+                        CONTEXT_MENU_VIEWPORT_MARGIN,
+                        Math.min(clientY, window.innerHeight - menuHeight - CONTEXT_MENU_VIEWPORT_MARGIN));
+                    return new DOMRect(clientX, top, menuWidth, 0);
+                };
+                contextMenuButtonRef.current = menuButton;
+                menuButton.click();
             }}
         />
     </div>
