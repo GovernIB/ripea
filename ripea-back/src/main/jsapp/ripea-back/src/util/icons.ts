@@ -4,7 +4,7 @@
  * visual entre pantallas y evita literales dispersos.
  */
 export const icons = {
-    expedient: 'folder',
+    expedient: 'topic',
     anotacio: 'email',
     tasca: 'assignment_turned_in',
     consulta: 'search',

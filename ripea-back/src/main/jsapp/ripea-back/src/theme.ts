@@ -237,7 +237,18 @@ const baseComponentStyles: ThemeOptions['components'] = {
     },
     MuiIcon: {
         styleOverrides: {
-            root: { fontSize: 'var(--toolbar-icon-size, 18px)', marginRight: '4px' },
+            root: {
+                fontSize: 'var(--toolbar-icon-size, 18px)',
+                marginRight: '4px',
+                // Icones del menú lateral a 24px. S'ancora a `.MuiDrawer-paper` (i no a la
+                // variable --toolbar-icon-size, que només es defineix a l'appbar) perquè el
+                // menú es renderitza dins d'un portal fora del <nav> a pantalles petites.
+                // El marge es treu perquè el contenidor ja centra l'icona.
+                '.MuiDrawer-paper .MuiListItemButton-root &': {
+                    fontSize: '1.5rem',
+                    marginRight: 0,
+                },
+            },
         },
     },
     MuiChip: {

@@ -33,6 +33,19 @@ import {EstilMenuProp} from "@src/components/ThemeUserProvider.tsx";
 
 export const HEIGHT_FOOTER = 36;
 
+/**
+ * Amplada del menú lateral plegat. La de reactlib (calc(spacing(7) + 1px) = 57px) deixa
+ * els icones 8px a l'esquerra dels del capçal; amb 74px queden alineats, perquè quan el
+ * menú està plegat l'icona es centra dins del calaix.
+ */
+const MENU_COLLAPSED_WIDTH = 74;
+/**
+ * Selector del calaix del menú quan està plegat: en mode compacte reactlib embolcalla la
+ * llista dins d'un <div> (el contenidor del panell flotant dels submenús), mentre que
+ * desplegat la llista penja directament del paper.
+ */
+const MENU_COLLAPSED_DRAWER_SELECTOR = '& nav .MuiDrawer-root:has(.MuiDrawer-paper > div > .MuiList-root)';
+
 export type MenuEntryWithResource = MenuEntry & {
     resourceName?: string;
 }
@@ -240,6 +253,29 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
     const { value } = useAlertesSession();
     const { value: read, save } = useSession('readAlerts');
     const menuColorSet = getMenuColorSet(theme, menuAppearance);
+    const menuLayoutSx = {
+        // Els icones del menú han de quedar alineats verticalment amb el del botó de
+        // plegar/desplegar del capçal. Amb el menú desplegat reactlib posa 24px de padding a
+        // l'enllaç i el contenidor de l'icona hi suma 8px de marge, així que es baixa el
+        // padding a 16px. Només al primer nivell, per no tocar la sagnia dels submenús. El
+        // padding és un style en línia, d'aquí l'!important.
+        '& nav .MuiDrawer-paper > .MuiList-root > .MuiListItemButton-root': {
+            paddingLeft: '16px !important',
+        },
+        // Amb el menú plegat l'icona es centra dins del calaix, per això s'alinea eixamplant-lo
+        // en lloc de tocar el padding.
+        [MENU_COLLAPSED_DRAWER_SELECTOR]: {
+            width: MENU_COLLAPSED_WIDTH,
+            '& .MuiDrawer-paper': { width: MENU_COLLAPSED_WIDTH },
+        },
+        // Panell flotant dels submenús del menú plegat: ha de començar on acaba el calaix i
+        // estendre's fins a baix de la pantalla. Si queda separat o curt, per arribar al
+        // submenú cal sortir del menú i el panell es tanca abans.
+        '& nav .MuiDrawer-paper > div > .MuiBox-root': {
+            bottom: 0,
+            left: MENU_COLLAPSED_WIDTH,
+        },
+    };
     const menuColorSetSx = {
         '& nav .MuiDrawer-root': {
             '& .MuiPaper-root, & .MuiList-root': {
@@ -276,7 +312,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         },
     };
 
-    return (<Box sx={menuColorSet ? menuColorSetSx : undefined}>
+    return (<Box sx={menuColorSet ? { ...menuLayoutSx, ...menuColorSetSx } : menuLayoutSx}>
         <MuiBaseApp
             code={code}
             headerTitle={title}
