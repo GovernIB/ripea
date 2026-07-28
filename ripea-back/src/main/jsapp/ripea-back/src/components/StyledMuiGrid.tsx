@@ -241,7 +241,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
 
 			persistentStateActive={persistentStateActive ? true : undefined}
 			persistentStateClearPageSortPropsOnTopLevelRouteChange
-			
+
             apiRef={apiRef}
             datagridApiRef={datagridApiRef}
             columns={columnsWithWordWrap}
@@ -287,6 +287,18 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             }}
             {...paginationProps}
             {...others}
+
+            onRowContextMenu={(event:any, row:any) => {
+                event.preventDefault();
+                const rowElement = document.querySelector(`.MuiDataGrid-row[data-id="${row.id}"]`);
+
+                if (rowElement) {
+                    const menuButton:any = rowElement.querySelector('button[role="menuitem"]');
+                    if (menuButton) {
+                        menuButton?.click?.();
+                    }
+                }
+            }}
         />
     </div>
 }

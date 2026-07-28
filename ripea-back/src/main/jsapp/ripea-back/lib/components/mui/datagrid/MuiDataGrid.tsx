@@ -243,6 +243,8 @@ export type MuiDataGridProps = {
     persistentStateStorage?: 'local' | 'session';
     /** Event que es llença quan es fa clic sobre una fila */
     onRowClick?: GridEventListener<'rowClick'>;
+    /** Event que es llença quan es fa clic dret sobre una fila */
+    onRowContextMenu?: (event:any, row: any) => void;
     /** Event que es llença quan hi ha canvis en les files que mostra la graella */
     onRowsChange?: (rows: GridRowsProp, pageInfo: any) => void;
     /** Event que es llença quan hi ha canvis en l'ordenació de la graella */
@@ -860,6 +862,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         persistentStateKey,
         persistentStateStorage,
         onRowClick,
+        onRowContextMenu,
         onRowsChange,
         onRowOrderChange,
         onRowSelectionModelChange,
@@ -1301,7 +1304,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         const requestPending =
             loading === undefined && autoFindDisabled && !isRowsPresentInOtherProps;
         return {
-            row: { linkTo: rowLink, isRowLinkActive, isRowClickActive: onRowClick != null },
+            row: { linkTo: rowLink, isRowLinkActive, isRowClickActive: onRowClick != null, onContextMenu: onRowContextMenu },
             footer: {
                 paginationActive,
                 selectionActive,
@@ -1333,6 +1336,7 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         autoFindDisabled,
         isRowsPresentInOtherProps,
         noRowsText,
+        onRowContextMenu,
     ]);
     const memoizedSx = React.useMemo(() => {
         return {
