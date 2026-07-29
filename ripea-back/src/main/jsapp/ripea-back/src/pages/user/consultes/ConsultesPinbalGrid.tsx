@@ -14,6 +14,7 @@ import useDocumentDetail from "../../contingut/details/DocumentDetail.tsx";
 import {useActions} from "../../contingut/details/ContingutActions.tsx";
 import useVisualitzar from "../../contingut/actions/Visualitzar.tsx";
 import Load from "../../../components/Load.tsx";
+import {GridSortDirection} from "@mui/x-data-grid-pro";
 
 // Action
 const useConsultaPinbalActions = (refresh?: () => void) => {
@@ -138,6 +139,7 @@ const columns = [
     {
         field: 'createdByFullName',
         flex: 0.5,
+        sortProcessor: (_field: string, sort: GridSortDirection) => [ { field: "createdBy", sort } ]
     },
     {
         field: 'createdDate',
