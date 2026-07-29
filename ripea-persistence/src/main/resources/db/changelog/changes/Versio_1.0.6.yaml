@@ -47,3 +47,21 @@ databaseChangeLog:
                   splitStatements: true
                   stripComments: true
                   relativeToChangelogFile: true
+  - changeSet:
+        id: Versio_1.0.6_4
+        author: limit
+        context: caib
+        comment: Trasllat dels segments LOB de IPA_INTEGRACIO_ACCIO i IPA_EXCEPCIO_LOG al tablespace RIPEA_LOB. Context caib com els changesets de 06-initial_schema_lob.yaml, perque depen del tablespace RIPEA_LOB
+        changes:
+            - sqlFile:
+                  dbms: oracle
+                  path: ../scripts/oracle/1.0.6/Versio_1.0.6_DDL_4.sql
+                  splitStatements: true
+                  stripComments: true
+                  relativeToChangelogFile: true
+            - sqlFile:
+                  dbms: postgresql
+                  path: ../scripts/postgres/1.0.6/Versio_1.0.6_DDL_4.sql
+                  splitStatements: true
+                  stripComments: true
+                  relativeToChangelogFile: true

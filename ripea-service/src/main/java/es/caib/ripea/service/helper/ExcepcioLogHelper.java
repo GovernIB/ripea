@@ -36,6 +36,7 @@ public class ExcepcioLogHelper {
 		return result;
 	}
 
+	@Transactional
 	public int esborrarExcepcionsMesAntigues3Mesos() {
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.MONTH, -3);
