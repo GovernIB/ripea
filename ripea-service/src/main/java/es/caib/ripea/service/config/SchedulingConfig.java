@@ -758,6 +758,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 @Override
                 public Date nextExecutionTime(TriggerContext triggerContext) {
                     CronTrigger trigger = new CronTrigger("0 0 3 * * SAT");
+                	//CronTrigger trigger = new CronTrigger("0 */4 * * * *");
                     Date nextExecution = trigger.nextExecutionTime(triggerContext);
                     Long longNextExecution = nextExecution.getTime() - System.currentTimeMillis();
                     monitorTasquesService.updateProperaExecucio(codiEsborrarExcepcionsMesAntigues, longNextExecution);
@@ -768,7 +769,8 @@ public class SchedulingConfig implements SchedulingConfigurer {
             return new Trigger() {
                 @Override
                 public Date nextExecutionTime(TriggerContext triggerContext) {
-                    CronTrigger trigger = new CronTrigger("0 0 12 * * SUN");
+                    CronTrigger trigger = new CronTrigger("0 0 3 * * SUN");
+                	//CronTrigger trigger = new CronTrigger("0 */6 * * * *");
                     Date nextExecution = trigger.nextExecutionTime(triggerContext);
                     Long longNextExecution = nextExecution.getTime() - System.currentTimeMillis();
                     monitorTasquesService.updateProperaExecucio(codiEsborrarIntegracionsAntigues, longNextExecution);

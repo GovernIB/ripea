@@ -11,7 +11,7 @@ import useInformacioArxiu from "../../InformacioArxiu.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import {Divider} from "@mui/material";
 import {useExportarDocuments} from "../actions/ExportarDocuments.tsx";
-import useHistoric from "../../Historic.tsx";
+import useHistoric, {HistoricContingutTipusEnum} from "../../Historic.tsx";
 import useTancar from "../actions/Tancar.tsx";
 import useDescargarDocuments from "../actions/DescargarDocuments.tsx";
 import useModifyExpedient from "../actions/ModifyExpedient.tsx";
@@ -230,7 +230,7 @@ export const useCommonActions = (refresh?: () => void) => {
         eliminar,
         syncArxiu,
     } = useActions(refresh);
-    const {handleOpen: handelHistoricOpen, dialog: dialogHistoric} = useHistoric();
+    const {handleOpen: handelHistoricOpen, dialog: dialogHistoric} = useHistoric(HistoricContingutTipusEnum.CONTINGUT, 'expedientResource');
     const {handleOpen: handleArxiuOpen, dialog: arxiuDialog} = useInformacioArxiu('expedientResource', 'ARXIU_EXPEDIENT');
     const {handleShow: hanldeAssignar, content: assignarContent} = useAssignar(refresh);
     const {handleShow: hanldeCambiarEstado, content: cambiarEstadoContent} = useCambiarEstat(refresh);

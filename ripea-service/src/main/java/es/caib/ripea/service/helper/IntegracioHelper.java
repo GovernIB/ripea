@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -35,6 +37,11 @@ public class IntegracioHelper {
 	private final CacheHelper cacheHelper;
 	private final ConfigHelper configHelper;
 	private final MessageHelper messageHelper;
+
+	// Cal passar pel proxy perquè el guard de addAccioOk/addAccioError quedi FORA del límit
+	// transaccional: l'error d'inserció es manifesta al commit, quan el mètode @Transactional
+	// ja ha retornat i un try/catch intern ja no el veuria.
+	@Lazy @Autowired private IntegracioHelper self;
 
 	public static final String INTCODI_USUARIS        = IntegracioCodiEnum.USUARIS.name();
 	public static final String INTCODI_UNITATS        = IntegracioCodiEnum.ORGANISMES.name();
@@ -105,8 +112,38 @@ public class IntegracioHelper {
 		return result;
 	}
 
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void addAccioOk(
+			String integracioCodi,
+			String descripcio,
+			String endpoint,
+			Map<String, String> parametres,
+			IntegracioAccioTipusEnumDto tipus,
+			long tempsResposta) {
+		try {
+			self.guardarAccioOk(integracioCodi, descripcio, endpoint, parametres, tipus, tempsResposta);
+		} catch (Throwable th) {
+			logErrorMonitor(integracioCodi, descripcio, th);
+		}
+	}
+
+	public void addAccioError(
+			String integracioCodi,
+			String descripcio,
+			String endpoint,
+			Map<String, String> parametres,
+			IntegracioAccioTipusEnumDto tipus,
+			long tempsResposta,
+			String errorDescripcio,
+			Throwable throwable) {
+		try {
+			self.guardarAccioError(integracioCodi, descripcio, endpoint, parametres, tipus, tempsResposta, errorDescripcio, throwable);
+		} catch (Throwable th) {
+			logErrorMonitor(integracioCodi, descripcio, th);
+		}
+	}
+
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void guardarAccioOk(
 			String integracioCodi,
 			String descripcio,
 			String endpoint,
@@ -120,7 +157,7 @@ public class IntegracioHelper {
 	}
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void addAccioError(
+	public void guardarAccioError(
 			String integracioCodi,
 			String descripcio,
 			String endpoint,
@@ -140,10 +177,23 @@ public class IntegracioHelper {
 		}
 	}
 
+	/**
+	 * El registre al monitor d'integracions és informatiu: si falla (p.ex. ORA-01691 per manca
+	 * d'espai al tablespace) no ha de tombar l'operació de negoci que l'ha provocat.
+	 *
+	 * Només es deixa constància al log de l'aplicació. No es fa servir ExcepcioLogHelper
+	 * expressament: si no s'ha pogut inserir a IPA_INTEGRACIO_ACCIO, molt probablement
+	 * tampoc es podria inserir a IPA_EXCEPCIO_LOG i l'error es tornaria a propagar.
+	 */
+	private void logErrorMonitor(String integracioCodi, String descripcio, Throwable th) {
+		log.error("No s'ha pogut registrar l'acció al monitor d'integracions (integracioCodi={}, descripcio={})", integracioCodi, descripcio, th);
+	}
+
 	public IntegracioAccioDto findOne(Long id) {
 		return integracioResourceRepository.findById(id).map(this::toDto).orElse(null);
 	}
 
+	@Transactional
 	public int esborrarAccionsMesAntigues3Mesos() {
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.MONTH, -3);

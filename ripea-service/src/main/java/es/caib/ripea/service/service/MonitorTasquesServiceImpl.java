@@ -27,10 +27,8 @@ public class MonitorTasquesServiceImpl implements MonitorTasquesService {
 		return monitorTascaInfo;
 	}
 
-
 	@Override
 	public void updateProperaExecucio(String codi, Long plusValue) {
-		
 		MonitorTascaInfo monitorTascaInfo = MonitorTasquesServiceImpl.tasques.get(codi);
 		Date dataProperaExecucio = plusValue != null ? new Date(System.currentTimeMillis() + plusValue) : null;
 		monitorTascaInfo.setProperaExecucio(dataProperaExecucio);

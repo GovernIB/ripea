@@ -106,6 +106,7 @@ const columns = [
     {
         field: 'createdByFullName',
         flex: 0.8,
+        sortProcessor: (_field: string, sort: GridSortDirection) => [ { field: "createdBy", sort } ]
     },
 ]
 
