@@ -863,8 +863,8 @@ class MetaExpedientHelperTest {
         MetaExpedientTascaEntity resultat = helper.tascaUpdate(tascaEntity, tascaDto);
 
         assertThat(resultat).isSameAs(tascaEntity);
-        // update(codi, nom, ordre, descripcio, responsable, dataLimit, duracio, prioritat, estatCrear, estatFinalitzar)
-        verify(tascaEntity).update(any(), any(), anyInt(), any(), any(), any(), any(), any(), any(), any());
+        // update(codi, nom, ordre, descripcio, responsable, dataLimit, duracio, prioritat, inicialitzarAutomaticament, estatCrear, estatFinalitzar)
+        verify(tascaEntity).update(any(), any(), anyInt(), any(), any(), any(), any(), any(), any(), any(), any());
         verify(metaExpedientTascaValidacioRepository, never()).save(any());
     }
 
@@ -1090,7 +1090,7 @@ class MetaExpedientHelperTest {
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("CLON");
     }
-    
+
     @Test
     void clonar_quanCodiLliure_clonaICanviaRevisioADisseny() {
         EntitatEntity entitat = mock(EntitatEntity.class);
@@ -1258,7 +1258,7 @@ class MetaExpedientHelperTest {
         when(metaExpedientTascaRepository.save(any(MetaExpedientTascaEntity.class))).thenAnswer(inv -> inv.getArgument(0));
         when(conversioTipusHelper.convertir(any(MetaExpedientTascaEntity.class), eq(MetaExpedientTascaDto.class))).thenReturn(tascaDto);
         initMeterRegistry();
-        
+
         MetaExpedientTascaDto resultat = helper.tascaCreate(ENTITAT_ID, META_EXPEDIENT_ID, tascaDto, "IPA_ADMIN", ORGAN_ID);
 
         assertThat(resultat).isNotNull();
@@ -1650,7 +1650,7 @@ class MetaExpedientHelperTest {
 
     @Test
     void createFromImport_ambDtoMinim_creaElProcedimentSenseErrors() {
-    	
+
         EntitatEntity entitat = mock(EntitatEntity.class);
         MetaExpedientEntity procedimentCreat = mock(MetaExpedientEntity.class);
         MetaExpedientEntity tascaMetaExpedient = mock(MetaExpedientEntity.class);
@@ -1662,7 +1662,7 @@ class MetaExpedientHelperTest {
         metaDadaDocumentDto.setNom("Dada de metadoc 1");
         metaDadaDocumentDto.setTipus(MetaDadaTipusEnumDto.IMPORT);
         metaDadaDocumentDto.setMultiplicitat(MultiplicitatEnumDto.M_1);
-        
+
         MetaDocumentDto metaDocumentDto = new MetaDocumentDto();
         metaDocumentDto.setCodi("DOC_1");
         metaDocumentDto.setNom("Document 1");
@@ -1717,7 +1717,7 @@ class MetaExpedientHelperTest {
                 .thenReturn(tascaDto);
         when(grupRepository.findByEntitatIdAndCodi(any(), any())).thenReturn(grupEntity);
         initMeterRegistry();
-        
+
         helper.createFromImport(ENTITAT_ID, importDto, "IPA_ADMIN", ORGAN_ID);
 
         verify(metaExpedientRepository).save(any());
@@ -1807,7 +1807,7 @@ class MetaExpedientHelperTest {
         when(grupRepository.findByEntitatIdAndCodi(any(), any())).thenReturn(grupEntity);
 
         initMeterRegistry();
-        
+
         helper.updateFromImport(ENTITAT_ID, importDto, "IPA_ADMIN", ORGAN_ID);
 
         verify(procedimentOriginal).update(any(), any(), any(), any(), any(), any(),
@@ -1817,74 +1817,74 @@ class MetaExpedientHelperTest {
         verify(expedientEstatHelper).createExpedientEstat(any(), any(), any(), any());
         verify(metaExpedientTascaRepository).save(any());
     }
-    
+
     private void initMeterRegistry() {
         when(applicationHelper.getMeterRegistry()).thenReturn(new MeterRegistry(new Clock() {
-			
+
 			@Override
 			public long wallTime() {
 				// TODO Auto-generated method stub
 				return 0;
 			}
-			
+
 			@Override
 			public long monotonicTime() {
 				// TODO Auto-generated method stub
 				return 0;
 			}
 		}) {
-			
+
 			@Override
 			protected Timer newTimer(Id id, DistributionStatisticConfig distributionStatisticConfig,
 					PauseDetector pauseDetector) {
 				// TODO Auto-generated method stub
 				return null;
 			}
-			
+
 			@Override
 			protected Meter newMeter(Id id, Type type, Iterable<Measurement> measurements) {
 				// TODO Auto-generated method stub
 				return null;
 			}
-			
+
 			@Override
 			protected <T> Gauge newGauge(Id id, T obj, ToDoubleFunction<T> valueFunction) {
 				// TODO Auto-generated method stub
 				return null;
 			}
-			
+
 			@Override
 			protected <T> FunctionTimer newFunctionTimer(Id id, T obj, ToLongFunction<T> countFunction,
 					ToDoubleFunction<T> totalTimeFunction, TimeUnit totalTimeFunctionUnit) {
 				// TODO Auto-generated method stub
 				return null;
 			}
-			
+
 			@Override
 			protected <T> FunctionCounter newFunctionCounter(Id id, T obj, ToDoubleFunction<T> countFunction) {
 				// TODO Auto-generated method stub
 				return null;
 			}
-			
+
 			@Override
 			protected DistributionSummary newDistributionSummary(Id id, DistributionStatisticConfig distributionStatisticConfig,
 					double scale) {
 				// TODO Auto-generated method stub
 				return null;
 			}
-			
+
 			@Override
 			protected Counter newCounter(Id id) {
 				// TODO Auto-generated method stub
 				return null;
 			}
-			
+
 			@Override
 			protected TimeUnit getBaseTimeUnit() {
 				// TODO Auto-generated method stub
 				return null;
 			}
-			
+
 			@Override
 			protected DistributionStatisticConfig defaultHistogramConfig() {
 				// TODO Auto-generated method stub

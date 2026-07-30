@@ -188,6 +188,7 @@ public class TestDataFactory {
                                         null,   // dataLimit
                                         null,   // duracio
                                         PrioritatEnumDto.B_NORMAL,
+                                        false,
                                         null,   // estatCrearTasca
                                         null    // estatFinalitzarTasca
                                 ).build()

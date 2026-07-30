@@ -90,7 +90,7 @@ public class TestDataFactory {
         );
 
         tipusDocumentalRepository.save(TipusDocumentalEntity.getBuilder("TD01", "Resolución", data.entitat, "Resolució").build());
-        
+
         // --- Usuaris de @WithMockUser (necessaris per a la conversió entitat→DTO) ---
         // ConversioTipusHelper cerca l'usuari per createdBy/lastModifiedBy. Si no existeix, llança NPE.
         data.usuari = usuariRepository.save(
@@ -220,6 +220,7 @@ public class TestDataFactory {
                                         null,   // dataLimit
                                         null,   // duracio
                                         PrioritatEnumDto.B_NORMAL,
+                                        false,
                                         null,   // estatCrearTasca
                                         null    // estatFinalitzarTasca
                                 ).build()
