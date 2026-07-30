@@ -921,14 +921,17 @@ public class EmailHelper {
 		if (createdByCodi != null) {
 			//Persona que ha llançat l'enviament / tasca (createdBy)
 			DadesUsuari createdBy = pluginHelper.dadesUsuariFindAmbCodi(createdByCodi);
-			if ((!isTasca || (isTasca && isTascaNova)) && createdBy.getEmail() != null && !createdBy.getEmail().isEmpty())
-				responsables.add(createdBy);
+			if (createdBy!=null) {
+				if ((!isTasca || (isTasca && isTascaNova)) && createdBy.getEmail() != null && !createdBy.getEmail().isEmpty()) {
+					responsables.add(createdBy);
+				}
+			}
 
 			//Persones responsables tasca
 			if (responsablesTasca != null && !responsablesTasca.isEmpty()) {
 				for (UsuariEntity resp: responsablesTasca) {
 					DadesUsuari responsable = pluginHelper.dadesUsuariFindAmbCodi(resp.getCodi());
-					if (responsable.getEmail() != null && !responsable.getEmail().isEmpty())
+					if (responsable!=null && responsable.getEmail() != null && !responsable.getEmail().isEmpty())
 						responsables.add(responsable);
 				}
 			}
@@ -936,14 +939,14 @@ public class EmailHelper {
 			//Persona que té agafat l'expedient sempre en cas de ser un canvi d'estat d'una tasca
 			if (isTasca && ! isTascaNova && agafatPer != null) {
 				DadesUsuari propietariExpedient = pluginHelper.dadesUsuariFindAmbCodi(expedient.getAgafatPer().getCodi());
-				if (propietariExpedient.getEmail() != null && !propietariExpedient.getEmail().isEmpty())
+				if (propietariExpedient!=null && propietariExpedient.getEmail() != null && !propietariExpedient.getEmail().isEmpty())
 					responsables.add(propietariExpedient);
 			}
 
 			//Persona que té agafat l'expedient si no és la mateixa que ha creat l'enviament, notificació o tasca
 			if (agafatPer != null && (!agafatPer.getCodi().equals(createdByCodi))) {
 				DadesUsuari propietariExpedient = pluginHelper.dadesUsuariFindAmbCodi(expedient.getAgafatPer().getCodi());
-				if (propietariExpedient.getEmail() != null && !propietariExpedient.getEmail().isEmpty())
+				if (propietariExpedient!=null && propietariExpedient.getEmail() != null && !propietariExpedient.getEmail().isEmpty())
 					responsables.add(propietariExpedient);
 			}
 
@@ -951,12 +954,13 @@ public class EmailHelper {
 			List<UsuariEntity> seguidors = expedient.getSeguidors();
 			for (UsuariEntity seguidorEntity : seguidors) {
 				DadesUsuari seguidor = pluginHelper.dadesUsuariFindAmbCodi(seguidorEntity.getCodi());
-
-				if ((agafatPer != null
-						&& (!agafatPer.getCodi().equals(seguidor.getCodi()))) //En cas de no ser la mateixa persona que ha llançat l'enviament o la que te agafat l'expedient
-						&& !createdByCodi.equals(seguidor.getCodi())
-						&& (seguidor.getEmail() != null && !seguidor.getEmail().isEmpty())) {
-					responsables.add(seguidor);
+				if (seguidor!=null) {
+					if ((agafatPer != null
+							&& (!agafatPer.getCodi().equals(seguidor.getCodi()))) //En cas de no ser la mateixa persona que ha llançat l'enviament o la que te agafat l'expedient
+							&& !createdByCodi.equals(seguidor.getCodi())
+							&& (seguidor.getEmail() != null && !seguidor.getEmail().isEmpty())) {
+						responsables.add(seguidor);
+					}
 				}
 			}
 		}
@@ -1171,8 +1175,10 @@ public class EmailHelper {
 		List<String> destinatarisAgrupats = new ArrayList<String>();
 		List<String> destinatarisNoAgrupats = new ArrayList<String>();
 
-		for (DadesUsuari responsable : responsables) {
-			addDestinatari(responsable.getCodi(), destinatarisNoAgrupats, destinatarisAgrupats, null, null);
+		if (responsables!=null) {
+			for (DadesUsuari responsable : responsables) {
+				addDestinatari(responsable.getCodi(), destinatarisNoAgrupats, destinatarisAgrupats, null, null);
+			}
 		}
 
 		sendOrSaveEmail(
