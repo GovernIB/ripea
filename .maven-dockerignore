@@ -2,9 +2,19 @@
 # Exclou tots els artefactes de compilació i re-inclou
 # únicament els necessaris per construir les imatges Docker.
 # ============================================================
-**/target/**
-!ripea-ear/target/ripea.ear
-!ripea-back/target/ripea-back-*.war
+ripea-api-interna/target/**
+ripea-backend/target/**
+ripea-ejb/target/**
+ripea-persistence/target/**
+ripea-plugin/target/**
+ripea-plugin-intf/target/**
+ripea-service/target/**
+ripea-service-intf/target/**
+ripea-back/target/**
+ripea-ear/target/docker/**
+ripea-ear/target/maven-archiver/**
+ripea-ear/target/ripea/**
+ripea-ear/target/temp/**
 
 # ============================================================
 # Mòduls Maven sense fitxers rellevants per a cap imatge.
