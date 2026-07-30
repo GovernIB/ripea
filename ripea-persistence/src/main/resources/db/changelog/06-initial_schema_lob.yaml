@@ -1,3 +1,19 @@
+# Trasllat dels segments LOB al tablespace RIPEA_LOB (equivalent Liquibase de
+# scripts/bbdd/1.0/oracle/ripea_07_lob.sql).
+#
+# ABAST: aquest fitxer nomes pot moure les columnes LOB creades a
+# 01-initial_schema_table.yaml, que son exactament les 7 dels changesets lob-1..lob-5.
+# La resta de columnes LOB de l'esquema es creen despres, als changelogs de db/changelog/changes,
+# i per tant el seu trasllat va alla:
+#   - IPA_ENTITAT.LOGO_RIPEA / LOGO_MENU / BLACK_LOGO_* -> Versio_1.0.6_DDL_5.sql
+#     (columnes afegides a Versio_1.0.3_DDL_7.sql)
+#   - IPA_INTEGRACIO_ACCIO i IPA_EXCEPCIO_LOG -> Versio_1.0.6_DDL_4.sql
+#     (taules creades a la 1.0.5)
+# En total, 15 columnes. Moure-les des d'aqui fallaria: quan s'executa aquest fitxer
+# encara no existeixen.
+#
+# PRE-REQUISIT: el tablespace RIPEA_LOB ha d'existir (scripts/bbdd/1.0/oracle/ripea_00_tablespace_lob.sql).
+# Per aixo tots els changesets tenen context caib.
 databaseChangeLog:
 - changeSet:
     id: lob-1
@@ -45,3 +61,19 @@ databaseChangeLog:
     - sql:
         dbms: oracle
         sql: ALTER TABLE ${app_prefix}registre_annex MOVE LOB(firma_contingut) STORE AS ${app_prefix}reg_annx_firmacont_lob(TABLESPACE ripea_lob INDEX ${app_prefix}reg_annx_firmacont_lob_i);
+# El MOVE LOB deixa UNUSABLE tots els indexs de la taula (PK, UK i FK inclosos) si la
+# taula te dades; amb la taula buida els deixa VALID. En una instalacio nova aquest
+# fitxer s'executa abans de 08-initial_data.yaml i per tant no invalida res, pero si el
+# context caib s'activa mes tard sobre una base de dades ja en servei els changesets
+# anteriors si que els invalidarien, i el primer INSERT posterior fallaria amb ORA-01502.
+# Aquest changeset ho cobreix: sobre taules buides no fa res.
+- changeSet:
+    id: lob-6
+    author: limit
+    context: caib
+    comment: Reconstruccio dels indexs que els MOVE LOB anteriors poden haver deixat UNUSABLE
+    changes:
+    - sql:
+        dbms: oracle
+        endDelimiter: "@@"
+        sql: BEGIN FOR r IN (SELECT index_name FROM user_indexes WHERE status = 'UNUSABLE' AND table_name IN (UPPER('${app_prefix}document'), UPPER('${app_prefix}metadocument'), UPPER('${app_prefix}registre'), UPPER('${app_prefix}registre_annex'), UPPER('${app_prefix}entitat'))) LOOP EXECUTE IMMEDIATE 'ALTER INDEX ' || r.index_name || ' REBUILD'; END LOOP; END;@@
