@@ -1,6 +1,7 @@
 import {useTranslation} from "react-i18next";
 import {useState} from "react";
 import {GridPage, useMuiDataGridApiRef} from "reactlib";
+import {GridSortDirection} from "@mui/x-data-grid-pro";
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
@@ -82,6 +83,11 @@ const columns: any[] = [
     {
         field: 'procediment',
         flex: 1,
+        // Camp transient (calculat a afterConversion): s'ordena pel nom del procediment,
+        // que és el que encapçala la descripció mostrada "nom (classificacio)".
+        sortProcessor: (_field: string, sort: GridSortDirection) => {
+            return [{field: 'expedient.metaExpedient.nom', sort}];
+        },
     },
     {
         field: 'expedient',
@@ -108,6 +114,9 @@ const columns: any[] = [
     },
     {
         field: 'destinatari',
+        // Camp transient: és el primer interessat de la col·lecció documentInteressats,
+        // no hi ha cap columna equivalent en BD per la qual ordenar.
+        sortable: false,
         flex: 1,
         valueFormatter: (interessat: any) => {
             let resum = '';

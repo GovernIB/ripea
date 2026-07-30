@@ -1778,21 +1778,12 @@ public class PluginHelper {
 			ArxiuFirmaPerfilEnumDto perfil,
 			String csvRegulacio) {
 		Firma firma = new Firma();
-		firma.setFitxerNom(
-				nom);
-
-		firma.setTipusMime(
-				contentType);
-		firma.setContingut(
-				contingut);
-		firma.setTipus(
-				ArxiuConversions.getFirmaTipus(
-						tipus));
-		firma.setPerfil(
-				ArxiuConversions.getFirmaPerfil(
-						perfil));
-		firma.setCsvRegulacio(
-				csvRegulacio);
+		firma.setFitxerNom(nom);
+		firma.setTipusMime(contentType);
+		firma.setContingut(contingut);
+		firma.setTipus(ArxiuConversions.getFirmaTipus(tipus));
+		firma.setPerfil(ArxiuConversions.getFirmaPerfil(perfil));
+		firma.setCsvRegulacio(csvRegulacio);
 		return firma;
 	}
 
@@ -1806,14 +1797,16 @@ public class PluginHelper {
 	 * TF06 - PAdES.
 	 * El tipo TF04 será establecido por defecto para documentos firmados, exceptuando los documentos en formato PDF o PDF/A, cuyo tipo será TF06.
 	 */
-	private void setContingutIFirmes(
+	private void setContingutAndFirmes(
 			Document documentArxiu,
 			FitxerDto fitxer,
 			DocumentFirmaTipusEnumDto documentFirmaTipus,
 			List<ArxiuFirmaDto> firmes,
 			ArxiuOperacioEnumDto arxiuAccio,
 			ArxiuEstatEnumDto arxiuEstat) {
-
+		
+		boolean esRequereixContingut = true;
+		
 		if (documentFirmaTipus == DocumentFirmaTipusEnumDto.SENSE_FIRMA) {
 
 			documentArxiu.setContingut(
@@ -1837,6 +1830,7 @@ public class PluginHelper {
 				documentArxiu.setFirmes(
 						Arrays.asList(
 								firma));
+				esRequereixContingut = false;
 			}
 
 		} else if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
@@ -1859,6 +1853,7 @@ public class PluginHelper {
 						FirmaTipus.XADES_DET.equals(firma.getTipus()) ||
 						FirmaTipus.XADES_ENV.equals(firma.getTipus())) {
 							inclourerContingutFitxer = false;
+							esRequereixContingut = false;
 					}
 				}
 
@@ -1875,7 +1870,7 @@ public class PluginHelper {
 		}
 
 		// És una modificació de metadades d'un document definitiu
-		if (documentArxiu.getContingut() == null && fitxer != null && isModificacioCustodiatsActiva()) {
+		if (documentArxiu.getContingut() == null && fitxer != null && isModificacioCustodiatsActiva() && esRequereixContingut) {
 			documentArxiu.setContingut(
 					getDocumentContingut(
 							fitxer.getNom(),
@@ -1884,7 +1879,7 @@ public class PluginHelper {
 		}
 
 	}
-
+	
 	private IntegracioAccioDto getIntegracioAccioArxiu(
 			DocumentEntity document,
 			String endpoint,
@@ -4898,12 +4893,9 @@ public class PluginHelper {
 						IntegracioAccioTipusEnumDto.ENVIAMENT,
 						System.currentTimeMillis() - t0,
 						throwable.getMessage(),
-						e);				
+						e);
 				applicationHelper.stopTimer(sample, "METRICS@Integracions.validaFirma", "resultado", "error", "endpoint", Utils.hasValue(validaSignaturaPlugin.getEndpoint())?validaSignaturaPlugin.getEndpoint():"N/A");
-				return new SignatureInfoDto(false, true,
-                        RolHelper.getRolsCurrentUser().contains("IPA_ADMIN")
-                        ? e.getMessage()
-                        : "Error al detectar firma de document.");
+				return new SignatureInfoDto(false, true, e.getMessage());
 			}
 		}
 	}
@@ -6852,7 +6844,7 @@ public class PluginHelper {
 		documentArxiu.setEstat(DocumentEstat.valueOf(arxiuEstat.toString()));
 
 		if (!DocumentTipusEnumDto.FISIC.equals(documentEntity.getDocumentTipus())) {
-			setContingutIFirmes(
+			setContingutAndFirmes(
 					documentArxiu,
 					fitxer,
 					documentFirmaTipus,
@@ -6919,7 +6911,7 @@ public class PluginHelper {
 			documentFirmaTipus = DocumentFirmaTipusEnumDto.SENSE_FIRMA;
 		}
 
-		setContingutIFirmes(
+		setContingutAndFirmes(
 				documentArxiu,
 				fitxer,
 				documentFirmaTipus,

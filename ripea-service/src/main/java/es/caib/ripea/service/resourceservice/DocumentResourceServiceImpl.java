@@ -437,7 +437,9 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     		throw ex;
     	} catch (Exception ex) {
     		excepcioLogHelper.addExcepcio("/document/"+resource.getId()+"/create", ex);
-    		throw ex;
+    		String message = messageHelper.getMessage(ex.getMessage());
+    		if (message.startsWith("???")) { message = ex.getMessage(); }
+    		throw new ValidationException(message);
     	}
     	return resource;
     }
