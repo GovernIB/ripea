@@ -465,7 +465,9 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
             await expect(headers.filter({ hasText: /\bnom\b|nombre/i }).first()).toBeVisible();    // Nom / Nombre
             await expect(headers.filter({ hasText: /documental/i }).first()).toBeVisible();        // Sèrie documental / Serie documental
             await expect(headers.filter({ hasText: /gestor/i }).first()).toBeVisible();            // Òrgan gestor / Órgano gestor
-            await expect(headers.filter({ hasText: /revis/i }).first()).toBeVisible();             // Estat revisió / Estado revisión
+            // La columna "Estat revisió" NO es comprova: metaExpedientList.jsp
+            // l'embolcalla amb <c:if test="${isRevisioActiva}">, de manera que la
+            // seva presència depèn de la configuració de l'entorn.
         });
 
         await test.step('botons d\'acció per a IPA_ADMIN visibles', async () => {
@@ -624,8 +626,8 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
             const checkGestio = frame.locator('#gestioAmbGrupsActiva');
             if (!await checkGestio.isChecked()) await checkGestio.check();
 
-            const checkInteressat = frame.locator('#interessatObligatori');
-            if (!await checkInteressat.isChecked()) await checkInteressat.check();
+            // "Interessat obligatori" NO es marca: el camp només existeix si la propietat
+            // PERMETRE_OBLIGAR_INTERESSAT està activa, i no aporta res a aquest test.
 
             const checkPermis = frame.locator('#permisDirecte');
             if (!await checkPermis.isChecked()) await checkPermis.check();

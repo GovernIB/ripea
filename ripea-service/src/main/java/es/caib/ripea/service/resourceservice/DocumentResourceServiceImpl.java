@@ -437,7 +437,9 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     		throw ex;
     	} catch (Exception ex) {
     		excepcioLogHelper.addExcepcio("/document/"+resource.getId()+"/create", ex);
-    		throw ex;
+    		String message = messageHelper.getMessage(ex.getMessage());
+    		if (message.startsWith("???")) { message = ex.getMessage(); }
+    		throw new ValidationException(message);
     	}
     	return resource;
     }
@@ -1519,10 +1521,22 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
             if (fieldName==null){
                 target.setPermetreEnviamentPostal(ConfigHelper.getEntitat().get().isPermetreEnviamentPostal());
                	target.setDuracio(configHelper.getAsInt(PropertyConfig.NOTIB_PLUGIN_CADUCA, 10));
+               	// Si l'expedient només té un interessat (sense comptar els representants) es
+               	// selecciona per defecte, igual que fa el formulari JSP. S'ha d'emprar el setter
+               	// perquè la lògica onChange només detecta com a canvis les cridades als setters.
                	List<InteressatResourceEntity> interessatsExp = documentResourceRepository.findById((Long)id).get().getExpedient().getInteressats();
-               	if (interessatsExp!=null && interessatsExp.size()==1) {
-               		InteressatResourceEntity interessatUnic = interessatsExp.get(0);
-               		target.getInteressats().add(ResourceReference.toResourceReference(interessatUnic.getId(), interessatUnic.getCodiNom()));
+               	if (interessatsExp!=null) {
+               		List<InteressatResourceEntity> titulars = interessatsExp.stream()
+               				.filter(interessat -> !interessat.isEsRepresentant())
+               				.collect(Collectors.toList());
+               		if (titulars.size()==1) {
+               			InteressatResourceEntity interessatUnic = titulars.get(0);
+               			List<ResourceReference<InteressatResource, Long>> interessatsPerDefecte = new ArrayList<>();
+               			interessatsPerDefecte.add(ResourceReference.<InteressatResource, Long>toResourceReference(
+               					interessatUnic.getId(),
+               					interessatUnic.getCodiNom()));
+               			target.setInteressats(interessatsPerDefecte);
+               		}
                	}
 			   return;
             }

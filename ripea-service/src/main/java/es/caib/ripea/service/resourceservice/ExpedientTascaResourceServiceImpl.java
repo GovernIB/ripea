@@ -422,7 +422,8 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
                 return resultat;
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/tasca/"+entity.getId()+"/ChangeDataLimitActionExecutor", e);
-				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "expedientTasca.changeDataLimit.reject");
+				String missatge = messageHelper.getMessage("expedientTasca.changeDataLimit.reject")+": "+e.getMessage();
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, missatge);
 			}	
         }
 

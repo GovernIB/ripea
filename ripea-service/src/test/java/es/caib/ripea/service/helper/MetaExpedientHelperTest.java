@@ -864,7 +864,7 @@ class MetaExpedientHelperTest {
 
         assertThat(resultat).isSameAs(tascaEntity);
         // update(codi, nom, ordre, descripcio, responsable, dataLimit, duracio, prioritat, inicialitzarAutomaticament, estatCrear, estatFinalitzar)
-        verify(tascaEntity).update(any(), any(), anyInt(), any(), any(), any(), any(), any(), any(), any(), any());
+        verify(tascaEntity).update(any(), any(), anyInt(), any(), any(), any(), any(), any(), anyBoolean(), any(), any());
         verify(metaExpedientTascaValidacioRepository, never()).save(any());
     }
 

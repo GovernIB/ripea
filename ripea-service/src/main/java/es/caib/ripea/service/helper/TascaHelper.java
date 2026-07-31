@@ -197,9 +197,7 @@ public class TascaHelper {
 	public ExpedientTascaEntity updateDataLimit(Long tascaId, Date dataLimit, Integer duracio) {
 
 		ExpedientTascaEntity expedientTascaEntity = expedientTascaRepository.getOne(tascaId);
-
-		Calendar c = Calendar.getInstance();
-		c.setTime(expedientTascaEntity.getDataLimit());
+		Date dataLimitAnterior = expedientTascaEntity.getDataLimit();
 
 		//Si no ha canviat res en el DTO respecte del entity (info a BBDD), no fer cap acció
 		if (Utils.sonValorsDiferentsControlantNulls(expedientTascaEntity.getDataLimit(), dataLimit) ||
@@ -208,8 +206,8 @@ public class TascaHelper {
 			expedientTascaEntity.setDuracio(duracio);
 			emailHelper.enviarEmailModificacioDataLimitTasca(expedientTascaEntity);
 		}
-
-		logAccioTasca(expedientTascaEntity, LogTipusEnumDto.CANVI_DATALIMIT_TASCA, c.getTime());
+		
+		logAccioTasca(expedientTascaEntity, LogTipusEnumDto.CANVI_DATALIMIT_TASCA, dataLimitAnterior);
 
 		pluginHelper.comandaTascaSend(expedientTascaEntity);
 
@@ -280,9 +278,9 @@ public class TascaHelper {
 				case CANCELAR_DELEGACIO_TASCA:
 					parametreCanviTasca1 = delegatAnterior!=null?delegatAnterior.getCodiAndNom():"Sense delegat anterior.";
 					parametreCanviTasca2 = expedientTascaEntity.getDelegat()!=null?expedientTascaEntity.getDelegat().getCodiAndNom():"Sense delegat actual.";
-					break;
-				case CANVI_DATALIMIT_TASCA:
-					parametreCanviTasca1 = new SimpleDateFormat("dd/MM/yyyy").format(dataLimitAnterior);
+					break;			
+				case CANVI_DATALIMIT_TASCA: 
+					parametreCanviTasca1 = dataLimitAnterior!=null?new SimpleDateFormat("dd/MM/yyyy").format(dataLimitAnterior):"";
 					parametreCanviTasca2 = new SimpleDateFormat("dd/MM/yyyy").format(expedientTascaEntity.getDataLimit());
 					break;
 				case CREACIO:

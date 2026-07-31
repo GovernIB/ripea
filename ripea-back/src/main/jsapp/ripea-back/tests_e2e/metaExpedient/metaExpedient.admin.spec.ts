@@ -423,7 +423,10 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             await expect(headers.filter({ hasText: /\bnom\b|nombre/i }).first()).toBeVisible();
             await expect(headers.filter({ hasText: /documental/i }).first()).toBeVisible();
             await expect(headers.filter({ hasText: /gestor/i }).first()).toBeVisible();
-            await expect(headers.filter({ hasText: /estat|estado/i }).first()).toBeVisible();
+            // La columna "Estat" (revisioEstat) NO es comprova: MetaExpedientGrid la
+            // amaga quan el circuit de revisió està desactivat
+            // (hidden: !user?.sessionScope?.isRevisioActiva), de manera que la seva
+            // presència depèn de la configuració de l'entorn.
         });
 
         await test.step('botons d\'acció per a IPA_ADMIN visibles', async () => {
@@ -563,8 +566,8 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             const checkGestio = dialog.locator('input[name="gestioAmbGrupsActiva"]');
             if (!await checkGestio.isChecked()) await checkGestio.click();
 
-            const checkInteressat = dialog.locator('input[name="interessatObligatori"]');
-            if (!await checkInteressat.isChecked()) await checkInteressat.click();
+            // "Interessat obligatori" NO es marca: el camp només existeix si la propietat
+            // PERMETRE_OBLIGAR_INTERESSAT està activa, i no aporta res a aquest test.
 
             const checkPermis = dialog.locator('input[name="permisDirecte"]');
             if (!await checkPermis.isChecked()) await checkPermis.click();
