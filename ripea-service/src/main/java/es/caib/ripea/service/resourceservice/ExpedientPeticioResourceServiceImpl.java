@@ -871,10 +871,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 					Exception exCanviEstat = expedientPeticioHelper.reintentarCanviEstatDistribucio(params.getIds().get(0));
 					
 					if (exCanviEstat!=null) {
-						String ids = Utils.getIdsSeparatsComa(params.getIds());
-						excepcioLogHelper.addExcepcio("/anotacio/CanviEstatDistribucioActionExecutor", exCanviEstat, ids, "massiu="+params.isMassivo());
-						String message = messageHelper.getMessage("message.common.action.error")+": "+exCanviEstat.getMessage();
-						throw new ActionExecutionException(getResourceClass(), ids, code, message);
+						throw exCanviEstat;
 					}
 					
 				} else {
