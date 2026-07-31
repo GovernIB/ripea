@@ -1652,7 +1652,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		        	throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "No s'han seleccionat documents per importar.");
 		        }
 		    } catch (Exception ex) {
-		        excepcioLogHelper.addExcepcio("/expedient/" + entity.getId() + "ImportarDocumentsZipArxiuActionExecutor", ex);
+		        excepcioLogHelper.addExcepcio("/expedient/" + entity.getId() + "/ImportarDocumentsZipArxiuActionExecutor", ex);
 		        String message = messageHelper.getMessage("message.common.action.error") + ": " + ex.getMessage();
 		        throw new ActionExecutionException(getResourceClass(), entity.getId(), code, message);
 		    }			

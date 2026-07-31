@@ -53,6 +53,7 @@ public class ZipImportacioHelper {
 
     @Autowired private MessageHelper messageHelper;
     @Autowired private DocumentHelper documentHelper;
+    @Autowired private ExcepcioLogHelper excepcioLogHelper;
     @Autowired private MetaDocumentRepository metaDocumentRepository;
 
     @Async
@@ -137,6 +138,7 @@ public class ZipImportacioHelper {
 					progres.addError(
 							messageHelper.getMessage("contingut.boto.crear.document.multiple.entrada.error",
 							new Object[] { izd.getRutaCompleta(), ex.getMessage() }));
+					excepcioLogHelper.addExcepcio("/contingut/" + pareId + "/ImportarDocumentDesdeZip", ex);
                 } finally {
                     progres.incrementOperacionsRealitzades();
                 }        		

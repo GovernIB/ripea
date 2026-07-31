@@ -215,6 +215,7 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
                 PropertyConfig.PROPAGAR_METADADES,
                 PropertyConfig.CARPETES_PER_DEFECTE,
                 PropertyConfig.CARPETES_RESTRINGIR_ACTIU,
+                PropertyConfig.PERMETRE_OBLIGAR_INTERESSAT,
                 PropertyConfig.MAX_RESULTS_SELECT));
 
         response.put("isConvertirDefinitiuActiu", Boolean.parseBoolean(props.getProperty(PropertyConfig.CONVERSIO_DEFINITIU)));
@@ -248,6 +249,7 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         response.put("isPropagarMetadades", Boolean.parseBoolean(props.getProperty(PropertyConfig.PROPAGAR_METADADES)));
         response.put("isCarpetesDefecte", Boolean.parseBoolean(props.getProperty(PropertyConfig.CARPETES_PER_DEFECTE)));
         response.put("isRestringirCarpetesActiu", Boolean.parseBoolean(props.getProperty(PropertyConfig.CARPETES_RESTRINGIR_ACTIU)));
+        response.put("isObligarInteressatActiu", Boolean.parseBoolean(props.getProperty(PropertyConfig.PERMETRE_OBLIGAR_INTERESSAT)));
         String maxResultsSelects = props.getProperty(PropertyConfig.MAX_RESULTS_SELECT);
         response.put("maxResultSelects", maxResultsSelects!=null?Integer.parseInt(maxResultsSelects):30);
 
