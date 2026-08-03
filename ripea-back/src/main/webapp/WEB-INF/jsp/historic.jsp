@@ -14,7 +14,7 @@
 	<link href="<c:url value="/webjars/select2/4.0.6-rc.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
 	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
 	<link href="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/css/bootstrap-datepicker.min.css"/>" rel="stylesheet"/>
-	
+
 	<script src="<c:url value="/webjars/datatables.net/1.10.19/js/jquery.dataTables.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.19/js/dataTables.bootstrap.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-select/1.3.1/js/dataTables.select.min.js"/>"></script>
@@ -69,39 +69,39 @@
 				'text': "<spring:message code="historic.metriques.enum.TASQUES_TRAMITADES"/>"
 			}
 		}
-		
+
 		var showingTables = ${ historicFiltreCommand.showingTables };
 		var showDadesEntitat = ${showDadesEntitat};
 		var showDadesOrganGestor = ${showDadesOrganGestor};
 		var showDadesUsuari = ${showDadesUsuari};
 		var showDadesInteressat = ${showDadesInteressat};
-		
+
 		var showingDadesActuals = ${ showingDadesActuals };
 		var metriquesSeleccionades = [];
 		<c:forEach items="${ metriquesSeleccionades }" var="metrica">
 			metriquesSeleccionades.push("${ metrica }");
 	    </c:forEach>
-		console.log(metriquesSeleccionades);
-		
+		// console.log(metriquesSeleccionades);
+
 		var usuarisSeleccionats = [];
 		<c:forEach items="${ usuarisSeleccionats }" var="codiUsuari">
 			usuarisSeleccionats.push("${ codiUsuari }");
 	    </c:forEach>
-		console.log(usuarisSeleccionats);
-		
+		// console.log(usuarisSeleccionats);
+
 		var interessatsSeleccionats = [];
 		<c:forEach items="${ interessatsSeleccionats }" var="docNum">
 		interessatsSeleccionats.push("${ docNum }");
 	    </c:forEach>
-		console.log(interessatsSeleccionats);
-		
+		// console.log(interessatsSeleccionats);
+
 		<c:if test="${empty historicFiltreCommand.organGestorsIds}">
-		var isAnyOrganSelected = false; 
+		var isAnyOrganSelected = false;
 		</c:if>;
 		<c:if test="${not empty historicFiltreCommand.organGestorsIds}">
-			var isAnyOrganSelected = true; 
+			var isAnyOrganSelected = true;
 		</c:if>;
-	
+
 		var language = requestLocale;
 		// Només acceptam es i ca com a llengues //
 		if (language.startsWith("es")) {
@@ -117,7 +117,7 @@
 			});
 			return sum;
 		}
-		
+
 		function dataTableHistoric (selector) {
 			return $(selector).DataTable({
 				language: {
@@ -136,7 +136,7 @@
 				}
 			});
 		}
-		
+
 		function chartPie(canvas, data, labels, backgroundColors, title) {
 			return new Chart(canvas, {
 			    type: 'doughnut',
@@ -157,9 +157,9 @@
 		          }
 			});
 		}
-		
+
 		function Taules () {
-			
+
 			this.buildTableActualsPerMetaExpedient = function(data) {
 
 				var tableHeader = '<table id="table-per-metaexpedients-' + this.taules.length + '" class="table table-bordered table-striped table-hover style="width:100%" >' +
@@ -170,10 +170,10 @@
 				tableHeader += '<th><spring:message code="historic.taula.header.numExpedientsCreatsTotal"/></th>';
 				tableHeader += '<th><spring:message code="historic.taula.header.numExpedientsTancats"/></th>';
 				tableHeader += '<th><spring:message code="historic.taula.header.numExpedientsTancatsTotal"/></th>';
-		
+
 				tableHeader += '</tr></thead><tbody>';
-				
-				
+
+
 				var tableBody = '';
 				data.forEach(function(serie){
 					var row = '<tr>';
@@ -182,31 +182,31 @@
 					row += '<td>' + serie.num_expedients_creats_total + '</td>';
 					row += '<td>' + serie.num_expedients_tancats + '</td>';
 					row += '<td>' + serie.num_expedients_tancats_total + '</td>';
-					
+
 					row += '</tr>';
 					tableBody += row;
 				});
 
 				var tableFooter = '</tbody></table>';
-				
+
 				return tableHeader + tableBody + tableFooter;
 
 			}
-			
+
 			this.buildTableActualsPerOrganGestor = function(data) {
 				var mapOrgansGestors = {};
-				console.log(data);
+				// console.log(data);
 				data.forEach(function(serie){
 					var organGestor = serie['organ_gestor'] != "" ? serie['organ_gestor'] : 'Comu';
-					
+
 					if (organGestor in mapOrgansGestors) {
 						mapOrgansGestors[organGestor].push(serie);
-						
+
 					} else {
 						mapOrgansGestors[organGestor] = [serie];
 					}
 				});
-				
+
 				var tableHeader = '<table id="table-per-organs-' + this.taules.length+ '" class="table table-bordered table-striped table-hover style="width:100%" >' +
 				'<thead>' +
 					'<tr>';
@@ -215,9 +215,9 @@
 				tableHeader += '<th><spring:message code="historic.taula.header.numExpedientsCreatsTotal"/></th>';
 				tableHeader += '<th><spring:message code="historic.taula.header.numExpedientsTancats"/></th>';
 				tableHeader += '<th><spring:message code="historic.taula.header.numExpedientsTancatsTotal"/></th>';
-		
+
 				tableHeader += '</tr></thead><tbody>';
-				
+
 				function sumListAttr(list, attrname) {
 					var sum = 0;
 					list.forEach(function(serie){
@@ -234,17 +234,17 @@
 					row += '<td>' + sumListAttr(dataOrganGestor, 'num_expedients_creats_total') + '</td>';
 					row += '<td>' + sumListAttr(dataOrganGestor, 'num_expedients_tancats') + '</td>';
 					row += '<td>' + sumListAttr(dataOrganGestor, 'num_expedients_tancats_total') + '</td>';
-					
+
 					row += '</tr>';
 					tableBody += row;
 				}
 
 				var tableFooter = '</tbody></table>';
-				
+
 				return tableHeader + tableBody + tableFooter;
-		
+
 			}
-			
+
 			this.taules = [];
 			this.cleanTaules = function() {
 				this.taules.forEach(function (dataTable) {
@@ -252,34 +252,34 @@
 				});
 				this.taules = [];
 			}
-			
+
 			this.addTaula = function (dataTable) {
 				this.taules.push(dataTable);
 			}
-			
+
 			this.addTaulaAcualsPerMetaExpedient = function (data, selectorDiv) {
 				var htmlTable = this.buildTableActualsPerMetaExpedient(data);
 				$(selectorDiv).append(htmlTable);
 				var dataTable = dataTableHistoric("#table-per-metaexpedients-" + this.taules.length);
 				this.addTaula(dataTable);
 			}
-			
+
 			this.addTaulaAcualsPerOrganGestor = function (data, selectorDiv) {
 				var title = '<h2><spring:message code="historic.taula.titol.perorgan"/></h2>'
 				var htmlTable = this.buildTableActualsPerOrganGestor(data);
-				$(selectorDiv).append(title + htmlTable);	
-				
+				$(selectorDiv).append(title + htmlTable);
+
 				dataTable = dataTableHistoric("#table-per-organs-" + this.taules.length);
 				this.addTaula(dataTable);
 			}
 		}
-		
+
 		function chartLine(canvas, labels, datasets, title) {
 			return new Chart(canvas, {
 			    type: 'line',
 			    data: {
 			        labels: labels,
-			        datasets: datasets, 
+			        datasets: datasets,
 			    },
 			    options: {
 			        scales: {
@@ -297,17 +297,17 @@
 			});
 		}
 
-		
+
 		function modalLoading() {
 			var modalId = "modal-loading";
 			this.show = function () {
 				$("#" + modalId).modal('show');
 			};
-			
+
 			this.hide = function () {
 				$("#" + modalId).modal('hide');
 			};
-			
+
 			$('body').append(
 					'	<div id="' + modalId + '" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">' +
 					'		<div class="modal-dialog modal-sm">' +
@@ -315,15 +315,15 @@
 					'				<div class="modal-body" style="padding:0">' +
 					'					<iframe frameborder="0" height="100" width="100%"></iframe>' +
 					'					<div class="datatable-dades-carregant" style="text-align: center; padding-bottom: 100px;">' +
-					'						<span class="fa fa-circle-o-notch fa-spin fa-3x"></span>' + 
+					'						<span class="fa fa-circle-o-notch fa-spin fa-3x"></span>' +
 					'					</div>' +
 					'				</div>' +
 					'			</div>' +
 					'		</div>' +
 					'	</div>');
 		}
-		
-		
+
+
 		function buildTableMetric(data, metric, idTable) {
 			var columns = Object.keys(data);
 			var tableHeader = '<table id="' + idTable + '" class="table table-bordered table-striped table-hover style="width:100%">' +
@@ -336,16 +336,16 @@
 					tableHeader += '<th><spring:message code="historic.taula.header.data"/></th>';
 				</c:when>
 				<c:otherwise>
-					tableHeader += '<th><spring:message code="historic.taula.header.any"/></th>';				
+					tableHeader += '<th><spring:message code="historic.taula.header.any"/></th>';
 					tableHeader += '<th><spring:message code="historic.taula.header.mes"/></th>';
 				</c:otherwise>
 			</c:choose>
-			
-			
+
+
 			columns.forEach(function(c){
 				tableHeader += '<th>' + c + '</th>';
 			});
-			
+
 			tableHeader += '</tr></thead><tbody>';
 			if (columns.length == 0) {
 				return tableHeader + tableFooter;
@@ -354,10 +354,10 @@
 			columns.forEach(function(c){
 				data[c] = data[c].sort((a, b) => (moment(a.data,'DD-MM-YYYY') > moment(b.data,'DD-MM-YYYY')));
 				if (data[c].length > dates.length) {
-					dates = data[c].map(item => item.data);	
+					dates = data[c].map(item => item.data);
 				}
 			});
-						
+
 			var tableBody = '';
 			for (var i = 0; i < dates.length; i++ ){
 				var date = dates[i];
@@ -374,7 +374,7 @@
 				row += '</tr>';
 				tableBody += row;
 			}
-			
+
 			return tableHeader + tableBody + tableFooter;
 		}
 
@@ -388,7 +388,7 @@
 					let mes = date.substring(3, 5);
 					mes = mes.replace(/^0+/, '');
 					let mesString;
-					
+
 					if (mes == 1) mesString = '<spring:message code="mes.1"/>';
 					else if (mes == 2) mesString = '<spring:message code="mes.2"/>';
 					else if (mes == 3) mesString = '<spring:message code="mes.3"/>';
@@ -414,17 +414,17 @@
 		function getAny(date){
 			return date.substring(6, 10);
 		}
-		
-		
+
+
 		function createChartMetric(data, metric, colors) {
 			var columns = Object.keys(data);
-			
+
 			columns.forEach(function(c){
 				data[c] = data[c].sort((a, b) => (moment(a.data,'DD-MM-YYYY') > moment(b.data,'DD-MM-YYYY')));
 			});
-			
+
 			var dates = data[columns[0]].map(item => getDate(item.data, true));
-			
+
 			var datasets = []
 			columns.forEach(function(c){
 				var attrname = metricsDefinition[metric]['attrname'];
@@ -435,15 +435,15 @@
     				'label': c,
     				'backgroundColor': "rgba(0,0,0,0.0)",
     				'borderColor': color
-    				});	
+    				});
 			});
 
 			var ctx = 'chart-' + metric;
 			var labels = dates
 			var chart = chartLine(ctx, labels, datasets, metricsDefinition[metric]["text"]);
 		}
-		
-		
+
+
 		function buildTableCurrent(data, metriques, firstColumnHeader, getRegistreName) {
 
 			var idTable = "table-organgestors";
@@ -455,7 +455,7 @@
 				tableHeader += '<th>' + metricsDefinition[metrica]['text']+ '</th>';
 			});
 			tableHeader += '</tr></thead><tbody>';
-			
+
 			var tableBody = '';
 			data.forEach(function(registre){
 				var row = '<tr>';
@@ -478,18 +478,18 @@
 			var colors = []
 			data.forEach(function(registre){
 				labels.push(getRegistreName(registre));
-				
+
 				var attrname = metricsDefinition[metric]['attrname'];
 				var value = registre[attrname] != null ? registre[attrname] : 0;
 				values.push(value);
-				
+
 				colors.push(getRandomColor());
 			});
-			
+
 			var ctx = 'chart-current-' + metric;
 			var chart = chartPie(ctx, values, labels, colors, metricsDefinition[metric]["text"]);
 		}
-		
+
 		/**
 		* 	CODI SECCIÓ ENTITAT
 		*/
@@ -500,18 +500,18 @@
 				'EXPEDIENTS_CREATS',
 				'EXPEDIENTS_CREATS_ACUM',
 				'EXPEDIENTS_TANCATS',
-				'EXPEDIENTS_TANCATS_ACUM'	
+				'EXPEDIENTS_TANCATS_ACUM'
 			];
 			// function to update our chart
 		    function buildChartEntitat(chart, url, data) {
 		        var data = data || {};
-		
+
 		        $.getJSON(url, data).done(function(response) {
-		        	console.log(response);
+		        	// console.log(response);
 		        	response.sort((a, b) => (moment(a.data,'DD-MM-YYYY') > moment(b.data,'DD-MM-YYYY')))
 		        	if (response.length > 0) {
 			        	var yLabels = response.map(item => getDate(item.data, true));
-			        	
+
 			            chart.data.labels = yLabels;
 			            metriques.forEach(function(metrica){
 		        			chart.data.datasets.push({
@@ -519,15 +519,15 @@
 		        				'label': metricsDefinition[metrica]["text"],
 		        				'backgroundColor': "rgba(0,0,0,0.0)",
 		        				'borderColor': getRandomColor()
-		        				});			            	
+		        				});
 			            });
 		        	}
-		        	
+
 		            chart.update(); // finally update our chart
 		        });
 		    }
 
-			
+
 		    if ( showingDadesActuals) {
 		    	loading.show();
 				$.ajax({
@@ -535,7 +535,7 @@
 					url: 'historic/entitat/actual',
 					success: function(response) {
 						taules.cleanTaules();
-						console.log(response);
+						// console.log(response);
 						$('#div-dades-entitat').html("");
 						loading.hide();
 						var title = '<h2><spring:message code="historic.taula.titol.permetaexp"/></h2>';
@@ -550,7 +550,7 @@
 				    type: 'line',
 				    data: {
 				        labels: [],
-				        datasets: [], 
+				        datasets: [],
 				        color: []
 				    },
 				    options: {
@@ -563,11 +563,11 @@
 				        }
 				    }
 				});
-	
+
 				buildChartEntitat(chartEntitat, "historic/chart/entitat", {});
 			}
 		}
-		
+
 		/**
 		* 	CODI SECCIÓ ORGANS GESTORS
 		*/
@@ -578,16 +578,16 @@
 				'EXPEDIENTS_CREATS',
 				'EXPEDIENTS_CREATS_ACUM',
 				'EXPEDIENTS_TANCATS',
-				'EXPEDIENTS_TANCATS_ACUM'	
+				'EXPEDIENTS_TANCATS_ACUM'
 			];
-			
+
 			var selectorContainer = '#div-dades-organ';
 			var $container = $(selectorContainer);
-			
+
 			var getColumnName = function (registre){
 				return registre['organ_gestor']
 			};
-			
+
 			function viewHistoric(data) {
 				taules.cleanTaules();
 				$container.html("");
@@ -596,10 +596,10 @@
 					metriques.forEach(function(metric){
 						var title = '<h2>' + metricsDefinition[metric]["text"] + '</h2>'
 						var htmlTable = buildTableMetric(data, metric, "table-dades-" + metric);
-						
-						$container.append(title + htmlTable);	
-						
-						var dataTable = dataTableHistoric("#table-dades-" + metric);								
+
+						$container.append(title + htmlTable);
+
+						var dataTable = dataTableHistoric("#table-dades-" + metric);
 						taules.addTaula(dataTable);
 					});
 				} else {
@@ -617,7 +617,7 @@
 			}
 
 			function updateContentOrganGestors() {
-				
+
 				if ( showingDadesActuals && showingTables) {
 					loading.show();
 					$.ajax({
@@ -629,8 +629,8 @@
 							taules.addTaulaAcualsPerOrganGestor(response, '#div-dades-organ');
 						}
 					});
-					
-				} else if ( showingDadesActuals && !showingTables){	
+
+				} else if ( showingDadesActuals && !showingTables){
 					if (!isAnyOrganSelected){
 						alert("Es necessari seleccionar algún òrgan gestor.");
 						return;
@@ -641,7 +641,7 @@
 						url: 'historic/organgestors/actual',
 						success: function(response) {
 							loading.hide();
-							console.log(response);
+							// console.log(response);
 							var data = [];
 							for (var oGestor in response) {
 								var registre = response[oGestor];
@@ -654,7 +654,7 @@
 								createChartCurrent(data, metric, getColumnName);
 							});
 						}
-					});						
+					});
 
 				}  else if ( !showingDadesActuals ) {
 					if (!isAnyOrganSelected){
@@ -670,16 +670,16 @@
 						},
 						success: function(response) {
 							loading.hide();
-							viewHistoric(response);			
+							viewHistoric(response);
 						}
 					});
 				}
 			}
-					
+
 			updateContentOrganGestors();
 
 		}
-		
+
 		/**
 		* 	CODI SECCIÓ USUARIS
 		*/
@@ -696,25 +696,25 @@
 			var columnHeader = '<spring:message code="historic.taula.header.usuari"/>';
 			var selectorContainer = '#div-dades-usuaris';
 			var $container = $(selectorContainer);
-			
+
 			var getColumnName = function (registre){
 				return registre['user']
 			};
-			
+
 			function viewHistoric(data) {
 				taules.cleanTaules();
 				$container.html("");
-				console.log(data)
+				// console.log(data)
 				if ( showingTables ) {
-					var dataTable = dataTableHistoric("#table-estats");								
+					var dataTable = dataTableHistoric("#table-estats");
 					taules.addTaula(dataTable);
 					metriques.forEach(function(metric){
 						var title = '<h2>' + metricsDefinition[metric]["text"] + '</h2>'
 						var htmlTable = buildTableMetric(data, metric, "table-usuaris-" + metric);
-						
-						$container.append(title + htmlTable);	
-						
-						var dataTable = dataTableHistoric("#table-usuaris-" + metric);								
+
+						$container.append(title + htmlTable);
+
+						var dataTable = dataTableHistoric("#table-usuaris-" + metric);
 						taules.addTaula(dataTable);
 					});
 				} else {
@@ -730,7 +730,7 @@
 					});
 				}
 			}
-			
+
 			function viewActuals(data) {
 				taules.cleanTaules();
 				loading.hide();
@@ -745,13 +745,13 @@
 					});
 					listData.push(registre);
 				}
-				console.log(listData);
-				
+				// console.log(listData);
+
 				if ( showingTables ) {
 					var title = '<h2></h2>'
 					var htmlTable = buildTableCurrent(listData, metriques, columnHeader, getColumnName);
 					$container.append(title + htmlTable);
-					
+
 				} else {
 					metriques.forEach(function(metric){
 						var canvas = '<div class="col-md-4"><canvas id="chart-current-' + metric + '" width="50" height="50"></canvas></div>';
@@ -760,7 +760,7 @@
 					});
 				}
 			}
-			
+
 			function updateContentUsuaris(usuaris) {
 				if (usuaris.length == 0){
 					return;
@@ -769,7 +769,7 @@
 				if ( showingDadesActuals ) {
 					taules.cleanTaules();
 					$('#div-dades-usuaris').html("");
-					
+
 					$.ajax({
 						type: "POST",
 						url: 'historic/usuaris/actual',
@@ -782,7 +782,7 @@
 						}
 					});
 				} else {
-					
+
 					$.ajax({
 						type: "POST",
 						url: 'historic/usuaris/dades/',
@@ -791,7 +791,7 @@
 						},
 						success: function (response) {
 							loading.hide();
-							viewHistoric(response);	
+							viewHistoric(response);
 						}
 					});
 				}
@@ -803,9 +803,9 @@
 				var names = $("#input-usuaris").find(':selected').map(function(){return $(this).html();}).get();;
 				updateContentUsuaris(usuaris);
 				return false;
-			});		
+			});
 		}
-		
+
 		function seccioInteressats() {
 			var taules = new Taules();
 			var loading = new modalLoading();
@@ -816,10 +816,10 @@
 				'EXPEDIENTS_TANCATS_ACUM'
 			];
 			var columnHeader = '<spring:message code="historic.taula.header.interessat"/>';
-			
+
 			var selectorContainer = '#div-dades-interessats';
 			var $container = $(selectorContainer);
-			
+
 			var getColumnName = function (registre){
 				return registre['interessat']
 			};
@@ -827,17 +827,17 @@
 			function viewHistoric(data) {
 				taules.cleanTaules();
 				$container.html("");
-				console.log(data)
+				// console.log(data)
 				if ( showingTables ) {
-					var dataTable = dataTableHistoric("#table-estats");								
+					var dataTable = dataTableHistoric("#table-estats");
 					taules.addTaula(dataTable);
 					metriques.forEach(function(metric){
 						var title = '<h2>' + metricsDefinition[metric]["text"] + '</h2>'
 						var htmlTable = buildTableMetric(data, metric, "table-usuaris-" + metric);
-						
-						$container.append(title + htmlTable);	
-						
-						var dataTable = dataTableHistoric("#table-usuaris-" + metric);								
+
+						$container.append(title + htmlTable);
+
+						var dataTable = dataTableHistoric("#table-usuaris-" + metric);
 						taules.addTaula(dataTable);
 					});
 				} else {
@@ -853,7 +853,7 @@
 					});
 				}
 			}
-			
+
 			function viewActuals(data) {
 				taules.cleanTaules();
 				loading.hide();
@@ -868,13 +868,13 @@
 					});
 					listData.push(registre);
 				}
-				console.log(listData);
-				
+				// console.log(listData);
+
 				if ( showingTables ) {
 					var title = '<h2></h2>'
 					var htmlTable = buildTableCurrent(listData, metriques, columnHeader, getColumnName);
 					$container.append(title + htmlTable);
-					
+
 				} else {
 					metriques.forEach(function(metric){
 						var canvas = '<div class="col-md-4"><canvas id="chart-current-' + metric + '" width="50" height="50"></canvas></div>';
@@ -883,7 +883,7 @@
 					});
 				}
 			}
-			
+
 			function updateContentInteressats(interessats) {
 				if (interessats.length == 0){
 					return;
@@ -911,49 +911,49 @@
 						},
 						success: function (response) {
 							loading.hide();
-							viewHistoric(response);	
+							viewHistoric(response);
 						}
 					});
 				}
 			}
-			
+
 			updateContentInteressats(interessatsSeleccionats);
 			$("form#form-estadistics-interessats").on('submit', function(){
 				var interessats = $("#inputinteressats").find(':selected').map(function(){return $(this).val();}).get();;
 				var names = $("#input-interessats").find(':selected').map(function(){return $(this).html();}).get();;
-				console.log(interessats);
-				console.log(names);
+				// console.log(interessats);
+				// console.log(names);
 				updateContentInteressats(names);
 				return false;
-			});	
+			});
 		}
-		
+
 		function checkBoxExpedientsComunsLogic($selectOrgansGestors) {
-			var valors = $selectOrgansGestors.val(); 
+			var valors = $selectOrgansGestors.val();
 			if (valors != null || showDadesOrganGestor) {
 				$("#incorporarExpedientsComuns").parent().show();
 			} else {
 				$("#incorporarExpedientsComuns").parent().hide();
 			}
 		}
-		
-		$(function () {			
+
+		$(function () {
 			if (showDadesEntitat) {
 				seccioEntitat();
 			}
-			
+
 			if (showDadesOrganGestor) {
 				seccioOrgansGestors();
 			}
-			
+
 			if (showDadesUsuari) {
 				seccioUsuaris();
 			}
-			
+
 			if (showDadesInteressat) {
-				seccioInteressats();				
+				seccioInteressats();
 			}
-			
+
 			var $selectOrgansGestors = $("#organGestorsIds");
 			checkBoxExpedientsComunsLogic($selectOrgansGestors);
 			$selectOrgansGestors.on('select2:select', function (e) {
@@ -962,18 +962,18 @@
 			$selectOrgansGestors.on('select2:unselect', function (e) {
 				checkBoxExpedientsComunsLogic($selectOrgansGestors);
 			});
-			
+
 			$(".form-filtre-visualitzacio").on('change', 'input:radio', function (event) {
 				$("#historicFiltreCommand").submit();
 			});
 		});
 
-		
+
 		$(document).ready(function() {
 			$("#dadesMostrar").on('change', function() {
 				var select2Options = {
-						theme: 'bootstrap', 
-						width: 'auto', 
+						theme: 'bootstrap',
+						width: 'auto',
 						minimumResultsForSearch: "0"};
 				if($(this).val()=='ENTITAT') {
 					$('#exportFormat option[value="csv"]').prop('disabled', false);
@@ -986,8 +986,8 @@
 
 			$('#dadesMostrar').trigger('change');
 		});
-		
-		
+
+
 	</script>
 </head>
 <body>
@@ -1002,22 +1002,22 @@
 			</div>
 			<div class="col-md-2">
 				<rip:inputDate name="dataFi" inline="true" placeholderKey="historic.filtre.data.fi"/>
-			</div>		
+			</div>
 			<div class="col-md-4">
-				<rip:inputSuggest 
-					name="organGestorsIds" 
-					urlConsultaInicial="${urlConsultaOrgansInicial}" 
-					urlConsultaLlistat="${urlConsultaOrgansLlistat}" 
-					inline="true" 
+				<rip:inputSuggest
+					name="organGestorsIds"
+					urlConsultaInicial="${urlConsultaOrgansInicial}"
+					urlConsultaLlistat="${urlConsultaOrgansLlistat}"
+					inline="true"
  					placeholderKey="historic.filtre.organsGestors"
  					suggestValue="id"
  					suggestText="codiINom"/>
 			</div>
 			<div class="col-md-4">
 				<rip:inputSuggest
-					name="metaExpedientsIds" 
-					urlConsultaInicial="${urlConsultaMetaExpedientsInicial}" 
-					urlConsultaLlistat="${urlConsultaMetaExpedientsLlistat}" 
+					name="metaExpedientsIds"
+					urlConsultaInicial="${urlConsultaMetaExpedientsInicial}"
+					urlConsultaLlistat="${urlConsultaMetaExpedientsLlistat}"
 					inline="true"
 					placeholderKey="historic.filtre.metaExpedients"
 					suggestValue="id"
@@ -1026,10 +1026,10 @@
 		</div>
 		<div class="row">
 			<div class="col-md-4">
-				<rip:inputSelect name="dadesMostrar" 
-								 optionEnum="HistoricDadesMostrarEnum" 
+				<rip:inputSelect name="dadesMostrar"
+								 optionEnum="HistoricDadesMostrarEnum"
 								 netejar="false"
-								 emptyOption="false" 
+								 emptyOption="false"
 								 inline="true"/>
 			</div>
 			<div class="col-md-4">
@@ -1045,33 +1045,33 @@
 		<div class="row form-filtre-visualitzacio">
 			<div class="col-md-2">
 				<div class="btn-group" data-toggle="buttons">
-					<label class="btn btn-default form-check-label <c:if test="${historicFiltreCommand.showingTables == false}">active</c:if>"> 
+					<label class="btn btn-default form-check-label <c:if test="${historicFiltreCommand.showingTables == false}">active</c:if>">
 						<form:radiobutton path="showingTables" value="false"/>
 						<i class="fa fa-bar-chart" aria-hidden="true"></i> <spring:message code="historic.filtre.mostraGrafics"/>
-					</label> 
-					<label class="btn btn-default form-check-label <c:if test="${historicFiltreCommand.showingTables == true}">active</c:if>"> 
+					</label>
+					<label class="btn btn-default form-check-label <c:if test="${historicFiltreCommand.showingTables == true}">active</c:if>">
 						<form:radiobutton path="showingTables" value="true"/>
 						<i class="fa fa-table" aria-hidden="true"></i> <spring:message code="historic.filtre.mostraTaules"/>
-					</label> 
+					</label>
 				</div>
 			</div>
 			<div class="col-md-3">
 				<div class="btn-group" data-toggle="buttons">
-					<label class="btn btn-default form-check-label <c:if test="${historicFiltreCommand.tipusAgrupament == null}">active</c:if>"> 
+					<label class="btn btn-default form-check-label <c:if test="${historicFiltreCommand.tipusAgrupament == null}">active</c:if>">
 						<form:radiobutton path="tipusAgrupament"/>
 						<i class="fa fa-clock-o"></i> <spring:message code="historic.filtre.mostraDadesActuals"/>
-					</label> 
-					<label class="btn btn-default form-check-label <c:if test="${historicFiltreCommand.tipusAgrupament == 'DIARI'}">active</c:if>"> 
+					</label>
+					<label class="btn btn-default form-check-label <c:if test="${historicFiltreCommand.tipusAgrupament == 'DIARI'}">active</c:if>">
 						<form:radiobutton path="tipusAgrupament" value="DIARI"/>
 						<i class="fa fa-calendar"></i> <spring:message code="historic.filtre.mostraDadesPerDia"/>
-					</label> 
-					<label class="btn btn-default form-check-label <c:if test="${historicFiltreCommand.tipusAgrupament == 'MENSUAL'}">active</c:if>"> 
-						<form:radiobutton path="tipusAgrupament" value="MENSUAL"/>						 
+					</label>
+					<label class="btn btn-default form-check-label <c:if test="${historicFiltreCommand.tipusAgrupament == 'MENSUAL'}">active</c:if>">
+						<form:radiobutton path="tipusAgrupament" value="MENSUAL"/>
 						<i class="fa fa-calendar-o"></i> <spring:message code="historic.filtre.mostraDadesPerMes"/>
 					</label>
-			
+
 				</div>
-			</div>		
+			</div>
 		</div>
 	</form:form>
 	<c:if test="${showDadesEntitat}">
@@ -1082,10 +1082,10 @@
 				<c:if test="${historicFiltreCommand.showingTables and !showingDadesActuals }">
 					<table
 						id="taulaDades"
-						data-toggle="datatable" 
-						data-url="<c:url value="/historic/expedient/datatable"/>" 
-						class="table table-bordered table-striped table-hover" 
-						data-default-order="0" 
+						data-toggle="datatable"
+						data-url="<c:url value="/historic/expedient/datatable"/>"
+						class="table table-bordered table-striped table-hover"
+						data-default-order="0"
 						data-default-dir="desc"
 						data-selection-enabled="true"
 						data-save-state="true"
@@ -1097,7 +1097,7 @@
 										<th data-col-name="data" data-type="date" data-converter="date" nowrap><spring:message code="historic.taula.header.data"/></th>
 									</c:when>
 									<c:otherwise>
-										<th data-col-name="any"><spring:message code="historic.taula.header.any"/></th>									
+										<th data-col-name="any"><spring:message code="historic.taula.header.any"/></th>
 										<th data-col-name="mes" data-type="date" data-converter="date" data-template="#cellMesTemplate" nowrap><spring:message code="historic.taula.header.mes"/>
 											<script id="cellMesTemplate" type="text/x-jsrender">
 												{{if mes == 1}}
@@ -1171,14 +1171,14 @@
 								style="width:100%" data-toggle="suggest"
 								data-placeholder="${placeholderText}"
 								data-minimum-input-length="3"
-								data-url-llistat="${urlConsultaLlistat}" 
+								data-url-llistat="${urlConsultaLlistat}"
 								data-url-inicial="${urlConsultaInicial}"
 							    multiple="true"
 							    data-placeholder="${placeholderText}"
-								data-current-value="${fn:join(usuarisSeleccionats, ",")}" 
+								data-current-value="${fn:join(usuarisSeleccionats, ",")}"
 								data-suggest-value="codi"
 								data-suggest-text="nom"
-								data-suggest-text-addicional="nif" 
+								data-suggest-text-addicional="nif"
 								data-url-param-addicional=""> </select>
 				</div>
 				<div class="col-offset-2 col-md-2 pull-right">
@@ -1207,11 +1207,11 @@
 								style="width:100%" data-toggle="suggest"
 								data-placeholder="${placeholderText}"
 								data-minimum-input-length="3"
-								data-url-llistat="${urlConsultaLlistat}" 
+								data-url-llistat="${urlConsultaLlistat}"
 								data-url-inicial="${urlConsultaInicial}"
 							    multiple="true"
 							    data-placeholder="${placeholderText}"
-								data-current-value="${fn:join(interessatsSeleccionats, ",")}" 
+								data-current-value="${fn:join(interessatsSeleccionats, ",")}"
 								data-suggest-value="documentNum"
 								data-suggest-text="documentNum"
 								data-url-param-addicional=""> </select>

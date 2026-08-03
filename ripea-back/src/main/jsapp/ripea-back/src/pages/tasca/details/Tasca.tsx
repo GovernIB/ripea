@@ -37,7 +37,7 @@ const HeaderMain = (props: any) => {
     const navigate = useNavigate();
     const { changeEstat } = useActions();
     const theme = useTheme();
-    const headerTextColor = theme.palette.mode === 'dark' ? '#464646' : theme.palette.primary.contrastText;
+    const headerTextColor = theme.palette.primary.contrastText;
 
     const campsExpedientContret = [
         { name: 'numero', value: expedient?.numero },

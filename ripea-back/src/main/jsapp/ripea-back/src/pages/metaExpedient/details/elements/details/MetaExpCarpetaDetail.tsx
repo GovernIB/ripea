@@ -63,6 +63,7 @@ const useMetaExpCarpetaDetail = () => {
             value: 'close',
             text: t('common.close'),
             icon: 'close',
+            componentProps: { variant: 'outlined' },
         },
     ]
 

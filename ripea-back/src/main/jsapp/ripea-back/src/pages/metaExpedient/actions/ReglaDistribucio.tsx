@@ -98,6 +98,7 @@ const useReglaDistribucio = (refresh?: () => void) => {
         {
             value: 'close',
             text: t('common.close'),
+            componentProps: { variant: 'outlined' },
             // icon: 'close',
         },
     ].filter((b:any)=>!b?.hidden), [t, entity]);

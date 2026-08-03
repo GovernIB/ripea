@@ -269,7 +269,7 @@ export const ContenidoData = (props:ContenidoDataProps) => {
     return (
         <Grid container direction={'row'} columnSpacing={1} size={size} {...other}>
             <Grid size={titleSize}>
-                <Typography variant={'body1'} color={'black'} sx={componentTitleProps}>
+                <Typography variant={'body1'} color={'primary.contrastText'} sx={componentTitleProps}>
                     {title}
                 </Typography>
             </Grid>

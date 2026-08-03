@@ -9,13 +9,14 @@ import '@fullcalendar/react/themes/monarch/palettes/purple.css';
 import {useBaseAppContext, useResourceApiService} from "reactlib";
 import {useCallback, useEffect, useState} from "react";
 import {actionToItem} from "@src/components/MenuButton.tsx";
-import {Menu} from "@mui/material";
+import {Menu, useTheme} from "@mui/material";
 import {useTranslation} from "react-i18next";
 import {useSession} from "@src/components/SessionStorageContext.tsx";
 
 export const TascaCalendar = (props:any) => {
     const {actions, filter, namedQueries, perspectives, reloadTrigger, ...other} = props;
     const { t } = useTranslation();
+    const theme = useTheme();
     const [tasques, setTasques] = useState<any[]>();
     const {value: view, save: setView} = useSession('calendarView');
 
@@ -70,6 +71,7 @@ export const TascaCalendar = (props:any) => {
 
     return <>
         <FullCalendar
+            colorScheme={theme.palette.mode}
             locale={currentLanguage}
             plugins={[themePlugin, weekGridPlugin, multiMonthPlugin]}
             initialView={view ?? "dayGridMonth"}

@@ -198,6 +198,12 @@ const usePerfil = () => {
 
     const dialogButtons = useMemo<DialogButton[]>(() => [
         {
+            value: true,
+            text: tBase('buttons.form.save'),
+            icon: 'save',
+            componentProps: { variant: 'contained' },
+        },
+        {
             value: false,
             text: tBase('buttons.form.cancel'),
             componentProps: {
@@ -207,12 +213,6 @@ const usePerfil = () => {
                     formApiRef.current?.close();
                 },
             },
-        },
-        {
-            value: true,
-            text: tBase('buttons.form.save'),
-            icon: 'save',
-            componentProps: { variant: 'contained' },
         },
     ], [formApiRef, remove, tBase]);
 

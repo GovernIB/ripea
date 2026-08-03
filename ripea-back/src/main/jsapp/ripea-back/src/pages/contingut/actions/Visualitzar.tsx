@@ -51,7 +51,7 @@ const useVisualitzar = () => {
         }
     };
 
-    let buttons :any[] = [
+    const buttons :any[] = [
         {
             value: 'download',
             text: t('page.document.action.original.label'),

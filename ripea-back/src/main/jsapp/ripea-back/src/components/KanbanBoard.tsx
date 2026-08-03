@@ -74,45 +74,66 @@ const KanbanCard = ({ icon, task, onClick, isDragging }: any) => {
 const KanbanSubcolumn = ({ id, title, tasks, children }: any) => {
     const { setNodeRef, isOver } = useDroppable({ id });
 
-    return (<Grid size={12}>
-        <Box
-            ref={setNodeRef}
-            sx={{
-                flex: 1,
-                minWidth: 0,
-                p: 1.5,
-                bgcolor: isOver ? 'action.hover' : 'background.paper',
-                borderRadius: 2,
-                border: isOver ? '2px dashed' : '2px solid transparent',
-                borderColor: isOver ? 'primary.main' : 'transparent',
-                transition: 'all 0.2s'
-            }}
-        >
-            <Typography variant="subtitle2" sx={{ mb: 1.5, textAlign: 'center', color: 'text.secondary' }}>
-                {title} ({tasks.length})
-            </Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                {children}
+    return (
+        <Grid size={12}>
+            <Box
+                ref={setNodeRef}
+                sx={{
+                    flex: 1,
+                    minWidth: 0,
+                    p: 1.5,
+                    bgcolor: isOver ? 'action.hover' : 'background.paper',
+                    borderRadius: 2,
+                    border: isOver ? '2px dashed' : '2px solid transparent',
+                    borderColor: isOver ? 'primary.main' : 'transparent',
+                    transition: 'all 0.2s',
+                }}
+            >
+                <Typography variant="subtitle2" sx={{ mb: 1.5, textAlign: 'center', color: 'text.secondary' }}>
+                    {title} ({tasks.length})
+                </Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>{children}</Box>
             </Box>
-        </Box>
-    </Grid>);
+        </Grid>
+    );
 };
 
 const KanbanColumn = ({ icon, title, subcolumns, onCreate, onClick, activeId }: any) => {
     const { t } = useTranslation();
-    return <Box sx={{ p: 2, bgcolor: 'grey.100', borderRadius: 3, height: '100%' }}>
-        <Typography variant="h6" sx={{ mb: 2, px: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            {title}{onCreate && <IconButton title={t('common.create')} onClick={onCreate}><Icon>add_circle</Icon></IconButton>}</Typography>
-        <Grid container spacing={1} sx={{ display: 'flex', alignItems: 'flex-start' }}>
-            {subcolumns.map((sub:any) => (
-                <KanbanSubcolumn key={sub.id} id={sub.id} title={sub.title} tasks={sub.tasks}>
-                    {sub.tasks.map((task:any) => (
-                        <KanbanCard key={task.id} icon={sub.icon || icon} task={task} onClick={onClick} isDragging={task.id === activeId} />
-                    ))}
-                </KanbanSubcolumn>
-            ))}
-        </Grid>
-    </Box>
+    return (
+        <Box
+            sx={{
+                p: 2,
+                bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'background.paper' : 'grey.100'),
+                borderRadius: 3,
+                height: '100%',
+            }}
+        >
+            <Typography variant="h6" sx={{ mb: 2, px: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                {title}
+                {onCreate && (
+                    <IconButton title={t('common.create')} onClick={onCreate}>
+                        <Icon>add_circle</Icon>
+                    </IconButton>
+                )}
+            </Typography>
+            <Grid container spacing={1} sx={{ display: 'flex', alignItems: 'flex-start' }}>
+                {subcolumns.map((sub: any) => (
+                    <KanbanSubcolumn key={sub.id} id={sub.id} title={sub.title} tasks={sub.tasks}>
+                        {sub.tasks.map((task: any) => (
+                            <KanbanCard
+                                key={task.id}
+                                icon={sub.icon || icon}
+                                task={task}
+                                onClick={onClick}
+                                isDragging={task.id === activeId}
+                            />
+                        ))}
+                    </KanbanSubcolumn>
+                ))}
+            </Grid>
+        </Box>
+    );
 };
 
 const groupTasksWithSubcolumns = (
@@ -140,21 +161,16 @@ const groupTasksWithSubcolumns = (
     return columns;
 };
 
-const KanbanBoard = ({
-                         columns: columnDefs,
-                         elements,
-                         onCreate,
-                         handleDragEnd: onExternalDragEnd,
-                         actions
-                     }: KanbanBoardProp) => {
+const KanbanBoard = ({ columns: columnDefs, elements, onCreate, handleDragEnd: onExternalDragEnd, actions }: KanbanBoardProp) => {
     const [activeId, setActiveId] = useState<string | null>(null);
 
     const [optimisticElements, setOptimisticElements] = useState<KanbanElementsProp[] | null>(null);
     const currentElements = optimisticElements || elements;
 
-    const columns: KanbanColumnsProp[] = useMemo(() =>
-            groupTasksWithSubcolumns(currentElements || [], columnDefs || []),
-        [currentElements, columnDefs]);
+    const columns: KanbanColumnsProp[] = useMemo(
+        () => groupTasksWithSubcolumns(currentElements || [], columnDefs || []),
+        [currentElements, columnDefs]
+    );
 
     const getActiveTask = useCallback(() => {
         if (!activeId) return null;
@@ -165,23 +181,24 @@ const KanbanBoard = ({
         setActiveId(event.active.id);
     }, []);
 
-    const handleDragEnd = useCallback((event: any) => {
-        setActiveId(null);
-        const { active, over } = event;
-        if (!active || !over) return;
+    const handleDragEnd = useCallback(
+        (event: any) => {
+            setActiveId(null);
+            const { active, over } = event;
+            if (!active || !over) return;
 
-        const origen = active.data?.current?.estat;
-        const desti = over.id;
-        const task = active.data?.current;
+            const origen = active.data?.current?.estat;
+            const desti = over.id;
+            const task = active.data?.current;
 
-        if (origen === desti) return;
+            if (origen === desti) return;
 
-        const updatedElements = (currentElements || []).map(t =>
-            String(t.id) === String(task.id) ? { ...t, estat: desti } : t
-        );
-        setOptimisticElements(updatedElements);
-        onExternalDragEnd?.(origen, desti, task);
-    }, [currentElements, onExternalDragEnd]);
+            const updatedElements = (currentElements || []).map((t) => (String(t.id) === String(task.id) ? { ...t, estat: desti } : t));
+            setOptimisticElements(updatedElements);
+            onExternalDragEnd?.(origen, desti, task);
+        },
+        [currentElements, onExternalDragEnd]
+    );
 
     useEffect(() => {
         setOptimisticElements(null);
@@ -190,7 +207,7 @@ const KanbanBoard = ({
     const [selectedTask, setSelectedTask] = useState<any>(null);
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
-    const eventClick = useCallback((e: any, element:any) => {
+    const eventClick = useCallback((e: any, element: any) => {
         e.preventDefault();
         if (element) {
             setSelectedTask(element.entity);
@@ -205,15 +222,19 @@ const KanbanBoard = ({
 
     return (
         <Box>
-            <DndContext
-                onDragStart={handleDragStart}
-                onDragEnd={handleDragEnd}
-                collisionDetection={pointerWithin}
-            >
+            <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd} collisionDetection={pointerWithin}>
                 <Grid container spacing={1}>
                     {columns.map((col, i) => (
                         <Grid size={{ xs: 12, md: 12 / columns.length }} key={col.id}>
-                            <KanbanColumn icon={col.icon} title={col.title} col={col} subcolumns={col.subcolumns} onCreate={i == 0 ?onCreate :undefined} onClick={eventClick} activeId={activeId} />
+                            <KanbanColumn
+                                icon={col.icon}
+                                title={col.title}
+                                col={col}
+                                subcolumns={col.subcolumns}
+                                onCreate={i == 0 ? onCreate : undefined}
+                                onClick={eventClick}
+                                activeId={activeId}
+                            />
                         </Grid>
                     ))}
                 </Grid>
@@ -223,15 +244,17 @@ const KanbanBoard = ({
                 </DragOverlay>
             </DndContext>
 
-            {actions && <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleMenuClose}
-                anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
-                transformOrigin={{vertical: 'top', horizontal: 'right'}}
-            >
-                {selectedTask && actionToItem(selectedTask, actions)}
-            </Menu>}
+            {actions && (
+                <Menu
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    onClose={handleMenuClose}
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                    transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                >
+                    {selectedTask && actionToItem(selectedTask, actions)}
+                </Menu>
+            )}
         </Box>
     );
 };

@@ -111,7 +111,6 @@ const useAlerta = () => {
     const [count, setCount] = useState<number>();
 
     const handleOpen = (id:any, row:any) => {
-        console.log(id, row)
         setEntity(row);
         setOpen(true);
     }

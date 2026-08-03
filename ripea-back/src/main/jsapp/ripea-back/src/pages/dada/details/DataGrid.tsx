@@ -110,7 +110,6 @@ const useDataGrid = (contingut:any, refresh?:() => void) => {
     const [entity, setEntity] = useState<any>();
 
     const handleOpen = (id:any, row:any) => {
-        console.log(id, row)
         setEntity(row);
         setOpen(true);
     }

@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {Box, Grid} from "@mui/material";
+import {Box, Grid, useTheme} from "@mui/material";
 import {BasePage, MuiDialog, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import TabComponent from "../components/TabComponent.tsx";
@@ -30,6 +30,7 @@ const sortModel:any = [{ field: 'createdDate', sort: 'asc' }];
 const Accions = (props:any) => {
     const { id, onRowCountChange, contingutTipus } = props;
     const { t } = useTranslation();
+    const theme = useTheme();
 
     const {handleOpen, dialog} = useAccioDialog()
 
@@ -42,23 +43,30 @@ const Accions = (props:any) => {
         }
     ]
 
-    return <BasePage>
-        <StyledMuiGrid
-            resourceName={'contingutLogResource'}
-            filter={builder.and(
-                builder.eq('contingutId', id),
-                builder.eq('contingutTipus', `'${contingutTipus}'`),
-            )}
-            staticSortModel={sortModel}
-            columns={columnsAccions}
-            rowAdditionalActions={actions}
-            onRowCountChange={onRowCountChange}
-            autoHeight
-            toolbarHide
-            readOnly
-        />
-        {dialog}
-    </BasePage>;
+    return (
+        <BasePage>
+            <Box
+                sx={{
+                    '& .MuiDataGrid-actionsCell .MuiIcon-root': {
+                        color: theme.palette.mode === 'dark' ? theme.palette.primary.contrastText : theme.palette.text.secondary,
+                    },
+                }}
+            >
+                <StyledMuiGrid
+                    resourceName={'contingutLogResource'}
+                    filter={builder.and(builder.eq('contingutId', id), builder.eq('contingutTipus', `'${contingutTipus}'`))}
+                    staticSortModel={sortModel}
+                    columns={columnsAccions}
+                    rowAdditionalActions={actions}
+                    onRowCountChange={onRowCountChange}
+                    autoHeight
+                    toolbarHide
+                    readOnly
+                />
+                {dialog}
+            </Box>
+        </BasePage>
+    );
 }
 const useAccioDialog = () => {
     const { t } = useTranslation();
@@ -66,7 +74,7 @@ const useAccioDialog = () => {
     const [entity, setEntity] = useState<any>();
 
     const handleOpen = (id:any, row:any) => {
-        console.log(id, row);
+        // console.log(id, row);
         setEntity(row);
         setOpen(true);
     }
@@ -256,7 +264,7 @@ const useHistoric = (contingutTipus:HistoricContingutTipus = HistoricContingutTi
     const [numMoviment, setMoviment] = useState<number>();
 
     const handleOpen = (id:any, row:any) => {
-        console.log(id, row);
+        // console.log(id, row);
         setEntity(row);
         setOpen(true);
     }

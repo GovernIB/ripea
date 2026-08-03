@@ -47,6 +47,7 @@ const useDetail = () => {
         {
             value: 'close',
             text: t('common.close'),
+            componentProps: { variant: 'outlined' },
         },
     ]
 

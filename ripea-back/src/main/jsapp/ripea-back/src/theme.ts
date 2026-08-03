@@ -107,6 +107,9 @@ const baseComponentStyles: ThemeOptions['components'] = {
                     color: 'inherit',
                 },
             },
+            'input.Mui-disabled': {
+                cursor: 'not-allowed !important',
+            },
         },
     },
     MuiDataGrid: {
@@ -480,9 +483,27 @@ export const darkTheme = createTheme({
         },
         MuiOutlinedInput: {
             styleOverrides: {
+                root: {
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: DARK_PRIMARY_LIGHT,
+                        borderWidth: '2px',
+                    },
+                    '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
+                        borderColor: alpha(DARK_TEXT_SECONDARY, 0.4),
+                    },
+                },
                 input: {
                     '&:-webkit-autofill': {
                         WebkitBoxShadow: `0 0 0 100px ${DARK_BACKGROUND_PAPER} inset`,
+                    },
+                },
+            },
+        },
+        MuiInputLabel: {
+            styleOverrides: {
+                root: {
+                    '&.Mui-focused': {
+                        color: lighten(DARK_PRIMARY_LIGHT, 0.2),
                     },
                 },
             },
@@ -578,6 +599,14 @@ export const darkTheme = createTheme({
                 },
             },
         },
+        MuiLink: {
+            styleOverrides: {
+                root: {
+                    ...(baseComponentStyles.MuiLink?.styleOverrides?.root as object),
+                    color: '#4697e7',
+                },
+            },
+        },
     },
 });
 
@@ -633,7 +662,25 @@ export const draculaTheme = createTheme({
         },
         MuiOutlinedInput: {
             styleOverrides: {
+                root: {
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: DRACULA_PRIMARY_LIGHT,
+                        borderWidth: '2px',
+                    },
+                    '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
+                        borderColor: alpha(DRACULA_TEXT_SECONDARY, 0.4),
+                    },
+                },
                 input: { '&:-webkit-autofill': { WebkitBoxShadow: `0 0 0 100px ${DRACULA_BACKGROUND_PAPER} inset` } },
+            },
+        },
+        MuiInputLabel: {
+            styleOverrides: {
+                root: {
+                    '&.Mui-focused': {
+                        color: lighten(DRACULA_PRIMARY_LIGHT, 0.2),
+                    },
+                },
             },
         },
         MuiDialog: {
@@ -710,10 +757,13 @@ export const draculaTheme = createTheme({
                                 variant === 'outlined' && color === 'primary',
                             style: {
                                 color: '#F8F8F2',
-                                borderColor: DRACULA_PRIMARY_MAIN,
+                                borderColor: DRACULA_PRIMARY_CONTRAST_TEXT,
                             },
                         },
                     ],
+                    '.MuiDialog-paper &.MuiButton-outlinedPrimary': {
+                         borderColor: DRACULA_PRIMARY_CONTRAST_TEXT,
+                    },
                 },
             },
         },
@@ -723,6 +773,14 @@ export const draculaTheme = createTheme({
                     ...(baseComponentStyles.MuiTab?.styleOverrides?.root as object),
                     color: DRACULA_TEXT_PRIMARY,
                     '&.Mui-selected': { color: DRACULA_PRIMARY_LIGHT },
+                },
+            },
+        },
+        MuiLink: {
+            styleOverrides: {
+                root: {
+                    ...(baseComponentStyles.MuiLink?.styleOverrides?.root as object),
+                    color: '#90c7ff',
                 },
             },
         },

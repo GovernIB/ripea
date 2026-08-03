@@ -72,16 +72,16 @@ const useAnotacionsComunicadesDetail = () => {
                     <FieldData field={'dataAlta'} size={4}>
                         {formatDate(entity?.dataAlta)}
                     </FieldData>
-                    <FieldData field={'consultaWsErrorDate'} size={4}>
+                    <FieldData field={'consultaWsErrorDate'} size={4} sx={{ borderRight: '1px solid' }}>
                         {formatDate(entity?.consultaWsErrorDate)}
                     </FieldData>
-                    <FieldData field={'consultaWsError'} size={4}>
+                    <FieldData field={'consultaWsError'} size={4} sx={{ borderBottom: '1px solid' }}>
                         <Icon>{entity?.consultaWsError ? 'check' : 'close'}</Icon>
                     </FieldData>
-                    <FieldData field={'pendentCanviEstatDistribucio'} size={4}>
+                    <FieldData field={'pendentCanviEstatDistribucio'} size={4} sx={{ borderBottom: '1px solid' }}>
                         <Icon>{entity?.pendentCanviEstatDistribucio ? 'check' : 'close'}</Icon>
                     </FieldData>
-                    <FieldData field={'reintentsCanviEstatDistribucio'} size={4} />
+                    <FieldData field={'reintentsCanviEstatDistribucio'} size={4} sx={{ borderRight: '1px solid', borderBottom: '1px solid' }} />
                 </DetailCard>
             </MuiDetail>
             {entity?.consultaWsErrorDesc && (
