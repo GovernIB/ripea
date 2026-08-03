@@ -110,6 +110,11 @@ const baseComponentStyles: ThemeOptions['components'] = {
             'input.Mui-disabled': {
                 cursor: 'not-allowed !important',
             },
+            'input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus, input:-webkit-autofill:active': {
+                WebkitBoxShadow: '0 0 0 100px transparent inset !important',
+                caretColor: 'inherit !important',
+                transition: 'background-color 5000s ease-in-out 0s !important',
+            },
         },
     },
     MuiDataGrid: {
@@ -351,11 +356,6 @@ export const lightTheme = createTheme({
                 },
             },
         },
-        MuiOutlinedInput: {
-            styleOverrides: {
-                input: { '&:-webkit-autofill': { WebkitBoxShadow: `0 0 0 100px ${LIGHT_BACKGROUND_PAPER} inset` } },
-            },
-        },
         MuiDialog: {
             styleOverrides: {
                 paper: {
@@ -490,11 +490,6 @@ export const darkTheme = createTheme({
                     },
                     '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
                         borderColor: alpha(DARK_TEXT_SECONDARY, 0.4),
-                    },
-                },
-                input: {
-                    '&:-webkit-autofill': {
-                        WebkitBoxShadow: `0 0 0 100px ${DARK_BACKGROUND_PAPER} inset`,
                     },
                 },
             },
@@ -671,7 +666,6 @@ export const draculaTheme = createTheme({
                         borderColor: alpha(DRACULA_TEXT_SECONDARY, 0.4),
                     },
                 },
-                input: { '&:-webkit-autofill': { WebkitBoxShadow: `0 0 0 100px ${DRACULA_BACKGROUND_PAPER} inset` } },
             },
         },
         MuiInputLabel: {
