@@ -3,10 +3,12 @@ import {useTranslation} from "react-i18next";
 import {useBaseAppContext, useResourceApiService} from "reactlib";
 import KanbanBoard from "@src/components/KanbanBoard.tsx";
 import {formatDate} from "@src/util/dateUtils.ts";
+import {useUserSession} from "@src/components/Session.tsx";
 
 export const TascaKanban = ({actions, filter, namedQueries, perspectives, reloadTrigger}:any) => {
     const { t } = useTranslation();
     const [tasques, setTasques] = useState<any[]>([]);
+    const { value: user } = useUserSession();
 
     const {
         isReady: apiIsReady,
@@ -16,6 +18,10 @@ export const TascaKanban = ({actions, filter, namedQueries, perspectives, reload
     } = useResourceApiService('expedientTascaResource');
     const {temporalMessageShow} = useBaseAppContext();
     const prioritat = fields?.find((f: { name: string; label: string }) => f.name === "prioritat")
+
+    const isOnlyObservador = (row: any): boolean => {
+        return row?.observadors?.map((obs:any)=>obs?.id).includes(user.codi) && !row?.usuariActualResponsable && !row?.usuariActualDelegat;
+    }
 
     const toKanbanElement = (t:any) => {
         return {
@@ -45,7 +51,7 @@ export const TascaKanban = ({actions, filter, namedQueries, perspectives, reload
                 },
             ],
             user: t?.responsableActual?.description.replace(` (${t?.responsableActual?.id})`,''),
-            draggable: !(t.estat == 'REBUTJADA' || t.estat == 'CANCELLADA' || t.estat == 'FINALITZADA'),
+            draggable: !isOnlyObservador(t) && !(t.estat == 'REBUTJADA' || t.estat == 'CANCELLADA' || t.estat == 'FINALITZADA'),
             entity: t
         }
     }
@@ -66,9 +72,7 @@ export const TascaKanban = ({actions, filter, namedQueries, perspectives, reload
         refresh()
     }, [filter, apiIsReady, reloadTrigger]);
 
-    const handleDragEnd = (origen:any, desti:any, tasca:any) => {
-        console.log("handleDragEnd", origen, desti, tasca);
-
+    const handleDragEnd = (_origen:any, desti:any, tasca:any) => {
         apiAction(tasca.id,{code:'CHANGE_ESTAT', data:{estat: desti, motiu: t('page.tasca.kanban.changeEstat.motiu')}})
             .catch((error) => {
                 refresh?.()

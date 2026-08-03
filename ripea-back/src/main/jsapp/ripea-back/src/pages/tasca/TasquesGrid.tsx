@@ -1,11 +1,11 @@
-import {useMuiDataGridApiRef,GridPage} from 'reactlib';
+import {useMuiDataGridApiRef, GridPage, useFilterApiRef} from 'reactlib';
 import {useTranslation} from "react-i18next";
 import { formatDate } from "../../util/dateUtils.ts";
 import {StyledPrioritat} from "../expedient/ExpedientGrid.tsx";
 import {TascaComment} from "../CommentDialog.tsx";
 import StyledMuiGrid from '../../components/StyledMuiGrid.tsx';
 import TasquesFilter from "./TasquesFilter.tsx";
-import {useCallback, useMemo, useState} from "react";
+import {useCallback, useEffect, useMemo, useState} from "react";
 import Load from "../../components/Load.tsx";
 import { CardPage } from "../../components/CardData.tsx";
 import {useUserSession} from "../../components/Session.tsx";
@@ -81,9 +81,11 @@ const TasquesGrid = () => {
     const [springFilter, setSpringFilter] = useState<string>();
     const [load, setLoad] = useState<boolean>(false);
     const { vista, setVista } = useTascaView('usuariTascaView');
+    const [reload, setReload] = useState<boolean>(false);
 
     const refresh = useCallback(() => {
         apiRef?.current?.refresh?.();
+        setReload((prev) => !prev)
     }, [apiRef])
 
     const columns = useMemo(() => [
@@ -158,9 +160,25 @@ const TasquesGrid = () => {
     const { actions, components, isTramitable } = useTascaActions({potModificar: true}, refresh)
     const { handleOpen, dialog } = useTascaDetail();
 
+    const filterRef = useFilterApiRef();
+    useEffect(() => {
+        if (filterRef.current != null && vista == TascaView.kanban) {
+            const fecha = new Date();
+            fecha.setDate(fecha.getDate() - 30);
+
+            filterRef.current.setFieldValue("dataInici", fecha)
+            filterRef.current.setFieldValue("estats", undefined)
+            filterRef.current.filter({
+                dataInici: fecha,
+                estats: undefined
+            })
+        }
+    }, [vista]);
+
     return <GridPage autoHeight>
         <CardPage title={t('page.user.menu.tasca')}>
             <TasquesFilter
+                apiRef={filterRef}
                 onSpringFilterChange={(value:any) => {
                     setSpringFilter(value)
                     setLoad(true)
@@ -172,8 +190,8 @@ const TasquesGrid = () => {
                     <Grid container display={'flex'} justifyContent={'end'} mb={1}>
                         <TascaViewSelector value={vista} onChange={setVista}/>
                     </Grid>
-                    {vista == TascaView.kanban && <TascaKanban actions={actions} filter={springFilter} namedQueries={namedQueries} perspectives={perspectives} readOnly />}
-                    {vista == TascaView.calendar && <TascaCalendar actions={actions} filter={springFilter} namedQueries={namedQueries} perspectives={perspectives} />}
+                    {vista == TascaView.kanban && <TascaKanban actions={actions} filter={springFilter} namedQueries={namedQueries} perspectives={perspectives} reloadTrigger={reload} readOnly />}
+                    {vista == TascaView.calendar && <TascaCalendar actions={actions} filter={springFilter} namedQueries={namedQueries} perspectives={perspectives} reloadTrigger={reload} />}
                 </>}
 
                 {vista == TascaView.table &&

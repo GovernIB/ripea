@@ -46,16 +46,15 @@ const springFilterBuilder = (data:any) => {
 }
 
 const TasquesFilter = (props:any) => {
-    const {onSpringFilterChange} = props;
     return <StyledMuiFilter
         resourceName={"expedientTascaResource"}
         code={"TASCA_FILTER"}
         springFilterBuilder={springFilterBuilder}
-        onSpringFilterChange={onSpringFilterChange}
         filterOnFieldEnterKeyPressed
         advancedSearch
         buttonGridProps={{size: {xs: 12, sm: 6, md: 2}}}
         buttonIconOnlyBreakpoint={FILTER_ADVANCED_ICON_ONLY_BREAKPOINT}
+        {...props}
     >
         <TasquesFilterForm/>
     </StyledMuiFilter>
