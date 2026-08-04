@@ -152,6 +152,7 @@ const AppRoutes: React.FC = () => {
             <Route path="metaExpedient/:id/:element" element={<MetaExpedientElements/>} />
             <Route path="expedientEstat/:id" element={<MetaExpedientElements/>} />
             <Route path="metaExpedient/:id/tasca/:tascaId/validacio" element={<MetaExpedientTascaValidacioGrid/>} />
+			<Route path="metaDocument/:id/metaDada" element={<MetaDadaGrid/>} />
         </Route>
         <Route element={<ProtectedRoute allowedRoles={[rols.ADMIN, rols.ORGAN_ADMIN, rols.DISSENY]} />}>
             <Route path="grup" element={<GrupGrid/>} />
@@ -164,7 +165,6 @@ const AppRoutes: React.FC = () => {
             <Route path="permis" element={<PermisEntitatGrid/>} />
             <Route path="domini" element={<DominiGrid/>} />
             <Route path="metaDocument" element={<MetaDocumentGrid/>} />
-            <Route path="metaDocument/:id/metaDada" element={<MetaDadaGrid/>} />
             <Route element={<ProtectedRoute params={['isUrlInstruccioEnabled']}/>}>
                 <Route path="urlInstruccio" element={<UrlInstruccioGrid/>} />
             </Route>
