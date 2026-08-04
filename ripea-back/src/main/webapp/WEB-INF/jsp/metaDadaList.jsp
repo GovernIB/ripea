@@ -47,6 +47,11 @@ $(document).ready(function() {
 </script>	
 </head>
 <body>
+	<%-- Només s'informa quan el meta-node és un dels tipus de document reservats i el rol
+	     actual no els pot editar (ho decideix MetaDocumentMetaDadaController). --%>
+	<c:if test="${metaDocumentReservat}">
+		<div class="alert well-sm alert-info"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="metadocument.reservat.modificacio.alerta"/></div>
+	</c:if>
 	<c:if test="${!esRevisor && !bloquejarCamps && !isRolActualAdministradorLectura}">
 		<div class="text-right" data-toggle="botons-titol">
 			<a class="btn btn-default" href="metaDada/new" data-toggle="modal" data-datatable-id="metadades"><span class="fa fa-plus"></span>&nbsp;<spring:message code="metadada.list.boto.nova"/></a>

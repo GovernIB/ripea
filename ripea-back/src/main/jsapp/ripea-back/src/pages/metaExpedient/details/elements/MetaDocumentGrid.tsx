@@ -1,7 +1,7 @@
 import {Badge, Icon, Typography} from "@mui/material";
 import {useTranslation} from "react-i18next";
 import {useMuiDataGridApiRef} from "reactlib";
-import {useMemo} from "react";
+import {useCallback, useMemo} from "react";
 import LinkIcon from "../../../../components/LinkIcon.tsx";
 import {useActions, useMetaDocumentActions} from "../../../metaDocument/details/MetaDocumentActions.tsx";
 import {MetaDocumentForm} from "../../../metaDocument/MetaDocumentGrid.tsx";
@@ -10,6 +10,8 @@ import StyledMuiGrid from "../../../../components/StyledMuiGrid.tsx";
 import useMetaDocumentDetail from "./details/MetaDocumentDetail.tsx";
 import {MultiplicitatStyled} from "../../../contingut/details/MetaExpedient.tsx";
 import {icons} from "@src/util/icons.ts";
+import {esMetaDocumentPerDefecte} from "@src/util/metaDocumentUtils.ts";
+import {useUserSession} from "../../../../components/Session.tsx";
 
 const sortModel: any = [{field: 'ordre', sort: 'asc'}]
 const perspectives = ["COUNT_METADADES"];
@@ -66,6 +68,7 @@ const columns: any[] = [
 export const MetaDocumentGrid = ({ entity, onRowCountChange, readOnly } :any) => {
     const {t} = useTranslation();
     const apiRef = useMuiDataGridApiRef();
+    const {rol} = useUserSession();
 
     const refresh = () => {
         apiRef?.current?.refresh?.();
@@ -94,16 +97,27 @@ export const MetaDocumentGrid = ({ entity, onRowCountChange, readOnly } :any) =>
     const {apiIsReady, handleOpen, dialog} = useMetaDocumentDetail()
     const {reordering} = useActions()
     const {actions} = useMetaDocumentActions(refresh);
-    const additionalActions:any[] = useMemo(() => readOnly ?[
+
+    // Els tipus de document creats per defecte a l'alta del procediment només els pot
+    // modificar un administrador d'entitat; per a la resta de rols només es consulten.
+    const nomesConsulta = useCallback(
+        (row:any) => readOnly || (esMetaDocumentPerDefecte(row?.codi) && !rol?.isAdmin),
+        [readOnly, rol])
+
+    const additionalActions:any[] = useMemo(() => [
         {
             label: t('page.metaExpedient.action.consultar.label'),
             icon: icons.detall,
             showInMenu: false,
             onClick: handleOpen,
+            hidden: (row:any) => !nomesConsulta(row),
         },
-    ]:[
-        ...actions
-    ], [t, actions, readOnly, apiIsReady])
+        ...actions.map((action:any) => ({
+            ...action,
+            hidden: (row:any) => nomesConsulta(row) ||
+                (typeof action.hidden === 'function' ? action.hidden(row) : !!action.hidden),
+        })),
+    ], [t, actions, nomesConsulta, apiIsReady])
 
     const handleDragEnd = (params: any) => {
         if (params.targetIndex != params.oldIndex) {

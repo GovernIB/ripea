@@ -25,6 +25,7 @@ import es.caib.ripea.persistence.entity.FluxFirmaUsuariEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentFluxPortafibEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientTascaValidacioEntity;
+import es.caib.ripea.persistence.entity.MetaNodeEntity;
 import es.caib.ripea.persistence.entity.PinbalServeiEntity;
 import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.repository.DocumentRepository;
@@ -36,21 +37,26 @@ import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientTascaValidacioRepository;
 import es.caib.ripea.persistence.repository.PinbalServeiRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
+import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ItemValidacioTascaEnum;
 import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentPerDefecteEnumDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
+import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
 import es.caib.ripea.service.intf.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.service.intf.exception.ExisteixenDocumentsException;
 import es.caib.ripea.service.intf.exception.NotFoundException;
+import es.caib.ripea.service.intf.exception.PermissionDeniedException;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
 import io.micrometer.core.instrument.Timer;
 
 @Component
 public class MetaDocumentHelper {
-	
+
 	@Autowired private EntityComprovarHelper entityComprovarHelper;
 	@Autowired private MetaExpedientHelper metaExpedientHelper;
 	@Autowired private ContingutHelper contingutHelper;
@@ -68,10 +74,11 @@ public class MetaDocumentHelper {
 	@Autowired private UsuariRepository usuariRepository;
 	@Autowired private ContingutLogHelper contingutLogHelper;
 	@Autowired private ValidacioCacheEvictHelper validacioCacheEvictHelper;
+	@Autowired private ConfigHelper configHelper;
 
 	public void moveTo(Long metaDocumentId, int posicio) throws NotFoundException {
 		
-		MetaDocumentEntity metaDocument = metaDocumentRepository.findById(metaDocumentId).get();		
+		MetaDocumentEntity metaDocument = metaDocumentRepository.findById(metaDocumentId).get();
 		List<MetaDocumentEntity> metaDocuments = metaDocumentRepository.findByMetaExpedientOrderByOrdreAsc(metaDocument.getMetaExpedient());
 
 		int anteriorIndex = -1; 
@@ -103,8 +110,9 @@ public class MetaDocumentHelper {
 				true);
 		MetaDocumentEntity currentMetaDocument = entityComprovarHelper.comprovarMetaDocument(
 				metaDocumentId);
+		comprovarPermisModificacio(currentMetaDocument);
 		MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedient(
-				entitat, 
+				entitat,
 				metaExpedientId);
 //		Recupera els metadocuments del mateix procediment
 		Set<MetaDocumentEntity> metaDocuments = metaExpedientEntity.getMetaDocuments();
@@ -148,7 +156,8 @@ public class MetaDocumentHelper {
 		} else {
 			metaDocumentEntity = metaDocumentRepository.findById(id).get();
 		}
-		
+		comprovarPermisModificacio(metaDocumentEntity);
+
 		List<DocumentEntity> docs = documentRepository.findByMetaNode(metaDocumentEntity);
 		if (docs != null && !docs.isEmpty()) {
 			throw new ExisteixenDocumentsException();
@@ -207,6 +216,7 @@ public class MetaDocumentHelper {
 		} else {
 			metaDocumentEntity = metaDocumentRepository.findById(metaDocumentId).get();
 		}
+		comprovarPermisModificacio(metaDocumentEntity);
 
 		metaDocumentEntity.updateActiu(actiu);
 
@@ -257,6 +267,7 @@ public class MetaDocumentHelper {
 			byte[] plantillaContingut) {
 
 		MetaDocumentEntity metaDocumentEntity = metaDocumentRepository.findById(metaDocument.getId()).get();
+		comprovarPermisModificacio(metaDocumentEntity);
 
 		//El Metadocument pot ser generic (sense associar a un procediment)
 		if (metaExpedientId!=null) {
@@ -473,7 +484,126 @@ public class MetaDocumentHelper {
 	public MetaDocumentEntity findByCodiAndProcediment(MetaExpedientEntity metaExpedientEntity, String codi) {
 		return metaDocumentRepository.findByMetaExpedientAndCodi(metaExpedientEntity, codi);
 	}
-	
+
+	/**
+	 * Crea els tipus de document que tot procediment ha de tenir per defecte:
+	 * NOTIB_JUSTIFICANT_RECEPCIO i REGISTRE_JUSTIFICANT_ENTRADA, els dos amb
+	 * multiplicitat 0..N, origen administració i estat d'elaboració original.
+	 *
+	 * És idempotent: no crea el tipus de document si el procediment ja en té un
+	 * amb el mateix codi.
+	 *
+	 * @param metaExpedient procediment al qual s'han d'afegir els tipus de document.
+	 * @return els tipus de document creats (buit si el procediment ja els tenia tots).
+	 */
+	public List<MetaDocumentEntity> crearMetaDocumentsPerDefecte(MetaExpedientEntity metaExpedient) {
+
+		List<MetaDocumentEntity> metaDocumentsCreats = new ArrayList<>();
+
+		for (MetaDocumentPerDefecteEnumDto metaDocumentPerDefecte : MetaDocumentPerDefecteEnumDto.values()) {
+			MetaDocumentEntity metaDocumentCreat = crearMetaDocumentPerDefecte(metaExpedient, metaDocumentPerDefecte);
+			if (metaDocumentCreat != null) {
+				metaDocumentsCreats.add(metaDocumentCreat);
+			}
+		}
+
+		return metaDocumentsCreats;
+	}
+
+	private MetaDocumentEntity crearMetaDocumentPerDefecte(
+			MetaExpedientEntity metaExpedient,
+			MetaDocumentPerDefecteEnumDto metaDocumentPerDefecte) {
+
+		String codi = metaDocumentPerDefecte.getCodi();
+		if (metaDocumentRepository.findByMetaExpedientAndCodi(metaExpedient, codi) != null) {
+			logger.debug("El procediment ja té el tipus de document per defecte (metaExpedientId=" + metaExpedient.getId() + ", codi=" + codi + ")");
+			return null;
+		}
+
+		MetaDocumentEntity metaDocument = metaDocumentRepository.save(
+				MetaDocumentEntity.getBuilder(
+						metaExpedient.getEntitat(),
+						codi,
+						metaDocumentPerDefecte.getNom(),
+						MultiplicitatEnumDto.M_0_N,
+						metaExpedient,
+						NtiOrigenEnumDto.O1,
+						DocumentNtiEstadoElaboracionEnumDto.EE01,
+						metaDocumentPerDefecte.getNtiTipoDocumental(),
+						false,
+						null,
+						metaDocumentRepository.countByMetaExpedient(metaExpedient)).build());
+
+		contingutLogHelper.logProcedimentObjecte(
+				metaExpedient.getId(),
+				LogTipusEnumDto.MODIFICACIO,
+				metaDocument,
+				LogObjecteTipusEnumDto.METADOCUMENT,
+				LogTipusEnumDto.CREACIO,
+				metaDocument.getCodi(),
+				metaDocument.getNom());
+
+		return metaDocument;
+	}
+
+	/**
+	 * Comprova que el rol actual pot modificar el tipus de document indicat.
+	 *
+	 * Els tipus de document creats per defecte a l'alta del procediment
+	 * ({@link MetaDocumentPerDefecteEnumDto}) només els pot modificar o eliminar un
+	 * administrador d'entitat; per a la resta de rols són de només consulta. La resta de
+	 * tipus de document no tenen cap restricció addicional.
+	 *
+	 * Reordenar (moveTo) queda fora d'aquesta restricció: només canvia l'ordre de
+	 * presentació de la llista i, de fet, moure qualsevol altre tipus de document ja
+	 * renumera tots els del procediment.
+	 *
+	 * @throws PermissionDeniedException si el tipus de document és un dels creats per
+	 *         defecte i el rol actual no és IPA_ADMIN.
+	 */
+	private void comprovarPermisModificacio(MetaDocumentEntity metaDocument) {
+		if (!potModificar(metaDocument)) {
+			throw new PermissionDeniedException(
+					MetaDocumentEntity.class,
+					metaDocument.getId(),
+					BaseConfig.ROLE_ADMIN,
+					"Els tipus de document creats per defecte només els pot modificar un administrador d'entitat");
+		}
+	}
+
+	/**
+	 * Indica si el rol actual pot modificar el tipus de document indicat.
+	 *
+	 * Pensat per als processos que recorren tots els tipus de document d'un procediment
+	 * (com la importació des de fitxer) i que han de saltar-se els que no poden tocar en
+	 * lloc d'avortar. Per a les modificacions puntuals fer servir
+	 * {@link #comprovarPermisModificacio(MetaDocumentEntity)}.
+	 */
+	public boolean potModificar(MetaDocumentEntity metaDocument) {
+		if (metaDocument == null || !MetaDocumentPerDefecteEnumDto.isCodiPerDefecte(metaDocument.getCodi())) {
+			return true;
+		}
+		return BaseConfig.ROLE_ADMIN.equals(configHelper.getRolActual());
+	}
+
+	/**
+	 * Comprova que el rol actual pot modificar les metadades del meta-node indicat.
+	 *
+	 * Les metadades d'un tipus de document formen part de la seva definició, així que
+	 * hereten la mateixa restricció: si el meta-node és un dels tipus de document creats
+	 * per defecte a l'alta del procediment, només un administrador d'entitat les pot
+	 * crear, modificar, activar/desactivar o eliminar. Els meta-nodes que no són tipus de
+	 * document (els procediments) no tenen cap restricció addicional.
+	 *
+	 * @throws PermissionDeniedException si el meta-node és un tipus de document creat per
+	 *         defecte i el rol actual no és IPA_ADMIN.
+	 */
+	public void comprovarPermisModificacioMetaDades(MetaNodeEntity metaNode) {
+		if (metaNode instanceof MetaDocumentEntity) {
+			comprovarPermisModificacio((MetaDocumentEntity) metaNode);
+		}
+	}
+
 	public List<MetaDocumentEntity> findActiusPerCreacio(EntitatEntity entitat, Long contingutId, Long metaExpedientId, boolean findAllMarkDisponiblesPerCreacio) {
 		
 		List<MetaDocumentEntity> metaDocuments = new ArrayList<>();

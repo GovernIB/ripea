@@ -2,7 +2,7 @@ import {useTranslation} from "react-i18next";
 import {GridPage, useBaseAppContext, useFormContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
 import {CardPage} from "@src/components/CardData.tsx";
 import StyledMuiGrid from "@src/components/StyledMuiGrid.tsx";
-import {Grid, Icon, Divider, Button} from "@mui/material";
+import {Alert, Grid, Icon, Divider, Button} from "@mui/material";
 import * as builder from "@src/util/springFilterUtils.ts";
 import {useNavigate, useParams} from "react-router-dom";
 import GridFormField from "@src/components/GridFormField.tsx";
@@ -13,6 +13,8 @@ import {MultiplicitatStyled} from "@src/pages/contingut/details/MetaExpedient.ts
 import useMetaDadaDetail from "./details/MetaDadaDetail.tsx";
 import {ErrorPage} from "@src/components/ErrorPage.tsx";
 import {icons} from "@src/util/icons.ts";
+import {esMetaDocumentPerDefecte} from "@src/util/metaDocumentUtils.ts";
+import Load from "@src/components/Load.tsx";
 
 const useActions = (refresh?: () => void) => {
     const {t} = useTranslation();
@@ -196,6 +198,11 @@ export const MetDadaGrid = ({ id, enviable = false, readOnly, persistentStateKey
     </>
 }
 
+// metaExpedientRevisioEstat és un camp @Transient que només omple la perspectiva REVISIO_ESTAT.
+// Sense demanar-la arriba buit i la comprovació de "procediment revisat" no s'aplicaria mai, de
+// manera que un administrador d'òrgan podria editar les metadades d'un procediment ja revisat.
+const metaDocumentPerspectives = ["REVISIO_ESTAT"];
+
 const MetaDadaGrid = () => {
     const {t} = useTranslation();
     const { id } = useParams();
@@ -211,7 +218,7 @@ const MetaDadaGrid = () => {
 
     useEffect(()=>{
         if (apiIsReady) {
-            appGetOne(id)
+            appGetOne(id, {perspectives: metaDocumentPerspectives})
                 .then((app) => setMetaDocument(app))
                 .catch((error) => setError(error))
         }
@@ -223,28 +230,51 @@ const MetaDadaGrid = () => {
         }
     }, [metaDocument]);
 
+    // Les metadades dels tipus de document creats per defecte a l'alta del procediment
+    // formen part de la seva definició: només les pot mantenir un administrador d'entitat,
+    // per a la resta de rols són de només consulta i se n'informa el motiu.
+    const reservat = useMemo(
+        () => esMetaDocumentPerDefecte(metaDocument?.codi) && !rol.isAdmin,
+        [metaDocument, rol])
+
     const readOnly = useMemo(() => {
+        if (reservat) {
+            return true
+        }
         return !(rol.isAdmin || (rol.isOrganAdmin && metaDocument?.metaExpedientRevisioEstat != 'REVISAT') || rol.isDissenyOrgan)
-    }, [metaDocument, rol])
+    }, [metaDocument, rol, reservat])
 
     if (error)
         return <ErrorPage error={error}/>
 
+    // El grid s'ha de muntar amb el readOnly ja definitiu: les accions de fila es
+    // construeixen un únic cop i no es refan si readOnly canvia després (les dependències
+    // del useMemo de les columnes a la llibreria no inclouen les accions). Fins que no
+    // arriba el tipus de document no se sap si el procediment està revisat, així que
+    // s'espera amb Load, igual que fa la pantalla del procediment.
     return <GridPage autoHeight>
-        <CardPage title={t('page.user.menu.documentDada', {nom: metaDocument?.nom})}
-                  header={<>
-                      <Button
-                          variant="outlined"
-                          color={"inherit"}
-                          sx={{ borderRadius: '4px', padding: '0px 10px', marginLeft: "auto !important" }}
-                          onClick={()=>navigate(`/metaExpedient/${metaDocument?.metaExpedient?.id}/metaDocument`)}
-                      >
-                          <Icon>arrow_back</Icon>
-                          {t('common.back')}
-                      </Button>
-                  </>}>
-            <MetDadaGrid id={id} readOnly={readOnly} persistentStateKey={"metaDadaResource_metaDocumentTab"}/>
-        </CardPage>
+        <Load value={metaDocument}>
+            <CardPage title={t('page.user.menu.documentDada', {nom: metaDocument?.nom})}
+                      header={<>
+                          <Button
+                              variant="outlined"
+                              color={"inherit"}
+                              sx={{ borderRadius: '4px', padding: '0px 10px', marginLeft: "auto !important" }}
+                              onClick={()=>navigate(`/metaExpedient/${metaDocument?.metaExpedient?.id}/metaDocument`)}
+                          >
+                              <Icon>arrow_back</Icon>
+                              {t('common.back')}
+                          </Button>
+                      </>}>
+                {metaDocument?.metaExpedientRevisioEstat === 'REVISAT' && rol?.isOrganAdmin &&
+                    <Alert severity={'info'} sx={{mb: 1}}>
+                        {t('page.metaExpedient.action.consultar.revisat')}
+                    </Alert>
+                }
+                {reservat && <Alert severity={'info'} sx={{mb: 2}}>{t('page.metaDocument.reservat')}</Alert>}
+                <MetDadaGrid id={id} readOnly={readOnly} persistentStateKey={"metaDadaResource_metaDocumentTab"}/>
+            </CardPage>
+        </Load>
     </GridPage>
 }
 export default MetaDadaGrid;

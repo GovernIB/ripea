@@ -49,6 +49,13 @@ public class MetaDocumentDto extends MetaNodeAmbMetaDadesDto implements Serializ
 	public String getNtiTipusDocumentalCodiNom() {
 		return ntiTipoDocumental + " - " + ntiTipoDocumentalNom;
 	}
+	/**
+	 * Indica si es tracta d'un dels tipus de document creats per defecte a l'alta del
+	 * procediment, que només pot modificar un administrador d'entitat.
+	 */
+	public boolean isModificacioRestringida() {
+		return MetaDocumentPerDefecteEnumDto.isCodiPerDefecte(getCodi());
+	}
 	
 	@Override
 	public String toString() {

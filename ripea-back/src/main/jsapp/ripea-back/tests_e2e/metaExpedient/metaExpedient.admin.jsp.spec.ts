@@ -11,6 +11,9 @@ const HUMAN_DELAY	= 1000; //milisegons de retard entre execució de accions
 const CODI_DOC1     = 'DOC_PW_JSP_01';
 const NOM_DOC1      = 'document tipus doc pw 1';
 const CODI_DOC2     = 'DOC_PW_JSP_02';
+// Tot procediment nou es crea amb els tipus de document per defecte
+// NOTIB_JUSTIFICANT_RECEPCIO i REGISTRE_JUSTIFICANT_ENTRADA.
+const NUM_DOCS_DEFECTE = 2;
 const NOM_DOC1_MOD  = 'doc modificat pw 1';
 const DESC_DOC1_MOD = 'descripció modificada doc 1';
 
@@ -682,9 +685,9 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
 
         const tipusDocsPage = await anarATipusDocs(page);
 
-        await test.step('verificar que la llista de documents està buida', async () => {
-            console.log('  -> verificar que la llista de documents està buida');
-            await expect(getDocRows(tipusDocsPage)).toHaveCount(0);
+        await test.step('verificar que la llista només té els documents per defecte', async () => {
+            console.log('  -> verificar que la llista només té els documents per defecte');
+            await expect(getDocRows(tipusDocsPage)).toHaveCount(NUM_DOCS_DEFECTE);
         });
 
         await test.step('crear el primer document', async () => {
@@ -697,9 +700,9 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
             await crearDocument(tipusDocsPage, CODI_DOC2, 'document tipus doc pw 2');
         });
 
-        await test.step('verificar que hi ha dos documents', async () => {
-            console.log('  -> verificar que hi ha dos documents');
-            await expect(getDocRows(tipusDocsPage)).toHaveCount(2);
+        await test.step('verificar que hi ha dos documents (més els per defecte)', async () => {
+            console.log('  -> verificar que hi ha dos documents (més els per defecte)');
+            await expect(getDocRows(tipusDocsPage)).toHaveCount(NUM_DOCS_DEFECTE + 2);
         });
 
         await tipusDocsPage.close();

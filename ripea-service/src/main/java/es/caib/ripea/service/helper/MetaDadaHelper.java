@@ -33,6 +33,7 @@ public class MetaDadaHelper {
 	@Autowired private ApplicationHelper applicationHelper;
 	@Autowired private ValidacioCacheEvictHelper validacioCacheEvictHelper;
 	@Autowired private ContingutLogHelper contingutLogHelper;
+	@Autowired private MetaDocumentHelper metaDocumentHelper;
 
 	public MetaDadaEntity findByMetaNodeAndCodi(MetaNodeEntity metaNode, String codi) {
 		return metaDadaRepository.findByMetaNodeAndCodi(metaNode, codi);
@@ -46,7 +47,8 @@ public class MetaDadaHelper {
 		
 			logger.debug("Creant una nova meta-dada (entitatId=" + entitatId + ", metaNodeId=" + metaNodeId + ", metaDada=" + metaDada + ")");
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-			MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(entitat, metaNodeId);		
+			MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(entitat, metaNodeId);
+			metaDocumentHelper.comprovarPermisModificacioMetaDades(metaNode);
 			int ordre = metaDadaRepository.countByMetaNode(metaNode);
 			
 			Object valor = null;
@@ -144,6 +146,7 @@ public class MetaDadaHelper {
 		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(
 				entitat,
 				metaNodeId);
+		metaDocumentHelper.comprovarPermisModificacioMetaDades(metaNode);
 		MetaDadaEntity metaDadaEntity = entityComprovarHelper.comprovarMetaDada(
 				entitat,
 				metaNode,
@@ -185,9 +188,10 @@ public class MetaDadaHelper {
 			Long id, String rolActual, Long organId) {
 		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(entitat, metaNodeId);		
+		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(entitat, metaNodeId);
+		metaDocumentHelper.comprovarPermisModificacioMetaDades(metaNode);
 		MetaDadaEntity metaDadaEntity = entityComprovarHelper.comprovarMetaDada(entitat, metaNode, id);
-		
+
 		//Eliminar les possibles validacions sobre la dada
 		List<MetaExpedientTascaValidacioEntity> validacionsDada = metaExpedientTascaValidacioRepository.findByItemValidacioAndItemId(
 				ItemValidacioTascaEnum.DADA,
@@ -236,6 +240,7 @@ public class MetaDadaHelper {
 		MetaNodeEntity metaNode = entityComprovarHelper.comprovarMetaNode(
 				entitat,
 				metaNodeId);
+		metaDocumentHelper.comprovarPermisModificacioMetaDades(metaNode);
 		MetaDadaEntity metaDadaEntity = entityComprovarHelper.comprovarMetaDada(
 				entitat,
 				metaNode,

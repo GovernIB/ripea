@@ -984,6 +984,9 @@ public class MetaExpedientHelper {
 			crearEstructuraCarpetes(metaExpedient.getEstructuraCarpetes(), metaExpedientEntity);
 		}
 
+		//crear tipus de document per defecte
+		metaDocumentHelper.crearMetaDocumentsPerDefecte(metaExpedientEntity);
+
 		if ("IPA_ORGAN_ADMIN".equals(rolActual)) {
 			canviarRevisioADisseny(entitatId, metaExpedientEntity.getId(), organId);
 		} else {
@@ -1620,6 +1623,13 @@ public class MetaExpedientHelper {
 				//Cercar el metaDocument per codi dins el procediment actual, si existeix s'actualitza, sino es crea
 				MetaDocumentEntity mdE = metaDocumentHelper.findByCodiAndProcediment(procedimentOriginal, metaDocumentDto.getCodi());
 				Long metaDocumentCreatedId = null;
+
+				//Els tipus de document creats per defecte només els pot modificar un administrador
+				//d'entitat: si la importació la fa un altre rol es deixen tal com estan en lloc
+				//d'avortar tota la importació.
+				if (mdE != null && !metaDocumentHelper.potModificar(mdE)) {
+					continue;
+				}
 
 				if (mdE!=null) {
 					metaDocumentCreatedId = metaDocumentHelper.update(

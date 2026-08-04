@@ -1,17 +1,25 @@
 import {useState} from "react";
-import {Alert} from "@mui/material";
+import {Alert, Grid} from "@mui/material";
 import {useResourceApiService, MuiDialog, useBaseAppContext} from "reactlib";
 import {useTranslation} from "react-i18next";
 import Load from "../../../../../components/Load.tsx";
 import {FieldData, MuiDetail} from "../../../../../components/MuiDetail.tsx";
 import {formatDate} from "../../../../../util/dateUtils.ts";
 import {DetailCard} from "../../../../../components/CardData.tsx";
+import {useUserSession} from "@src/components/Session.tsx";
+import {esMetaDocumentPerDefecte} from "@src/util/metaDocumentUtils.ts";
 
 const MetaDocumentDetail = (props:any) => {
     const {entity, fields} = props;
     const { t } = useTranslation();
+    const {rol} = useUserSession();
+    // Els tipus de document creats per defecte a l'alta del procediment només els pot
+    // editar un administrador d'entitat: per a la resta de rols s'informa del motiu.
+    const reservat = esMetaDocumentPerDefecte(entity?.codi) && !rol?.isAdmin;
 
     return <MuiDetail entity={entity} fields={fields}>
+        {reservat && <Grid size={12}><Alert severity={'info'}>{t('page.metaDocument.reservat')}</Alert></Grid>}
+
         <DetailCard>
             <FieldData field={'codi'}/>
             <FieldData field={'nom'}/>

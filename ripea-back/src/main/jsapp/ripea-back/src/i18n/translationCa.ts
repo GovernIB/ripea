@@ -1635,6 +1635,7 @@ const translationCa = {
             detail: {
                 title: "Detall de tipus de document",
             },
+            reservat: "Els documents reservats NOTIB_JUSTIFICANT_RECEPCIO i REGISTRE_JUSTIFICANT_ENTRADA només poden ser editats per un administrador.",
             tabs: {
                 dades: "Dades",
                 nti: "Dades NTI",
