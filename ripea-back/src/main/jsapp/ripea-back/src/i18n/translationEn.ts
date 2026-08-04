@@ -406,9 +406,9 @@ const translationEn = {
         tasca: {
             title: "Task",
             view: {
-                table: "Table",
-                calendar: "Calendar",
-                kanban: "Kanban",
+                table: "Table view",
+                calendar: "Calendar view",
+                kanban: "Status view",
             },
             kanban: {
                 todo: "To do",

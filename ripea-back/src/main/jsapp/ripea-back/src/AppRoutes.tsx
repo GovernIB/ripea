@@ -46,10 +46,17 @@ import {Propietats, PropietatsByEntitat} from "./pages/user/propietats/Propietat
 import {ExcepcioGrid} from "./pages/user/monitor/ExcepcioGrid.tsx";
 import {IntegracioGrid} from "./pages/user/monitor/integracio/IntegracioGrid.tsx";
 import Accesibilitat from "./pages/Accesibilitat.tsx";
+import Load from "./components/Load.tsx";
 
 const ProtectedRoute = ({ allowedRoles = [], params = [] }: any) => {
-    const {value: user} = useUserSession();
+    const {value: user, isLoaded} = useUserSession();
     const { t } = useTranslation();
+
+    // Fins que no arriba la sessió no es pot decidir sobre rols ni permisos: resoldre-ho
+    // abans mostraria el missatge de no autoritzat a qualsevol rol.
+    if (!isLoaded) {
+        return <Load value={false} />;
+    }
 
     if (allowedRoles?.length > 0 && !allowedRoles.includes(user?.rolActual)) {
         return <NotFoundPage message={t('page.forbidden')} variant="h4" />;
@@ -62,7 +69,14 @@ const ProtectedRoute = ({ allowedRoles = [], params = [] }: any) => {
 };
 
 const HomeRedirect = () => {
-    const {value: user} = useUserSession();
+    const {value: user, isLoaded} = useUserSession();
+
+    // Sense sessió carregada, rolActual és undefined i cauríem al redirect per defecte
+    // (/expedient), que els rols de configuració (DISSENY/REVISIO/SUPER) no tenen autoritzat:
+    // hi aterrarien amb el missatge de no autoritzat en comptes de la seva pantalla d'inici.
+    if (!isLoaded) {
+        return <Load value={false} />;
+    }
 
     // En arribar aquí ja estem dins de la UI React (p.ex. després de canviar de rol,
     // entitat o òrgan). Es manté la interfície actual encara que el perfil de l'usuari
@@ -152,10 +166,6 @@ const AppRoutes: React.FC = () => {
             <Route path="metaExpedient/:id/:element" element={<MetaExpedientElements/>} />
             <Route path="expedientEstat/:id" element={<MetaExpedientElements/>} />
             <Route path="metaExpedient/:id/tasca/:tascaId/validacio" element={<MetaExpedientTascaValidacioGrid/>} />
-            {/* Les metadades d'un tipus de document s'obren des de la pestanya de tipus de document
-                del procediment, així que han de ser accessibles pels mateixos rols que aquella
-                pantalla (els mateixos que comprova el JSP a
-                getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor). */}
             <Route path="metaDocument/:id/metaDada" element={<MetaDadaGrid/>} />
         </Route>
         <Route element={<ProtectedRoute allowedRoles={[rols.ADMIN, rols.ORGAN_ADMIN, rols.DISSENY]} />}>

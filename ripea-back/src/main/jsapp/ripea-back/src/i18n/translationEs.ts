@@ -406,9 +406,9 @@ const translationEs = {
         tasca: {
             title: "Tarea",
             view: {
-                table: "Tabla",
-                calendar: "Calendario",
-                kanban: "Kanban",
+                table: "Vista de tabla",
+                calendar: "Vista de calendario",
+                kanban: "Vista por estado",
             },
             kanban: {
                 todo: "Por hacer",

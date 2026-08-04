@@ -58,6 +58,26 @@ export const countTopLevel = (filter?: string): number => {
     return matches ? matches.length + 1 : 1;
 };
 
+type FilterCount = number | ((num: number) => number);
+
+/** Nombre de filtres aplicats: el compte del filtre spring, ajustat si es rep una funció. */
+export const resolveFilterCount = (filter?: string, filterCount?: FilterCount): number =>
+    (typeof filterCount === 'function') ? filterCount(countTopLevel(filter)) : (filterCount ?? countTopLevel(filter));
+
+// Xip amb el nombre de filtres aplicats. A part de la barra d'eines de la graella, s'usa a
+// les pantalles amb vistes alternatives (calendari, kanban), on no hi ha barra d'eines.
+export const FilterCountChip = (props: { filter?: string, filterCount?: FilterCount, sx?: any }) => {
+    const { filter, filterCount, sx } = props;
+    const { t } = useTranslation();
+    const num = resolveFilterCount(filter, filterCount);
+
+    if (!num) {
+        return null;
+    }
+
+    return <Chip label={t('common.filterCount', {num})} size={"small"} icon={<Icon>filter_alt</Icon>} color={"primary"} sx={{px: 0.5, ...sx}} />
+}
+
 type StyledMuiGridProps = Omit<MuiDataGridProps,
     'rowSelectionModel'
     | 'onRowSelectionModelChange'
@@ -65,7 +85,7 @@ type StyledMuiGridProps = Omit<MuiDataGridProps,
     | 'paginationActive'
     | 'persistentStateActive'
 > & {
-    filterCount?: number | ((num:number) => number),
+    filterCount?: FilterCount,
     toolbarShowFilterCount?: boolean,
     toolbarCreateTitle?: string,
     toolbarMassiveActions?: MassiveActionProps[],
@@ -99,7 +119,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
     const {
         resourceName,
         filter,
-        filterCount = countTopLevel(filter),
+        filterCount,
         toolbarShowFilterCount = false,
         namedQueries,
         columns,
@@ -145,11 +165,11 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         datagridApiRef?.current?.setRowSelectionModel?.(toSelectionModel(value))
     }
 
-    const filterNum:number = ((typeof filterCount === 'function') ? filterCount?.(countTopLevel(filter)) : filterCount)
+    const filterNum:number = resolveFilterCount(filter, filterCount)
     const toolbarElements = [
         {
             position: 0,
-            element: <Chip label={t('common.filterCount', {num: filterNum})} size={"small"} icon={<Icon>filter_alt</Icon>} color={"primary"} sx={{px: 0.5}} />,
+            element: <FilterCountChip filter={filter} filterCount={filterCount} />,
             hidden: !toolbarShowFilterCount || !filterNum,
         },
         {

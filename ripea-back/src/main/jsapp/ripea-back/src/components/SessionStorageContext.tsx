@@ -156,6 +156,9 @@ export const useSessionContext = (key: string) => {
     const { sessionMap, setSessionByKey, clearSessionByKey } = context;
 
     const value = sessionMap.get(key);
+    // Distingeix "encara no s'ha resolt" (la clau no existeix) de "resolt a null/buit"
+    // (la clau existeix amb valor nul), cosa que value tot sol no permet saber.
+    const isInitialized = sessionMap.has(key);
 
     const save = useCallback(
         (newValue: any) => {
@@ -168,5 +171,5 @@ export const useSessionContext = (key: string) => {
         clearSessionByKey(key);
     }, [key, clearSessionByKey]);
 
-    return { value, save, clear };
+    return { value, isInitialized, save, clear };
 };

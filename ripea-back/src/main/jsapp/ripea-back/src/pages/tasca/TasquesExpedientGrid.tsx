@@ -108,6 +108,7 @@ const TasquesExpedientGrid = (props: any) => {
 
     const refresh = () => {
         apiRef?.current?.refresh?.();
+        setReload((v) => v + 1)
     }
 
     const { actions, components } = useTascaActions(entity, refresh);
@@ -123,7 +124,7 @@ const TasquesExpedientGrid = (props: any) => {
     const viewSelector = <TascaViewSelector value={vista} onChange={setVista}/>
 
     const [reload, setReload] = useState(0);
-    const { handleShow: handleCreate, content: createContent } = useCreate(() => setReload((v) => v + 1));
+    const { handleShow: handleCreate, content: createContent } = useCreate(refresh);
     const createButton = entity?.potModificar
         ? <ToolbarButton
             title={t('common.create')}

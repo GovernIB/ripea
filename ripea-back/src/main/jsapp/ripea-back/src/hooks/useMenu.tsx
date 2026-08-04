@@ -406,7 +406,26 @@ export const useMenuDissenyOrgan = () => {
                 to: '/grup',
             },
         ];
-        const entries: any[] = [];
+        const entries: any[] = [
+            {
+                id: 'config',
+                title: t('page.user.menu.config'),
+                icon: 'settings',
+                children: [
+                    {
+                        id: 'procediments',
+                        title: t('page.user.menu.procediments'),
+                        hover: t('page.user.menu.procedimentsTitle'),
+                        to: '/metaExpedient',
+                    },
+                    {
+                        id: 'grups',
+                        title: t('page.user.menu.grups'),
+                        to: '/grup',
+                    },
+                ],
+            },
+        ];
         const content = <></>;
 
         return { appEntries, entries, content };
@@ -610,7 +629,15 @@ export const useMenuRevisor = () => {
                 to: '/metaExpedient',
             },
         ];
-        const entries: any[] = [];
+        const entries: any[] = [
+            {
+                id: 'revisar',
+                title: t('page.user.menu.revisar'),
+                icon: 'integration_instructions',
+                iconVariant: 'material-icons-outlined',
+                to: '/metaExpedient',
+            },
+        ];
         const content = <></>;
 
         return { appEntries, entries, content };

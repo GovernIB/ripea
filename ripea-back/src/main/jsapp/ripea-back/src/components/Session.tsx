@@ -23,7 +23,7 @@ export const useUserSession = () => {
     axios.defaults.withCredentials = true;
     const { apiUrl } = useResourceApiContext();
 
-    const { value, save, clear } = useSessionContext(userkey);
+    const { value, isInitialized, save, clear } = useSessionContext(userkey);
 
     const refresh = () => {
         axios.get(apiUrl + 'usuari/actual/securityInfo')
@@ -85,6 +85,10 @@ export const useUserSession = () => {
 
     return {
         value,
+        // Fals mentre la crida a securityInfo està en curs. Qui decideixi sobre rols o
+        // permisos ha d'esperar-lo: abans, rolActual és undefined i qualsevol comprovació
+        // donaria un "no autoritzat" fals.
+        isLoaded: isInitialized,
         rol,
         permisos,
 
