@@ -59,6 +59,11 @@ const StyledMuiFilter = (props:any) => {
         componentProps,
         children,
         code,
+        // Dades amb què s'inicialitza el filtre mentre l'usuari no n'hagi desat cap a la
+        // sessió (p. ex. el revisor arriba al llistat de procediments amb l'estat de revisió
+        // a PENDENT). Es desen a la sessió amb la cerca automàtica inicial, i a partir
+        // d'aquí mana sempre el que hi hagi desat.
+        defaultData,
         // La clau de sessió ha d'incloure el resourceName: el `code` sol ("FILTER")
         // és genèric i el comparteixen filtres sense relació (OrganGestor, Integracio,
         // Contingut...), provocant que les dades persistides d'un filtre es filtrin a
@@ -120,7 +125,7 @@ const StyledMuiFilter = (props:any) => {
         buttonControlled
         filterOnFieldEnterKeyPressed
 
-        initialData={filterData}
+        initialData={filterData ?? defaultData}
         springFilterBuilder={springFilterBuilder}
         onSpringFilterChange={handleSpringFilterChange}
         onDataChange={(data:any) => {

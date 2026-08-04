@@ -9,8 +9,12 @@ vi.mock('reactlib', () => ({
 }));
 
 vi.mock('@src/components/StyledMuiFilter', () => ({
-    default: ({ children, resourceName }: any) => (
-        <div data-testid="styled-filter" data-resource={resourceName}>{children}</div>
+    default: ({ children, resourceName, defaultData }: any) => (
+        <div
+            data-testid="styled-filter"
+            data-resource={resourceName}
+            data-default={JSON.stringify(defaultData)}
+        >{children}</div>
     ),
 }));
 
@@ -72,6 +76,24 @@ describe('MetaExpedientFilter', () => {
         } as any);
         render(<MetaExpedientFilter onSpringFilterChange={vi.fn()} />);
         expect(screen.getByTestId('field-revisioEstat')).toHaveAttribute('data-hidden', 'false');
+    });
+
+    it('el revisor arriba amb el filtre revisioEstat=PENDENT per defecte', () => {
+        vi.mocked(useUserSession).mockReturnValue({
+            value: { sessionScope: { isRevisioActiva: true } },
+            rol: { isRevisor: true },
+        } as any);
+        render(<MetaExpedientFilter onSpringFilterChange={vi.fn()} />);
+        expect(screen.getByTestId('styled-filter')).toHaveAttribute('data-default', '{"revisioEstat":"PENDENT"}');
+    });
+
+    it('la resta de rols no tenen filtre per defecte', () => {
+        vi.mocked(useUserSession).mockReturnValue({
+            value: { sessionScope: { isRevisioActiva: true } },
+            rol: { isRevisor: false, isAdmin: true },
+        } as any);
+        render(<MetaExpedientFilter onSpringFilterChange={vi.fn()} />);
+        expect(screen.getByTestId('styled-filter')).not.toHaveAttribute('data-default');
     });
 
     it('deshabilita organGestor quan ambit és COMUNS', () => {

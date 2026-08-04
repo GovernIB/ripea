@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useFormContext } from 'reactlib';
 import GridFormField, { GridButtonField } from '../../components/GridFormField.tsx';
 import StyledMuiFilter from '../../components/StyledMuiFilter.tsx';
@@ -45,10 +46,21 @@ export const springFilterBuilder = (data: any) => {
 };
 
 export const MetaExpedientFilter = (props: any) => {
-    const { value: user } = useUserSession();
+    const { value: user, rol } = useUserSession();
+
+    // El revisor entra al llistat amb l'estat de revisió filtrat a PENDENT, igual que a la
+    // UI clàssica (MetaExpedientRevisioController.getFiltreCommand). Només val com a valor
+    // inicial: en desar-se el filtre a la sessió, mana el que hagi triat l'usuari.
+    const defaultData = useMemo(() => (rol?.isRevisor ? { revisioEstat: 'PENDENT' } : undefined), [rol?.isRevisor]);
 
     return (
-        <StyledMuiFilter resourceName={'metaExpedientResource'} code={'FILTER_GESTIO'} springFilterBuilder={springFilterBuilder} {...props}>
+        <StyledMuiFilter
+            resourceName={'metaExpedientResource'}
+            code={'FILTER_GESTIO'}
+            springFilterBuilder={springFilterBuilder}
+            defaultData={defaultData}
+            {...props}
+        >
             <MetaExpedientFilterForm user={user} />
         </StyledMuiFilter>
     );
