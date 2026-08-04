@@ -1,4 +1,4 @@
-import StyledMuiFilter, {FILTER_ADVANCED_ICON_ONLY_BREAKPOINT} from "../../components/StyledMuiFilter.tsx";
+import StyledMuiFilter, {FILTER_ADVANCED_ICON_ONLY_BREAKPOINT, filterSessionKey} from "../../components/StyledMuiFilter.tsx";
 import * as builder from '../../util/springFilterUtils';
 import GridFormField from "../../components/GridFormField.tsx";
 import {useFormContext} from "reactlib";
@@ -12,9 +12,9 @@ const TasquesFilterForm = () => {
         {(!data?.advanced) && <>
             <GridFormField size={{xs: 12, sm: 6, md: 2}} name="metaExpedient"/>
 			<GridFormField size={{xs: 12, sm: 6, md: 2}} name="metaExpedientTasca" filter={procedimentFilter}/>
-            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="titol"/>
             <GridFormField size={{xs: 12, sm: 6, md: 2}} name="prioritat"/>
             <GridFormField size={{xs: 12, sm: 6, md: 2}} name="estats" multiple/>
+            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="dataInici" type={"date"}/>
         </>}
         {(data?.advanced) && <>
             <GridFormField size={{xs: 12, sm: 6, md: 2}} name="metaExpedient"/>
@@ -45,10 +45,15 @@ const springFilterBuilder = (data:any) => {
     );
 }
 
+const RESOURCE_NAME = "expedientTascaResource";
+const CODE = "TASCA_FILTER";
+/** Clau de sessió on aquest filtre desa les seves dades (veure StyledMuiFilter). */
+export const TASCA_FILTER_SESSION_KEY = filterSessionKey(RESOURCE_NAME, CODE);
+
 const TasquesFilter = (props:any) => {
     return <StyledMuiFilter
-        resourceName={"expedientTascaResource"}
-        code={"TASCA_FILTER"}
+        resourceName={RESOURCE_NAME}
+        code={CODE}
         springFilterBuilder={springFilterBuilder}
         filterOnFieldEnterKeyPressed
         advancedSearch

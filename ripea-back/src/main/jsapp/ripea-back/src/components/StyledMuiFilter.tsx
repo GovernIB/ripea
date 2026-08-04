@@ -13,6 +13,13 @@ const filterStyle = { className: "styledFilter" };
 // to keep their collapse point in sync.
 export const FILTER_ADVANCED_ICON_ONLY_BREAKPOINT = 1615;
 
+// Clau amb què el filtre desa les seves dades a la sessió. Ha d'incloure el resourceName:
+// el `code` sol ("FILTER") és genèric i el comparteixen filtres sense relació (OrganGestor,
+// Integracio, Contingut...), provocant que les dades persistides d'un filtre es filtrin a un
+// altre (p. ex. estat='V' d'òrgans arribant al monitor d'integracions).
+export const filterSessionKey = (resourceName?: string, code?: string) =>
+    [resourceName, code].filter(Boolean).join('.');
+
 export type FilterButtonProps = {
     value: string;
     text?: string;
@@ -64,11 +71,7 @@ const StyledMuiFilter = (props:any) => {
         // a PENDENT). Es desen a la sessió amb la cerca automàtica inicial, i a partir
         // d'aquí mana sempre el que hi hagi desat.
         defaultData,
-        // La clau de sessió ha d'incloure el resourceName: el `code` sol ("FILTER")
-        // és genèric i el comparteixen filtres sense relació (OrganGestor, Integracio,
-        // Contingut...), provocant que les dades persistides d'un filtre es filtrin a
-        // un altre (p. ex. estat='V' d'òrgans arribant al monitor d'integracions).
-        sessionKey = code != null ? [props.resourceName, code].filter(Boolean).join('.') : undefined,
+        sessionKey = code != null ? filterSessionKey(props.resourceName, code) : undefined,
         advancedSearch = false,
         buttonIconOnlyBreakpoint = 'lg',
         ...other
