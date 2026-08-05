@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {Box, Grid, useTheme} from "@mui/material";
+import {Box, Grid} from "@mui/material";
 import {BasePage, MuiDialog, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import TabComponent from "../components/TabComponent.tsx";
@@ -12,7 +12,7 @@ import Load from "../components/Load.tsx";
 const columnsAccions = [
     {
         field: 'createdDate',
-        flex: 0.5,
+        flex: 0.2,
         valueFormatter: (value: any) => formatDate(value),
     },
     {
@@ -30,7 +30,6 @@ const sortModel:any = [{ field: 'createdDate', sort: 'asc' }];
 const Accions = (props:any) => {
     const { id, onRowCountChange, contingutTipus } = props;
     const { t } = useTranslation();
-    const theme = useTheme();
 
     const {handleOpen, dialog} = useAccioDialog()
 
@@ -45,26 +44,18 @@ const Accions = (props:any) => {
 
     return (
         <BasePage>
-            <Box
-                sx={{
-                    '& .MuiDataGrid-actionsCell .MuiIcon-root': {
-                        color: theme.palette.mode === 'dark' ? theme.palette.primary.contrastText : theme.palette.text.secondary,
-                    },
-                }}
-            >
-                <StyledMuiGrid
-                    resourceName={'contingutLogResource'}
-                    filter={builder.and(builder.eq('contingutId', id), builder.eq('contingutTipus', `'${contingutTipus}'`))}
-                    staticSortModel={sortModel}
-                    columns={columnsAccions}
-                    rowAdditionalActions={actions}
-                    onRowCountChange={onRowCountChange}
-                    autoHeight
-                    toolbarHide
-                    readOnly
-                />
-                {dialog}
-            </Box>
+            <StyledMuiGrid
+                resourceName={'contingutLogResource'}
+                filter={builder.and(builder.eq('contingutId', id), builder.eq('contingutTipus', `'${contingutTipus}'`))}
+                staticSortModel={sortModel}
+                columns={columnsAccions}
+                rowAdditionalActions={actions}
+                onRowCountChange={onRowCountChange}
+                autoHeight
+                toolbarHide
+                readOnly
+            />
+            {dialog}
         </BasePage>
     );
 }
