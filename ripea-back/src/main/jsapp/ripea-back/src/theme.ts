@@ -359,7 +359,9 @@ export const lightTheme = createTheme({
         MuiDialog: {
             styleOverrides: {
                 paper: {
-                    '& .MuiIconButton-root .MuiIcon-root': {
+                    // Només el botó de tancar (fill directe del paper, sobre la capçalera acolorida).
+                    // Sense el combinador '>' també s'aplicava a les icones del cos del diàleg.
+                    '& > .MuiIconButton-root .MuiIcon-root': {
                         color: LIGHT_PRIMARY_CONTRAST_TEXT,
                     },
                 },
@@ -506,7 +508,8 @@ export const darkTheme = createTheme({
         MuiDialog: {
             styleOverrides: {
                 paper: {
-                    '& .MuiIconButton-root .MuiIcon-root': {
+                    // Només el botó de tancar (fill directe del paper, sobre la capçalera acolorida).
+                    '& > .MuiIconButton-root .MuiIcon-root': {
                         color: DARK_PRIMARY_CONTRAST_TEXT,
                     },
                 },
@@ -680,7 +683,8 @@ export const draculaTheme = createTheme({
         MuiDialog: {
             styleOverrides: {
                 paper: {
-                    '& .MuiIconButton-root .MuiIcon-root': {
+                    // Només el botó de tancar (fill directe del paper, sobre la capçalera acolorida).
+                    '& > .MuiIconButton-root .MuiIcon-root': {
                         color: DRACULA_PRIMARY_CONTRAST_TEXT,
                     },
                 },
