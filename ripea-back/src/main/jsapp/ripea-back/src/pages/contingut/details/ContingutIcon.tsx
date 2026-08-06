@@ -16,7 +16,13 @@ const ContingutIcon = (props:any) => {
         {entity?.tipus=="DOCUMENT" && <DocumentIcon entity={entity}/>}
         {entity?.tipus=="CARPETA" && <CarpetaIcon />}
 
-        {entity?.valid == false && (
+        {/*
+          * `valid` és un boolean primitiu del recurs (NodeResource) i només l'omplen les
+          * perspectives que el calculen (RESUM als documents, AVISOS als expedients).
+          * Si la consulta no les demana arriba sempre false i mostraria un avís fals, per
+          * això només es mostra quan la llista d'errors ve informada.
+          */}
+        {entity?.valid == false && entity?.errors != null && (
             (() => {
                 const llistaErrors = entity?.errors || [];
                 const textTitol = llistaErrors.length > 0 

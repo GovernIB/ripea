@@ -6,7 +6,7 @@ import {
 import {useTranslation} from "react-i18next";
 import useInteressatDetail from "./InteressatDetail.tsx";
 import useCreate, {useCreateRepresentant} from "../actions/Create.tsx";
-import {iniciaDescargaBlob, iniciaDescargaJSON} from "../../expedient/details/CommonActions.tsx";
+import {iniciaDescargaJSON} from "../../expedient/details/CommonActions.tsx";
 import useImportarSGD from "../actions/ImportarSGD.tsx";
 import useManageInteressatGrups from "../actions/groups/ManageInteressatGrups.tsx";
 import { useConfirmDialogButtons } from "@src/util/buttonsOverride.tsx";
@@ -89,9 +89,8 @@ export const useMassiveActions = (refresh?: () => void) => {
 
     const massiveAction = (ids:any, code:string, msg:string) => {
         return apiAction(undefined, {code :code, data:{ ids, massivo: true }})
-            .then((result) => {
+            .then(() => {
                 refresh?.();
-                iniciaDescargaBlob(result);
                 temporalMessageShow(null, msg, 'info');
             })
             .catch((error) => {
