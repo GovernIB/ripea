@@ -23,7 +23,7 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 
 	@Query(	"select d from ExpedientPeticioEntity d order by data_alta desc")
 	Page<ExpedientPeticioEntity> findLastAnotacioRebuda(Pageable pageable);
-	
+
 	@Query("select peticio.registre.id from ExpedientPeticioEntity peticio where peticio.id = :id")
 	Long getRegistreId(@Param("id") Long id);
 
@@ -85,7 +85,7 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			"and (:senseMetaExpedientInformat = false or ep.metaExpedient is null) " +
 			"and (:esNullNumero = true or lower(ep.registre.identificador) like lower('%'||:numero||'%')) " +
 			"and (:esNullExtracte = true or lower(ep.registre.extracte) like lower('%'||:extracte||'%')) " +
-			"and (:esNullDestinacio = true or ep.registre.destiCodi = :destinacio) " + 
+			"and (:esNullDestinacio = true or ep.registre.destiCodi = :destinacio) " +
 			"and (:esNullDataInicial = true or ep.registre.data >= :dataInicial) " +
 			"and (:esNullDataFinal = true or ep.registre.data <= :dataFinal) " +
 			"and (:esNullEstat = true or " +
@@ -96,7 +96,7 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			"and (:esNullInteressat = true " +
 			"		or  ep.registre.id in (" +
 			"			select interessat.registre.id " +
-			"			from RegistreInteressatEntity interessat " +	
+			"			from RegistreInteressatEntity interessat " +
 			"			where (lower(interessat.documentNumero||' '||interessat.nom||' '||interessat.llinatge1||' '||interessat.llinatge2) like lower('%'||:interessat||'%')" +
 			"					or lower(interessat.raoSocial) like lower('%'||:interessat||'%')" +
 			"					or lower(interessat.documentNumero) like lower('%'||:interessat||'%')))) " +
@@ -131,8 +131,8 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			@Param("esNullEstat") boolean esNullEstat,
 			@Param("estat") String estat,
 			@Param("esNullAccio") boolean esNullAccio,
-			@Param("accio") ExpedientPeticioAccioEnumDto accio, 
-			@Param("esNullInteressat") boolean esNullInteressat, 
+			@Param("accio") ExpedientPeticioAccioEnumDto accio,
+			@Param("esNullInteressat") boolean esNullInteressat,
 			@Param("interessat") String interessat,
 			@Param("isGrupIdNull") boolean isGrupIdNull,
 			@Param("grupId") Long grupId,
@@ -146,7 +146,7 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			"(:esNullNumero = true or lower(ep.identificador) like lower('%'||:numero||'%')) " +
 			"and (:esNullDataInicial = true or ep.dataAlta >= :dataInicial) " +
 			"and (:esNullDataFinal = true or ep.dataAlta <= :dataFinal) " +
-			"and (:esNullEstat = true or estat = :estat )" + 
+			"and (:esNullEstat = true or estat = :estat )" +
 			"and (:nomesAmbErrorsConsulta = false or ep.consultaWsError = true) "
 			)
 	Page<ExpedientPeticioEntity> findComunicadesByFiltre(
@@ -169,7 +169,7 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			"(:esNullNumero = true or lower(ep.identificador) like lower('%'||:numero||'%')) " +
 			"and (:esNullDataInicial = true or ep.dataAlta >= :dataInicial) " +
 			"and (:esNullDataFinal = true or ep.dataAlta <= :dataFinal) " +
-			"and (:esNullEstat = true or estat = :estat )" + 
+			"and (:esNullEstat = true or estat = :estat )" +
 			"and (:nomesAmbErrorsConsulta = false or ep.consultaWsError = true) "
 			)
 	List<Long> findIdsComunicadesByFiltre(
@@ -252,7 +252,7 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			@Param("esNullDataFi") boolean esNullDataFi,
 			@Param("dataFi") Date dataFi,
 			@Param("esNullEstat") boolean esNullEstat,
-			@Param("estat") String estat,	
+			@Param("estat") String estat,
 			@Param("nomesPendentEnviarDistribucio") boolean nomesPendentEnviarDistribucio,
 			Pageable pageable);
 
@@ -280,7 +280,7 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			@Param("esNullDataFi") boolean esNullDataFi,
 			@Param("dataFi") Date dataFi,
 			@Param("esNullEstat") boolean esNullEstat,
-			@Param("estat") String estat,	
+			@Param("estat") String estat,
 			@Param("nomesPendentEnviarDistribucio") boolean nomesPendentEnviarDistribucio);
 
 	@Modifying
@@ -290,4 +290,19 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
  			"WHERE CREATEDBY_CODI = :codiAntic OR LASTMODIFIEDBY_CODI = :codiAntic",
  			nativeQuery = true)
 	public int updateUsuariAuditoria(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
+
+    /**
+     * Obté els IDs únics dels expedients oberts i no esborrats que tenen anotacions
+     * amb justificant de registre pendent d'incorporar com a document.
+     */
+    @Query("SELECT DISTINCT p.id FROM ExpedientPeticioEntity p " +
+        "WHERE p.expedient.estat = es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto.OBERT " +
+        "AND p.expedient.esborrat = 0 " +
+        "AND p.registre.justificantArxiuUuid IS NOT NULL " +
+        "AND NOT EXISTS (" +
+        "    SELECT 1 FROM DocumentEntity d " +
+        "    WHERE d.expedient = p.expedient " +
+        "    AND d.fitxerNom LIKE CONCAT('REGISTRE_JUSTIFICANT_ENTRADA_', p.id, '_%')" +
+        ")")
+    List<Long> findExpedientsObertsAmbJustificantPendent();
 }

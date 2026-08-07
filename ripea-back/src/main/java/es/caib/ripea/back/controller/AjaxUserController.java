@@ -33,7 +33,7 @@ import es.caib.ripea.service.intf.service.SegonPlaService;
 
 /**
  * Controlador per a les consultes ajax dels usuaris normals.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Controller
@@ -72,7 +72,7 @@ public class AjaxUserController extends BaseUserController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // HTTP 500
 		}
 	}
-	
+
 	/**
 	 * Inicialitzar tasques Comanda
 	 */
@@ -101,7 +101,7 @@ public class AjaxUserController extends BaseUserController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // HTTP 500
 		}
 	}
-	
+
 	/**
 	 * Inicialitzar tasques Comanda
 	 */
@@ -130,9 +130,9 @@ public class AjaxUserController extends BaseUserController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // HTTP 500
 		}
 	}
-	
-	
-	
+
+
+
 	@RequestMapping(value = "/usuari/{codi}", method = RequestMethod.GET)
 	@ResponseBody
 	public UsuariDto getByCodi(
@@ -142,7 +142,7 @@ public class AjaxUserController extends BaseUserController {
 		UsuariDto aux = aplicacioService.findUsuariAmbCodi(codi);
 		return aux;
 	}
-	
+
 	@RequestMapping(value = "/getEntitatLogo", method = RequestMethod.GET)
 	public String getEntitatLogo(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request, entitatService);
@@ -153,7 +153,7 @@ public class AjaxUserController extends BaseUserController {
 		} catch (Exception ex) {}
 		return null;
 	}
-	
+
 	@RequestMapping(value = "/getFaviconLogo", method = RequestMethod.GET)
 	public String getFaviconLogo(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request, entitatService);
@@ -162,7 +162,7 @@ public class AjaxUserController extends BaseUserController {
 		} catch (Exception ex) {}
 		return null;
 	}
-	
+
 	@RequestMapping(value = "/stats/{dataTextddmmyyyy}", method = RequestMethod.GET)
 	@ResponseBody
 	public String stats(
@@ -207,7 +207,7 @@ public class AjaxUserController extends BaseUserController {
 			return null;
 		}
 	}
-	
+
 	// CERCA USUARIS a BBDD RIPEA, ELSE PLUGIN. (SUGGEST)
 	@RequestMapping(value = "/usuarisDades/{text}", method = RequestMethod.GET, produces= {"application/json; charset=UTF-8"})
 	@ResponseBody
@@ -228,7 +228,7 @@ public class AjaxUserController extends BaseUserController {
 			return new ArrayList<UsuariDto>();
 		}
 	}
-	
+
 	// CERCA UN USUARI a BBDD RIPEA, ELSE PLUGIN. VALOR SUGGEST EMPLENAT
 	@RequestMapping(value = "/usuariDades/item/{codi}", method = RequestMethod.GET)
 	@ResponseBody
@@ -262,7 +262,7 @@ public class AjaxUserController extends BaseUserController {
 		List<HtmlOption> resposta = new ArrayList<HtmlOption>();
 		if (enumeracio.isEnum()) {
 			for (Object e: enumeracio.getEnumConstants()) {
-				resposta.add(new HtmlOption( 
+				resposta.add(new HtmlOption(
 						((Enum<?>)e).name(),
 						getMessage(
 								request,
@@ -272,14 +272,14 @@ public class AjaxUserController extends BaseUserController {
 		}
 		return resposta;
 	}
-	
+
 	private Class<?> findEnumDtoClass(String className) throws ClassNotFoundException{
 		try {
 			return Class.forName("es.caib.ripea.service.intf.dto." + className);
 		} catch(ClassNotFoundException e) {
 			// TODO: això hauria de cercar per tots els subpackages de dto
 			return Class.forName("es.caib.ripea.service.intf.dto.historic." + className);
-		}		
+		}
 	}
 
 	private String decodedParam(String param) {
@@ -324,6 +324,80 @@ public class AjaxUserController extends BaseUserController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
+
+    /**
+     * Afegir com a document de l'expedient els certificats/justificants de
+     * recepció de les remeses ja existents.
+     */
+    @RequestMapping(value = "/initCertificatsRemeses", method = RequestMethod.GET)
+    public String initCertificatsRemeses(HttpServletRequest request, Model model) {
+        model.addAttribute("titolProces", "Afegir els certificats de les remeses com a documents de l'expedient");
+        model.addAttribute("urlTotalIteracions", "getExpedientsAmbCertificatRemesa");
+        model.addAttribute("urlInteracioIndividual", "executeCertificatsRemesaExpedient");
+        return "util/processAjax";
+    }
+
+    @RequestMapping(value = "/getExpedientsAmbCertificatRemesa", method = RequestMethod.GET)
+    @ResponseBody
+    public List<Long> getExpedientsAmbCertificatRemesa(HttpServletRequest request, Model model) {
+        return aplicacioService.getExpedientsAmbCertificatRemesa();
+    }
+
+    @RequestMapping(value = "/executeCertificatsRemesaExpedient/{notificacioId}", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity<String> executeCertificatsRemesaExpedient(
+        HttpServletRequest request,
+        @PathVariable Long notificacioId,
+        Model model) {
+        try {
+            String resultat = aplicacioService.executeCertificatsRemesaExpedient(notificacioId);
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
+            return ResponseEntity.ok(resultat);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    /**
+     * Afegir com a document de l'expedient tots els justificants de registre de les
+     * anotacions ja incorporades.
+     */
+    @RequestMapping(value = "/initJustificantsRegistre", method = RequestMethod.GET)
+    public String initJustificantsRegistre(HttpServletRequest request, Model model) {
+        model.addAttribute("titolProces", "Afegir els justificants de registre com a documents de l'expedient");
+        model.addAttribute("urlTotalIteracions", "getExpedientsAmbJustificantRegistre");
+        model.addAttribute("urlInteracioIndividual", "executeJustificantsRegistreExpedient");
+        return "util/processAjax";
+    }
+
+    @RequestMapping(value = "/getExpedientsAmbJustificantRegistre", method = RequestMethod.GET)
+    @ResponseBody
+    public List<Long> getExpedientsAmbJustificantRegistre(HttpServletRequest request, Model model) {
+        return aplicacioService.getExpedientsAmbJustificantRegistre();
+    }
+
+    @RequestMapping(value = "/executeJustificantsRegistreExpedient/{peticioId}", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity<String> executeJustificantsRegistreExpedient(
+        HttpServletRequest request,
+        @PathVariable Long peticioId,
+        Model model) {
+        try {
+            String resultat = aplicacioService.executeJustificantsRegistreExpedient(peticioId);
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
+            return ResponseEntity.ok(resultat);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
 
 	/**
 	 * Eliminar configuracions d'entitats inexistents
