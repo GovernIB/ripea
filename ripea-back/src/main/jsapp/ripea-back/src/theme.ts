@@ -1,4 +1,4 @@
-import { createTheme, darken, ThemeOptions } from '@mui/material/styles';
+import { createTheme, darken, emphasize, ThemeOptions } from '@mui/material/styles';
 import { lighten, alpha } from '@mui/material';
 import type {} from '@mui/x-data-grid/themeAugmentation';
 
@@ -9,6 +9,103 @@ export const DEFAULT_SECONDARY_COLOR = '#f1efef';
 // Patró de línies en diàgonal per al fons
 const hatchPattern = (lineColor: string) =>
     `repeating-linear-gradient(45deg, transparent 0, transparent 0.75px, ${lineColor} 1.25px, transparent 1.75px, transparent 3px)`;
+
+// ── PALETA DEL CALENDARI (FullCalendar, tema "monarch") ──────────────────────
+//
+// El calendari no es pinta amb la paleta de MUI sinó amb variables CSS pròpies, i el paquet
+// només en porta dues versions —clara i fosca, de color morat— dins palettes/purple.css.
+// FullCalendar tria entre l'una i l'altra amb l'atribut data-color-scheme, al qual li passem
+// theme.palette.mode (veure TascaCalendar.tsx). Això deixava dos problemes: el calendari no
+// seguia el blau corporatiu, i com que Dracula també és mode 'dark' es veia igual que el tema
+// obscur. Cada tema declara ara la seva paleta amb aquesta funció.
+//
+// Dos detalls del selector:
+//  - Porta "html" al davant només per pujar l'especificitat per damunt de la paleta del paquet
+//    ([data-color-scheme=dark]) i no dependre de l'ordre en què es carreguin els fulls d'estil.
+//  - S'aplica a qualsevol [data-color-scheme], no només al del calendari, perquè FullCalendar
+//    posa l'atribut tant a l'arrel del calendari com als popovers de "+N més" i a l'element
+//    fantasma d'arrossegar, que es renderitzen fora (portal) i no en són descendents.
+// El @media not print replica el del paquet: en imprimir es torna a la paleta clara.
+type CalendarPalette = {
+    /** Fons dels esdeveniments i dels botons principals. */
+    primary: string;
+    primaryForeground: string;
+    /** Botons secundaris; també és la base del ressaltat del dia actual i de la selecció. */
+    secondary: string;
+    secondaryForeground: string;
+    /** Botons d'accent de la barra d'eines. */
+    tertiary: string;
+    tertiaryForeground: string;
+    /** Botó de vista actiu (mes/setmana/any). */
+    selected: string;
+    selectedForeground: string;
+    /** Anell de focus. */
+    outline: string;
+    /** Marca del dia i de l'hora actuals. */
+    now: string;
+    background: string;
+    /** Fons del desplegable "+N més". */
+    popover: string;
+    foreground: string;
+    mutedForeground: string;
+    /** Text més apagat que el "muted" (nombres de setmana, dies d'altres mesos...). */
+    faintForeground: string;
+    /** Base dels fons translúcids: capçaleres, hover de les cel·les, franges horàries... */
+    neutral: string;
+    border: string;
+    strongBorder: string;
+};
+const calendarPalette = (c: CalendarPalette) => ({
+    '@media not print': {
+        'html [data-color-scheme]': {
+            // Els estats "over" (passar-hi per damunt) i "down" (prémer) s'obtenen amb
+            // emphasize(), que aclareix els colors foscos i enfosqueix els clars: és el mateix
+            // criteri que segueix la paleta del paquet, on tot tendeix cap al to mitjà.
+            '--fc-monarch-primary': c.primary,
+            '--fc-monarch-primary-foreground': c.primaryForeground,
+            '--fc-monarch-primary-over': emphasize(c.primary, 0.1),
+            '--fc-monarch-primary-down': emphasize(c.primary, 0.2),
+            '--fc-monarch-secondary': c.secondary,
+            '--fc-monarch-secondary-foreground': c.secondaryForeground,
+            '--fc-monarch-secondary-over': emphasize(c.secondary, 0.1),
+            '--fc-monarch-secondary-down': emphasize(c.secondary, 0.2),
+            '--fc-monarch-tertiary': c.tertiary,
+            '--fc-monarch-tertiary-foreground': c.tertiaryForeground,
+            '--fc-monarch-tertiary-over': emphasize(c.tertiary, 0.1),
+            '--fc-monarch-tertiary-down': emphasize(c.tertiary, 0.2),
+            // Contingut del calendari. Els esdeveniments de tasques porten color propi segons
+            // la data límit (veure TascaCalendar.renderEvent), així que aquestes dues només
+            // afecten els que no en tenen.
+            '--fc-monarch-event': 'var(--fc-monarch-primary)',
+            '--fc-monarch-event-contrast': 'var(--fc-monarch-primary-foreground)',
+            '--fc-monarch-highlight': alpha(c.secondary, 0.3),
+            '--fc-monarch-now': c.now,
+            // Controls
+            '--fc-monarch-selected': c.selected,
+            '--fc-monarch-selected-foreground': c.selectedForeground,
+            '--fc-monarch-selected-over': emphasize(c.selected, 0.1),
+            '--fc-monarch-selected-down': emphasize(c.selected, 0.2),
+            '--fc-monarch-outline': c.outline,
+            // Popover
+            '--fc-monarch-popover': c.popover,
+            '--fc-monarch-popover-foreground': c.foreground,
+            // Fons neutres
+            '--fc-monarch-background': c.background,
+            '--fc-monarch-faint': alpha(c.neutral, 0.1),
+            '--fc-monarch-muted': alpha(c.neutral, 0.15),
+            '--fc-monarch-strong': alpha(c.neutral, 0.3),
+            '--fc-monarch-stronger': alpha(c.neutral, 0.35),
+            '--fc-monarch-strongest': alpha(c.neutral, 0.4),
+            // Textos neutres
+            '--fc-monarch-foreground': c.foreground,
+            '--fc-monarch-faint-foreground': c.faintForeground,
+            '--fc-monarch-muted-foreground': c.mutedForeground,
+            // Vores
+            '--fc-monarch-border': c.border,
+            '--fc-monarch-strong-border': c.strongBorder,
+        },
+    },
+});
 
 // ── CONFIGURACIÓ BASE D'ESTILS DE RIPEA ──────────────────────────────────────
 // IMPORTANT: aquest objecte NO inclou `MuiCssBaseline.styleOverrides.body`
@@ -324,11 +421,42 @@ const LIGHT_BACKGROUND_PAPER = '#ffffff';
 const LIGHT_TEXT_PRIMARY = '#1e1e1e';
 const LIGHT_TEXT_SECONDARY = '#666666';
 const LIGHT_DIVIDER = '#e0e0e0';
+// El tema clar no declara `error` a la paleta, així que fa servir el vermell per defecte de MUI
+// (red[700]). Es repeteix aquí perquè el calendari hi marca el dia i l'hora actuals.
+const LIGHT_ERROR_MAIN = '#d32f2f';
+// Blau corporatiu aclarit: és el que acaba sent palette.primary.main del tema.
+const LIGHT_PRIMARY = lighten(LIGHT_PRIMARY_MAIN, 0.2);
+
+const lightCalendarPalette = calendarPalette({
+    primary: LIGHT_PRIMARY,
+    primaryForeground: LIGHT_PRIMARY_CONTRAST_TEXT,
+    // Blau molt pàl·lid: de fons del dia actual ha de deixar llegir el text a sobre.
+    secondary: lighten(LIGHT_PRIMARY_MAIN, 0.88),
+    secondaryForeground: darken(LIGHT_PRIMARY_MAIN, 0.2),
+    tertiary: LIGHT_PRIMARY_MAIN,
+    tertiaryForeground: LIGHT_PRIMARY_CONTRAST_TEXT,
+    selected: LIGHT_SECONDARY_MAIN,
+    selectedForeground: LIGHT_PRIMARY_CONTRAST_TEXT,
+    outline: LIGHT_PRIMARY,
+    now: LIGHT_ERROR_MAIN,
+    // Color de "paper": el calendari va dins la targeta de la pàgina (veure la nota del tema
+    // fosc, on la diferència sí que es nota; aquí totes dues superfícies són blanques).
+    background: LIGHT_BACKGROUND_PAPER,
+    popover: LIGHT_BACKGROUND_PAPER,
+    foreground: LIGHT_TEXT_PRIMARY,
+    mutedForeground: LIGHT_TEXT_SECONDARY,
+    // Just un punt més apagat que el "muted": aquest color pinta els dies dels mesos veïns,
+    // que són text, i ha de mantenir el 4,5:1 de la WCAG AA sobre el fons (4,61:1).
+    faintForeground: lighten(LIGHT_TEXT_SECONDARY, 0.1),
+    neutral: LIGHT_TEXT_SECONDARY,
+    border: LIGHT_DIVIDER,
+    strongBorder: darken(LIGHT_DIVIDER, 0.2),
+});
 
 export const lightTheme = createTheme({
     palette: {
         mode: 'light',
-        primary: { main: lighten(LIGHT_PRIMARY_MAIN, 0.2), contrastText: LIGHT_PRIMARY_CONTRAST_TEXT },
+        primary: { main: LIGHT_PRIMARY, contrastText: LIGHT_PRIMARY_CONTRAST_TEXT },
         secondary: { main: LIGHT_SECONDARY_MAIN },
         background: { default: LIGHT_BACKGROUND_DEFAULT, paper: LIGHT_BACKGROUND_PAPER },
         text: { primary: LIGHT_TEXT_PRIMARY, secondary: LIGHT_TEXT_SECONDARY },
@@ -339,8 +467,9 @@ export const lightTheme = createTheme({
         MuiCssBaseline: {
             styleOverrides: {
                 ...(baseComponentStyles.MuiCssBaseline?.styleOverrides as object),
+                ...lightCalendarPalette,
                 body: {
-                    backgroundColor: '#ffffff',
+                    backgroundColor: LIGHT_BACKGROUND_DEFAULT,
                     backgroundImage: hatchPattern('#e1e1e1'),
                     color: LIGHT_TEXT_SECONDARY,
                 },
@@ -371,7 +500,7 @@ export const lightTheme = createTheme({
             styleOverrides: {
                 root: {
                     ...(baseComponentStyles.MuiDialogTitle?.styleOverrides?.root as object),
-                    backgroundColor: lighten(LIGHT_PRIMARY_MAIN, 0.2),
+                    backgroundColor: LIGHT_PRIMARY,
                     color: LIGHT_PRIMARY_CONTRAST_TEXT,
                     // borderBottom: '1px solid #e3e3e3',
                 },
@@ -449,6 +578,40 @@ const DARK_ERROR_MAIN = '#f44336';
 const DARK_INFO_MAIN = '#29b6f6';
 const DARK_SUCCESS_MAIN = '#66bb6a';
 
+// Superfície del calendari. Es dibuixa DINS la targeta de la pàgina, no sobre el fons del
+// document: amb background.default (més fosc que la targeta) es veia com un forat negre al mig,
+// just al revés del que toca en un tema fosc, on les superfícies elevades han de ser més clares.
+// Es parteix del color de "paper" i s'apuja un punt perquè el calendari se n'acabi de separar.
+// El popover i les vores es deriven d'aquest color, no de la targeta, per no perdre'ls de vista
+// quan es toqui: han de mantenir el contrast amb la superfície que tenen a sota.
+const DARK_CALENDAR_BG = lighten(DARK_BACKGROUND_PAPER, 0.08);
+
+const darkCalendarPalette = calendarPalette({
+    // Sobre fons fosc l'esdeveniment ha de ser el blau clar, no el corporatiu: aquest darrer
+    // amb prou feines es distingiria del fons. El text a sobre, per tant, va en fosc.
+    primary: DARK_PRIMARY_LIGHT,
+    primaryForeground: DARK_BACKGROUND_DEFAULT,
+    secondary: DARK_PRIMARY_MAIN,
+    secondaryForeground: DARK_TEXT_PRIMARY,
+    tertiary: DARK_SECONDARY_MAIN,
+    tertiaryForeground: DARK_BACKGROUND_DEFAULT,
+    selected: DARK_TEXT_SECONDARY,
+    selectedForeground: DARK_BACKGROUND_DEFAULT,
+    outline: DARK_PRIMARY_LIGHT,
+    now: DARK_ERROR_MAIN,
+    background: DARK_CALENDAR_BG,
+    popover: lighten(DARK_CALENDAR_BG, 0.1),
+    foreground: DARK_TEXT_PRIMARY,
+    mutedForeground: DARK_TEXT_SECONDARY,
+    // Prou apagat per distingir-se del "muted", però mantenint el 4,5:1 de la WCAG AA sobre la
+    // superfície del calendari (4,90:1): pinta els dies dels mesos veïns, que són text.
+    faintForeground: darken(DARK_TEXT_SECONDARY, 0.15),
+    neutral: DARK_TEXT_SECONDARY,
+    // DARK_DIVIDER és blanc pur: com a vora de totes les cel·les seria un reticulat massa dur.
+    border: lighten(DARK_CALENDAR_BG, 0.18),
+    strongBorder: lighten(DARK_CALENDAR_BG, 0.4),
+});
+
 export const darkTheme = createTheme({
     palette: {
         mode: 'dark',
@@ -466,6 +629,7 @@ export const darkTheme = createTheme({
         MuiCssBaseline: {
             styleOverrides: {
                 ...(baseComponentStyles.MuiCssBaseline?.styleOverrides as object),
+                ...darkCalendarPalette,
                 body: {
                     backgroundColor: '#1c1c1c',
                     backgroundImage: hatchPattern('#2a2a2a'),
@@ -622,6 +786,39 @@ const DRACULA_ERROR_MAIN = '#FF5555';
 const DRACULA_WARNING_MAIN = '#FFB86C';
 const DRACULA_SUCCESS_MAIN = '#50FA7B';
 const DRACULA_INFO_MAIN = '#8BE9FD';
+// Colors de la paleta oficial de Dracula que no formen part de la paleta MUI però sí de la
+// del calendari: "current line" (fons de ressaltat i vores) i "comment" (grisos i text apagat).
+const DRACULA_CURRENT_LINE = '#44475A';
+const DRACULA_COMMENT = '#6272A4';
+const DRACULA_PINK = '#FF79C6';
+// Superfície del calendari: el color de "paper" apujat un punt (veure la nota del tema fosc).
+const DRACULA_CALENDAR_BG = lighten(DRACULA_BACKGROUND_PAPER, 0.08);
+
+const draculaCalendarPalette = calendarPalette({
+    primary: DRACULA_PRIMARY_MAIN,
+    primaryForeground: DRACULA_BACKGROUND_DEFAULT,
+    secondary: DRACULA_CURRENT_LINE,
+    secondaryForeground: DRACULA_TEXT_PRIMARY,
+    tertiary: DRACULA_PINK,
+    tertiaryForeground: DRACULA_BACKGROUND_DEFAULT,
+    selected: DRACULA_COMMENT,
+    selectedForeground: DRACULA_TEXT_PRIMARY,
+    outline: DRACULA_PINK,
+    now: DRACULA_ERROR_MAIN,
+    background: DRACULA_CALENDAR_BG,
+    popover: lighten(DRACULA_CALENDAR_BG, 0.1),
+    foreground: DRACULA_TEXT_PRIMARY,
+    mutedForeground: DRACULA_TEXT_SECONDARY,
+    // El "comment" de Dracula tal qual es queda per sota del 4,5:1 de la WCAG AA sobre la
+    // superfície del calendari, i pinta els dies dels mesos veïns, que són text: s'aclareix
+    // fins a arribar-hi (4,96:1).
+    faintForeground: lighten(DRACULA_COMMENT, 0.5),
+    neutral: DRACULA_COMMENT,
+    // El "current line" queda pràcticament igual que la superfície del calendari i el reticulat
+    // desapareixeria: les vores es deriven de la superfície, com al tema fosc.
+    border: lighten(DRACULA_CALENDAR_BG, 0.18),
+    strongBorder: lighten(DRACULA_CALENDAR_BG, 0.4),
+});
 
 export const draculaTheme = createTheme({
     palette: {
@@ -641,9 +838,10 @@ export const draculaTheme = createTheme({
         MuiCssBaseline: {
             styleOverrides: {
                 ...(baseComponentStyles.MuiCssBaseline?.styleOverrides as object),
+                ...draculaCalendarPalette,
                 body: {
-                    backgroundColor: '#282A36',
-                    backgroundImage: hatchPattern('#44475A'),
+                    backgroundColor: DRACULA_BACKGROUND_DEFAULT,
+                    backgroundImage: hatchPattern(DRACULA_CURRENT_LINE),
                     color: DRACULA_TEXT_PRIMARY,
                 },
                 '.myComment': {

@@ -10,9 +10,9 @@ import Load from "../../components/Load.tsx";
 import { CardPage } from "../../components/CardData.tsx";
 import {useUserSession} from "../../components/Session.tsx";
 import {FormControl, Grid, Icon, MenuItem, Select, Typography} from "@mui/material";
-import useTascaActions from "./details/TascaActions.tsx";
+import useTascaActions, {tascaTramitacioRoute} from "./details/TascaActions.tsx";
 import ContingutLink from "../../components/ContingutLink.tsx";
-import {useNavigate} from "react-router-dom";
+import {openRouteInNewTab} from "../../util/navigationUtils.ts";
 import useTascaDetail from "./details/TascaDetail.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
 import {TascaCalendar} from "@src/pages/tasca/TascaCalendar.tsx";
@@ -86,7 +86,6 @@ const perspectives:any = ['CONTEXT_USUARI'];
 const TasquesGrid = () => {
     const { t } = useTranslation();
     const { value: user } = useUserSession();
-    const navigate = useNavigate();
     const apiRef = useMuiDataGridApiRef();
 
     const [springFilter, setSpringFilter] = useState<string>();
@@ -171,6 +170,17 @@ const TasquesGrid = () => {
     const { actions, components, isTramitable } = useTascaActions({potModificar: true}, refresh)
     const { handleOpen, dialog } = useTascaDetail();
 
+    // Acció principal de la tasca, compartida per la vista de taula (clic a la fila) i la de
+    // calendari (clic amb el botó esquerre), perquè totes dues es comportin igual. La tramitació
+    // s'obre en una pestanya nova per no perdre el llistat ni els filtres aplicats.
+    const handleTascaClick = (tasca: any) => {
+        if (isTramitable(tasca)) {
+            openRouteInNewTab(tascaTramitacioRoute(tasca?.expedient?.id, tasca?.id));
+        } else {
+            handleOpen(tasca?.id);
+        }
+    };
+
     const filterRef = useFilterApiRef();
     const { save: saveFilterData } = useSession(TASCA_FILTER_SESSION_KEY);
     // Es guarda per referència perquè useSession en retorna una de nova a cada render: com a
@@ -239,7 +249,7 @@ const TasquesGrid = () => {
                         <TascaViewSelector value={vista} onChange={setVista}/>
                     </Grid>
                     {vista == TascaView.kanban && <TascaKanban actions={actions} filter={springFilter} namedQueries={namedQueries} perspectives={perspectives} reloadTrigger={reload} readOnly />}
-                    {vista == TascaView.calendar && <TascaCalendar actions={actions} filter={springFilter} namedQueries={namedQueries} perspectives={perspectives} reloadTrigger={reload} />}
+                    {vista == TascaView.calendar && <TascaCalendar actions={actions} filter={springFilter} namedQueries={namedQueries} perspectives={perspectives} reloadTrigger={reload} onEventClick={handleTascaClick} />}
                 </>}
 
                 {vista == TascaView.table &&
@@ -259,13 +269,7 @@ const TasquesGrid = () => {
                                 element: <TascaViewSelector value={vista} onChange={setVista}/>,
                             }
                         ]}
-                        onRowClick={(params: any) => {
-                            if (isTramitable(params?.row)) {
-                                navigate(`/contingut/${params?.row?.expedient?.id}/tasca/${params?.id}`)
-                            } else {
-                                handleOpen(params?.row?.id)
-                            }
-                        }}
+                        onRowClick={(params: any) => handleTascaClick(params?.row)}
                         rowProps={(row: any) => {
                             let color;
                             if (row?.delegat?.id == user.codi) {

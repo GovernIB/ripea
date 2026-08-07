@@ -14,6 +14,10 @@ import {useNavigate} from "react-router-dom";
 import useHistoric, {HistoricContingutTipusEnum} from "../../Historic.tsx";
 import { useConfirmDialogButtons } from "@src/util/buttonsOverride.tsx";
 
+/** Ruta de la pantalla de tramitació d'una tasca dins del seu expedient. */
+export const tascaTramitacioRoute = (expedientId: any, tascaId: any) =>
+    `/contingut/${expedientId}/tasca/${tascaId}`;
+
 export const useActions = (refresh?: () => void) => {
     const { t } = useTranslation();
     const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
@@ -101,7 +105,7 @@ const useTascaActions = (entity:any, refresh?: () => void) => {
             label: t('page.tasca.action.tramitar.label'),
             icon: "folder",
             showInMenu: true,
-            onClick: (id:any, row:any) => navigate(`/contingut/${row?.expedient?.id}/tasca/${id}`),
+            onClick: (id:any, row:any) => navigate(tascaTramitacioRoute(row?.expedient?.id, id)),
             disabled: disableResponsable,
             hidden: (row: any) => hiddenTramitable(row) || !entity?.potModificar,
         },
