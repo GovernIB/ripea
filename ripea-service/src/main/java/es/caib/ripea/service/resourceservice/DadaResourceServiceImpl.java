@@ -15,16 +15,14 @@ import es.caib.ripea.persistence.entity.resourceentity.DadaResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.DadaResourceRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
-import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.DominiHelper;
-import es.caib.ripea.service.helper.EventHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
+import es.caib.ripea.service.helper.ValidacioPostCommitHelper;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.model.FieldOption;
 import es.caib.ripea.service.intf.dto.ResultatConsultaDto;
 import es.caib.ripea.service.intf.model.DadaResource;
-import es.caib.ripea.service.intf.model.sse.ErrorsValidacioChangedEvent;
 import es.caib.ripea.service.intf.resourceservice.DadaResourceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,10 +38,9 @@ import lombok.extern.slf4j.Slf4j;
 public class DadaResourceServiceImpl extends BaseMutableResourceService<DadaResource, Long, DadaResourceEntity> implements DadaResourceService {
 
 	private final DominiHelper dominiHelper;
-	private final CacheHelper cacheHelper;
-	private final EventHelper eventHelper;
 	private final ConfigHelper configHelper;
 	private final ExcepcioLogHelper excepcioLogHelper;
+	private final ValidacioPostCommitHelper validacioPostCommitHelper;
 	private final EntitatRepository entitatRepository;
     private final DadaResourceRepository dadaResourceRepository;
 
@@ -72,14 +69,16 @@ public class DadaResourceServiceImpl extends BaseMutableResourceService<DadaReso
         updateOrder(entity, null);
         afterDbChange(entity);
     }    
+    /**
+     * Refresca les validacions del node després d'un canvi a una dada.
+     *
+     * El evict, el recàlcul, l'avís a COMANDA i la notificació SSE es difereixen fins després del commit de la
+     * transacció de l'operació i s'executen en un fil de segon pla, de manera que no allarguen la petició.
+     * Veure {@link ValidacioPostCommitHelper}. L'id del node es resol aquí, amb la sessió encara oberta.
+     */
     private void afterDbChange(DadaResourceEntity entity) {
-    	//Esborram cache de validacions del expedient
     	if (entity.getMetaDada().getMultiplicitat().esObligatoria()) {
-    		cacheHelper.evictErrorsValidacioPerNode(entity.getNode().getId()); // Primero hace evict
-    		ErrorsValidacioChangedEvent evce = new ErrorsValidacioChangedEvent(
-    				entity.getNode().getId(),
-    				cacheHelper.findErrorsValidacioPerNodeAndSendComanda(entity.getNode().getId()));
-    		eventHelper.notifyErrorsValidacio(evce); // Luego notifica con datos frescos	
+    		validacioPostCommitHelper.programarRecalculINotificacio(entity.getNode().getId());
     	}
     }
     //Fi Metodes AFTER

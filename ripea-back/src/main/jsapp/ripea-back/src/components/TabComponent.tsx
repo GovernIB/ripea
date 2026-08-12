@@ -17,7 +17,16 @@ type TabProps = {
 };
 
 const TabPanel = (props:any) => {
-    const { children, value, index, ...other } = props;
+    const { children, value, index, panelScroll = true, ...other } = props;
+
+    // Amb panelScroll el panell ocupa l'alçada disponible i el contingut que no hi cap scrolleja dins seu: és el
+    // que necessiten les vistes que omplen la pantalla (graelles, detalls d'expedient). Dins un diàleg, en canvi,
+    // el panell no té cap alçada de referència i qualsevol excedent de pocs píxels hi dibuixa una barra de scroll
+    // pròpia; amb panelScroll={false} el panell creix amb el contingut i el scroll queda a càrrec del contenidor
+    // (el DialogContent), que ja en té un de sol per a tot el formulari.
+    const style = panelScroll ?
+            { height: '100%', minHeight: 0, overflow: 'auto' } :
+            { minHeight: 0 };
 
     return (
         <div
@@ -25,11 +34,11 @@ const TabPanel = (props:any) => {
             hidden={value !== index}
             id={`simple-tabpanel-${index}`}
             aria-labelledby={`simple-tab-${index}`}
-            style={{ height: '100%', minHeight: 0, overflow: 'auto' }}
+            style={style}
             {...other}
         >
             {value === index && (
-                <Box sx={{ pt: 1, height: '100%' }}>{children}</Box>
+                <Box sx={{ pt: 1, height: panelScroll ? '100%' : 'auto' }}>{children}</Box>
             )}
         </div>
     );
@@ -37,7 +46,7 @@ const TabPanel = (props:any) => {
 
 const TabComponent = (props :any) => {
     const [valueDef, setValueDef] = useState<any>();
-    const { tabs, headerAdditionalData, defaultValue, value = valueDef, onChange:setValue = setValueDef, ...other}=props;
+    const { tabs, headerAdditionalData, defaultValue, panelScroll = true, value = valueDef, onChange:setValue = setValueDef, ...other}=props;
 
     const handleChange = (_event :any, newValue :string) : void => {
         if (tabs.some((tab:TabProps)=>tab?.value==newValue)) {
@@ -54,7 +63,7 @@ const TabComponent = (props :any) => {
     }, [tabs, value]);
 
     return <Load value={tabs?.length && value}>
-    <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ width: '100%', height: panelScroll ? '100%' : 'auto', display: 'flex', flexDirection: 'column' }}>
         <Box sx={{flexShrink: 0, display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%'}}>
             <Tabs
                 value={value}
@@ -76,7 +85,7 @@ const TabComponent = (props :any) => {
             {headerAdditionalData}
         </Box>
         {tabs.map((tab:TabProps) =>
-            <TabPanel value={value} index={tab.value} key={"tab-panel-"+tab.value}>
+            <TabPanel value={value} index={tab.value} panelScroll={panelScroll} key={"tab-panel-"+tab.value}>
                 {!tab.hidden && tab.content}
             </TabPanel>
         )}

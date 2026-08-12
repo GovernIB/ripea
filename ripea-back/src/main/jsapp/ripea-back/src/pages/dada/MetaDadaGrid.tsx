@@ -12,6 +12,8 @@ const dadesFilter = (metaDada:any, dades:any[]) :any[] => {
 }
 
 const sortModel:any = [{ field: 'ordre', sort: 'asc' }]
+// Només es mostren les metadades actives al procediment de l'expedient
+const namedQueries = ['ACTIVES']
 const MetaDadaGrid = (props: any) => {
     const apiRef = useMuiDataGridApiRef()
     const { entity, onRowCountChange, onRefresh } = props
@@ -85,6 +87,7 @@ const MetaDadaGrid = (props: any) => {
                     builder.eq('metaNode.id', entity?.metaNode?.id)
                 )
             }
+            namedQueries={namedQueries}
             staticSortModel={sortModel}
             apiRef={apiRef}
             rowAdditionalActions={actions}

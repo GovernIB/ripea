@@ -145,7 +145,7 @@ const DocumentsGridForm = ({ setDisabled }:any) => {
                     hidden={!data.pluginSummarizeActiu}>
             IA
         </GridButton>
-        <GridFormField name="descripcio" type={"textarea"} />
+        <GridFormField name="descripcio" />
         <GridFormField name="dataCaptura" type={"date"} disabled required />
         <GridFormField name="ntiOrigen" required />
         <GridFormField name="ntiEstadoElaboracion" required />
@@ -167,6 +167,7 @@ const DocumentsGridForm = ({ setDisabled }:any) => {
 	            <TabComponent
 	                tabs={tabs}
 	                variant="scrollable"
+	                panelScroll={false}
 	            />
 	        </Grid>
 		}

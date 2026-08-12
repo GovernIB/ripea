@@ -22,6 +22,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.Where;
 
 import es.caib.ripea.persistence.entity.ExpedientOrganPareEntity;
@@ -49,6 +50,16 @@ public class ExpedientResourceEntity extends NodeResourceEntity<ExpedientResourc
 	private MetaExpedientResourceEntity metaExpedient;
 	@Column(name = "metaexpedient_id", insertable = false, updatable = false)
 	private Long metaExpedientId;
+	// Nom del procediment, nomes de lectura, per a poder ordenar el llistat pel valor que es
+	// mostra a la columna en comptes de per l'id. No es pot ordenar per metaExpedient.nom
+	// perque el JOIN implicit amb el DISTINCT del llistat provoca ORA-01791 a Oracle; en canvi
+	// una subconsulta escalar si que s'admet dins l'ORDER BY d'un SELECT DISTINCT.
+	// La correlacio es fa per la clau primaria (present a totes les taules de la jerarquia
+	// JOINED contingut/node/expedient) i no per metaexpedient_id, que nomes existeix a
+	// ipa_expedient i quedaria qualificada amb l'alias erroni de la taula arrel.
+	@Formula("(select mn.nom from " + BaseConfig.DB_PREFIX + "metanode mn, " + BaseConfig.DB_PREFIX + "expedient ex" +
+			" where ex.metaexpedient_id = mn.id and ex.id = id)")
+	private String metaExpedientNom;
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "tancat_data")
 	protected Date tancatData;

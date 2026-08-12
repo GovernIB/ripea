@@ -317,9 +317,11 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                 // agafatPerCodi mapeja la mateixa columna FK directament, sense JOIN.
                 orders.add(order.withProperty("agafatPerCodi"));
             } else if ("metaExpedient".equals(order.getProperty())) {
-                // metaExpedient.id requereix JOIN amb DISTINCT i provoca ORA-01791 a Oracle.
-                // metaExpedientId mapeja la mateixa columna FK directament, sense JOIN.
-                orders.add(order.withProperty("metaExpedientId"));
+                // metaExpedient.nom requereix JOIN amb DISTINCT i provoca ORA-01791 a Oracle.
+                // metaExpedientNom es una subconsulta escalar (@Formula), admesa dins l'ORDER BY
+                // d'un SELECT DISTINCT, i ordena pel nom que realment es mostra a la columna
+                // en comptes de per l'id del procediment.
+                orders.add(order.withProperty("metaExpedientNom"));
             } else {
                 orders.add(order);
             }

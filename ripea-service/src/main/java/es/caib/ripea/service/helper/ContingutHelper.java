@@ -1527,18 +1527,23 @@ public class ContingutHelper {
 		
 		//O no es definitiu, o la propietat de esborrar definitius esta a true
 		if (permetEsborrarPerDefinitiu) {
-
+			
+			boolean contingutExisteixArxiu = true;
+			
 			// Si el contingut és un document guarda una còpia del fitxer esborrat
 			// per a poder recuperar-lo posteriorment
 			if (contingut instanceof DocumentEntity) {
+				
 				DocumentEntity document = (DocumentEntity)contingut;
+				
 				if (DocumentTipusEnumDto.DIGITAL.equals(document.getDocumentTipus()) && document.getGesDocAdjuntId() == null) {
-					try {						
+					try {
 						fitxerDocumentEsborratGuardarEnTmp((DocumentEntity)contingut);
 					} catch (Exception e) {
 						Throwable root = Utils.getRootCauseOrItself(e);
-						if (root.getMessage().contains("No s'ha trobat l'arxiu")) {
+						if (isMissatgeNotrobat(root.getMessage())) {
 							logger.info("Al borrar el documento no se ha encontrado el contenido del documento " + document.getNom() + "del expediente " + document.getExpedient().getNom() + " amd id " + document.getExpedient().getId());
+							contingutExisteixArxiu = false;
 						} else {
 							throw e;
 						}
@@ -1547,20 +1552,34 @@ public class ContingutHelper {
 						fitxerDocumentEsborratGuardarFirmaEnTmp((DocumentEntity)contingut);
 					} catch (Exception e) {
 						Throwable root = Utils.getRootCauseOrItself(e);
-						if (root.getMessage().contains("Petición mal formada. No fue informado el identificador o localizador del documento a recuperar")) {
+						if (isMissatgeNotrobat(root.getMessage())) {
 							logger.info("Al borrar el documento no se ha encontrado el contenido de firma del documento " + document.getNom() + "del expediente " + document.getExpedient().getNom() + " amd id " + document.getExpedient().getId());
 						} else {
 							throw e;
 						}
-					}					
+					}
 				}
 			} 
 			
-			// Elimina contingut a l'arxiu
-			arxiuPropagarEliminacio(contingut);
+			try {
+				// Elimina contingut a l'arxiu si existeix
+				if (contingutExisteixArxiu)
+					arxiuPropagarEliminacio(contingut);
+			} catch (Exception e) {
+				Throwable root = Utils.getRootCauseOrItself(e);
+				if (isMissatgeNotrobat(root.getMessage())) {
+					logger.info("Al borrar el documento no se ha encontrado el contenido en arxiu. id:"+contingutId);
+				} else {
+					throw e;
+				}
+			}
 		}
 	}
 
+	private boolean isMissatgeNotrobat(String message) {
+		return (message.contains("No s'ha trobat l'arxiu") || message.contains("GdibException: Node not found") || message.contains("Petición mal formada. No fue informado el identificador o localizador del documento"));
+	}
+	
 	public boolean conteDocumentsDefinitius(ContingutEntity contingut) {
 		boolean conteDefinitius = false;
 		ContingutEntity deproxied = HibernateHelper.deproxy(contingut);

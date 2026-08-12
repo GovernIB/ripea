@@ -53,7 +53,6 @@ import es.caib.ripea.service.base.springfilter.FilterSpecification;
 import es.caib.ripea.service.helper.CacheHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
-import es.caib.ripea.service.helper.EventHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.ExecucioMassivaHelper;
 import es.caib.ripea.service.helper.ExpedientInteressatHelper;
@@ -61,6 +60,7 @@ import es.caib.ripea.service.helper.MessageHelper;
 import es.caib.ripea.service.helper.MetaExpedientHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.helper.UnitatOrganitzativaHelper;
+import es.caib.ripea.service.helper.ValidacioPostCommitHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
@@ -94,7 +94,6 @@ import es.caib.ripea.service.intf.model.InteressatGrupResource;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.InteressatResource.UnitatOrganitzativaFormFilter;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
-import es.caib.ripea.service.intf.model.sse.ErrorsValidacioChangedEvent;
 import es.caib.ripea.service.intf.resourceservice.InteressatResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.resourcehelper.InteressatResourceHelper;
@@ -113,7 +112,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     private final ConfigHelper configHelper;
     private final PluginHelper pluginHelper;
     private final CacheHelper cacheHelper;
-    private final EventHelper eventHelper;
+    private final ValidacioPostCommitHelper validacioPostCommitHelper;
     private final EntityComprovarHelper entityComprovarHelper;
     private final ExecucioMassivaHelper execucioMassivaHelper;
     private final ExecucioMassivaContingutRepository execucioMassivaContingutRepository;
@@ -450,13 +449,15 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     	}
     }
 
+    /**
+     * Refresca les validacions de l'expedient després d'un canvi als interessats.
+     *
+     * El evict, el recàlcul i la notificació SSE es difereixen fins després del commit de la transacció de
+     * l'operació i s'executen en un fil de segon pla, de manera que no allarguen la petició.
+     * Veure {@link ValidacioPostCommitHelper}. Aquí no s'envia l'avís a COMANDA, igual que abans.
+     */
     private void afterDbChange(Long expedientId) {
-    	//Esborram cache de validacions del expedient
-		cacheHelper.evictErrorsValidacioPerNode(expedientId); // Primero hace evict
-		ErrorsValidacioChangedEvent evce = new ErrorsValidacioChangedEvent(
-				expedientId,
-				cacheHelper.findErrorsValidacioPerNode(expedientId));
-		eventHelper.notifyErrorsValidacio(evce); // Luego notifica con datos frescos	
+    	validacioPostCommitHelper.programarRecalculINotificacio(expedientId, false);
     }
 
     private class RespresentantPerspectiveApplicator implements PerspectiveApplicator<InteressatResourceEntity, InteressatResource> {

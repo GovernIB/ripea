@@ -27,6 +27,7 @@ import org.springframework.security.acls.model.ObjectIdentity;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.persistence.entity.ContingutEntity;
 import es.caib.ripea.persistence.entity.DadaEntity;
@@ -207,6 +208,11 @@ public class CacheHelper {
 	
 	//Metode de encapsulament, ja que el metode send comanda podria donar errors de connexio
 	//i en tal cas el metode no quedaria cacheat si incloem la crida a comanda dins el metode anotat amb "Cacheable"
+	// @Transactional perquè es pot cridar des d'un fil de segon pla (ValidacioRecalculAsyncExecutor), que no té
+	// cap sessió de Hibernate oberta; tant el càlcul de validacions com l'avís a COMANDA naveguen per relacions
+	// lazy i necessiten la sessió durant tota la crida. Si ja hi ha transacció (crida des d'una petició) s'hi
+	// participa i el readOnly no hi té cap efecte.
+	@Transactional(readOnly = true)
 	public List<ValidacioErrorDto> findErrorsValidacioPerNodeAndSendComanda(Long nodeId) {
 		List<ValidacioErrorDto> errors = findErrorsValidacioPerNode(nodeId);
 		NodeEntity node = nodeRepository.findById(nodeId).get();
@@ -216,6 +222,16 @@ public class CacheHelper {
 		return errors;
 	}
 	
+	// Mateixa feina que findErrorsValidacioPerNode però amb transacció pròpia, per poder-lo cridar des d'un fil de
+	// segon pla (ValidacioRecalculAsyncExecutor) que no té cap sessió de Hibernate oberta. No s'anota
+	// findErrorsValidacioPerNode directament perquè és un mètode molt cridat (una vegada per fila de graella) i
+	// en els encerts de cache no ha de prendre cap connexió del pool. Com que la crida és interna, no passa pel
+	// proxy: recalcula sempre i no reescriu la cache, que es tornarà a omplir a la següent lectura.
+	@Transactional(readOnly = true)
+	public List<ValidacioErrorDto> findErrorsValidacioPerNodeEnTransaccio(Long nodeId) {
+		return findErrorsValidacioPerNode(nodeId);
+	}
+
 	@Cacheable(value = "errorsValidacioNode", key = "#nodeId")
 	public List<ValidacioErrorDto> findErrorsValidacioPerNode(Long nodeId) {
 

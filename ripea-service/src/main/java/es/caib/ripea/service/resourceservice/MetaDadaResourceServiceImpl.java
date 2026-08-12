@@ -46,6 +46,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class MetaDadaResourceServiceImpl extends BaseMutableResourceService<MetaDadaResource, Long, MetaDadaResourceEntity> implements MetaDadaResourceService {
     
+	/** Nomes les metadades actives al procediment (pestanya "Dades" d'un expedient). */
+	private static final String NAMED_QUERY_ACTIVES = "ACTIVES";
+
 	private final ConfigHelper configHelper;
 	private final MetaDadaHelper metaDadaHelper;
 	private final MetaNodeHelper metaNodeHelper;
@@ -69,6 +72,18 @@ public class MetaDadaResourceServiceImpl extends BaseMutableResourceService<Meta
                 FilterBuilder.equal(MetaDadaResource.Fields.metaNode + "." + MetaNodeResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
                 		entitatActualCodi != null?entitatActualCodi:"................................................................................")
         );
+        
+        Map<String, String> mapaNamedQueries = Utils.namedQueriesToMap(namedQueries);
+        if (mapaNamedQueries.containsKey(NAMED_QUERY_ACTIVES)) {
+        	/**
+        	 * S'utilitza a la pestanya "Dades" d'un expedient, a on nomes s'hi han de mostrar les
+        	 * metadades que estan actives al procediment. Equivalent al que fa la interficie JSP a
+        	 * MetaDadaServiceImpl.findByNode -> findByMetaNodeAndActivaTrueOrderByOrdreAsc.
+        	 */
+        	filtreBase = FilterBuilder.and(
+        			filtreBase,
+        			FilterBuilder.equal(MetaDadaResource.Fields.activa, true));
+        }
         
         return filtreBase.generate();
     }

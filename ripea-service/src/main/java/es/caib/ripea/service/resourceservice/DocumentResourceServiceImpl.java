@@ -67,7 +67,6 @@ import es.caib.ripea.service.helper.DocumentHelper;
 import es.caib.ripea.service.helper.DocumentNotificacioHelper;
 import es.caib.ripea.service.helper.EmailHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
-import es.caib.ripea.service.helper.EventHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.ExecucioMassivaHelper;
 import es.caib.ripea.service.helper.ExpedientHelper;
@@ -77,6 +76,7 @@ import es.caib.ripea.service.helper.PinbalHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.helper.RolHelper;
 import es.caib.ripea.service.helper.UsuariHelper;
+import es.caib.ripea.service.helper.ValidacioPostCommitHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
@@ -139,7 +139,6 @@ import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.MetaDocumentResource;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.model.UsuariResource;
-import es.caib.ripea.service.intf.model.sse.ErrorsValidacioChangedEvent;
 import es.caib.ripea.service.intf.resourceservice.DocumentResourceService;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.utils.Utils;
@@ -159,7 +158,6 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private final EmailHelper emailHelper;
     private final ExpedientHelper expedientHelper;
     private final CacheHelper cacheHelper;
-    private final EventHelper eventHelper;
     private final DocumentHelper documentHelper;
     private final ContingutHelper contingutHelper;
     private final ExcepcioLogHelper excepcioLogHelper;
@@ -171,6 +169,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 	private final MessageHelper messageHelper;
 	private final MetaExpedientHelper metaExpedientHelper;
 	private final ExecucioMassivaHelper execucioMassivaHelper;
+	private final ValidacioPostCommitHelper validacioPostCommitHelper;
     private final AplicacioService aplicacioService;
 
     private final UsuariResourceRepository usuariResourceRepository;
@@ -475,13 +474,15 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     	return resource;
     }
     
+    /**
+     * Refresca les validacions de l'expedient després d'un canvi (creació, modificació o esborrat d'un document).
+     *
+     * El evict, el recàlcul, l'avís a COMANDA i la notificació SSE es difereixen fins després del commit de la
+     * transacció de l'operació i s'executen en un fil de segon pla, de manera que no allarguen la petició.
+     * Veure {@link ValidacioPostCommitHelper}.
+     */
     private void afterDbChange(Long expedientId) {
-    	//Esborram cache de validacions del expedient
-		cacheHelper.evictErrorsValidacioPerNode(expedientId); // Primero hace evict
-		ErrorsValidacioChangedEvent evce = new ErrorsValidacioChangedEvent(
-				expedientId,
-				cacheHelper.findErrorsValidacioPerNodeAndSendComanda(expedientId));
-		eventHelper.notifyErrorsValidacio(evce); // Luego notifica con datos frescos	
+    	validacioPostCommitHelper.programarRecalculINotificacio(expedientId);
     }
 
     @Override
