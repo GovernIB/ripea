@@ -125,7 +125,7 @@ const aplicarFiltreProcediments = async (page: Page, codi: string, permisDirecte
     const dialog = page.locator('.styledFilter');
     await triaMuiSelectFirst(page, dialog, 'actiu', true);
     if (permisDirecte) {
-        await page.getByRole('button').filter({ hasText: /amb permis directe|con permiso directo/i }).click();
+        await page.getByRole('button').filter({ hasText: /permis directe|permiso directo/i }).click();
     }
     logDebug('[Filtre] Fent click a Filtrar...');
     await page.getByRole('button', { name: 'Filtra', exact: true }).click();
@@ -252,16 +252,19 @@ const crearEstat = async (page: Page, codi: string, nom: string) => {
 const getGrupRows = (page: Page) => page.locator('#simple-tabpanel-grup .MuiDataGrid-row');
 
 const vincularGrup = async (page: Page) => {
-    await page.getByRole('button').filter({ hasText: /vincula grup(o)?/i }).click();
+    // El botó de la barra d'eines i el de dins el diàleg comparteixen text; ens quedem amb
+    // el primer del DOM (la barra d'eines, perquè el diàleg es porta al final del body) per
+    // evitar una violació de strict mode en el reintent.
+    const botoToolbar = page.getByRole('button').filter({ hasText: /vincula grup(o)?/i }).first();
+    await botoToolbar.click();
     const dialog = page.locator('[role="dialog"]');
-    await expect(dialog).toBeVisible({ timeout: 5_000 }).catch(() => { 
-        //throw new Error('No s\'ha obert el diàleg de vincular grup');
-        logDebug('Error: No s\'ha obert el diàleg de vincular grup');
-        page.getByRole('button').filter({ hasText: /vincula grup(o)?/i }).click();
-        expect(dialog).toBeVisible({ timeout: 5_000 }).catch(() => { 
-            throw new Error('No s\'ha obert el diàleg de vincular grup després de reintentar');
-        });
-    });
+    try {
+        await expect(dialog).toBeVisible({ timeout: 10_000 });
+    } catch {
+        logDebug('Error: No s\'ha obert el diàleg de vincular grup, reintentant...');
+        await botoToolbar.click();
+        await expect(dialog).toBeVisible({ timeout: 10_000 });
+    }
     const grupInput = dialog.locator('[name="grup"] input[type="text"]');
     await grupInput.click();
     await page.waitForSelector('[role="listbox"]', { timeout: 5_000 });
@@ -594,7 +597,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             await page.locator('input[name="codi"]').fill(CODI_TEST);
             await page.locator('input[name="nom"]').fill('modificació');
 			await humanDelay(page);
-			await page.getByRole('button').filter({ hasText: /amb permis directe|con permiso directo/i }).click();
+			await page.getByRole('button').filter({ hasText: /permis directe|permiso directo/i }).click();
 			await humanDelay(page);
 			const resp = waitApiGet(page, url => url.includes('/metaExpedient') && !url.includes('/metaExpedient/'));
 			await page.getByRole('button', { name: 'Filtra', exact: true }).click();
