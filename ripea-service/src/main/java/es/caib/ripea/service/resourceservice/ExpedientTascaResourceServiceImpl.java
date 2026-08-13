@@ -17,6 +17,7 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -100,8 +101,27 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
 	}
 	
     @Override
+    protected Sort processSort(Sort sort) {
+        if (sort == null || sort.isUnsorted()) return sort;
+        List<Sort.Order> orders = new ArrayList<>();
+        for (Sort.Order order : sort) {
+            if (ExpedientTascaResource.Fields.metaExpedientTasca.equals(order.getProperty())) {
+                // Per defecte una referencia a una altra entitat s'ordena per l'id, i la columna
+                // del llistat mostra el nom del tipus de tasca (descriptionField del recurs).
+                // El llistat de tasques no fa servir DISTINCT, per tant el JOIN implicit que
+                // genera aquest path no provoca ORA-01791 a Oracle.
+                orders.add(order.withProperty(
+                        ExpedientTascaResource.Fields.metaExpedientTasca + "." + MetaExpedientTascaResource.Fields.nom));
+            } else {
+                orders.add(order);
+            }
+        }
+        return Sort.by(orders);
+    }
+
+    @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
-    		
+
     	Timer.Sample sample = Timer.start(applicationHelper.getMeterRegistry());
     	
     	try {
