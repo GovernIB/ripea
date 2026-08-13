@@ -40,8 +40,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -118,6 +116,7 @@ import es.caib.ripea.plugin.PropertiesHelper;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternNoTrobatException;
 import es.caib.ripea.plugin.comanda.ComandaCaibPlugin;
+import es.caib.ripea.plugin.comanda.ComandaResultatListener;
 import es.caib.ripea.plugin.conversio.ConversioArxiu;
 import es.caib.ripea.plugin.conversio.ConversioPlugin;
 import es.caib.ripea.plugin.dadesext.ComunitatAutonoma;
@@ -6313,73 +6312,131 @@ public class PluginHelper {
 	public void comandaTascaSendNoLog(ExpedientTascaEntity tascaEntity) throws Exception {
 		getComandaPlugin().sendTasca(tascaRipeaToComanda(tascaEntity));
 	}
-	
-	public void comandaTascaSend(ExpedientTascaEntity tascaEntity) {
-		
-		if (configHelper.getAsBoolean(PropertyConfig.COMANDA_PLUGIN_ACTIU)) {
-		
-			Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
-			long t0 = System.currentTimeMillis();
-			String accioDescripcio = "Enviament de una tasca";
-			Map<String, String> accioParams = new HashMap<String, String>();
-			accioParams.put("prodeciment", tascaEntity.getMetaTasca().getMetaExpedient().getNom());
-			accioParams.put("titol", tascaEntity.getTitol());
-			String endpoint = "desconegut";
-			
-			try {
 
-				ComandaCaibPlugin comandaCaibPlugin = getComandaPlugin();
-				endpoint = comandaCaibPlugin.getEndpointURL();
-				
-				ResponseEntity<String> resultat = null;
-				
-				if (TascaEstatEnumDto.FINALITZADA.equals(tascaEntity.getEstat()) ||
-					TascaEstatEnumDto.CANCELLADA.equals(tascaEntity.getEstat())) {
-					resultat = comandaCaibPlugin.deleteTasca(tascaEntity.getId() + "");
-				} else {
-					resultat = comandaCaibPlugin.sendTasca(tascaRipeaToComanda(tascaEntity));
-				}
-				
-				if (resultat.getStatusCode().equals(HttpStatus.OK)) {
+	/**
+	 * Registre al monitor d'integracions del resultat d'una crida a comanda.
+	 *
+	 * Les crides es fan en segon pla, de manera que aquests mètodes s'executen a un fil que no té ni l'entitat
+	 * actual ni el context de seguretat de la petició que les ha demanades. Totes dues coses s'agafen aquí, al fil
+	 * que demana la crida: l'entitat perquè IntegracioHelper l'empra per omplir ENTITAT_CODI, i l'usuari perquè
+	 * s'afegeix als paràmetres de l'acció. Sense això les files quedarien sense entitat i sense usuari.
+	 *
+	 * @param ignorarNoTrobat si un 404 de comanda (l'element que es volia eliminar ja no hi és) s'ha de comptar
+	 *                        com a resultat nul en lloc de com a error.
+	 */
+	private ComandaResultatListener comandaResultatListener(
+			String accioDescripcio,
+			String errorDescripcio,
+			String endpoint,
+			Map<String, String> accioParams,
+			Timer.Sample sample,
+			boolean ignorarNoTrobat) {
+
+		EntitatDto entitat = ConfigHelper.getEntitat() != null ? ConfigHelper.getEntitat().get() : null;
+		Map<String, String> params = afegirUsuariActual(accioParams);
+		String endpointMetrica = Utils.hasValue(endpoint) ? endpoint : "N/D";
+
+		return new ComandaResultatListener() {
+			@Override
+			public void onOk(long tempsResposta) {
+				registrarAmbEntitat(entitat, () -> {
 					integracioHelper.addAccioOk(
 							IntegracioHelper.INTCODI_COMANDA,
 							accioDescripcio,
 							endpoint,
-							accioParams,
+							params,
 							IntegracioAccioTipusEnumDto.ENVIAMENT,
-							System.currentTimeMillis() - t0);
-					applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
-				} else {
-					String errorDescripcio = "Error en la resposta al enviar una tasca a comanda.";
-					integracioHelper.addAccioError(
-							IntegracioHelper.INTCODI_COMANDA,
-							accioDescripcio,
-							endpoint,
-							accioParams,
-							IntegracioAccioTipusEnumDto.ENVIAMENT,
-							System.currentTimeMillis() - t0,
-							errorDescripcio,
-							null);
-					applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
-				}
-							
-			} catch (Exception ex) {
-				if(ex instanceof ApiException && ((ApiException)ex).getCode()==404) {
+							tempsResposta);
+					applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "exito", "endpoint", endpointMetrica);
+				});
+			}
+			@Override
+			public void onError(long tempsResposta, Exception excepcio) {
+				if (ignorarNoTrobat && excepcio instanceof ApiException && ((ApiException)excepcio).getCode()==404) {
 					//No s'ha trobat l'element que es volia eliminar
-					applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "nulo", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
-				} else {
-					String errorDescripcio = "Error al enviar una tasca a comanda.";
+					applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "nulo", "endpoint", endpointMetrica);
+					return;
+				}
+				registrarAmbEntitat(entitat, () -> {
 					integracioHelper.addAccioError(
 							IntegracioHelper.INTCODI_COMANDA,
 							accioDescripcio,
 							endpoint,
-							accioParams,
+							params,
 							IntegracioAccioTipusEnumDto.ENVIAMENT,
-							System.currentTimeMillis() - t0,
+							tempsResposta,
 							errorDescripcio,
-							ex);
-					applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+							excepcio);
+					applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "error", "endpoint", endpointMetrica);
+				});
+			}
+		};
+	}
+
+	/**
+	 * Deixa l'entitat de la petició original al fil mentre dura el registre i hi torna a posar la que hi havia.
+	 * Es restaura en lloc d'esborrar-la perquè el registre també es pot fer des del fil de la petició, quan la
+	 * crida ha fallat abans d'arribar-se a fer.
+	 */
+	private void registrarAmbEntitat(EntitatDto entitat, Runnable registre) {
+		EntitatDto anterior = ConfigHelper.getEntitat() != null ? ConfigHelper.getEntitat().get() : null;
+		ConfigHelper.setEntitat(entitat);
+		try {
+			registre.run();
+		} finally {
+			ConfigHelper.setEntitat(anterior);
+		}
+	}
+
+	/**
+	 * Còpia dels paràmetres de l'acció amb l'usuari actual, que al fil de segon pla ja no es podria obtenir del
+	 * context de seguretat.
+	 */
+	private Map<String, String> afegirUsuariActual(Map<String, String> accioParams) {
+		Map<String, String> params = accioParams != null ? new HashMap<>(accioParams) : new HashMap<>();
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth != null && auth.getName() != null) {
+			params.put("usuari", auth.getName());
+		}
+		return params;
+	}
+	
+	public void comandaTascaSend(ExpedientTascaEntity tascaEntity) {
+
+		if (configHelper.getAsBoolean(PropertyConfig.COMANDA_PLUGIN_ACTIU)) {
+
+			Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
+			long t0 = System.currentTimeMillis();
+			String accioDescripcio = "Enviament de una tasca";
+			String errorDescripcio = "Error al enviar una tasca a comanda.";
+			Map<String, String> accioParams = new HashMap<String, String>();
+			accioParams.put("prodeciment", tascaEntity.getMetaTasca().getMetaExpedient().getNom());
+			accioParams.put("titol", tascaEntity.getTitol());
+			String endpoint = "desconegut";
+
+			try {
+
+				ComandaCaibPlugin comandaCaibPlugin = getComandaPlugin();
+				endpoint = comandaCaibPlugin.getEndpointURL();
+
+				// La crida va en segon pla: no se n'aprofita la resposta i així ni la petició de l'usuari ni la
+				// seva transacció han d'esperar comanda. El resultat es registra al monitor d'integracions des del
+				// listener, ja al fil de segon pla.
+				ComandaResultatListener listener = comandaResultatListener(
+						accioDescripcio, errorDescripcio, endpoint, accioParams, sample, true);
+
+				if (TascaEstatEnumDto.FINALITZADA.equals(tascaEntity.getEstat()) ||
+					TascaEstatEnumDto.CANCELLADA.equals(tascaEntity.getEstat())) {
+					comandaCaibPlugin.deleteTascaAsync(tascaEntity.getId() + "", listener);
+				} else {
+					comandaCaibPlugin.sendTascaAsync(tascaRipeaToComanda(tascaEntity), listener);
 				}
+
+			} catch (Exception ex) {
+				// La crida no s'ha arribat a fer (configuració del plugin, conversió de la tasca...): es registra
+				// aquí mateix, pel mateix camí que si hagués fallat la crida.
+				comandaResultatListener(accioDescripcio, errorDescripcio, endpoint, accioParams, sample, true)
+						.onError(System.currentTimeMillis() - t0, ex);
 			}
 		}
 	}
@@ -6483,36 +6540,37 @@ public class PluginHelper {
 	private Avis validacionsRipeaToAvisComanda(ExpedientEntity expedient, List<ValidacioErrorDto> errors) throws Exception {
 		//Els avisos tendran una duració de 10 dies a comanda
 		Date dataFi = DateUtil.addToDate(Calendar.getInstance().getTime(), Calendar.DATE, 10);
-		String descripcio = "L'expedient no té avisos en aquests moments.";
+		String descripcio = "";
 		//Si ja no hi ha avisos per aquest node, es deixa de mostrar a comanda posant una data inferior a avui
 		if (errors==null || errors.size()==0) {
 			dataFi = DateUtil.addToDate(Calendar.getInstance().getTime(), Calendar.DATE, -1);
+			descripcio+= "L'expedient no té avisos en aquests moments";
 		} else {
 			for (ValidacioErrorDto err: errors) {
 				if (err.getMetaDada()!=null) {
-					descripcio = "No s'ha informat la dada: "+err.getMetaDada().getNom();
+					descripcio+= "No s'ha informat la dada: "+err.getMetaDada().getNom();
 				} else if (err.getTipusValidacio()!=null) {
 					
 					switch (err.getTipusValidacio()) {
 						case INTERESSATS:
-							descripcio = "No s'ha informat cap interessat.";
+							descripcio+= "No s'ha informat cap interessat";
 							break;
 						case METADOCUMENT:
 							if (err.getMetaDocument()==null) {
-								descripcio = "Hi ha documents sense tipus assignat.";
+								descripcio+= "Hi ha documents sense tipus assignat";
 							} else {
-								descripcio = "Falta aportar el document: "+err.getMetaDocument().getNom();
+								descripcio+= "Falta aportar el document: "+err.getMetaDocument().getNom();
 							}
 							break;
 						case MULTIPLICITAT:
 							if (err.getMetaDocument()!=null) {
-								descripcio = "Falta aportar el document: "+err.getMetaDocument().getNom();
+								descripcio+= "Falta aportar el document: "+err.getMetaDocument().getNom();
 							} else if (err.getMetaDada()!=null) {
-								descripcio = "No s'ha informat la dada: "+err.getMetaDada().getNom();
+								descripcio+= "No s'ha informat la dada: "+err.getMetaDada().getNom();
 							}
 							break;
 						case NOTIFICACIONS:
-							descripcio = "Notificacions pendents.";
+							descripcio+= "Notificacions pendents";
 							break;
 						default:
 							break;
@@ -6528,8 +6586,8 @@ public class PluginHelper {
 					if (err.getMultiplicitat()!=null) {
 						descripcio+=" que té una multiplicitat "+err.getMultiplicitat().toString();
 					}
-					descripcio+=". ";
 				}
+				descripcio+=". ";
 			}
 		}
 		
@@ -6564,62 +6622,28 @@ public class PluginHelper {
 	}
 	
 	public void comandaAvisDelete(ExpedientPeticioEntity expedientPeticioEntity) {
-		
+
 		if (configHelper.getAsBoolean(PropertyConfig.COMANDA_PLUGIN_ACTIU)) {
-		
+
 			Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 			long t0 = System.currentTimeMillis();
 			String accioDescripcio = "Eliminar un avís";
+			String errorDescripcio = "Error al enviar un avís a comanda.";
 			Map<String, String> accioParams = new HashMap<String, String>();
 			String endpoint = "desconegut";
-			
+
 			try {
 
 				ComandaCaibPlugin comandaCaibPlugin = getComandaPlugin();
 				endpoint = comandaCaibPlugin.getEndpointURL();
-				
-				ResponseEntity<String> resultat = comandaCaibPlugin.deleteAvis("ANOTACIO#"+expedientPeticioEntity.getId());
-				
-				if (resultat.getStatusCode().equals(HttpStatus.OK)) {
-					integracioHelper.addAccioOk(
-							IntegracioHelper.INTCODI_COMANDA,
-							accioDescripcio,
-							endpoint,
-							accioParams,
-							IntegracioAccioTipusEnumDto.ENVIAMENT,
-							System.currentTimeMillis() - t0);
-					applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
-				} else {
-					String errorDescripcio = "Error en la resposta al enviar un avís a comanda.";
-					integracioHelper.addAccioError(
-							IntegracioHelper.INTCODI_COMANDA,
-							accioDescripcio,
-							endpoint,
-							accioParams,
-							IntegracioAccioTipusEnumDto.ENVIAMENT,
-							System.currentTimeMillis() - t0,
-							errorDescripcio,
-							null);
-					applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");				
-				}
-				
+
+				comandaCaibPlugin.deleteAvisAsync(
+						"ANOTACIO#" + expedientPeticioEntity.getId(),
+						comandaResultatListener(accioDescripcio, errorDescripcio, endpoint, accioParams, sample, true));
+
 			} catch (Exception ex) {
-				if(ex instanceof ApiException && ((ApiException)ex).getCode()==404) {
-					//No s'ha trobat l'element que es volia eliminar
-					applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "nulo", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
-				} else {
-					String errorDescripcio = "Error al enviar un avís a comanda.";
-					integracioHelper.addAccioError(
-							IntegracioHelper.INTCODI_COMANDA,
-							accioDescripcio,
-							endpoint,
-							accioParams,
-							IntegracioAccioTipusEnumDto.ENVIAMENT,
-							System.currentTimeMillis() - t0,
-							errorDescripcio,
-							ex);
-					applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
-				}
+				comandaResultatListener(accioDescripcio, errorDescripcio, endpoint, accioParams, sample, true)
+						.onError(System.currentTimeMillis() - t0, ex);
 			}
 		}
 	}
@@ -6632,53 +6656,25 @@ public class PluginHelper {
 			Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 			long t0 = System.currentTimeMillis();
 			String accioDescripcio = "Enviament de un avís";
+			String errorDescripcio = "Error al enviar un avís a comanda.";
 			Map<String, String> accioParams = new HashMap<String, String>();
 			String endpoint = "desconegut";
-			
+
 			try {
 
 				ComandaCaibPlugin comandaCaibPlugin = getComandaPlugin();
 				endpoint = comandaCaibPlugin.getEndpointURL();
-				
+
 				Avis avisComanda = anotacioRipeaToAvisComanda(expedientPeticioEntity);
-				ResponseEntity<String> resultat = comandaCaibPlugin.sendAvis(avisComanda);
 				accioParams.put("nom", avisComanda.getNom());
-				
-				if (resultat.getStatusCode().equals(HttpStatus.OK)) {
-					integracioHelper.addAccioOk(
-							IntegracioHelper.INTCODI_COMANDA,
-							accioDescripcio,
-							endpoint,
-							accioParams,
-							IntegracioAccioTipusEnumDto.ENVIAMENT,
-							System.currentTimeMillis() - t0);
-					applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
-				} else {
-					String errorDescripcio = "Error en la resposta al enviar un avís a comanda.";
-					integracioHelper.addAccioError(
-							IntegracioHelper.INTCODI_COMANDA,
-							accioDescripcio,
-							endpoint,
-							accioParams,
-							IntegracioAccioTipusEnumDto.ENVIAMENT,
-							System.currentTimeMillis() - t0,
-							errorDescripcio,
-							null);
-					applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");				
-				}
-				
+
+				comandaCaibPlugin.sendAvisAsync(
+						avisComanda,
+						comandaResultatListener(accioDescripcio, errorDescripcio, endpoint, accioParams, sample, false));
+
 			} catch (Exception ex) {
-				String errorDescripcio = "Error al enviar un avís a comanda.";
-				integracioHelper.addAccioError(
-						IntegracioHelper.INTCODI_COMANDA,
-						accioDescripcio,
-						endpoint,
-						accioParams,
-						IntegracioAccioTipusEnumDto.ENVIAMENT,
-						System.currentTimeMillis() - t0,
-						errorDescripcio,
-						ex);
-				applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+				comandaResultatListener(accioDescripcio, errorDescripcio, endpoint, accioParams, sample, false)
+						.onError(System.currentTimeMillis() - t0, ex);
 			}
 		}
 	}
@@ -6696,63 +6692,28 @@ public class PluginHelper {
 			Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 			long t0 = System.currentTimeMillis();
 			String accioDescripcio = "Enviament de un avís";
+			String errorDescripcio = "Error al enviar un avís a comanda.";
 			Map<String, String> accioParams = new HashMap<String, String>();
-			ResponseEntity<String> resultat = null;
+			accioParams.put("expedient", expedient.getCodi());
 			String endpoint = "desconegut";
-			
+
 			try {
-				
+
 				ComandaCaibPlugin comandaCaibPlugin = getComandaPlugin();
 				endpoint = comandaCaibPlugin.getEndpointURL();
-				
+
+				ComandaResultatListener listener = comandaResultatListener(
+						accioDescripcio, errorDescripcio, endpoint, accioParams, sample, true);
+
 				if (errors==null || errors.size()==0) {
-					resultat = comandaCaibPlugin.deleteAvis(expedient.getId()+"");
+					comandaCaibPlugin.deleteAvisAsync(expedient.getId()+"", listener);
 				} else {
-					Avis avisComanda = validacionsRipeaToAvisComanda(expedient, errors);
-					resultat = comandaCaibPlugin.sendAvis(avisComanda);
+					comandaCaibPlugin.sendAvisAsync(validacionsRipeaToAvisComanda(expedient, errors), listener);
 				}
 
-				accioParams.put("expedient", expedient.getCodi());
-				if (resultat.getStatusCode().equals(HttpStatus.OK)) {
-					integracioHelper.addAccioOk(
-							IntegracioHelper.INTCODI_COMANDA,
-							accioDescripcio,
-							endpoint,
-							accioParams,
-							IntegracioAccioTipusEnumDto.ENVIAMENT,
-							System.currentTimeMillis() - t0);
-					applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
-				} else {
-					String errorDescripcio = "Error en la resposta al enviar un avís a comanda.";
-					integracioHelper.addAccioError(
-							IntegracioHelper.INTCODI_COMANDA,
-							accioDescripcio,
-							endpoint,
-							accioParams,
-							IntegracioAccioTipusEnumDto.ENVIAMENT,
-							System.currentTimeMillis() - t0,
-							errorDescripcio,
-							null);
-					applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");				
-				}
-				
 			} catch (Exception ex) {
-				if(ex instanceof ApiException && ((ApiException)ex).getCode()==404) {
-					//No s'ha trobat l'element que es volia eliminar
-					applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "nulo", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
-				} else {				
-					String errorDescripcio = "Error al enviar un avís a comanda.";
-					integracioHelper.addAccioError(
-							IntegracioHelper.INTCODI_COMANDA,
-							accioDescripcio,
-							endpoint,
-							accioParams,
-							IntegracioAccioTipusEnumDto.ENVIAMENT,
-							System.currentTimeMillis() - t0,
-							errorDescripcio,
-							ex);
-					applicationHelper.stopTimer(sample, "METRICS@Integracions.comanda", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
-				}
+				comandaResultatListener(accioDescripcio, errorDescripcio, endpoint, accioParams, sample, true)
+						.onError(System.currentTimeMillis() - t0, ex);
 			}
 		}
 	}
