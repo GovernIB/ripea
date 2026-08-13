@@ -135,7 +135,6 @@ const AnotacionsGrid = () => {
                     popupEditFormContent={<AnotacionsGridForm/>}
                     // toolbarHide
                     readOnly
-                    toolbarHideRefresh
                     popupEditFormDialogTitle={t('page.anotacio.action.canviProcediment.title')}
                     popupEditFormComponentProps={{ initOnChangeRequest: true }}
                     popupEditFormI18nKeys={{

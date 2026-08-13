@@ -64,8 +64,11 @@ const MetaDadaGrid = (props: any) => {
                 const value = params.value;
                 const row = params.row;
                 if (row?.tipus == 'DOMINI') {
+                    // Si la descripció del domini no s'ha pogut resoldre (domini inaccessible o valor que ja no
+                    // hi és) es mostra el valor guardat, com fa el detall dels valors: altrament sortiria un
+                    // requadre buit i el valor semblaria perdut.
                     return value?.map((dada: any) => (
-                        <StyledLabel key={dada.id} className={'multiplicitat'} sx={{marginRight: '4px'}}>{dada?.dominiDescription}</StyledLabel>
+                        <StyledLabel key={dada.id} className={'multiplicitat'} sx={{marginRight: '4px'}}>{dada?.dominiDescription || dada?.valor}</StyledLabel>
                     ));
                 }
                 return value?.map((dada: any) => (
