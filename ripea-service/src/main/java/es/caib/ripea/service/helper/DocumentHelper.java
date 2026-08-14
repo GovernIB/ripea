@@ -1850,14 +1850,15 @@ public class DocumentHelper {
 				throwExceptionIfNotValid);
 		if (updateEstat) {
 			document.updateEstat(DocumentEstatEnumDto.FIRMAT);
+			contingutLogHelper.log(
+					document,
+					LogTipusEnumDto.DOC_FIRMAT,
+					null,
+					null,
+					false,
+					false);
 		}
-		contingutLogHelper.log(
-				document,
-				LogTipusEnumDto.DOC_FIRMAT,
-				null,
-				null,
-				false,
-				false);
+		
 		return firmes;
 	}
 

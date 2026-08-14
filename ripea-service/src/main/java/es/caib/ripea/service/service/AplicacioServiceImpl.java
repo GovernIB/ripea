@@ -963,6 +963,13 @@ public class AplicacioServiceImpl implements AplicacioService {
             .collect(Collectors.toList());
     }
 
+    /**
+     * Executa la incorporació del certificat de remesa d'un enviament com a document del seu expedient.
+     *
+     * @param enviamentDestinatariId Identificador de l'enviament (destinatari de la notificació) a processar.
+     * @return Missatge explicatiu de la feina feta, el mateix que es registra al log.
+     * @throws Exception Si es produeix qualsevol error en el procés.
+     */
     @Override
     @Transactional
     public String executeCertificatsRemesaExpedient(Long enviamentDestinatariId) throws Exception {
@@ -970,11 +977,7 @@ public class AplicacioServiceImpl implements AplicacioService {
             DocumentEnviamentInteressatEntity enviamentIntEntity = documentEnviamentInteressatRepository.findById(enviamentDestinatariId)
                 .orElseThrow(() -> new Exception("Notificació no trobada"));
 
-            int creats = certificatRemesaHelper.crearDocumentsCertificatNotificacio(enviamentIntEntity);
-
-            return creats > 0
-                ? "Notificació " + enviamentDestinatariId + ": " + creats + " certificat(s) afegit(s) al contingut de l'expedient " + enviamentIntEntity.getNotificacio().getExpedient().getId() + "."
-                : "La notificació " + enviamentDestinatariId + " no té certificats pendents d'incorporar.";
+            return certificatRemesaHelper.crearDocumentsCertificatNotificacio(enviamentIntEntity);
         } catch (Exception ex) {
             throw new Exception("Error al afegir els certificats de la enviament " + enviamentDestinatariId + ": " + ex.getMessage());
         }

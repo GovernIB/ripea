@@ -25,15 +25,16 @@ public class CertificatRemesaHelper {
     @Autowired private ContingutHelper contingutHelper;
 
     /**
-     * Incorpora com a documents de l'expedient tots els certificats pendents (un per interessat/destinatari) d'una notificació.
+     * Incorpora com a document de l'expedient el certificat pendent d'un enviament (interessat/destinatari) d'una notificació.
+     * Com a molt tracta un certificat, el de l'enviament indicat.
      *
-     * @return Nombre de certificats creats.
+     * @param interessatEnviament enviament de la notificació a processar.
+     * @return missatge descriptiu de l'acció feta, que també queda registrat al log.
+     * @throws Exception si el procediment no té el tipus de document per defecte.
      */
-    public int crearDocumentsCertificatNotificacio(DocumentEnviamentInteressatEntity interessatEnviament) throws Exception {
+    public String crearDocumentsCertificatNotificacio(DocumentEnviamentInteressatEntity interessatEnviament) throws Exception {
 
         ExpedientEntity expedient = interessatEnviament.getNotificacio().getExpedient();
-        int creats = 0;
-
 
         String nif = interessatEnviament.getInteressat() != null
             ? interessatEnviament.getInteressat().getDocumentNum()
@@ -47,8 +48,10 @@ public class CertificatRemesaHelper {
 
         boolean jaExisteix = documentRepository
             .existsByExpedientIdAndFitxerNom(expedient.getId(), nomFitxer);
+
         if (jaExisteix) {
-            return 0;
+            return logIRetorna("El certificat de l'enviament " + interessatEnviament.getId()
+                + " ja està incorporat al contingut de l'expedient " + expedient.getId() + ".");
         }
 
         MetaDocumentEntity metaDocument = metaDocumentRepository
@@ -57,20 +60,21 @@ public class CertificatRemesaHelper {
                 MetaDocumentPerDefecteEnumDto.NOTIB_JUSTIFICANT_RECEPCIO.getCodi());
 
         if (metaDocument == null) {
-            throw new Exception("No s'ha trobat el MetaDocument per defecte NOTIB_JUSTIFICANT_RECEPCIO per al metaexpedient "
-                + expedient.getMetaExpedient().getId());
+            throw new Exception("No s'ha trobat el MetaDocument per defecte NOTIB_JUSTIFICANT_RECEPCIO per al procediment "
+                + expedient.getMetaExpedient().getCodi());
         }
 
         byte[] contingutCertificat = documentNotificacioHelper.getCertificacio(interessatEnviament.getId());
-        if (contingutCertificat == null) {
-            LOGGER.warn("No s'ha pogut descarregar el certificat de l'enviament {} (notificació {})",
-                interessatEnviament.getId(), interessatEnviament.getNotificacio().getId());
-            return 0;
+        if (contingutCertificat == null || contingutCertificat.length==0) {
+            String missatge = "No s'ha pogut descarregar el certificat de l'enviament " + interessatEnviament.getId()
+                + " (notificació " + interessatEnviament.getNotificacio().getId() + ").";
+            LOGGER.warn(missatge);
+            return missatge;
         }
 
         DocumentDto document = new DocumentDto();
         document.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
-        document.setNom(nomUnicDinsExpedient(expedient, "Justificant enviament notib destinatari " + nifPerNom));
+        document.setNom(nomUnicDinsExpedient(expedient, "Justificant enviament notib "+interessatEnviament.getId()+" destinatari " + nifPerNom));
         document.setData(interessatEnviament.getEnviamentCertificacioData() != null
             ? interessatEnviament.getEnviamentCertificacioData()
             : new Date());
@@ -97,10 +101,14 @@ public class CertificatRemesaHelper {
             true,
             true);
 
-        creats++;
-        LOGGER.info("Creat document de certificat {} per a l'expedient {}", nomFitxer, expedient.getId());
+        return logIRetorna("Incorporat el certificat de l'enviament " + interessatEnviament.getId()
+            + " (notificació " + interessatEnviament.getNotificacio().getId() + ")"
+            + " com a document " + nomFitxer + " al contingut de l'expedient " + expedient.getId() + ".");
+    }
 
-        return creats;
+    private String logIRetorna(String missatge) {
+        LOGGER.info(missatge);
+        return missatge;
     }
 
     /**

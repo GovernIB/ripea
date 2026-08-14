@@ -76,8 +76,8 @@ public class RegistreJustificantHelper {
             MetaDocumentPerDefecteEnumDto.REGISTRE_JUSTIFICANT_ENTRADA.getCodi());
 
         if (metaDocument == null) {
-            throw new Exception("No s'ha trobat el MetaDocument per defecte REGISTRE_JUSTIFICANT_ENTRADA per al metaexpedient "
-                + expedient.getMetaExpedient().getId());
+            throw new Exception("No s'ha trobat el MetaDocument per defecte REGISTRE_JUSTIFICANT_ENTRADA per al procediment "
+                + expedient.getMetaExpedient().getCodi());
         }
 
         expedientHelper.crearDocFromUuid(
