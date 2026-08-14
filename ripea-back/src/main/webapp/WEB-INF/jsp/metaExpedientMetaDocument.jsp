@@ -52,6 +52,9 @@ pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.ripea.back.h
 		<thead>
 			<tr>
 				<th data-col-name="ordre" data-visible="false"></th>
+				<%-- Columna oculta: DatatablesHelper només inclou al JSON de cada fila les propietats
+				     declarades com a columna, i la plantilla d'accions necessita modificacioRestringida. --%>
+				<th data-col-name="modificacioRestringida" data-visible="false" data-orderable="false"></th>
 				<th data-col-name="codi" data-orderable="false"><spring:message code="metadocument.list.columna.codi"/></th>
 				<th data-col-name="nom" data-orderable="false"><spring:message code="metadocument.list.columna.nom"/></th>
 				<th data-col-name="actiu" data-orderable="false" data-template="#cellActiuTemplate">
@@ -125,15 +128,22 @@ pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.ripea.back.h
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
+								<%-- Els tipus de document creats per defecte (modificacioRestringida) només els pot
+								     modificar un administrador d'entitat; per a la resta de rols només es consulten. --%>
 								<c:choose>
 									<c:when test="${consultar}">
 										<li><a href="<c:url value="metaDocument/{{:id}}"/>" data-toggle="modal"><span class="fa fa-search"></span>&nbsp;&nbsp;<spring:message code="comu.boto.consultar"/></a></li>
 									</c:when>
 									<c:otherwise>
+										{{if modificacioRestringida && !${esAdminEntitat ? 'true' : 'false'}}}
+										<li><a href="<c:url value="metaDocument/{{:id}}"/>" data-toggle="modal"><span class="fa fa-search"></span>&nbsp;&nbsp;<spring:message code="comu.boto.consultar"/></a></li>
+										{{else}}
 										<li><a href="<c:url value="metaDocument/{{:id}}"/>" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+										{{/if}}
 									</c:otherwise>
 								</c:choose>
 								<c:if test="${!bloquejarCamps}">
+								{{if !modificacioRestringida || ${esAdminEntitat ? 'true' : 'false'}}}
 								{{if !actiu}}
 								<li><a href="<c:url value="metaDocument/{{:id}}/enable"/>" data-toggle="ajax"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.activar"/></a></li>
 								{{else}}
@@ -144,6 +154,7 @@ pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.ripea.back.h
 									<li><a href="<c:url value="metaDocument/{{:id}}/default"/>" data-toggle="ajax"><span class="fa fa-check-square-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.defecte"/></a></li>
 								{{else}}
 									<li><a href="<c:url value="metaDocument/{{:id}}/default/remove"/>" data-toggle="ajax"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.defecte.remove"/></a></li>
+								{{/if}}
 								{{/if}}
 								</c:if>
 							</ul>

@@ -489,6 +489,10 @@ pageContext.setAttribute("metadocumentFluxtipEnumOptions", es.caib.ripea.back.he
 </head>
 <body>
 
+	<c:if test="${metaDocumentReservat}">
+		<div class="alert well-sm alert-info"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="metadocument.reservat.modificacio.alerta"/></div>
+	</c:if>
+
     <!-- Reutilitzaió del formulari per metaDocuments amb procediment associat o sense -->
     <c:choose>
         <c:when test="${byMetaExpedient}">

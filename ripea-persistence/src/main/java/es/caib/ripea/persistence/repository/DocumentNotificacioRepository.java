@@ -29,7 +29,7 @@ public interface DocumentNotificacioRepository extends JpaRepository<DocumentNot
 			ExpedientEntity expedient);
 	List<DocumentNotificacioEntity> findByExpedientOrderByCreatedDateDesc(
 			ExpedientEntity expedient);
-	
+
 
 	List<DocumentNotificacioEntity> findByDocumentOrderByEnviatDataAsc(
 			DocumentEntity document);
@@ -37,12 +37,12 @@ public interface DocumentNotificacioRepository extends JpaRepository<DocumentNot
 			DocumentEntity document);
 
 	List<DocumentNotificacioEntity> findByDocumentOrderByCreatedDateDesc(DocumentEntity document);
-	
+
 	List<DocumentNotificacioEntity> findByDocumentAndNotificacioEstatInAndErrorOrderByCreatedDateAsc(
 			DocumentEntity document,
 			DocumentNotificacioEstatEnumDto[] estat,
 			boolean error);
-	
+
 	long countByDocument(DocumentEntity document);
 
 	DocumentNotificacioEntity findByNotificacioIdentificador(String notificacioIdentificador);
@@ -58,7 +58,7 @@ public interface DocumentNotificacioRepository extends JpaRepository<DocumentNot
 			"		where " +
 			"			n.document.id = :documentId) ")
 	DocumentNotificacioEstatEnumDto findLastEstatNotificacioByDocumentId(@Param("documentId") Long documentId);
-	
+
 	@Query( "select dn.error " +
 			"from " +
 			"	DocumentNotificacioEntity dn " +
@@ -70,7 +70,7 @@ public interface DocumentNotificacioRepository extends JpaRepository<DocumentNot
 			"		where " +
 			"			n.document.id = :documentId) ")
 	Boolean findErrorLastNotificacioByDocumentId(@Param("documentId") Long documentId);
-	
+
 	@Query("select " +
 			"	dn " +
 			"from " +
@@ -83,9 +83,9 @@ public interface DocumentNotificacioRepository extends JpaRepository<DocumentNot
 			"and (:esNullDocumentNom = true or lower(dn.document.nom) like lower('%'||:documentNom||'%'))" +
 			"and (:esNullDataEnviamentInici = true or dn.createdDate >= :dataEnviamentInici) " +
 			"and (:esNullDataEnviamentFinal = true or dn.createdDate <= :dataEnviamentFinal) " +
-			"and (:esNullEstatNotificacio = true or dn.notificacioEstat = :estatNotificacio) " + 
-			"and (:esNullEstatEnviament = true or envInt.enviamentDatatEstat = :estatEnviament) " + 			
-			"and (:esNullEnviamentTipus = true or dn.tipus = :enviamentTipus) " + 
+			"and (:esNullEstatNotificacio = true or dn.notificacioEstat = :estatNotificacio) " +
+			"and (:esNullEstatEnviament = true or envInt.enviamentDatatEstat = :estatEnviament) " +
+			"and (:esNullEnviamentTipus = true or dn.tipus = :enviamentTipus) " +
 			"and (:esNullConcepte = true or lower(dn.assumpte) like lower('%'||:concepte||'%'))" +
 			"and (:esNullInteressat = true " +
 			"		or  envInt.interessat.esRepresentant = false " +
@@ -93,7 +93,7 @@ public interface DocumentNotificacioRepository extends JpaRepository<DocumentNot
 			"					or lower(envInt.interessat.raoSocial) like lower('%'||:interessat||'%')" +
 			"					or lower(envInt.interessat.organNom) like lower('%'||:interessat||'%'))) " +
 			"and (:esNullOrganId = true or dn.expedient.organGestor.id = :organId) " +
-			"and (:esNullProcedimentId = true or dn.expedient.metaExpedient.id = :procedimentId) " + 
+			"and (:esNullProcedimentId = true or dn.expedient.metaExpedient.id = :procedimentId) " +
 			"and (:nomesAmbError = false or dn.error = true) ")
 	public Page<DocumentNotificacioEntity> findAmbFiltrePaginat(
 			@Param("entitat") EntitatEntity entitat,
@@ -121,11 +121,11 @@ public interface DocumentNotificacioRepository extends JpaRepository<DocumentNot
 			@Param("esNullOrganId") boolean esNullOrganId,
 			@Param("organId") Long organId,
 			@Param("esNullProcedimentId") boolean esNullProcedimentId,
-			@Param("procedimentId") Long procedimentId,		
+			@Param("procedimentId") Long procedimentId,
 			@Param("nomesAmbError") boolean nomesAmbError,
 			Pageable paginacio);
-	
-	
+
+
 	@Query("select " +
 			"	dn.id " +
 			"from " +
@@ -137,9 +137,9 @@ public interface DocumentNotificacioRepository extends JpaRepository<DocumentNot
 			"and (:esNullDocumentNom = true or lower(dn.document.nom) like lower('%'||:documentNom||'%'))" +
 			"and (:esNullDataEnviamentInici = true or dn.createdDate >= :dataEnviamentInici) " +
 			"and (:esNullDataEnviamentFinal = true or dn.createdDate <= :dataEnviamentFinal) " +
-			"and (:esNullEstatNotificacio = true or dn.notificacioEstat = :estatNotificacio) " + 
-			"and (:esNullEstatEnviament = true or envInt.enviamentDatatEstat = :estatEnviament) " + 			
-			"and (:esNullEnviamentTipus = true or dn.tipus = :enviamentTipus) " + 
+			"and (:esNullEstatNotificacio = true or dn.notificacioEstat = :estatNotificacio) " +
+			"and (:esNullEstatEnviament = true or envInt.enviamentDatatEstat = :estatEnviament) " +
+			"and (:esNullEnviamentTipus = true or dn.tipus = :enviamentTipus) " +
 			"and (:esNullConcepte = true or lower(dn.assumpte) like lower('%'||:concepte||'%'))" +
 			"and (:esNullInteressat = true " +
 			"		or  envInt.interessat.esRepresentant = false " +

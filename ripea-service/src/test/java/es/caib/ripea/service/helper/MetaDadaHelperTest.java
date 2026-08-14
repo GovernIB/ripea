@@ -1,7 +1,10 @@
 package es.caib.ripea.service.helper;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -34,6 +37,8 @@ import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDadaDto;
 import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
+import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.exception.PermissionDeniedException;
 
 /**
  * Tests unitaris per a MetaDadaHelper.
@@ -54,6 +59,7 @@ class MetaDadaHelperTest {
     @Mock private ApplicationHelper applicationHelper;
     @Mock private ValidacioCacheEvictHelper validacioCacheEvictHelper;
     @Mock private ContingutLogHelper contingutLogHelper;
+    @Mock private MetaDocumentHelper metaDocumentHelper;
 
     @InjectMocks
     private MetaDadaHelper helper;
@@ -651,5 +657,76 @@ class MetaDadaHelperTest {
         MetaDadaEntity resultat = helper.updateActiva(ENTITAT_ID, META_NODE_ID, META_DADA_ID, true, "IPA_ADMIN", ORGAN_ID);
 
         assertThat(resultat).isSameAs(metaDadaEntity);
+    }
+
+    // =========================================================================
+    // Restricció de modificació de les metadades dels tipus de document per defecte
+    //
+    // La regla la implementa MetaDocumentHelper (i s'hi prova); aquí es comprova que
+    // tots els mètodes que modifiquen metadades hi deleguen abans de tocar res.
+    // =========================================================================
+
+    /** Prepara el meta-node d'un tipus de document que el rol actual no pot modificar. */
+    private MetaDocumentEntity mockMetaNodeAmbModificacioDenegada() {
+        EntitatEntity entitat = mock(EntitatEntity.class);
+        MetaDocumentEntity metaNode = mock(MetaDocumentEntity.class);
+        when(entityComprovarHelper.comprovarEntitatPerMetaExpedients(ENTITAT_ID)).thenReturn(entitat);
+        when(entityComprovarHelper.comprovarMetaNode(entitat, META_NODE_ID)).thenReturn(metaNode);
+        doThrow(new PermissionDeniedException(
+                META_NODE_ID,
+                MetaDocumentEntity.class,
+                "usuari",
+                BaseConfig.ROLE_ADMIN,
+                "Els tipus de document creats per defecte només els pot modificar un administrador d'entitat"))
+                .when(metaDocumentHelper).comprovarPermisModificacioMetaDades(metaNode);
+        return metaNode;
+    }
+
+    @Test
+    void create_metaDocumentAmbModificacioRestringida_llancaPermissionDeniedINoDesa() {
+        mockMetaNodeAmbModificacioDenegada();
+        MetaDadaDto dto = buildDto(MetaDadaTipusEnumDto.TEXT);
+
+        assertThatThrownBy(() -> helper.create(ENTITAT_ID, META_NODE_ID, dto, "IPA_DISSENY", ORGAN_ID))
+                .isInstanceOf(PermissionDeniedException.class);
+
+        verify(metaDadaRepository, never()).save(any(MetaDadaEntity.class));
+    }
+
+    @Test
+    void update_metaDocumentAmbModificacioRestringida_llancaPermissionDeniedINoActualitza() {
+        MetaDocumentEntity metaNode = mockMetaNodeAmbModificacioDenegada();
+        MetaDadaEntity metaDadaEntity = mock(MetaDadaEntity.class);
+        when(entityComprovarHelper.comprovarMetaDada(any(), any(), any())).thenReturn(metaDadaEntity);
+        MetaDadaDto dto = buildDtoAmbId(MultiplicitatEnumDto.M_1);
+
+        assertThatThrownBy(() -> helper.update(ENTITAT_ID, META_NODE_ID, dto, "IPA_DISSENY", ORGAN_ID))
+                .isInstanceOf(PermissionDeniedException.class);
+
+        verify(metaDadaEntity, never()).update(any(MetaDadaDto.class));
+        verify(metaDocumentHelper).comprovarPermisModificacioMetaDades(metaNode);
+    }
+
+    @Test
+    void delete_metaDocumentAmbModificacioRestringida_llancaPermissionDeniedINoEsborra() {
+        mockMetaNodeAmbModificacioDenegada();
+
+        assertThatThrownBy(() -> helper.delete(ENTITAT_ID, META_NODE_ID, META_DADA_ID, "IPA_DISSENY", ORGAN_ID))
+                .isInstanceOf(PermissionDeniedException.class);
+
+        verify(metaDadaRepository, never()).delete(any(MetaDadaEntity.class));
+    }
+
+    @Test
+    void updateActiva_metaDocumentAmbModificacioRestringida_llancaPermissionDeniedINoCanviaLEstat() {
+        mockMetaNodeAmbModificacioDenegada();
+        MetaDadaEntity metaDadaEntity = mock(MetaDadaEntity.class);
+        when(entityComprovarHelper.comprovarMetaDada(any(), any(), any())).thenReturn(metaDadaEntity);
+
+        assertThatThrownBy(() -> helper.updateActiva(
+                ENTITAT_ID, META_NODE_ID, META_DADA_ID, false, "IPA_DISSENY", ORGAN_ID))
+                .isInstanceOf(PermissionDeniedException.class);
+
+        verify(metaDadaEntity, never()).updateActiva(anyBoolean());
     }
 }

@@ -49,6 +49,9 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 		String rolActual = RolHelper.getRolActual(request);
 		model.addAttribute("esRevisor", rolActual.equals("IPA_REVISIO"));
+		//Necessari a la llista per a decidir, fila a fila, si els tipus de document creats
+		//per defecte es mostren com a modificables o només com a consultables.
+		model.addAttribute("esAdminEntitat", RolHelper.isRolActualAdministrador(request));
 		if (!rolActual.equals("IPA_REVISIO")) {
 			comprovarAccesMetaExpedient(request, metaExpedientId);
 		}
@@ -123,7 +126,15 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 		command.setComu(metaExpedientService.findById(entitatActual.getId(), metaExpedientId).isComu());
 		model.addAttribute(command);
 		emplenarModelForm(request, model);
-		
+
+		//Els tipus de document creats per defecte a l'alta del procediment només els pot
+		//modificar un administrador d'entitat; per a la resta de rols són de només consulta.
+		if (metaDocument != null && metaDocument.isModificacioRestringida() && !RolHelper.isRolActualAdministrador(request)) {
+			model.addAttribute("bloquejarCamps", true);
+			model.addAttribute("consultar", true);
+			model.addAttribute("metaDocumentReservat", true);
+		}
+
 		if (metaExpedient != null && metaExpedientService.isRevisioActiva()) { // es tracta d'una modificació
 			if (RolHelper.isRolActualAdministradorOrgan(request)  && metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.REVISAT){
 				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.adminOrgan.bloquejada.alerta"));

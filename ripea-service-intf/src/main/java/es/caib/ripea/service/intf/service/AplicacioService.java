@@ -24,7 +24,7 @@ import io.micrometer.core.instrument.Timer;
 
 /**
  * Declaració dels mètodes comuns de l'aplicació.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 
@@ -35,7 +35,7 @@ public interface AplicacioService {
 
 	/**
 	 * Processa l'autenticació d'un usuari.
-	 * 
+	 *
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'usuari amb el codi de l'usuari autenticat.
 	 */
@@ -44,15 +44,15 @@ public interface AplicacioService {
 
 	/**
 	 * Obté l'usuari actual.
-	 * 
+	 *
 	 * @return L'usuari actual.
 	 */
 	@PreAuthorize("isAuthenticated()")
 	public UsuariDto getUsuariActual();
-	
+
 	/**
 	 * Modifica la configuració de l'usuari actual
-	 * 
+	 *
 	 * @return L'usuari actual.
 	 */
 	@PreAuthorize("isAuthenticated()")
@@ -60,7 +60,7 @@ public interface AplicacioService {
 
 	/**
 	 * Obté un usuari donat el seu codi.
-	 * 
+	 *
 	 * @param codi
 	 *            Codi de l'usuari a cercar.
 	 * @return L'usuari obtingut o null si no s'ha trobat.
@@ -70,7 +70,7 @@ public interface AplicacioService {
 
 	/**
 	 * Consulta els usuaris donat un text.
-	 * 
+	 *
 	 * @param text
 	 *            Text per a fer la consulta.
 	 * @return La llista d'usuaris.
@@ -80,7 +80,7 @@ public interface AplicacioService {
 
 	/**
 	 * Obté les integracions disponibles.
-	 * 
+	 *
 	 * @return La llista d'integracions.
 	 */
 	@PreAuthorize("hasRole('IPA_SUPER')")
@@ -88,10 +88,10 @@ public interface AplicacioService {
 
 	@PreAuthorize("hasRole('IPA_SUPER')")
 	public GenericDto integracioDiagnostic(String codi, DiagnosticFiltreDto filtre);
-	
+
 	/**
 	 * Obté la llista de les darreres accions realitzades a una integració.
-	 * 
+	 *
 	 * @param codi Codi de la integració.
 	 * @return La llista amb les darreres accions.
 	 * @throws NotFoundException Si no s'ha trobat la integració amb el codi especificat.
@@ -120,10 +120,10 @@ public interface AplicacioService {
 	IntegracioAccioDto integracioFindOne(Long id);
 
 	public List<IntegracioAccioDto> getLastIntegracions(IntegracioEnumDto codiIntegracio, int numElements);
-	
+
 	/**
 	 * Emmagatzema una excepció llençada per un servei.
-	 * 
+	 *
 	 * @param exception
 	 *             L'excepció a emmagatzemar.
 	 */
@@ -131,7 +131,7 @@ public interface AplicacioService {
 
 	/**
 	 * Consulta la informació d'una excepció donat el seu índex.
-	 * 
+	 *
 	 * @param index
 	 *             L'index de l'excepció.
 	 * @return L'excepció.
@@ -160,14 +160,14 @@ public interface AplicacioService {
 	/**
 	 * Retorna una llista amb els diferents rols els quals
 	 * tenen assignat algun permis.
-	 * 
+	 *
 	 * @return La llista amb els rols.
 	 */
 	public List<String> permisosFindRolsDistinctAll();
 
 	/**
 	 * Retorna el valor de la propietat es.caib.ripea.base.url.
-	 * 
+	 *
 	 * @return el valor del paràmetre.
 	 */
 	@PreAuthorize("isAuthenticated()")
@@ -176,7 +176,7 @@ public interface AplicacioService {
 	/**
 	 * Retorna els valors dels paràmetres de configuració de l'aplicació
 	 * agrupades dins un grup determinat
-	 * 
+	 *
 	 * @return els valors com a un objecte Properties.
 	 */
 	Properties propertiesFindByGroup(String codiGrup);
@@ -194,7 +194,7 @@ public interface AplicacioService {
 	List<UsuariDto> findUsuariAmbTextDades(String text);
 
 	UsuariDto findUsuariCarrecAmbCodiDades(String codi);
-	
+
 	@PreAuthorize("isAuthenticated()")
 	public Boolean propertyBooleanFindByKey(String key);
 
@@ -239,16 +239,16 @@ public interface AplicacioService {
 
 	@PreAuthorize("isAuthenticated()")
 	public String getEntitatActualCodi();
-	
+
 	@PreAuthorize("isAuthenticated()")
 	public Long getEntitatActualId();
-	
+
 	@PreAuthorize("isAuthenticated()")
 	public String getOrganActualCodi();
-	
+
 	@PreAuthorize("isAuthenticated()")
 	public String getRolActualCodi();
-	
+
 	@PreAuthorize("isAuthenticated()")
 	public Long getOrganActualId();
 
@@ -278,37 +278,37 @@ public interface AplicacioService {
 	@PreAuthorize("isAuthenticated()")
 	public boolean doesCurrentUserHasRol(
 			String rol);
-	
+
 	@PreAuthorize("isAuthenticated()")
 	public Long getProcedimentPerDefecte(Long entitatId, String rolActual);
 
 	@PreAuthorize("isAuthenticated()")
 	public boolean mostrarLogsCercadorAnotacio();
-	
+
 	@PreAuthorize("hasRole('IPA_SUPER')")
 	public Long updateUsuariCodi(String codiAntic, String codiNou);
-	
+
 	@PermitAll
 	public MeterRegistry getMeterRegistry();
-	
+
 	@PermitAll
 	public void stopTimer(Timer.Sample sample, String metricCode, String... tags);
-	
+
 	@PermitAll
 	public String getMetriquesJSON() throws Exception;
-	
+
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public List<Long> getPortafirmesEliminats();
-	
+
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public String executePortafirmesEliminat(Long tascaId) throws Exception;
-	
+
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public List<Long> getTasquesComanda();
-	
+
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public String executeTascaComanda(Long tascaId) throws Exception;
-	
+
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public List<Long> getAvisosComanda();
 
@@ -326,4 +326,16 @@ public interface AplicacioService {
 
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public String executeEliminaConfigOrfe(String key) throws Exception;
+
+    @PreAuthorize("hasRole('IPA_ADMIN')")
+    public List<Long> getExpedientsAmbCertificatRemesa();
+
+    @PreAuthorize("hasRole('IPA_ADMIN')")
+    public String executeCertificatsRemesaExpedient(Long expedientId) throws Exception;
+
+    @PreAuthorize("hasRole('IPA_ADMIN')")
+    public List<Long> getExpedientsAmbJustificantRegistre();
+
+    @PreAuthorize("hasRole('IPA_ADMIN')")
+    public String executeJustificantsRegistreExpedient(Long peticioId) throws Exception;
 }

@@ -1635,6 +1635,7 @@ const translationEs = {
             detail: {
                 title: "Detalle del tipo de documento",
             },
+            reservat: "Los documentos reservados NOTIB_JUSTIFICANT_RECEPCIO y REGISTRE_JUSTIFICANT_ENTRADA solo pueden ser editados por un administrador.",
             tabs: {
                 dades: "Datos",
                 nti: "Datos NTI",

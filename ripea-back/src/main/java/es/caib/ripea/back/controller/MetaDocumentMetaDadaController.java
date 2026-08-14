@@ -76,8 +76,22 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 				}
 			}
 		}
+		bloquejarSiModificacioRestringida(request, metaDocument, model);
 
 		return "metaDadaList";
+	}
+
+	/**
+	 * Les metadades dels tipus de document creats per defecte a l'alta del procediment
+	 * només les pot mantenir un administrador d'entitat; per a la resta de rols la llista
+	 * i el formulari són de només consulta.
+	 */
+	private void bloquejarSiModificacioRestringida(HttpServletRequest request, MetaDocumentDto metaDocument, Model model) {
+		if (metaDocument != null && metaDocument.isModificacioRestringida() && !RolHelper.isRolActualAdministrador(request)) {
+			model.addAttribute("bloquejarCamps", true);
+			model.addAttribute("consultar", true);
+			model.addAttribute("metaDocumentReservat", true);
+		}
 	}
 
 	@RequestMapping(value = "/{metaDocumentId}/metaDada/datatable", method = RequestMethod.GET)
@@ -134,6 +148,7 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 				}
 			}
 		}
+		bloquejarSiModificacioRestringida(request, metaDocument, model);
 		List<HtmlOption> tipus = EnumHelper.getOptionsForEnum(MetaDadaTipusEnumDto.class, "meta.dada.tipus.enum.");
 		if (!aplicacioService.propertyBooleanFindByKey(PropertyConfig.DOMINIS_HABILITATS)) {
 			tipus.remove(new HtmlOption("DOMINI", null));

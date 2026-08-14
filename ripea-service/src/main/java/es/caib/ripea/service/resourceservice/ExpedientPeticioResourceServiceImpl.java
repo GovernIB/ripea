@@ -215,11 +215,11 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
         }
 
     	if (!mapaNamedQueries.isEmpty()) {
-    		
+
     		if (mapaNamedQueries.containsKey("ESTAT_PENDENT")) {
     			filters.add(FilterBuilder.equal(ExpedientPeticioResource.Fields.estat, ExpedientPeticioEstatEnumDto.PENDENT));
     		}
-    		
+
     		if (mapaNamedQueries.containsKey("LLISTAT_ANOTACIONS")) {
 
     			String organActualCodi	 = configHelper.getOrganActualCodi();
@@ -685,7 +685,9 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 											expedientId,
 											arxiuUuid,
 											expedientPeticioId,
-											Long.parseLong(entry.getValue()));
+											Long.parseLong(entry.getValue()),
+                                            null,
+                                            null);
 								}
 							}
 

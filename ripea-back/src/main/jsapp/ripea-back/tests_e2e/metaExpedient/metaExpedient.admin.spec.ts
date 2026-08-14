@@ -25,6 +25,9 @@ const DESC_MODIFICADA = 'descripció de prova per playwright react';
 const CODI_DOC1      = 'DOC_PW_REACT_01';
 const NOM_DOC1       = 'document tipus doc pw react 1';
 const CODI_DOC2      = 'DOC_PW_REACT_02';
+// Tot procediment nou es crea amb els tipus de document per defecte
+// NOTIB_JUSTIFICANT_RECEPCIO i REGISTRE_JUSTIFICANT_ENTRADA.
+const NUM_DOCS_DEFECTE = 2;
 const NOM_DOC1_MOD   = 'doc modificat pw react 1';
 const DESC_DOC1_MOD  = 'descripció modificada doc 1 react';
 
@@ -613,9 +616,9 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
         await anarASubPagina(page, 'metaDocument');
 
-        await test.step('verificar que la llista de documents està buida', async () => {
-            logInfo('  -> verificar que la llista de documents està buida');
-            await expect(getDocRows(page)).toHaveCount(0);
+        await test.step('verificar que la llista només té els documents per defecte', async () => {
+            logInfo('  -> verificar que la llista només té els documents per defecte');
+            await expect(getDocRows(page)).toHaveCount(NUM_DOCS_DEFECTE);
         });
 
         await test.step('crear el primer document', async () => {
@@ -628,9 +631,9 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             await crearDocument(page, CODI_DOC2, 'document tipus doc pw react 2');
         });
 
-        await test.step('verificar que hi ha dos documents', async () => {
-            logInfo('  -> verificar que hi ha dos documents');
-            await expect(getDocRows(page)).toHaveCount(2);
+        await test.step('verificar que hi ha dos documents (més els per defecte)', async () => {
+            logInfo('  -> verificar que hi ha dos documents (més els per defecte)');
+            await expect(getDocRows(page)).toHaveCount(NUM_DOCS_DEFECTE + 2);
         });
 
     });

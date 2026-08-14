@@ -33,7 +33,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			+ "and (:arxiuEstat is null OR d.arxiuEstat=:arxiuEstat) "
 			+ "order by data desc")
 	Page<DocumentEntity> findLastByUuid(@Param("arxiuEstat") ArxiuEstatEnumDto arxiuEstat, Pageable pageable);
-	
+
 	@Query(	"select d from DocumentEntity d where d.arxiuUuid is not null "
 			+ "and d.arxiuEstat = es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto.DEFINITIU "
 			+ "and lower(d.fitxerNom) like '%.pdf' and d.ntiCsv is not null "
@@ -47,7 +47,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 		Page<DocumentEntity> page = findLastWithCsv(LocalDateTime.now().minusHours(1), PageRequest.of(0, 1));
 		return page.hasContent() ? page.getContent().get(0) : null;
 	}
-	
+
 	@Query(	"select d from DocumentEntity d "
 			+ "where (lower(d.fitxerNom) like '%.pdf' or lower(d.fitxerNom) like '%.odt' or lower(d.fitxerNom) like '%.docx') "
 			+ "and d.createdDate <= :creacioMaxima "
@@ -60,7 +60,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 		Page<DocumentEntity> page = findLastWithCsv(LocalDateTime.now().minusHours(1), PageRequest.of(0, 1));
 		return page.hasContent() ? page.getContent().get(0) : null;
 	}
-	
+
 	@Query(	"select d from DocumentEntity d where d.arxiuUuid is not null "
 			+ "and d.fitxerContentType in (:fitxerContentTypes) "
 			+ "and (:arxiuEstat is null OR d.arxiuEstat=:arxiuEstat) "
@@ -69,7 +69,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("fitxerContentTypes") List<String> fitxerContentTypes,
 			@Param("arxiuEstat") ArxiuEstatEnumDto arxiuEstat,
 			Pageable pageable);
-	
+
 	List<DocumentEntity> findByExpedientAndEstatAndEsborrat(
 			ExpedientEntity expedient,
 			DocumentEstatEnumDto estat,
@@ -79,13 +79,13 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			ExpedientEntity expedient,
 			DocumentEstatEnumDto[] estat,
 			int esborrat);
-	
+
 	int countByExpedient(ExpedientEntity expedient);
 
 	int countByExpedientAndEstat(
 			ExpedientEntity expedient,
 			DocumentEstatEnumDto estat);
-	
+
 	@Query(	"select " +
 			"    d.expedient.id " +
 			"from " +
@@ -94,7 +94,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"    d.id = :documentId ")
 	Long findExpedientId(
 			@Param("documentId") Long documentId);
-	
+
 	@Query(	"select " +
 			"    c " +
 			"from " +
@@ -107,7 +107,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("expedient") ExpedientEntity expedient,
 			@Param("esborrat") int esborrat,
 			Sort sort);
-	
+
 	@Query(	"select " +
 			"    c " +
 			"from " +
@@ -133,7 +133,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("carpeta") CarpetaEntity carpeta,
 			@Param("esborrat") int esborrat,
 			Sort sort);
-	
+
 	@Query(	"select " +
 			"    c " +
 			"from " +
@@ -146,7 +146,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("carpeta") CarpetaEntity carpeta,
 			@Param("esborrat") int esborrat,
 			Sort sort);
-	
+
 	@Query(	" SELECT " +
 			"    count(d) " +
 			" FROM " +
@@ -157,8 +157,8 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 	long countByExpedientAndNotificacionsNotificacioEstatIn(
 			@Param("expedient") ExpedientEntity expedient,
 			@Param("estat") DocumentNotificacioEstatEnumDto[] estats);
-	
-	
+
+
 	@Query( "select   " +
 			"    new es.caib.ripea.persistence.aggregation.MetaExpedientCountAggregation( " +
 			"	     e.metaExpedient, " +
@@ -178,7 +178,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"    DocumentEntity c " +
 			"where " +
 			"    c.entitat = :entitat " +
-			"and c.expedient = :expedient "  + 
+			"and c.expedient = :expedient "  +
 			"and c.documentTipus != 2 " +
 			"and c.esborrat = 0 " +
 			"and c.id != :documentId ")
@@ -188,7 +188,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("documentId") Long documentId);
 
 	List<DocumentEntity> findByExpedientAndEsborrat(ExpedientEntity expedient, int esborrat);
-	
+
 	@Query(	"select " +
 			"    d.id " +
 			"from " +
@@ -197,21 +197,21 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"d.expedient.id = :expedientId " +
 			"and d.esborrat = :esborrat ")
 	List<Long> findIdByExpedientIdAndEsborrat(@Param("expedientId") Long expedientId, @Param("esborrat") int esborrat);
-	
+
 	List<DocumentEntity> findByExpedient(ExpedientEntity expedient);
-	
+
 	@Query(	"select " +
 			"    d " +
 			"from " +
 			"    DocumentEntity d " +
 			"where " +
-			"	 d.expedient = :expedient "  + 
+			"	 d.expedient = :expedient "  +
 			"and d.esborrat = 0 " +
 			"and d.arxiuEstat = :arxiuEstat ")
 	List<DocumentEntity> findByExpedientAndArxiuEstat(
 			@Param("expedient") ExpedientEntity expedient,
 			@Param("arxiuEstat") ArxiuEstatEnumDto arxiuEstat);
-	
+
 	@Query(	"select " +
 			"    d " +
 			"from " +
@@ -220,30 +220,30 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"    d.expedient.id = :expedientId " )
 	List<DocumentEntity> findByExpedientId(
 			@Param("expedientId") Long expedientId);
-	
+
 	@Query(	"select " +
 			"    d " +
 			"from " +
 			"    DocumentEntity d " +
 			"where " +
-			"    d.expedient.id = :expedientId " + 
+			"    d.expedient.id = :expedientId " +
 			"and d.esborrat != 0 ")
 	List<DocumentEntity> findDeleted(
 			@Param("expedientId") Long expedientId);
-	
-	
+
+
 	@Query(	"select " +
 			"    d.id " +
 			"from " +
 			"    DocumentEntity d " +
 			"where " +
-			"	 d.expedient = :expedient "  + 
+			"	 d.expedient = :expedient "  +
 			"and d.esborrat = 0 " +
-			"and d.arxiuEstat = es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto.ESBORRANY " + 
+			"and d.arxiuEstat = es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto.ESBORRANY " +
 			"and d.documentFirmaTipus != es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto.SENSE_FIRMA ")
 	List<Long> findPendentsDeMarcarComADefinitius(
 			@Param("expedient") ExpedientEntity expedient);
-	
+
 	@Query(	"select " +
 			"    c " +
 			"from " +
@@ -256,8 +256,8 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"	or c.estat = es.caib.ripea.service.intf.dto.DocumentEstatEnumDto.FIRMA_PARCIAL)")
 	List<DocumentEntity> findEnProccessDeFirma(
 			@Param("expedient") ExpedientEntity expedient);
-	
-	
+
+
 	@Query(	"select " +
 			"    d " +
 			"from " +
@@ -268,9 +268,9 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"and d.gesDocFirmatId is not null")
 	List<DocumentEntity> findDocumentsDePortafirmesNoCustodiats(
 			@Param("expedient") ExpedientEntity expedient);
-	
-	
-	
+
+
+
 	@Query(	"select " +
 			"    d " +
 			"from " +
@@ -283,24 +283,24 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 	List<DocumentEntity> findDocumentsPendentsReintentsArxiu(
 			@Param("expedient") ExpedientEntity expedient,
 			@Param("arxiuMaxReintentsDocuments") int arxiuMaxReintentsDocuments);
-	
-	
+
+
 	@Query(	"select case when (count(c) > 0) then true else false end " +
 			"from " +
 			"    DocumentEntity c " +
 			"where " +
-			"    c.expedient = :expedient "  + 
+			"    c.expedient = :expedient "  +
 			"and c.documentTipus = 0 " + //= DIGITAL
 			"and c.esborrat = 0 " +
 			"and c.estat = 0 ")
 	Boolean hasFillsEsborranys(@Param("expedient") ExpedientEntity expedient);
-	
-	
+
+
 	@Query(	"select case when (count(c) = 0) then true else false end " +
 			"from " +
 			"    DocumentEntity c " +
 			"where " +
-			"    c.expedient = :expedient "  + 
+			"    c.expedient = :expedient "  +
 			"and c.documentTipus = 0 " + //= DIGITAL
 			"and c.esborrat = 0 " +
 			"and (c.estat = 0 or c.estat = 1 " + //!= REDACCIO || != FIRMA_PENDENT
@@ -312,19 +312,19 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"from " +
 			"    DocumentEntity c " +
 			"where " +
-			"    c.expedient = :expedient "  + 
+			"    c.expedient = :expedient "  +
 			"and (c.documentTipus = 0 or c.documentTipus = 3)" + //= DIGITAL || = IMPORTAT
 			"and c.esborrat = 0 " +
 			"and (c.estat = 3 or c.estat = 5) ") //= CUSTODIAT || = DEFINITIU
 	Boolean hasAnyDocumentDefinitiu(@Param("expedient") ExpedientEntity expedient);
-	
+
 	List<DocumentEntity> findByEntitat(EntitatEntity entitat);
-	
+
 	List<DocumentEntity> findByExpedientAndMetaNodeAndEsborrat(
 			ExpedientEntity expedient,
 			MetaNodeEntity metaNode,
 			int esborrat);
-	
+
 	List<DocumentEntity> findByExpedientAndExpedientEstatAdditionalAndEsborrat(
 			ExpedientEntity expedient,
 			ExpedientEstatEntity expedientEstatAdditional,
@@ -367,8 +367,8 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 	public Page<DocumentEntity> findDocumentMassiuByIdsPaginat(
 			@Param("ids") List<Long> ids,
 			Pageable pageable);
-	
-	
+
+
 	@Query(	"select " +
 			"    d " +
 			"from " +
@@ -386,7 +386,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"and (:esNullNom = true or lower(d.nom) like lower('%'||:nom||'%')) " +
 			"and (:esNullDataInici = true or d.createdDate >= :dataInici) " +
 			"and (:esNullDataFi = true or d.createdDate <= :dataFi) " +
-			"and (d.metaNode.id in " + 
+			"and (d.metaNode.id in " +
 			"			(select metaDocument.id from MetaDocumentEntity metaDocument " +
 			"				where metaDocument.firmaPortafirmesActiva = true))" )
 //			"				and (metaDocument.portafirmesFluxTipus = 'PORTAFIB' and metaDocument.portafirmesFluxId != null)" +
@@ -395,7 +395,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
-			@Param("metaExpedient") MetaNodeEntity metaExpedient,	
+			@Param("metaExpedient") MetaNodeEntity metaExpedient,
 			@Param("esNullExpedient") boolean esNullExpedient,
 			@Param("expedient") ExpedientEntity expedient,
 			@Param("esNullMetaDocument") boolean esNullMetaDocument,
@@ -407,7 +407,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("esNullDataFi") boolean esNullDataFi,
 			@Param("dataFi") LocalDateTime dataFi,
 			Pageable pageable);
-	
+
 	@Query(	"select " +
 			"    d.id " +
 			"from " +
@@ -415,7 +415,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"where " +
 			"    d.entitat = :entitat " +
 			"and (d.expedient.metaNode in (:metaExpedientsPermesos)) " +
-			"and d.estat = 0 "  + 
+			"and d.estat = 0 "  +
 			"and d.esborrat = 0 " +
 			"and d.gesDocAdjuntId is null " +
 			"and d.documentTipus != 1 and d.documentTipus != 2 and d.documentTipus != 3 " +
@@ -425,7 +425,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"and (:esNullNom = true or lower(d.nom) like lower('%'||:nom||'%')) " +
 			"and (:esNullDataInici = true or d.createdDate >= :dataInici) " +
 			"and (:esNullDataFi = true or d.createdDate <= :dataFi) " +
-			"and (d.metaNode.id in " + 
+			"and (d.metaNode.id in " +
 			"			(select metaDocument.id from MetaDocumentEntity metaDocument " +
 			"				where metaDocument.firmaPortafirmesActiva = true))" )
 //			"				and (metaDocument.portafirmesFluxTipus = 'PORTAFIB' and metaDocument.portafirmesFluxId != null)" +
@@ -434,7 +434,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
-			@Param("metaExpedient") MetaNodeEntity metaExpedient,	
+			@Param("metaExpedient") MetaNodeEntity metaExpedient,
 			@Param("esNullExpedient") boolean esNullExpedient,
 			@Param("expedient") ExpedientEntity expedient,
 			@Param("esNullMetaDocument") boolean esNullMetaDocument,
@@ -445,7 +445,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("dataInici") LocalDateTime dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
 			@Param("dataFi") LocalDateTime dataFi);
-	
+
 	@Query(	"select " +
 			"    d " +
 			"from " +
@@ -454,14 +454,14 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"    d.entitat = :entitat " +
 			"and (d.expedient.metaNode in (:metaExpedientsPermesos)) " +
 			"and d.esborrat = 0 " +
-			"and (d.metaNode.id in " + 
+			"and (d.metaNode.id in " +
 			"			(select metaDocument.id from MetaDocumentEntity metaDocument " +
 			"				where metaDocument.firmaPassarelaActiva = true))"  +
-			"and d.estat = 0 " +	
+			"and d.estat = 0 " +
 			"and d.documentTipus = 0 " +
 			"and d.fitxerNom not like '%.zip' " +
 			"and d.gesDocAdjuntId is null " +
-			"and (:esNullMetaExpedient = true or d.expedient.metaNode = :metaExpedient) " +	
+			"and (:esNullMetaExpedient = true or d.expedient.metaNode = :metaExpedient) " +
 			"and (:esNullExpedient = true or d.expedient = :expedient) " +
 			"and (:esNullMetaDocument = true or d.metaNode = :metaDocument) " +
 			"and (:esNullNom = true or lower(d.nom) like lower('%'||:nom||'%')) " +
@@ -471,7 +471,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
-			@Param("metaExpedient") MetaNodeEntity metaExpedient,	
+			@Param("metaExpedient") MetaNodeEntity metaExpedient,
 			@Param("esNullExpedient") boolean esNullExpedient,
 			@Param("expedient") ExpedientEntity expedient,
 			@Param("esNullMetaDocument") boolean esNullMetaDocument,
@@ -483,8 +483,8 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("esNullDataFi") boolean esNullDataFi,
 			@Param("dataFi") LocalDateTime dataFi,
 			Pageable pageable);
-	
-	
+
+
 	@Query(	"select " +
 			"    d.id " +
 			"from " +
@@ -493,14 +493,14 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"    d.entitat = :entitat " +
 			"and (d.expedient.metaNode in (:metaExpedientsPermesos)) " +
 			"and d.esborrat = 0 " +
-			"and (d.metaNode.id in " + 
+			"and (d.metaNode.id in " +
 			"			(select metaDocument.id from MetaDocumentEntity metaDocument " +
 			"				where metaDocument.firmaPassarelaActiva = true))"  +
-			"and d.estat = 0 " +	
+			"and d.estat = 0 " +
 			"and d.documentTipus = 0 " +
 			"and d.fitxerNom not like '%.zip' " +
 			"and d.gesDocAdjuntId is null " +
-			"and (:esNullMetaExpedient = true or d.expedient.metaNode = :metaExpedient) " +	
+			"and (:esNullMetaExpedient = true or d.expedient.metaNode = :metaExpedient) " +
 			"and (:esNullExpedient = true or d.expedient = :expedient) " +
 			"and (:esNullMetaDocument = true or d.metaNode = :metaDocument) " +
 			"and (:esNullNom = true or lower(d.nom) like lower('%'||:nom||'%')) " +
@@ -510,7 +510,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
-			@Param("metaExpedient") MetaNodeEntity metaExpedient,	
+			@Param("metaExpedient") MetaNodeEntity metaExpedient,
 			@Param("esNullExpedient") boolean esNullExpedient,
 			@Param("expedient") ExpedientEntity expedient,
 			@Param("esNullMetaDocument") boolean esNullMetaDocument,
@@ -521,7 +521,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("dataInici") LocalDateTime dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
 			@Param("dataFi") LocalDateTime dataFi);
-	
+
 	@Query(	"select " +
 			"    d " +
 			"from " +
@@ -544,7 +544,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
-			@Param("metaExpedient") MetaNodeEntity metaExpedient,	
+			@Param("metaExpedient") MetaNodeEntity metaExpedient,
 			@Param("esNullExpedient") boolean esNullExpedient,
 			@Param("expedient") ExpedientEntity expedient,
 			@Param("esNullMetaDocument") boolean esNullMetaDocument,
@@ -556,16 +556,16 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("esNullDataFi") boolean esNullDataFi,
 			@Param("dataFi") LocalDateTime dataFi,
 			Pageable pageable);
-	
 
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
 	@Query(	"select " +
 			"    d " +
 			"from " +
@@ -573,8 +573,8 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"where " +
 			"    d.entitat = :entitat " +
 			"and (d.expedient.metaNode in (:metaExpedientsPermesos)) " +
-			"and ((d.estat = 1 or d.estat = 2) or ((d.estat = 0 or d.estat = 7) and d.gesDocAdjuntId!=null)) "  + 
-			"and d.esborrat = 0 " + 
+			"and ((d.estat = 1 or d.estat = 2) or ((d.estat = 0 or d.estat = 7) and d.gesDocAdjuntId!=null)) "  +
+			"and d.esborrat = 0 " +
 			"and d.documentTipus = 0 " +
 			"and (:nomesAgafats = false or d.expedient.agafatPer.codi = :usuariActual) " +
 			"and (:esNullMetaExpedient = true or d.expedient.metaNode = :metaExpedient) " +
@@ -583,7 +583,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"and (:esNullNom = true or lower(d.nom) like lower('%'||:nom||'%')) " +
 			"and (:esNullDataInici = true or d.createdDate >= :dataInici) " +
 			"and (:esNullDataFi = true or d.createdDate <= :dataFi) " +
-			"and (d.id in " + 
+			"and (d.id in " +
 			"			(select docPortafirmes.document.id from DocumentPortafirmesEntity docPortafirmes " +
 			"				where (docPortafirmes.id, docPortafirmes.createdDate) in (select docPortaf.id, max(docPortaf.createdDate) from DocumentPortafirmesEntity docPortaf group by docPortaf.id) " +
 			"				and docPortafirmes.estat = 'ENVIAT' " +
@@ -594,7 +594,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("nomesAgafats") boolean nomesAgafats,
 			@Param("usuariActual") String usuariActual,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
-			@Param("metaExpedient") MetaNodeEntity metaExpedient,	
+			@Param("metaExpedient") MetaNodeEntity metaExpedient,
 			@Param("esNullExpedientNom") boolean esNullExpedientNom,
 			@Param("expedientNom") String expedientNom,
 			@Param("esNullMetaDocument") boolean esNullMetaDocument,
@@ -606,8 +606,8 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("esNullDataFi") boolean esNullDataFi,
 			@Param("dataFi") LocalDateTime dataFi,
 			Pageable pageable);
-	
-	
+
+
 	@Query(	"select " +
 			"    d.id " +
 			"from " +
@@ -615,8 +615,8 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"where " +
 			"    d.entitat = :entitat " +
 			"and (d.expedient.metaNode in (:metaExpedientsPermesos)) " +
-			"and (d.estat = 1 or d.estat = 2) "  + 
-			"and d.esborrat = 0 " + 
+			"and (d.estat = 1 or d.estat = 2) "  +
+			"and d.esborrat = 0 " +
 			"and d.documentTipus = 0 " +
 			"and (:nomesAgafats = false or d.expedient.agafatPer.codi = :usuariActual) " +
 			"and (:esNullMetaExpedient = true or d.expedient.metaNode = :metaExpedient) " +
@@ -625,7 +625,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"and (:esNullNom = true or lower(d.nom) like lower('%'||:nom||'%')) " +
 			"and (:esNullDataInici = true or d.createdDate >= :dataInici) " +
 			"and (:esNullDataFi = true or d.createdDate <= :dataFi) " +
-			"and (d.id in " + 
+			"and (d.id in " +
 			"			(select docPortafirmes.document.id from DocumentPortafirmesEntity docPortafirmes " +
 			"				where (docPortafirmes.id, docPortafirmes.createdDate) in (select docPortaf.id, max(docPortaf.createdDate) from DocumentPortafirmesEntity docPortaf group by docPortaf.id) " +
 			"				and docPortafirmes.estat = 'ENVIAT' " +
@@ -636,7 +636,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("nomesAgafats") boolean nomesAgafats,
 			@Param("usuariActual") String usuariActual,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
-			@Param("metaExpedient") MetaNodeEntity metaExpedient,	
+			@Param("metaExpedient") MetaNodeEntity metaExpedient,
 			@Param("esNullExpedient") boolean esNullExpedient,
 			@Param("expedient") ExpedientEntity expedient,
 			@Param("esNullMetaDocument") boolean esNullMetaDocument,
@@ -647,9 +647,9 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("dataInici") LocalDateTime dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
 			@Param("dataFi") LocalDateTime dataFi);
-	
+
 	public List<DocumentEntity> findByArxiuUuidAndEsborrat(String arxiuUuid, int esborrat);
-	
+
 	public List<DocumentEntity> findByPareAndEsborrat(
 			ContingutEntity pare,
 			int esborrat);
@@ -659,12 +659,12 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"from " +
 			"    DocumentEntity d inner join d.contingut c1 " + // d.contingut c1 is used in ordenacioMap
 			"    inner join d.expedient e " +
-			"	 left join d.annexos a " + 
+			"	 left join d.annexos a " +
 			"where " +
 			"	 c1.esborrat = 0 " +
 			"and (c1.arxiuUuid = null " + //documents uploaded manually in ripea that were not saved in arxiu
 			"	  or a.error is not null " + //documents from distribucio that were not moved in arxiu to ripea expedient
-			"	  or d.gesDocFirmatId is not null) " + // documents signed in portafirmes that arrived in callback and were not saved in arxiu 		
+			"	  or d.gesDocFirmatId is not null) " + // documents signed in portafirmes that arrived in callback and were not saved in arxiu
 			"and d.entitat = :entitat " +
 			"and e.esborrat = 0 " +
 			"and e.estat = es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto.OBERT " +
@@ -683,7 +683,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("esNullNom") boolean esNullNom,
 			@Param("nom") String nom,
 			@Param("esNullExpedient") boolean esNullExpedient,
-			@Param("expedient") ExpedientEntity expedient,			
+			@Param("expedient") ExpedientEntity expedient,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
 			@Param("esNullCreacioInici") boolean esNullCreacioInici,
@@ -691,18 +691,18 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("esNullCreacioFi") boolean esNullCreacioFi,
 			@Param("creacioFi") LocalDateTime creacioFi,
 			Pageable pageable);
-	
+
 	@Query(	"select " +
 			"    d.id " +
 			"from " +
 			"    DocumentEntity d inner join d.contingut c1 " + // d.contingut c1 is used in ordenacioMap
 			"    inner join d.expedient e " +
-			"	 left join d.annexos a " + 
+			"	 left join d.annexos a " +
 			"where " +
 			"	 c1.esborrat = 0 " +
 			"and (c1.arxiuUuid = null " + //documents uploaded manually in ripea that were not saved in arxiu
 			"	  or a.error is not null " + //documents from distribucio that were not moved in arxiu to ripea expedient
-			"	  or d.gesDocFirmatId is not null) " + // documents signed in portafirmes that arrived in callback and were not saved in arxiu 		
+			"	  or d.gesDocFirmatId is not null) " + // documents signed in portafirmes that arrived in callback and were not saved in arxiu
 			"and d.entitat = :entitat " +
 			"and e.esborrat = 0 " +
 			"and e.estat = es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto.OBERT " +
@@ -721,26 +721,28 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("esNullNom") boolean esNullNom,
 			@Param("nom") String nom,
 			@Param("esNullExpedient") boolean esNullExpedient,
-			@Param("expedient") ExpedientEntity expedient,			
+			@Param("expedient") ExpedientEntity expedient,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
 			@Param("esNullCreacioInici") boolean esNullCreacioInici,
 			@Param("creacioInici") LocalDateTime creacioInici,
 			@Param("esNullCreacioFi") boolean esNullCreacioFi,
 			@Param("creacioFi") LocalDateTime creacioFi);
-	
-    @Query("select case when count(c) > 0 then true else false end " + 
+
+    @Query("select case when count(c) > 0 then true else false end " +
     		"from DocumentEntity d " +
     		"join d.contingut c " +
             "where c.expedient = :expedient " +
             "and d.arxiuEstat = es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto.DEFINITIU")
     Boolean expedientHasDocumentsDefinitius(@Param("expedient") ExpedientEntity expedient);
-    
-    @Query("select case when count(c) > 0 then true else false end " + 
+
+    @Query("select case when count(c) > 0 then true else false end " +
     		"from DocumentEntity d " +
     		"join d.contingut c " +
             "where c.pare = :carpeta " +
             "and d.arxiuEstat = es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto.DEFINITIU")
     Boolean carpetaHasDocumentsDefinitius(@Param("carpeta") CarpetaEntity carpeta);
+
+    boolean existsByExpedientIdAndFitxerNom(Long expedientId, String fitxerNom);
 
 }

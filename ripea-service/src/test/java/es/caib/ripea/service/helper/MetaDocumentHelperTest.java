@@ -1,8 +1,10 @@
 package es.caib.ripea.service.helper;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -47,14 +49,19 @@ import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientTascaValidacioRepository;
 import es.caib.ripea.persistence.repository.PinbalServeiRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
+import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ItemValidacioTascaEnum;
 import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
+import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentPerDefecteEnumDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
+import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
 import es.caib.ripea.service.intf.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.service.intf.exception.ExisteixenDocumentsException;
+import es.caib.ripea.service.intf.exception.PermissionDeniedException;
 
 /**
  * Tests unitaris per a MetaDocumentHelper.
@@ -85,6 +92,7 @@ class MetaDocumentHelperTest {
     @Mock private UsuariRepository usuariRepository;
     @Mock private ContingutLogHelper contingutLogHelper;
     @Mock private ValidacioCacheEvictHelper validacioCacheEvictHelper;
+    @Mock private ConfigHelper configHelper;
 
     @InjectMocks
     private MetaDocumentHelper helper;
@@ -716,6 +724,175 @@ class MetaDocumentHelperTest {
         when(metaDocumentRepository.findByMetaExpedientAndCodi(metaExpedient, "INEXISTENT")).thenReturn(null);
 
         assertThat(helper.findByCodiAndProcediment(metaExpedient, "INEXISTENT")).isNull();
+    }
+
+    // =========================================================================
+    // crearMetaDocumentsPerDefecte
+    // =========================================================================
+
+    @Test
+    void crearMetaDocumentsPerDefecte_procedimentSenseTipusDocument_creaElsDos() {
+        MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
+        when(metaExpedient.getId()).thenReturn(META_EXPEDIENT_ID);
+        when(metaDocumentRepository.findByMetaExpedientAndCodi(any(), any())).thenReturn(null);
+        when(metaDocumentRepository.countByMetaExpedient(metaExpedient)).thenReturn(0, 1);
+        when(metaDocumentRepository.save(any(MetaDocumentEntity.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        List<MetaDocumentEntity> creats = helper.crearMetaDocumentsPerDefecte(metaExpedient);
+
+        assertThat(creats).hasSize(2);
+
+        MetaDocumentEntity justificantRecepcio = creats.get(0);
+        assertThat(justificantRecepcio.getCodi()).isEqualTo(MetaDocumentPerDefecteEnumDto.NOTIB_JUSTIFICANT_RECEPCIO.getCodi());
+        assertThat(justificantRecepcio.getNom()).isEqualTo("Justificant de recepció de la notificació");
+        assertThat(justificantRecepcio.getNtiTipoDocumental()).isEqualTo("TD09");
+        assertThat(justificantRecepcio.getOrdre()).isZero();
+
+        MetaDocumentEntity justificantEntrada = creats.get(1);
+        assertThat(justificantEntrada.getCodi()).isEqualTo(MetaDocumentPerDefecteEnumDto.REGISTRE_JUSTIFICANT_ENTRADA.getCodi());
+        assertThat(justificantEntrada.getNom()).isEqualTo("Justificant de registre");
+        assertThat(justificantEntrada.getNtiTipoDocumental()).isEqualTo("TD11");
+        assertThat(justificantEntrada.getOrdre()).isEqualTo(1);
+
+        assertThat(creats).allSatisfy(metaDocument -> {
+            assertThat(metaDocument.getMultiplicitat()).isEqualTo(MultiplicitatEnumDto.M_0_N);
+            assertThat(metaDocument.getNtiOrigen()).isEqualTo(NtiOrigenEnumDto.O1);
+            assertThat(metaDocument.getNtiEstadoElaboracion()).isEqualTo(DocumentNtiEstadoElaboracionEnumDto.EE01);
+            assertThat(metaDocument.getMetaDocumentTipusGeneric()).isNull();
+            assertThat(metaDocument.getMetaExpedient()).isSameAs(metaExpedient);
+        });
+    }
+
+    @Test
+    void crearMetaDocumentsPerDefecte_quanJaExisteixen_noEnCreaCapDeNou() {
+        MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
+        when(metaExpedient.getId()).thenReturn(META_EXPEDIENT_ID);
+        when(metaDocumentRepository.findByMetaExpedientAndCodi(any(), any()))
+                .thenReturn(mock(MetaDocumentEntity.class));
+
+        List<MetaDocumentEntity> creats = helper.crearMetaDocumentsPerDefecte(metaExpedient);
+
+        assertThat(creats).isEmpty();
+        verify(metaDocumentRepository, never()).save(any(MetaDocumentEntity.class));
+    }
+
+    @Test
+    void crearMetaDocumentsPerDefecte_quanNomesNhiHaUn_creaNomesElQueFalta() {
+        MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
+        when(metaExpedient.getId()).thenReturn(META_EXPEDIENT_ID);
+        when(metaDocumentRepository.findByMetaExpedientAndCodi(
+                metaExpedient, MetaDocumentPerDefecteEnumDto.NOTIB_JUSTIFICANT_RECEPCIO.getCodi()))
+                .thenReturn(mock(MetaDocumentEntity.class));
+        when(metaDocumentRepository.findByMetaExpedientAndCodi(
+                metaExpedient, MetaDocumentPerDefecteEnumDto.REGISTRE_JUSTIFICANT_ENTRADA.getCodi()))
+                .thenReturn(null);
+        when(metaDocumentRepository.countByMetaExpedient(metaExpedient)).thenReturn(3);
+        when(metaDocumentRepository.save(any(MetaDocumentEntity.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        List<MetaDocumentEntity> creats = helper.crearMetaDocumentsPerDefecte(metaExpedient);
+
+        assertThat(creats).hasSize(1);
+        assertThat(creats.get(0).getCodi()).isEqualTo(MetaDocumentPerDefecteEnumDto.REGISTRE_JUSTIFICANT_ENTRADA.getCodi());
+        assertThat(creats.get(0).getOrdre()).isEqualTo(3);
+        verify(metaDocumentRepository).save(any(MetaDocumentEntity.class));
+    }
+
+    // =========================================================================
+    // Restricció de modificació dels tipus de document per defecte
+    // =========================================================================
+
+    private MetaDocumentEntity mockMetaDocument(String codi) {
+        MetaDocumentEntity metaDocument = mock(MetaDocumentEntity.class);
+        when(metaDocument.getId()).thenReturn(META_DOCUMENT_ID);
+        when(metaDocument.getCodi()).thenReturn(codi);
+        when(metaDocumentRepository.findById(META_DOCUMENT_ID)).thenReturn(Optional.of(metaDocument));
+        return metaDocument;
+    }
+
+    // Reordenar no és una modificació restringida: només canvia l'ordre de presentació.
+    @Test
+    void moveTo_metaDocumentPerDefecteISenseRolAdminEntitat_permetElCanvi() {
+        MetaDocumentEntity metaDocument =
+                mockMetaDocument(MetaDocumentPerDefecteEnumDto.NOTIB_JUSTIFICANT_RECEPCIO.getCodi());
+        when(configHelper.getRolActual()).thenReturn(BaseConfig.ROLE_ORGAN_ADMIN);
+        when(metaDocumentRepository.findByMetaExpedientOrderByOrdreAsc(any()))
+                .thenReturn(new ArrayList<>(Arrays.asList(metaDocument)));
+
+        helper.moveTo(META_DOCUMENT_ID, 0);
+
+        verify(metaDocument).updateOrdre(0);
+    }
+
+    @Test
+    void delete_metaDocumentPerDefecteISenseRolAdminEntitat_llancaPermissionDenied() {
+        mockMetaDocument(MetaDocumentPerDefecteEnumDto.NOTIB_JUSTIFICANT_RECEPCIO.getCodi());
+        when(entityComprovarHelper.comprovarEntitat(ENTITAT_ID, false, false, false, false, true))
+                .thenReturn(mock(EntitatEntity.class));
+        when(configHelper.getRolActual()).thenReturn(BaseConfig.ROLE_DISSENY);
+
+        assertThatThrownBy(() -> helper.delete(
+                ENTITAT_ID, null, META_DOCUMENT_ID, BaseConfig.ROLE_DISSENY, ORGAN_ID))
+                .isInstanceOf(PermissionDeniedException.class);
+
+        verify(metaDocumentRepository, never()).delete(any(MetaDocumentEntity.class));
+    }
+
+    @Test
+    void updateActiu_metaDocumentPerDefecteISenseRolAdminEntitat_llancaPermissionDenied() {
+        MetaDocumentEntity metaDocument =
+                mockMetaDocument(MetaDocumentPerDefecteEnumDto.REGISTRE_JUSTIFICANT_ENTRADA.getCodi());
+        when(entityComprovarHelper.comprovarEntitat(ENTITAT_ID, false, false, false, false, true))
+                .thenReturn(mock(EntitatEntity.class));
+        when(configHelper.getRolActual()).thenReturn(BaseConfig.ROLE_ORGAN_ADMIN);
+
+        assertThatThrownBy(() -> helper.updateActiu(
+                ENTITAT_ID, null, META_DOCUMENT_ID, false, BaseConfig.ROLE_ORGAN_ADMIN))
+                .isInstanceOf(PermissionDeniedException.class);
+
+        verify(metaDocument, never()).updateActiu(anyBoolean());
+    }
+
+    // =========================================================================
+    // comprovarPermisModificacioMetaDades
+    // =========================================================================
+
+    @Test
+    void comprovarPermisModificacioMetaDades_metaDocumentPerDefecteISenseRolAdminEntitat_llancaPermissionDenied() {
+        MetaDocumentEntity metaDocument = mock(MetaDocumentEntity.class);
+        when(metaDocument.getCodi()).thenReturn(MetaDocumentPerDefecteEnumDto.NOTIB_JUSTIFICANT_RECEPCIO.getCodi());
+        when(configHelper.getRolActual()).thenReturn(BaseConfig.ROLE_DISSENY);
+
+        assertThatThrownBy(() -> helper.comprovarPermisModificacioMetaDades(metaDocument))
+                .isInstanceOf(PermissionDeniedException.class);
+    }
+
+    @Test
+    void comprovarPermisModificacioMetaDades_metaDocumentPerDefecteIRolAdminEntitat_noLlancaRes() {
+        MetaDocumentEntity metaDocument = mock(MetaDocumentEntity.class);
+        when(metaDocument.getCodi()).thenReturn(MetaDocumentPerDefecteEnumDto.REGISTRE_JUSTIFICANT_ENTRADA.getCodi());
+        when(configHelper.getRolActual()).thenReturn(BaseConfig.ROLE_ADMIN);
+
+        assertThatCode(() -> helper.comprovarPermisModificacioMetaDades(metaDocument)).doesNotThrowAnyException();
+    }
+
+    @Test
+    void comprovarPermisModificacioMetaDades_metaDocumentNormal_noLlancaRes() {
+        MetaDocumentEntity metaDocument = mock(MetaDocumentEntity.class);
+        when(metaDocument.getCodi()).thenReturn("DOC_QUALSEVOL");
+        when(configHelper.getRolActual()).thenReturn(BaseConfig.ROLE_DISSENY);
+
+        assertThatCode(() -> helper.comprovarPermisModificacioMetaDades(metaDocument)).doesNotThrowAnyException();
+    }
+
+    // Les metadades del procediment no tenen cap restricció addicional.
+    @Test
+    void comprovarPermisModificacioMetaDades_metaExpedient_noLlancaRes() {
+        MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
+        when(configHelper.getRolActual()).thenReturn(BaseConfig.ROLE_DISSENY);
+
+        assertThatCode(() -> helper.comprovarPermisModificacioMetaDades(metaExpedient)).doesNotThrowAnyException();
     }
 
     // =========================================================================

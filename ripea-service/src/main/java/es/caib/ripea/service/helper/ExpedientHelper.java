@@ -396,7 +396,7 @@ public class ExpedientHelper {
 
             // Crear automàticament les tasques actives del procediment
             tascaHelper.crearTasquesExpedient(expedient);
-			
+
 			// Les carpetes per defecte del procediment ja NO es creen aquí: cal fer-ho després
 			// de propagar l'expedient a l'Arxiu (crearCarpetesMetaExpedientNewTransaction), quan
 			// l'expedient ja disposa d'UUID. Si es fes ara, l'Arxiu rebutjaria l'agrupació
@@ -616,7 +616,7 @@ public class ExpedientHelper {
 			if (interessatDistribucio.getDocumentNumero() == null || accioARealitzar==null || InteressatAssociacioAccioEnum.NO_ASSOCIAR.equals(accioARealitzar)) {
 				continue;
 			}
-			
+
 			RegistreInteressatEntity representantDistribucio = interessatDistribucio.getRepresentant();
 			boolean hasRepresentantDistribucio = representantDistribucio != null;
 
@@ -1208,7 +1208,9 @@ public class ExpedientHelper {
 			Long expedientId,
 			String arxiuUuid,
 			Long expedientPeticioId,
-			Long justificantIdMetaDoc) {
+			Long justificantIdMetaDoc,
+            String nomDocument,
+            String titolDocument)  {
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedientId));
 		ExpedientEntity expedientEntity;
 		EntitatEntity entitat;
@@ -1261,7 +1263,7 @@ public class ExpedientHelper {
 
 		DocumentEntity docEntity = documentHelper.crearDocumentDB(
 				documentDto.getDocumentTipus(),
-				documentDto.getNom(),
+                titolDocument != null ? titolDocument : documentDto.getNom(),
 				documentDto.getDescripcio(),
 				documentDto.getData(),
 				documentDto.getDataCaptura(),
@@ -1280,7 +1282,7 @@ public class ExpedientHelper {
 				expedientEntity.getEstatAdditional());
 
 		FitxerDto fitxer = new FitxerDto(
-				documentDto.getFitxerNom(),
+                nomDocument != null ? nomDocument : documentDto.getFitxerNom(),
 				documentDto.getFitxerContentType(),
 				documentDto.getFitxerTamany());
 

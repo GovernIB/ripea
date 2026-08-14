@@ -104,7 +104,12 @@ const KanbanColumn = ({ icon, title, subcolumns, onCreate, onClick, activeId }: 
         <Box
             sx={{
                 p: 2,
-                bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'background.paper' : 'grey.100'),
+                // La columna ha de quedar un escaló per sota dels blocs d'estat (que van amb
+                // `background.paper`, igual que la card principal). Als temes foscos (obscur i
+                // dràcula) `background.paper` és el mateix color que la card, i per això s'hi
+                // fa servir `background.default`; al tema clar `background.default` és blanc i
+                // cal `grey.100`.
+                bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'background.default' : 'grey.100'),
                 borderRadius: 3,
                 height: '100%',
             }}
