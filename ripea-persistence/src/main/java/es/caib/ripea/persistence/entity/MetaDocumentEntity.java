@@ -88,7 +88,9 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	@Transient
 	private boolean leftPerCreacio;
 
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	// El servei PINBAL només s'informa si el tipus de document té PINBAL actiu: la columna
+	// és nullable a l'esquema i a MetaDocumentResourceEntity, per això optional = true.
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "pinbal_servei")
 	@ForeignKey(name = "PINBAL_SERVEI_FK")
 	private PinbalServeiEntity pinbalServei;

@@ -22,6 +22,7 @@ public class CertificatRemesaHelper {
     @Autowired private MetaDocumentRepository metaDocumentRepository;
     @Autowired private DocumentNotificacioHelper documentNotificacioHelper;
     @Autowired private DocumentHelper documentHelper;
+    @Autowired private ContingutHelper contingutHelper;
 
     /**
      * Incorpora com a documents de l'expedient tots els certificats pendents (un per interessat/destinatari) d'una notificació.
@@ -35,10 +36,12 @@ public class CertificatRemesaHelper {
 
 
         String nif = interessatEnviament.getInteressat() != null
-            ? interessatEnviament.getInteressat().getDocumentNum().replace("/", "_")
+            ? interessatEnviament.getInteressat().getDocumentNum()
             : null;
 
-        String nifPerNom = nif != null ? nif : "SENSE_NIF";
+        String nifPerNom = nif != null && !nif.trim().isEmpty()
+            ? nif.trim().replace("/", "_")
+            : "SENSE_NIF";
 
         String nomFitxer = nomFitxerCertificat(expedient.getId(), interessatEnviament.getId(), nifPerNom);
 
@@ -48,22 +51,29 @@ public class CertificatRemesaHelper {
             return 0;
         }
 
-        byte[] contingutCertificat = documentNotificacioHelper.getCertificacio(interessatEnviament.getId());
-        if (contingutCertificat == null) {
-            LOGGER.warn("No s'ha pogut descarregar el certificat de l'enviament {} (notificació {})",
-                interessatEnviament.getId(), interessatEnviament.getId());
-            return 0;
-        }
-
         MetaDocumentEntity metaDocument = metaDocumentRepository
             .findByMetaExpedientAndCodi(
                 expedient.getMetaExpedient(),
                 MetaDocumentPerDefecteEnumDto.NOTIB_JUSTIFICANT_RECEPCIO.getCodi());
 
+        if (metaDocument == null) {
+            throw new Exception("No s'ha trobat el MetaDocument per defecte NOTIB_JUSTIFICANT_RECEPCIO per al metaexpedient "
+                + expedient.getMetaExpedient().getId());
+        }
+
+        byte[] contingutCertificat = documentNotificacioHelper.getCertificacio(interessatEnviament.getId());
+        if (contingutCertificat == null) {
+            LOGGER.warn("No s'ha pogut descarregar el certificat de l'enviament {} (notificació {})",
+                interessatEnviament.getId(), interessatEnviament.getNotificacio().getId());
+            return 0;
+        }
+
         DocumentDto document = new DocumentDto();
         document.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
-        document.setNom("Justificant enviament notib destinatari " + nifPerNom);
-        document.setData(new Date());
+        document.setNom(nomUnicDinsExpedient(expedient, "Justificant enviament notib destinatari " + nifPerNom));
+        document.setData(interessatEnviament.getEnviamentCertificacioData() != null
+            ? interessatEnviament.getEnviamentCertificacioData()
+            : new Date());
         document.setNtiOrgano(expedient.getNtiOrgano());
         document.setNtiOrigen(metaDocument.getNtiOrigen());
         document.setNtiEstadoElaboracion(metaDocument.getNtiEstadoElaboracion());
@@ -91,6 +101,26 @@ public class CertificatRemesaHelper {
         LOGGER.info("Creat document de certificat {} per a l'expedient {}", nomFitxer, expedient.getId());
 
         return creats;
+    }
+
+    /**
+     * Retorna un nom de document lliure dins l'expedient. El nom del certificat només
+     * depèn del NIF del destinatari, així que un expedient amb diverses remeses al mateix
+     * interessat repetiria el nom i {@code documentHelper.crearDocument} llançaria
+     * ContingutNotUniqueException; en aquest cas s'hi afegeix un comptador.
+     */
+    private String nomUnicDinsExpedient(ExpedientEntity expedient, String nomBase) {
+        String nom = nomBase;
+        int comptador = 1;
+        while (contingutHelper.checkUniqueContraint(
+                nom,
+                expedient,
+                expedient.getEntitat(),
+                ContingutTipusEnumDto.DOCUMENT) > 0) {
+            comptador++;
+            nom = nomBase + " (" + comptador + ")";
+        }
+        return nom;
     }
 
     private String nomFitxerCertificat(Long expedientId, Long enviamentInteressatId, String nif) {

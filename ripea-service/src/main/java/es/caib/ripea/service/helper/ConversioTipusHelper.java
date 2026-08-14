@@ -1117,15 +1117,20 @@ public class ConversioTipusHelper {
 					if (source.getMetaExpedient() != null) {
 						tipusDocumental = tipusDocumentalRepository.findByCodiAndEntitat(source.getNtiTipoDocumental(), source.getMetaExpedient().getEntitat());
 					}  else {
-						tipusDocumental = tipusDocumentalRepository.findByCodi(source.getNtiTipoDocumental()).get(0);
+						List<TipusDocumentalEntity> tipusDocumentals = tipusDocumentalRepository.findByCodi(source.getNtiTipoDocumental());
+						tipusDocumental = tipusDocumentals != null && !tipusDocumentals.isEmpty() ? tipusDocumentals.get(0) : null;
 					}
-	            	
+
 //					target.setNtiTipoDocumental(tipusDocumental.getCodiEspecific() != null ? tipusDocumental.getCodiEspecific() : tipusDocumental.getCodi());
-	            	if (LocaleContextHolder.getLocale().toString().equals("ca") && Utils.isNotEmpty(tipusDocumental.getNomCatala())) {
-	            		target.setNtiTipoDocumentalNom(tipusDocumental.getNomCatala());
-					} else {
-						target.setNtiTipoDocumentalNom(tipusDocumental.getNomEspanyol());
-					}
+	            	// El tipus documental pot no estar donat d'alta a l'entitat (p.ex. entitats sense tipus
+	            	// documentals inicialitzats): en aquest cas es deixa el nom buit en lloc de fer petar la conversió.
+	            	if (tipusDocumental != null) {
+		            	if (LocaleContextHolder.getLocale().toString().equals("ca") && Utils.isNotEmpty(tipusDocumental.getNomCatala())) {
+		            		target.setNtiTipoDocumentalNom(tipusDocumental.getNomCatala());
+						} else {
+							target.setNtiTipoDocumentalNom(tipusDocumental.getNomEspanyol());
+						}
+	            	}
 	            	
 	            	if (source.getFluxosFirma()!=null) {
 	            		String[] arrayIds = new String[source.getFluxosFirma().size()];

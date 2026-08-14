@@ -89,7 +89,12 @@ public class TestDataFactory {
                 ).build()
         );
 
+        // Els tipus documentals reals es donen d'alta a partir de tiposDocumentales.json en crear l'entitat.
+        // Aquí només hi ha els que fan falta: TD01 pels meta-documents de test i TD09/TD11 pels
+        // meta-documents per defecte (NOTIB_JUSTIFICANT_RECEPCIO i REGISTRE_JUSTIFICANT_ENTRADA).
         tipusDocumentalRepository.save(TipusDocumentalEntity.getBuilder("TD01", "Resolución", data.entitat, "Resolució").build());
+        tipusDocumentalRepository.save(TipusDocumentalEntity.getBuilder("TD09", "Acuse de recibo", data.entitat, "Acusament de rebut").build());
+        tipusDocumentalRepository.save(TipusDocumentalEntity.getBuilder("TD11", "Certificado", data.entitat, "Certificat").build());
 
         // --- Usuaris de @WithMockUser (necessaris per a la conversió entitat→DTO) ---
         // ConversioTipusHelper cerca l'usuari per createdBy/lastModifiedBy. Si no existeix, llança NPE.

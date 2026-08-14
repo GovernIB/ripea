@@ -965,18 +965,18 @@ public class AplicacioServiceImpl implements AplicacioService {
 
     @Override
     @Transactional
-    public String executeCertificatsRemesaExpedient(Long enviamentId) throws Exception {
+    public String executeCertificatsRemesaExpedient(Long enviamentDestinatariId) throws Exception {
         try {
-            DocumentEnviamentInteressatEntity notificacio = documentEnviamentInteressatRepository.findById(enviamentId)
+            DocumentEnviamentInteressatEntity enviamentIntEntity = documentEnviamentInteressatRepository.findById(enviamentDestinatariId)
                 .orElseThrow(() -> new Exception("Notificació no trobada"));
 
-            int creats = certificatRemesaHelper.crearDocumentsCertificatNotificacio(notificacio);
+            int creats = certificatRemesaHelper.crearDocumentsCertificatNotificacio(enviamentIntEntity);
 
             return creats > 0
-                ? "Notificació " + enviamentId + ": " + creats + " certificat(s) afegit(s) al contingut de l'expedient " + notificacio.getNotificacio().getExpedient().getId() + "."
-                : "La notificació " + enviamentId + " no té certificats pendents d'incorporar.";
+                ? "Notificació " + enviamentDestinatariId + ": " + creats + " certificat(s) afegit(s) al contingut de l'expedient " + enviamentIntEntity.getNotificacio().getExpedient().getId() + "."
+                : "La notificació " + enviamentDestinatariId + " no té certificats pendents d'incorporar.";
         } catch (Exception ex) {
-            throw new Exception("Error al afegir els certificats de la enviament " + enviamentId + ": " + ex.getMessage());
+            throw new Exception("Error al afegir els certificats de la enviament " + enviamentDestinatariId + ": " + ex.getMessage());
         }
     }
 
@@ -991,25 +991,19 @@ public class AplicacioServiceImpl implements AplicacioService {
     }
 
     /**
-     * Executa la incorporació dels justificants de registre com a documents per a un expedient concret.
+     * Executa la incorporació del justificant de registre d'una anotació com a document del seu expedient.
      *
-     * @param peticioId Identificador de la petició a processar.
-     * @return Missatge explicatiu de la feina feta.
+     * @param anotacioRegistreId Identificador de l'anotació de registre a processar.
+     * @return Missatge explicatiu de la feina feta, el mateix que es registra al log.
      * @throws Exception Si es produeix qualsevol error en el procés.
      */
     @Override
     @Transactional
-    public String executeJustificantsRegistreExpedient(Long peticioId) throws Exception {
+    public String executeJustificantsRegistreExpedient(Long anotacioRegistreId) throws Exception {
         try {
-            int justificantsAfegits = registreJustificantHelper.incorporarJustificantsRegistreExpedient(peticioId);
-
-            if (justificantsAfegits > 0) {
-                return "Expedient " + peticioId + ": " + justificantsAfegits + " justificants de registre afegits al contingut.";
-            } else {
-                return "L'expedient " + peticioId + " no té justificants pendents d'incorporar.";
-            }
+            return registreJustificantHelper.incorporarJustificantsRegistreExpedient(anotacioRegistreId);
         } catch (Exception ex) {
-            throw new Exception("Error al afegir els justificants de registre de l'expedient " + peticioId + ": " + ex.getMessage());
+            throw new Exception("Error al afegir el justificant de registre de l'anotació " + anotacioRegistreId + ": " + ex.getMessage());
         }
     }
 }

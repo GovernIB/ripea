@@ -343,14 +343,14 @@ public class AjaxUserController extends BaseUserController {
         return aplicacioService.getExpedientsAmbCertificatRemesa();
     }
 
-    @RequestMapping(value = "/executeCertificatsRemesaExpedient/{notificacioId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/executeCertificatsRemesaExpedient/{enviamentInteressatId}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<String> executeCertificatsRemesaExpedient(
         HttpServletRequest request,
-        @PathVariable Long notificacioId,
+        @PathVariable Long enviamentInteressatId,
         Model model) {
         try {
-            String resultat = aplicacioService.executeCertificatsRemesaExpedient(notificacioId);
+            String resultat = aplicacioService.executeCertificatsRemesaExpedient(enviamentInteressatId);
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException ie) {
@@ -368,7 +368,7 @@ public class AjaxUserController extends BaseUserController {
      */
     @RequestMapping(value = "/initJustificantsRegistre", method = RequestMethod.GET)
     public String initJustificantsRegistre(HttpServletRequest request, Model model) {
-        model.addAttribute("titolProces", "Afegir els justificants de registre com a documents de l'expedient");
+        model.addAttribute("titolProces", "Afegir justificants d'anotacions acceptades com a documents de l'expedient");
         model.addAttribute("urlTotalIteracions", "getExpedientsAmbJustificantRegistre");
         model.addAttribute("urlInteracioIndividual", "executeJustificantsRegistreExpedient");
         return "util/processAjax";
@@ -380,14 +380,14 @@ public class AjaxUserController extends BaseUserController {
         return aplicacioService.getExpedientsAmbJustificantRegistre();
     }
 
-    @RequestMapping(value = "/executeJustificantsRegistreExpedient/{peticioId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/executeJustificantsRegistreExpedient/{anotacioRegistreId}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<String> executeJustificantsRegistreExpedient(
         HttpServletRequest request,
-        @PathVariable Long peticioId,
+        @PathVariable Long anotacioRegistreId,
         Model model) {
         try {
-            String resultat = aplicacioService.executeJustificantsRegistreExpedient(peticioId);
+            String resultat = aplicacioService.executeJustificantsRegistreExpedient(anotacioRegistreId);
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException ie) {

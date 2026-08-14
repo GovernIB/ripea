@@ -27,27 +27,34 @@ public class RegistreJustificantHelper {
     @Autowired private AplicacioService aplicacioService;
     @Autowired private ExpedientHelper expedientHelper;
 
-    public int incorporarJustificantsRegistreExpedient(Long peticioId) throws Exception {
+    /**
+     * Incorpora el justificant de registre d'una anotació com a document del seu expedient.
+     * Com a molt tracta un justificant, el de l'anotació indicada.
+     *
+     * @param anotacioRegistreId identificador de l'anotació de registre a processar.
+     * @return missatge descriptiu de l'acció feta, que també queda registrat al log.
+     * @throws Exception si l'anotació no existeix o el procediment no té el tipus de document per defecte.
+     */
+    public String incorporarJustificantsRegistreExpedient(Long anotacioRegistreId) throws Exception {
 
-        boolean incorporarJustificant = aplicacioService
-            .propertyBooleanFindByKey(PropertyConfig.INCORPORAR_JUSTIFICANT, false);
+        boolean incorporarJustificant = aplicacioService.propertyBooleanFindByKey(PropertyConfig.INCORPORAR_JUSTIFICANT, false);
+        
         if (!incorporarJustificant) {
-            LOGGER.info("La configuració {} està desactivada. No s'incorporen justificants per al registre {}",
-                PropertyConfig.INCORPORAR_JUSTIFICANT, peticioId);
-            return 0;
+            return logIRetorna("La configuració " + PropertyConfig.INCORPORAR_JUSTIFICANT
+                + " està desactivada: no s'incorpora el justificant de l'anotació " + anotacioRegistreId + ".");
         }
 
-        ExpedientPeticioEntity peticio = expedientPeticioRepository.findById(peticioId)
-            .orElseThrow(() -> new Exception("Petició d'expedient no trobada amb id " + peticioId));
+        ExpedientPeticioEntity peticio = expedientPeticioRepository.findById(anotacioRegistreId)
+            .orElseThrow(() -> new Exception("Anotació de registre no trobada amb id " + anotacioRegistreId));
 
         String justificantArxiuUuid = peticio.getRegistre().getJustificantArxiuUuid();
         if (justificantArxiuUuid == null) {
-            return 0;
+            return logIRetorna("L'anotació " + anotacioRegistreId + " no té cap justificant de registre a l'arxiu.");
         }
 
         ExpedientEntity expedient = peticio.getExpedient();
         if (expedient == null) {
-            return 0;
+            return logIRetorna("L'anotació " + anotacioRegistreId + " no està associada a cap expedient.");
         }
 
         String registreIdentificador = peticio.getRegistre().getIdentificador();
@@ -57,10 +64,11 @@ public class RegistreJustificantHelper {
 
         String fitxerNom = nomFitxerJustificant(peticio.getId(), identificadorPerNom);
 
-        boolean jaExisteix = documentRepository
-            .existsByExpedientIdAndFitxerNom(expedient.getId(), fitxerNom);
+        boolean jaExisteix = documentRepository.existsByExpedientIdAndFitxerNom(expedient.getId(), fitxerNom);
+        
         if (jaExisteix) {
-            return 0;
+            return logIRetorna("El justificant de l'anotació " + anotacioRegistreId
+                + " ja està incorporat al contingut de l'expedient " + expedient.getId() + ".");
         }
 
         MetaDocumentEntity metaDocument = metaDocumentRepository.findByMetaExpedientAndCodi(
@@ -80,8 +88,14 @@ public class RegistreJustificantHelper {
             fitxerNom,
             "Justificant del registre " + registreIdentificador);
 
-        LOGGER.info("Creat document de justificant de registre {} per a l'expedient {}", fitxerNom, expedient.getId());
-        return 1;
+        return logIRetorna("Incorporat el justificant de l'anotació " + anotacioRegistreId
+            + (registreIdentificador != null ? " (registre " + registreIdentificador + ")" : "")
+            + " com a document " + fitxerNom + " al contingut de l'expedient " + expedient.getId() + ".");
+    }
+
+    private String logIRetorna(String missatge) {
+        LOGGER.info(missatge);
+        return missatge;
     }
 
     // Nom del fitxer: TIPUSDOC_<idpeticio>_<registre.identificador amb / -> _>.pdf
