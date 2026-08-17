@@ -1,8 +1,9 @@
 import {useTranslation} from "react-i18next";
 import {useState} from "react";
-import {MuiDialog} from "reactlib";
+import {MuiDialog, useBaseAppContext, useResourceApiService} from "reactlib";
 import {Box, Grid, Icon, IconButton, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography} from "@mui/material";
 import {DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
+import Load from "../../../components/Load.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import {useToProgramaAntic} from "../../user/UserHeadToolbar.tsx";
 
@@ -47,6 +48,12 @@ const AnnexFirma = (props:any) => {
         document.body.removeChild(link);
     }
 
+    if (!entity?.firmes?.length) {
+        //El llistat només mira firmaTipus per oferir aquesta acció, així que es pot arribar aquí sense
+        //firmes si l'Arxiu o el plugin de validació no han respost.
+        return <Typography variant={"body2"} color={"textSecondary"}>{t('page.anotacio.action.firma.senseFirmes')}</Typography>
+    }
+
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={2}>
         {
             entity?.firmes?.map((firma:any, index:number)=>{
@@ -86,14 +93,28 @@ const AnnexFirma = (props:any) => {
     </Grid>
 }
 
+// Obtenir les firmes d'un annex costa dues crides remotes —descarregar el document de l'Arxiu i validar-lo
+// amb el plugin de validació de signatura—, així que la perspectiva es demana només en obrir aquest
+// diàleg i no des del llistat d'annexos, que no en mostra cap dada.
+const firmesPerspectives = ['FIRMES'];
+
 const useAnnexFirma = () => {
     const { t } = useTranslation();
     const [open, setOpen] = useState(false);
+    //undefined = firmes encara no consultades; null = consultades i sense resultat
     const [entity, setEntity] = useState<any>();
+    const { getOne } = useResourceApiService('registreAnnexResource');
+    const { temporalMessageShow } = useBaseAppContext();
 
-    const handleOpen = (_id: any, row:any) => {
-        setEntity(row)
+    const handleOpen = (id: any, row:any) => {
+        setEntity(undefined);
         setOpen(true);
+        getOne(id ?? row?.id, {perspectives: firmesPerspectives})
+            .then((annex:any) => setEntity(annex ?? null))
+            .catch((error:any) => {
+                temporalMessageShow(null, error.message, 'error');
+                setEntity(null);
+            });
     }
 
     const handleClose = (reason?: string) => {
@@ -122,7 +143,9 @@ const useAnnexFirma = () => {
                 }
             }}
         >
-            <AnnexFirma entity={entity}/>
+            <Load value={entity !== undefined} noEffect={!open}>
+                <AnnexFirma entity={entity}/>
+            </Load>
         </MuiDialog>
 
     return {

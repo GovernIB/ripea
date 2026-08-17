@@ -2364,28 +2364,24 @@ public class PluginHelper {
 		}
 	}
 
-	public ContingutArxiu arxiuDocumentLink(
-			DocumentEntity document,
-			String arxiuUuidDesti) {
+	public ContingutArxiu arxiuDocumentLink(DocumentEntity document, String arxiuUuidDesti) {
+		
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		organGestorHelper.actualitzarOrganCodi(
 				organGestorHelper.getOrganCodiFromContingutId(
 						document.getId()));
 		String accioDescripcio = "Enllaçar document";
 		Map<String, String> accioParams = new HashMap<String, String>();
-		accioParams.put(
-				"id",
-				document.getId().toString());
-		accioParams.put(
-				"títol",
-				document.getNom());
-		accioParams.put(
-				"arxiuUuidDesti",
-				arxiuUuidDesti);
+		accioParams.put("id", document.getId().toString());
+		accioParams.put("títol", document.getNom());
+		accioParams.put("arxiuUuidDesti", arxiuUuidDesti);
+		
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
 		String endpoint = arxiuPluginWrapper.getEndpoint();
+		
 		try {
+			
 			// Empram el mètode carpetaCopiar per no disposar d'un mètode específic per
 			// vincular.
 			ContingutArxiu nouContingut = arxiuPluginWrapper.getPlugin().carpetaCopiar(
@@ -2421,16 +2417,14 @@ public class PluginHelper {
 		String accioDescripcio = "Moure document";
 		Map<String, String> accioParams = new HashMap<String, String>();
 
-		accioParams.put(
-				"arxiuUuidOrigen",
-				uuid);
-		accioParams.put(
-				"uuidDesti",
-				uuidDesti);
+		accioParams.put("arxiuUuidOrigen", uuid);
+		accioParams.put("uuidDesti", uuidDesti);
 		
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
+		
 		try {
+			
 			boolean throwException = false;// throwException = true
 			if (throwException) {
 				throw new RuntimeException("Mock excepcion moving document ");
@@ -2511,27 +2505,22 @@ public class PluginHelper {
 		}
 	}
 	
-	public String arxiuDocumentMoure(
-			String uuid,
-			String uuidDesti,
-			String uuidExpedientDesti) {
+	public String arxiuDocumentMoure(String uuid, String uuidDesti, String uuidExpedientDesti) {
+		
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		String accioDescripcio = "Moure document";
 		Map<String, String> accioParams = new HashMap<String, String>();
 
-		accioParams.put(
-				"arxiuUuidOrigen",
-				uuid);
-		accioParams.put(
-				"uuidDesti",
-				uuidDesti);
-		accioParams.put(
-				"uuidExpedientDesti",
-				uuidExpedientDesti);
+		accioParams.put("arxiuUuidOrigen",uuid);
+		accioParams.put("uuidDesti",uuidDesti);
+		accioParams.put("uuidExpedientDesti",uuidExpedientDesti);
+		
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
 		String endpoint = arxiuPluginWrapper.getEndpoint();
+		
 		try {
+			
 			boolean throwException = false;// throwException = true
 			if (throwException) {
 				throw new RuntimeException("Mock excepcion moving document ");

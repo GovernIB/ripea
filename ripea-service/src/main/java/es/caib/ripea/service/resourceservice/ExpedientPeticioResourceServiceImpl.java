@@ -41,6 +41,7 @@ import es.caib.ripea.persistence.entity.resourcerepository.RegistreResourceRepos
 import es.caib.ripea.persistence.repository.ExecucioMassivaContingutRepository;
 import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
+import es.caib.ripea.persistence.repository.MetaDocumentRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
@@ -77,6 +78,7 @@ import es.caib.ripea.service.intf.dto.ExpedientPeticioAccioEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatViewEnumDto;
 import es.caib.ripea.service.intf.dto.InteressatAssociacioAccioEnum;
+import es.caib.ripea.service.intf.dto.MetaDocumentPerDefecteEnumDto;
 import es.caib.ripea.service.intf.dto.NtiTipoDocumentoEnumDto;
 import es.caib.ripea.service.intf.dto.SiNoEnumDto;
 import es.caib.ripea.service.intf.model.ExpedientPeticioResource;
@@ -92,6 +94,7 @@ import es.caib.ripea.service.intf.registre.RegistreAnnexFirmaTipusEnum;
 import es.caib.ripea.service.intf.registre.RegistreAnnexNtiEstadoElaboracionEnum;
 import es.caib.ripea.service.intf.registre.RegistreAnnexNtiOrigenEnum;
 import es.caib.ripea.service.intf.resourceservice.ExpedientPeticioResourceService;
+import es.caib.ripea.service.intf.utils.RegistreJustificantUtils;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -117,6 +120,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 
 	private final OrganGestorRepository organGestorRepository;
 	private final MetaExpedientRepository metaExpedientRepository;
+	private final MetaDocumentRepository metaDocumentRepository;
 	private final ExpedientPeticioRepository expedientPeticioRepository;
 	private final ExpedientRepository expedientRepository;
 	private final RegistreResourceRepository registreResourceRepository;
@@ -130,6 +134,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
     @PostConstruct
     public void init() {
         register(ExpedientPeticioResource.PERSPECTIVE_REGISTRE_CODE, new RegistrePerspectiveApplicator());
+        register(ExpedientPeticioResource.PERSPECTIVE_JUSTIFICANT_CODE, new JustificantPerspectiveApplicator());
         register(ExpedientPeticioResource.PERSPECTIVE_ESTAT_VIEW_CODE, new EstatViewPerspectiveApplicator());
         register(ExpedientPeticioResource.PERSPECTIVE_EN_PROCES_ACTUALITZAR_ESTAT_CODE, new EnProcesActualitzarEstatPerspectiveApplicator());
         register(ExpedientPeticioResource.REPORT_DOWNLOAD_JUSTIFICANT, new DescarregarJustificantReportGenerator());
@@ -336,54 +341,94 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 	            );
         	}
 
-            if (resource.getRegistreInfo().getJustificantArxiuUuid()!=null && Boolean.parseBoolean(configHelper.getConfig(PropertyConfig.INCORPORAR_JUSTIFICANT))) {
-            	RegistreAnnexResource justificant = new RegistreAnnexResource();
-            	Document documentDetalls = pluginHelper.arxiuDocumentConsultar(
-    					null,
-    					resource.getRegistreInfo().getJustificantArxiuUuid(),
-    					null,
-    					true,
-    					false);
-            	justificant.setTitol(documentDetalls.getNom());
-            	if (documentDetalls.getContingut()!=null) {
-            		justificant.setTamany(documentDetalls.getContingut().getTamany());
-            		justificant.setTipusMime(documentDetalls.getContingut().getTipusMime());
-            	}
-            	justificant.setObservacions(documentDetalls.getDescripcio());
-            	//Millora: es fan conversions d'enumerats que no farien falta si la classe destí tengues com a tipus d'atribut la clase enum del origen
-            	try {
-            		ArxiuEstatEnumDto estatArxiu = ArxiuEstatEnumDto.valueOf(documentDetalls.getEstat().toString());
-            		justificant.setAnnexArxiuEstat(estatArxiu);
-            	} catch (Exception ex) {}
-            	if (documentDetalls.getMetadades()!=null) {
-            		String extensio = documentDetalls.getMetadades().getExtensio()!=null?documentDetalls.getMetadades().getExtensio().toString():".pdf";
-            		justificant.setNom(documentDetalls.getNom()+extensio);
-            		justificant.setNtiFechaCaptura(documentDetalls.getMetadades().getDataCaptura());
-            		if (ContingutOrigen.ADMINISTRACIO.equals(documentDetalls.getMetadades().getOrigen())) {
-            			justificant.setNtiOrigen(RegistreAnnexNtiOrigenEnum.ADMINISTRACIO);
-            		} else {
-            			justificant.setNtiOrigen(RegistreAnnexNtiOrigenEnum.CIUTADA);
-            		}
-            		try {
-            			NtiTipoDocumentoEnumDto enumTD = NtiTipoDocumentoEnumDto.valueOf(documentDetalls.getMetadades().getTipusDocumental().name());
-            			justificant.setNtiTipoDocumental(enumTD);
-            		} catch (Exception ex) {}
-            		justificant.setUuid(documentDetalls.getIdentificador());
-            		if (documentDetalls.getFirmes() != null && !documentDetalls.getFirmes().isEmpty()) {
-            			justificant.setFirmaPerfil(documentDetalls.getFirmes().get(0).getPerfil().name());
-            			try {
-            				RegistreAnnexFirmaTipusEnum enumTF = RegistreAnnexFirmaTipusEnum.valueOf(documentDetalls.getFirmes().get(0).getTipus().name());
-            				justificant.setFirmaTipus(enumTF);
-            			} catch (Exception ex) {}
-            		}
-            		try {
-            			RegistreAnnexNtiEstadoElaboracionEnum enumEE = RegistreAnnexNtiEstadoElaboracionEnum.valueOf(documentDetalls.getMetadades().getEstatElaboracio().name());
-            			justificant.setNtiEstadoElaboracion(enumEE);
-            		} catch (Exception ex) {}
-            	}
-            	resource.getRegistreInfo().setJustificant(justificant);
-            }
+            //Només s'indica si hi ha justificant per incorporar. Les metadades es carreguen a la perspectiva
+            //JUSTIFICANT, que consulta l'Arxiu i per això no es pot aplicar a cada fila d'un llistat.
+            resource.setTeJustificant(teJustificant(resource.getRegistreInfo().getJustificantArxiuUuid()));
         }
+    }
+
+    /**
+     * Carrega les metadades del justificant de registre consultant-les a l'Arxiu. És una crida remota per
+     * anotació: aquesta perspectiva només s'ha de demanar en obrir un detall (pestanya "Justificant" o
+     * diàleg d'acceptació), mai des d'un llistat.
+     */
+    private class JustificantPerspectiveApplicator implements PerspectiveApplicator<ExpedientPeticioResourceEntity, ExpedientPeticioResource> {
+        @Override
+        public void applySingle(String code, ExpedientPeticioResourceEntity entity, ExpedientPeticioResource resource) throws PerspectiveApplicationException {
+
+            if (entity.getRegistre() == null) {
+                return;
+            }
+            //El justificant penja del registre, així que si la perspectiva es demana sense REGISTRE s'ha de mapar aquí.
+            if (resource.getRegistreInfo() == null) {
+                resource.setRegistreInfo(objectMappingHelper.newInstanceMap(Hibernate.unproxy(entity.getRegistre()), RegistreResource.class));
+            }
+
+            String justificantArxiuUuid = resource.getRegistreInfo().getJustificantArxiuUuid();
+            if (!teJustificant(justificantArxiuUuid)) {
+                return;
+            }
+            resource.setTeJustificant(true);
+            resource.getRegistreInfo().setJustificant(justificantArxiuConsultar(justificantArxiuUuid));
+        }
+    }
+
+    /**
+     * Hi ha justificant a incorporar si el registre en té un a l'Arxiu i la incorporació està activada.
+     * No fa cap consulta remota, per això la pot resoldre la perspectiva del llistat.
+     */
+    private boolean teJustificant(String justificantArxiuUuid) {
+        return justificantArxiuUuid != null
+                && Boolean.parseBoolean(configHelper.getConfig(PropertyConfig.INCORPORAR_JUSTIFICANT));
+    }
+
+    private RegistreAnnexResource justificantArxiuConsultar(String justificantArxiuUuid) {
+
+    	RegistreAnnexResource justificant = new RegistreAnnexResource();
+    	Document documentDetalls = pluginHelper.arxiuDocumentConsultar(
+				null,
+				justificantArxiuUuid,
+				null,
+				true,
+				false);
+    	justificant.setTitol(documentDetalls.getNom());
+    	if (documentDetalls.getContingut()!=null) {
+    		justificant.setTamany(documentDetalls.getContingut().getTamany());
+    		justificant.setTipusMime(documentDetalls.getContingut().getTipusMime());
+    	}
+    	justificant.setObservacions(documentDetalls.getDescripcio());
+    	//Millora: es fan conversions d'enumerats que no farien falta si la classe destí tengues com a tipus d'atribut la clase enum del origen
+    	try {
+    		ArxiuEstatEnumDto estatArxiu = ArxiuEstatEnumDto.valueOf(documentDetalls.getEstat().toString());
+    		justificant.setAnnexArxiuEstat(estatArxiu);
+    	} catch (Exception ex) {}
+    	if (documentDetalls.getMetadades()!=null) {
+    		String extensio = documentDetalls.getMetadades().getExtensio()!=null?documentDetalls.getMetadades().getExtensio().toString():".pdf";
+    		justificant.setNom(documentDetalls.getNom()+extensio);
+    		justificant.setNtiFechaCaptura(documentDetalls.getMetadades().getDataCaptura());
+    		if (ContingutOrigen.ADMINISTRACIO.equals(documentDetalls.getMetadades().getOrigen())) {
+    			justificant.setNtiOrigen(RegistreAnnexNtiOrigenEnum.ADMINISTRACIO);
+    		} else {
+    			justificant.setNtiOrigen(RegistreAnnexNtiOrigenEnum.CIUTADA);
+    		}
+    		try {
+    			NtiTipoDocumentoEnumDto enumTD = NtiTipoDocumentoEnumDto.valueOf(documentDetalls.getMetadades().getTipusDocumental().name());
+    			justificant.setNtiTipoDocumental(enumTD);
+    		} catch (Exception ex) {}
+    		justificant.setUuid(documentDetalls.getIdentificador());
+    		if (documentDetalls.getFirmes() != null && !documentDetalls.getFirmes().isEmpty()) {
+    			justificant.setFirmaPerfil(documentDetalls.getFirmes().get(0).getPerfil().name());
+    			try {
+    				RegistreAnnexFirmaTipusEnum enumTF = RegistreAnnexFirmaTipusEnum.valueOf(documentDetalls.getFirmes().get(0).getTipus().name());
+    				justificant.setFirmaTipus(enumTF);
+    			} catch (Exception ex) {}
+    		}
+    		try {
+    			RegistreAnnexNtiEstadoElaboracionEnum enumEE = RegistreAnnexNtiEstadoElaboracionEnum.valueOf(documentDetalls.getMetadades().getEstatElaboracio().name());
+    			justificant.setNtiEstadoElaboracion(enumEE);
+    		} catch (Exception ex) {}
+    	}
+    	return justificant;
     }
 
     private class EstatViewPerspectiveApplicator implements PerspectiveApplicator<ExpedientPeticioResourceEntity, ExpedientPeticioResource> {
@@ -511,12 +556,18 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
                                     //Procediment comú
                                     target.setDisableOrganGestor(false);
                                 }
+
+                                Long metaDocJustificantId = metaDocumentJustificantId(metaExpedientResourceEntity.getId());
+                                target.setMetaDocumentJustificantId(metaDocJustificantId);
+                                target.setAnnexos(annexosReiniciats(previous.getAnnexos(), metaDocJustificantId));
                             });
                         } else {
                             target.setGestioAmbGrupsActiva(false);
                             target.setOrganGestor(null);
                             target.setDisableOrganGestor(true);
                             target.setSequencia(null);
+                            target.setMetaDocumentJustificantId(null);
+                            target.setAnnexos(annexosReiniciats(previous.getAnnexos(), null));
                         }
                         break;
                     case AcceptarAnotacioForm.Fields.any:
@@ -551,6 +602,43 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
                 }
                 comprovarExpedientReferenciat(id, target);
             }
+        }
+
+        /**
+         * En canviar de procediment els tipus de document ja triats deixen de ser vàlids —són del
+         * procediment anterior i el desplegable els torna a carregar amb els del nou—, així que es buiden.
+         * S'hi manté el joc de claus perquè les files de la graella no han canviat, i la del justificant
+         * es torna a proposar amb el tipus per defecte del procediment nou.
+         */
+        private Map<Long, String> annexosReiniciats(Map<Long, String> annexos, Long metaDocumentJustificantId) {
+            Map<Long, String> reiniciats = new HashMap<>();
+            if (annexos != null) {
+                annexos.keySet().forEach(annexId -> reiniciats.put(annexId, ""));
+            }
+            if (metaDocumentJustificantId != null && reiniciats.containsKey(ExpedientPeticioResource.ANNEX_ID_JUSTIFICANT)) {
+                reiniciats.put(ExpedientPeticioResource.ANNEX_ID_JUSTIFICANT, String.valueOf(metaDocumentJustificantId));
+            }
+            return reiniciats;
+        }
+
+        /**
+         * Id del tipus de document REGISTRE_JUSTIFICANT_ENTRADA del procediment, que el front proposa com a
+         * valor per defecte de la fila del justificant. Retorna null si el procediment no en té o si no està
+         * actiu: en aquest cas no sortiria a les opcions del desplegable ({@link #getOptions}) i el valor
+         * proposat no seria seleccionable.
+         */
+        private Long metaDocumentJustificantId(Long metaExpedientId) {
+            if (metaExpedientId == null) {
+                return null;
+            }
+            MetaExpedientEntity metaExpedient = metaExpedientRepository.findById(metaExpedientId).orElse(null);
+            if (metaExpedient == null) {
+                return null;
+            }
+            MetaDocumentEntity metaDocument = metaDocumentRepository.findByMetaExpedientAndCodi(
+                    metaExpedient,
+                    MetaDocumentPerDefecteEnumDto.REGISTRE_JUSTIFICANT_ENTRADA.getCodi());
+            return metaDocument != null && metaDocument.isActiu() ? metaDocument.getId() : null;
         }
 
         /**
@@ -681,13 +769,16 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 								//És un justificant
 								String arxiuUuid = entity.getRegistre().getJustificantArxiuUuid();
 								if (arxiuUuid != null && configHelper.getAsBoolean(PropertyConfig.INCORPORAR_JUSTIFICANT)) {
+									//Mateix nom i títol que el procés automàtic, perquè el document sigui idèntic
+									//s'incorpori per on s'incorpori i la detecció de duplicats funcioni entre vies.
+									String registreIdentificador = entity.getRegistre().getIdentificador();
 									expedientHelper.crearDocFromUuid(
 											expedientId,
 											arxiuUuid,
 											expedientPeticioId,
 											Long.parseLong(entry.getValue()),
-                                            null,
-                                            null);
+											RegistreJustificantUtils.nomFitxerJustificant(expedientPeticioId, registreIdentificador),
+											RegistreJustificantUtils.titolJustificant(registreIdentificador));
 								}
 							}
 

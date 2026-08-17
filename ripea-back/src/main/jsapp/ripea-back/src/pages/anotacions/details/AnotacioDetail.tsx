@@ -1,8 +1,9 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {Box, Grid} from "@mui/material";
-import {BasePage, MuiDialog} from "reactlib";
+import {BasePage, MuiDialog, useBaseAppContext, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {CardButton, DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
+import Load from "../../../components/Load.tsx";
 import TabComponent from "../../../components/TabComponent.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
@@ -215,7 +216,6 @@ const annexosColumns = [
     },
 ];
 
-const annexosPerspective = ['FIRMES'];
 const annexosSortModel:any = [{field: 'id', sort: 'asc'}];
 const Annexos = (props:any) => {
     const { entity, onRowCountChange, autoHeight = false } = props;
@@ -238,7 +238,9 @@ const Annexos = (props:any) => {
             icon: "edit",
             showInMenu: true,
             onClick: handleAnnexFirma,
-            hidden: (row:any) => row?.firmaTipus == null || !row?.firmes?.length,
+            //Només es mira el tipus de firma, que és un camp de l'annex a BBDD. Les firmes en si les
+            //carrega el diàleg en obrir-se, perquè obtenir-les costa dues crides remotes per annex.
+            hidden: (row:any) => row?.firmaTipus == null,
         },
         {
             label: t('page.anotacio.action.descargarAnnex.label'),
@@ -255,7 +257,6 @@ const Annexos = (props:any) => {
             persistentStateActive={false}
             columns={annexosColumns}
             filter={builder.and(builder.eq('registre.id',entity?.id))}
-            perspectives={annexosPerspective}
             staticSortModel={annexosSortModel}
             toolbarHide
             disableColumnSorting
@@ -275,13 +276,44 @@ const Annexos = (props:any) => {
     </>
 }
 
+// Les metadades del justificant surten d'una consulta a l'Arxiu, així que es demanen amb una perspectiva
+// pròpia i només en obrir aquesta pestanya. El llistat només rep teJustificant (perspectiva REGISTRE).
+const justificantPerspectives = ['REGISTRE', 'JUSTIFICANT'];
+
 const Justificant = (props:any) => {
-    const { id, entity } = props;
+    const { id, value, onChange } = props;
     const { t } = useTranslation();
+    const { isReady, getOne } = useResourceApiService('expedientPeticioResource');
+    const { temporalMessageShow } = useBaseAppContext();
 
     const {downloadJustificant} = useActions()
 
-    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
+    // El TabComponent només munta el contingut de la pestanya activa, així que la consulta es fa en
+    // clicar-la. El resultat es guarda al hook del diàleg (value) per no repetir-la si s'hi torna.
+    useEffect(() => {
+        if (!id || !isReady || value !== undefined) {
+            return;
+        }
+        let vigent = true;
+        getOne(id, {perspectives: justificantPerspectives})
+            .then((anotacio:any) => {
+                if (vigent) {
+                    onChange(anotacio?.registreInfo?.justificant ?? null);
+                }
+            })
+            .catch((error:any) => {
+                if (vigent) {
+                    temporalMessageShow(null, error.message, 'error');
+                    onChange(null);
+                }
+            });
+        return () => { vigent = false };
+    }, [id, isReady, value]);
+
+    const entity = value;
+
+    return <Load value={value !== undefined}>
+    <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <DetailCard icon={'description'} title={entity?.titol}
                     header={<Box ml="auto">
                         <CardButton icon={'download'}
@@ -301,6 +333,7 @@ const Justificant = (props:any) => {
             <DetailCardContent title={t('page.registre.justificant.firmaPerfil')}   size={6}>{entity?.firmaPerfil}</DetailCardContent>
         </DetailCard>
     </Grid>
+    </Load>
 }
 
 const useAnotacioDetail = () => {
@@ -311,9 +344,12 @@ const useAnotacioDetail = () => {
     const [entity, setEntity] = useState<any>();
     const [numInteressats, setNumInteressats] = useState<number>();
     const [numAnnexos, setNumAnnexos] = useState<number>();
+    //undefined = encara no consultat a l'Arxiu; null = consultat i sense dades
+    const [justificant, setJustificant] = useState<any>();
 
     const handleOpen = (id:any, row:any) => {
         setEntity(row);
+        setJustificant(undefined);
         setOpen(true);
     }
 
@@ -354,8 +390,8 @@ const useAnotacioDetail = () => {
         {
             value: "justificant",
             label: t('page.anotacio.tabs.justificant'),
-            content: <Justificant id={entity?.id} entity={entity?.registreInfo?.justificant}/>,
-            hidden: !user?.sessionScope?.isIncorporacioJustificantActiva,
+            content: <Justificant id={entity?.id} value={justificant} onChange={setJustificant}/>,
+            hidden: !user?.sessionScope?.isIncorporacioJustificantActiva || !entity?.teJustificant,
         },
     ]
 

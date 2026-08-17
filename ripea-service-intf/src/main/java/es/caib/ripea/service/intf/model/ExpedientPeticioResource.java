@@ -54,6 +54,9 @@ import lombok.experimental.FieldNameConstants;
                         code = ExpedientPeticioResource.PERSPECTIVE_REGISTRE_CODE),
                 @ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
+                        code = ExpedientPeticioResource.PERSPECTIVE_JUSTIFICANT_CODE),
+                @ResourceArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
                         code = ExpedientPeticioResource.PERSPECTIVE_ESTAT_VIEW_CODE),
                 @ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,
@@ -97,6 +100,12 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
     public static final String FILTER_CODE = "ANOTACIO_FILTER";
 
     public static final String PERSPECTIVE_REGISTRE_CODE = "REGISTRE";
+    /**
+     * Metadades del justificant de registre. Requereix una consulta a l'Arxiu per anotació, així que
+     * només s'ha de demanar en obrir un detall, mai des d'un llistat: per saber si n'hi ha, la
+     * perspectiva {@link #PERSPECTIVE_REGISTRE_CODE} ja informa {@code teJustificant} sense cap consulta remota.
+     */
+    public static final String PERSPECTIVE_JUSTIFICANT_CODE = "JUSTIFICANT";
     public static final String PERSPECTIVE_ESTAT_VIEW_CODE = "ESTAT_VIEW";
     public static final String PERSPECTIVE_EN_PROCES_ACTUALITZAR_ESTAT_CODE = "EN_PROCES_ACTUALITZAR_ESTAT";
     public static final String PERSPECTIVE_ANNEXOS_ERROR_CODE = "ANNEXOS_ERROR";
@@ -106,6 +115,12 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
     public static final String ACTION_ESTAT_DISTRIBUCIO = "ESTAT_DISTRIBUCIO";
     public static final String ACTION_CONSULTAR_I_GUARDAR = "CONSULTAR_I_GUARDAR";
     public static final String ACTION_SUBSANAR_ANNEXOS = "SUBSANAR_ANNEXOS";
+
+    /**
+     * Clau reservada dins {@code AcceptarAnotacioForm.annexos} per al justificant de registre: la resta de
+     * claus són identificadors d'annex reals, sempre majors que zero.
+     */
+    public static final Long ANNEX_ID_JUSTIFICANT = 0L;
 
 //    private Long id;
     private String identificador;
@@ -137,6 +152,8 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
     @Transient private ExpedientPeticioEstatViewEnumDto estatView;
     @Transient private Long execucioMassivaActualitzarEstatId;
     @Transient private boolean teAnnexosAmbError;
+    /** Indica si l'anotació té justificant de registre incorporable, sense consultar-ne les metadades a l'Arxiu. */
+    @Transient private boolean teJustificant;
 
     @Getter
     @Setter
@@ -197,6 +214,11 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
         @Transient boolean gestioAmbGrupsActiva;
         @Transient private boolean disableOrganGestor = false;
         @Transient private String expedientNoTrobatMissatge;
+        /**
+         * Id del tipus de document REGISTRE_JUSTIFICANT_ENTRADA del procediment seleccionat, que el front
+         * proposa com a valor per defecte de la fila del justificant. Null si el procediment no en té cap d'actiu.
+         */
+        @Transient private Long metaDocumentJustificantId;
         private ResourceReference<GrupResource, Long> grup;
     	private boolean associarInteressats = true;
     	private boolean agafarExpedient = true;

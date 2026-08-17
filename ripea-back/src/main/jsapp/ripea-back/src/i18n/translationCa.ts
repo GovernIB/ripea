@@ -378,6 +378,7 @@ const translationCa = {
                     autoFirma: "Firmat per RIPEA",
                     autoFirmaInfo: "RIPEA ha afegit automàticament aquesta firma a l'annex de l'anotació de registre per desar-lo com a definitiu a l'arxiu",
                     firmaDetalls: "Detalls dels firmants",
+                    senseFirmes: "No s'ha pogut obtenir la informació de les firmes d'aquest annex.",
                     detalls: {
                         data: "Data",
                         dataNd: "N/D",

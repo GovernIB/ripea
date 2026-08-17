@@ -378,6 +378,7 @@ const translationEs = {
                     autoFirma: "Firmado para RIPEA",
                     autoFirmaInfo: "RIPEA ha añadido automáticamente esta firma al anexo de la anotación de registro para guardarlo como definitivo en el archivo",
                     firmaDetalls: "Detalles de los firmantes",
+                    senseFirmes: "No se ha podido obtener la información de las firmas de este anexo.",
                     detalls: {
                         data: "Fecha",
                         dataNd: "N/D",

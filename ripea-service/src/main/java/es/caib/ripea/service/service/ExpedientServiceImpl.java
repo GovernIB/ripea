@@ -97,6 +97,7 @@ import es.caib.ripea.service.intf.exception.PermissionDeniedException;
 import es.caib.ripea.service.intf.service.EventService;
 import es.caib.ripea.service.intf.service.ExpedientService;
 import es.caib.ripea.service.intf.utils.DateUtil;
+import es.caib.ripea.service.intf.utils.RegistreJustificantUtils;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
 import io.micrometer.core.instrument.Timer;
@@ -240,13 +241,15 @@ public class ExpedientServiceImpl implements ExpedientService {
 					if (arxiuUuid != null && isIncorporacioJustificantActiva()) {
 						try {
 							expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
+							//Mateix nom i títol que el procés automàtic i que l'acceptació des de REACT.
+							String registreIdentificador = expedientPeticioEntity.getRegistre().getIdentificador();
 							expedientHelper.crearDocFromUuid(
 									expedient.getId(),
 									arxiuUuid,
 									expedientPeticioEntity.getId(),
 									justificantIdMetaDoc,
-                                    null,
-                                    null);
+									RegistreJustificantUtils.nomFitxerJustificant(expedientPeticioEntity.getId(), registreIdentificador),
+									RegistreJustificantUtils.titolJustificant(registreIdentificador));
 						} catch (Exception e) {
 							processatOk = false;
 							logger.error("Error crear doc from uuid", e);
@@ -345,13 +348,15 @@ public class ExpedientServiceImpl implements ExpedientService {
 			String arxiuUuid = expedientPeticioRepository.getRegistreJustificantArxiuUuid(registreId);
 			if (arxiuUuid != null && isIncorporacioJustificantActiva()) {
 				try {
+					//Mateix nom i títol que el procés automàtic i que l'acceptació des de REACT.
+					String registreIdentificador = expedientPeticioEntity.getRegistre().getIdentificador();
 					expedientHelper.crearDocFromUuid(
 							expedientId,
 							arxiuUuid,
 							expedientPeticioId,
 							justificantIdMetaDoc,
-                            null,
-                            null);
+							RegistreJustificantUtils.nomFitxerJustificant(expedientPeticioId, registreIdentificador),
+							RegistreJustificantUtils.titolJustificant(registreIdentificador));
 				} catch (Exception e) {
 					logger.error(ExceptionUtils.getStackTrace(e));
 				}

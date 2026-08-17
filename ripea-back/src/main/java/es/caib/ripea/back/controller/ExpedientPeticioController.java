@@ -62,6 +62,7 @@ import es.caib.ripea.service.intf.dto.GrupDto;
 import es.caib.ripea.service.intf.dto.InteressatAssociacioAccioEnum;
 import es.caib.ripea.service.intf.dto.InteressatDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentPerDefecteEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
 import es.caib.ripea.service.intf.dto.PermissionEnumDto;
@@ -79,6 +80,7 @@ import es.caib.ripea.service.intf.service.GrupService;
 import es.caib.ripea.service.intf.service.MetaDocumentService;
 import es.caib.ripea.service.intf.service.MetaExpedientService;
 import es.caib.ripea.service.intf.service.OrganGestorService;
+import es.caib.ripea.service.intf.utils.RegistreJustificantUtils;
 import es.caib.ripea.service.intf.utils.Utils;
 
 /**
@@ -92,6 +94,9 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 
 	public static final String SESSION_ATTRIBUTE_FILTRE = "ExpedientPeticioController.session.filtre";
 	
+	/** Id fictici de la fila del justificant de registre dins la llista d'annexos de l'assistent d'acceptació. */
+	private static final Long JUSTIFICANT_ANNEX_ID = -1L;
+
 	private static final String SESSION_ATTRIBUTE_COMMAND = "ExpedientPeticioController.session.command";
 	private static final String SESSION_ATTRIBUTE_TIPUS_DOCS_DISPONIBLES = "ExpedientPeticioController.session.tipusDocsDisponibles";
 	private static final String SESSION_ATTRIBUTE_INDEX = "ExpedientPeticioController.session.index";
@@ -445,7 +450,13 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		// set justificant
 		if (isIncorporacioJustificantActiva() && registre.getJustificant() != null) {
 			RegistreAnnexCommand justificant = ConversioTipusHelper.convertir(registre.getJustificant(), RegistreAnnexCommand.class);
-			justificant.setId(-1L); // to differenciate justificant from annexes
+			justificant.setId(JUSTIFICANT_ANNEX_ID); // to differenciate justificant from annexes
+			//El justificant no té nom de fitxer d'origen (RegistreJustificantDto no en porta), així que sense
+			//aquest títol explícit es mostraria "<titol de l'arxiu> (null)". S'hi posa el títol que tendrà el
+			//document quan s'incorpori, el mateix que generen la resta de vies d'incorporació.
+			justificant.setTitolINom(
+					getMessage(request, "registre.detalls.titol.justificant")
+					+ " (" + RegistreJustificantUtils.titolJustificant(registre.getIdentificador()) + ")");
 			expedientPeticioAcceptarCommand.getAnnexos().add(justificant);
 		}
 
@@ -509,8 +520,14 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 					model,
 					index,
 					expedientPeticioAcceptarCommand.getAnnexos().size());
-			registreAnnexCommand.setNtiFechaCaptura(expedientPeticioService.findAnnexById(registreAnnexCommand.getId()).getNtiFechaCaptura()); //in POST it is passed as date without time, we want timpestamp 
-			
+			//El POST envia la data de captura sense hora, així que es recupera sencera. El justificant no és
+			//un annex real —du un id fictici— i no es pot llegir de la BD: es pren de la còpia de sessió, que
+			//ja la porta amb l'hora des que es va muntar la llista d'annexos.
+			registreAnnexCommand.setNtiFechaCaptura(
+					JUSTIFICANT_ANNEX_ID.equals(registreAnnexCommand.getId())
+							? expedientPeticioAcceptarCommand.getAnnexos().get(index).getNtiFechaCaptura()
+							: expedientPeticioService.findAnnexById(registreAnnexCommand.getId()).getNtiFechaCaptura());
+
 		} else {
 			
 			expedientPeticioAcceptarCommand.getAnnexos().get(index).setMetaDocumentId(registreAnnexCommand.getMetaDocumentId());
@@ -571,7 +588,18 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			Long metaExpedientId,
 			List<MetaDocumentDto> tipusDocsDisponibles,
 			RegistreAnnexCommand registreAnnexCommand) {
-		
+
+		//El justificant de registre té tipus de document propi: es proposa el del procediment si encara
+		//està disponible (podria haver-lo consumit un annex anterior si no permet multiplicitat). Si no
+		//n'hi ha, es deixa en blanc perquè l'usuari en triï un, i no s'aplica el per defecte genèric.
+		if (registreAnnexCommand != null && JUSTIFICANT_ANNEX_ID.equals(registreAnnexCommand.getId())) {
+			tipusDocsDisponibles.stream()
+					.filter(metaDoc -> MetaDocumentPerDefecteEnumDto.REGISTRE_JUSTIFICANT_ENTRADA.getCodi().equals(metaDoc.getCodi()))
+					.findFirst()
+					.ifPresent(metaDoc -> registreAnnexCommand.setMetaDocumentId(metaDoc.getId()));
+			return;
+		}
+
 		MetaDocumentDto tipusDocPerDefecte = metaDocumentService.findByMetaExpedientAndPerDefecteTrue(metaExpedientId);
 		if (tipusDocPerDefecte != null) {
 			boolean isTipusDocPerDefecteDisponible = tipusDocsDisponibles.contains(tipusDocPerDefecte);
@@ -812,7 +840,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 	private String  processarAnotacio(HttpServletRequest request, Long expedientPeticioId, ExpedientPeticioAcceptarCommand expedientPeticioAcceptarCommand) {
 		RegistreAnnexCommand last = Utils.getLast(expedientPeticioAcceptarCommand.getAnnexos());
 		Long justificantIdMetaDoc = null;
-		if (last != null && last.getId() == -1) { // if is justificant
+		if (last != null && JUSTIFICANT_ANNEX_ID.equals(last.getId())) { // if is justificant
 			justificantIdMetaDoc = last.getMetaDocumentId();
 			Utils.removeLast(expedientPeticioAcceptarCommand.getAnnexos());
 		}

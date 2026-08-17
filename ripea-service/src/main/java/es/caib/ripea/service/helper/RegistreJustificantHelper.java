@@ -11,9 +11,8 @@ import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
 import es.caib.ripea.persistence.repository.MetaDocumentRepository;
-import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.MetaDocumentPerDefecteEnumDto;
-import es.caib.ripea.service.intf.service.AplicacioService;
+import es.caib.ripea.service.intf.utils.RegistreJustificantUtils;
 
 
 @Component
@@ -24,7 +23,6 @@ public class RegistreJustificantHelper {
     @Autowired private ExpedientPeticioRepository expedientPeticioRepository;
     @Autowired private DocumentRepository documentRepository;
     @Autowired private MetaDocumentRepository metaDocumentRepository;
-    @Autowired private AplicacioService aplicacioService;
     @Autowired private ExpedientHelper expedientHelper;
 
     /**
@@ -37,12 +35,12 @@ public class RegistreJustificantHelper {
      */
     public String incorporarJustificantsRegistreExpedient(Long anotacioRegistreId) throws Exception {
 
-        boolean incorporarJustificant = aplicacioService.propertyBooleanFindByKey(PropertyConfig.INCORPORAR_JUSTIFICANT, false);
-        
-        if (!incorporarJustificant) {
-            return logIRetorna("La configuració " + PropertyConfig.INCORPORAR_JUSTIFICANT
-                + " està desactivada: no s'incorpora el justificant de l'anotació " + anotacioRegistreId + ".");
-        }
+//        boolean incorporarJustificant = aplicacioService.propertyBooleanFindByKey(PropertyConfig.INCORPORAR_JUSTIFICANT, false);
+//        
+//        if (!incorporarJustificant) {
+//            return logIRetorna("La configuració " + PropertyConfig.INCORPORAR_JUSTIFICANT
+//                + " està desactivada: no s'incorpora el justificant de l'anotació " + anotacioRegistreId + ".");
+//        }
 
         ExpedientPeticioEntity peticio = expedientPeticioRepository.findById(anotacioRegistreId)
             .orElseThrow(() -> new Exception("Anotació de registre no trobada amb id " + anotacioRegistreId));
@@ -58,11 +56,7 @@ public class RegistreJustificantHelper {
         }
 
         String registreIdentificador = peticio.getRegistre().getIdentificador();
-        String identificadorPerNom = registreIdentificador != null
-            ? registreIdentificador.replace("/", "_")
-            : String.valueOf(peticio.getId());
-
-        String fitxerNom = nomFitxerJustificant(peticio.getId(), identificadorPerNom);
+        String fitxerNom = RegistreJustificantUtils.nomFitxerJustificant(peticio.getId(), registreIdentificador);
 
         boolean jaExisteix = documentRepository.existsByExpedientIdAndFitxerNom(expedient.getId(), fitxerNom);
         
@@ -86,7 +80,7 @@ public class RegistreJustificantHelper {
             peticio.getId(),
             metaDocument.getId(),
             fitxerNom,
-            "Justificant del registre " + registreIdentificador);
+            RegistreJustificantUtils.titolJustificant(registreIdentificador));
 
         return logIRetorna("Incorporat el justificant de l'anotació " + anotacioRegistreId
             + (registreIdentificador != null ? " (registre " + registreIdentificador + ")" : "")
@@ -96,11 +90,5 @@ public class RegistreJustificantHelper {
     private String logIRetorna(String missatge) {
         LOGGER.info(missatge);
         return missatge;
-    }
-
-    // Nom del fitxer: TIPUSDOC_<idpeticio>_<registre.identificador amb / -> _>.pdf
-    private String nomFitxerJustificant(Long peticioId, String identificadorPerNom) {
-        return MetaDocumentPerDefecteEnumDto.REGISTRE_JUSTIFICANT_ENTRADA.getCodi()
-            + "_" + peticioId + "_" + identificadorPerNom + ".pdf";
     }
 }
