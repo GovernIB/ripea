@@ -23,6 +23,7 @@ public class CertificatRemesaHelper {
     @Autowired private DocumentNotificacioHelper documentNotificacioHelper;
     @Autowired private DocumentHelper documentHelper;
     @Autowired private ContingutHelper contingutHelper;
+    @Autowired private PluginHelper pluginHelper;
 
     /**
      * Incorpora com a document de l'expedient el certificat pendent d'un enviament (interessat/destinatari) d'una notificació.
@@ -101,6 +102,13 @@ public class CertificatRemesaHelper {
             true,
             true);
 
+        //Borram el backup que es guardava en el gestor documental si existeix
+        if (interessatEnviament.getNotificacio().getEnviamentCertificacioArxiuId()!=null) {
+        	pluginHelper.gestioDocumentalDelete(
+        			interessatEnviament.getNotificacio().getEnviamentCertificacioArxiuId(),
+        			PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS);
+        }
+        
         return logIRetorna("Incorporat el certificat de l'enviament " + interessatEnviament.getId()
             + " (notificació " + interessatEnviament.getNotificacio().getId() + ")"
             + " com a document " + nomFitxer + " al contingut de l'expedient " + expedient.getId() + ".");

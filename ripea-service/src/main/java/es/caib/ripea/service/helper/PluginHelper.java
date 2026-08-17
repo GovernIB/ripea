@@ -211,6 +211,7 @@ import es.caib.ripea.service.intf.dto.InteressatTipusEnumDto;
 import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentPerDefecteEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentTipusGenericEnumDto;
 import es.caib.ripea.service.intf.dto.MunicipiDto;
 import es.caib.ripea.service.intf.dto.NivellAdministracioDto;
@@ -5552,17 +5553,32 @@ public class PluginHelper {
 		if (certificacioRetornat) {
 
 			if (getPropertyGuardarCertificacioExpedient()) {
+				
 				boolean certificacioJaGuardat = documentEnviamentInteressatEntity.getEnviamentCertificacioData() != null;
+				
 				if (!certificacioJaGuardat) {
+					
+					String prefixNom = "Certificació";
 					MetaDocumentEntity metaDocument = metaDocumentRepository.findByEntitatAndTipusGeneric(
 							true,
 							null,
 							MetaDocumentTipusGenericEnumDto.ACUSE_RECIBO_NOTIFICACION);
+					
+					//No ha trobat el metaDocument generic ACUSE_RECIBO_NOTIFICACION (nomes l'utilitza la APB)
+					//Llavors anam a cercar el metaDocument de tipus del procediment.
+					if (metaDocument==null) {
+				        metaDocument = metaDocumentRepository.findByMetaExpedientAndCodi(
+				        		notificacio.getExpedient().getMetaExpedient(),
+				        		MetaDocumentPerDefecteEnumDto.NOTIB_JUSTIFICANT_RECEPCIO.getCodi());
+				        prefixNom = "Justificant enviament notib";
+					}
 
-					DocumentDto document = certificacioToDocumentDto(
+					DocumentDto document = contingutHelper.generarDocumentDto(
 							documentEnviamentInteressatEntity,
 							metaDocument,
-							resposta);
+							resposta,
+							prefixNom);
+
 					document = documentHelper.crearDocument(
 							null,
 							document,
@@ -5583,24 +5599,6 @@ public class PluginHelper {
 						}
 					}
 				}
-
-			} else {
-				//Guarda la certificació al gestor documental com a backup, pero sembla que no es llegeix en cap moment
-				byte[] certificacio = resposta.getCertificacioContingut();
-				String gestioDocumentalId = notificacio.getEnviamentCertificacioArxiuId();
-				boolean eliminadaAnteriorCertificacio = false;
-				//Borra la certificació anterior si existia i era anterior a la nova data (obsoleta)
-				if (gestioDocumentalId!=null && 
-					documentEnviamentInteressatEntity.getEnviamentCertificacioData()!=null &&
-					documentEnviamentInteressatEntity.getEnviamentCertificacioData().before(resposta.getCertificacioData())) {
-					gestioDocumentalDelete(gestioDocumentalId, GESDOC_AGRUPACIO_CERTIFICACIONS);
-					eliminadaAnteriorCertificacio = true;
-				}
-				//Guarda la nova certificació si no existia o es més recent que la anterior
-				if (gestioDocumentalId == null || eliminadaAnteriorCertificacio) {
-					gestioDocumentalId = gestioDocumentalCreate(PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS, new ByteArrayInputStream(certificacio));
-				}
-				notificacio.setEnviamentCertificacioArxiuId(gestioDocumentalId);
 			}
 		}
 
@@ -5610,6 +5608,8 @@ public class PluginHelper {
 			logAll(notificacio, LogTipusEnumDto.NOTIFICACIO_REBUTJADA, null);
 		}
 
+		//Pot pareixer que guarda una data la primera vegada i ja no es podrá tornar a intentar gurdar per el if,
+		//pero si no hi ha certificació, la data es null.
 		documentEnviamentInteressatEntity.updateEnviamentCertificacioData(resposta.getCertificacioData());
 	}
 
@@ -5668,13 +5668,6 @@ public class PluginHelper {
 					errorDescripcio,
 					ex);
 		}
-	}
-
-	private DocumentDto certificacioToDocumentDto(
-			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity,
-			MetaDocumentEntity metaDocument,
-			RespostaConsultaEstatEnviament resposta) {
-		return contingutHelper.generarDocumentDto(documentEnviamentInteressatEntity, metaDocument, resposta);
 	}
 
 	private void logAll(

@@ -1103,7 +1103,9 @@ public class ContingutHelper {
 	public DocumentDto generarDocumentDto(
 			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity,
 			MetaDocumentEntity metaDocument,
-			RespostaConsultaEstatEnviament resposta) {
+			RespostaConsultaEstatEnviament resposta,
+			String prefixNom) {
+		
 		DocumentDto dto = new DocumentDto();
 		MetaNodeDto metaNode = null;
 		String interessatNif = null;
@@ -1113,24 +1115,27 @@ public class ContingutHelper {
 		InteressatEntity interessat = HibernateHelper.deproxy(documentEnviamentInteressatEntity.getInteressat());
 		if (interessat instanceof InteressatPersonaFisicaEntity) {
 			InteressatPersonaFisicaEntity interessatPf = (InteressatPersonaFisicaEntity)interessat;
-			interessatNif = interessatPf.getDocumentNum();
+			interessatNif = interessatPf.getDocumentNum().trim().replace("/", "_");
 			interessatNom = interessatPf.getNom() + " " + interessatPf.getLlinatge1();
 			String llinatge2 = interessatPf.getLlinatge2();
 			interessatNom += (llinatge2 != null && !llinatge2.isEmpty()) ? " " + llinatge2 : "";
 		} else if (interessat instanceof InteressatPersonaJuridicaEntity) {
 			InteressatPersonaJuridicaEntity interessatPj = (InteressatPersonaJuridicaEntity)interessat;
-			interessatNif = interessatPj.getDocumentNum();
+			interessatNif = interessatPj.getDocumentNum().trim().replace("/", "_");
 			interessatNom = interessatPj.getRaoSocial();
 		} else if (interessat instanceof InteressatAdministracioEntity) {
 			InteressatAdministracioEntity interessatA = (InteressatAdministracioEntity)interessat;
-			interessatNif = interessatA.getDocumentNum();
+			interessatNif = interessatA.getDocumentNum().trim().replace("/", "_");
 			interessatNom = interessatA.getOrganNom();
 		}
 
+		String contingutTitol = "";
 		if (interessatNif != null && interessatNom != null)
-			dto.setNom("Certificació_" + notificacio.getAssumpte().replaceAll("\\s+","_") + "-" + interessatNif + "-" + interessatNom);
+			contingutTitol = prefixNom+"_" + notificacio.getAssumpte().replaceAll("\\s+","_") + "-" + interessatNif + "-" + interessatNom;
 		else
-			dto.setNom("Certificació_" + notificacio.getAssumpte().replaceAll("\\s+","_"));
+			contingutTitol = prefixNom+"_" + notificacio.getAssumpte().replaceAll("\\s+","_");
+		
+		dto.setNom(Utils.abbreviate(contingutTitol, 1024));
 		dto.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
 		dto.setUbicacio(null);
 		dto.setData(resposta.getCertificacioData());
