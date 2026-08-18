@@ -29,6 +29,8 @@ PREREQUISITS
 3. Tenir JBoss EAP 7.2 arrencat amb RIPEA desplegat i Keycloak accessible.
    Per defecte s'espera que l'aplicació respongui a:
      http://localhost:8080/ripeaback/reactapp/
+   (per executar-los contra un altre entorn, vegeu l'apartat
+    EXECUTAR CONTRA UN ALTRE ENTORN)
 
 4. Crear el fitxer de credencials locals (NO es puja al repositori):
 
@@ -109,6 +111,50 @@ Des de  ripea-back/src/main/jsapp/ripea-back/  (amb JBoss arrencat):
 
   # Veure l'informe HTML de l'última execució:
   npx playwright show-report tests_e2e/report
+
+
+EXECUTAR CONTRA UN ALTRE ENTORN
+-------------------------------
+Per defecte els tests s'executen contra l'entorn local
+(http://localhost:8080) amb les credencials de
+tests_e2e/auth/credentials.json. Dues variables d'entorn permeten
+canviar-ho sense modificar cap fitxer del projecte:
+
+  E2E_BASE_URL           URL base de l'aplicació.
+                         Per defecte: http://localhost:8080
+  E2E_CREDENTIALS_FILE   Ruta del fitxer de credencials.
+                         Per defecte: tests_e2e/auth/credentials.json
+
+Normalment cal canviar-les totes dues alhora, perquè cada entorn té
+els seus propis usuaris: a dev.caib.es els usuaris són del directori
+corporatiu, no els rip_admin / rip_user del Keycloak local.
+
+El fitxer de credencials alternatiu ha de tenir la mateixa estructura
+que credentials.json i, igual que aquell, NO s'ha de pujar al
+repositori: desa'l fora de l'arbre del projecte.
+
+Exemples:
+
+  # Windows PowerShell
+  $env:E2E_BASE_URL = 'https://dev.caib.es'
+  $env:E2E_CREDENTIALS_FILE = 'C:\ruta\segura\credentials.dev.json'
+  npm run e2e
+
+  # bash / Git Bash
+  E2E_BASE_URL=https://dev.caib.es \
+  E2E_CREDENTIALS_FILE=/c/ruta/segura/credentials.dev.json \
+  npm run e2e
+
+El login s'adapta automàticament a l'IdP de cada entorn (Keycloak en
+local, Soffid SAML a dev.caib.es); vegeu auth/login.ts.
+
+ATENCIÓ: els tests de procediments creen, modifiquen i esborren dades
+reals a l'entorn on s'executen (codis zz_PLAYWRIGHT_*). Si una
+execució s'interromp a mig camí, el procediment de proves hi queda i
+la següent execució fallarà en crear-lo; per esborrar-lo (l'esborrat
+és en cascada):
+
+  npx playwright test tests_e2e/metaExpedient/metaExpedient.admin.spec.ts -g "PROCEDIMENT ELIMINAR"
 
 
 CONVENCIÓ DE NOMS
