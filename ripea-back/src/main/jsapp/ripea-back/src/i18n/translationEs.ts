@@ -407,6 +407,7 @@ const translationEs = {
         tasca: {
             title: "Tarea",
             view: {
+                title: "Tipo de vista",
                 table: "Vista de tabla",
                 calendar: "Vista de calendario",
                 kanban: "Vista por estado",

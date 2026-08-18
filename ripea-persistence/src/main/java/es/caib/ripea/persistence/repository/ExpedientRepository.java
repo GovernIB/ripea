@@ -916,6 +916,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
         "where e.agafatPer = :usuari " +
         "and e.entitat.id = :entitatId " +
         "and e.esborrat = 0 " +
+        "and e.estat = es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto.OBERT " +
         "and e.createdDate <= :dataLimit " +
         "and (select count(metaDocument) " +
         "     from MetaDocumentEntity metaDocument " +

@@ -8,7 +8,9 @@ import { performLogin } from './login';
 // Les credencials es llegeixen de tests_e2e/auth/credentials.json (NO pujat a git).
 // Copia tests_e2e/auth/credentials.json.example i omple-ho amb les teves dades.
 // ─────────────────────────────────────────────────────────────────────────────
-const CREDENTIALS_FILE = path.join('tests_e2e', 'auth', 'credentials.json');
+// Es pot apuntar a un altre fitxer amb la variable d'entorn E2E_CREDENTIALS_FILE
+// (útil per executar contra un entorn amb usuaris diferents, p.ex. dev.caib.es).
+const CREDENTIALS_FILE = process.env.E2E_CREDENTIALS_FILE || path.join('tests_e2e', 'auth', 'credentials.json');
 
 interface Credentials {
     admin: { usuari: string; password: string };

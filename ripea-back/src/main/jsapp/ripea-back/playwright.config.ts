@@ -13,9 +13,11 @@ export default defineConfig({
     ],
 
     use: {
-        // URL base de l'aplicació sobre JBoss
-        //baseURL: 'https://dev.caib.es',
-		baseURL: 'http://localhost:8080',
+        // URL base de l'aplicació sobre JBoss.
+        // Es pot sobreescriure amb la variable d'entorn E2E_BASE_URL per executar
+        // els tests contra un altre entorn, p.ex.:
+        //   E2E_BASE_URL=https://dev.caib.es npm run e2e
+        baseURL: process.env.E2E_BASE_URL || 'http://localhost:8080',
         // Captura screenshot només en cas de fallada
         screenshot: 'only-on-failure',
         // Vídeo de tots els tests (èxit i fallada)

@@ -211,6 +211,7 @@ public interface ExpedientTascaRepository extends JpaRepository<ExpedientTascaEn
         "    (:responsable MEMBER OF tasca.responsables or :responsable MEMBER OF tasca.observadors or :responsable = tasca.delegat) " +
         "and (tasca.estat in (:estats)) " +
         "and (tasca.expedient.esborrat = 0) " +
+        "and (tasca.expedient.estat = es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto.OBERT) " +
         "and (tasca.expedient.entitat.id = :entitatId) " +
         "and (tasca.dataLimit is not null) " +
         "and (tasca.dataLimit >= :avui) "
