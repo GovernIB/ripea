@@ -406,6 +406,7 @@ const translationEn = {
         tasca: {
             title: "Task",
             view: {
+                title: "View type",
                 table: "Table view",
                 calendar: "Calendar view",
                 kanban: "Status view",

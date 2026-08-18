@@ -1,5 +1,5 @@
 import React, {useEffect, useMemo, useState} from "react";
-import {Button, Chip, Icon, Tooltip, Typography} from "@mui/material";
+import {Box, Button, Chip, Icon, Tooltip, Typography} from "@mui/material";
 import {useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro";
 import {MuiDataGridProps, MuiGrid, useMuiDataGridApiRef} from "reactlib";
 import {useTranslation} from "react-i18next";
@@ -270,7 +270,20 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         }
     }, [user?.conf?.numElementsPagina])
 
-    return <div ref={containerRef} style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
+    return <Box
+        ref={containerRef}
+        sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            width: '100%',
+            height: '100%',
+            // El filtre ràpid de la barra d'eines és un TextField "small" de 37px i quedava
+            // més alt que la resta de controls de la barra (32px). S'iguala des d'aquí perquè
+            // el crea reactlib i no admet ni props ni estils des de fora.
+            '& .MuiToolbar-root .MuiOutlinedInput-root': { height: '32px' },
+            '& .MuiToolbar-root .MuiOutlinedInput-input': { pt: 0, pb: 0 },
+        }}
+    >
         <style>{rowStyles}</style>
 
         <MuiGrid
@@ -362,6 +375,6 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
                 menuButton.click();
             }}
         />
-    </div>
+    </Box>
 }
 export default StyledMuiGrid;

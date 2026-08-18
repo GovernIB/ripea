@@ -1,5 +1,5 @@
 import React, {RefObject, useCallback, useEffect, useMemo, useState} from "react";
-import { FormControl, Grid, Select, MenuItem, Icon, Box } from "@mui/material";
+import { Icon, Box } from "@mui/material";
 import {GridApiPro, GridTreeDataGroupingCell, ReorderValidationContext} from "@mui/x-data-grid-pro";
 import { useMuiDataGridApiRef, useResourceApiService } from 'reactlib';
 import { useTranslation } from "react-i18next";
@@ -7,6 +7,7 @@ import ContingutIcon from "./details/ContingutIcon.tsx";
 import { useContingutActions } from "./details/ContingutActions.tsx";
 import useContingutMassiveActions from "./details/ContingutMassiveActions.tsx";
 import StyledMuiGrid, { ToolbarButton } from "../../components/StyledMuiGrid.tsx";
+import ViewSelector from "../../components/ViewSelector.tsx";
 import Load from "../../components/Load.tsx";
 import { MenuActionButton } from "../../components/MenuButton.tsx";
 import * as builder from '../../util/springFilterUtils.ts';
@@ -60,26 +61,30 @@ const ExpandButton = (props: { value: any, onChange: (value: any) => void, hidde
     </ToolbarButton>
 }
 
+// Vistes que ofereix el selector, amb la icona de cada botó i el text que se'n mostra com a
+// tooltip (i com a etiqueta accessible, ja que el botó no porta text visible).
+const treeViewOptions: { view: View, icon: string, i18nKey: string }[] = [
+    { view: View.estat, icon: 'checklist', i18nKey: 'page.document.view.estat' },
+    { view: View.tipus, icon: 'description', i18nKey: 'page.document.view.tipus' },
+    { view: View.carpeta, icon: 'folder_copy', i18nKey: 'page.document.view.carpeta' },
+];
+
 const TreeViewSelector = (props: { value: any, onChange: (value: any) => void }) => {
     const { value, onChange } = props;
     const { t } = useTranslation();
 
-    return <Grid size={3} sx={{ ml: 1 }}>
-        <FormControl fullWidth size="small">
-            {/*<InputLabel id="demo-simple-select-label">{t('page.document.view.title')}</InputLabel>*/}
-            <Select
-                sx={{ maxHeight: '32px' }}
-                title={t('page.document.view.title')}
-                labelId="demo-simple-select-label"
-                value={value}
-                onChange={(event) => onChange(event.target.value)}
-            >
-                <MenuItem value={View.estat}>{t('page.document.view.estat')}</MenuItem>
-                <MenuItem value={View.tipus}>{t('page.document.view.tipus')}</MenuItem>
-                <MenuItem value={View.carpeta}>{t('page.document.view.carpeta')}</MenuItem>
-            </Select>
-        </FormControl>
-    </Grid>
+    const options = useMemo(() => treeViewOptions.map(({ view, icon, i18nKey }) => ({
+        value: view,
+        icon,
+        label: t(i18nKey),
+    })), [t]);
+
+    return <ViewSelector
+        value={value}
+        onChange={onChange}
+        options={options}
+        groupLabel={t('page.document.view.title')}
+    />
 }
 
 const carpetaPerspectives =  ["PATH" , "RESTRICCIONS", "RESPONSABLE_RESTRICCIO"];

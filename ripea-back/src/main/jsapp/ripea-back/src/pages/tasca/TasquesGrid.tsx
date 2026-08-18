@@ -4,12 +4,13 @@ import { formatDate } from "../../util/dateUtils.ts";
 import {StyledPrioritat} from "../expedient/ExpedientGrid.tsx";
 import {TascaComment} from "../CommentDialog.tsx";
 import StyledMuiGrid, {FilterCountChip} from '../../components/StyledMuiGrid.tsx';
+import ViewSelector from '../../components/ViewSelector.tsx';
 import TasquesFilter, {TASCA_FILTER_SESSION_KEY} from "./TasquesFilter.tsx";
 import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import Load from "../../components/Load.tsx";
 import { CardPage } from "../../components/CardData.tsx";
 import {useUserSession} from "../../components/Session.tsx";
-import {FormControl, Grid, Icon, MenuItem, Select, Typography} from "@mui/material";
+import {Grid, Icon, Typography} from "@mui/material";
 import useTascaActions, {tascaTramitacioRoute} from "./details/TascaActions.tsx";
 import ContingutLink from "../../components/ContingutLink.tsx";
 import {openRouteInNewTab} from "../../util/navigationUtils.ts";
@@ -38,25 +39,30 @@ export enum TascaView {
     calendar = 'CALENDAR',
     kanban = 'KANBAN',
 }
+// Vistes que ofereix el selector, amb la icona de cada botó i el text que se'n mostra
+// com a tooltip (i com a etiqueta accessible, ja que el botó no porta text visible).
+const tascaViewOptions: { view: TascaView, icon: string, i18nKey: string }[] = [
+    { view: TascaView.table, icon: 'view_headline', i18nKey: 'page.tasca.view.table' },
+    { view: TascaView.calendar, icon: 'calendar_month', i18nKey: 'page.tasca.view.calendar' },
+    { view: TascaView.kanban, icon: 'view_week', i18nKey: 'page.tasca.view.kanban' },
+];
+
 export const TascaViewSelector = (props: { value: any, onChange: (value: any) => void }) => {
     const { value, onChange } = props;
     const { t } = useTranslation();
 
-    return <Grid size={3} sx={{ ml: 1 }}>
-        <FormControl fullWidth size="small">
-            <Select
-                sx={{ maxHeight: '32px' }}
-                title={t('page.document.view.title')}
-                labelId="demo-simple-select-label"
-                value={value}
-                onChange={(event) => onChange(event.target.value)}
-            >
-                <MenuItem value={TascaView.table}>{t('page.tasca.view.table')}</MenuItem>
-                <MenuItem value={TascaView.calendar}>{t('page.tasca.view.calendar')}</MenuItem>
-                <MenuItem value={TascaView.kanban}>{t('page.tasca.view.kanban')}</MenuItem>
-            </Select>
-        </FormControl>
-    </Grid>
+    const options = useMemo(() => tascaViewOptions.map(({ view, icon, i18nKey }) => ({
+        value: view,
+        icon,
+        label: t(i18nKey),
+    })), [t]);
+
+    return <ViewSelector
+        value={value}
+        onChange={onChange}
+        options={options}
+        groupLabel={t('page.tasca.view.title')}
+    />
 }
 
 // Persisteix el tipus de vista seleccionat (taula/calendari/kanban) a la sessió del

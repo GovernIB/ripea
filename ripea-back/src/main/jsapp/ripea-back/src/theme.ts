@@ -114,6 +114,18 @@ const calendarPalette = (c: CalendarPalette) => ({
 // caldrà fer-ho amb cura, ja que als temes de sota es fa spread d'aquest
 // objecte i després es sobreescriu `body` explícitament: qualsevol `body` que
 // es posi aquí quedaria silenciosament ignorat.
+// Vores dels botons del selector d'accions massives. Es volen neutres (no tenyides del color
+// primari, com faria MUI amb els outlined) però amb el contrast que toca segons el tema: amb
+// el negre fix que hi havia abans, als temes foscos els botons es veien sempre com si
+// estiguessin deshabilitats encara que hi hagués files seleccionades. Els valors són els
+// mateixos que fa servir MUI per als botons outlined (0.23 normal, 0.5 hover, 0.12 disabled),
+// de manera que l'estat actiu i el deshabilitat es distingeixen.
+const massiveSelectorBorders = (rgb: string) => ({
+    '& .MuiButton-root': { borderColor: `rgba(${rgb}, 0.23)` },
+    '& .MuiButton-root:hover': { borderColor: `rgba(${rgb}, 0.5)` },
+    '& .MuiButton-root.Mui-disabled': { borderColor: `rgba(${rgb}, 0.12)` },
+});
+
 const baseComponentStyles: ThemeOptions['components'] = {
     MuiCssBaseline: {
         styleOverrides: {
@@ -183,15 +195,7 @@ const baseComponentStyles: ThemeOptions['components'] = {
                 color: 'white',
             },
             '.massive-selector': {
-                '& .MuiButton-root': {
-                    borderColor: 'rgba(0, 0, 0, 0.23)', // Standard MUI outlined button border color
-                },
-                '& .MuiButton-root:hover': {
-                    borderColor: 'rgba(0, 0, 0, 0.50)', // Standard MUI outlined button border color
-                },
-                '& .MuiButton-root.Mui-disabled': {
-                    borderColor: 'rgba(0, 0, 0, 0.23)',
-                },
+                ...massiveSelectorBorders('0, 0, 0'),
                 '& .MuiButtonGroup-grouped:first-of-type': {
                     borderTopLeftRadius: '4px',
                     borderBottomLeftRadius: '4px',
@@ -645,6 +649,10 @@ export const darkTheme = createTheme({
                     color: DARK_PRIMARY_CONTRAST_TEXT,
                     backgroundColor: DARK_BACKGROUND_PAPER,
                 },
+                '.massive-selector': {
+                    ...((baseComponentStyles.MuiCssBaseline?.styleOverrides as any)['.massive-selector']),
+                    ...massiveSelectorBorders('255, 255, 255'),
+                },
             },
         },
         MuiOutlinedInput: {
@@ -853,6 +861,10 @@ export const draculaTheme = createTheme({
                     ...((baseComponentStyles.MuiCssBaseline?.styleOverrides as any)['.otherComment']),
                     color: DRACULA_PRIMARY_CONTRAST_TEXT,
                     backgroundColor: DRACULA_BACKGROUND_PAPER,
+                },
+                '.massive-selector': {
+                    ...((baseComponentStyles.MuiCssBaseline?.styleOverrides as any)['.massive-selector']),
+                    ...massiveSelectorBorders('255, 255, 255'),
                 },
             },
         },

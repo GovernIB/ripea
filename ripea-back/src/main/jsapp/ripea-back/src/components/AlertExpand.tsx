@@ -10,13 +10,14 @@ type LinkAlertExpandProps = {
     codi: string;
 };
 
+/** Enllaç a l'expedient dins d'un avis: navega a la pestanya actual, no n'obre una de nova. */
 export const LinkAlertExpand = (props: LinkAlertExpandProps) => {
     const { id, texte, codi, ...other } = props;
 
     return (
         <>
             {texte}
-            <ContingutLink id={id} {...other}>
+            <ContingutLink id={id} novaPestanya={false} {...other}>
                 {codi}
             </ContingutLink>
         </>
