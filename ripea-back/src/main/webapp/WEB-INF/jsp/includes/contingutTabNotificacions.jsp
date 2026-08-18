@@ -291,7 +291,7 @@ $(document).ready(function() {
 								<li><a href="<c:url value="/document/${contingut.id}/notificacio/{{:id}}/descarregarJustificantEnviamentNotib"/>"><span class="fa fa-download"></span>&nbsp;&nbsp;<spring:message code="notificacio.info.camp.justificant.enviament.notib.boto"/></a></li>
 							{{/if}}
 							{{if enviamentCertificacio}}
-								<li><a href="<c:url value="/document/{{:enviamentId}}/descarregarCertificacio"/>"><span class="fa fa-download"></span>&nbsp;&nbsp;<spring:message code="notificacio.info.camp.certifiacio"/></a></li>
+								<li><a href="<c:url value="/document/{{:enviamentId}}/descarregarCertificacio"/>"><span class="fa fa-download"></span>&nbsp;&nbsp;<spring:message code="notificacio.info.camp.justificant.recepcio.boto"/></a></li>
 							{{/if}}
 							{{if tipus == 'MANUAL'}}
 								<li><a href="<c:url value="/expedient/${expedientId}/notificacio/{{:id}}"/>" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>

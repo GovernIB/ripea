@@ -23,7 +23,7 @@ export const useActions = () => {
             });
     }
 
-    const certificat = (id:any) => report(id, 'DESCARREGAR_CERTIFICAT', t('page.notificacioInteressat.action.certificat.ok'), 'ZIP')
+    const certificat = (id:any) => report(id, 'DESCARREGAR_CERTIFICAT', t('page.notificacioInteressat.action.certificat.ok'), 'PDF')
 
     return {
         certificat
