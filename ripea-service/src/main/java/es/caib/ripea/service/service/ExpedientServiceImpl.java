@@ -237,15 +237,15 @@ public class ExpedientServiceImpl implements ExpedientService {
 					}
 				}
 				if (justificantIdMetaDoc!=null) {
-					String arxiuUuid = expedientPeticioEntity.getRegistre().getJustificantArxiuUuid();
-					if (arxiuUuid != null && isIncorporacioJustificantActiva()) {
+					String justificantArxiuUuid = expedientPeticioEntity.getRegistre().getJustificantArxiuUuid();
+					if (justificantArxiuUuid != null && isIncorporacioJustificantActiva()) {
 						try {
 							expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
 							//Mateix nom i títol que el procés automàtic i que l'acceptació des de REACT.
 							String registreIdentificador = expedientPeticioEntity.getRegistre().getIdentificador();
-							expedientHelper.crearDocFromUuid(
+							expedientHelper.crearDocFromJustificantRegistreUuid(
 									expedient.getId(),
-									arxiuUuid,
+									justificantArxiuUuid,
 									expedientPeticioEntity.getId(),
 									justificantIdMetaDoc,
 									RegistreJustificantUtils.nomFitxerJustificant(expedientPeticioEntity.getId(), registreIdentificador),
@@ -345,14 +345,14 @@ public class ExpedientServiceImpl implements ExpedientService {
 			}
 		}
 		if (justificantIdMetaDoc!=null) {
-			String arxiuUuid = expedientPeticioRepository.getRegistreJustificantArxiuUuid(registreId);
-			if (arxiuUuid != null && isIncorporacioJustificantActiva()) {
+			String justificantArxiuUuid = expedientPeticioRepository.getRegistreJustificantArxiuUuid(registreId);
+			if (justificantArxiuUuid != null && isIncorporacioJustificantActiva()) {
 				try {
 					//Mateix nom i títol que el procés automàtic i que l'acceptació des de REACT.
 					String registreIdentificador = expedientPeticioEntity.getRegistre().getIdentificador();
-					expedientHelper.crearDocFromUuid(
+					expedientHelper.crearDocFromJustificantRegistreUuid(
 							expedientId,
-							arxiuUuid,
+							justificantArxiuUuid,
 							expedientPeticioId,
 							justificantIdMetaDoc,
 							RegistreJustificantUtils.nomFitxerJustificant(expedientPeticioId, registreIdentificador),

@@ -1198,15 +1198,15 @@ public class ExpedientHelper {
 	 * Creates document from registre annex
 	 * @param expedientId
 	 *
-	 * @param arxiuUuid
+	 * @param justificantArxiuUuid
 	 * @param expedientPeticioId
 	 * @param justificantIdMetaDoc
 	 * @return
 	 */
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public DocumentEntity crearDocFromUuid(
+	public DocumentEntity crearDocFromJustificantRegistreUuid(
 			Long expedientId,
-			String arxiuUuid,
+			String justificantArxiuUuid,
 			Long expedientPeticioId,
 			Long justificantIdMetaDoc,
             String nomDocument,
@@ -1219,7 +1219,7 @@ public class ExpedientHelper {
 		expedientEntity = expedientRepository.getOne(expedientId);
 		Document documentDetalls = pluginHelper.arxiuDocumentConsultar(
 				null,
-				arxiuUuid,
+				justificantArxiuUuid,
 				null,
 				true,
 				false);
@@ -1227,7 +1227,7 @@ public class ExpedientHelper {
 		entitat = entitatRepository.findByUnitatArrel(expedientPeticioEntity.getRegistre().getEntitatCodi());
 		logger.debug(
 				"Creant justificant de expedient peticio (" + "expedientId=" +
-						expedientId + ", " + "arxiuUuid=" + arxiuUuid +
+						expedientId + ", " + "arxiuUuid=" + justificantArxiuUuid +
 						", " + "expedientPeticioId=" + expedientPeticioEntity.getId() + ")");
 
 		// CREATE CARPETA IN DB AND IN ARXIU
@@ -1246,7 +1246,7 @@ public class ExpedientHelper {
 		// CREATE DOCUMENT IN DB
 		DocumentDto documentDto = toDocumentDto(documentDetalls, expedientPeticioEntity.getIdentificador());
 		// comprovar si el justificant s'ha importat anteriorment
-		List<DocumentDto> documents = documentHelper.findByArxiuUuid(arxiuUuid);
+		List<DocumentDto> documents = documentHelper.findByArxiuUuid(justificantArxiuUuid);
 		if (documents != null && !documents.isEmpty()) {
 			for (DocumentDto documentAlreadyImported: documents) {
 				expedientsWithImportacio.add(documentAlreadyImported);
@@ -1296,7 +1296,6 @@ public class ExpedientHelper {
 			documentHelper.validaFirmaDocument(docEntity, fitxer, documentDto.getFirmaContingut(), true, false);
 		}
 
-
 		docEntity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
 		docEntity.setNtiTipoFirma(documentDto.getNtiTipoFirma());
 
@@ -1336,7 +1335,7 @@ public class ExpedientHelper {
 			Expedient expedient = pluginHelper.arxiuExpedientConsultar(expedientEntity);
 			boolean documentExistsInArxiu = false;
 			String documentUuid = null;
-			if (expedient.getContinguts() != null) {
+			if (expedient != null && expedient.getContinguts() != null) {
 				for (ContingutArxiu contingutArxiu : expedient.getContinguts()) {
 					if (contingutArxiu.getTipus() == ContingutTipus.DOCUMENT &&
 							contingutArxiu.getNom().equals(docEntity.getNom())) {
@@ -1345,8 +1344,9 @@ public class ExpedientHelper {
 					}
 				}
 			}
-			if (documentExistsInArxiu && carpetaEntity.getArxiuUuid() == null) {
-				expedientEntity.updateArxiu(documentUuid);
+			if (documentExistsInArxiu && documentUuid != null) {
+				// document already in arxiu: update uuid of the document, not of the expedient
+				docEntity.updateArxiu(documentUuid);
 			}
 			if (!documentExistsInArxiu) {
 				String uuidDesti = contingutHelper.arxiuDocumentPropagarMoviment(

@@ -7,10 +7,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-import es.caib.ripea.persistence.entity.*;
-import es.caib.ripea.persistence.repository.*;
-import es.caib.ripea.service.helper.*;
-import es.caib.ripea.service.intf.service.ExpedientPeticioService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +17,79 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.caib.ripea.persistence.entity.DocumentEnviamentInteressatEntity;
+import es.caib.ripea.persistence.entity.DocumentPortafirmesEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientPeticioEntity;
+import es.caib.ripea.persistence.entity.GrupEntity;
+import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.OrganGestorEntity;
+import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.entity.config.ConfigEntity;
+import es.caib.ripea.persistence.repository.AclSidRepository;
+import es.caib.ripea.persistence.repository.AlertaRepository;
+import es.caib.ripea.persistence.repository.AvisRepository;
+import es.caib.ripea.persistence.repository.ConsultaPinbalRepository;
+import es.caib.ripea.persistence.repository.ContingutLogRepository;
+import es.caib.ripea.persistence.repository.ContingutMovimentRepository;
+import es.caib.ripea.persistence.repository.ContingutRepository;
+import es.caib.ripea.persistence.repository.DadaRepository;
+import es.caib.ripea.persistence.repository.DispositiuEnviamentRepository;
+import es.caib.ripea.persistence.repository.DocumentEnviamentInteressatRepository;
+import es.caib.ripea.persistence.repository.DocumentNotificacioRepository;
+import es.caib.ripea.persistence.repository.DocumentPortafirmesRepository;
+import es.caib.ripea.persistence.repository.DominiRepository;
+import es.caib.ripea.persistence.repository.EmailPendentEnviarRepository;
+import es.caib.ripea.persistence.repository.EntitatRepository;
+import es.caib.ripea.persistence.repository.ExecucioMassivaContingutRepository;
+import es.caib.ripea.persistence.repository.ExecucioMassivaRepository;
+import es.caib.ripea.persistence.repository.ExpedientComentariRepository;
+import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
+import es.caib.ripea.persistence.repository.ExpedientOrganPareRepository;
+import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
+import es.caib.ripea.persistence.repository.ExpedientRepository;
+import es.caib.ripea.persistence.repository.ExpedientTascaComentariRepository;
+import es.caib.ripea.persistence.repository.ExpedientTascaRepository;
+import es.caib.ripea.persistence.repository.FluxFirmaUsuariRepository;
+import es.caib.ripea.persistence.repository.GrupRepository;
+import es.caib.ripea.persistence.repository.InteressatRepository;
+import es.caib.ripea.persistence.repository.MetaDadaRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientCarpetaRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientComentariRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientOrganGestorRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientSequenciaRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientTascaRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientTascaValidacioRepository;
+import es.caib.ripea.persistence.repository.MetaNodeRepository;
+import es.caib.ripea.persistence.repository.OrganGestorRepository;
+import es.caib.ripea.persistence.repository.PinbalServeiRepository;
+import es.caib.ripea.persistence.repository.PortafirmesBlockInfoRepository;
+import es.caib.ripea.persistence.repository.PortafirmesBlockRepository;
+import es.caib.ripea.persistence.repository.RegistreAnnexRepository;
+import es.caib.ripea.persistence.repository.RegistreInteressatRepository;
+import es.caib.ripea.persistence.repository.RegistreRepository;
+import es.caib.ripea.persistence.repository.TipusDocumentalRepository;
+import es.caib.ripea.persistence.repository.UsuariRepository;
+import es.caib.ripea.persistence.repository.ViaFirmaUsuariRepository;
 import es.caib.ripea.persistence.repository.config.ConfigRepository;
 import es.caib.ripea.persistence.repository.historic.HistoricUsuariRepository;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 import es.caib.ripea.service.firma.DocumentFirmaPortafirmesHelper;
+import es.caib.ripea.service.helper.ApplicationHelper;
+import es.caib.ripea.service.helper.CacheHelper;
+import es.caib.ripea.service.helper.CertificatRemesaHelper;
+import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.ConversioTipusHelper;
+import es.caib.ripea.service.helper.ExcepcioLogHelper;
+import es.caib.ripea.service.helper.IntegracioHelper;
+import es.caib.ripea.service.helper.MetaExpedientHelper;
+import es.caib.ripea.service.helper.PaginacioHelper;
+import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.helper.RegistreJustificantHelper;
+import es.caib.ripea.service.helper.RolHelper;
+import es.caib.ripea.service.helper.TipusDocumentalHelper;
+import es.caib.ripea.service.helper.UsuariHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.DiagnosticFiltreDto;
 import es.caib.ripea.service.intf.dto.EntitatDto;
@@ -1003,10 +1067,16 @@ public class AplicacioServiceImpl implements AplicacioService {
     @Override
     @Transactional
     public String executeJustificantsRegistreExpedient(Long anotacioRegistreId) throws Exception {
+    	ExpedientPeticioEntity peticio = null;
         try {
-            return registreJustificantHelper.incorporarJustificantsRegistreExpedient(anotacioRegistreId);
+        	peticio = expedientPeticioRepository.findById(anotacioRegistreId).orElse(null);
+            return registreJustificantHelper.incorporarJustificantsRegistreExpedient(anotacioRegistreId, peticio);
         } catch (Exception ex) {
-            throw new Exception("Error al afegir el justificant de registre de l'anotació " + anotacioRegistreId + ": " + ex.getMessage());
+        	if (peticio!=null && peticio.getRegistre()!=null) {
+        		throw new Exception("Error al afegir el justificant de registre de l'anotació " + peticio.getRegistre().getIdentificador() + ": " + ex.getMessage());
+        	} else {
+        		throw new Exception("Error al afegir el justificant de registre de l'anotació " + anotacioRegistreId + ": " + ex.getMessage());
+        	}
         }
     }
 }

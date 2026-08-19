@@ -2580,11 +2580,11 @@ public class ContingutHelper {
 		}
 	}
 	
-	
 	public String arxiuDocumentPropagarMoviment(
 			String uuid,
 			ContingutEntity desti,
 			String uuidExpedientDesti) {
+		
 			String identificador = null;
 			if (desti instanceof ExpedientEntity || (desti instanceof CarpetaEntity && !isCarpetaLogica())) {
 				identificador = pluginHelper.arxiuDocumentMoure(

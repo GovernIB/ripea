@@ -767,14 +767,14 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 							} else {
 
 								//És un justificant
-								String arxiuUuid = entity.getRegistre().getJustificantArxiuUuid();
-								if (arxiuUuid != null && configHelper.getAsBoolean(PropertyConfig.INCORPORAR_JUSTIFICANT)) {
+								String justificantArxiuUuid = entity.getRegistre().getJustificantArxiuUuid();
+								if (justificantArxiuUuid != null && configHelper.getAsBoolean(PropertyConfig.INCORPORAR_JUSTIFICANT)) {
 									//Mateix nom i títol que el procés automàtic, perquè el document sigui idèntic
 									//s'incorpori per on s'incorpori i la detecció de duplicats funcioni entre vies.
 									String registreIdentificador = entity.getRegistre().getIdentificador();
-									expedientHelper.crearDocFromUuid(
+									expedientHelper.crearDocFromJustificantRegistreUuid(
 											expedientId,
-											arxiuUuid,
+											justificantArxiuUuid,
 											expedientPeticioId,
 											Long.parseLong(entry.getValue()),
 											RegistreJustificantUtils.nomFitxerJustificant(expedientPeticioId, registreIdentificador),
