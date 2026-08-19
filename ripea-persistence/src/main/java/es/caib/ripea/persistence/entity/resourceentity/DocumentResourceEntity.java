@@ -143,6 +143,10 @@ public class DocumentResourceEntity extends NodeResourceEntity<DocumentResource>
 	@Column(name = "arxiu_estat", length = 16)
 	private ArxiuEstatEnumDto arxiuEstat;
 	
+	// No s'ha pogut moure el justificant de registre a dins l'expedient de l'arxiu.
+	@Column(name = "just_moure_error")
+	private boolean justificantMoureError;
+	
 	@Enumerated(EnumType.STRING)
 	@Column(name = "doc_firma_tipus", length = 16)
 	private DocumentFirmaTipusEnumDto documentFirmaTipus;

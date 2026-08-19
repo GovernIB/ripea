@@ -242,7 +242,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             showInMenu: true,
             onClick: guardarArxiu,
             disabled: !entity?.arxiuUuid,
-            hidden: (row:any) => (row?.arxiuUuid && !row?.gesDocFirmatId) || !entity?.potModificar,
+            hidden: (row:any) => (row?.arxiuUuid && !row?.gesDocFirmatId && !row?.justificantMoureError) || !entity?.potModificar,
         },
         {
             label: t('page.document.action.detall.label'),

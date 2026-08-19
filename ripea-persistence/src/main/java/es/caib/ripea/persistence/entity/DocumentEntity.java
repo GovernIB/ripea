@@ -148,6 +148,11 @@ public class DocumentEntity extends NodeEntity {
 	@Column(name = "arxiu_estat", length = 16)
 	private ArxiuEstatEnumDto arxiuEstat;
 	
+	// No s'ha pogut moure el justificant de registre a dins l'expedient de l'arxiu.
+	// El document queda a l'expedient de RIPEA amb l'uuid original i no es reintenta.
+	@Column(name = "just_moure_error")
+	private boolean justificantMoureError;
+	
 	@Enumerated(EnumType.STRING)
 	@Column(name = "doc_firma_tipus", length = 16)
 	private DocumentFirmaTipusEnumDto documentFirmaTipus;
@@ -289,6 +294,10 @@ public class DocumentEntity extends NodeEntity {
 	
 	public void updateArxiuEstat(ArxiuEstatEnumDto arxiuEstat) {
 		this.arxiuEstat = arxiuEstat;
+	}
+	
+	public void updateJustificantMoureError(boolean justificantMoureError) {
+		this.justificantMoureError = justificantMoureError;
 	}
 	
 	public void eliminaDadesArxiu() {

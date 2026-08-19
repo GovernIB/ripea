@@ -220,7 +220,7 @@
 			
 			<%---- Guardar en arxiu ----%>
 			<c:choose>
-				<c:when test="${contingut.document && contingut.arxiuUuid==null}">
+				<c:when test="${contingut.document && (contingut.arxiuUuid==null || contingut.justificantMoureError)}">
 					<c:set var="primerGuardarExpedientArxiu"><spring:message code="disabled.button.primerGuardarExpedientArxiu"/></c:set>
 					<li class="disabledMsg" title="${expedient.arxiuUuid == null ? primerGuardarExpedientArxiu : ''}"><a class="${expedient.arxiuUuid == null ? 'disabled' : ''}" href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/guardarDocumentArxiu?origin=docDetail&tascaId=${tascaId}&expedientId=${contingutNavigationId}"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
 				</c:when>

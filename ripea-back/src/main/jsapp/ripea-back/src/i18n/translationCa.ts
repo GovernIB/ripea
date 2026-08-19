@@ -1125,6 +1125,7 @@ const translationCa = {
                 original: "Aquest document contenia signatures invàlides i s'ha clonat i signat en servidor per poder guardar-lo a l'Arxiu Digital. Es pot descarregar l'original des del menú d'accions",
                 custodiar: "Pendent de custodiar document signat de portafirmes",
                 moure: "El document de l'anotació està pendent de moure a la sèrie documental del procediment",
+                moureJustificant: "No s'ha pogut moure el justificant de registre a l'expedient documental de RIPEA.",
                 definitiu: "Document definitiu",
                 firmaPendent: "Pendent de signar",
                 firmaParcial: "Signat parcialment",

@@ -15,4 +15,10 @@ public interface RegistreAnnexResourceRepository extends BaseRepository<Registre
 	@Query("select count(a) from RegistreAnnexResourceEntity a " +
 			"where a.registre.id = :registreId and (a.document is null or a.error is not null)")
 	long countAnnexosAmbErrorByRegistreId(@Param("registreId") Long registreId);
+
+	//Compta els annexos d'un document que han quedat amb error, es a dir, pendents de moure
+	//a la sèrie documental del procediment.
+	@Query("select count(a) from RegistreAnnexResourceEntity a " +
+			"where a.document.id = :documentId and a.error is not null")
+	long countAnnexosAmbErrorByDocumentId(@Param("documentId") Long documentId);
 }

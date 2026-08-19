@@ -154,6 +154,7 @@ import es.caib.ripea.service.intf.dto.SiNoEnumDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.exception.ArxiuJaGuardatException;
 import es.caib.ripea.service.intf.exception.InteressatTipusDocumentException;
+import es.caib.ripea.service.intf.exception.SistemaExternException;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.service.ExecucioMassivaService;
 import es.caib.ripea.service.intf.service.ExpedientSeguidorService;
@@ -1322,14 +1323,7 @@ public class ExpedientHelper {
 				carpetaEntity.updateArxiu(documentUuid);
 			}
 			if (!documentExistsInArxiu) {
-				String uuidDesti = contingutHelper.arxiuDocumentPropagarMoviment(
-						docEntity.getArxiuUuid(),
-						carpetaEntity,
-						expedientEntity.getArxiuUuid());
-				// if document was dispatched, update uuid to new document
-				if (uuidDesti != null) {
-					docEntity.updateArxiu(uuidDesti);
-				}
+				moureJustificantArxiu(docEntity, carpetaEntity, expedientEntity, justificantArxiuUuid);
 			}
 		} else {
 			Expedient expedient = pluginHelper.arxiuExpedientConsultar(expedientEntity);
@@ -1349,14 +1343,7 @@ public class ExpedientHelper {
 				docEntity.updateArxiu(documentUuid);
 			}
 			if (!documentExistsInArxiu) {
-				String uuidDesti = contingutHelper.arxiuDocumentPropagarMoviment(
-						docEntity.getArxiuUuid(),
-						expedientEntity,
-						expedientEntity.getArxiuUuid());
-				// if document was dispatched, update uuid to new document
-				if (uuidDesti != null) {
-					docEntity.updateArxiu(uuidDesti);
-				}
+				moureJustificantArxiu(docEntity, expedientEntity, expedientEntity, justificantArxiuUuid);
 			}
 		}
 
@@ -1368,6 +1355,88 @@ public class ExpedientHelper {
 		contingutLogHelper.logCreacio(docEntity, true, true);
 
 		return docEntity;
+	}
+
+	/**
+	 * Mou el justificant de registre a dins l'expedient de l'arxiu.
+	 *
+	 * El moviment no es critic per a la incorporacio del justificant: si l'arxiu el rebutja
+	 * (tipicament per politiques del servei extern damunt documentMoure) el document es queda
+	 * incorporat a l'expedient de RIPEA amb l'uuid original que s'ha rebut per parametre, es
+	 * marca amb l'indicador justificantMoureError per poder avisar a la interficie i la
+	 * transaccio pot fer commit igualment. No es reintenta.
+	 *
+	 * Nomes es controla l'error del moviment: les consultes previes a l'arxiu i qualsevol altre
+	 * error segueixen propagant-se i fent rollback.
+	 *
+	 * @param docEntity document ja creat a la base de dades.
+	 * @param desti carpeta o expedient de desti dins l'arxiu.
+	 * @param expedientEntity expedient al qual pertany el document.
+	 * @param justificantArxiuUuid uuid original del justificant a l'arxiu.
+	 */
+	private void moureJustificantArxiu(
+			DocumentEntity docEntity,
+			ContingutEntity desti,
+			ExpedientEntity expedientEntity,
+			String justificantArxiuUuid) {
+		try {
+			String uuidDesti = contingutHelper.arxiuDocumentPropagarMoviment(
+					docEntity.getArxiuUuid(),
+					desti,
+					expedientEntity.getArxiuUuid());
+			// if document was dispatched, update uuid to new document
+			if (uuidDesti != null) {
+				docEntity.updateArxiu(uuidDesti);
+			}
+		} catch (SistemaExternException ex) {
+			docEntity.updateArxiu(justificantArxiuUuid);
+			docEntity.updateJustificantMoureError(true);
+			logger.error(
+					"No s'ha pogut moure el justificant de registre a l'expedient de l'arxiu (" +
+							"expedientId=" + expedientEntity.getId() + ", " +
+							"documentId=" + docEntity.getId() + ", " +
+							"justificantArxiuUuid=" + justificantArxiuUuid + ")",
+					ex);
+		}
+	}
+
+	/**
+	 * Reintenta el moviment del justificant de registre a dins l'expedient de l'arxiu, per als
+	 * documents que han quedat marcats amb justificantMoureError. El reintent el demana l'usuari
+	 * des de l'acció "Guardar en arxiu" del document.
+	 *
+	 * Segueix el mateix patró que moveDocumentArxiuNewTransaction per als annexos: no llança
+	 * l'excepció, la retorna, de manera que si el moviment torna a fallar el document conservi
+	 * l'uuid original i la marca.
+	 *
+	 * @param documentId document del justificant de registre.
+	 * @return l'excepció produïda, o null si el moviment ha anat bé.
+	 */
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public Exception moureJustificantArxiuNewTransaction(Long documentId) {
+		DocumentEntity docEntity = documentRepository.getOne(documentId);
+		ExpedientEntity expedientEntity = docEntity.getExpedient();
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedientEntity.getId()));
+		try {
+			String uuidDesti = contingutHelper.arxiuDocumentPropagarMoviment(
+					docEntity.getArxiuUuid(),
+					docEntity.getPare(),
+					expedientEntity.getArxiuUuid());
+			// if document was dispatched, update uuid to new document
+			if (uuidDesti != null) {
+				docEntity.updateArxiu(uuidDesti);
+			}
+			docEntity.updateJustificantMoureError(false);
+			return null;
+		} catch (Exception ex) {
+			logger.error(
+					"No s'ha pogut moure el justificant de registre a l'expedient de l'arxiu (" +
+							"expedientId=" + expedientEntity.getId() + ", " +
+							"documentId=" + documentId + ", " +
+							"arxiuUuid=" + docEntity.getArxiuUuid() + ")",
+					ex);
+			return ex;
+		}
 	}
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)

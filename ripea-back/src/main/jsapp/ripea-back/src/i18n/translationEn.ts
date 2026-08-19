@@ -1124,6 +1124,7 @@ const translationEn = {
                 original: "This document contained invalid signatures and has been cloned and signed on the server to be saved in the Digital Archive. The original can be downloaded from the actions menu",
                 custodiar: "Pending to custody signed portafirmas document",
                 moure: "The annotation's document is pending to be moved to the procedural document series",
+                moureJustificant: "The registry receipt could not be moved to the RIPEA document case file.",
                 definitiu: "Definitive document",
                 firmaPendent: "Pending signature",
                 firmaParcial: "Partially signed",

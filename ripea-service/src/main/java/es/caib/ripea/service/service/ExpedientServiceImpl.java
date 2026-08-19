@@ -44,6 +44,7 @@ import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.GrupRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
+import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.persistence.repository.RegistreAnnexRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.persistence.repository.command.ExpedientRepositoryCommnand;
@@ -128,6 +129,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 	@Autowired private OrganGestorRepository organGestorRepository;
 	@Autowired private GrupRepository grupRepository;
 	@Autowired private RegistreAnnexRepository registreAnnexRepository;
+	@Autowired private DocumentRepository documentRepository;
 	@Autowired private EmailHelper emailHelper;
 	@Autowired private EventService eventService;
 	@Autowired private ApplicationHelper applicationHelper;
@@ -405,6 +407,15 @@ public class ExpedientServiceImpl implements ExpedientService {
 		Long expedientId = registreAnnexRepository.findExpedientId(registreAnnexId);
 		synchronized (SynchronizationHelper.get0To99Lock(expedientId, SynchronizationHelper.locksExpedients)) {
 			return expedientHelper.moveDocumentArxiuNewTransaction(registreAnnexId);
+		}
+	}
+
+	@Transactional
+	@Override
+	public Exception retryMoureJustificantArxiu(Long documentId) {
+		Long expedientId = documentRepository.getOne(documentId).getExpedient().getId();
+		synchronized (SynchronizationHelper.get0To99Lock(expedientId, SynchronizationHelper.locksExpedients)) {
+			return expedientHelper.moureJustificantArxiuNewTransaction(documentId);
 		}
 	}
 

@@ -15,3 +15,19 @@ databaseChangeLog:
             splitStatements: false
             stripComments: true
             relativeToChangelogFile: true
+  - changeSet:
+      id: RIPEA_1.0.8_JUST_MOURE_ERROR_1
+      author: limit
+      changes:
+        - sqlFile:
+            dbms: oracle
+            path: ../scripts/oracle/1.0.8/Versio_1.0.8_DDL_1.sql
+            splitStatements: true
+            stripComments: true
+            relativeToChangelogFile: true
+        - sqlFile:
+            dbms: postgresql
+            path: ../scripts/postgres/1.0.8/Versio_1.0.8_DDL_1.sql
+            splitStatements: true
+            stripComments: true
+            relativeToChangelogFile: true

@@ -535,6 +535,16 @@ public interface ExpedientService {
 	@PreAuthorize("isAuthenticated()")
 	public Exception retryMoverAnnexArxiu(Long registreAnnexId);
 
+	/**
+	 * Reintenta el moviment a l'arxiu del justificant de registre que ha quedat marcat amb
+	 * justificantMoureError.
+	 *
+	 * @param documentId document del justificant de registre.
+	 * @return l'excepció produïda, o null si el moviment ha anat bé.
+	 */
+	@PreAuthorize("isAuthenticated()")
+	public Exception retryMoureJustificantArxiu(Long documentId);
+
 	@PreAuthorize("isAuthenticated()")
 	public long countByMetaExpedient(
 			Long entitatId,

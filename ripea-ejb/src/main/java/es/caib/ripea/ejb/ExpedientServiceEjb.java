@@ -450,6 +450,12 @@ public class ExpedientServiceEjb extends AbstractServiceEjb<ExpedientService> im
 	
 	@Override
 	@RolesAllowed("**")
+	public Exception retryMoureJustificantArxiu(Long documentId) {
+		return delegateService.retryMoureJustificantArxiu(documentId);
+	}
+	
+	@Override
+	@RolesAllowed("**")
 	public long countByMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId) {

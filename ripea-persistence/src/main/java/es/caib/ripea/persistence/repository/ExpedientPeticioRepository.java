@@ -292,8 +292,15 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 	public int updateUsuariAuditoria(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 
     /**
-     * Obté els IDs únics dels expedients oberts i no esborrats que tenen anotacions
-     * amb justificant de registre pendent d'incorporar com a document.
+     * Obté els IDs únics de les anotacions d'expedients oberts i no esborrats que tenen
+     * justificant de registre pendent d'incorporar com a document.
+     *
+     * El justificant es considera ja incorporat si l'expedient té un document del tipus indicat
+     * per codiJustificant (REGISTRE_JUSTIFICANT_ENTRADA de MetaDocumentPerDefecteEnumDto) amb el
+     * número de registre de l'anotació. Tots dos valors els deixa informats
+     * ExpedientHelper.crearDocFromJustificantRegistreUuid, sigui quina sigui la via d'incorporació.
+     *
+     * @param codiJustificant codi del tipus de document del justificant de registre.
      */
     @Query("SELECT DISTINCT p.id FROM ExpedientPeticioEntity p " +
         "WHERE p.expedient.estat = es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto.OBERT " +
@@ -302,7 +309,8 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
         "AND NOT EXISTS (" +
         "    SELECT 1 FROM DocumentEntity d " +
         "    WHERE d.expedient = p.expedient " +
-        "    AND d.fitxerNom LIKE CONCAT('REGISTRE_JUSTIFICANT_ENTRADA_', p.id, '_%')" +
+        "    AND d.metaDocument.codi = :codiJustificant " +
+        "    AND d.numeroRegistre = p.identificador" +
         ")")
-    List<Long> findExpedientsObertsAmbJustificantPendent();
+    List<Long> findExpedientsObertsAmbJustificantPendent(@Param("codiJustificant") String codiJustificant);
 }

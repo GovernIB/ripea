@@ -626,6 +626,12 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			} catch (Exception e) {
 				exception = e;
 			}
+		} else if (document.isJustificantMoureError()) {
+			try {
+				exception = expedientService.retryMoureJustificantArxiu(documentId);
+			} catch (Exception e) {
+				exception = e;
+			}
 		} else if (!StringUtils.isEmpty(document.getGesDocFirmatId())) {
 			
 			try {

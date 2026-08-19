@@ -64,6 +64,8 @@ public class DocumentDto extends NodeDto {
 	private String pinbalIdpeticion;
 	
 	private boolean pendentMoverArxiu;
+	// No s'ha pogut moure el justificant de registre a dins l'expedient de l'arxiu.
+	private boolean justificantMoureError;
 	private Long annexId;
 
 	private boolean validacioFirmaCorrecte;

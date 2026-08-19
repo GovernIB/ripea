@@ -77,6 +77,9 @@ const DocumentIcon = (props:any) => {
         {entity?.pendentMoverArxiu && !entity?.gesDocOriginalId &&
             <Icon title={t('page.document.alert.moure')} color={"warning"}>warning</Icon>}
 
+        {entity?.justificantMoureError &&
+            <Icon title={t('page.document.alert.moureJustificant')} color={"warning"}>warning</Icon>}
+
         {!entity?.validacioFirmaCorrecte && <Icon title={entity?.validacioFirmaErrorMsg} color={"warning"}>warning</Icon>}
         {isInOptions(entity?.estat, 'DEFINITIU') && <Icon title={t('page.document.alert.definitiu')} color={"success"}>check_box</Icon>}
 

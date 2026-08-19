@@ -99,6 +99,7 @@ import es.caib.ripea.service.intf.dto.IntegracioAccioDto;
 import es.caib.ripea.service.intf.dto.IntegracioDto;
 import es.caib.ripea.service.intf.dto.IntegracioEnumDto;
 import es.caib.ripea.service.intf.dto.IntegracioFiltreDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentPerDefecteEnumDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
@@ -1054,7 +1055,8 @@ public class AplicacioServiceImpl implements AplicacioService {
     @Override
     @Transactional(readOnly = true)
     public List<Long> getExpedientsAmbJustificantRegistre() {
-        return expedientPeticioRepository.findExpedientsObertsAmbJustificantPendent();
+        return expedientPeticioRepository.findExpedientsObertsAmbJustificantPendent(
+                MetaDocumentPerDefecteEnumDto.REGISTRE_JUSTIFICANT_ENTRADA.getCodi());
     }
 
     /**

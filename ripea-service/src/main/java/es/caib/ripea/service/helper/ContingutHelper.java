@@ -943,6 +943,7 @@ public class ContingutHelper {
 		dto.setArxiuEstat(document.getArxiuEstat());
 		dto.setArxiuEstatDefinitiu(document.isArxiuEstatDefinitiu());
 		dto.setDocumentFirmaTipus(document.getDocumentFirmaTipus());
+		dto.setJustificantMoureError(document.isJustificantMoureError());
 	}
 
 	// CARPETA
@@ -2454,8 +2455,6 @@ public class ContingutHelper {
 		carpeta.updateArxiuIntent(true);
 		return exception;
 	}
-	
-	
 
 	public void arxiuPropagarModificacio(
 			DocumentEntity document,
