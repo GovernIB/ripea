@@ -522,6 +522,11 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
             Boolean isErrorLastEnviament = documentPortafirmesRepository.findErrorLastEnviamentPortafirmesByDocumentId(entity.getId());
             resource.setErrorEnviamentPortafirmes(isErrorLastEnviament != null ? isErrorLastEnviament : false);
 
+            //Document provinent d'un annex d'anotació que ha quedat amb error: pendent de moure
+            //a la sèrie documental del procediment. Equival a DocumentEntity.isPendentMoverArxiu(),
+            //que és el que fa servir la interfície JSP.
+            resource.setPendentMoverArxiu(registreAnnexResourceRepository.countAnnexosAmbErrorByDocumentId(entity.getId()) > 0);
+
             if (entity.getMetaDocument() != null) {
                 resource.setMetaDocumentInfo(objectMappingHelper.newInstanceMap(
                         entity.getMetaDocument(),

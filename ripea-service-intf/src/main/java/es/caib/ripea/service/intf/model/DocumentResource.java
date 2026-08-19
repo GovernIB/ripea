@@ -336,6 +336,9 @@ public class DocumentResource extends NodeResource {
     @Transient private boolean errorDarreraNotificacio;
     @Transient private boolean funcionariHabilitatDigitalib;
     @Transient private boolean errorEnviamentPortafirmes;
+    // El document prove d'un annex d'anotacio que ha quedat amb error: esta pendent de
+    // moure a la serie documental del procediment. Equivalent a DocumentEntity.isPendentMoverArxiu().
+    @Transient private boolean pendentMoverArxiu;
     @Transient private boolean pluginSummarizeActiu;
     @ResourceField(enumType = true, onChangeActive = true)
     @Transient private String digitalitzacioPerfil;
