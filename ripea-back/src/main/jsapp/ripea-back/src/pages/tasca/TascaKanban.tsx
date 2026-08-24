@@ -5,7 +5,7 @@ import KanbanBoard from "@src/components/KanbanBoard.tsx";
 import {formatDate} from "@src/util/dateUtils.ts";
 import {useUserSession} from "@src/components/Session.tsx";
 
-export const TascaKanban = ({actions, filter, namedQueries, perspectives, reloadTrigger}:any) => {
+export const TascaKanban = ({actions, filter, namedQueries, perspectives, reloadTrigger, onEventClick}:any) => {
     const { t } = useTranslation();
     const [tasques, setTasques] = useState<any[]>([]);
     const { value: user } = useUserSession();
@@ -99,6 +99,7 @@ export const TascaKanban = ({actions, filter, namedQueries, perspectives, reload
             ]}
             actions={actions}
             handleDragEnd={handleDragEnd}
+            onElementClick={onEventClick}
         />
     );
 };
