@@ -38,7 +38,7 @@
                             <select id="${configKey}" class="form-control selector2" ${disabled} style="width:100%;">
                                 <option value=""></option>
                                 <c:forEach var="opt" items="${config.validValues}">
-                                    <option value="${opt}">${opt}</option>
+                                    <option value="${opt}"><spring:message code="config.type.${config.typeCode}.${opt}" text="${opt}"/></option>
                                 </c:forEach>
                             </select>
                         </c:when>
@@ -47,12 +47,12 @@
                                 <label id="${configKey}_radio_1" class="radio-inline ${textGray}">
                                     <input id="${configKey}_1" name="${configKey}" type="radio" value="${config.validValues[0]}"
                                         ${disabled} <c:if test="${config.validValues[0] == config.value}">checked</c:if>>
-                                        ${config.validValues[0]}
+                                        <spring:message code="config.type.${config.typeCode}.${config.validValues[0]}" text="${config.validValues[0]}"/>
                                 </label>
                                 <label id="${configKey}_radio_2" class="radio-inline ${textGray}">
                                     <input id="${configKey}_2" name="${configKey}" type="radio" value="${config.validValues[1]}"
                                         ${disabled} <c:if test="${config.validValues[1] == config.value}">checked</c:if>>
-                                        ${config.validValues[1]}
+                                        <spring:message code="config.type.${config.typeCode}.${config.validValues[1]}" text="${config.validValues[1]}"/>
                                 </label>
                             </div>
                         </c:when>

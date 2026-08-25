@@ -12,6 +12,11 @@ public class OrganConfigDto {
 
 	private String key;
 	private String value;
+	/**
+	 * Etiqueta traduida del valor, emplenada nomes a la capa web. Si el valor no te
+	 * traduccio definida no s'emplena i la vista mostra el valor tal qual.
+	 */
+	private String valueLabel;
 	private Long organGestorId;
 	
 	private String organGestorCodiNom;

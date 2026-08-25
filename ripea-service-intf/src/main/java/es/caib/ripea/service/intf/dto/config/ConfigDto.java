@@ -30,6 +30,11 @@ ConfigDto {
 
     private String typeCode;
     private List<String> validValues;
+    /**
+     * Etiquetes traduides dels valors valids, en el mateix ordre que validValues.
+     * Nomes s'emplena a la capa web: si un valor no te traduccio s'hi posa el valor tal qual.
+     */
+    private List<String> validValuesLabels;
 
     public ConfigDto() {
         entitatsConfig = new ArrayList<>();

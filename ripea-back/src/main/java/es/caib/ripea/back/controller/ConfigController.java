@@ -8,6 +8,8 @@ import es.caib.ripea.back.helper.SessioHelper;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.config.ConfigDto;
 import es.caib.ripea.service.intf.dto.config.ConfigGroupDto;
+import es.caib.ripea.service.intf.dto.config.OrganConfigDto;
+import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.service.ConfigService;
 import es.caib.ripea.service.intf.service.EntitatService;
 import lombok.Builder;
@@ -26,6 +28,9 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+
+import org.springframework.web.servlet.support.RequestContext;
 
 /**
  * Controlador per a la gestió de la configuració de l'aplicació.
@@ -133,10 +138,61 @@ public class ConfigController extends BaseUserController{
     public List<ConfigDto> getEntitatConfigByKey(HttpServletRequest request, @RequestParam(value = "key") String key, Model model) {
 
         try {
-            return configService.findEntitatsConfigByKey(key);
+            return emplenarValidValuesLabels(request, configService.findEntitatsConfigByKey(key));
         } catch (Exception ex) {
             log.error("Error obtinguent les configuracions d'entitat per la key " + key, ex);
             return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Tradueix els valors valids de cada propietat perque la vista els pugui mostrar amb una
+     * etiqueta llegible sense canviar el valor que es desa a la base de dades. Si un valor no
+     * te traduccio definida es manté el valor tal qual.
+     */
+    private List<ConfigDto> emplenarValidValuesLabels(HttpServletRequest request, List<ConfigDto> configs) {
+
+        if (configs == null || configs.isEmpty()) {
+            return configs;
+        }
+        Locale locale = new RequestContext(request).getLocale();
+        for (ConfigDto config: configs) {
+            List<String> validValues = config.getValidValues();
+            if (validValues == null || validValues.isEmpty()) {
+                continue;
+            }
+            List<String> validValuesLabels = new ArrayList<>();
+            for (String validValue: validValues) {
+                validValuesLabels.add(messageSource.getMessage(
+                        "config.type." + config.getTypeCode() + "." + validValue,
+                        null,
+                        validValue,
+                        locale));
+            }
+            config.setValidValuesLabels(validValuesLabels);
+        }
+        return configs;
+    }
+
+    /**
+     * Tradueix el valor de cada configuracio per organ per a mostrar-lo al llistat. Nomes
+     * afecta el text mostrat: el valor desat a la base de dades no canvia.
+     */
+    private void emplenarValueLabels(HttpServletRequest request, List<OrganConfigDto> configs) {
+
+        if (configs == null || configs.isEmpty()) {
+            return;
+        }
+        Locale locale = new RequestContext(request).getLocale();
+        for (OrganConfigDto config: configs) {
+            if (config.getValue() == null || config.getValue().isEmpty()) {
+                continue;
+            }
+            config.setValueLabel(messageSource.getMessage(
+                    "config.type." + config.getTypeCode() + "." + config.getValue(),
+                    null,
+                    config.getValue(),
+                    locale));
         }
     }
     
@@ -249,11 +305,13 @@ public class ConfigController extends BaseUserController{
 			HttpServletRequest request,
 			@PathVariable String keyUnderscore) {
 
+		PaginaDto<OrganConfigDto> pagina = configService.findConfigsOrgans(
+				keyUnderscore.replace("-", "."),
+				DatatablesHelper.getPaginacioDtoFromRequest(request));
+		emplenarValueLabels(request, pagina.getContingut());
 		return DatatablesHelper.getDatatableResponse(
 				request,
-				configService.findConfigsOrgans(
-						keyUnderscore.replace("-", "."),
-						DatatablesHelper.getPaginacioDtoFromRequest(request)),
+				pagina,
 				"id");
 	}
 	

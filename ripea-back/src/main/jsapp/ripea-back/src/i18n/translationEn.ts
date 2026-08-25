@@ -80,6 +80,12 @@ const translationEn = {
         },
     },
     enum: {
+        configType: {
+            INTERFACES: {
+                JSP: "Classic",
+                REACT: "Modern",
+            },
+        },
         rol: {
             IPA_SUPER: "Superuser",
             IPA_ADMIN: "Administrator",

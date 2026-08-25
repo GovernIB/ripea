@@ -55,16 +55,17 @@
                                 <form:select path="value" cssClass="form-control" id="config_${config.key}" disabled="${config.jbossProperty}" style="width:100%" data-toggle="select2"
                                              data-placeholder="${config.description}">
                                     <c:forEach var="opt" items="${config.validValues}">
-                                        <form:option value="${opt}"/>
+                                        <c:set var="optLabel"><spring:message code="config.type.${config.typeCode}.${opt}" text="${opt}"/></c:set>
+                                        <form:option value="${opt}" label="${optLabel}"/>
                                     </c:forEach>
                                 </form:select>
                             </c:when>
                             <c:when test="${config.validValues != null and fn:length(config.validValues) == 2}">
                                 <label id="config_${config.key}_1" class="radio-inline">
-                                    <form:radiobutton path="value" value="${config.validValues[0]}"/> ${config.validValues[0]}
+                                    <form:radiobutton path="value" value="${config.validValues[0]}"/> <spring:message code="config.type.${config.typeCode}.${config.validValues[0]}" text="${config.validValues[0]}"/>
                                 </label>
                                 <label id="config_${config.key}_2" class="radio-inline">
-                                    <form:radiobutton path="value" value="${config.validValues[1]}"/> ${config.validValues[1]}
+                                    <form:radiobutton path="value" value="${config.validValues[1]}"/> <spring:message code="config.type.${config.typeCode}.${config.validValues[1]}" text="${config.validValues[1]}"/>
                                 </label>
                             </c:when>
                             <c:otherwise>

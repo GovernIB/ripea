@@ -49,6 +49,13 @@
 
 
 
+// Retorna l'etiqueta traduida del valor valid indicat. Si el servidor no n'ha enviat cap
+// traduccio (propietats sense claus definides) es mostra el valor tal qual.
+function validValueLabel(config, index) {
+    var labels = config.validValuesLabels;
+    return (labels && labels[index]) ? labels[index] : config.validValues[index];
+}
+
 $(document).ready(function() {
 
     $(".btnDesplegable").click(e => {
@@ -119,9 +126,9 @@ $(document).ready(function() {
 	                            string += '<select id="' + keyReplaced + '" class="form-control" ' + disabled + '>';
 	                            let selected = "";
 	                            string += '<option value=""></option>';
-	                            entitat.validValues.map(x => {
+	                            entitat.validValues.map((x, i) => {
 	                                selected = x === entitat.value ? "selected" : "";
-	                                string += '<option value="' + x + '"' + ' ' + selected + '>' + x + '</option>';
+	                                string += '<option value="' + x + '"' + ' ' + selected + '>' + validValueLabel(entitat, i) + '</option>';
 	                            });
 	                            string += '<select>';
 	                        } else if (entitat.validValues && entitat.validValues.length === 2) {
@@ -130,11 +137,11 @@ $(document).ready(function() {
 	                            string += '<div id="' + keyReplaced + '" class="visualitzar entitat-input radio-div">'
 	                                + '<label id="' + keyReplaced+ '_radio_1" for="' + keyReplaced + '_1" class="radio-inline ' + textGray + '">'
 	                                + '<input id="' + keyReplaced + '_1" name="' + keyReplaced + '" type=radio value="' + entitat.validValues[0] + '"' + ' ' + checked + ' ' + disabled + '>'
-	                                + entitat.validValues[0]
+	                                + validValueLabel(entitat, 0)
 	                                + '</label>'
 	                                + '<label id="' + keyReplaced+ '_radio_2" for="' + keyReplaced+ '_2" class="radio-inline ' + textGray + '">'
 	                                + '<input id="' + keyReplaced + '_2" name="' + keyReplaced + '" type=radio value="' + entitat.validValues[1] + '"' + ' ' + checked2 + ' ' + disabled + '>'
-	                                + entitat.validValues[1]
+	                                + validValueLabel(entitat, 1)
 	                                + '</label></div>';
 	                        } else {
 	                            string += '<input id="' + keyReplaced + '" class="form-control" type="text" maxlength="2048" value="'
@@ -222,7 +229,7 @@ $(document).ready(function() {
             	tableHtml += '				{{else typeCode == "PASSWORD"}} '    	
                 tableHtml += '					{{:value}} '                       	
                 tableHtml += '				{{else}} '  	
-                tableHtml += '					{{:value}} '                      
+                tableHtml += '					{{:valueLabel ? valueLabel : value}} '                      
                 tableHtml += '				{{/if}} '   
                 tableHtml += '				</div> '                     
                 tableHtml += '				<div class="table-organ-key">{{:key}}</div> '                                             						

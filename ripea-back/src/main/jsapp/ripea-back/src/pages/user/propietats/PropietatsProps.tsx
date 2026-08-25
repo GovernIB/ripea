@@ -22,6 +22,13 @@ import {DraggableGridRowHandler, DraggableItem} from "../../../components/Dragga
 import {DndContext} from "@dnd-kit/core";
 import {dndScreenReaderInstructions} from "../../../util/dndAccessibility.tsx";
 
+export type TranslateFn = (key: string, options?: any) => string;
+
+// Etiqueta traduida d'un dels valors valids d'un tipus de propietat (IPA_CONFIG_TYPE). El valor
+// que es desa a la base de dades no canvia: si no hi ha traduccio definida es mostra tal qual.
+export const configTypeValueLabel = (t: TranslateFn, typeCode: string, value: string) =>
+    t(`enum.configType.${typeCode}.${value}`, { defaultValue: value, nsSeparator: false });
+
 const fieldPropType = (typeCode: string, typeValue?: string) => {
     if (typeValue != null) {
         return 'search';
@@ -64,11 +71,12 @@ export const TextHighlight: React.FC<{ text: string; match?: string; ignoreCase?
 
 const PropsListItem: React.FC<{ item: any; highlight?: string, handleSaveClick: (value: any) => void }> = (props) => {
     const { item, highlight, handleSaveClick } = props;
+    const { t } = useTranslation();
     const disabled = item.jbossProperty;
     const password = item.type.id === 'PASSWORD' ? true : undefined;
     const decimalScale = item.type.id === 'INT' ? 0 : undefined;
 
-    const field = getFieldFromItem(item)
+    const field = getFieldFromItem(item, t)
     const [changedValue, setChangedValue] = React.useState<any | undefined>(field?.value);
 
     const handleFieldOnChange = (value: any) => {
@@ -119,11 +127,13 @@ const PropsListItem: React.FC<{ item: any; highlight?: string, handleSaveClick: 
     );
 };
 
-export const getFieldFromItem = (item:any) => {
+export const getFieldFromItem = (item:any, t: TranslateFn) => {
     const type = fieldPropType(item.type.id, item.type.description);
     const options = item.type.description
         ? Object.fromEntries(
-            item.type.description.split(',').map((v: string) => [v, v])
+            item.type.description
+                .split(',')
+                .map((v: string) => [v, configTypeValueLabel(t, item.type.id, v)])
         )
         : undefined;
     const value = (item.type.id == 'BOOL' && typeof item.value == 'string')

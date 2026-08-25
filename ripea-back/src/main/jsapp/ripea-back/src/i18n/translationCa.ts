@@ -80,6 +80,12 @@ const translationCa = {
         },
     },
     enum: {
+        configType: {
+            INTERFACES: {
+                JSP: "Clàssica",
+                REACT: "Moderna",
+            },
+        },
         rol: {
             IPA_SUPER: "Superusuari",
             IPA_ADMIN: "Administrador d'entitat",

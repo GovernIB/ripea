@@ -6,7 +6,7 @@ import Load from "../../../components/Load.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import GridFormField from "../../../components/GridFormField.tsx";
-import {getFieldFromItem} from "./PropietatsProps.tsx";
+import {configTypeValueLabel, getFieldFromItem} from "./PropietatsProps.tsx";
 
 const PropietatsForm = ({item, itemField}:any) => {
     const {data, fields, apiRef} = useFormContext()
@@ -36,29 +36,6 @@ const PropietatsForm = ({item, itemField}:any) => {
     </Grid>
 }
 
-const columns:any[] = [
-    {
-        field: 'key',
-        flex: 1,
-    },
-    {
-        field: 'value',
-        flex: 1,
-    },
-    {
-        field: 'entitatCodi',
-        flex: 0.25,
-    },
-    {
-        field: 'organCodi',
-        flex: 0.25,
-    },
-    {
-        field: 'configurableOrgansDescendents',
-        flex: 0.5,
-        renderCell: (params:any) => params?.row.configurableOrgansDescendents && <Icon>check</Icon>
-    },
-];
 const perspectives:any[] = [];
 const sortModel:any[] = [{field: 'entitatCodi', sort: 'asc'}];
 const filter = builder.or(
@@ -72,12 +49,42 @@ export const usePropietatsDialog = () => {
     const [open, setOpen] = useState(false);
     const [item, setItem] = useState<any>();
     const [itemField, setItemField] = useState<any>();
+
+    // El valor es mostra amb l'etiqueta traduida del tipus de propietat, igual que al
+    // formulari d'edicio. El valor desat no canvia: si no hi ha traduccio es mostra tal qual.
+    const columns:any[] = useMemo(() => [
+        {
+            field: 'key',
+            flex: 1,
+        },
+        {
+            field: 'value',
+            flex: 1,
+            valueFormatter: (value: any) =>
+                value != null && item?.type?.id != null
+                    ? configTypeValueLabel(t, item.type.id, value)
+                    : value,
+        },
+        {
+            field: 'entitatCodi',
+            flex: 0.25,
+        },
+        {
+            field: 'organCodi',
+            flex: 0.25,
+        },
+        {
+            field: 'configurableOrgansDescendents',
+            flex: 0.5,
+            renderCell: (params:any) => params?.row.configurableOrgansDescendents && <Icon>check</Icon>
+        },
+    ], [item, t]);
     // console.log(item, itemField)
 
     const handleOpen = (_id:any, row:any) => {
         // console.log("row", row)
         setItem(row)
-        setItemField(getFieldFromItem(row))
+        setItemField(getFieldFromItem(row, t))
         setOpen(true);
     }
 
