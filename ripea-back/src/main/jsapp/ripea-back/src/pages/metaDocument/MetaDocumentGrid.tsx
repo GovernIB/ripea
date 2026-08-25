@@ -79,6 +79,10 @@ const portafibColumns = [
         flex: 1,
     },
 ]
+// Constant de mòdul: amb un literal en línia cada render crea un objecte nou, i l'useEffect
+// de MuiDataGrid el torna a aplicar retornant la graella a la primera pàgina.
+const portafibPaginationModel = {page: 0, pageSize: 5};
+
 const PortafirmesMetaDocumentForm = () => {
     const {t} = useTranslation()
     const apiRef = useMuiDataGridApiRef();
@@ -141,7 +145,7 @@ const PortafirmesMetaDocumentForm = () => {
                 rowAdditionalActions={actions}
                 toolbarHide
                 autoHeight
-                paginationModel={{page: 0, pageSize: 5}}
+                paginationModel={portafibPaginationModel}
                 sx={{ ml: 1, mt: 1 }}
             />
         </>}

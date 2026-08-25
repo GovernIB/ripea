@@ -61,6 +61,9 @@ const CrearGrupForm = () => {
 
 const perspectives = ['INTERESSATS']
 const sortModel:any = [{field: 'nom', sort: 'asc'}]
+// Constant de mòdul: amb un literal en línia cada render crea un objecte nou, i l'useEffect
+// de MuiDataGrid el torna a aplicar retornant la graella a la primera pàgina.
+const paginationModel = {page: 0, pageSize: 5};
 const columns = [
     {
         field: 'nom',
@@ -101,7 +104,7 @@ export const GrupGrid = (props:any) => {
             popupEditFormDialogResourceTitle={t('page.interessat.grup.title')}
             columns={columns}
             autoHeight
-            paginationModel={{page: 0, pageSize: 5}}
+            paginationModel={paginationModel}
             filter={builder.eq('expedient.id', entity?.id)}
             staticSortModel={sortModel}
             perspectives={perspectives}

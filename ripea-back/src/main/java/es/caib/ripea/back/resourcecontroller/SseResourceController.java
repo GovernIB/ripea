@@ -180,6 +180,72 @@ public class SseResourceController {
     }
 
     /**
+     * P I N G   D E   M A N T E N I M E N T
+     */
+
+    /**
+     * Manté vives les connexions SSE obertes.
+     *
+     * Entre event i event pel stream no hi circula res, i qualsevol proxy intermedi acaba tallant la
+     * connexió pel seu timeout d'inactivitat (60 s amb la configuració per defecte d'Apache). El client
+     * ho detecta com un error, reconnecta 5 s després i torna a demanar l'estat inicial (anotacions,
+     * tasques i avisos): un cicle d'uns 65 s per pestanya oberta que no aporta res, i que a més fa perdre
+     * els events d'un sol ús (firma_finalitzada, scan_finalitzat...) que caiguin dins la finestra en què
+     * no hi ha connexió.
+     *
+     * S'envia un COMENTARI SSE (":ping"), no un event amb nom: el navegador l'ignora i no arriba a cap
+     * listener del client, de manera que la connexió es manté viva sense provocar cap re-render a REACT.
+     * De passada, aquest enviament periòdic és el que detecta els emisors morts —fins ara només es
+     * descobrien quan arribava un event de veritat— i els treu de les llistes.
+     *
+     * L'interval el programa SsePingSchedulingConfig a partir de la propietat SSE_PING_INTERVAL
+     * (IPA_CONFIG, grup SCHEDULLED). Per defecte 20 s, que deixa marge per perdre un parell de pings
+     * dins la finestra de 60 s del proxy.
+     */
+    public void pingClientsSse() {
+        try {
+            int usuaris = pingEmisors(clientsUsuaris);
+            int expedients = pingEmisors(clientsExpedient);
+            if (usuaris > 0 || expedients > 0) {
+                logger.debug("Ping SSE enviat a {} emisors d'usuari i {} d'expedient.", usuaris, expedients);
+            }
+        } catch (Exception e) {
+            // Cap error pot impedir que es programi la següent execució.
+            logger.error("Error enviant el ping de manteniment de les connexions SSE", e);
+        }
+    }
+
+    /**
+     * Envia un comentari a tots els emisors del mapa i elimina els que fallin, amb el mateix criteri de
+     * neteja que la resta d'enviaments. Retorna quants emisors continuen vius.
+     */
+    private <K> int pingEmisors(Map<K, List<SseEmitter>> clients) {
+        int vius = 0;
+        Iterator<Map.Entry<K, List<SseEmitter>>> iterator = clients.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<K, List<SseEmitter>> entry = iterator.next();
+            List<SseEmitter> emisors = entry.getValue();
+            List<SseEmitter> toRemove = new ArrayList<>();
+            for (SseEmitter emitter : emisors) {
+                try {
+                    // Un builder nou per a cada emisor: SseEventBuilder acumula estat a cada build(),
+                    // i reaprofitar-ne un afegiria salts de línia de més a cada enviament.
+                    emitter.send(SseEmitter.event().comment("ping"));
+                    vius++;
+                } catch (Exception e) {
+                    toRemove.add(emitter);
+                    logger.debug("... eliminat emisor {} de {} en el ping: {}.", emitter.hashCode(), entry.getKey(), e.getMessage());
+                }
+            }
+            emisors.removeAll(toRemove);
+            if (emisors.isEmpty()) {
+                iterator.remove();
+            }
+        }
+        return vius;
+    }
+
+    /**
      * T E S T I N G
      */
 

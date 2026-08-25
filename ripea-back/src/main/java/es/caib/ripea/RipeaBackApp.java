@@ -19,6 +19,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -35,6 +36,9 @@ import java.util.jar.Manifest;
 @Slf4j
 @ConditionalOnWarDeployment
 @EnableAsync
+// Necessari per al ping de manteniment de les connexions SSE (SseResourceController): el context
+// de ripea-back exclou es.caib.ripea.service.*, on hi ha l'únic @EnableScheduling de l'aplicació.
+@EnableScheduling
 @SpringBootApplication(exclude = {
 		DataSourceAutoConfiguration.class, 
 		DataSourceTransactionManagerAutoConfiguration.class,

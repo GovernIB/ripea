@@ -38,6 +38,9 @@ const PropietatsForm = ({item, itemField}:any) => {
 
 const perspectives:any[] = [];
 const sortModel:any[] = [{field: 'entitatCodi', sort: 'asc'}];
+// Constant de mòdul: amb un literal en línia cada render crea un objecte nou, i l'useEffect
+// de MuiDataGrid el torna a aplicar retornant la graella a la primera pàgina.
+const paginationModel = {page: 0, pageSize: 5};
 const filter = builder.or(
     builder.neq('entitatCodi', null),
     builder.neq('organCodi ', null),
@@ -149,7 +152,7 @@ export const usePropietatsDialog = () => {
                     perspectives={perspectives}
                     namedQueries={[`QUERY_ESPECIFIQUES#${item?.key}`]}
                     autoHeight
-                    paginationModel={{page: 0, pageSize: 5}}
+                    paginationModel={paginationModel}
                     popupEditFormI18nKeys={{
                         createSuccess: 'page.propietats.action.new.ok',
                         updateSuccess: 'page.propietats.action.update.ok',

@@ -249,6 +249,10 @@ const columnsInteressats = [
     },
 ]
 
+// Constant de mòdul: amb un literal en línia cada render crea un objecte nou, i l'useEffect
+// de MuiDataGrid el torna a aplicar retornant la graella a la primera pàgina.
+const paginationModelInteressats = {page: 0, pageSize: 5};
+
 const AcceptarTabInteressats = () => {
     const { t } = useTranslation()
     const {data, apiRef} = useFormContext();
@@ -291,7 +295,7 @@ const AcceptarTabInteressats = () => {
             }}
 
             autoHeight
-            paginationModel={{page: 0, pageSize: 5}}
+            paginationModel={paginationModelInteressats}
             readOnly
         />
         {dialog}

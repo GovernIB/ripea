@@ -12,6 +12,9 @@ import {Link as RouterLink} from "react-router-dom";
 
 const sortModel:any = [{ field: 'createdDate', sort: 'desc' }];
 const perspectives = ["AVISOS", "ESTAT"];
+// Constant de mòdul: amb un literal en línia cada render crea un objecte nou, i l'useEffect
+// de MuiDataGrid el torna a aplicar retornant la graella a la primera pàgina.
+const paginationModel = {page: 0, pageSize: 10};
 
 const ExpedientDialog = (props:any) => {
     const {entity} = props;
@@ -82,7 +85,7 @@ const ExpedientDialog = (props:any) => {
             }}
 
             autoHeight
-            paginationModel={{page: 0, pageSize: 10}}
+            paginationModel={paginationModel}
             readOnly
         />
     </>

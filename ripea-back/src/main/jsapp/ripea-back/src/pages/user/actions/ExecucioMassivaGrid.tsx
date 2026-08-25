@@ -103,6 +103,9 @@ const columns = [
     },
 ]
 const sortModel: any = [{field: 'createdDate', sort: 'desc'}];
+// Constant de mòdul: amb un literal en línia cada render crea un objecte nou, i l'useEffect
+// de MuiDataGrid el torna a aplicar retornant la graella a la primera pàgina.
+const paginationModel = {page: 0, pageSize: 10};
 const ExecucioMassivaGrid = () => {
     const {t} = useTranslation();
     const [isRefresh, setRefresh] = useState(false);
@@ -152,7 +155,7 @@ const ExecucioMassivaGrid = () => {
             columns={columns}
             rowAdditionalActions={actions}
             autoHeight
-            paginationModel={{page: 0, pageSize: 10}}
+            paginationModel={paginationModel}
             readOnly
 
             toolbarElementsWithPositions={[
@@ -274,6 +277,7 @@ const columnsContingut = [
     },
 ]
 const sortModelContingut: any = [{field: 'dataFi', sort: 'desc'}];
+const paginationModelContingut = {page: 0, pageSize: 10};
 
 const estatColor :any = {
     'ESTAT_FINALITZAT': 'green',
@@ -358,7 +362,7 @@ export const useExecucioMassivaContingut = () => {
                 sortModel={sortModelContingut}
                 columns={columnsContingut}
                 autoHeight
-                paginationModel={{page: 0, pageSize: 10}}
+                paginationModel={paginationModelContingut}
                 readOnly
 
                 rowProps={(row: any) => {

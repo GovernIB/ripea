@@ -251,6 +251,7 @@ public class PropertyConfig {
 	public static final String ACTUALITZAR_PROCEDIMENTS 							= "es.caib.ripea.procediment.actualitzar.cron";
 	public static final String CONSULTA_CANVIS_ORGANIGRAMA 							= "es.caib.ripea.organs.consulta.canvis";
 	public static final String TANCAMENT_LOGIC_CRON 								= "es.caib.ripea.expedient.tancament.logic.cron";
+	public static final String SSE_PING_INTERVAL									= "es.caib.ripea.sse.ping.interval";
 	public static final String CONVERSIO_DEFINITIU	 								= "es.caib.ripea.conversio.definitiu";
 	public static final String CONVERSIO_DEFINITIU_PROPAGAR_ARXIU					= "es.caib.ripea.conversio.definitiu.propagar.arxiu";
 	public static final String PROPAGAR_RELACIO_EXPEDIENTS							= "es.caib.ripea.propagar.relacio.expedients";

@@ -16,6 +16,9 @@ import {GridSortDirection} from "@mui/x-data-grid-pro";
 
 const sortModel:any = [{ field: 'createdDate', sort: 'desc' }];
 const perspectives = ["ESTAT"];
+// Constant de mòdul: amb un literal en línia cada render crea un objecte nou, i l'useEffect
+// de MuiDataGrid el torna a aplicar retornant la graella a la primera pàgina.
+const paginationModel = {page: 0, pageSize: 10};
 
 const columns = [
     {
@@ -144,7 +147,7 @@ const RelacionarForm= () => {
             }}
 
             autoHeight
-            paginationModel={{page: 0, pageSize: 10}}
+            paginationModel={paginationModel}
             readOnly
         />
         </Load>
