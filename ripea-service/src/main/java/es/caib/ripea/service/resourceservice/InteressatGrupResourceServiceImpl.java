@@ -23,8 +23,10 @@ import es.caib.ripea.service.base.springfilter.FilterSpecification;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.ExpedientInteressatHelper;
+import es.caib.ripea.service.helper.MessageHelper;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
+import es.caib.ripea.service.intf.base.exception.ResourceNotDeletedException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.model.InteressatGrupResource;
@@ -49,6 +51,7 @@ public class InteressatGrupResourceServiceImpl extends BaseMutableResourceServic
     private final ExpedientInteressatHelper expedientInteressatHelper;
     private final EntityComprovarHelper entityComprovarHelper;
     private final ExcepcioLogHelper excepcioLogHelper;
+    private final MessageHelper messageHelper;
     
     @PostConstruct
     public void init() {
@@ -142,7 +145,7 @@ public class InteressatGrupResourceServiceImpl extends BaseMutableResourceServic
     		interessatGrupRepository.delete(grup);
     	} catch (Exception ex) {
     		excepcioLogHelper.addExcepcio("/intressatGrup/"+id+"/delete", ex);
-    		throw new ResourceNotFoundException(getResourceClass(), ex.getMessage());
+    		throw new ResourceNotDeletedException(getResourceClass(), String.valueOf(id), messageHelper.getMissatgeError(ex), ex);
     	}
     }
 

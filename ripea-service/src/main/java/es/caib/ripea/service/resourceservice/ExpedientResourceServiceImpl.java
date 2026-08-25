@@ -1434,11 +1434,19 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 				}
 				return objectMappingHelper.newInstanceMap(entity, ExpedientResource.class);
 			} catch (Exception e) {
-				excepcioLogHelper.addExcepcio(
-						"/expedient/TancarActionExecutor", e,
-						Utils.getIdsSeparatsComa(params.getIds()),
-						"massiu="+params.isMassivo());
-				throw new ActionExecutionException(getResourceClass(), params.getIds().toString(), code, messageHelper.getMessage("expedient.tancar.reject", new Object[]{e.getMessage()}));
+				// El missatge es calcula abans de res: qualsevol fallada registrant l'excepció no ha de
+				// substituir l'error original, o l'usuari es queda sense cap informació del que ha passat.
+				String ids = Utils.getIdsSeparatsComa(params.getIds());
+				String missatge = messageHelper.getMessage("expedient.tancar.reject", new Object[]{e.getMessage()});
+				try {
+					excepcioLogHelper.addExcepcio(
+							"/expedient/TancarActionExecutor", e,
+							ids,
+							"massiu="+params.isMassivo());
+				} catch (Exception logEx) {
+					log.error("No s'ha pogut registrar l'excepció del tancament de l'expedient (ids=" + ids + ")", logEx);
+				}
+				throw new ActionExecutionException(getResourceClass(), ids, code, missatge);
 			}
 		}
     }

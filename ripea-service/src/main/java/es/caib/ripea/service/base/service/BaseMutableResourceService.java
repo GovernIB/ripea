@@ -196,11 +196,13 @@ public abstract class BaseMutableResourceService<R extends Resource<ID>, ID exte
 			} catch (ActionExecutionException ex) {
 				throw ex;
 			} catch (Exception ex) {
+				// El missatge no pot quedar buit: el front el fa servir com a únic detall de l'error i,
+				// si arriba buit, l'usuari només veu el títol genèric "Error executant l'acció".
 				ActionExecutionException aex = new ActionExecutionException(
 						getResourceClass(),
 						id,
 						code,
-						"",
+						ex.getMessage() != null ? ex.getMessage() : ex.getClass().getSimpleName(),
 						ex);
 				log.error(aex.getMessage(), ex);
 				throw aex;

@@ -29,11 +29,13 @@ import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ContingutHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
+import es.caib.ripea.service.helper.MessageHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
+import es.caib.ripea.service.intf.base.exception.ResourceNotDeletedException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
@@ -62,6 +64,7 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
 	
 	private final ContingutHelper contingutHelper;
 	private final ExcepcioLogHelper excepcioLogHelper;
+	private final MessageHelper messageHelper;
 	private final CarpetaHelper carpetaHelper;
 	private final ConfigHelper configHelper;
 	private final ContingutResourceHelper contingutResourceHelper;
@@ -163,7 +166,7 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
     		contingutHelper.deleteReversible(entitatEntity.getId(), id, null, configHelper.getRolActual());
     	} catch (Exception ex) {
     		excepcioLogHelper.addExcepcio("/document/"+id+"/delete", ex);
-    		throw new ResourceNotFoundException(getResourceClass(), ex.getMessage());
+    		throw new ResourceNotDeletedException(getResourceClass(), String.valueOf(id), messageHelper.getMissatgeError(ex), ex);
     	}
     }
 

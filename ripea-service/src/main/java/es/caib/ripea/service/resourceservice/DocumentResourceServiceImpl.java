@@ -82,6 +82,7 @@ import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
+import es.caib.ripea.service.intf.base.exception.ResourceNotDeletedException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.FieldOption;
@@ -436,9 +437,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     		throw ex;
     	} catch (Exception ex) {
     		excepcioLogHelper.addExcepcio("/document/"+resource.getId()+"/create", ex);
-    		String message = messageHelper.getMessage(ex.getMessage());
-    		if (message.startsWith("???")) { message = ex.getMessage(); }
-    		throw new ValidationException(message);
+    		throw new ValidationException(messageHelper.getMissatgeError(ex));
     	}
     	return resource;
     }
@@ -451,8 +450,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     		contingutHelper.deleteReversible(entitatEntity.getId(), id, null, configHelper.getRolActual());
     		afterDbChange(expedientId);
     	} catch (Exception ex) {
-    		excepcioLogHelper.addExcepcio("/document/"+id+"/delete", ex);
-    		throw new ResourceNotFoundException(getResourceClass(), ex.getMessage());
+    		if (!(ex instanceof ValidationException)) excepcioLogHelper.addExcepcio("/document/"+id+"/delete", ex);
+    		throw new ResourceNotDeletedException(getResourceClass(), String.valueOf(id), messageHelper.getMissatgeError(ex), ex);
     	}
     }
     

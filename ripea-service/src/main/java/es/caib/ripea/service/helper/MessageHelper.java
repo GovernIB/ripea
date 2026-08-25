@@ -66,6 +66,17 @@ public class MessageHelper implements MessageSourceAware {
 	public String getMessage(String key) {
 		return getMessage(key, null, null);
 	}
+	/**
+	 * Retorna el missatge d'una excepció en format apte per a mostrar a l'usuari: si
+	 * el missatge de l'excepció és una clau de traducció retorna el text traduït i,
+	 * si no ho és, retorna el missatge original sense modificar.
+	 */
+	public String getMissatgeError(Exception ex) {
+		String message = ex.getMessage();
+		if (message == null) { return ex.getClass().getSimpleName(); }
+		String translated = getMessage(message);
+		return translated.startsWith("???") ? message : translated;
+	}
 	public void setMessageSource(MessageSource messageSource) {
 		this.messageSource = messageSource;
 	}

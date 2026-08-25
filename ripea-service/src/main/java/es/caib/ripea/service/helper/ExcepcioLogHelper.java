@@ -18,11 +18,21 @@ import es.caib.ripea.service.intf.dto.ExcepcioLogDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.PermissionDeniedException;
 import es.caib.ripea.service.intf.exception.ValidationException;
+import es.caib.ripea.service.intf.utils.Utils;
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
 public class ExcepcioLogHelper {
+
+	/** Longituds de les columnes de IPA_EXCEPCIO_LOG. Els valors s'han de retallar abans de desar-los:
+	 *  un missatge d'error massa llarg feia fallar l'insert i, com que addExcepcio es crida des dels
+	 *  blocs catch, aquesta fallada substituïa l'error original i l'usuari es quedava sense missatge. */
+	private static final int LONGITUD_TIPUS = 512;
+	private static final int LONGITUD_OBJECT = 512;
+	private static final int LONGITUD_URI = 1024;
+	private static final int LONGITUD_PARAM = 512;
+	private static final int LONGITUD_MESSAGE = 4000;
 
 	private final ExcepcioLogResourceRepository excepcioLogResourceRepository;
 
@@ -58,29 +68,29 @@ public class ExcepcioLogHelper {
 	private ExcepcioLogResourceEntity toEntity(String uri, Throwable exception, String param1, String param2) {
 		ExcepcioLogResourceEntity newExcepcioLog = new ExcepcioLogResourceEntity();
 		newExcepcioLog.setData(new Date());
-		newExcepcioLog.setUri(uri);
+		newExcepcioLog.setUri(Utils.left(uri, LONGITUD_URI));
 		ThreadLocal<EntitatDto> entitatActual = ConfigHelper.getEntitat();
 		newExcepcioLog.setEntitatId((entitatActual!=null && entitatActual.get()!=null)?entitatActual.get().getId():null);
-		newExcepcioLog.setTipus(exception.getClass().getName());
-		newExcepcioLog.setMessage(exception.getMessage());
+		newExcepcioLog.setTipus(Utils.left(exception.getClass().getName(), LONGITUD_TIPUS));
+		newExcepcioLog.setMessage(Utils.left(exception.getMessage(), LONGITUD_MESSAGE));
 		newExcepcioLog.setStacktrace(ExceptionUtils.getStackTrace(exception));
-		if (param1 != null) newExcepcioLog.setParam1(param1);
-		if (param2 != null) newExcepcioLog.setParam2(param2);
+		if (param1 != null) newExcepcioLog.setParam1(Utils.left(param1, LONGITUD_PARAM));
+		if (param2 != null) newExcepcioLog.setParam2(Utils.left(param2, LONGITUD_PARAM));
 		if (exception instanceof NotFoundException) {
 			NotFoundException ex = (NotFoundException) exception;
-			if (ex.getObjectId() != null) newExcepcioLog.setObjectId(ex.getObjectId().toString());
-			if (ex.getObjectClass() != null) newExcepcioLog.setObjectClass(ex.getObjectClass().getName());
+			if (ex.getObjectId() != null) newExcepcioLog.setObjectId(Utils.left(ex.getObjectId().toString(), LONGITUD_OBJECT));
+			if (ex.getObjectClass() != null) newExcepcioLog.setObjectClass(Utils.left(ex.getObjectClass().getName(), LONGITUD_OBJECT));
 		} else if (exception instanceof PermissionDeniedException) {
 			PermissionDeniedException ex = (PermissionDeniedException) exception;
-			if (ex.getObjectId() != null) newExcepcioLog.setObjectId(ex.getObjectId().toString());
-			if (ex.getObjectClass() != null) newExcepcioLog.setObjectClass(ex.getObjectClass().getName());
-			newExcepcioLog.setParam1(ex.getUserName());
-			newExcepcioLog.setParam2(ex.getPermissionName());
+			if (ex.getObjectId() != null) newExcepcioLog.setObjectId(Utils.left(ex.getObjectId().toString(), LONGITUD_OBJECT));
+			if (ex.getObjectClass() != null) newExcepcioLog.setObjectClass(Utils.left(ex.getObjectClass().getName(), LONGITUD_OBJECT));
+			newExcepcioLog.setParam1(Utils.left(ex.getUserName(), LONGITUD_PARAM));
+			newExcepcioLog.setParam2(Utils.left(ex.getPermissionName(), LONGITUD_PARAM));
 		} else if (exception instanceof ValidationException) {
 			ValidationException ex = (ValidationException) exception;
-			if (ex.getObjectId() != null) newExcepcioLog.setObjectId(ex.getObjectId().toString());
-			if (ex.getObjectClass() != null) newExcepcioLog.setObjectClass(ex.getObjectClass().getName());
-			newExcepcioLog.setParam1(ex.getError());
+			if (ex.getObjectId() != null) newExcepcioLog.setObjectId(Utils.left(ex.getObjectId().toString(), LONGITUD_OBJECT));
+			if (ex.getObjectClass() != null) newExcepcioLog.setObjectClass(Utils.left(ex.getObjectClass().getName(), LONGITUD_OBJECT));
+			newExcepcioLog.setParam1(Utils.left(ex.getError(), LONGITUD_PARAM));
 		}
 		return newExcepcioLog;
 	}

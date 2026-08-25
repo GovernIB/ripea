@@ -38,12 +38,14 @@ import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
+import es.caib.ripea.service.helper.MessageHelper;
 import es.caib.ripea.service.helper.MetaDocumentHelper;
 import es.caib.ripea.service.helper.UsuariHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
+import es.caib.ripea.service.intf.base.exception.ResourceNotDeletedException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
 import es.caib.ripea.service.intf.base.model.FieldOption;
 import es.caib.ripea.service.intf.base.model.FileReference;
@@ -77,6 +79,7 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 	private final UsuariHelper usuariHelper;
 	private final EntityComprovarHelper entityComprovarHelper;
 	private final ExcepcioLogHelper excepcioLogHelper;
+	private final MessageHelper messageHelper;
 	private final ConfigHelper configHelper;
 
     @PostConstruct
@@ -429,7 +432,7 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
     		//amb els guards d'obligatorietat. No cal repetir-lo aquí (evitava el doble evict i saltava els guards).
     	} catch (Exception ex) {
     		excepcioLogHelper.addExcepcio("/metaDocumentResource/"+id+"/delete", ex);
-    		throw new ResourceNotFoundException(getResourceClass(), ex.getMessage());
+    		throw new ResourceNotDeletedException(getResourceClass(), String.valueOf(id), messageHelper.getMissatgeError(ex), ex);
     	}
     }
     
