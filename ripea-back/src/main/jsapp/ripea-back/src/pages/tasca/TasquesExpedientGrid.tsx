@@ -140,7 +140,7 @@ const TasquesExpedientGrid = (props: any) => {
                 {viewSelector}
                 {createButton}
             </Grid>
-            {vista == TascaView.kanban && <TascaKanban actions={actions} filter={filter} perspectives={perspectives} reloadTrigger={reload} />}
+            {vista == TascaView.kanban && <TascaKanban actions={actions} filter={filter} perspectives={perspectives} reloadTrigger={reload} onEventClick={(tasca: any) => handleOpen(tasca?.id)} />}
             {vista == TascaView.calendar && <TascaCalendar actions={actions} filter={filter} perspectives={perspectives} reloadTrigger={reload} onEventClick={(tasca: any) => handleOpen(tasca?.id)} />}
             {createContent}
         </>}

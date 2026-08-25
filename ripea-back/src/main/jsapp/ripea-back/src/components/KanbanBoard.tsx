@@ -2,8 +2,13 @@ import {useState, useCallback, useMemo, useEffect} from 'react';
 import {
     DndContext,
     DragOverlay,
+    KeyboardSensor,
+    MouseSensor,
+    TouchSensor,
     useDraggable,
     useDroppable,
+    useSensor,
+    useSensors,
     pointerWithin
 } from '@dnd-kit/core';
 import {Card, CardContent, Typography, Box, Chip, Grid, Menu, Icon, IconButton} from '@mui/material';
@@ -28,10 +33,11 @@ type KanbanBoardProp = {
     elements: KanbanElementsProp[],
     onCreate?: (estat:string) => void,
     handleDragEnd: (origen:string, desti:string, element:any) => void,
+    onElementClick?: (element:any) => void,
     actions?: any[]
 }
 
-const KanbanCard = ({ icon, task, onClick, isDragging }: any) => {
+const KanbanCard = ({ icon, task, onClick, onContextMenu, isDragging }: any) => {
     const canDrag = task.draggable !== false;
     const { attributes, listeners, setNodeRef, isDragging: isDraggingLocal } = useDraggable({
         id: task.id,
@@ -39,14 +45,34 @@ const KanbanCard = ({ icon, task, onClick, isDragging }: any) => {
         disabled: !canDrag
     });
     const dragging = isDragging || isDraggingLocal;
+    const clickable = Boolean(onClick);
+    // Les targetes que no es poden arrossegar no reben els atributs de dnd-kit (role i tabIndex),
+    // així que si són clicables se'ls han de posar aquí perquè també s'hi pugui arribar amb el
+    // teclat. Les arrossegables ja els porten, i allà l'espai i l'intro els fa servir el sensor
+    // de teclat per agafar i deixar anar la targeta.
+    const clickableProps = clickable && !canDrag ? {
+        role: 'button',
+        tabIndex: 0,
+        onKeyDown: (e: any) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onClick(e, task);
+            }
+        },
+    } : {};
     return (
         <Card
             ref={setNodeRef}
-            onContextMenu={(e:any) => onClick?.(e, task)}
-            // onClick={(e:any) => onClick?.(e, task)}
+            onContextMenu={(e:any) => onContextMenu?.(e, task)}
+            // Amb el botó esquerre la targeta fa dues coses: arrossegar-la per canviar-ne l'estat
+            // o, si no hi ha hagut arrossegament, obrir-la. No es trepitgen perquè els sensors del
+            // tauler no activen el drag fins que el punter s'ha desplaçat uns quants píxels i,
+            // quan s'activa, dnd-kit atura el click que ve després de deixar anar.
+            onClick={clickable ? (e:any) => onClick(e, task) : undefined}
             {...(canDrag ? { ...listeners, ...attributes } : {})}
+            {...clickableProps}
             sx={{
-                cursor: canDrag ? (dragging ? 'grabbing' : 'grab') : 'default',
+                cursor: canDrag ? (dragging ? 'grabbing' : 'grab') : clickable ? 'pointer' : 'default',
                 opacity: dragging ? 0.4 : canDrag ? 1 : 0.6,
                 transition: 'opacity 0.2s, transform 0.2s',
                 '&:active': canDrag ? { cursor: 'grabbing' } : {},
@@ -98,7 +124,7 @@ const KanbanSubcolumn = ({ id, title, tasks, children }: any) => {
     );
 };
 
-const KanbanColumn = ({ icon, title, subcolumns, onCreate, onClick, activeId }: any) => {
+const KanbanColumn = ({ icon, title, subcolumns, onCreate, onClick, onContextMenu, activeId }: any) => {
     const { t } = useTranslation();
     return (
         <Box
@@ -131,6 +157,7 @@ const KanbanColumn = ({ icon, title, subcolumns, onCreate, onClick, activeId }: 
                                 icon={sub.icon || icon}
                                 task={task}
                                 onClick={onClick}
+                                onContextMenu={onContextMenu}
                                 isDragging={task.id === activeId}
                             />
                         ))}
@@ -166,8 +193,18 @@ const groupTasksWithSubcolumns = (
     return columns;
 };
 
-const KanbanBoard = ({ columns: columnDefs, elements, onCreate, handleDragEnd: onExternalDragEnd, actions }: KanbanBoardProp) => {
+const KanbanBoard = ({ columns: columnDefs, elements, onCreate, handleDragEnd: onExternalDragEnd, onElementClick, actions }: KanbanBoardProp) => {
     const [activeId, setActiveId] = useState<string | null>(null);
+
+    // Per defecte dnd-kit engega l'arrossegament tan bon punt es prem el botó, i això deixa la
+    // targeta sense clic. Amb aquests sensors el drag demana un gest explícit (moure el ratolí uns
+    // quants píxels o mantenir premut en tàctil), de manera que un clic o un toc curt segueixen
+    // sent un clic. El sensor de tàctil amb retard també deixa desplaçar la pàgina amb el dit.
+    const sensors = useSensors(
+        useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
+        useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } }),
+        useSensor(KeyboardSensor),
+    );
 
     const [optimisticElements, setOptimisticElements] = useState<KanbanElementsProp[] | null>(null);
     const currentElements = optimisticElements || elements;
@@ -212,13 +249,21 @@ const KanbanBoard = ({ columns: columnDefs, elements, onCreate, handleDragEnd: o
     const [selectedTask, setSelectedTask] = useState<any>(null);
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
-    const eventClick = useCallback((e: any, element: any) => {
+    // Botó dret: menú d'accions de l'element.
+    const eventContextMenu = useCallback((e: any, element: any) => {
         e.preventDefault();
         if (element) {
             setSelectedTask(element.entity);
             setAnchorEl(e.target as HTMLElement);
         }
     }, []);
+
+    // Botó esquerre sense arrossegament: l'acció principal de l'element, que decideix el pare.
+    const eventClick = useCallback((_e: any, element: any) => {
+        if (element) {
+            onElementClick?.(element.entity ?? element);
+        }
+    }, [onElementClick]);
 
     const handleMenuClose = () => {
         setAnchorEl(null);
@@ -227,7 +272,7 @@ const KanbanBoard = ({ columns: columnDefs, elements, onCreate, handleDragEnd: o
 
     return (
         <Box>
-            <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd} collisionDetection={pointerWithin}>
+            <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd} collisionDetection={pointerWithin}>
                 <Grid container spacing={1}>
                     {columns.map((col, i) => (
                         <Grid size={{ xs: 12, md: 12 / columns.length }} key={col.id}>
@@ -237,7 +282,8 @@ const KanbanBoard = ({ columns: columnDefs, elements, onCreate, handleDragEnd: o
                                 col={col}
                                 subcolumns={col.subcolumns}
                                 onCreate={i == 0 ? onCreate : undefined}
-                                onClick={eventClick}
+                                onClick={onElementClick ? eventClick : undefined}
+                                onContextMenu={eventContextMenu}
                                 activeId={activeId}
                             />
                         </Grid>

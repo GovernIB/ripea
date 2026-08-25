@@ -11,9 +11,8 @@ import Load from "../../components/Load.tsx";
 import { CardPage } from "../../components/CardData.tsx";
 import {useUserSession} from "../../components/Session.tsx";
 import {Grid, Icon, Typography} from "@mui/material";
-import useTascaActions, {tascaTramitacioRoute} from "./details/TascaActions.tsx";
+import useTascaActions from "./details/TascaActions.tsx";
 import ContingutLink from "../../components/ContingutLink.tsx";
-import {openRouteInNewTab} from "../../util/navigationUtils.ts";
 import useTascaDetail from "./details/TascaDetail.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
 import {TascaCalendar} from "@src/pages/tasca/TascaCalendar.tsx";
@@ -173,18 +172,14 @@ const TasquesGrid = () => {
         },
     ], [refresh, t]);
 
-    const { actions, components, isTramitable } = useTascaActions({potModificar: true}, refresh)
+    const { actions, components } = useTascaActions({potModificar: true}, refresh)
     const { handleOpen, dialog } = useTascaDetail();
 
-    // Acció principal de la tasca, compartida per la vista de taula (clic a la fila) i la de
-    // calendari (clic amb el botó esquerre), perquè totes dues es comportin igual. La tramitació
-    // s'obre en una pestanya nova per no perdre el llistat ni els filtres aplicats.
+    // Acció del botó esquerre, compartida per les tres vistes (clic a la fila de la taula, a
+    // l'esdeveniment del calendari i a la targeta del kanban): sempre obre el detall de la tasca
+    // en una modal. La tramitació es fa des del menú d'accions.
     const handleTascaClick = (tasca: any) => {
-        if (isTramitable(tasca)) {
-            openRouteInNewTab(tascaTramitacioRoute(tasca?.expedient?.id, tasca?.id));
-        } else {
-            handleOpen(tasca?.id);
-        }
+        handleOpen(tasca?.id);
     };
 
     const filterRef = useFilterApiRef();
@@ -254,7 +249,7 @@ const TasquesGrid = () => {
                         <FilterCountChip filter={springFilter} filterCount={filterCount} sx={{mr: 'auto'}}/>
                         <TascaViewSelector value={vista} onChange={setVista}/>
                     </Grid>
-                    {vista == TascaView.kanban && <TascaKanban actions={actions} filter={springFilter} namedQueries={namedQueries} perspectives={perspectives} reloadTrigger={reload} readOnly />}
+                    {vista == TascaView.kanban && <TascaKanban actions={actions} filter={springFilter} namedQueries={namedQueries} perspectives={perspectives} reloadTrigger={reload} onEventClick={handleTascaClick} readOnly />}
                     {vista == TascaView.calendar && <TascaCalendar actions={actions} filter={springFilter} namedQueries={namedQueries} perspectives={perspectives} reloadTrigger={reload} onEventClick={handleTascaClick} />}
                 </>}
 
