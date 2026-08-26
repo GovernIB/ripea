@@ -1833,6 +1833,27 @@ const translationEn = {
                 },
             },
         },
+        fluxFirmaUsuari: {
+            title: "Signature flow",
+            destinataris: {
+                obligatori: "mandatory",
+            },
+            action: {
+                new: {
+                    label: "New signature flow",
+                    title: "Create new signature flow",
+                    ok: "Signature flow successfully created",
+                },
+                update: {
+                    title: "Edit signature flow",
+                    ok: "Signature flow successfully updated",
+                },
+                delete: {
+                    ok: "Signature flow successfully deleted",
+                },
+                error: "The signature flow operation could not be completed",
+            },
+        },
         urlInstruccio: {
             title: "URL de instrucción",
             detall: {

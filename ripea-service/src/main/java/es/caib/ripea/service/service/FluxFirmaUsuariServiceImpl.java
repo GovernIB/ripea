@@ -13,6 +13,7 @@ import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.FluxFirmaUsuariService;
+import es.caib.ripea.service.intf.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,6 +87,13 @@ public class FluxFirmaUsuariServiceImpl implements FluxFirmaUsuariService {
 			entity.update(destinataris);
 		}
 		
+		// El nom i la descripció es poden haver canviat al portafirmes: es refresquen amb els
+		// del detall recuperat. Només si el detall du nom, per no buidar les dades guardades
+		// quan el portafirmes no ha retornat informació del flux.
+		if (fluxDetall != null && Utils.hasValue(fluxDetall.getNom())) {
+			entity.updateNomDescripcio(fluxDetall.getNom(), fluxDetall.getDescripcio());
+		}
+
 		return conversioTipusHelper.convertir(
 				entity,
 				FluxFirmaUsuariDto.class);

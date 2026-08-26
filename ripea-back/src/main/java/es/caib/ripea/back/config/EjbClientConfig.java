@@ -38,6 +38,7 @@ import es.caib.ripea.service.intf.resourceservice.ExpedientPeticioResourceServic
 import es.caib.ripea.service.intf.resourceservice.ExpedientResourceService;
 import es.caib.ripea.service.intf.resourceservice.ExpedientTascaComentariResourceService;
 import es.caib.ripea.service.intf.resourceservice.ExpedientTascaResourceService;
+import es.caib.ripea.service.intf.resourceservice.FluxFirmaUsuariResourceService;
 import es.caib.ripea.service.intf.resourceservice.GrupResourceService;
 import es.caib.ripea.service.intf.resourceservice.IntegracioResourceService;
 import es.caib.ripea.service.intf.resourceservice.InteressatGrupResourceService;
@@ -521,6 +522,11 @@ public class EjbClientConfig {
 	@Bean
 	public LocalStatelessSessionProxyFactoryBean uRLInstruccioResourceServiceEjb() {
 		return getLocalEjbFactoyBean(URLInstruccioResourceService.class);
+	}
+	
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean fluxFirmaUsuariResourceServiceEjb() {
+		return getLocalEjbFactoyBean(FluxFirmaUsuariResourceService.class);
 	}
 	
 	@Bean

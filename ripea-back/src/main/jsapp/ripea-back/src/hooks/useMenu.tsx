@@ -487,7 +487,7 @@ export const useMenuUsuari = () => {
                 id: 'flux',
                 title: t('page.user.menu.flux'),
                 icon: iconsAppMenu.firma,
-                onClick: () => toProgramaAntic('fluxusuari'),
+                to: '/fluxusuari',
                 hidden: !user?.sessionScope?.isCreacioFluxUsuariActiu,
             },
             {

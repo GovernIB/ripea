@@ -1834,6 +1834,27 @@ const translationCa = {
                 },
             },
         },
+        fluxFirmaUsuari: {
+            title: "Flux de firma",
+            destinataris: {
+                obligatori: "obligatori",
+            },
+            action: {
+                new: {
+                    label: "Nou flux de firma",
+                    title: "Crear nou flux de firma",
+                    ok: "El flux de firma s'ha creat correctament",
+                },
+                update: {
+                    title: "Modificar flux de firma",
+                    ok: "El flux de firma s'ha modificat correctament",
+                },
+                delete: {
+                    ok: "El flux de firma s'ha esborrat correctament",
+                },
+                error: "No s'ha pogut completar l'operació sobre el flux de firma",
+            },
+        },
         urlInstruccio: {
             title: "URL Instrucció",
             detall: {

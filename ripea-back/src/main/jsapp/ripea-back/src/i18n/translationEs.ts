@@ -1834,6 +1834,27 @@ const translationEs = {
                 },
             },
         },
+        fluxFirmaUsuari: {
+            title: "Flujo de firma",
+            destinataris: {
+                obligatori: "obligatorio",
+            },
+            action: {
+                new: {
+                    label: "Nuevo flujo de firma",
+                    title: "Crear nuevo flujo de firma",
+                    ok: "El flujo de firma se ha creado correctamente",
+                },
+                update: {
+                    title: "Modificar flujo de firma",
+                    ok: "El flujo de firma se ha modificado correctamente",
+                },
+                delete: {
+                    ok: "El flujo de firma se ha borrado correctamente",
+                },
+                error: "No se ha podido completar la operación sobre el flujo de firma",
+            },
+        },
         urlInstruccio: {
             title: "URL de instrucción",
             detall: {

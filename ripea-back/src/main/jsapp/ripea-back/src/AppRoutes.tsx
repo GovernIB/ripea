@@ -5,6 +5,7 @@ import Expedient from './pages/expedient/details/Expedient.tsx';
 import ExpedientGrid from './pages/expedient/ExpedientGrid';
 import AnotacionsGrid from "./pages/anotacions/AnotacionsGrid.tsx";
 import TasquesGrid from "./pages/tasca/TasquesGrid.tsx";
+import FluxFirmaUsuariGrid from "./pages/fluxFirmaUsuari/FluxFirmaUsuariGrid.tsx";
 import Tasca from "./pages/tasca/details/Tasca.tsx";
 import EnviarPortafirmesGrid from "./pages/user/accionsMassives/EnviarPortafirmesGrid.tsx";
 import FirmaNavegadorGrid from "./pages/user/accionsMassives/FirmaNavegadorGrid.tsx";
@@ -114,6 +115,12 @@ const AppRoutes: React.FC = () => {
         {/* Tasques de l'usuari: només al menú d'usuari (tothom). */}
         <Route element={<ProtectedRoute allowedRoles={[rols.tothom]} />}>
             <Route path="usuariTasca" element={<TasquesGrid />} />
+        </Route>
+
+        {/* Fluxos de firma de l'usuari: com a la interfície antiga, només al rol usuari i
+            només si la propietat que permet als usuaris crear fluxos està activada. */}
+        <Route element={<ProtectedRoute allowedRoles={[rols.tothom]} params={['isCreacioFluxUsuariActiu']} />}>
+            <Route path="fluxusuari" element={<FluxFirmaUsuariGrid />} />
         </Route>
 
         <Route element={<ProtectedRoute allowedRoles={[rols.SUPER]} />}>
