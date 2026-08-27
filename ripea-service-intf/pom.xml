@@ -57,7 +57,7 @@
         <dependency>
             <groupId>es.caib.comanda</groupId>
             <artifactId>comanda-api-client-management</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.jboss.resteasy</groupId>
@@ -76,7 +76,7 @@
         <dependency>
             <groupId>es.caib.comanda</groupId>
             <artifactId>comanda-api-utils</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
             <exclusions>
             	<exclusion>
               		<groupId>org.apache.cxf</groupId>

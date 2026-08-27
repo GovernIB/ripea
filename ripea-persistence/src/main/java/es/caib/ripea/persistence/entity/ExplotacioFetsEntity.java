@@ -26,6 +26,9 @@ public class ExplotacioFetsEntity extends RipeaPersistable<Long> {
 	@JoinColumn(name="temps_id")
 	protected ExplotacioTempsEntity temps;
 	
+	@Column(name = "prc_actius_tot")		private Long procedimentsActiusTotal;
+	@Column(name = "srv_actius_tot")		private Long serveisActiusTotal;
+	
 	@Column(name = "exp_obert")			private Long expedientsOberts;
 	@Column(name = "exp_obert_tot")		private Long expedientsObertsTotal;
 	@Column(name = "exp_tancat")		private Long expedientsTancats;
@@ -35,8 +38,10 @@ public class ExplotacioFetsEntity extends RipeaPersistable<Long> {
 	@Column(name = "tas_pendent_tot")	private Long tasquesPendentsTotal;
 	@Column(name = "tas_iniciada")		private Long tasquesIniciades;
 	@Column(name = "tas_iniciada_tot")	private Long tasquesIniciadesTotal;
-	@Column(name = "tas_finalitzada")	private Long tasquesFinalitzades;
-	@Column(name = "tas_finalitzada_tot")	private Long tasquesFinalitzadesTotal;
+	@Column(name = "tas_finalitzada_ok")		private Long tasquesFinalitzadesDinsTermini;
+	@Column(name = "tas_finalitzada_ko")		private Long tasquesFinalitzadesForaTermini;
+	@Column(name = "tas_finalitzada_total_ok")		private Long tasquesFinalitzadesTotalDinsTermini;
+	@Column(name = "tas_finalitzada_total_ko")		private Long tasquesFinalitzadesTotalForaTermini;
 	@Column(name = "tas_cancelada")		private Long tasquesCancelades;
 	@Column(name = "tas_cancelada_tot")	private Long tasquesCanceladesTotal;
 	@Column(name = "tas_rebutjada")		private Long tasquesRebutjades;
@@ -51,8 +56,10 @@ public class ExplotacioFetsEntity extends RipeaPersistable<Long> {
 	@Column(name = "ano_rebutjada")	private Long anotacionsRebutjades;
 	@Column(name = "ano_rebutjada_tot")private Long anotacionsRebutjadesTotal;
 	
-	@Column(name = "pin_enviats")		private Long pinbalEnviaments;
-	@Column(name = "pin_enviats_tot")	private Long pinbalEnviamentsTotal;
+	@Column(name = "pin_enviats_ok")		private Long pinbalEnviamentsOk;
+	@Column(name = "pin_enviats_ko")		private Long pinbalEnviamentsError;
+	@Column(name = "pin_enviats_tot_ok")	private Long pinbalEnviamentsTotalOk;
+	@Column(name = "pin_enviats_tot_ko")	private Long pinbalEnviamentsTotalError;
 	
 	@Column(name = "not_enviada")			private Long notificacionsEnviades;
 	@Column(name = "not_enviada_tot")		private Long notificacionsEnviadesTotal;
@@ -115,14 +122,20 @@ public class ExplotacioFetsEntity extends RipeaPersistable<Long> {
 		this.setNotificacionsProcessadesTotal(fetsDto.getNotificacionsProcessadesTotal()!=null?fetsDto.getNotificacionsProcessadesTotal():0l);
 		this.setNotificacionsRegistrades(fetsDto.getNotificacionsRegistrades()!=null?fetsDto.getNotificacionsRegistrades():0l);
 		this.setNotificacionsRegistradesTotal(fetsDto.getNotificacionsRegistradesTotal()!=null?fetsDto.getNotificacionsRegistradesTotal():0l);
-		this.setPinbalEnviaments(fetsDto.getPinbalEnviaments()!=null?fetsDto.getPinbalEnviaments():0l);
-		this.setPinbalEnviamentsTotal(fetsDto.getPinbalEnviamentsTotal()!=null?fetsDto.getPinbalEnviamentsTotal():0l);
+		this.setPinbalEnviamentsOk(fetsDto.getPinbalEnviamentsOk()!=null?fetsDto.getPinbalEnviamentsOk():0l);
+		this.setPinbalEnviamentsError(fetsDto.getPinbalEnviamentsError()!=null?fetsDto.getPinbalEnviamentsError():0l);
+		this.setPinbalEnviamentsTotalOk(fetsDto.getPinbalEnviamentsTotalOk()!=null?fetsDto.getPinbalEnviamentsTotalOk():0l);
+		this.setPinbalEnviamentsTotalError(fetsDto.getPinbalEnviamentsTotalError()!=null?fetsDto.getPinbalEnviamentsTotalError():0l);
+		this.setProcedimentsActiusTotal(fetsDto.getProcedimentActiusTotal()!=null?fetsDto.getProcedimentActiusTotal():0l);
+		this.setServeisActiusTotal(fetsDto.getServeisActiusTotal()!=null?fetsDto.getServeisActiusTotal():0l);
 		this.setTasquesAgafades(fetsDto.getTasquesAgafades()!=null?fetsDto.getTasquesAgafades():0l);
 		this.setTasquesAgafadesTotal(fetsDto.getTasquesAgafadesTotal()!=null?fetsDto.getTasquesAgafadesTotal():0l);
 		this.setTasquesCancelades(fetsDto.getTasquesCancelades()!=null?fetsDto.getTasquesCancelades():0l);
 		this.setTasquesCanceladesTotal(fetsDto.getTasquesCanceladesTotal()!=null?fetsDto.getTasquesCanceladesTotal():0l);
-		this.setTasquesFinalitzades(fetsDto.getTasquesFinalitzades()!=null?fetsDto.getTasquesFinalitzades():0l);
-		this.setTasquesFinalitzadesTotal(fetsDto.getTasquesFinalitzadesTotal()!=null?fetsDto.getTasquesFinalitzadesTotal():0l);
+		this.setTasquesFinalitzadesDinsTermini(fetsDto.getTasquesFinalitzadesDinsTermini()!=null?fetsDto.getTasquesFinalitzadesDinsTermini():0l);
+		this.setTasquesFinalitzadesForaTermini(fetsDto.getTasquesFinalitzadesForaTermini()!=null?fetsDto.getTasquesFinalitzadesForaTermini():0l);
+		this.setTasquesFinalitzadesTotalDinsTermini(fetsDto.getTasquesFinalitzadesTotalDinsTermini()!=null?fetsDto.getTasquesFinalitzadesTotalDinsTermini():0l);
+		this.setTasquesFinalitzadesTotalForaTermini(fetsDto.getTasquesFinalitzadesTotalForaTermini()!=null?fetsDto.getTasquesFinalitzadesTotalForaTermini():0l);
 		this.setTasquesIniciades(fetsDto.getTasquesIniciades()!=null?fetsDto.getTasquesIniciades():0l);
 		this.setTasquesIniciadesTotal(fetsDto.getTasquesIniciadesTotal()!=null?fetsDto.getTasquesIniciadesTotal():0l);
 		this.setTasquesPendents(fetsDto.getTasquesPendents()!=null?fetsDto.getTasquesPendents():0l);

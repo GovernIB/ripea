@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.comanda.model.server.monitoring.Dimensio;
 import es.caib.comanda.model.server.monitoring.DimensioDesc;
+import es.caib.comanda.model.server.monitoring.EntitatDesc;
 import es.caib.comanda.model.server.monitoring.Fet;
 import es.caib.comanda.model.server.monitoring.Format;
 import es.caib.comanda.model.server.monitoring.IndicadorDesc;
@@ -77,6 +78,7 @@ import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.helper.SynchronizationHelper;
 import es.caib.ripea.service.helper.TestHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.ConsultaPinbalEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.EventTipusEnumDto;
@@ -86,6 +88,7 @@ import es.caib.ripea.service.intf.dto.ExplotFetsAmbDimensioDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
+import es.caib.ripea.service.intf.dto.TipusProcedimentServeiEnum;
 import es.caib.ripea.service.intf.exception.ArxiuJaGuardatException;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
 import es.caib.ripea.service.intf.service.SegonPlaService;
@@ -622,6 +625,9 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		
 		List<IndicadorDesc> resultat = new ArrayList<IndicadorDesc>();
 		
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.PROCEDIMENTS_ACTIUS_TOTAL.toString(), "Procediments actius totals").descripcio("Procediments actius a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.SERVEIS_ACTIUS_TOTAL.toString(), "Serveis actius totals").descripcio("Serveis actius a RIPEA").format(Format.LONG));
+		
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.ANO_NOVES.toString(), "Anotacions noves").descripcio("Noves anotacions rebudes a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.ANO_NOVES_TOTAL.toString(), "Anotacions noves totals").descripcio("Total noves anotacions rebudes a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.ANO_PROCESSADES.toString(), "Anotacions processades").descripcio("Anotacions processades a RIPEA").format(Format.LONG));
@@ -660,15 +666,17 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_FINALITZADES_ERROR.toString(), "Notificacions finalitzades amb error").descripcio("Notificacions finalitzades amb error a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_FINALITZADES_ERROR_TOTAL.toString(), "Notificacions finalitzades amb error totals").descripcio("Notificacions finalitzades amb error totals a RIPEA").format(Format.LONG));
 
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS.toString(), "Enviaments PINBAL").descripcio("Enviaments PINBAL a RIPEA").format(Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_TOTAL.toString(), "Enviaments PINBAL totals").descripcio("Enviaments PINBAL totals a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_OK.toString(), "Enviaments PINBAL processats OK").descripcio("Enviaments PINBAL processats OK a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_ERROR.toString(), "Enviaments PINBAL amb error").descripcio("Enviaments PINBAL amb error a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_TOTAL_OK.toString(), "Enviaments PINBAL totals processats OK").descripcio("Enviaments PINBAL totals processats a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_TOTAL_ERROR.toString(), "Enviaments PINBAL totals amb error").descripcio("Enviaments PINBAL totals amb error a RIPEA").format(Format.LONG));
 		
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_AGAFADES.toString(), "Tasques afagades").descripcio("Tasques afagades a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_AGAFADES_TOTAL.toString(), "Tasques afagades totals").descripcio("Tasques afagades totals a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_CANCELADES.toString(), "Tasques cancelades").descripcio("Tasques cancelades a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_CANCELADES_TOTAL.toString(), "Tasques cancelades totals").descripcio("Tasques cancelades totals a RIPEA").format(Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FINALITZADES.toString(), "Tasques finalitzades").descripcio("Tasques finalitzades a RIPEA").format(Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FINALITZADES_TOTAL.toString(), "Tasques finalitzades totals").descripcio("Tasques finalitzades totals a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FINALITZADES_DINS_TERMINI.toString(), "Tasques finalitzades dins termini").descripcio("Tasques finalitzades dins termini a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FINALITZADES_FORA_TERMINI.toString(), "Tasques finalitzades fora termini").descripcio("Tasques finalitzades fora termini a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_INICIADES.toString(), "Tasques iniciades").descripcio("Tasques iniciades a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_INICIADES_TOTAL.toString(), "Tasques iniciades totals").descripcio("Tasques iniciades totals a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_PENDENTS.toString(), "Tasques pendents").descripcio("Tasques pendents a RIPEA").format(Format.LONG));
@@ -676,6 +684,19 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_REBUTJADES.toString(), "Tasques rebutjades").descripcio("Tasques rebutjades a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_REBUTJADES_TOTAL.toString(), "Tasques rebutjades totals").descripcio("Tasques rebutjades totals a RIPEA").format(Format.LONG));
 		
+		return resultat;
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<EntitatDesc> getEntitatsInfo() {
+		List<EntitatDesc> resultat = new ArrayList<EntitatDesc>();
+		List<EntitatEntity> entitats = entitatRepository.findAll();
+		if (entitats!=null) {
+			for (EntitatEntity entitat: entitats) {
+				resultat.add(new EntitatDesc(entitat.getCodi(), entitat.getNom(), entitat.getUnitatArrel(), entitat.getCif()));
+			}
+		}
 		return resultat;
 	}
 	
@@ -723,6 +744,10 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	
 	private List<Fet> toFetComanda(ExplotacioFetsEntity efe) {
 		List<Fet> resultat = new ArrayList<Fet>();
+		
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.PROCEDIMENTS_ACTIUS_TOTAL.toString()).valor(efe.getProcedimentsActiusTotal()!=null?efe.getProcedimentsActiusTotal().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.SERVEIS_ACTIUS_TOTAL.toString()).valor(efe.getServeisActiusTotal()!=null?efe.getServeisActiusTotal().doubleValue():null));
+		
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.ANO_NOVES.toString()).valor(efe.getAnotacionsNoves()!=null?efe.getAnotacionsNoves().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.ANO_NOVES_TOTAL.toString()).valor(efe.getAnotacionsNovesTotal()!=null?efe.getAnotacionsNovesTotal().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.ANO_PROCESSADES.toString()).valor(efe.getAnotacionsProcessades()!=null?efe.getAnotacionsProcessades().doubleValue():null));
@@ -761,15 +786,17 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.NOT_FINALITZADES_ERROR.toString()).valor(efe.getNotificacionsFinError()!=null?efe.getNotificacionsFinError().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.NOT_FINALITZADES_ERROR_TOTAL.toString()).valor(efe.getNotificacionsFinErrorTotal()!=null?efe.getNotificacionsFinErrorTotal().doubleValue():null));
 		
-		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS.toString()).valor(efe.getPinbalEnviaments()!=null?efe.getPinbalEnviaments().doubleValue():null));
-		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_TOTAL.toString()).valor(efe.getPinbalEnviamentsTotal()!=null?efe.getPinbalEnviamentsTotal().doubleValue():null));		
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_OK.toString()).valor(efe.getPinbalEnviamentsOk()!=null?efe.getPinbalEnviamentsOk().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_ERROR.toString()).valor(efe.getPinbalEnviamentsError()!=null?efe.getPinbalEnviamentsError().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_TOTAL_OK.toString()).valor(efe.getPinbalEnviamentsTotalOk()!=null?efe.getPinbalEnviamentsTotalOk().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_TOTAL_ERROR.toString()).valor(efe.getPinbalEnviamentsTotalError()!=null?efe.getPinbalEnviamentsTotalError().doubleValue():null));
 		
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_AGAFADES.toString()).valor(efe.getTasquesAgafades()!=null?efe.getTasquesAgafades().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_AGAFADES_TOTAL.toString()).valor(efe.getTasquesAgafadesTotal()!=null?efe.getTasquesAgafadesTotal().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_CANCELADES.toString()).valor(efe.getTasquesCancelades()!=null?efe.getTasquesCancelades().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_CANCELADES_TOTAL.toString()).valor(efe.getTasquesCanceladesTotal()!=null?efe.getTasquesCanceladesTotal().doubleValue():null));
-		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FINALITZADES.toString()).valor(efe.getTasquesFinalitzades()!=null?efe.getTasquesFinalitzades().doubleValue():null));
-		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FINALITZADES_TOTAL.toString()).valor(efe.getTasquesFinalitzadesTotal()!=null?efe.getTasquesFinalitzadesTotal().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FINALITZADES_DINS_TERMINI.toString()).valor(efe.getTasquesFinalitzadesDinsTermini()!=null?efe.getTasquesFinalitzadesDinsTermini().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FINALITZADES_FORA_TERMINI.toString()).valor(efe.getTasquesFinalitzadesForaTermini()!=null?efe.getTasquesFinalitzadesForaTermini().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_INICIADES.toString()).valor(efe.getTasquesIniciades()!=null?efe.getTasquesIniciades().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_INICIADES_TOTAL.toString()).valor(efe.getTasquesIniciadesTotal()!=null?efe.getTasquesIniciadesTotal().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_PENDENTS.toString()).valor(efe.getTasquesPendents()!=null?efe.getTasquesPendents().doubleValue():null));
@@ -808,6 +835,12 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		
 		List<ExplotFetsAmbDimensioDto> dimensions = new ArrayList<ExplotFetsAmbDimensioDto>();
 		
+		//PROCEDIMENTS I SERVEIS
+		List<ExplotFetsAmbDimensioDto> procedimentsActius		= explotacioFetsRepository.getProcedimentsActiusPerDimensio(dataFi, TipusProcedimentServeiEnum.PROCEDIMENT);
+		agruparDimensions(dimensions, procedimentsActius, ExplotFetsAmbDimensioDto.FetsEnum.PROCEDIMENTS_ACTIUS_TOTAL);
+		List<ExplotFetsAmbDimensioDto> serveisActius		= explotacioFetsRepository.getProcedimentsActiusPerDimensio(dataFi, TipusProcedimentServeiEnum.SERVEI);
+		agruparDimensions(dimensions, serveisActius, ExplotFetsAmbDimensioDto.FetsEnum.SERVEIS_ACTIUS_TOTAL);
+		
 		//EXPEDIENTS
 		List<ExplotFetsAmbDimensioDto> expedientsObertsPerDimensio		= explotacioFetsRepository.getExpedientsObertsPerDimensio(dataIni, dataFi);
 		agruparDimensions(dimensions, expedientsObertsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.EXP_OBERTS);
@@ -837,14 +870,19 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		//Afegim les dades parcials del dia a la llista definitiva
 		agruparDimensions(dimensions, tasquesIniciadesParcialsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.TAS_INICIADES);
 		
-		List<ExplotFetsAmbDimensioDto> tasquesFinalitzadesTotalsPerDimensio= explotacioFetsRepository.getTasquesTotalsByEstatPerDimensio(dataFi, TascaEstatEnumDto.FINALITZADA);
-		agruparDimensions(dimensions, tasquesFinalitzadesTotalsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.TAS_FINALITZADES_TOTAL);
+		List<ExplotFetsAmbDimensioDto> tasquesFinalitzadesTotalsPerDimensioDinsTermini= explotacioFetsRepository.getTasquesTotalsByEstatPerDimensioDinsTermini(dataFi, TascaEstatEnumDto.FINALITZADA);
+		agruparDimensions(dimensions, tasquesFinalitzadesTotalsPerDimensioDinsTermini, ExplotFetsAmbDimensioDto.FetsEnum.TAS_FINALITZADES_TOTAL_DINS_TERMINI);
+		List<ExplotFetsAmbDimensioDto> tasquesFinalitzadesTotalsPerDimensioForaTermini= explotacioFetsRepository.getTasquesTotalsByEstatPerDimensioForaTermini(dataFi, TascaEstatEnumDto.FINALITZADA);
+		agruparDimensions(dimensions, tasquesFinalitzadesTotalsPerDimensioForaTermini, ExplotFetsAmbDimensioDto.FetsEnum.TAS_FINALITZADES_TOTAL_FORA_TERMINI);		
 		//Recuperam les de ahir per poder calcular el parcial d'avui
-		List<ExplotFetsAmbDimensioDto> tasquesFinalitzadesTotalsPerDimensioAhir	= explotacioFetsRepository.getTasquesTotalsByEstatPerDimensio(dataAhirFi, TascaEstatEnumDto.FINALITZADA);
+		List<ExplotFetsAmbDimensioDto> tasquesFinalitzadesTotalsPerDimensioAhirDinsTermini	= explotacioFetsRepository.getTasquesTotalsByEstatPerDimensioDinsTermini(dataAhirFi, TascaEstatEnumDto.FINALITZADA);
+		List<ExplotFetsAmbDimensioDto> tasquesFinalitzadesTotalsPerDimensioAhirForaTermini	= explotacioFetsRepository.getTasquesTotalsByEstatPerDimensioForaTermini(dataAhirFi, TascaEstatEnumDto.FINALITZADA);
 		//Feim la resta avui-ahir per calcular la dada parcial (tasquesIniciades)
-		List<ExplotFetsAmbDimensioDto> tasquesFinalitzadesParcialsPerDimensio = restarDadaMateixaDimensio(tasquesFinalitzadesTotalsPerDimensio, tasquesFinalitzadesTotalsPerDimensioAhir);
+		List<ExplotFetsAmbDimensioDto> tasquesFinalitzadesParcialsPerDimensioDinsTermini = restarDadaMateixaDimensio(tasquesFinalitzadesTotalsPerDimensioDinsTermini, tasquesFinalitzadesTotalsPerDimensioAhirDinsTermini);
+		List<ExplotFetsAmbDimensioDto> tasquesFinalitzadesParcialsPerDimensioForaTermini = restarDadaMateixaDimensio(tasquesFinalitzadesTotalsPerDimensioForaTermini, tasquesFinalitzadesTotalsPerDimensioAhirForaTermini);
 		//Afegim les dades parcials del dia a la llista definitiva
-		agruparDimensions(dimensions, tasquesFinalitzadesParcialsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.TAS_FINALITZADES);
+		agruparDimensions(dimensions, tasquesFinalitzadesParcialsPerDimensioDinsTermini, ExplotFetsAmbDimensioDto.FetsEnum.TAS_FINALITZADES_DINS_TERMINI);
+		agruparDimensions(dimensions, tasquesFinalitzadesParcialsPerDimensioForaTermini, ExplotFetsAmbDimensioDto.FetsEnum.TAS_FINALITZADES_FORA_TERMINI);
 		
 		List<ExplotFetsAmbDimensioDto> tasquesCanceladesTotalsPerDimensio= explotacioFetsRepository.getTasquesTotalsByEstatPerDimensio(dataFi, TascaEstatEnumDto.CANCELLADA);
 		agruparDimensions(dimensions, tasquesCanceladesTotalsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.TAS_CANCELADES_TOTAL);
@@ -899,11 +937,16 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		agruparDimensions(dimensions, anotacionsRebutjadesParcialsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.ANO_REBUTJADES);
 		
 		//PINBAL
-		List<ExplotFetsAmbDimensioDto> pinbalEnviamentsPerDimensio 		= explotacioFetsRepository.getPinbalEnviamentsPerDimensio(dataIni, dataFi);
-		agruparDimensions(dimensions, pinbalEnviamentsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS);
+		List<ExplotFetsAmbDimensioDto> pinbalEnviamentsPerDimensioOk = explotacioFetsRepository.getPinbalEnviamentsPerDimensio(dataIni, dataFi, ConsultaPinbalEstatEnumDto.TRAMITADA);
+		agruparDimensions(dimensions, pinbalEnviamentsPerDimensioOk, ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_OK);
+		List<ExplotFetsAmbDimensioDto> pinbalEnviamentsPerDimensioError = explotacioFetsRepository.getPinbalEnviamentsPerDimensio(dataIni, dataFi, ConsultaPinbalEstatEnumDto.ERROR);
+		agruparDimensions(dimensions, pinbalEnviamentsPerDimensioError, ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_ERROR);
 		
-		List<ExplotFetsAmbDimensioDto> pinbalEnviamentsTotalsPerDimensio 		= explotacioFetsRepository.getPinbalEnviamentsTotalsPerDimensio(dataFi);
-		agruparDimensions(dimensions, pinbalEnviamentsTotalsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_TOTAL);
+		List<ExplotFetsAmbDimensioDto> pinbalEnviamentsTotalsPerDimensioOk = explotacioFetsRepository.getPinbalEnviamentsTotalsPerDimensio(dataFi, ConsultaPinbalEstatEnumDto.TRAMITADA);
+		agruparDimensions(dimensions, pinbalEnviamentsTotalsPerDimensioOk, ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_TOTAL_OK);
+		
+		List<ExplotFetsAmbDimensioDto> pinbalEnviamentsTotalsPerDimensioErr	= explotacioFetsRepository.getPinbalEnviamentsTotalsPerDimensio(dataFi, ConsultaPinbalEstatEnumDto.ERROR);
+		agruparDimensions(dimensions, pinbalEnviamentsTotalsPerDimensioErr, ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_TOTAL_ERROR);
 		
 		//NOTIFICACIONS
 		List<ExplotFetsAmbDimensioDto> notificacionsEnviadesPerDimensio = explotacioFetsRepository.getNotificacionsEnviadesTotalsByEstatPerDimensio(
@@ -1131,6 +1174,8 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	
 	private void setFetActual(ExplotFetsAmbDimensioDto fetDto, ExplotFetsAmbDimensioDto.FetsEnum fetActual, Long valor) {
 		switch (fetActual) {
+		case PROCEDIMENTS_ACTIUS_TOTAL: fetDto.setProcedimentActiusTotal(valor); break;
+		case SERVEIS_ACTIUS_TOTAL: fetDto.setServeisActiusTotal(valor); break;
 		case ANO_NOVES: fetDto.setAnotacionsNoves(valor); break;
 		case ANO_NOVES_TOTAL: fetDto.setAnotacionsNovesTotal(valor); break;
 		case ANO_PROCESSADES: fetDto.setAnotacionsProcessades(valor); break;
@@ -1165,14 +1210,18 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		case NOT_ENVIADES_ERROR_TOTAL: fetDto.setNotificacionsEnvErrorTotal(valor); break;
 		case NOT_FINALITZADES_ERROR: fetDto.setNotificacionsFinError(valor); break;
 		case NOT_FINALITZADES_ERROR_TOTAL: fetDto.setNotificacionsFinErrorTotal(valor); break;
-		case PIN_ENVIAMENTS: fetDto.setPinbalEnviaments(valor); break;
-		case PIN_ENVIAMENTS_TOTAL: fetDto.setPinbalEnviamentsTotal(valor); break;
+		case PIN_ENVIAMENTS_OK: fetDto.setPinbalEnviamentsOk(valor); break;
+		case PIN_ENVIAMENTS_ERROR: fetDto.setPinbalEnviamentsError(valor); break;
+		case PIN_ENVIAMENTS_TOTAL_OK: fetDto.setPinbalEnviamentsTotalOk(valor); break;
+		case PIN_ENVIAMENTS_TOTAL_ERROR: fetDto.setPinbalEnviamentsTotalError(valor); break;
 		case TAS_AGAFADES: fetDto.setTasquesAgafades(valor); break;
 		case TAS_AGAFADES_TOTAL: fetDto.setTasquesAgafadesTotal(valor); break;
 		case TAS_CANCELADES: fetDto.setTasquesCancelades(valor); break;
 		case TAS_CANCELADES_TOTAL: fetDto.setTasquesCanceladesTotal(valor); break;
-		case TAS_FINALITZADES: fetDto.setTasquesFinalitzades(valor); break;
-		case TAS_FINALITZADES_TOTAL: fetDto.setTasquesFinalitzadesTotal(valor); break;
+		case TAS_FINALITZADES_DINS_TERMINI: fetDto.setTasquesFinalitzadesDinsTermini(valor); break;
+		case TAS_FINALITZADES_FORA_TERMINI: fetDto.setTasquesFinalitzadesForaTermini(valor); break;
+		case TAS_FINALITZADES_TOTAL_DINS_TERMINI: fetDto.setTasquesFinalitzadesTotalDinsTermini(valor); break;
+		case TAS_FINALITZADES_TOTAL_FORA_TERMINI: fetDto.setTasquesFinalitzadesTotalForaTermini(valor); break;
 		case TAS_INICIADES: fetDto.setTasquesIniciades(valor); break;
 		case TAS_INICIADES_TOTAL: fetDto.setTasquesIniciadesTotal(valor); break;
 		case TAS_PENDENTS: fetDto.setTasquesPendents(valor); break;

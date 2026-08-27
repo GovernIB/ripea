@@ -12,10 +12,12 @@ import org.springframework.stereotype.Component;
 import es.caib.ripea.persistence.entity.ExplotacioDimensioEntity;
 import es.caib.ripea.persistence.entity.ExplotacioFetsEntity;
 import es.caib.ripea.persistence.entity.ExplotacioTempsEntity;
+import es.caib.ripea.service.intf.dto.ConsultaPinbalEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ExplotFetsAmbDimensioDto;
 import es.caib.ripea.service.intf.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
+import es.caib.ripea.service.intf.dto.TipusProcedimentServeiEnum;
 
 @Component
 public interface ExplotacioFetsRepository extends JpaRepository<ExplotacioFetsEntity, Long> {
@@ -25,6 +27,21 @@ public interface ExplotacioFetsRepository extends JpaRepository<ExplotacioFetsEn
 	public ExplotacioFetsEntity findByDimensioAndTemps(
 			@Param("dimensio") ExplotacioDimensioEntity dimensio,
 			@Param("temps") ExplotacioTempsEntity temps);
+	
+	/**
+	 * PROCEDIMENTS * 
+	 */
+	
+	//Procediments actius totals fins a la data especificada
+	@Query(	"select new es.caib.ripea.service.intf.dto.ExplotFetsAmbDimensioDto( "
+			+ "e.entitat.id, e.id, e.organGestor.id, e.createdBy, count(e) ) " +
+    "from MetaExpedientEntity e " +
+	"where e.createdDate <= :dataFins and e.tipusProcedimentServei=:tipus and e.actiu = 1 " +
+    "group by e.entitat.id, e.id, e.organGestor.id, e.createdBy " +
+    "order by e.entitat.id, e.id, e.organGestor.id, e.createdBy")
+	List<ExplotFetsAmbDimensioDto> getProcedimentsActiusPerDimensio(
+			@Param("dataFins") LocalDateTime dataFins,
+			@Param("tipus") TipusProcedimentServeiEnum tipus);
 	
 	/**
 	 * EXPEDIENT * 
@@ -75,7 +92,7 @@ public interface ExplotacioFetsRepository extends JpaRepository<ExplotacioFetsEn
 	 */
 	//No es correcte utilitzar la data de creació com a filtre per cercar tasques en un estat determinat.
 	//Per tant s'obtendrá el total per el dia actual, i es restará de la mateixa dada del dia anterior.
-	
+
 	@Query(	"select new es.caib.ripea.service.intf.dto.ExplotFetsAmbDimensioDto( "
 			+ "e.expedient.entitat.id, e.metaExpedientTasca.metaExpedient.id, e.expedient.organGestor.id, e.createdBy, count(e) ) " +
     "from ExpedientTascaEntity e " +
@@ -83,6 +100,29 @@ public interface ExplotacioFetsRepository extends JpaRepository<ExplotacioFetsEn
     "group by e.expedient.entitat.id, e.metaExpedientTasca.metaExpedient.id, e.expedient.organGestor.id, e.createdBy " +
     "order by e.expedient.entitat.id, e.metaExpedientTasca.metaExpedient.id, e.expedient.organGestor.id, e.createdBy")    
 	List<ExplotFetsAmbDimensioDto> getTasquesTotalsByEstatPerDimensio(@Param("dataFins") LocalDateTime dataFins, @Param("estatTasca") TascaEstatEnumDto estatTasca);
+	
+	@Query(	"select new es.caib.ripea.service.intf.dto.ExplotFetsAmbDimensioDto( "
+			+ "e.expedient.entitat.id, e.metaExpedientTasca.metaExpedient.id, e.expedient.organGestor.id, e.createdBy, count(e) ) " +
+    "from ExpedientTascaEntity e " +
+	"where e.createdDate <= :dataFins and e.estat = :estatTasca and e.expedient.esborrat = 0 " +
+	//Dins de termini: la tasca no té data límit, o s'ha finalitzat abans o just a la data límit.
+	//Si no es coneix la data de finalització no es pot afirmar que sigui fora de termini, i per tant es compta aquí
+	//(les dues consultes són complementàries: dins + fora = total de tasques a l'estat indicat).
+	"and (e.dataLimit is null or e.dataFi is null or e.dataFi <= e.dataLimit) " +
+    "group by e.expedient.entitat.id, e.metaExpedientTasca.metaExpedient.id, e.expedient.organGestor.id, e.createdBy " +
+    "order by e.expedient.entitat.id, e.metaExpedientTasca.metaExpedient.id, e.expedient.organGestor.id, e.createdBy")    
+	List<ExplotFetsAmbDimensioDto> getTasquesTotalsByEstatPerDimensioDinsTermini(@Param("dataFins") LocalDateTime dataFins, @Param("estatTasca") TascaEstatEnumDto estatTasca);
+
+	@Query(	"select new es.caib.ripea.service.intf.dto.ExplotFetsAmbDimensioDto( "
+			+ "e.expedient.entitat.id, e.metaExpedientTasca.metaExpedient.id, e.expedient.organGestor.id, e.createdBy, count(e) ) " +
+    "from ExpedientTascaEntity e " +
+	"where e.createdDate <= :dataFins and e.estat = :estatTasca and e.expedient.esborrat = 0 " +
+	//Fora de termini: només es compta com a fora de termini quan es pot demostrar, és a dir, quan les dues
+	//dates estan informades i la data de finalització és posterior a la data límit.
+	"and (e.dataLimit is not null and e.dataFi is not null and e.dataFi > e.dataLimit) " +
+    "group by e.expedient.entitat.id, e.metaExpedientTasca.metaExpedient.id, e.expedient.organGestor.id, e.createdBy " +
+    "order by e.expedient.entitat.id, e.metaExpedientTasca.metaExpedient.id, e.expedient.organGestor.id, e.createdBy")    
+	List<ExplotFetsAmbDimensioDto> getTasquesTotalsByEstatPerDimensioForaTermini(@Param("dataFins") LocalDateTime dataFins, @Param("estatTasca") TascaEstatEnumDto estatTasca);
 	
 	/**
 	 * ANOTACIONS * 
@@ -129,20 +169,23 @@ public interface ExplotacioFetsRepository extends JpaRepository<ExplotacioFetsEn
 	@Query(	"select new es.caib.ripea.service.intf.dto.ExplotFetsAmbDimensioDto("
 			+ "e.entitat.id, e.metaExpedient.id, e.metaExpedient.organGestor.id, e.createdBy, count(e) ) " +
     "from ConsultaPinbalEntity e " +
-	"where e.createdDate > :dataDesde and e.createdDate <= :dataFins and e.expedient.esborrat = 0 " +
+	"where e.createdDate > :dataDesde and e.createdDate <= :dataFins and e.expedient.esborrat = 0 and e.estat = :estat " +
     "group by e.entitat.id, e.metaExpedient.id, e.metaExpedient.organGestor.id, e.createdBy " +
     "order by e.entitat.id, e.metaExpedient.id, e.metaExpedient.organGestor.id, e.createdBy")    
 	List<ExplotFetsAmbDimensioDto> getPinbalEnviamentsPerDimensio(
 			@Param("dataDesde") LocalDateTime dataDesde,
-			@Param("dataFins") LocalDateTime dataFins);
+			@Param("dataFins") LocalDateTime dataFins,
+			@Param("estat") ConsultaPinbalEstatEnumDto estat);
 	
 	@Query(	"select new es.caib.ripea.service.intf.dto.ExplotFetsAmbDimensioDto("
 			+ "e.entitat.id, e.metaExpedient.id, e.metaExpedient.organGestor.id, e.createdBy, count(e) ) " +
     "from ConsultaPinbalEntity e " +
-	"where e.createdDate <= :dataFins and e.expedient.esborrat = 0 " +
+	"where e.createdDate <= :dataFins and e.expedient.esborrat = 0 and e.estat = :estat " +
     "group by e.entitat.id, e.metaExpedient.id, e.metaExpedient.organGestor.id, e.createdBy " +
     "order by e.entitat.id, e.metaExpedient.id, e.metaExpedient.organGestor.id, e.createdBy")    
-	List<ExplotFetsAmbDimensioDto> getPinbalEnviamentsTotalsPerDimensio(@Param("dataFins") LocalDateTime dataFins);
+	List<ExplotFetsAmbDimensioDto> getPinbalEnviamentsTotalsPerDimensio(
+			@Param("dataFins") LocalDateTime dataFins,
+			@Param("estat") ConsultaPinbalEstatEnumDto estat);
 	
 	/**
 	 * NOTIFICACIONS I COMUNICACIONS * 

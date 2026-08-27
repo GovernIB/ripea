@@ -47,3 +47,19 @@ databaseChangeLog:
             splitStatements: false
             stripComments: true
             relativeToChangelogFile: true
+  - changeSet:
+      id: RIPEA_1.0.8_EXPLOT_FET_INDICADORS_1
+      author: limit
+      changes:
+        - sqlFile:
+            dbms: oracle
+            path: ../scripts/oracle/1.0.8/Versio_1.0.8_DDL_2.sql
+            splitStatements: true
+            stripComments: true
+            relativeToChangelogFile: true
+        - sqlFile:
+            dbms: postgresql
+            path: ../scripts/postgres/1.0.8/Versio_1.0.8_DDL_2.sql
+            splitStatements: true
+            stripComments: true
+            relativeToChangelogFile: true

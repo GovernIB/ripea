@@ -15,6 +15,9 @@ public class ExplotFetsAmbDimensioDto {
 	
 	private Long aux;
 	
+	private Long procedimentActiusTotal;
+	private Long serveisActiusTotal;
+	
 	private Long expedientsOberts;
 	private Long expedientsObertsTotal;
 	private Long expedientsTancats;
@@ -24,8 +27,10 @@ public class ExplotFetsAmbDimensioDto {
 	private Long tasquesPendentsTotal;
 	private Long tasquesIniciades;
 	private Long tasquesIniciadesTotal;
-	private Long tasquesFinalitzades;
-	private Long tasquesFinalitzadesTotal;
+	private Long tasquesFinalitzadesDinsTermini;
+	private Long tasquesFinalitzadesForaTermini;
+	private Long tasquesFinalitzadesTotalDinsTermini;
+	private Long tasquesFinalitzadesTotalForaTermini;	
 	private Long tasquesCancelades;
 	private Long tasquesCanceladesTotal;
 	private Long tasquesRebutjades;
@@ -40,8 +45,10 @@ public class ExplotFetsAmbDimensioDto {
 	private Long anotacionsRebutjades;
 	private Long anotacionsRebutjadesTotal;
 	
-	private Long pinbalEnviaments;
-	private Long pinbalEnviamentsTotal;
+	private Long pinbalEnviamentsOk;
+	private Long pinbalEnviamentsError;
+	private Long pinbalEnviamentsTotalOk;
+	private Long pinbalEnviamentsTotalError;
 	
 	private Long notificacionsEnviades;
 	private Long notificacionsEnviadesTotal;
@@ -70,6 +77,8 @@ public class ExplotFetsAmbDimensioDto {
 	private Long firmesParcialsTotal;
 	
 	public enum FetsEnum {
+		PROCEDIMENTS_ACTIUS_TOTAL,
+		SERVEIS_ACTIUS_TOTAL,
         EXP_OBERTS,
         EXP_OBERTS_TOTAL,
         EXP_TANCATS,
@@ -78,8 +87,10 @@ public class ExplotFetsAmbDimensioDto {
         TAS_PENDENTS_TOTAL,
         TAS_INICIADES,
         TAS_INICIADES_TOTAL,
-        TAS_FINALITZADES,
-        TAS_FINALITZADES_TOTAL,
+        TAS_FINALITZADES_DINS_TERMINI,
+        TAS_FINALITZADES_FORA_TERMINI,
+        TAS_FINALITZADES_TOTAL_DINS_TERMINI,
+        TAS_FINALITZADES_TOTAL_FORA_TERMINI,        
         TAS_CANCELADES,
         TAS_CANCELADES_TOTAL,
         TAS_REBUTJADES,
@@ -92,8 +103,10 @@ public class ExplotFetsAmbDimensioDto {
         ANO_PROCESSADES_TOTAL,
         ANO_REBUTJADES,
         ANO_REBUTJADES_TOTAL,
-        PIN_ENVIAMENTS,
-        PIN_ENVIAMENTS_TOTAL,
+        PIN_ENVIAMENTS_OK,
+        PIN_ENVIAMENTS_ERROR,
+        PIN_ENVIAMENTS_TOTAL_OK,
+        PIN_ENVIAMENTS_TOTAL_ERROR,
         NOT_ENVIADES,
         NOT_ENVIADES_TOTAL,
         NOT_PENDENTS,

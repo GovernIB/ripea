@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import es.caib.comanda.model.server.monitoring.DimensioDesc;
+import es.caib.comanda.model.server.monitoring.EntitatDesc;
 import es.caib.comanda.model.server.monitoring.EstadistiquesInfo;
 import es.caib.comanda.model.server.monitoring.IndicadorDesc;
 import es.caib.comanda.model.server.monitoring.RegistresEstadistics;
@@ -44,14 +45,16 @@ public class EstadistiquesController extends BaseApiInternaController {
 			summary = "Consulta de paràmetres estadístics de l'aplicació (indicadors i dimensions disponibles).",
 			security = { @SecurityRequirement(name = "basicAuth") })
     public EstadistiquesInfo statsInfo() throws IOException {
-        List<DimensioDesc> dimensions  = segonPlaService.getDimensionsInfo();
-        List<IndicadorDesc> indicadors = segonPlaService.getIndicadorsInfo();
+        List<DimensioDesc> dimensions	= segonPlaService.getDimensionsInfo();
+        List<IndicadorDesc> indicadors	= segonPlaService.getIndicadorsInfo();
+        List<EntitatDesc> entitats		= segonPlaService.getEntitatsInfo();
         return new EstadistiquesInfo()
         		.codi(aplicacioService.propertyFindByNom(PropertyConfig.COMANDA_APP_CODI))
         		.data(DateUtil.toOffsetDateTime(Calendar.getInstance().getTime()))
         		.versio(getManifestInfo().getVersion())
         		.dimensions(dimensions)
-        		.indicadors(indicadors);
+        		.indicadors(indicadors)
+        		.entitats(entitats);
     }
 	
     @GetMapping

@@ -9,6 +9,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 
 import es.caib.comanda.model.server.monitoring.DimensioDesc;
+import es.caib.comanda.model.server.monitoring.EntitatDesc;
 import es.caib.comanda.model.server.monitoring.IndicadorDesc;
 import es.caib.comanda.model.server.monitoring.RegistresEstadistics;
 import es.caib.ripea.ejb.base.AbstractServiceEjb;
@@ -120,6 +121,12 @@ public class SegonPlaServiceEjb extends AbstractServiceEjb<SegonPlaService> impl
 	@PermitAll
 	public List<IndicadorDesc> getIndicadorsInfo() {
 		return delegateService.getIndicadorsInfo();
+	}
+	
+	@Override
+	@PermitAll
+	public List<EntitatDesc> getEntitatsInfo() {
+		return delegateService.getEntitatsInfo();
 	}
 	
 	@Override
