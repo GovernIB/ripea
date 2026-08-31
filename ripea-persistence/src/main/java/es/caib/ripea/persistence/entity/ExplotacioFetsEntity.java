@@ -76,6 +76,8 @@ public class ExplotacioFetsEntity extends RipeaPersistable<Long> {
 	@Column(name = "not_fin_err")			private Long notificacionsFinError;
 	@Column(name = "not_fin_err_tot")		private Long notificacionsFinErrorTotal;
 	
+	@Column(name = "fir_enviat")		private Long firmesEnviades;
+	@Column(name = "fir_enviat_tot")	private Long firmesEnviadesTotal;
 	@Column(name = "fir_iniciat")		private Long firmesIniciades;
 	@Column(name = "fir_iniciat_tot")	private Long firmesIniciadesTotal;
 	@Column(name = "fir_pausat")		private Long firmesPausades;
@@ -100,6 +102,8 @@ public class ExplotacioFetsEntity extends RipeaPersistable<Long> {
 		this.setExpedientsTancatsTotal(fetsDto.getExpedientsTancatsTotal()!=null?fetsDto.getExpedientsTancatsTotal():0l);
 		this.setFirmesFirmades(fetsDto.getFirmesFirmades()!=null?fetsDto.getFirmesFirmades():0l);
 		this.setFirmesFirmadesTotal(fetsDto.getFirmesFirmadesTotal()!=null?fetsDto.getFirmesFirmadesTotal():0l);
+		this.setFirmesEnviades(fetsDto.getFirmesEnviades()!=null?fetsDto.getFirmesEnviades():0l);
+		this.setFirmesEnviadesTotal(fetsDto.getFirmesEnviadesTotal()!=null?fetsDto.getFirmesEnviadesTotal():0l);
 		this.setFirmesIniciades(fetsDto.getFirmesIniciades()!=null?fetsDto.getFirmesIniciades():0l);
 		this.setFirmesIniciadesTotal(fetsDto.getFirmesIniciadesTotal()!=null?fetsDto.getFirmesIniciadesTotal():0l);
 		this.setFirmesParcials(fetsDto.getFirmesParcials()!=null?fetsDto.getFirmesParcials():0l);

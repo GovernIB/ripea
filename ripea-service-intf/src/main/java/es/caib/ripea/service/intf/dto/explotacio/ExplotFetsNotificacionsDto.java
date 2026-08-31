@@ -1,0 +1,43 @@
+package es.caib.ripea.service.intf.dto.explotacio;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+/**
+ * Fets d'explotació de notificacions obtinguts amb una única consulta agregada sobre DocumentNotificacioEntity.
+ *
+ * Els camps acabats en "Ahir" contenen el mateix total calculat amb el tall del dia anterior;
+ * la dada parcial del dia s'obté restant-los del total (equival a la resta que abans es feia
+ * amb dues consultes i el mètode restarDadaMateixaDimensio).
+ *
+ * IMPORTANT: l'ordre dels camps forma part del contracte amb l'expressió constructora
+ * (`select new ...`) de la consulta corresponent a ExplotacioFetsRepository. Si es reordenen
+ * o s'afegeixen camps, s'ha d'actualitzar també la consulta.
+ *
+ * @author Limit Tecnologies <limit@limit.es>
+ */
+@Getter
+@AllArgsConstructor
+public class ExplotFetsNotificacionsDto {
+
+	private Long entitatId;
+	private Long procedimentId;
+	private Long organId;
+	private String usuariCodi;
+
+	private Long enviadesTotal;
+	private Long enviadesTotalAhir;
+	private Long pendentsTotal;
+	private Long pendentsTotalAhir;
+	private Long registradesTotal;
+	private Long registradesTotalAhir;
+	private Long finalitzadesTotal;
+	private Long finalitzadesTotalAhir;
+	private Long processadesTotal;
+	private Long processadesTotalAhir;
+	private Long enviadesErrorTotal;
+	private Long enviadesErrorTotalAhir;
+	private Long finalitzadesErrorTotal;
+	private Long finalitzadesErrorTotalAhir;
+
+}

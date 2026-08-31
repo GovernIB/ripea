@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -86,6 +87,14 @@ import es.caib.ripea.service.intf.dto.ExpedientErrorTancamentDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ExplotFetsAmbDimensioDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.explotacio.ExplotFetsAnotacionsDto;
+import es.caib.ripea.service.intf.dto.explotacio.ExplotFetsExpedientsObertsDto;
+import es.caib.ripea.service.intf.dto.explotacio.ExplotFetsExpedientsTancatsDto;
+import es.caib.ripea.service.intf.dto.explotacio.ExplotFetsNotificacionsDto;
+import es.caib.ripea.service.intf.dto.explotacio.ExplotFetsPinbalDto;
+import es.caib.ripea.service.intf.dto.explotacio.ExplotFetsPortafirmesDto;
+import es.caib.ripea.service.intf.dto.explotacio.ExplotFetsProcedimentsDto;
+import es.caib.ripea.service.intf.dto.explotacio.ExplotFetsTasquesDto;
 import es.caib.ripea.service.intf.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
 import es.caib.ripea.service.intf.dto.TipusProcedimentServeiEnum;
@@ -642,6 +651,8 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_FIRMADES.toString(), "Env. portafib firmats").descripcio("Env. portafib firmats a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_FIRMADES_TOTAL.toString(), "Env. portafib firmats totals").descripcio("Env. portafib firmats totals a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_ENVIADES.toString(), "Env. portafib enviats").descripcio("Env. portafib enviats a RIPEA pendents de resposta de portafirmes").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_ENVIADES_TOTAL.toString(), "Env. portafib enviats totals").descripcio("Env. portafib enviats totals a RIPEA pendents de resposta de portafirmes").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_INICIADES.toString(), "Env. portafib iniciats").descripcio("Env. portafib iniciats a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_INICIADES_TOTAL.toString(), "Env. portafib iniciats totals").descripcio("Env. portafib iniciats totals a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_PARCIALS.toString(), "Env. portafib parcials").descripcio("Env. portafib parcials a RIPEA").format(Format.LONG));
@@ -668,15 +679,17 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_OK.toString(), "Enviaments PINBAL processats OK").descripcio("Enviaments PINBAL processats OK a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_ERROR.toString(), "Enviaments PINBAL amb error").descripcio("Enviaments PINBAL amb error a RIPEA").format(Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_TOTAL_OK.toString(), "Enviaments PINBAL totals processats OK").descripcio("Enviaments PINBAL totals processats a RIPEA").format(Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_TOTAL_ERROR.toString(), "Enviaments PINBAL totals amb error").descripcio("Enviaments PINBAL totals amb error a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_OK_TOTAL.toString(), "Enviaments PINBAL totals processats OK").descripcio("Enviaments PINBAL totals processats a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_ERROR_TOTAL.toString(), "Enviaments PINBAL totals amb error").descripcio("Enviaments PINBAL totals amb error a RIPEA").format(Format.LONG));
 		
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_AGAFADES.toString(), "Tasques afagades").descripcio("Tasques afagades a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_AGAFADES_TOTAL.toString(), "Tasques afagades totals").descripcio("Tasques afagades totals a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_CANCELADES.toString(), "Tasques cancelades").descripcio("Tasques cancelades a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_CANCELADES_TOTAL.toString(), "Tasques cancelades totals").descripcio("Tasques cancelades totals a RIPEA").format(Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FINALITZADES_DINS_TERMINI.toString(), "Tasques finalitzades dins termini").descripcio("Tasques finalitzades dins termini a RIPEA").format(Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FINALITZADES_FORA_TERMINI.toString(), "Tasques finalitzades fora termini").descripcio("Tasques finalitzades fora termini a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FIN_DINS_TERMINI.toString(), "Tasques finalitzades dins termini").descripcio("Tasques finalitzades dins termini a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FIN_DINS_TERMINI_TOTAL.toString(), "Tasques finalitzades dins termini totals").descripcio("Tasques finalitzades dins termini totals a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FIN_FORA_TERMINI.toString(), "Tasques finalitzades fora termini").descripcio("Tasques finalitzades fora termini a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FIN_FORA_TERMINI_TOTAL.toString(), "Tasques finalitzades fora termini totals").descripcio("Tasques finalitzades fora termini totals a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_INICIADES.toString(), "Tasques iniciades").descripcio("Tasques iniciades a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_INICIADES_TOTAL.toString(), "Tasques iniciades totals").descripcio("Tasques iniciades totals a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_PENDENTS.toString(), "Tasques pendents").descripcio("Tasques pendents a RIPEA").format(Format.LONG));
@@ -762,6 +775,8 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.FIR_FIRMADES.toString()).valor(efe.getFirmesFirmades()!=null?efe.getFirmesFirmades().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.FIR_FIRMADES_TOTAL.toString()).valor(efe.getFirmesFirmadesTotal()!=null?efe.getFirmesFirmadesTotal().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.FIR_ENVIADES.toString()).valor(efe.getFirmesEnviades()!=null?efe.getFirmesEnviades().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.FIR_ENVIADES_TOTAL.toString()).valor(efe.getFirmesEnviadesTotal()!=null?efe.getFirmesEnviadesTotal().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.FIR_INICIADES.toString()).valor(efe.getFirmesIniciades()!=null?efe.getFirmesIniciades().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.FIR_INICIADES_TOTAL.toString()).valor(efe.getFirmesIniciadesTotal()!=null?efe.getFirmesIniciadesTotal().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.FIR_PARCIALS.toString()).valor(efe.getFirmesParcials()!=null?efe.getFirmesParcials().doubleValue():null));
@@ -788,15 +803,17 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_OK.toString()).valor(efe.getPinbalEnviamentsOk()!=null?efe.getPinbalEnviamentsOk().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_ERROR.toString()).valor(efe.getPinbalEnviamentsError()!=null?efe.getPinbalEnviamentsError().doubleValue():null));
-		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_TOTAL_OK.toString()).valor(efe.getPinbalEnviamentsTotalOk()!=null?efe.getPinbalEnviamentsTotalOk().doubleValue():null));
-		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_TOTAL_ERROR.toString()).valor(efe.getPinbalEnviamentsTotalError()!=null?efe.getPinbalEnviamentsTotalError().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_OK_TOTAL.toString()).valor(efe.getPinbalEnviamentsTotalOk()!=null?efe.getPinbalEnviamentsTotalOk().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_ERROR_TOTAL.toString()).valor(efe.getPinbalEnviamentsTotalError()!=null?efe.getPinbalEnviamentsTotalError().doubleValue():null));
 		
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_AGAFADES.toString()).valor(efe.getTasquesAgafades()!=null?efe.getTasquesAgafades().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_AGAFADES_TOTAL.toString()).valor(efe.getTasquesAgafadesTotal()!=null?efe.getTasquesAgafadesTotal().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_CANCELADES.toString()).valor(efe.getTasquesCancelades()!=null?efe.getTasquesCancelades().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_CANCELADES_TOTAL.toString()).valor(efe.getTasquesCanceladesTotal()!=null?efe.getTasquesCanceladesTotal().doubleValue():null));
-		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FINALITZADES_DINS_TERMINI.toString()).valor(efe.getTasquesFinalitzadesDinsTermini()!=null?efe.getTasquesFinalitzadesDinsTermini().doubleValue():null));
-		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FINALITZADES_FORA_TERMINI.toString()).valor(efe.getTasquesFinalitzadesForaTermini()!=null?efe.getTasquesFinalitzadesForaTermini().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FIN_DINS_TERMINI.toString()).valor(efe.getTasquesFinalitzadesDinsTermini()!=null?efe.getTasquesFinalitzadesDinsTermini().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FIN_DINS_TERMINI_TOTAL.toString()).valor(efe.getTasquesFinalitzadesTotalDinsTermini()!=null?efe.getTasquesFinalitzadesTotalDinsTermini().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FIN_FORA_TERMINI.toString()).valor(efe.getTasquesFinalitzadesForaTermini()!=null?efe.getTasquesFinalitzadesForaTermini().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FIN_FORA_TERMINI_TOTAL.toString()).valor(efe.getTasquesFinalitzadesTotalForaTermini()!=null?efe.getTasquesFinalitzadesTotalForaTermini().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_INICIADES.toString()).valor(efe.getTasquesIniciades()!=null?efe.getTasquesIniciades().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_INICIADES_TOTAL.toString()).valor(efe.getTasquesIniciadesTotal()!=null?efe.getTasquesIniciadesTotal().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_PENDENTS.toString()).valor(efe.getTasquesPendents()!=null?efe.getTasquesPendents().doubleValue():null));
@@ -833,259 +850,106 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		
 		LocalDateTime dataAhirFi	= DateUtil.getLocalDateTimeFromDate(ahirFi, false, true);
 		
-		List<ExplotFetsAmbDimensioDto> dimensions = new ArrayList<ExplotFetsAmbDimensioDto>();
-		
+		//Cada grup d'indicadors es resol amb una unica consulta agregada per taula d'origen, i els
+		//resultats s'acumulen per dimensio (entitat-procediment-organ-usuari) dins d'un mapa.
+		Map<ExplotFetsAmbDimensioDto.DimensioKey, ExplotFetsAmbDimensioDto> acumulador = new LinkedHashMap<ExplotFetsAmbDimensioDto.DimensioKey, ExplotFetsAmbDimensioDto>();
+
 		//PROCEDIMENTS I SERVEIS
-		List<ExplotFetsAmbDimensioDto> procedimentsActius		= explotacioFetsRepository.getProcedimentsActiusPerDimensio(dataFi, TipusProcedimentServeiEnum.PROCEDIMENT);
-		agruparDimensions(dimensions, procedimentsActius, ExplotFetsAmbDimensioDto.FetsEnum.PROCEDIMENTS_ACTIUS_TOTAL);
-		List<ExplotFetsAmbDimensioDto> serveisActius		= explotacioFetsRepository.getProcedimentsActiusPerDimensio(dataFi, TipusProcedimentServeiEnum.SERVEI);
-		agruparDimensions(dimensions, serveisActius, ExplotFetsAmbDimensioDto.FetsEnum.SERVEIS_ACTIUS_TOTAL);
-		
+		for (ExplotFetsProcedimentsDto fet: explotacioFetsRepository.getProcedimentsPerDimensio(dataFi)) {
+			ExplotFetsAmbDimensioDto dim = obtenirDimensio(acumulador, fet.getEntitatId(), fet.getProcedimentId(), fet.getOrganId(), fet.getUsuariCodi());
+			dim.setProcedimentActiusTotal(fet.getProcedimentsActiusTotal());
+			dim.setServeisActiusTotal(fet.getServeisActiusTotal());
+		}
+
 		//EXPEDIENTS
-		List<ExplotFetsAmbDimensioDto> expedientsObertsPerDimensio		= explotacioFetsRepository.getExpedientsObertsPerDimensio(dataIni, dataFi);
-		agruparDimensions(dimensions, expedientsObertsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.EXP_OBERTS);
-		List<ExplotFetsAmbDimensioDto> expedientsObertsTotalsPerDimensio= explotacioFetsRepository.getExpedientsObertsTotalPerDimensio(dataFi);
-		agruparDimensions(dimensions, expedientsObertsTotalsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.EXP_OBERTS_TOTAL);			
-		List<ExplotFetsAmbDimensioDto> expedientsTancatsPerDimensio 	= explotacioFetsRepository.getExpedientsTancatsPerDimensio(dateIni, dateFi);
-		agruparDimensions(dimensions, expedientsTancatsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.EXP_TANCATS);
-		List<ExplotFetsAmbDimensioDto> expedientsTancatsTotalsPerDimensio 	= explotacioFetsRepository.getExpedientsTancatsTotalPerDimensio(dateFi);
-		agruparDimensions(dimensions, expedientsTancatsTotalsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.EXP_TANCATS_TOTAL);
-		
-		//TASQUES (les dades totals o acumulades), es poder conseguir directament. Per les diaries, s'ha de restar del dia anterior. 
-		List<ExplotFetsAmbDimensioDto> tasquesPendentsTotalsPerDimensio		= explotacioFetsRepository.getTasquesTotalsByEstatPerDimensio(dataFi, TascaEstatEnumDto.PENDENT);
-		agruparDimensions(dimensions, tasquesPendentsTotalsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.TAS_PENDENTS_TOTAL);
-		//Recuperam les de ahir per poder calcular el parcial d'avui
-		List<ExplotFetsAmbDimensioDto> tasquesPendentsTotalsPerDimensioAhir	= explotacioFetsRepository.getTasquesTotalsByEstatPerDimensio(dataAhirFi, TascaEstatEnumDto.PENDENT);
-		//Feim la resta avui-ahir per calcular la dada parcial (tasquesPendents)
-		List<ExplotFetsAmbDimensioDto> tasquesPendentsParcialsPerDimensio = restarDadaMateixaDimensio(tasquesPendentsTotalsPerDimensio, tasquesPendentsTotalsPerDimensioAhir);
-		//Afegim les dades parcials del dia a la llista definitiva
-		agruparDimensions(dimensions, tasquesPendentsParcialsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.TAS_PENDENTS);
-		
-		List<ExplotFetsAmbDimensioDto> tasquesIniciadesTotalsPerDimensio= explotacioFetsRepository.getTasquesTotalsByEstatPerDimensio(dataFi, TascaEstatEnumDto.INICIADA);
-		agruparDimensions(dimensions, tasquesIniciadesTotalsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.TAS_INICIADES_TOTAL);
-		//Recuperam les de ahir per poder calcular el parcial d'avui
-		List<ExplotFetsAmbDimensioDto> tasquesIniciadesTotalsPerDimensioAhir	= explotacioFetsRepository.getTasquesTotalsByEstatPerDimensio(dataAhirFi, TascaEstatEnumDto.INICIADA);
-		//Feim la resta avui-ahir per calcular la dada parcial (tasquesIniciades)
-		List<ExplotFetsAmbDimensioDto> tasquesIniciadesParcialsPerDimensio = restarDadaMateixaDimensio(tasquesIniciadesTotalsPerDimensio, tasquesIniciadesTotalsPerDimensioAhir);
-		//Afegim les dades parcials del dia a la llista definitiva
-		agruparDimensions(dimensions, tasquesIniciadesParcialsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.TAS_INICIADES);
-		
-		List<ExplotFetsAmbDimensioDto> tasquesFinalitzadesTotalsPerDimensioDinsTermini= explotacioFetsRepository.getTasquesTotalsByEstatPerDimensioDinsTermini(dataFi, TascaEstatEnumDto.FINALITZADA);
-		agruparDimensions(dimensions, tasquesFinalitzadesTotalsPerDimensioDinsTermini, ExplotFetsAmbDimensioDto.FetsEnum.TAS_FINALITZADES_TOTAL_DINS_TERMINI);
-		List<ExplotFetsAmbDimensioDto> tasquesFinalitzadesTotalsPerDimensioForaTermini= explotacioFetsRepository.getTasquesTotalsByEstatPerDimensioForaTermini(dataFi, TascaEstatEnumDto.FINALITZADA);
-		agruparDimensions(dimensions, tasquesFinalitzadesTotalsPerDimensioForaTermini, ExplotFetsAmbDimensioDto.FetsEnum.TAS_FINALITZADES_TOTAL_FORA_TERMINI);		
-		//Recuperam les de ahir per poder calcular el parcial d'avui
-		List<ExplotFetsAmbDimensioDto> tasquesFinalitzadesTotalsPerDimensioAhirDinsTermini	= explotacioFetsRepository.getTasquesTotalsByEstatPerDimensioDinsTermini(dataAhirFi, TascaEstatEnumDto.FINALITZADA);
-		List<ExplotFetsAmbDimensioDto> tasquesFinalitzadesTotalsPerDimensioAhirForaTermini	= explotacioFetsRepository.getTasquesTotalsByEstatPerDimensioForaTermini(dataAhirFi, TascaEstatEnumDto.FINALITZADA);
-		//Feim la resta avui-ahir per calcular la dada parcial (tasquesIniciades)
-		List<ExplotFetsAmbDimensioDto> tasquesFinalitzadesParcialsPerDimensioDinsTermini = restarDadaMateixaDimensio(tasquesFinalitzadesTotalsPerDimensioDinsTermini, tasquesFinalitzadesTotalsPerDimensioAhirDinsTermini);
-		List<ExplotFetsAmbDimensioDto> tasquesFinalitzadesParcialsPerDimensioForaTermini = restarDadaMateixaDimensio(tasquesFinalitzadesTotalsPerDimensioForaTermini, tasquesFinalitzadesTotalsPerDimensioAhirForaTermini);
-		//Afegim les dades parcials del dia a la llista definitiva
-		agruparDimensions(dimensions, tasquesFinalitzadesParcialsPerDimensioDinsTermini, ExplotFetsAmbDimensioDto.FetsEnum.TAS_FINALITZADES_DINS_TERMINI);
-		agruparDimensions(dimensions, tasquesFinalitzadesParcialsPerDimensioForaTermini, ExplotFetsAmbDimensioDto.FetsEnum.TAS_FINALITZADES_FORA_TERMINI);
-		
-		List<ExplotFetsAmbDimensioDto> tasquesCanceladesTotalsPerDimensio= explotacioFetsRepository.getTasquesTotalsByEstatPerDimensio(dataFi, TascaEstatEnumDto.CANCELLADA);
-		agruparDimensions(dimensions, tasquesCanceladesTotalsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.TAS_CANCELADES_TOTAL);
-		//Recuperam les de ahir per poder calcular el parcial d'avui
-		List<ExplotFetsAmbDimensioDto> tasquesCanceladesTotalsPerDimensioAhir	= explotacioFetsRepository.getTasquesTotalsByEstatPerDimensio(dataAhirFi, TascaEstatEnumDto.CANCELLADA);
-		//Feim la resta avui-ahir per calcular la dada parcial (tasquesIniciades)
-		List<ExplotFetsAmbDimensioDto> tasquesCanceladesParcialsPerDimensio = restarDadaMateixaDimensio(tasquesCanceladesTotalsPerDimensio, tasquesCanceladesTotalsPerDimensioAhir);
-		//Afegim les dades parcials del dia a la llista definitiva
-		agruparDimensions(dimensions, tasquesCanceladesParcialsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.TAS_CANCELADES);
-		
-		List<ExplotFetsAmbDimensioDto> tasquesRebutjadesTotalsPerDimensio= explotacioFetsRepository.getTasquesTotalsByEstatPerDimensio(dataFi, TascaEstatEnumDto.REBUTJADA);
-		agruparDimensions(dimensions, tasquesRebutjadesTotalsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.TAS_REBUTJADES_TOTAL);
-		//Recuperam les de ahir per poder calcular el parcial d'avui
-		List<ExplotFetsAmbDimensioDto> tasquesRebutjadesTotalsPerDimensioAhir	= explotacioFetsRepository.getTasquesTotalsByEstatPerDimensio(dataAhirFi, TascaEstatEnumDto.REBUTJADA);
-		//Feim la resta avui-ahir per calcular la dada parcial (tasquesIniciades)
-		List<ExplotFetsAmbDimensioDto> tasquesRebutjadesParcialsPerDimensio = restarDadaMateixaDimensio(tasquesRebutjadesTotalsPerDimensio, tasquesRebutjadesTotalsPerDimensioAhir);
-		//Afegim les dades parcials del dia a la llista definitiva
-		agruparDimensions(dimensions, tasquesRebutjadesParcialsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.TAS_REBUTJADES);
-		
-		List<ExplotFetsAmbDimensioDto> tasquesAgafadesTotalsPerDimensio= explotacioFetsRepository.getTasquesTotalsByEstatPerDimensio(dataFi, TascaEstatEnumDto.AGAFADA);
-		agruparDimensions(dimensions, tasquesAgafadesTotalsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.TAS_AGAFADES_TOTAL);
-		//Recuperam les de ahir per poder calcular el parcial d'avui
-		List<ExplotFetsAmbDimensioDto> tasquesAgafadesTotalsPerDimensioAhir	= explotacioFetsRepository.getTasquesTotalsByEstatPerDimensio(dataAhirFi, TascaEstatEnumDto.AGAFADA);
-		//Feim la resta avui-ahir per calcular la dada parcial (tasquesIniciades)
-		List<ExplotFetsAmbDimensioDto> tasquesAgafadesParcialsPerDimensio = restarDadaMateixaDimensio(tasquesAgafadesTotalsPerDimensio, tasquesAgafadesTotalsPerDimensioAhir);
-		//Afegim les dades parcials del dia a la llista definitiva
-		agruparDimensions(dimensions, tasquesAgafadesParcialsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.TAS_AGAFADES);
+		for (ExplotFetsExpedientsObertsDto fet: explotacioFetsRepository.getExpedientsObertsPerDimensio(dataIni, dataFi)) {
+			ExplotFetsAmbDimensioDto dim = obtenirDimensio(acumulador, fet.getEntitatId(), fet.getProcedimentId(), fet.getOrganId(), fet.getUsuariCodi());
+			dim.setExpedientsObertsTotal(fet.getExpedientsObertsTotal());
+			dim.setExpedientsOberts(fet.getExpedientsOberts());
+		}
+		for (ExplotFetsExpedientsTancatsDto fet: explotacioFetsRepository.getExpedientsTancatsPerDimensio(dateIni, dateFi)) {
+			ExplotFetsAmbDimensioDto dim = obtenirDimensio(acumulador, fet.getEntitatId(), fet.getProcedimentId(), fet.getOrganId(), fet.getUsuariCodi());
+			dim.setExpedientsTancatsTotal(fet.getExpedientsTancatsTotal());
+			dim.setExpedientsTancats(fet.getExpedientsTancats());
+		}
+
+		//TASQUES (les dades totals o acumulades es poden aconseguir directament; per les diaries, s'ha de restar el total del dia anterior)
+		for (ExplotFetsTasquesDto fet: explotacioFetsRepository.getTasquesPerDimensio(dataFi, dataAhirFi)) {
+			ExplotFetsAmbDimensioDto dim = obtenirDimensio(acumulador, fet.getEntitatId(), fet.getProcedimentId(), fet.getOrganId(), fet.getUsuariCodi());
+			dim.setTasquesPendentsTotal(fet.getPendentsTotal());
+			dim.setTasquesPendents(parcial(fet.getPendentsTotal(), fet.getPendentsTotalAhir()));
+			dim.setTasquesIniciadesTotal(fet.getIniciadesTotal());
+			dim.setTasquesIniciades(parcial(fet.getIniciadesTotal(), fet.getIniciadesTotalAhir()));
+			dim.setTasquesFinalitzadesTotalDinsTermini(fet.getFinalitzadesDinsTerminiTotal());
+			dim.setTasquesFinalitzadesDinsTermini(parcial(fet.getFinalitzadesDinsTerminiTotal(), fet.getFinalitzadesDinsTerminiTotalAhir()));
+			dim.setTasquesFinalitzadesTotalForaTermini(fet.getFinalitzadesForaTerminiTotal());
+			dim.setTasquesFinalitzadesForaTermini(parcial(fet.getFinalitzadesForaTerminiTotal(), fet.getFinalitzadesForaTerminiTotalAhir()));
+			dim.setTasquesCanceladesTotal(fet.getCanceladesTotal());
+			dim.setTasquesCancelades(parcial(fet.getCanceladesTotal(), fet.getCanceladesTotalAhir()));
+			dim.setTasquesRebutjadesTotal(fet.getRebutjadesTotal());
+			dim.setTasquesRebutjades(parcial(fet.getRebutjadesTotal(), fet.getRebutjadesTotalAhir()));
+			dim.setTasquesAgafadesTotal(fet.getAgafadesTotal());
+			dim.setTasquesAgafades(parcial(fet.getAgafadesTotal(), fet.getAgafadesTotalAhir()));
+		}
 
 		//ANOTACIONS
-		List<ExplotFetsAmbDimensioDto> anotacionsNovesPerDimensio	= explotacioFetsRepository.getNovesAnotacionsPerDimensio(dateIni, dateFi);
-		agruparDimensions(dimensions, anotacionsNovesPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.ANO_NOVES);
-		
-		List<ExplotFetsAmbDimensioDto> anotacionsNovesTotalsPerDimensio	= explotacioFetsRepository.getNovesAnotacionsTotalsPerDimensio(dateFi);
-		agruparDimensions(dimensions, anotacionsNovesTotalsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.ANO_NOVES_TOTAL);
-		
-		List<ExplotFetsAmbDimensioDto> anotacionsProcessadesTotalsPerDimensio = explotacioFetsRepository.getAnotacionsProcessadesTotalsPerDimensio(dateFi);
-		agruparDimensions(dimensions, anotacionsProcessadesTotalsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.ANO_PROCESSADES_TOTAL);
-		//Recuperam les de ahir per poder calcular el parcial d'avui
-		List<ExplotFetsAmbDimensioDto> anotacionsProcessadesTotalsPerDimensioAhir	= explotacioFetsRepository.getAnotacionsProcessadesTotalsPerDimensio(ahirFi);
-		//Feim la resta avui-ahir per calcular la dada parcial (tasquesIniciades)
-		List<ExplotFetsAmbDimensioDto> anotacionsProcessadesParcialsPerDimensio = restarDadaMateixaDimensio(anotacionsProcessadesTotalsPerDimensio, anotacionsProcessadesTotalsPerDimensioAhir);
-		//Afegim les dades parcials del dia a la llista definitiva
-		agruparDimensions(dimensions, anotacionsProcessadesParcialsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.ANO_PROCESSADES);
-		
-		List<ExplotFetsAmbDimensioDto> anotacionsRebutjadesTotalsPerDimensio = explotacioFetsRepository.getAnotacionsRebutjadesTotalsPerDimensio(dateFi);
-		agruparDimensions(dimensions, anotacionsRebutjadesTotalsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.ANO_REBUTJADES_TOTAL);
-		//Recuperam les de ahir per poder calcular el parcial d'avui
-		List<ExplotFetsAmbDimensioDto> anotacionsRebutjadesTotalsPerDimensioAhir	= explotacioFetsRepository.getAnotacionsRebutjadesTotalsPerDimensio(ahirFi);
-		//Feim la resta avui-ahir per calcular la dada parcial (tasquesIniciades)
-		List<ExplotFetsAmbDimensioDto> anotacionsRebutjadesParcialsPerDimensio = restarDadaMateixaDimensio(anotacionsRebutjadesTotalsPerDimensio, anotacionsRebutjadesTotalsPerDimensioAhir);
-		//Afegim les dades parcials del dia a la llista definitiva
-		agruparDimensions(dimensions, anotacionsRebutjadesParcialsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.ANO_REBUTJADES);
-		
+		for (ExplotFetsAnotacionsDto fet: explotacioFetsRepository.getAnotacionsPerDimensio(dateIni, dateFi, ahirFi)) {
+			ExplotFetsAmbDimensioDto dim = obtenirDimensio(acumulador, fet.getEntitatId(), fet.getProcedimentId(), fet.getOrganId(), fet.getUsuariCodi());
+			dim.setAnotacionsNovesTotal(fet.getNovesTotal());
+			dim.setAnotacionsNoves(fet.getNoves());
+			dim.setAnotacionsProcessadesTotal(fet.getProcessadesTotal());
+			dim.setAnotacionsProcessades(parcial(fet.getProcessadesTotal(), fet.getProcessadesTotalAhir()));
+			dim.setAnotacionsRebutjadesTotal(fet.getRebutjadesTotal());
+			dim.setAnotacionsRebutjades(parcial(fet.getRebutjadesTotal(), fet.getRebutjadesTotalAhir()));
+		}
+
 		//PINBAL
-		List<ExplotFetsAmbDimensioDto> pinbalEnviamentsPerDimensioOk = explotacioFetsRepository.getPinbalEnviamentsPerDimensio(dataIni, dataFi, ConsultaPinbalEstatEnumDto.TRAMITADA);
-		agruparDimensions(dimensions, pinbalEnviamentsPerDimensioOk, ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_OK);
-		List<ExplotFetsAmbDimensioDto> pinbalEnviamentsPerDimensioError = explotacioFetsRepository.getPinbalEnviamentsPerDimensio(dataIni, dataFi, ConsultaPinbalEstatEnumDto.ERROR);
-		agruparDimensions(dimensions, pinbalEnviamentsPerDimensioError, ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_ERROR);
-		
-		List<ExplotFetsAmbDimensioDto> pinbalEnviamentsTotalsPerDimensioOk = explotacioFetsRepository.getPinbalEnviamentsTotalsPerDimensio(dataFi, ConsultaPinbalEstatEnumDto.TRAMITADA);
-		agruparDimensions(dimensions, pinbalEnviamentsTotalsPerDimensioOk, ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_TOTAL_OK);
-		
-		List<ExplotFetsAmbDimensioDto> pinbalEnviamentsTotalsPerDimensioErr	= explotacioFetsRepository.getPinbalEnviamentsTotalsPerDimensio(dataFi, ConsultaPinbalEstatEnumDto.ERROR);
-		agruparDimensions(dimensions, pinbalEnviamentsTotalsPerDimensioErr, ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_TOTAL_ERROR);
-		
+		for (ExplotFetsPinbalDto fet: explotacioFetsRepository.getPinbalEnviamentsPerDimensio(dataIni, dataFi)) {
+			ExplotFetsAmbDimensioDto dim = obtenirDimensio(acumulador, fet.getEntitatId(), fet.getProcedimentId(), fet.getOrganId(), fet.getUsuariCodi());
+			dim.setPinbalEnviamentsTotalOk(fet.getOkTotal());
+			dim.setPinbalEnviamentsOk(fet.getOk());
+			dim.setPinbalEnviamentsTotalError(fet.getErrorTotal());
+			dim.setPinbalEnviamentsError(fet.getError());
+		}
+
 		//NOTIFICACIONS
-		List<ExplotFetsAmbDimensioDto> notificacionsEnviadesPerDimensio = explotacioFetsRepository.getNotificacionsEnviadesTotalsByEstatPerDimensio(
-				dataFi, DocumentNotificacioEstatEnumDto.ENVIADA);
-		agruparDimensions(dimensions, notificacionsEnviadesPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.NOT_ENVIADES_TOTAL);
-		//Recuperam les de ahir per poder calcular el parcial d'avui
-		List<ExplotFetsAmbDimensioDto> notificacionsEnviadesPerDimensioAhir	= explotacioFetsRepository.getNotificacionsEnviadesTotalsByEstatPerDimensio(
-				dataAhirFi, DocumentNotificacioEstatEnumDto.ENVIADA);
-		//Feim la resta avui-ahir per calcular la dada parcial (tasquesIniciades)
-		List<ExplotFetsAmbDimensioDto> notificacionsEnviadesParcialsPerDimensio = restarDadaMateixaDimensio(notificacionsEnviadesPerDimensio, notificacionsEnviadesPerDimensioAhir);
-		//Afegim les dades parcials del dia a la llista definitiva
-		agruparDimensions(dimensions, notificacionsEnviadesParcialsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.NOT_ENVIADES);
-		
-		List<ExplotFetsAmbDimensioDto> notificacionsPendentsPerDimensio = explotacioFetsRepository.getNotificacionsEnviadesTotalsByEstatPerDimensio(
-				dataFi, DocumentNotificacioEstatEnumDto.PENDENT);
-		agruparDimensions(dimensions, notificacionsPendentsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.NOT_PENDENTS_TOTAL);
-		//Recuperam les de ahir per poder calcular el parcial d'avui
-		List<ExplotFetsAmbDimensioDto> notificacionsPendentsPerDimensioAhir	= explotacioFetsRepository.getNotificacionsEnviadesTotalsByEstatPerDimensio(
-				dataAhirFi, DocumentNotificacioEstatEnumDto.PENDENT);
-		//Feim la resta avui-ahir per calcular la dada parcial (tasquesIniciades)
-		List<ExplotFetsAmbDimensioDto> notificacionsPendentsParcialsPerDimensio = restarDadaMateixaDimensio(notificacionsPendentsPerDimensio, notificacionsPendentsPerDimensioAhir);
-		//Afegim les dades parcials del dia a la llista definitiva
-		agruparDimensions(dimensions, notificacionsPendentsParcialsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.NOT_PENDENTS);
-		
-		List<ExplotFetsAmbDimensioDto> notificacionsRegistradesPerDimensio = explotacioFetsRepository.getNotificacionsEnviadesTotalsByEstatPerDimensio(
-				dataFi, DocumentNotificacioEstatEnumDto.REGISTRADA);
-		agruparDimensions(dimensions, notificacionsRegistradesPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.NOT_REGISTRADES_TOTAL);
-		//Recuperam les de ahir per poder calcular el parcial d'avui
-		List<ExplotFetsAmbDimensioDto> notificacionsRegistradesPerDimensioAhir	= explotacioFetsRepository.getNotificacionsEnviadesTotalsByEstatPerDimensio(
-				dataAhirFi, DocumentNotificacioEstatEnumDto.REGISTRADA);
-		//Feim la resta avui-ahir per calcular la dada parcial (tasquesIniciades)
-		List<ExplotFetsAmbDimensioDto> notificacionsRegistradesParcialsPerDimensio = restarDadaMateixaDimensio(notificacionsRegistradesPerDimensio, notificacionsRegistradesPerDimensioAhir);
-		//Afegim les dades parcials del dia a la llista definitiva
-		agruparDimensions(dimensions, notificacionsRegistradesParcialsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.NOT_REGISTRADES);
-		
-		List<ExplotFetsAmbDimensioDto> notificacionsFinalitzadesPerDimensio = explotacioFetsRepository.getNotificacionsEnviadesTotalsByEstatPerDimensio(
-				dataFi, DocumentNotificacioEstatEnumDto.FINALITZADA);
-		agruparDimensions(dimensions, notificacionsFinalitzadesPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.NOT_FINALITZADES_TOTAL);
-		//Recuperam les de ahir per poder calcular el parcial d'avui
-		List<ExplotFetsAmbDimensioDto> notificacionsFinalitzadesPerDimensioAhir	= explotacioFetsRepository.getNotificacionsEnviadesTotalsByEstatPerDimensio(
-				dataAhirFi, DocumentNotificacioEstatEnumDto.FINALITZADA);
-		//Feim la resta avui-ahir per calcular la dada parcial (tasquesIniciades)
-		List<ExplotFetsAmbDimensioDto> notificacionsFinalitzadesParcialsPerDimensio = restarDadaMateixaDimensio(notificacionsFinalitzadesPerDimensio, notificacionsFinalitzadesPerDimensioAhir);
-		//Afegim les dades parcials del dia a la llista definitiva
-		agruparDimensions(dimensions, notificacionsFinalitzadesParcialsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.NOT_FINALITZADES);
-		
-		List<ExplotFetsAmbDimensioDto> notificacionsProcessadesPerDimensio = explotacioFetsRepository.getNotificacionsEnviadesTotalsByEstatPerDimensio(
-				dataFi, DocumentNotificacioEstatEnumDto.PROCESSADA);
-		agruparDimensions(dimensions, notificacionsProcessadesPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.NOT_PROCESSADES_TOTAL);
-		//Recuperam les de ahir per poder calcular el parcial d'avui
-		List<ExplotFetsAmbDimensioDto> notificacionsProcessadesPerDimensioAhir	= explotacioFetsRepository.getNotificacionsEnviadesTotalsByEstatPerDimensio(
-				dataAhirFi, DocumentNotificacioEstatEnumDto.PROCESSADA);
-		//Feim la resta avui-ahir per calcular la dada parcial (tasquesIniciades)
-		List<ExplotFetsAmbDimensioDto> notificacionsProcessadesParcialsPerDimensio = restarDadaMateixaDimensio(notificacionsProcessadesPerDimensio, notificacionsProcessadesPerDimensioAhir);
-		//Afegim les dades parcials del dia a la llista definitiva
-		agruparDimensions(dimensions, notificacionsProcessadesParcialsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.NOT_PROCESSADES);
-		
-		List<ExplotFetsAmbDimensioDto> notificacionsEnviadesErrorPerDimensio = explotacioFetsRepository.getNotificacionsEnviadesTotalsByEstatPerDimensio(
-				dataFi, DocumentNotificacioEstatEnumDto.ENVIADA_AMB_ERRORS);
-		agruparDimensions(dimensions, notificacionsEnviadesErrorPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.NOT_ENVIADES_ERROR_TOTAL);
-		//Recuperam les de ahir per poder calcular el parcial d'avui
-		List<ExplotFetsAmbDimensioDto> notificacionsEnviadesErrorPerDimensioAhir	= explotacioFetsRepository.getNotificacionsEnviadesTotalsByEstatPerDimensio(
-				dataAhirFi, DocumentNotificacioEstatEnumDto.ENVIADA_AMB_ERRORS);
-		//Feim la resta avui-ahir per calcular la dada parcial (tasquesIniciades)
-		List<ExplotFetsAmbDimensioDto> notificacionsEnviadesErrorParcialsPerDimensio = restarDadaMateixaDimensio(notificacionsEnviadesErrorPerDimensio, notificacionsEnviadesErrorPerDimensioAhir);
-		//Afegim les dades parcials del dia a la llista definitiva
-		agruparDimensions(dimensions, notificacionsEnviadesErrorParcialsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.NOT_ENVIADES_ERROR);
-		
-		List<ExplotFetsAmbDimensioDto> notificacionsFinalitzadesErrorPerDimensio = explotacioFetsRepository.getNotificacionsEnviadesTotalsByEstatPerDimensio(
-				dataFi, DocumentNotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS);
-		agruparDimensions(dimensions, notificacionsFinalitzadesErrorPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.NOT_FINALITZADES_ERROR_TOTAL);
-		//Recuperam les de ahir per poder calcular el parcial d'avui
-		List<ExplotFetsAmbDimensioDto> notificacionsFinalitzadesErrorPerDimensioAhir	= explotacioFetsRepository.getNotificacionsEnviadesTotalsByEstatPerDimensio(
-				dataAhirFi, DocumentNotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS);
-		//Feim la resta avui-ahir per calcular la dada parcial (tasquesIniciades)
-		List<ExplotFetsAmbDimensioDto> notificacionsFinalitzadesErrorParcialsPerDimensio = restarDadaMateixaDimensio(notificacionsFinalitzadesErrorPerDimensio, notificacionsFinalitzadesErrorPerDimensioAhir);
-		//Afegim les dades parcials del dia a la llista definitiva
-		agruparDimensions(dimensions, notificacionsFinalitzadesErrorParcialsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.NOT_FINALITZADES_ERROR);
+		for (ExplotFetsNotificacionsDto fet: explotacioFetsRepository.getNotificacionsPerDimensio(dataFi, dataAhirFi)) {
+			ExplotFetsAmbDimensioDto dim = obtenirDimensio(acumulador, fet.getEntitatId(), fet.getProcedimentId(), fet.getOrganId(), fet.getUsuariCodi());
+			dim.setNotificacionsEnviadesTotal(fet.getEnviadesTotal());
+			dim.setNotificacionsEnviades(parcial(fet.getEnviadesTotal(), fet.getEnviadesTotalAhir()));
+			dim.setNotificacionsPendentsTotal(fet.getPendentsTotal());
+			dim.setNotificacionsPendents(parcial(fet.getPendentsTotal(), fet.getPendentsTotalAhir()));
+			dim.setNotificacionsRegistradesTotal(fet.getRegistradesTotal());
+			dim.setNotificacionsRegistrades(parcial(fet.getRegistradesTotal(), fet.getRegistradesTotalAhir()));
+			dim.setNotificacionsFinalitzadesTotal(fet.getFinalitzadesTotal());
+			dim.setNotificacionsFinalitzades(parcial(fet.getFinalitzadesTotal(), fet.getFinalitzadesTotalAhir()));
+			dim.setNotificacionsProcessadesTotal(fet.getProcessadesTotal());
+			dim.setNotificacionsProcessades(parcial(fet.getProcessadesTotal(), fet.getProcessadesTotalAhir()));
+			dim.setNotificacionsEnvErrorTotal(fet.getEnviadesErrorTotal());
+			dim.setNotificacionsEnvError(parcial(fet.getEnviadesErrorTotal(), fet.getEnviadesErrorTotalAhir()));
+			dim.setNotificacionsFinErrorTotal(fet.getFinalitzadesErrorTotal());
+			dim.setNotificacionsFinError(parcial(fet.getFinalitzadesErrorTotal(), fet.getFinalitzadesErrorTotalAhir()));
+		}
 
 		//PORTAFIRMES
-		List<ExplotFetsAmbDimensioDto> portafibFirmadesTotalsPerDimensio = explotacioFetsRepository.getPortafirmesTotalsByEstatPerDimensio(
-				dataFi, PortafirmesCallbackEstatEnumDto.FIRMAT);
-		agruparDimensions(dimensions, portafibFirmadesTotalsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.FIR_FIRMADES_TOTAL);
-		//Recuperam les de ahir per poder calcular el parcial d'avui
-		List<ExplotFetsAmbDimensioDto> portafibFirmadesPerDimensioAhir	= explotacioFetsRepository.getPortafirmesTotalsByEstatPerDimensio(
-				dataAhirFi, PortafirmesCallbackEstatEnumDto.FIRMAT);
-		//Feim la resta avui-ahir per calcular la dada parcial (tasquesIniciades)
-		List<ExplotFetsAmbDimensioDto> portafibFirmadesParcialsPerDimensio = restarDadaMateixaDimensio(portafibFirmadesTotalsPerDimensio, portafibFirmadesPerDimensioAhir);
-		//Afegim les dades parcials del dia a la llista definitiva
-		agruparDimensions(dimensions, portafibFirmadesParcialsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.FIR_FIRMADES);
-		
-		List<ExplotFetsAmbDimensioDto> portafibPausadesTotalsPerDimensio = explotacioFetsRepository.getPortafirmesTotalsByEstatPerDimensio(
-				dataFi, PortafirmesCallbackEstatEnumDto.PAUSAT);		
-		agruparDimensions(dimensions, portafibPausadesTotalsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.FIR_PAUSADES_TOTAL);
-		//Recuperam les de ahir per poder calcular el parcial d'avui
-		List<ExplotFetsAmbDimensioDto> portafibPausadesPerDimensioAhir	= explotacioFetsRepository.getPortafirmesTotalsByEstatPerDimensio(
-				dataAhirFi, PortafirmesCallbackEstatEnumDto.PAUSAT);
-		//Feim la resta avui-ahir per calcular la dada parcial (tasquesIniciades)
-		List<ExplotFetsAmbDimensioDto> portafibPausadesParcialsPerDimensio = restarDadaMateixaDimensio(portafibPausadesTotalsPerDimensio, portafibPausadesPerDimensioAhir);
-		//Afegim les dades parcials del dia a la llista definitiva
-		agruparDimensions(dimensions, portafibPausadesParcialsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.FIR_PAUSADES);
-		
-		List<ExplotFetsAmbDimensioDto> portafibIniciadesTotalsPerDimensio = explotacioFetsRepository.getPortafirmesTotalsByEstatPerDimensio(
-				dataFi, PortafirmesCallbackEstatEnumDto.INICIAT);		
-		agruparDimensions(dimensions, portafibIniciadesTotalsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.FIR_INICIADES_TOTAL);
-		//Recuperam les de ahir per poder calcular el parcial d'avui
-		List<ExplotFetsAmbDimensioDto> portafibIniciadesPerDimensioAhir	= explotacioFetsRepository.getPortafirmesTotalsByEstatPerDimensio(
-				dataAhirFi, PortafirmesCallbackEstatEnumDto.INICIAT);
-		//Feim la resta avui-ahir per calcular la dada parcial (tasquesIniciades)
-		List<ExplotFetsAmbDimensioDto> portafibIniciadesParcialsPerDimensio = restarDadaMateixaDimensio(portafibIniciadesTotalsPerDimensio, portafibIniciadesPerDimensioAhir);
-		//Afegim les dades parcials del dia a la llista definitiva
-		agruparDimensions(dimensions, portafibIniciadesParcialsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.FIR_INICIADES);
-		
-		List<ExplotFetsAmbDimensioDto> portafibRebutjadesTotalsPerDimensio = explotacioFetsRepository.getPortafirmesTotalsByEstatPerDimensio(
-				dataFi, PortafirmesCallbackEstatEnumDto.REBUTJAT);		
-		agruparDimensions(dimensions, portafibRebutjadesTotalsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.FIR_REBUTJADES_TOTAL);
-		//Recuperam les de ahir per poder calcular el parcial d'avui
-		List<ExplotFetsAmbDimensioDto> portafibRebutjadesPerDimensioAhir	= explotacioFetsRepository.getPortafirmesTotalsByEstatPerDimensio(
-				dataAhirFi, PortafirmesCallbackEstatEnumDto.REBUTJAT);
-		//Feim la resta avui-ahir per calcular la dada parcial (tasquesIniciades)
-		List<ExplotFetsAmbDimensioDto> portafibRebutjadesParcialsPerDimensio = restarDadaMateixaDimensio(portafibRebutjadesTotalsPerDimensio, portafibRebutjadesPerDimensioAhir);
-		//Afegim les dades parcials del dia a la llista definitiva
-		agruparDimensions(dimensions, portafibRebutjadesParcialsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.FIR_REBUTJADES);
-		
-		List<ExplotFetsAmbDimensioDto> portafibParcialsTotalsPerDimensio = explotacioFetsRepository.getPortafirmesTotalsByEstatPerDimensio(
-				dataFi, PortafirmesCallbackEstatEnumDto.PARCIAL);
-		agruparDimensions(dimensions, portafibParcialsTotalsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.FIR_PARCIALS_TOTAL);
-		//Recuperam les de ahir per poder calcular el parcial d'avui
-		List<ExplotFetsAmbDimensioDto> portafibParcialsPerDimensioAhir	= explotacioFetsRepository.getPortafirmesTotalsByEstatPerDimensio(
-				dataAhirFi, PortafirmesCallbackEstatEnumDto.PARCIAL);
-		//Feim la resta avui-ahir per calcular la dada parcial (tasquesIniciades)
-		List<ExplotFetsAmbDimensioDto> portafibParcialsParcialsPerDimensio = restarDadaMateixaDimensio(portafibParcialsTotalsPerDimensio, portafibParcialsPerDimensioAhir);
-		//Afegim les dades parcials del dia a la llista definitiva
-		agruparDimensions(dimensions, portafibParcialsParcialsPerDimensio, ExplotFetsAmbDimensioDto.FetsEnum.FIR_PARCIALS);
-		
-		//Unificar les llistes anteriors en una unica llista
-//		List<ExplotFetsAmbDimensioDto> dadesDiariesFetsAndDimensio = explotacioFetsRepository
-		System.out.println("dimensions: "+dimensions.size());
-		//explotacioTempsRepository.findFirstByData(Calendar.getInstance().getTime());
+		for (ExplotFetsPortafirmesDto fet: explotacioFetsRepository.getPortafirmesPerDimensio(dataFi, dataAhirFi)) {
+			ExplotFetsAmbDimensioDto dim = obtenirDimensio(acumulador, fet.getEntitatId(), fet.getProcedimentId(), fet.getOrganId(), fet.getUsuariCodi());
+			dim.setFirmesEnviadesTotal(fet.getEnviadesTotal());
+			dim.setFirmesEnviades(parcial(fet.getEnviadesTotal(), fet.getEnviadesTotalAhir()));
+			dim.setFirmesIniciadesTotal(fet.getIniciadesTotal());
+			dim.setFirmesIniciades(parcial(fet.getIniciadesTotal(), fet.getIniciadesTotalAhir()));
+			dim.setFirmesPausadesTotal(fet.getPausadesTotal());
+			dim.setFirmesPausades(parcial(fet.getPausadesTotal(), fet.getPausadesTotalAhir()));
+			dim.setFirmesFirmadesTotal(fet.getFirmadesTotal());
+			dim.setFirmesFirmades(parcial(fet.getFirmadesTotal(), fet.getFirmadesTotalAhir()));
+			dim.setFirmesRebutjadesTotal(fet.getRebutjadesTotal());
+			dim.setFirmesRebutjades(parcial(fet.getRebutjadesTotal(), fet.getRebutjadesTotalAhir()));
+			dim.setFirmesParcialsTotal(fet.getParcialsTotal());
+			dim.setFirmesParcials(parcial(fet.getParcialsTotal(), fet.getParcialsTotalAhir()));
+		}
+
+		List<ExplotFetsAmbDimensioDto> dimensions = new ArrayList<ExplotFetsAmbDimensioDto>(acumulador.values());
+		logger.debug("Generacio d'estadistiques diaries: " + dimensions.size() + " dimensions");
 		
 		for (ExplotFetsAmbDimensioDto dim: dimensions) {
 			//Recuperam la dimensió si ja existís a BBDD
@@ -1142,124 +1006,31 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		return dimensions;
 	}
 	
-	//Afegeix a la llista de distinctDimensions, les tuples entitatId-procedimentId-organId-usuariCodi que estan a aux pero no a distinctDimensions
-	private void agruparDimensions(
-			List<ExplotFetsAmbDimensioDto> distinctDimensions,
-			List<ExplotFetsAmbDimensioDto> novesDimensions,
-			ExplotFetsAmbDimensioDto.FetsEnum fetActual) {
-		List<ExplotFetsAmbDimensioDto> novesDimensionsFound = new ArrayList<ExplotFetsAmbDimensioDto>();
-		if (novesDimensions!=null) {
-			for (ExplotFetsAmbDimensioDto dimensioAux: novesDimensions) {
-				ExplotFetsAmbDimensioDto found = null;
-				for (ExplotFetsAmbDimensioDto distinct: distinctDimensions) {
-					if (dimensioAux.isSameDimensio(distinct)) {
-						found = distinct;
-						break;
-					}
-				}
-				if (found == null) {
-					//Una de les noves dimensions no la teniem enregistrada, l'afegim a la llista.
-					//També actualitzam el camp (fet) correcte que estam rebent.
-					setFetActual(dimensioAux, fetActual, dimensioAux.getAux());
-					novesDimensionsFound.add(dimensioAux);
-				} else {
-					//La dimensió (entitatId-procedimentId-organId-usuariCodi) ja existia a la llista "distinct"
-					//Actualitzam el camp (fet) correcte que estam rebent a la llista "distinct".
-					setFetActual(found, fetActual, dimensioAux.getAux());
-				}
-			}
+	//Recupera del mapa la dimensio (entitat-procediment-organ-usuari) indicada, creant-la si encara
+	//no hi era. Substitueix la cerca lineal que abans feia agruparDimensions per cada fet rebut.
+	private ExplotFetsAmbDimensioDto obtenirDimensio(
+			Map<ExplotFetsAmbDimensioDto.DimensioKey, ExplotFetsAmbDimensioDto> acumulador,
+			Long entitatId,
+			Long procedimentId,
+			Long organId,
+			String usuariCodi) {
+		ExplotFetsAmbDimensioDto.DimensioKey key = new ExplotFetsAmbDimensioDto.DimensioKey(entitatId, procedimentId, organId, usuariCodi);
+		ExplotFetsAmbDimensioDto dimensio = acumulador.get(key);
+		if (dimensio == null) {
+			dimensio = new ExplotFetsAmbDimensioDto(entitatId, procedimentId, organId, usuariCodi);
+			acumulador.put(key, dimensio);
 		}
-		distinctDimensions.addAll(novesDimensionsFound);
+		return dimensio;
 	}
-	
-	private void setFetActual(ExplotFetsAmbDimensioDto fetDto, ExplotFetsAmbDimensioDto.FetsEnum fetActual, Long valor) {
-		switch (fetActual) {
-		case PROCEDIMENTS_ACTIUS_TOTAL: fetDto.setProcedimentActiusTotal(valor); break;
-		case SERVEIS_ACTIUS_TOTAL: fetDto.setServeisActiusTotal(valor); break;
-		case ANO_NOVES: fetDto.setAnotacionsNoves(valor); break;
-		case ANO_NOVES_TOTAL: fetDto.setAnotacionsNovesTotal(valor); break;
-		case ANO_PROCESSADES: fetDto.setAnotacionsProcessades(valor); break;
-		case ANO_PROCESSADES_TOTAL: fetDto.setAnotacionsProcessadesTotal(valor); break;
-		case ANO_REBUTJADES: fetDto.setAnotacionsRebutjades(valor); break;
-		case ANO_REBUTJADES_TOTAL: fetDto.setAnotacionsRebutjadesTotal(valor); break;
-		case EXP_OBERTS: fetDto.setExpedientsOberts(valor); break;
-		case EXP_OBERTS_TOTAL: fetDto.setExpedientsObertsTotal(valor); break;
-		case EXP_TANCATS: fetDto.setExpedientsTancats(valor); break;
-		case EXP_TANCATS_TOTAL: fetDto.setExpedientsTancatsTotal(valor); break;
-		case FIR_FIRMADES: fetDto.setFirmesFirmades(valor); break;
-		case FIR_FIRMADES_TOTAL: fetDto.setFirmesFirmadesTotal(valor); break;
-		case FIR_INICIADES: fetDto.setFirmesIniciades(valor); break;
-		case FIR_INICIADES_TOTAL: fetDto.setFirmesIniciadesTotal(valor); break;
-		case FIR_PARCIALS: fetDto.setFirmesParcials(valor); break;
-		case FIR_PARCIALS_TOTAL: fetDto.setFirmesParcialsTotal(valor); break;
-		case FIR_PAUSADES: fetDto.setFirmesPausades(valor); break;
-		case FIR_PAUSADES_TOTAL: fetDto.setFirmesPausadesTotal(valor); break;
-		case FIR_REBUTJADES: fetDto.setFirmesRebutjades(valor); break;
-		case FIR_REBUTJADES_TOTAL: fetDto.setFirmesRebutjadesTotal(valor); break;
-		case NOT_ENVIADES: fetDto.setNotificacionsEnviades(valor); break;
-		case NOT_ENVIADES_TOTAL: fetDto.setNotificacionsEnviadesTotal(valor); break;
-		case NOT_PENDENTS: fetDto.setNotificacionsPendents(valor); break;
-		case NOT_PENDENTS_TOTAL: fetDto.setNotificacionsPendentsTotal(valor); break;
-		case NOT_REGISTRADES: fetDto.setNotificacionsRegistrades(valor); break;
-		case NOT_REGISTRADES_TOTAL: fetDto.setNotificacionsRegistradesTotal(valor); break;
-		case NOT_FINALITZADES: fetDto.setNotificacionsFinalitzades(valor); break;
-		case NOT_FINALITZADES_TOTAL: fetDto.setNotificacionsFinalitzadesTotal(valor); break;
-		case NOT_PROCESSADES: fetDto.setNotificacionsProcessades(valor); break;
-		case NOT_PROCESSADES_TOTAL: fetDto.setNotificacionsProcessadesTotal(valor); break;
-		case NOT_ENVIADES_ERROR: fetDto.setNotificacionsEnvError(valor); break;
-		case NOT_ENVIADES_ERROR_TOTAL: fetDto.setNotificacionsEnvErrorTotal(valor); break;
-		case NOT_FINALITZADES_ERROR: fetDto.setNotificacionsFinError(valor); break;
-		case NOT_FINALITZADES_ERROR_TOTAL: fetDto.setNotificacionsFinErrorTotal(valor); break;
-		case PIN_ENVIAMENTS_OK: fetDto.setPinbalEnviamentsOk(valor); break;
-		case PIN_ENVIAMENTS_ERROR: fetDto.setPinbalEnviamentsError(valor); break;
-		case PIN_ENVIAMENTS_TOTAL_OK: fetDto.setPinbalEnviamentsTotalOk(valor); break;
-		case PIN_ENVIAMENTS_TOTAL_ERROR: fetDto.setPinbalEnviamentsTotalError(valor); break;
-		case TAS_AGAFADES: fetDto.setTasquesAgafades(valor); break;
-		case TAS_AGAFADES_TOTAL: fetDto.setTasquesAgafadesTotal(valor); break;
-		case TAS_CANCELADES: fetDto.setTasquesCancelades(valor); break;
-		case TAS_CANCELADES_TOTAL: fetDto.setTasquesCanceladesTotal(valor); break;
-		case TAS_FINALITZADES_DINS_TERMINI: fetDto.setTasquesFinalitzadesDinsTermini(valor); break;
-		case TAS_FINALITZADES_FORA_TERMINI: fetDto.setTasquesFinalitzadesForaTermini(valor); break;
-		case TAS_FINALITZADES_TOTAL_DINS_TERMINI: fetDto.setTasquesFinalitzadesTotalDinsTermini(valor); break;
-		case TAS_FINALITZADES_TOTAL_FORA_TERMINI: fetDto.setTasquesFinalitzadesTotalForaTermini(valor); break;
-		case TAS_INICIADES: fetDto.setTasquesIniciades(valor); break;
-		case TAS_INICIADES_TOTAL: fetDto.setTasquesIniciadesTotal(valor); break;
-		case TAS_PENDENTS: fetDto.setTasquesPendents(valor); break;
-		case TAS_PENDENTS_TOTAL: fetDto.setTasquesPendentsTotal(valor); break;
-		case TAS_REBUTJADES: fetDto.setTasquesRebutjades(valor); break;
-		case TAS_REBUTJADES_TOTAL: fetDto.setTasquesRebutjadesTotal(valor); break;
+
+	//Dada parcial del dia: total d'avui menys el total del dia anterior. El conjunt del dia anterior
+	//sempre es un subconjunt del d'avui (nomes canvia el tall de la data), i per tant la resta mai
+	//es negativa. Equival al que abans feia restarDadaMateixaDimensio amb dues consultes.
+	private Long parcial(Long total, Long totalAhir) {
+		if (total == null) {
+			return null;
 		}
-	}
-	
-	private List<ExplotFetsAmbDimensioDto> restarDadaMateixaDimensio(List<ExplotFetsAmbDimensioDto> totalsAvui, List<ExplotFetsAmbDimensioDto> totalsAhir) {
-		List<ExplotFetsAmbDimensioDto> novesDimensionsFound = new ArrayList<ExplotFetsAmbDimensioDto>();
-		if (totalsAvui!=null) {
-			for (ExplotFetsAmbDimensioDto dimensioAvui: totalsAvui) {
-				Long found = 0l;
-				if (totalsAhir!=null) {
-					for (ExplotFetsAmbDimensioDto dimensioAhir: totalsAhir) {
-						if (dimensioAvui.isSameDimensio(dimensioAhir)) {
-							found = dimensioAhir.getAux();
-							break;
-						}
-					}
-				}
-				//Inicialitzam les dades a les de avui, valid si no s'ha trobat la dada corresponent al dia d'ahir,
-				//Per tant com a dada parcial pot servir la d'avui.
-				ExplotFetsAmbDimensioDto aux = new ExplotFetsAmbDimensioDto(
-						dimensioAvui.getEntitatId(),
-						dimensioAvui.getProcedimentId(),
-						dimensioAvui.getOrganId(),
-						dimensioAvui.getUsuariCodi(),
-						dimensioAvui.getAux());
-				//Si s'ha trobat la dada corresponent al dia d'ahir, feim la resta i actualitzam aux.
-				if (found>0) {
-					aux.setAux(dimensioAvui.getAux()-found);
-				}
-				novesDimensionsFound.add(aux);
-			}
-		}
-		return novesDimensionsFound;
+		return totalAhir == null ? total : Long.valueOf(total.longValue() - totalAhir.longValue());
 	}
 	
 	@Override

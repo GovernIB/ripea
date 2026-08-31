@@ -13,8 +13,6 @@ public class ExplotFetsAmbDimensioDto {
 	private Long organId;
 	private String usuariCodi;
 	
-	private Long aux;
-	
 	private Long procedimentActiusTotal;
 	private Long serveisActiusTotal;
 	
@@ -65,6 +63,8 @@ public class ExplotFetsAmbDimensioDto {
 	private Long notificacionsFinError;
 	private Long notificacionsFinErrorTotal;
 	
+	private Long firmesEnviades;
+	private Long firmesEnviadesTotal;
 	private Long firmesIniciades;
 	private Long firmesIniciadesTotal;
 	private Long firmesPausades;
@@ -87,10 +87,10 @@ public class ExplotFetsAmbDimensioDto {
         TAS_PENDENTS_TOTAL,
         TAS_INICIADES,
         TAS_INICIADES_TOTAL,
-        TAS_FINALITZADES_DINS_TERMINI,
-        TAS_FINALITZADES_FORA_TERMINI,
-        TAS_FINALITZADES_TOTAL_DINS_TERMINI,
-        TAS_FINALITZADES_TOTAL_FORA_TERMINI,        
+        TAS_FIN_DINS_TERMINI,
+        TAS_FIN_FORA_TERMINI,
+        TAS_FIN_DINS_TERMINI_TOTAL,
+        TAS_FIN_FORA_TERMINI_TOTAL,        
         TAS_CANCELADES,
         TAS_CANCELADES_TOTAL,
         TAS_REBUTJADES,
@@ -105,8 +105,8 @@ public class ExplotFetsAmbDimensioDto {
         ANO_REBUTJADES_TOTAL,
         PIN_ENVIAMENTS_OK,
         PIN_ENVIAMENTS_ERROR,
-        PIN_ENVIAMENTS_TOTAL_OK,
-        PIN_ENVIAMENTS_TOTAL_ERROR,
+        PIN_ENVIAMENTS_OK_TOTAL,
+        PIN_ENVIAMENTS_ERROR_TOTAL,
         NOT_ENVIADES,
         NOT_ENVIADES_TOTAL,
         NOT_PENDENTS,
@@ -121,6 +121,8 @@ public class ExplotFetsAmbDimensioDto {
         NOT_ENVIADES_ERROR_TOTAL,
         NOT_FINALITZADES_ERROR,
         NOT_FINALITZADES_ERROR_TOTAL,
+        FIR_ENVIADES,
+        FIR_ENVIADES_TOTAL,
         FIR_INICIADES,
         FIR_INICIADES_TOTAL,
         FIR_PAUSADES,
@@ -133,18 +135,48 @@ public class ExplotFetsAmbDimensioDto {
         FIR_PARCIALS_TOTAL
     }
 	
-	public ExplotFetsAmbDimensioDto(Long entitatId, Long procedimentId, Long organId, String usuariCodi, Long aux) {
+	public ExplotFetsAmbDimensioDto(Long entitatId, Long procedimentId, Long organId, String usuariCodi) {
 		super();
 		this.entitatId = entitatId;
 		this.procedimentId = procedimentId;
 		this.organId = organId;
 		this.usuariCodi = usuariCodi;
-		this.aux = aux;
 	}
 	
-	public boolean isSameDimensio(ExplotFetsAmbDimensioDto other) {
-		if (other == null) return false;
-		return Objects.equals(entitatId, other.entitatId) && Objects.equals(organId, other.organId)
-				&& Objects.equals(procedimentId, other.procedimentId) && Objects.equals(usuariCodi, other.usuariCodi);
+	public DimensioKey getDimensioKey() {
+		return new DimensioKey(entitatId, procedimentId, organId, usuariCodi);
+	}
+	
+	/**
+	 * Identitat d'una dimensio (entitat-procediment-organ-usuari), per poder acumular en un mapa
+	 * els fets que arriben de consultes diferents.
+	 */
+	public static class DimensioKey {
+		
+		private final Long entitatId;
+		private final Long procedimentId;
+		private final Long organId;
+		private final String usuariCodi;
+		
+		public DimensioKey(Long entitatId, Long procedimentId, Long organId, String usuariCodi) {
+			this.entitatId = entitatId;
+			this.procedimentId = procedimentId;
+			this.organId = organId;
+			this.usuariCodi = usuariCodi;
+		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) return true;
+			if (!(obj instanceof DimensioKey)) return false;
+			DimensioKey other = (DimensioKey)obj;
+			return Objects.equals(entitatId, other.entitatId) && Objects.equals(organId, other.organId)
+					&& Objects.equals(procedimentId, other.procedimentId) && Objects.equals(usuariCodi, other.usuariCodi);
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hash(entitatId, procedimentId, organId, usuariCodi);
+		}
 	}
 }
