@@ -35,6 +35,10 @@ public class ExplotFetsAmbDimensioDto {
 	private Long tasquesRebutjadesTotal;
 	private Long tasquesAgafades;
 	private Long tasquesAgafadesTotal;
+	private Long tasquesCreades;
+	private Long tasquesCreadesTotal;
+	private Long tasquesNoFinalitzadesForaTermini;
+	private Long tasquesNoFinalitzadesForaTerminiTotal;
 	
 	private Long anotacionsNoves;
 	private Long anotacionsNovesTotal;
@@ -97,6 +101,10 @@ public class ExplotFetsAmbDimensioDto {
         TAS_REBUTJADES_TOTAL,
         TAS_AGAFADES,
         TAS_AGAFADES_TOTAL,
+        TAS_CREADES,
+        TAS_CREADES_TOTAL,
+        TAS_NOTFIN_FORA_TERMINI,
+        TAS_NOTFIN_FORA_TERMINI_TOTAL,
         ANO_NOVES,
         ANO_NOVES_TOTAL,
         ANO_PROCESSADES,

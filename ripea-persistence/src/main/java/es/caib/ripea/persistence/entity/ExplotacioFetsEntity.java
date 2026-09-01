@@ -48,6 +48,10 @@ public class ExplotacioFetsEntity extends RipeaPersistable<Long> {
 	@Column(name = "tas_rebutjada_tot")	private Long tasquesRebutjadesTotal;
 	@Column(name = "tas_agafada")		private Long tasquesAgafades;
 	@Column(name = "tas_agafada_tot")	private Long tasquesAgafadesTotal;
+	@Column(name = "tas_creada")		private Long tasquesCreades;
+	@Column(name = "tas_creada_tot")	private Long tasquesCreadesTotal;
+	@Column(name = "tas_notfin_fora_termini")		private Long tasquesNoFinalitzadesForaTermini;
+	@Column(name = "tas_notfin_fora_termini_tot")	private Long tasquesNoFinalitzadesForaTerminiTotal;
 
 	@Column(name = "ano_noves")		private Long anotacionsNoves;
 	@Column(name = "ano_noves_tot")	private Long anotacionsNovesTotal;
@@ -134,6 +138,10 @@ public class ExplotacioFetsEntity extends RipeaPersistable<Long> {
 		this.setServeisActiusTotal(fetsDto.getServeisActiusTotal()!=null?fetsDto.getServeisActiusTotal():0l);
 		this.setTasquesAgafades(fetsDto.getTasquesAgafades()!=null?fetsDto.getTasquesAgafades():0l);
 		this.setTasquesAgafadesTotal(fetsDto.getTasquesAgafadesTotal()!=null?fetsDto.getTasquesAgafadesTotal():0l);
+		this.setTasquesCreades(fetsDto.getTasquesCreades()!=null?fetsDto.getTasquesCreades():0l);
+		this.setTasquesCreadesTotal(fetsDto.getTasquesCreadesTotal()!=null?fetsDto.getTasquesCreadesTotal():0l);
+		this.setTasquesNoFinalitzadesForaTermini(fetsDto.getTasquesNoFinalitzadesForaTermini()!=null?fetsDto.getTasquesNoFinalitzadesForaTermini():0l);
+		this.setTasquesNoFinalitzadesForaTerminiTotal(fetsDto.getTasquesNoFinalitzadesForaTerminiTotal()!=null?fetsDto.getTasquesNoFinalitzadesForaTerminiTotal():0l);
 		this.setTasquesCancelades(fetsDto.getTasquesCancelades()!=null?fetsDto.getTasquesCancelades():0l);
 		this.setTasquesCanceladesTotal(fetsDto.getTasquesCanceladesTotal()!=null?fetsDto.getTasquesCanceladesTotal():0l);
 		this.setTasquesFinalitzadesDinsTermini(fetsDto.getTasquesFinalitzadesDinsTermini()!=null?fetsDto.getTasquesFinalitzadesDinsTermini():0l);

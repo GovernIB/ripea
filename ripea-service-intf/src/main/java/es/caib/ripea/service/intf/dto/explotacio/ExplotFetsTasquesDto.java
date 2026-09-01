@@ -39,5 +39,9 @@ public class ExplotFetsTasquesDto {
 	private Long rebutjadesTotalAhir;
 	private Long agafadesTotal;
 	private Long agafadesTotalAhir;
+	private Long creadesTotal;
+	private Long creadesTotalAhir;
+	private Long noFinalitzadesForaTerminiTotal;
+	private Long noFinalitzadesForaTerminiTotalAhir;
 
 }

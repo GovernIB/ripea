@@ -100,6 +100,11 @@ public interface ExplotacioFetsRepository extends JpaRepository<ExplotacioFetsEn
 	//Si no es coneix la data de finalització no es pot afirmar que sigui fora de termini, i per tant es compta aquí.
 	//Fora de termini: només es compta quan es pot demostrar, és a dir, quan les dues dates estan informades
 	//i la data de finalització és posterior a la data límit (dins + fora = total de tasques finalitzades).
+	//Creades (TAS_CREADES): totes les tasques, sense mirar l'estat.
+	//Fora de termini no finalitzades (TAS_NOTFIN_FORA_TERMINI): tasques amb data limit informada i ja
+	//superada a la data de tall que encara no estan finalitzades. Es complementari de TAS_FIN_FORA_TERMINI:
+	//la suma dels dos indicadors son totes les tasques fora de termini, sigui quin sigui l'estat.
+	//Com que la data limit es un Date, el tall d'aquest indicador arriba amb parametres propis.
 	@Query(	"select new es.caib.ripea.service.intf.dto.explotacio.ExplotFetsTasquesDto( "
 			+ "e.expedient.entitat.id, e.metaExpedientTasca.metaExpedient.id, e.expedient.organGestor.id, e.createdBy, "
 			//TAS_PENDENTS_TOTAL i el total d'ahir (per TAS_PENDENTS)
@@ -122,14 +127,22 @@ public interface ExplotacioFetsRepository extends JpaRepository<ExplotacioFetsEn
 			+ "sum(case when e.estat = es.caib.ripea.service.intf.dto.TascaEstatEnumDto.REBUTJADA and e.createdDate <= :dataAhirFins then 1 else 0 end), "
 			//TAS_AGAFADES_TOTAL i el total d'ahir (per TAS_AGAFADES)
 			+ "sum(case when e.estat = es.caib.ripea.service.intf.dto.TascaEstatEnumDto.AGAFADA then 1 else 0 end), "
-			+ "sum(case when e.estat = es.caib.ripea.service.intf.dto.TascaEstatEnumDto.AGAFADA and e.createdDate <= :dataAhirFins then 1 else 0 end) ) " +
+			+ "sum(case when e.estat = es.caib.ripea.service.intf.dto.TascaEstatEnumDto.AGAFADA and e.createdDate <= :dataAhirFins then 1 else 0 end), "
+			//TAS_CREADES_TOTAL i el total d'ahir (per TAS_CREADES)
+			+ "count(e), "
+			+ "sum(case when e.createdDate <= :dataAhirFins then 1 else 0 end), "
+			//TAS_NOTFIN_FORA_TERMINI_TOTAL i el total d'ahir (per TAS_NOTFIN_FORA_TERMINI)
+			+ "sum(case when e.estat <> es.caib.ripea.service.intf.dto.TascaEstatEnumDto.FINALITZADA and e.dataLimit is not null and e.dataLimit < :dataLimitFins then 1 else 0 end), "
+			+ "sum(case when e.estat <> es.caib.ripea.service.intf.dto.TascaEstatEnumDto.FINALITZADA and e.dataLimit is not null and e.dataLimit < :dataLimitAhirFins and e.createdDate <= :dataAhirFins then 1 else 0 end) ) " +
     "from ExpedientTascaEntity e " +
 	"where e.createdDate <= :dataFins and e.expedient.esborrat = 0 " +
     "group by e.expedient.entitat.id, e.metaExpedientTasca.metaExpedient.id, e.expedient.organGestor.id, e.createdBy " +
     "order by e.expedient.entitat.id, e.metaExpedientTasca.metaExpedient.id, e.expedient.organGestor.id, e.createdBy")
 	List<ExplotFetsTasquesDto> getTasquesPerDimensio(
 			@Param("dataFins") LocalDateTime dataFins,
-			@Param("dataAhirFins") LocalDateTime dataAhirFins);
+			@Param("dataAhirFins") LocalDateTime dataAhirFins,
+			@Param("dataLimitFins") Date dataLimitFins,
+			@Param("dataLimitAhirFins") Date dataLimitAhirFins);
 
 	/**
 	 * ANOTACIONS *

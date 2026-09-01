@@ -686,12 +686,16 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_AGAFADES_TOTAL.toString(), "Tasques afagades totals").descripcio("Tasques afagades totals a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_CANCELADES.toString(), "Tasques cancelades").descripcio("Tasques cancelades a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_CANCELADES_TOTAL.toString(), "Tasques cancelades totals").descripcio("Tasques cancelades totals a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_CREADES.toString(), "Tasques creades").descripcio("Tasques creades a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_CREADES_TOTAL.toString(), "Tasques creades totals").descripcio("Tasques creades totals a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FIN_DINS_TERMINI.toString(), "Tasques finalitzades dins termini").descripcio("Tasques finalitzades dins termini a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FIN_DINS_TERMINI_TOTAL.toString(), "Tasques finalitzades dins termini totals").descripcio("Tasques finalitzades dins termini totals a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FIN_FORA_TERMINI.toString(), "Tasques finalitzades fora termini").descripcio("Tasques finalitzades fora termini a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FIN_FORA_TERMINI_TOTAL.toString(), "Tasques finalitzades fora termini totals").descripcio("Tasques finalitzades fora termini totals a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_INICIADES.toString(), "Tasques iniciades").descripcio("Tasques iniciades a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_INICIADES_TOTAL.toString(), "Tasques iniciades totals").descripcio("Tasques iniciades totals a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_NOTFIN_FORA_TERMINI.toString(), "Tasques no finalitzades fora termini").descripcio("Tasques no finalitzades amb la data limit superada a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_NOTFIN_FORA_TERMINI_TOTAL.toString(), "Tasques no finalitzades fora termini totals").descripcio("Tasques no finalitzades amb la data limit superada totals a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_PENDENTS.toString(), "Tasques pendents").descripcio("Tasques pendents a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_PENDENTS_TOTAL.toString(), "Tasques pendents totals").descripcio("Tasques pendents totals a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_REBUTJADES.toString(), "Tasques rebutjades").descripcio("Tasques rebutjades a RIPEA").format(Format.LONG));
@@ -810,12 +814,16 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_AGAFADES_TOTAL.toString()).valor(efe.getTasquesAgafadesTotal()!=null?efe.getTasquesAgafadesTotal().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_CANCELADES.toString()).valor(efe.getTasquesCancelades()!=null?efe.getTasquesCancelades().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_CANCELADES_TOTAL.toString()).valor(efe.getTasquesCanceladesTotal()!=null?efe.getTasquesCanceladesTotal().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_CREADES.toString()).valor(efe.getTasquesCreades()!=null?efe.getTasquesCreades().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_CREADES_TOTAL.toString()).valor(efe.getTasquesCreadesTotal()!=null?efe.getTasquesCreadesTotal().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FIN_DINS_TERMINI.toString()).valor(efe.getTasquesFinalitzadesDinsTermini()!=null?efe.getTasquesFinalitzadesDinsTermini().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FIN_DINS_TERMINI_TOTAL.toString()).valor(efe.getTasquesFinalitzadesTotalDinsTermini()!=null?efe.getTasquesFinalitzadesTotalDinsTermini().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FIN_FORA_TERMINI.toString()).valor(efe.getTasquesFinalitzadesForaTermini()!=null?efe.getTasquesFinalitzadesForaTermini().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_FIN_FORA_TERMINI_TOTAL.toString()).valor(efe.getTasquesFinalitzadesTotalForaTermini()!=null?efe.getTasquesFinalitzadesTotalForaTermini().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_INICIADES.toString()).valor(efe.getTasquesIniciades()!=null?efe.getTasquesIniciades().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_INICIADES_TOTAL.toString()).valor(efe.getTasquesIniciadesTotal()!=null?efe.getTasquesIniciadesTotal().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_NOTFIN_FORA_TERMINI.toString()).valor(efe.getTasquesNoFinalitzadesForaTermini()!=null?efe.getTasquesNoFinalitzadesForaTermini().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_NOTFIN_FORA_TERMINI_TOTAL.toString()).valor(efe.getTasquesNoFinalitzadesForaTerminiTotal()!=null?efe.getTasquesNoFinalitzadesForaTerminiTotal().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_PENDENTS.toString()).valor(efe.getTasquesPendents()!=null?efe.getTasquesPendents().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_PENDENTS_TOTAL.toString()).valor(efe.getTasquesPendentsTotal()!=null?efe.getTasquesPendentsTotal().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.TAS_REBUTJADES.toString()).valor(efe.getTasquesRebutjades()!=null?efe.getTasquesRebutjades().doubleValue():null));
@@ -874,7 +882,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		}
 
 		//TASQUES (les dades totals o acumulades es poden aconseguir directament; per les diaries, s'ha de restar el total del dia anterior)
-		for (ExplotFetsTasquesDto fet: explotacioFetsRepository.getTasquesPerDimensio(dataFi, dataAhirFi)) {
+		for (ExplotFetsTasquesDto fet: explotacioFetsRepository.getTasquesPerDimensio(dataFi, dataAhirFi, dateFi, ahirFi)) {
 			ExplotFetsAmbDimensioDto dim = obtenirDimensio(acumulador, fet.getEntitatId(), fet.getProcedimentId(), fet.getOrganId(), fet.getUsuariCodi());
 			dim.setTasquesPendentsTotal(fet.getPendentsTotal());
 			dim.setTasquesPendents(parcial(fet.getPendentsTotal(), fet.getPendentsTotalAhir()));
@@ -890,6 +898,10 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 			dim.setTasquesRebutjades(parcial(fet.getRebutjadesTotal(), fet.getRebutjadesTotalAhir()));
 			dim.setTasquesAgafadesTotal(fet.getAgafadesTotal());
 			dim.setTasquesAgafades(parcial(fet.getAgafadesTotal(), fet.getAgafadesTotalAhir()));
+			dim.setTasquesCreadesTotal(fet.getCreadesTotal());
+			dim.setTasquesCreades(parcial(fet.getCreadesTotal(), fet.getCreadesTotalAhir()));
+			dim.setTasquesNoFinalitzadesForaTerminiTotal(fet.getNoFinalitzadesForaTerminiTotal());
+			dim.setTasquesNoFinalitzadesForaTermini(parcial(fet.getNoFinalitzadesForaTerminiTotal(), fet.getNoFinalitzadesForaTerminiTotalAhir()));
 		}
 
 		//ANOTACIONS
