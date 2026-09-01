@@ -507,7 +507,7 @@ public class ExpedientHelper {
 		logRelacionarExpedients(expedient, relacionatId, LogTipusEnumDto.CREACIO);
 
 		boolean isPropagarRelacioActiva = configHelper.getAsBoolean(PropertyConfig.PROPAGAR_RELACIO_EXPEDIENTS);
-		if (isPropagarRelacioActiva) {
+		if (isPropagarRelacioActiva && toRelate.getTancatData() == null) {
 			pluginHelper.arxiuExpedientEnllacar(
 					expedient,
 					toRelate);
