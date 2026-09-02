@@ -53,6 +53,8 @@ public class ContingutImportacioHelper {
     @Autowired private ContingutHelper contingutHelper;
     @Autowired private ConfigHelper configHelper;
     @Autowired private ExpedientInteressatHelper expedientInteressatHelper;
+    @Autowired private ExpedientHelper expedientHelper;
+    @Autowired private CarpetaHelper carpetaHelper;
     @Autowired private MessageHelper messageHelper;
     
     private final ConcurrentMap<Long, ProgresImportacioSgdDto> progressos = new ConcurrentHashMap<>();
@@ -102,6 +104,8 @@ public class ContingutImportacioHelper {
             }
 
             processarDocumentsAsync(entitat.getId(), expedientId, params, progress);
+
+            expedientHelper.updateRegistresImportats(expedientId, params.getNumeroRegistre());
 
         } catch (Exception e) {
             progress.addError(e.getMessage());
@@ -183,18 +187,51 @@ public class ContingutImportacioHelper {
                 continue;
             }
 
+            prepararEstructuraCarpetes(entitatId, expedientSuperior.getId(), params);
+
             documentHelper.procesarDocumentImportacioNewTransaction(
             		entitatId,
             		contingutId,
-            		documentArxiu, 
+            		documentArxiu,
             		buildFitxer(documentArxiu),
             		null,
                     params);
-            
+
+        }
+        
+        expedientHelper.updateRegistresImportats(expedientSuperior.getId(), params.getNumeroRegistre());
+        return documentsRepetits;
+    }
+
+    private void prepararEstructuraCarpetes(
+            Long entitatId,
+            Long expedientId,
+            ImportacioRegistreParamsDto params) {
+
+        if (params.getEstructuraCarpetes() == null) {
+            return;
         }
 
-        expedientSuperior.updateRegistresImportats(params.getNumeroRegistre());
-        return documentsRepetits;
+        Map<String, Long> carpetesCreades = carpetaHelper.crearEstructuraCarpetesNewTransaction(
+                entitatId,
+                params.getEstructuraCarpetes(),
+                expedientId,
+                params.getDestiId());
+
+        Long destiId = resoldreDestiId(params.getDestiId(), carpetesCreades);
+        if (destiId != null) {
+            params.setDestiId(String.valueOf(destiId));
+        }
+        params.setEstructuraCarpetes(null);
+    }
+
+    private Long resoldreDestiId(String destiId, Map<String, Long> carpetesCreades) {
+        try {
+            return Long.valueOf(destiId);
+        } catch (NumberFormatException nfe) {
+            // Destí encara amb l'id temporal de jstree: es correspon amb una carpeta nova
+            return carpetesCreades.get(destiId);
+        }
     }
 
     private void processarInteressatsAsync(

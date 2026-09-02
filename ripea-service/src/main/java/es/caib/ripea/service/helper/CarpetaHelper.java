@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.persistence.entity.CarpetaEntity;
 import es.caib.ripea.persistence.entity.ContingutEntity;
@@ -226,6 +228,24 @@ public class CarpetaHelper {
 			logger.info("CarpetaHelper.obtenirArbreCarpetesPerExpedient end:  " + (System.currentTimeMillis() - t0) + " ms");
 		
 		return expedientArrel;
+	}
+
+	/**
+	 * Crea l'estructura de carpetes en una transacció nova i ja confirmada, de manera que les
+	 * carpetes creades siguin visibles per a les transaccions REQUIRES_NEW posteriors que les
+	 * han d'utilitzar com a destí.
+	 */
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public Map<String, Long> crearEstructuraCarpetesNewTransaction(
+			Long entitatId,
+			Set<ArbreJsonDto> estructuraCarpetes,
+			Long expedientId,
+			String carpetaDestiId) {
+		return crearEstructuraCarpetes(
+				entitatId,
+				estructuraCarpetes,
+				expedientId,
+				carpetaDestiId);
 	}
 
 	public Map<String, Long> crearEstructuraCarpetes(

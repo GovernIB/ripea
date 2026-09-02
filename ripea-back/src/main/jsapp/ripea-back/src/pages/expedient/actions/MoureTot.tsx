@@ -5,14 +5,16 @@ import {useTranslation} from "react-i18next";
 import * as builder from "../../../util/springFilterUtils.ts";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 
+const namedQueries = ['PERMIS_ESCRIPTURA'];
+
 const MoureTotForm = () => {
-	const { data } = useFormContext();
+	const { apiRef } = useFormContext();
 	const { t } = useTranslation();
-	
-	const filtreProcediment = builder.eq('metaExpedient.id', data?.metaExpedientId);
-	
-	//namedQueries={[`BY_PROCEDIMENT#${data?.metaExpedientId}`]}
-	
+
+	// Qualsevol expedient amb permís d'escriptura, encara que sigui d'un altre procediment,
+	// exceptuant el propi expedient d'origen (#1888).
+	const filtreExpedientDesti = builder.and(builder.neq('id', apiRef?.current?.getId()));
+
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
 		<Grid size={12}>
 			<Alert severity="info">
@@ -28,7 +30,7 @@ const MoureTotForm = () => {
 			</Alert>
 		</Grid>
 		
-        <GridFormField name="expedientDesti" filter={filtreProcediment} required/>
+        <GridFormField name="expedientDesti" filter={filtreExpedientDesti} namedQueries={namedQueries} required/>
     </Grid>
 }
 
@@ -54,8 +56,8 @@ const useMoureTot = (refresh?: () => void) => {
     const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 	
-	const handleShow = (id:any, row:any) :void => {
-		apiRef.current?.show?.(id, { metaExpedientId: row?.metaExpedient?.id })
+	const handleShow = (id:any) :void => {
+		apiRef.current?.show?.(id)
 	}
 	
 	const onSuccess = (response:any) :void => {

@@ -2197,15 +2197,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				expedientOrigenId, 
 				RolHelper.getRolActual(request));
 		
-		Long metaExpedientId = expedientOrigen.getMetaExpedient().getId();
-		List<ExpedientDto> expedientsMetaExpedient = expedientService.findByEntitatAndMetaExpedient(
-				entitatActual.getId(),
-				metaExpedientId, 
-				RolHelper.getRolActual(request),
-				EntitatHelper.getOrganGestorActualId(request));
-		
 		model.addAttribute("expedientOrigen", expedientOrigen);
-		model.addAttribute("expedients", expedientsMetaExpedient);
 		
 		ExpedientMoureCommand command = new ExpedientMoureCommand();
 		command.setExpedientOrigenId(expedientOrigenId);

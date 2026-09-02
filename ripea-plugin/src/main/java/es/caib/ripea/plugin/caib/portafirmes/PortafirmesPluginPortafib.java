@@ -168,7 +168,7 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 			}
 			signatureRequest.setSignatureBlocks(signatureBlocks);
 			if (isEnviarUrlExpedientPermitida()) {
-				signatureRequest.setExpedientUrl(getUrlExpedient() + "/contingut/" + document.getExpedientUuid());
+				signatureRequest.setExpedientUrl(getUrlExpedient() + document.getExpedientUuid());
 			}
 			peticioDeFirmaId = getFirmaAsyncSimpleApi().createAndStartSignatureRequestWithSignBlockList(signatureRequest);
 			return Long.valueOf(peticioDeFirmaId).toString();

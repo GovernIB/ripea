@@ -356,6 +356,43 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         	EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true, false);
         	Filter filtreNoEliminats = FilterBuilder.and(FilterBuilder.equal(ContingutResource.Fields.esborrat, "0"));
         	
+        	//Expedients sobre els quals l'usuari pot escriure: mateix criteri de permisos que les accions
+        	//massives (findPermesosAccioMassiva), sense restringir a un procediment concret. S'utilitza pels
+        	//selectors d'expedient destí, on el destí pot ser d'un procediment diferent al de l'origen (#1888).
+        	if (mapaNamedQueries.containsKey("PERMIS_ESCRIPTURA")) {
+
+        		List<MetaExpedientEntity> procedimentsPermesos = metaExpedientHelper.findPermesosAccioMassiva(
+        				entitatEntity.getId(),
+        				rolActual);
+
+        		if (procedimentsPermesos == null || procedimentsPermesos.isEmpty()) {
+        			return FilterBuilder.equal("id", 0).generate();
+        		}
+
+        		List<Long> procedimentsPermesosIds = new ArrayList<Long>();
+        		for (MetaExpedientEntity meePe: procedimentsPermesos) {
+        			procedimentsPermesosIds.add(meePe.getId());
+        		}
+
+        		String procedimentId = ExpedientResource.Fields.metaExpedient + ".id";
+        		Filter filtreProcedimentsPermesos = null;
+        		List<String> permesosClausulesIn = Utils.getIdsEnGruposMil(procedimentsPermesosIds);
+        		if (permesosClausulesIn!=null) {
+        			for (String aux: permesosClausulesIn) {
+        				if (aux != null && !aux.isEmpty()) {
+        					filtreProcedimentsPermesos = FilterBuilder.or(filtreProcedimentsPermesos, Filter.parse(procedimentId + " IN (" + aux + ")"));
+        				}
+        			}
+        		}
+
+        		Filter filtrePermisEscriptura = FilterBuilder.and(
+        				filtreFrontAndEntitat,
+        				filtreProcedimentsPermesos,
+        				filtreNoEliminats);
+
+        		return filtrePermisEscriptura.generate();
+        	}
+
         	if (mapaNamedQueries.containsKey("MASSIVE_ACTION_QUERY")) {
         		
         		String codiUsuariActual = SecurityContextHolder.getContext().getAuthentication().getName();
