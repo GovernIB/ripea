@@ -227,6 +227,22 @@ public class ExpedientServiceEjb extends AbstractServiceEjb<ExpedientService> im
 
 	@Override
 	@RolesAllowed("**")
+	public PaginaDto<ExpedientSelectorDto> findPerUserAmbPermisEscriptura(
+			Long entitatId,
+			String text,
+			Long expedientExclosId,
+			PaginacioParamsDto paginacioParams,
+			String rolActual) throws NotFoundException {
+		return delegateService.findPerUserAmbPermisEscriptura(
+				entitatId,
+				text,
+				expedientExclosId,
+				paginacioParams,
+				rolActual);
+	}
+
+	@Override
+	@RolesAllowed("**")
 	public PaginaDto<ExpedientDto> findAmbFiltreNoRelacionat(
 			Long entitatId,
 			ExpedientFiltreDto filtre,

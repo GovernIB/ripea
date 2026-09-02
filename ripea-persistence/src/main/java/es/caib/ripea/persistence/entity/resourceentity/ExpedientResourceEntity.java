@@ -21,6 +21,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.Where;
@@ -216,5 +217,11 @@ public class ExpedientResourceEntity extends NodeResourceEntity<ExpedientResourc
 
 	@Column(name = "prioritat_motiu")
 	private String prioritatMotiu;
+
+	@Transient
+	private String numeroINom;
+	public String getNumeroINom() {
+		return numero != null && !numero.isEmpty() ? numero + " - " + getNom() : getNom();
+	}
 
 }

@@ -20,6 +20,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import es.caib.ripea.back.helper.EntitatHelper;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.ExpedientDto;
+import es.caib.ripea.service.intf.dto.ExpedientSelectorDto;
+import es.caib.ripea.service.intf.dto.PaginaDto;
+import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
 import es.caib.ripea.service.intf.service.ExpedientService;
 import es.caib.ripea.service.intf.service.MetaDadaService;
 import es.caib.ripea.service.intf.utils.Utils;
@@ -88,6 +91,30 @@ public class AjaxExpedientController extends BaseUserOAdminOOrganController {
 				EntitatHelper.getOrganGestorActualId(request));
 		
 		return expedients;
+	}
+	
+	@RequestMapping(value = "/expedient/permisEscriptura", method = RequestMethod.GET)
+	@ResponseBody
+	public PaginaDto<ExpedientSelectorDto> getAmbPermisEscriptura(
+			HttpServletRequest request,
+			@RequestParam(value = "filter", required = false) String filter,
+			@RequestParam(value = "page", defaultValue = "1") int page,
+			@RequestParam(value = "pageSize", defaultValue = "20") int pageSize,
+			@RequestParam(value = "expedientExclosId", required = false) Long expedientExclosId,
+			Model model) {
+
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		PaginacioParamsDto paginacioParams = new PaginacioParamsDto();
+		paginacioParams.setPaginaNum(page > 0 ? page - 1 : 0);
+		paginacioParams.setPaginaTamany(pageSize);
+		Utils.addSortDefault(paginacioParams, "nom");
+
+		return expedientService.findPerUserAmbPermisEscriptura(
+				entitat.getId(),
+				Utils.trim(filter),
+				expedientExclosId,
+				paginacioParams,
+				getRolActual(request));
 	}
 	
 	@RequestMapping(value = "/expedient/item/{id}", method = RequestMethod.GET)

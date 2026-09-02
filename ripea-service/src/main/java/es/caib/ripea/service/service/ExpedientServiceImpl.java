@@ -693,6 +693,32 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Transactional(readOnly = true)
 	@Override
+	public PaginaDto<ExpedientSelectorDto> findPerUserAmbPermisEscriptura(
+			Long entitatId,
+			String text,
+			Long expedientExclosId,
+			PaginacioParamsDto paginacioParams,
+			String rolActual) {
+		logger.debug(
+				"Consultant els expedients amb permís d'escriptura per usuari (" + "entitatId=" + entitatId + ", " +
+						"text=" + text + ", " + "expedientExclosId=" + expedientExclosId + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId, rolActual);
+		if (metaExpedientsPermesos.isEmpty()) {
+			return paginacioHelper.getPaginaDtoBuida(ExpedientSelectorDto.class);
+		}
+		return paginacioHelper.toPaginaDto(
+				expedientRepositoryCommnand.findByEntitatAndMetaExpedientsPermesosAndText(
+						entitat,
+						text,
+						expedientExclosId,
+						metaExpedientsPermesos,
+						paginacioHelper.toSpringDataPageable(paginacioParams)),
+				ExpedientSelectorDto.class);
+	}
+
+	@Transactional(readOnly = true)
+	@Override
 	public List<Long> findIdsAmbFiltre(
 			Long entitatId,
 			ExpedientFiltreDto filtre,

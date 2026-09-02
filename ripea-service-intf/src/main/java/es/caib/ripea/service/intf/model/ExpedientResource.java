@@ -323,6 +323,11 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	@Size(max = 64)
 	private String numero;
 
+	//Descripció alternativa pels selectors d'expedient
+	public String getNumeroINom() {
+		return numero != null && !numero.isEmpty() ? numero + " - " + getNom() : getNom();
+	}
+
 	@NotNull
 	@ResourceField(onChangeActive = true)
 	private ResourceReference<MetaExpedientResource, Long> metaExpedient;
@@ -566,6 +571,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
     @Setter
     public static class MoureTotFormAction implements Serializable {
     	@NotNull
+    	@ResourceField(descriptionField = "numeroINom")
         private ResourceReference<ExpedientResource, Long> expedientDesti;
     }
     

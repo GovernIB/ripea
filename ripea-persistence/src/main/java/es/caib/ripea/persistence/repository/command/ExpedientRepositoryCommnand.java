@@ -59,6 +59,21 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
         return getList(new ExpedientByEntitatAndMetaExpedientCommand(params), metaNodesPermesos, true);
     }
 
+    public Page<ExpedientEntity> findByEntitatAndMetaExpedientsPermesosAndText(
+            final EntitatEntity entitat,
+            final String text,
+            final Long expedientExclosId,
+            final List<? extends MetaNodeEntity> metaNodesPermesos,
+            final Pageable pageable) {
+        Map<String, Object> params = new HashMap<String, Object>() {{
+            put("entitat", entitat);
+            put("text", text);
+            put("expedientExclosId", expedientExclosId);
+            put("pageable", pageable);
+        }};
+        return getPage(new ExpedientByMetaExpedientsPermesosITextCommand(params), metaNodesPermesos);
+    }
+
     public Page<ExpedientEntity> findExpedientsPerCanviEstatMassiu(
     		final EntitatEntity entitat,
     		final boolean nomesAgafats,
@@ -256,6 +271,44 @@ public class ExpedientRepositoryCommnand extends AbstractRepositoryCommnand {
         @Override
         public Pageable getPageable() {
             throw new UnsupportedOperationException();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private class ExpedientByMetaExpedientsPermesosITextCommand implements RepositoryCommand<ExpedientEntity> {
+
+        private final EntitatEntity entitat;
+        private final String text;
+        private final Long expedientExclosId;
+        private final Pageable pageable;
+
+        public ExpedientByMetaExpedientsPermesosITextCommand(Map<String, Object> params) {
+            this.entitat = (EntitatEntity) params.get("entitat");
+            this.text = (String) params.get("text");
+            this.expedientExclosId = (Long) params.get("expedientExclosId");
+            this.pageable = (Pageable) params.get("pageable");
+        }
+
+        @Override
+        public List<ExpedientEntity> executeList(List<?> sublist) {
+            return expedientRepository.findByEntitatAndMetaExpedientsPermesosAndText(entitat,
+                    (List<? extends MetaNodeEntity>)sublist,
+                    expedientExclosId == null, expedientExclosId,
+                    Utils.isBlank(text), Utils.getEmptyStringIfNull(text));
+        }
+
+        @Override
+        public Page<ExpedientEntity> executePage(List<?> sublist) {
+            return expedientRepository.findByEntitatAndMetaExpedientsPermesosAndText(entitat,
+                    (List<? extends MetaNodeEntity>)sublist,
+                    expedientExclosId == null, expedientExclosId,
+                    Utils.isBlank(text), Utils.getEmptyStringIfNull(text),
+                    pageable);
+        }
+
+        @Override
+        public Pageable getPageable() {
+            return this.pageable;
         }
     }
 

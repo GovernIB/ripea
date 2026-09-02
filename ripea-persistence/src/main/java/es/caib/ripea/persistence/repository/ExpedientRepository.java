@@ -447,6 +447,36 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullMetaNode") boolean esNullMetaNode,
 			@Param("metaNode") MetaNodeEntity metaNode);
 
+	static final String FIND_BY_META_EXPEDIENTS_PERMESOS_I_TEXT = "select " +
+			"    e " +
+			"from " +
+			"    ExpedientEntity e " +
+			"where " +
+			"    e.entitat = :entitat " +
+			"and e.esborrat = 0 " +
+			"and (e.metaNode is null or e.metaNode in (:metaNodesPermesos)) " +
+			"and (:esNullExpedientExclos = true or e.id <> :expedientExclosId) " +
+			"and (:esNullText = true or lower(e.nom) like lower('%'||:text||'%') or lower(e.numero) like lower('%'||:text||'%'))";
+
+	@Query(FIND_BY_META_EXPEDIENTS_PERMESOS_I_TEXT)
+	List<ExpedientEntity> findByEntitatAndMetaExpedientsPermesosAndText(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("metaNodesPermesos") List<? extends MetaNodeEntity> metaNodesPermesos,
+			@Param("esNullExpedientExclos") boolean esNullExpedientExclos,
+			@Param("expedientExclosId") Long expedientExclosId,
+			@Param("esNullText") boolean esNullText,
+			@Param("text") String text);
+
+	@Query(FIND_BY_META_EXPEDIENTS_PERMESOS_I_TEXT)
+	Page<ExpedientEntity> findByEntitatAndMetaExpedientsPermesosAndText(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("metaNodesPermesos") List<? extends MetaNodeEntity> metaNodesPermesos,
+			@Param("esNullExpedientExclos") boolean esNullExpedientExclos,
+			@Param("expedientExclosId") Long expedientExclosId,
+			@Param("esNullText") boolean esNullText,
+			@Param("text") String text,
+			Pageable pageable);
+
 	Page<ExpedientEntity> findByMetaExpedientAndEsborrat(MetaExpedientEntity metaExpedient, int esborrat, Pageable pageable);
 
 	static final String FIND_BY_CANVI_ESTAT_MASSIU = "select " +

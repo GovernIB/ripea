@@ -137,6 +137,31 @@ public interface ExpedientService {
 			String rolActual) throws NotFoundException;
 
 	/**
+	 * Consulta paginada dels expedients sobre els quals l'usuari actual té permís
+	 * d'escriptura, filtrant opcionalment pel text del nom o del número.
+	 * 
+	 * @param entitatId
+	 *            Atribut id de l'entitat.
+	 * @param text
+	 *            Text a cercar dins el nom o el número de l'expedient.
+	 * @param expedientExclosId
+	 *            id de l'expedient que s'ha d'excloure del resultat.
+	 * @param paginacioParams
+	 *            Paràmetres de paginació.
+	 * @param rolActual Rol actual de l'usuari
+	 * @return La pàgina d'expedients trobats
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("isAuthenticated()")
+	public PaginaDto<ExpedientSelectorDto> findPerUserAmbPermisEscriptura(
+			Long entitatId,
+			String text,
+			Long expedientExclosId,
+			PaginacioParamsDto paginacioParams,
+			String rolActual) throws NotFoundException;
+
+	/**
 	 * Consulta la llista d'ids d'expedient segons el filtre.
 	 * 
 	 * @param entitatId

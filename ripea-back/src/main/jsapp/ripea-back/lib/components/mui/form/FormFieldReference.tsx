@@ -15,6 +15,8 @@ import { useDataGridDialog } from '../datagrid/DataGridDialog';
 import { useFormFieldCommon } from './FormFieldText';
 
 const DEFAULT_PAGE_SIZE = 5;
+// Distància en píxels des del final de la llista a partir de la qual es carrega la pàgina següent.
+const LOAD_MORE_SCROLL_OFFSET = 40;
 
 type FormFieldReferenceRendererArgs = {
     id: any;
@@ -43,7 +45,7 @@ type FormFieldRefProps = FormFieldCustomProps & {
     /** Propietats del component Dialog per a la finestra emergent de consulta avançada */
     advancedSearchDialogComponentProps?: any;
     /** Callback per a substituir la funció que fa la consulta de resultats */
-    optionsRequest?: (q: string) => AdvancedSearchOptionsRequestType;
+    optionsRequest?: (q: string, pageNumber: number) => AdvancedSearchOptionsRequestType;
     /** Callback per personalitzar cada element de la llista de resultats */
     optionRenderer?: (args: FormFieldReferenceRendererArgs) => React.ReactElement;
 };
@@ -128,34 +130,58 @@ const AdvancedSearchDialog: React.FC<AdvancedSearchDialogProps> = (props) => {
 const useFieldOptions = (
     open: boolean,
     inputValue: string | undefined,
-    optionsRequest: (q: string) => AdvancedSearchOptionsRequestType
+    optionsRequest: (q: string, pageNumber: number) => AdvancedSearchOptionsRequestType
 ) => {
     const [loading, setLoading] = React.useState<boolean>(false);
     const [options, setOptions] = React.useState<any[]>([]);
     const [page, setPage] = React.useState<any>();
     const [error, setError] = React.useState<any>();
     const debouncedInputValue = useDebounce(inputValue, undefined, true);
-    React.useEffect(() => {
-        if (open) {
+    // Darrera pàgina carregada amb èxit i petició en curs. Són refs i no estat perquè
+    // loadMore es crida des de l'event de scroll, que es dispara diverses vegades abans
+    // que React torni a renderitzar i actualitzi el valor de loading.
+    const pageNumberRef = React.useRef<number>(0);
+    const requestingRef = React.useRef<boolean>(false);
+    const requestPage = React.useCallback(
+        (pageNumber: number, append: boolean) => {
             const q = debouncedInputValue?.length ? debouncedInputValue : null;
+            requestingRef.current = true;
             setLoading(true);
-            const or = optionsRequest(q);
+            const or = optionsRequest(q, pageNumber);
             const optionsRequestPromise = Array.isArray(or) ? or[0] : or;
             const optionsRequestCancel = Array.isArray(or) ? or[1] : undefined;
             setError(undefined);
             optionsRequestPromise
                 .then((response) => {
-                    setOptions(response.options);
+                    pageNumberRef.current = pageNumber;
+                    setOptions((current) =>
+                        append ? [...current, ...response.options] : response.options
+                    );
                     setPage(response?.page);
                 })
                 .catch(setError)
                 .finally(() => {
+                    requestingRef.current = false;
                     setLoading(false);
                 });
+            return optionsRequestCancel;
+        },
+        [optionsRequest, debouncedInputValue]
+    );
+    React.useEffect(() => {
+        if (open) {
+            const optionsRequestCancel = requestPage(0, false);
             return () => optionsRequestCancel?.();
         }
-    }, [open, optionsRequest, debouncedInputValue]);
-    return { loading, options, page, error };
+    }, [open, requestPage]);
+    // Carrega la pàgina següent i afegeix els resultats als ja carregats (scroll infinit).
+    const loadMore = React.useCallback(() => {
+        const hasMore = page != null && options.length < page.totalElements;
+        if (hasMore && !requestingRef.current) {
+            requestPage(pageNumberRef.current + 1, true);
+        }
+    }, [page, options.length, requestPage]);
+    return { loading, options, page, error, loadMore };
 };
 
 export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
@@ -199,9 +225,9 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
         setOptionsQuickFilter('');
     };
     const optionsRequest = React.useCallback(
-        (q: string) => {
+        (q: string, pageNumber: number) => {
             if (optionsRequestProp != null) {
-                return optionsRequestProp(q);
+                return optionsRequestProp(q, pageNumber);
             } else {
                 return new Promise<FormFieldRefOptionsResponse>((resolve, reject) => {
                     const dataSource = field.dataSource;
@@ -209,7 +235,7 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
                     const labelField = dataSource.labelField;
                     const pageArgs = optionsUnpaged
                         ? { page: 'UNPAGED' }
-                        : { page: 0, size: optionsPageSize };
+                        : { page: pageNumber, size: optionsPageSize };
                     const sorts =
                         sortModel && sortModel.length
                             ? sortModel.map((sm) => sm.field + ',' + sm.sort)
@@ -245,6 +271,7 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
         options,
         page: optionsPage,
         error: optionsError,
+        loadMore: optionsLoadMore,
     } = useFieldOptions(open, optionsQuickFilter, optionsRequest);
     const handleOnChange = (_event: Event, value: any, reason: AutocompleteChangeReason): void => {
         if (reason === 'clear') {
@@ -417,12 +444,13 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
                 }}
                 filterOptions={(options) => {
                     if (!optionsUnpaged) {
-                        const currentPageSize = optionsPage?.size ?? DEFAULT_PAGE_SIZE;
-                        if (optionsPage?.totalElements > currentPageSize) {
+                        // Els resultats carregats van creixent a mesura que es fa scroll,
+                        // per això el comptador mostra options.length i no la mida de pàgina.
+                        if (optionsPage?.totalElements > options.length) {
                             options.push({
                                 id: '___pageLabel',
                                 description: t('form.field.reference.page', {
-                                    size: currentPageSize,
+                                    size: options.length,
                                     totalElements: optionsPage?.totalElements,
                                 }),
                                 disabled: true,
@@ -484,7 +512,17 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
                     },
                     // The next prop fixes a bug in Firefox where the focus was put into the Listbox
                     // container, and then lost focus of the form completely when navigating to the next input
-                    listbox: { tabIndex: '-1' },
+                    listbox: {
+                        tabIndex: '-1',
+                        onScroll: (event: React.SyntheticEvent) => {
+                            const listbox = event.currentTarget as HTMLElement;
+                            const remaining =
+                                listbox.scrollHeight - listbox.scrollTop - listbox.clientHeight;
+                            if (remaining <= LOAD_MORE_SCROLL_OFFSET) {
+                                optionsLoadMore();
+                            }
+                        },
+                    },
                 }}
                 openText={t('form.field.reference.open')}
                 closeText={t('form.field.reference.close')}
