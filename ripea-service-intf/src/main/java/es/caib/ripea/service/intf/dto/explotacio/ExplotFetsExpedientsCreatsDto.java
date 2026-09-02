@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * Fets d'explotació d'expedients oberts (ancorats a la data de creació) obtinguts amb una única consulta agregada sobre ExpedientEntity.
+ * Fets d'explotació d'expedients creats (ancorats a la data de creació) obtinguts amb una única consulta agregada sobre ExpedientEntity.
  *
  * IMPORTANT: l'ordre dels camps forma part del contracte amb l'expressió constructora
  * (`select new ...`) de la consulta corresponent a ExplotacioFetsRepository. Si es reordenen
@@ -14,14 +14,13 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public class ExplotFetsExpedientsObertsDto {
+public class ExplotFetsExpedientsCreatsDto {
 
 	private Long entitatId;
 	private Long procedimentId;
 	private Long organId;
 	private String usuariCodi;
 
-	private Long expedientsObertsTotal;
-	private Long expedientsOberts;
+	private Long expedientsCreatsTotal;
 
 }

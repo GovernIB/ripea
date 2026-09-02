@@ -22,6 +22,5 @@ public class ExplotFetsExpedientsTancatsDto {
 	private String usuariCodi;
 
 	private Long expedientsTancatsTotal;
-	private Long expedientsTancats;
 
 }

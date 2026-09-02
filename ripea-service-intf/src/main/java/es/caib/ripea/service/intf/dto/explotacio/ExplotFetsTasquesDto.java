@@ -6,9 +6,9 @@ import lombok.Getter;
 /**
  * Fets d'explotació de tasques obtinguts amb una única consulta agregada sobre ExpedientTascaEntity.
  *
- * Els camps acabats en "Ahir" contenen el mateix total calculat amb el tall del dia anterior;
- * la dada parcial del dia s'obté restant-los del total (equival a la resta que abans es feia
- * amb dues consultes i el mètode restarDadaMateixaDimensio).
+ * Només conté indicadors acumulats a la data demanada: les dades diàries es calculen després,
+ * restant a cada total el mateix indicador de la mateixa dimensió al dia anterior
+ * (SegonPlaServiceImpl.calcularParcialsDiaris).
  *
  * IMPORTANT: l'ordre dels camps forma part del contracte amb l'expressió constructora
  * (`select new ...`) de la consulta corresponent a ExplotacioFetsRepository. Si es reordenen
@@ -26,22 +26,13 @@ public class ExplotFetsTasquesDto {
 	private String usuariCodi;
 
 	private Long pendentsTotal;
-	private Long pendentsTotalAhir;
 	private Long iniciadesTotal;
-	private Long iniciadesTotalAhir;
 	private Long finalitzadesDinsTerminiTotal;
-	private Long finalitzadesDinsTerminiTotalAhir;
 	private Long finalitzadesForaTerminiTotal;
-	private Long finalitzadesForaTerminiTotalAhir;
 	private Long canceladesTotal;
-	private Long canceladesTotalAhir;
 	private Long rebutjadesTotal;
-	private Long rebutjadesTotalAhir;
 	private Long agafadesTotal;
-	private Long agafadesTotalAhir;
 	private Long creadesTotal;
-	private Long creadesTotalAhir;
 	private Long noFinalitzadesForaTerminiTotal;
-	private Long noFinalitzadesForaTerminiTotalAhir;
 
 }

@@ -29,8 +29,8 @@ public class ExplotacioFetsEntity extends RipeaPersistable<Long> {
 	@Column(name = "prc_actius_tot")		private Long procedimentsActiusTotal;
 	@Column(name = "srv_actius_tot")		private Long serveisActiusTotal;
 	
-	@Column(name = "exp_obert")			private Long expedientsOberts;
-	@Column(name = "exp_obert_tot")		private Long expedientsObertsTotal;
+	@Column(name = "exp_creat")			private Long expedientsCreats;
+	@Column(name = "exp_creat_tot")		private Long expedientsCreatsTotal;
 	@Column(name = "exp_tancat")		private Long expedientsTancats;
 	@Column(name = "exp_tancat_tot")	private Long expedientsTancatsTotal;
 	
@@ -100,8 +100,8 @@ public class ExplotacioFetsEntity extends RipeaPersistable<Long> {
 		this.setAnotacionsProcessadesTotal(fetsDto.getAnotacionsProcessadesTotal()!=null?fetsDto.getAnotacionsProcessadesTotal():0l);
 		this.setAnotacionsRebutjades(fetsDto.getAnotacionsRebutjades()!=null?fetsDto.getAnotacionsRebutjades():0l);
 		this.setAnotacionsRebutjadesTotal(fetsDto.getAnotacionsRebutjadesTotal()!=null?fetsDto.getAnotacionsRebutjadesTotal():0l);
-		this.setExpedientsOberts(fetsDto.getExpedientsOberts()!=null?fetsDto.getExpedientsOberts():0l);
-		this.setExpedientsObertsTotal(fetsDto.getExpedientsObertsTotal()!=null?fetsDto.getExpedientsObertsTotal():0l);
+		this.setExpedientsCreats(fetsDto.getExpedientsCreats()!=null?fetsDto.getExpedientsCreats():0l);
+		this.setExpedientsCreatsTotal(fetsDto.getExpedientsCreatsTotal()!=null?fetsDto.getExpedientsCreatsTotal():0l);
 		this.setExpedientsTancats(fetsDto.getExpedientsTancats()!=null?fetsDto.getExpedientsTancats():0l);
 		this.setExpedientsTancatsTotal(fetsDto.getExpedientsTancatsTotal()!=null?fetsDto.getExpedientsTancatsTotal():0l);
 		this.setFirmesFirmades(fetsDto.getFirmesFirmades()!=null?fetsDto.getFirmesFirmades():0l);

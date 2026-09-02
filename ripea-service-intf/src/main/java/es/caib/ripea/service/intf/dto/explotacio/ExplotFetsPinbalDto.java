@@ -6,8 +6,9 @@ import lombok.Getter;
 /**
  * Fets d'explotació de consultes PINBAL obtinguts amb una única consulta agregada sobre ConsultaPinbalEntity.
  *
- * Els camps "ok" i "error" són les dades parcials del dia, comptades pel rang de la data de
- * creació (igual que feia la consulta getPinbalEnviamentsPerDimensio); no s'obtenen per resta.
+ * Només conté indicadors acumulats a la data demanada: les dades diàries es calculen després,
+ * restant a cada total el mateix indicador de la mateixa dimensió al dia anterior
+ * (SegonPlaServiceImpl.calcularParcialsDiaris).
  *
  * IMPORTANT: l'ordre dels camps forma part del contracte amb l'expressió constructora
  * (`select new ...`) de la consulta corresponent a ExplotacioFetsRepository. Si es reordenen
@@ -25,8 +26,6 @@ public class ExplotFetsPinbalDto {
 	private String usuariCodi;
 
 	private Long okTotal;
-	private Long ok;
 	private Long errorTotal;
-	private Long error;
 
 }

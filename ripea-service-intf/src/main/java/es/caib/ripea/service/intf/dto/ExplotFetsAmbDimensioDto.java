@@ -16,8 +16,8 @@ public class ExplotFetsAmbDimensioDto {
 	private Long procedimentActiusTotal;
 	private Long serveisActiusTotal;
 	
-	private Long expedientsOberts;
-	private Long expedientsObertsTotal;
+	private Long expedientsCreats;
+	private Long expedientsCreatsTotal;
 	private Long expedientsTancats;
 	private Long expedientsTancatsTotal;
 	
@@ -83,8 +83,8 @@ public class ExplotFetsAmbDimensioDto {
 	public enum FetsEnum {
 		PROCEDIMENTS_ACTIUS_TOTAL,
 		SERVEIS_ACTIUS_TOTAL,
-        EXP_OBERTS,
-        EXP_OBERTS_TOTAL,
+        EXP_CREATS,
+        EXP_CREAT_TOTAL,
         EXP_TANCATS,
         EXP_TANCATS_TOTAL,
         TAS_PENDENTS,

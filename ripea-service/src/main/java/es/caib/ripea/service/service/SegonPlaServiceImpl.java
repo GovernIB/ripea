@@ -88,7 +88,7 @@ import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ExplotFetsAmbDimensioDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.explotacio.ExplotFetsAnotacionsDto;
-import es.caib.ripea.service.intf.dto.explotacio.ExplotFetsExpedientsObertsDto;
+import es.caib.ripea.service.intf.dto.explotacio.ExplotFetsExpedientsCreatsDto;
 import es.caib.ripea.service.intf.dto.explotacio.ExplotFetsExpedientsTancatsDto;
 import es.caib.ripea.service.intf.dto.explotacio.ExplotFetsNotificacionsDto;
 import es.caib.ripea.service.intf.dto.explotacio.ExplotFetsPinbalDto;
@@ -644,10 +644,10 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.ANO_REBUTJADES.toString(), "Anotacions rebutjades").descripcio("Anotacions rebutjades a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.ANO_REBUTJADES_TOTAL.toString(), "Anotacions rebutjades totals").descripcio("Anotacions rebutjades totals a RIPEA").format(Format.LONG));
 		
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.EXP_OBERTS.toString(), "Expedients oberts").descripcio("Expedients oberts a RIPEA").format(Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.EXP_OBERTS_TOTAL.toString(), "Expedients oberts totals").descripcio("Expedients oberts totals a RIPEA").format(Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.EXP_TANCATS.toString(), "Expedients tancats").descripcio("Expedients tancats a RIPEA").format(Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.EXP_TANCATS_TOTAL.toString(), "Expedients tancats totals").descripcio("Expedients tancats totals a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.EXP_CREATS.toString(), "Expedients creats").descripcio("Expedients creats a RIPEA dins del dia").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.EXP_CREAT_TOTAL.toString(), "Expedients creats totals").descripcio("Expedients creats a RIPEA fins a la data, tant oberts com tancats").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.EXP_TANCATS.toString(), "Expedients tancats").descripcio("Expedients tancats a RIPEA dins del dia").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.EXP_TANCATS_TOTAL.toString(), "Expedients tancats totals").descripcio("Expedients tancats a RIPEA fins a la data").format(Format.LONG));
 		
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_FIRMADES.toString(), "Env. portafib firmats").descripcio("Env. portafib firmats a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_FIRMADES_TOTAL.toString(), "Env. portafib firmats totals").descripcio("Env. portafib firmats totals a RIPEA").format(Format.LONG));
@@ -772,8 +772,8 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.ANO_REBUTJADES.toString()).valor(efe.getAnotacionsRebutjades()!=null?efe.getAnotacionsRebutjades().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.ANO_REBUTJADES_TOTAL.toString()).valor(efe.getAnotacionsRebutjadesTotal()!=null?efe.getAnotacionsRebutjadesTotal().doubleValue():null));
 		
-		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.EXP_OBERTS.toString()).valor(efe.getExpedientsOberts()!=null?efe.getExpedientsOberts().doubleValue():null));
-		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.EXP_OBERTS_TOTAL.toString()).valor(efe.getExpedientsObertsTotal()!=null?efe.getExpedientsObertsTotal().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.EXP_CREATS.toString()).valor(efe.getExpedientsCreats()!=null?efe.getExpedientsCreats().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.EXP_CREAT_TOTAL.toString()).valor(efe.getExpedientsCreatsTotal()!=null?efe.getExpedientsCreatsTotal().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.EXP_TANCATS.toString()).valor(efe.getExpedientsTancats()!=null?efe.getExpedientsTancats().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.EXP_TANCATS_TOTAL.toString()).valor(efe.getExpedientsTancatsTotal()!=null?efe.getExpedientsTancatsTotal().doubleValue():null));
 		
@@ -842,22 +842,16 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 			fecha = Date.from(avui.atStartOfDay(ZoneId.systemDefault()).toInstant());
 		}
 		
-		LocalDateTime dataIni	= DateUtil.getLocalDateTimeFromDate(fecha, true, false);
+		LocalDate dataEstadistiques = fecha.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+		//Totes les consultes calculen nomes els acumulats a final del dia demanat. Les dades diaries
+		//es calculen despres comparant aquests acumulats amb els del dia anterior (calcularParcialsDiaris).
 		LocalDateTime dataFi	= DateUtil.getLocalDateTimeFromDate(fecha, false, true);
-		
+
 		Calendar calendarFechaAvui = Calendar.getInstance();
 		calendarFechaAvui.setTime(fecha);
-		
-		Calendar calendarFechaAhir = Calendar.getInstance();
-		calendarFechaAhir.setTime(fecha);
-		calendarFechaAhir.add(Calendar.DAY_OF_MONTH, -1);
-		
-		Date dateIni	= DateUtil.startOfDay(calendarFechaAvui).getTime();
 		Date dateFi		= DateUtil.endOfDay(calendarFechaAvui).getTime();
-		Date ahirFi		= DateUtil.endOfDay(calendarFechaAhir).getTime();
-		
-		LocalDateTime dataAhirFi	= DateUtil.getLocalDateTimeFromDate(ahirFi, false, true);
-		
+
 		//Cada grup d'indicadors es resol amb una unica consulta agregada per taula d'origen, i els
 		//resultats s'acumulen per dimensio (entitat-procediment-organ-usuari) dins d'un mapa.
 		Map<ExplotFetsAmbDimensioDto.DimensioKey, ExplotFetsAmbDimensioDto> acumulador = new LinkedHashMap<ExplotFetsAmbDimensioDto.DimensioKey, ExplotFetsAmbDimensioDto>();
@@ -870,99 +864,72 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		}
 
 		//EXPEDIENTS
-		for (ExplotFetsExpedientsObertsDto fet: explotacioFetsRepository.getExpedientsObertsPerDimensio(dataIni, dataFi)) {
+		for (ExplotFetsExpedientsCreatsDto fet: explotacioFetsRepository.getExpedientsCreatsPerDimensio(dataFi)) {
 			ExplotFetsAmbDimensioDto dim = obtenirDimensio(acumulador, fet.getEntitatId(), fet.getProcedimentId(), fet.getOrganId(), fet.getUsuariCodi());
-			dim.setExpedientsObertsTotal(fet.getExpedientsObertsTotal());
-			dim.setExpedientsOberts(fet.getExpedientsOberts());
+			dim.setExpedientsCreatsTotal(fet.getExpedientsCreatsTotal());
 		}
-		for (ExplotFetsExpedientsTancatsDto fet: explotacioFetsRepository.getExpedientsTancatsPerDimensio(dateIni, dateFi)) {
+		for (ExplotFetsExpedientsTancatsDto fet: explotacioFetsRepository.getExpedientsTancatsPerDimensio(dateFi)) {
 			ExplotFetsAmbDimensioDto dim = obtenirDimensio(acumulador, fet.getEntitatId(), fet.getProcedimentId(), fet.getOrganId(), fet.getUsuariCodi());
 			dim.setExpedientsTancatsTotal(fet.getExpedientsTancatsTotal());
-			dim.setExpedientsTancats(fet.getExpedientsTancats());
 		}
 
-		//TASQUES (les dades totals o acumulades es poden aconseguir directament; per les diaries, s'ha de restar el total del dia anterior)
-		for (ExplotFetsTasquesDto fet: explotacioFetsRepository.getTasquesPerDimensio(dataFi, dataAhirFi, dateFi, ahirFi)) {
+		//TASQUES
+		for (ExplotFetsTasquesDto fet: explotacioFetsRepository.getTasquesPerDimensio(dataFi, dateFi)) {
 			ExplotFetsAmbDimensioDto dim = obtenirDimensio(acumulador, fet.getEntitatId(), fet.getProcedimentId(), fet.getOrganId(), fet.getUsuariCodi());
 			dim.setTasquesPendentsTotal(fet.getPendentsTotal());
-			dim.setTasquesPendents(parcial(fet.getPendentsTotal(), fet.getPendentsTotalAhir()));
 			dim.setTasquesIniciadesTotal(fet.getIniciadesTotal());
-			dim.setTasquesIniciades(parcial(fet.getIniciadesTotal(), fet.getIniciadesTotalAhir()));
 			dim.setTasquesFinalitzadesTotalDinsTermini(fet.getFinalitzadesDinsTerminiTotal());
-			dim.setTasquesFinalitzadesDinsTermini(parcial(fet.getFinalitzadesDinsTerminiTotal(), fet.getFinalitzadesDinsTerminiTotalAhir()));
 			dim.setTasquesFinalitzadesTotalForaTermini(fet.getFinalitzadesForaTerminiTotal());
-			dim.setTasquesFinalitzadesForaTermini(parcial(fet.getFinalitzadesForaTerminiTotal(), fet.getFinalitzadesForaTerminiTotalAhir()));
 			dim.setTasquesCanceladesTotal(fet.getCanceladesTotal());
-			dim.setTasquesCancelades(parcial(fet.getCanceladesTotal(), fet.getCanceladesTotalAhir()));
 			dim.setTasquesRebutjadesTotal(fet.getRebutjadesTotal());
-			dim.setTasquesRebutjades(parcial(fet.getRebutjadesTotal(), fet.getRebutjadesTotalAhir()));
 			dim.setTasquesAgafadesTotal(fet.getAgafadesTotal());
-			dim.setTasquesAgafades(parcial(fet.getAgafadesTotal(), fet.getAgafadesTotalAhir()));
 			dim.setTasquesCreadesTotal(fet.getCreadesTotal());
-			dim.setTasquesCreades(parcial(fet.getCreadesTotal(), fet.getCreadesTotalAhir()));
 			dim.setTasquesNoFinalitzadesForaTerminiTotal(fet.getNoFinalitzadesForaTerminiTotal());
-			dim.setTasquesNoFinalitzadesForaTermini(parcial(fet.getNoFinalitzadesForaTerminiTotal(), fet.getNoFinalitzadesForaTerminiTotalAhir()));
 		}
 
 		//ANOTACIONS
-		for (ExplotFetsAnotacionsDto fet: explotacioFetsRepository.getAnotacionsPerDimensio(dateIni, dateFi, ahirFi)) {
+		for (ExplotFetsAnotacionsDto fet: explotacioFetsRepository.getAnotacionsPerDimensio(dateFi)) {
 			ExplotFetsAmbDimensioDto dim = obtenirDimensio(acumulador, fet.getEntitatId(), fet.getProcedimentId(), fet.getOrganId(), fet.getUsuariCodi());
 			dim.setAnotacionsNovesTotal(fet.getNovesTotal());
-			dim.setAnotacionsNoves(fet.getNoves());
 			dim.setAnotacionsProcessadesTotal(fet.getProcessadesTotal());
-			dim.setAnotacionsProcessades(parcial(fet.getProcessadesTotal(), fet.getProcessadesTotalAhir()));
 			dim.setAnotacionsRebutjadesTotal(fet.getRebutjadesTotal());
-			dim.setAnotacionsRebutjades(parcial(fet.getRebutjadesTotal(), fet.getRebutjadesTotalAhir()));
 		}
 
 		//PINBAL
-		for (ExplotFetsPinbalDto fet: explotacioFetsRepository.getPinbalEnviamentsPerDimensio(dataIni, dataFi)) {
+		for (ExplotFetsPinbalDto fet: explotacioFetsRepository.getPinbalEnviamentsPerDimensio(dataFi)) {
 			ExplotFetsAmbDimensioDto dim = obtenirDimensio(acumulador, fet.getEntitatId(), fet.getProcedimentId(), fet.getOrganId(), fet.getUsuariCodi());
 			dim.setPinbalEnviamentsTotalOk(fet.getOkTotal());
-			dim.setPinbalEnviamentsOk(fet.getOk());
 			dim.setPinbalEnviamentsTotalError(fet.getErrorTotal());
-			dim.setPinbalEnviamentsError(fet.getError());
 		}
 
 		//NOTIFICACIONS
-		for (ExplotFetsNotificacionsDto fet: explotacioFetsRepository.getNotificacionsPerDimensio(dataFi, dataAhirFi)) {
+		for (ExplotFetsNotificacionsDto fet: explotacioFetsRepository.getNotificacionsPerDimensio(dataFi)) {
 			ExplotFetsAmbDimensioDto dim = obtenirDimensio(acumulador, fet.getEntitatId(), fet.getProcedimentId(), fet.getOrganId(), fet.getUsuariCodi());
 			dim.setNotificacionsEnviadesTotal(fet.getEnviadesTotal());
-			dim.setNotificacionsEnviades(parcial(fet.getEnviadesTotal(), fet.getEnviadesTotalAhir()));
 			dim.setNotificacionsPendentsTotal(fet.getPendentsTotal());
-			dim.setNotificacionsPendents(parcial(fet.getPendentsTotal(), fet.getPendentsTotalAhir()));
 			dim.setNotificacionsRegistradesTotal(fet.getRegistradesTotal());
-			dim.setNotificacionsRegistrades(parcial(fet.getRegistradesTotal(), fet.getRegistradesTotalAhir()));
 			dim.setNotificacionsFinalitzadesTotal(fet.getFinalitzadesTotal());
-			dim.setNotificacionsFinalitzades(parcial(fet.getFinalitzadesTotal(), fet.getFinalitzadesTotalAhir()));
 			dim.setNotificacionsProcessadesTotal(fet.getProcessadesTotal());
-			dim.setNotificacionsProcessades(parcial(fet.getProcessadesTotal(), fet.getProcessadesTotalAhir()));
 			dim.setNotificacionsEnvErrorTotal(fet.getEnviadesErrorTotal());
-			dim.setNotificacionsEnvError(parcial(fet.getEnviadesErrorTotal(), fet.getEnviadesErrorTotalAhir()));
 			dim.setNotificacionsFinErrorTotal(fet.getFinalitzadesErrorTotal());
-			dim.setNotificacionsFinError(parcial(fet.getFinalitzadesErrorTotal(), fet.getFinalitzadesErrorTotalAhir()));
 		}
 
 		//PORTAFIRMES
-		for (ExplotFetsPortafirmesDto fet: explotacioFetsRepository.getPortafirmesPerDimensio(dataFi, dataAhirFi)) {
+		for (ExplotFetsPortafirmesDto fet: explotacioFetsRepository.getPortafirmesPerDimensio(dataFi)) {
 			ExplotFetsAmbDimensioDto dim = obtenirDimensio(acumulador, fet.getEntitatId(), fet.getProcedimentId(), fet.getOrganId(), fet.getUsuariCodi());
 			dim.setFirmesEnviadesTotal(fet.getEnviadesTotal());
-			dim.setFirmesEnviades(parcial(fet.getEnviadesTotal(), fet.getEnviadesTotalAhir()));
 			dim.setFirmesIniciadesTotal(fet.getIniciadesTotal());
-			dim.setFirmesIniciades(parcial(fet.getIniciadesTotal(), fet.getIniciadesTotalAhir()));
 			dim.setFirmesPausadesTotal(fet.getPausadesTotal());
-			dim.setFirmesPausades(parcial(fet.getPausadesTotal(), fet.getPausadesTotalAhir()));
 			dim.setFirmesFirmadesTotal(fet.getFirmadesTotal());
-			dim.setFirmesFirmades(parcial(fet.getFirmadesTotal(), fet.getFirmadesTotalAhir()));
 			dim.setFirmesRebutjadesTotal(fet.getRebutjadesTotal());
-			dim.setFirmesRebutjades(parcial(fet.getRebutjadesTotal(), fet.getRebutjadesTotalAhir()));
 			dim.setFirmesParcialsTotal(fet.getParcialsTotal());
-			dim.setFirmesParcials(parcial(fet.getParcialsTotal(), fet.getParcialsTotalAhir()));
 		}
 
 		List<ExplotFetsAmbDimensioDto> dimensions = new ArrayList<ExplotFetsAmbDimensioDto>(acumulador.values());
 		logger.debug("Generacio d'estadistiques diaries: " + dimensions.size() + " dimensions");
-		
+
+		calcularParcialsDiaris(dimensions, dataEstadistiques.minusDays(1));
+
 		for (ExplotFetsAmbDimensioDto dim: dimensions) {
 			//Recuperam la dimensió si ja existís a BBDD
 			ExplotacioDimensioEntity dimensioEntity = explotacioDimensioRepository.findByEntitatIdAndProcedimentIdAndOrganGestorIdAndUsuariCodi(
@@ -995,7 +962,6 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 				}
 			}
 			
-			LocalDate dataEstadistiques = fecha.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 			ExplotacioTempsEntity ete = explotacioTempsRepository.findFirstByData(dataEstadistiques);
 			if (ete==null) {
 				ete = new ExplotacioTempsEntity(dataEstadistiques);
@@ -1035,16 +1001,84 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		return dimensio;
 	}
 
-	//Dada parcial del dia: total d'avui menys el total del dia anterior. El conjunt del dia anterior
-	//sempre es un subconjunt del d'avui (nomes canvia el tall de la data), i per tant la resta mai
-	//es negativa. Equival al que abans feia restarDadaMateixaDimensio amb dues consultes.
-	private Long parcial(Long total, Long totalAhir) {
+	//Calcula les dades diaries de cada dimensio restant a cada indicador acumulat el mateix
+	//indicador de la mateixa dimensio a la foto del dia anterior, que ja esta guardada a
+	//ipa_explot_fet. A diferencia de recalcular el total d'ahir amb l'estat d'avui, aixi es
+	//comptabilitzen els canvis d'estat de files creades dies abans, i la suma de les dades
+	//diaries d'un periode coincideix amb la variacio de l'acumulat.
+	//Si no hi ha foto del dia anterior no es pot calcular cap variacio i totes les dades diaries
+	//queden a zero (els camps es queden a null i updateFromDto els guarda com a 0).
+	private void calcularParcialsDiaris(List<ExplotFetsAmbDimensioDto> dimensions, LocalDate dataAhir) {
+
+		ExplotacioTempsEntity tempsAhir = explotacioTempsRepository.findFirstByData(dataAhir);
+		if (tempsAhir == null) {
+			logger.debug("Generacio d'estadistiques diaries: sense dades del dia " + dataAhir + ", les dades diaries queden a zero");
+			return;
+		}
+
+		Map<ExplotFetsAmbDimensioDto.DimensioKey, ExplotacioFetsEntity> fetsAhir = new HashMap<ExplotFetsAmbDimensioDto.DimensioKey, ExplotacioFetsEntity>();
+		for (Object[] fila: explotacioFetsRepository.findFetsAmbClauDimensioByTemps(tempsAhir)) {
+			ExplotFetsAmbDimensioDto.DimensioKey clau = new ExplotFetsAmbDimensioDto.DimensioKey(
+					(Long)fila[0],
+					(Long)fila[1],
+					(Long)fila[2],
+					(String)fila[3]);
+			fetsAhir.put(clau, (ExplotacioFetsEntity)fila[4]);
+		}
+
+		for (ExplotFetsAmbDimensioDto dim: dimensions) {
+			//Si ahir no hi havia fila per aquesta dimensio es que encara no existia: els seus
+			//acumulats d'ahir eren zero i tot el que s'ha comptat avui es activitat del dia.
+			ExplotacioFetsEntity ahir = fetsAhir.get(dim.getDimensioKey());
+
+			dim.setExpedientsCreats(variacioDiaria(dim.getExpedientsCreatsTotal(), ahir!=null?ahir.getExpedientsCreatsTotal():null));
+			dim.setExpedientsTancats(variacioDiaria(dim.getExpedientsTancatsTotal(), ahir!=null?ahir.getExpedientsTancatsTotal():null));
+
+			dim.setTasquesPendents(variacioDiaria(dim.getTasquesPendentsTotal(), ahir!=null?ahir.getTasquesPendentsTotal():null));
+			dim.setTasquesIniciades(variacioDiaria(dim.getTasquesIniciadesTotal(), ahir!=null?ahir.getTasquesIniciadesTotal():null));
+			dim.setTasquesFinalitzadesDinsTermini(variacioDiaria(dim.getTasquesFinalitzadesTotalDinsTermini(), ahir!=null?ahir.getTasquesFinalitzadesTotalDinsTermini():null));
+			dim.setTasquesFinalitzadesForaTermini(variacioDiaria(dim.getTasquesFinalitzadesTotalForaTermini(), ahir!=null?ahir.getTasquesFinalitzadesTotalForaTermini():null));
+			dim.setTasquesCancelades(variacioDiaria(dim.getTasquesCanceladesTotal(), ahir!=null?ahir.getTasquesCanceladesTotal():null));
+			dim.setTasquesRebutjades(variacioDiaria(dim.getTasquesRebutjadesTotal(), ahir!=null?ahir.getTasquesRebutjadesTotal():null));
+			dim.setTasquesAgafades(variacioDiaria(dim.getTasquesAgafadesTotal(), ahir!=null?ahir.getTasquesAgafadesTotal():null));
+			dim.setTasquesCreades(variacioDiaria(dim.getTasquesCreadesTotal(), ahir!=null?ahir.getTasquesCreadesTotal():null));
+			dim.setTasquesNoFinalitzadesForaTermini(variacioDiaria(dim.getTasquesNoFinalitzadesForaTerminiTotal(), ahir!=null?ahir.getTasquesNoFinalitzadesForaTerminiTotal():null));
+
+			dim.setAnotacionsNoves(variacioDiaria(dim.getAnotacionsNovesTotal(), ahir!=null?ahir.getAnotacionsNovesTotal():null));
+			dim.setAnotacionsProcessades(variacioDiaria(dim.getAnotacionsProcessadesTotal(), ahir!=null?ahir.getAnotacionsProcessadesTotal():null));
+			dim.setAnotacionsRebutjades(variacioDiaria(dim.getAnotacionsRebutjadesTotal(), ahir!=null?ahir.getAnotacionsRebutjadesTotal():null));
+
+			dim.setPinbalEnviamentsOk(variacioDiaria(dim.getPinbalEnviamentsTotalOk(), ahir!=null?ahir.getPinbalEnviamentsTotalOk():null));
+			dim.setPinbalEnviamentsError(variacioDiaria(dim.getPinbalEnviamentsTotalError(), ahir!=null?ahir.getPinbalEnviamentsTotalError():null));
+
+			dim.setNotificacionsEnviades(variacioDiaria(dim.getNotificacionsEnviadesTotal(), ahir!=null?ahir.getNotificacionsEnviadesTotal():null));
+			dim.setNotificacionsPendents(variacioDiaria(dim.getNotificacionsPendentsTotal(), ahir!=null?ahir.getNotificacionsPendentsTotal():null));
+			dim.setNotificacionsRegistrades(variacioDiaria(dim.getNotificacionsRegistradesTotal(), ahir!=null?ahir.getNotificacionsRegistradesTotal():null));
+			dim.setNotificacionsFinalitzades(variacioDiaria(dim.getNotificacionsFinalitzadesTotal(), ahir!=null?ahir.getNotificacionsFinalitzadesTotal():null));
+			dim.setNotificacionsProcessades(variacioDiaria(dim.getNotificacionsProcessadesTotal(), ahir!=null?ahir.getNotificacionsProcessadesTotal():null));
+			dim.setNotificacionsEnvError(variacioDiaria(dim.getNotificacionsEnvErrorTotal(), ahir!=null?ahir.getNotificacionsEnvErrorTotal():null));
+			dim.setNotificacionsFinError(variacioDiaria(dim.getNotificacionsFinErrorTotal(), ahir!=null?ahir.getNotificacionsFinErrorTotal():null));
+
+			dim.setFirmesEnviades(variacioDiaria(dim.getFirmesEnviadesTotal(), ahir!=null?ahir.getFirmesEnviadesTotal():null));
+			dim.setFirmesIniciades(variacioDiaria(dim.getFirmesIniciadesTotal(), ahir!=null?ahir.getFirmesIniciadesTotal():null));
+			dim.setFirmesPausades(variacioDiaria(dim.getFirmesPausadesTotal(), ahir!=null?ahir.getFirmesPausadesTotal():null));
+			dim.setFirmesFirmades(variacioDiaria(dim.getFirmesFirmadesTotal(), ahir!=null?ahir.getFirmesFirmadesTotal():null));
+			dim.setFirmesRebutjades(variacioDiaria(dim.getFirmesRebutjadesTotal(), ahir!=null?ahir.getFirmesRebutjadesTotal():null));
+			dim.setFirmesParcials(variacioDiaria(dim.getFirmesParcialsTotal(), ahir!=null?ahir.getFirmesParcialsTotal():null));
+		}
+	}
+
+	//Variacio d'un indicador acumulat respecte del dia anterior. Es limita a zero perque un
+	//acumulat pot baixar (per exemple si s'esborra un expedient) i una dada diaria negativa no
+	//tindria sentit al quadre de comandament.
+	private Long variacioDiaria(Long total, Long totalAhir) {
 		if (total == null) {
 			return null;
 		}
-		return totalAhir == null ? total : Long.valueOf(total.longValue() - totalAhir.longValue());
+		long variacio = total.longValue() - (totalAhir != null ? totalAhir.longValue() : 0l);
+		return variacio > 0 ? Long.valueOf(variacio) : Long.valueOf(0l);
 	}
-	
+
 	@Override
 	public void restartSchedulledTasks(String taskCodi) {
 		schedulingConfig.restartSchedulledTasks(taskCodi);
