@@ -12,8 +12,8 @@ const CODI_DOC1     = 'DOC_PW_JSP_01';
 const NOM_DOC1      = 'document tipus doc pw 1';
 const CODI_DOC2     = 'DOC_PW_JSP_02';
 // Tot procediment nou es crea amb els tipus de document per defecte
-// NOTIB_JUSTIFICANT_RECEPCIO i REGISTRE_JUSTIFICANT_ENTRADA.
-const NUM_DOCS_DEFECTE = 2;
+// NOTIB_JUSTIFICANT_RECEPCIO, REGISTRE_JUSTIFICANT_ENTRADA i NOTIFICACIO_MULTIPLE.
+const NUM_DOCS_DEFECTE = 3;
 const NOM_DOC1_MOD  = 'doc modificat pw 1';
 const DESC_DOC1_MOD = 'descripció modificada doc 1';
 

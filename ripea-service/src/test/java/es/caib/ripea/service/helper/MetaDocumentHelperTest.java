@@ -731,34 +731,46 @@ class MetaDocumentHelperTest {
     // =========================================================================
 
     @Test
-    void crearMetaDocumentsPerDefecte_procedimentSenseTipusDocument_creaElsDos() {
+    void crearMetaDocumentsPerDefecte_procedimentSenseTipusDocument_elsCreaTots() {
         MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
         when(metaExpedient.getId()).thenReturn(META_EXPEDIENT_ID);
         when(metaDocumentRepository.findByMetaExpedientAndCodi(any(), any())).thenReturn(null);
-        when(metaDocumentRepository.countByMetaExpedient(metaExpedient)).thenReturn(0, 1);
+        when(metaDocumentRepository.countByMetaExpedient(metaExpedient)).thenReturn(0, 1, 2);
         when(metaDocumentRepository.save(any(MetaDocumentEntity.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
         List<MetaDocumentEntity> creats = helper.crearMetaDocumentsPerDefecte(metaExpedient);
 
-        assertThat(creats).hasSize(2);
+        assertThat(creats).hasSize(3);
 
         MetaDocumentEntity justificantRecepcio = creats.get(0);
         assertThat(justificantRecepcio.getCodi()).isEqualTo(MetaDocumentPerDefecteEnumDto.NOTIB_JUSTIFICANT_RECEPCIO.getCodi());
         assertThat(justificantRecepcio.getNom()).isEqualTo("Justificant de recepció de la notificació");
+        assertThat(justificantRecepcio.getDescripcio()).isNull();
         assertThat(justificantRecepcio.getNtiTipoDocumental()).isEqualTo("TD09");
+        assertThat(justificantRecepcio.getNtiEstadoElaboracion()).isEqualTo(DocumentNtiEstadoElaboracionEnumDto.EE01);
         assertThat(justificantRecepcio.getOrdre()).isZero();
 
         MetaDocumentEntity justificantEntrada = creats.get(1);
         assertThat(justificantEntrada.getCodi()).isEqualTo(MetaDocumentPerDefecteEnumDto.REGISTRE_JUSTIFICANT_ENTRADA.getCodi());
         assertThat(justificantEntrada.getNom()).isEqualTo("Justificant de registre");
+        assertThat(justificantEntrada.getDescripcio()).isNull();
         assertThat(justificantEntrada.getNtiTipoDocumental()).isEqualTo("TD11");
+        assertThat(justificantEntrada.getNtiEstadoElaboracion()).isEqualTo(DocumentNtiEstadoElaboracionEnumDto.EE01);
         assertThat(justificantEntrada.getOrdre()).isEqualTo(1);
+
+        MetaDocumentEntity notificacioMultiple = creats.get(2);
+        assertThat(notificacioMultiple.getCodi()).isEqualTo(MetaDocumentPerDefecteEnumDto.NOTIFICACIO_MULTIPLE.getCodi());
+        assertThat(notificacioMultiple.getNom()).isEqualTo("Notificació de múltiples documents");
+        assertThat(notificacioMultiple.getDescripcio())
+                .isEqualTo(MetaDocumentPerDefecteEnumDto.NOTIFICACIO_MULTIPLE.getDescripcio());
+        assertThat(notificacioMultiple.getNtiTipoDocumental()).isEqualTo("TD07");
+        assertThat(notificacioMultiple.getNtiEstadoElaboracion()).isEqualTo(DocumentNtiEstadoElaboracionEnumDto.EE99);
+        assertThat(notificacioMultiple.getOrdre()).isEqualTo(2);
 
         assertThat(creats).allSatisfy(metaDocument -> {
             assertThat(metaDocument.getMultiplicitat()).isEqualTo(MultiplicitatEnumDto.M_0_N);
             assertThat(metaDocument.getNtiOrigen()).isEqualTo(NtiOrigenEnumDto.O1);
-            assertThat(metaDocument.getNtiEstadoElaboracion()).isEqualTo(DocumentNtiEstadoElaboracionEnumDto.EE01);
             assertThat(metaDocument.getMetaDocumentTipusGeneric()).isNull();
             assertThat(metaDocument.getMetaExpedient()).isSameAs(metaExpedient);
         });
@@ -781,8 +793,7 @@ class MetaDocumentHelperTest {
     void crearMetaDocumentsPerDefecte_quanNomesNhiHaUn_creaNomesElQueFalta() {
         MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
         when(metaExpedient.getId()).thenReturn(META_EXPEDIENT_ID);
-        when(metaDocumentRepository.findByMetaExpedientAndCodi(
-                metaExpedient, MetaDocumentPerDefecteEnumDto.NOTIB_JUSTIFICANT_RECEPCIO.getCodi()))
+        when(metaDocumentRepository.findByMetaExpedientAndCodi(any(), any()))
                 .thenReturn(mock(MetaDocumentEntity.class));
         when(metaDocumentRepository.findByMetaExpedientAndCodi(
                 metaExpedient, MetaDocumentPerDefecteEnumDto.REGISTRE_JUSTIFICANT_ENTRADA.getCodi()))

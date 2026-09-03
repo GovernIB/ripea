@@ -20,8 +20,8 @@ import es.caib.ripea.persistence.entity.ContingutEntity;
 import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
-import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.FluxFirmaUsuariEntity;
+import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentFluxPortafibEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientTascaValidacioEntity;
@@ -38,7 +38,6 @@ import es.caib.ripea.persistence.repository.MetaExpedientTascaValidacioRepositor
 import es.caib.ripea.persistence.repository.PinbalServeiRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.service.intf.config.BaseConfig;
-import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ItemValidacioTascaEnum;
 import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
@@ -486,9 +485,10 @@ public class MetaDocumentHelper {
 	}
 
 	/**
-	 * Crea els tipus de document que tot procediment ha de tenir per defecte:
-	 * NOTIB_JUSTIFICANT_RECEPCIO i REGISTRE_JUSTIFICANT_ENTRADA, els dos amb
-	 * multiplicitat 0..N, origen administració i estat d'elaboració original.
+	 * Crea els tipus de document que tot procediment ha de tenir per defecte
+	 * ({@link MetaDocumentPerDefecteEnumDto}), tots amb multiplicitat 0..N i origen
+	 * administració; el nom, la descripció, el tipus documental i l'estat d'elaboració
+	 * els aporta cada constant de l'enumerat.
 	 *
 	 * És idempotent: no crea el tipus de document si el procediment ja en té un
 	 * amb el mateix codi.
@@ -528,11 +528,13 @@ public class MetaDocumentHelper {
 						MultiplicitatEnumDto.M_0_N,
 						metaExpedient,
 						NtiOrigenEnumDto.O1,
-						DocumentNtiEstadoElaboracionEnumDto.EE01,
+						metaDocumentPerDefecte.getNtiEstadoElaboracion(),
 						metaDocumentPerDefecte.getNtiTipoDocumental(),
 						false,
 						null,
-						metaDocumentRepository.countByMetaExpedient(metaExpedient)).build());
+						metaDocumentRepository.countByMetaExpedient(metaExpedient))
+						.descripcio(metaDocumentPerDefecte.getDescripcio())
+						.build());
 
 		contingutLogHelper.logProcedimentObjecte(
 				metaExpedient.getId(),

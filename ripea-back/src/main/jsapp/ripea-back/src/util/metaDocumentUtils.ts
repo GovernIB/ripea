@@ -8,6 +8,7 @@
 export const CODIS_METADOC_PER_DEFECTE = [
     'NOTIB_JUSTIFICANT_RECEPCIO',
     'REGISTRE_JUSTIFICANT_ENTRADA',
+    'NOTIFICACIO_MULTIPLE',
 ];
 
 /** Indica si el tipus de document és un dels creats per defecte al procediment. */

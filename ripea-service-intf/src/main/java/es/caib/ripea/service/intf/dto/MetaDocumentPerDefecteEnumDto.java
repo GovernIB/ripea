@@ -14,15 +14,36 @@ package es.caib.ripea.service.intf.dto;
  */
 public enum MetaDocumentPerDefecteEnumDto {
 
-	NOTIB_JUSTIFICANT_RECEPCIO("Justificant de recepció de la notificació", "TD09"),
-	REGISTRE_JUSTIFICANT_ENTRADA("Justificant de registre", "TD11");
+	NOTIB_JUSTIFICANT_RECEPCIO(
+			"Justificant de recepció de la notificació",
+			null,
+			"TD09",
+			DocumentNtiEstadoElaboracionEnumDto.EE01),
+	REGISTRE_JUSTIFICANT_ENTRADA(
+			"Justificant de registre",
+			null,
+			"TD11",
+			DocumentNtiEstadoElaboracionEnumDto.EE01),
+	NOTIFICACIO_MULTIPLE(
+			"Notificació de múltiples documents",
+			"Al seleccionar varis documents de un expedient i notificar-los conjuntament, si son tots PDFs es combinarán en un sol PDF, en cas contrari es generará un zip que contendrá els documents.",
+			"TD07",
+			DocumentNtiEstadoElaboracionEnumDto.EE99);
 
 	private final String nom;
+	private final String descripcio;
 	private final String ntiTipoDocumental;
+	private final DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion;
 
-	MetaDocumentPerDefecteEnumDto(String nom, String ntiTipoDocumental) {
+	MetaDocumentPerDefecteEnumDto(
+			String nom,
+			String descripcio,
+			String ntiTipoDocumental,
+			DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion) {
 		this.nom = nom;
+		this.descripcio = descripcio;
 		this.ntiTipoDocumental = ntiTipoDocumental;
+		this.ntiEstadoElaboracion = ntiEstadoElaboracion;
 	}
 
 	/** El codi del tipus de document coincideix amb el nom de la constant. */
@@ -32,8 +53,15 @@ public enum MetaDocumentPerDefecteEnumDto {
 	public String getNom() {
 		return nom;
 	}
+	/** Descripció del tipus de document; null si no en té cap. */
+	public String getDescripcio() {
+		return descripcio;
+	}
 	public String getNtiTipoDocumental() {
 		return ntiTipoDocumental;
+	}
+	public DocumentNtiEstadoElaboracionEnumDto getNtiEstadoElaboracion() {
+		return ntiEstadoElaboracion;
 	}
 
 	/**
