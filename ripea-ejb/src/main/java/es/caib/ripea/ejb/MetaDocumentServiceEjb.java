@@ -202,6 +202,18 @@ public class MetaDocumentServiceEjb extends AbstractServiceEjb<MetaDocumentServi
 
 	@Override
 	@RolesAllowed("**")
+	public MetaDocumentDto findPerDefecteByMetaExpedient(
+			Long entitatId,
+			Long metaExpedientId,
+			MetaDocumentPerDefecteEnumDto metaDocumentPerDefecte) {
+		return delegateService.findPerDefecteByMetaExpedient(
+				entitatId,
+				metaExpedientId,
+				metaDocumentPerDefecte);
+	}
+
+	@Override
+	@RolesAllowed("**")
 	public List<MetaDocumentDto> findByMetaExpedientAndFirmaPortafirmesActiva(Long entitatId, Long metaExpedientId) {
 		return delegateService.findByMetaExpedientAndFirmaPortafirmesActiva(entitatId, metaExpedientId);
 	}

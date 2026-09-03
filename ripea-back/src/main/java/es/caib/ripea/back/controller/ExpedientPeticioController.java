@@ -432,6 +432,19 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			return "expedientPeticioAccept";
 		}
 		
+		RegistreDto registre = expedientPeticioService.findOne(expedientPeticioId).getRegistre();
+
+		//El justificant de registre s'incorpora amb un tipus de document propi del procediment. Si el
+		//procediment no el té (importat d'un fitxer generat abans que existis, o esborrat per un
+		//administrador d'entitat) es crea ara, abans de muntar la llista de tipus disponibles, perquè
+		//hi aparegui i es pugui proposar igual que a la resta de casos.
+		if (isIncorporacioJustificantActiva() && registre.getJustificant() != null) {
+			metaDocumentService.findPerDefecteByMetaExpedient(
+					entitatActual.getId(),
+					expedientPeticioAcceptarCommand.getMetaExpedientId(),
+					MetaDocumentPerDefecteEnumDto.REGISTRE_JUSTIFICANT_ENTRADA);
+		}
+
 		// find tipus docs disponibles
 		List<MetaDocumentDto> tipusDocsDisponibles = new ArrayList<>();
 		if (expedientPeticioAcceptarCommand.getAccio() == ExpedientPeticioAccioEnumDto.CREAR) {
@@ -442,7 +455,6 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		model.addAttribute("metaDocuments", tipusDocsDisponibles);
 		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_TIPUS_DOCS_DISPONIBLES, tipusDocsDisponibles);
 		
-		RegistreDto registre = expedientPeticioService.findOne(expedientPeticioId).getRegistre();
 		// set annexos
 		expedientPeticioAcceptarCommand.setAnnexos(ConversioTipusHelper.convertirList(registre.getAnnexos(), RegistreAnnexCommand.class));
 		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_COMMAND, expedientPeticioAcceptarCommand);

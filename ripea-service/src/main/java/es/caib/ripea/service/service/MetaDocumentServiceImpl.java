@@ -383,7 +383,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
+	@Transactional
 	public MetaDocumentDto findPerDefecteByContingut(
 			Long entitatId,
 			Long contingutId,
@@ -404,15 +404,34 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 			throw new NotFoundException(contingutId, ExpedientEntity.class);
 		}
 
-		MetaDocumentEntity metaDocument = metaDocumentHelper.findByCodiAndProcediment(
+		MetaDocumentEntity metaDocument = metaDocumentHelper.getOrCreateMetaDocumentPerDefecte(
 				expedient.getMetaExpedient(),
-				metaDocumentPerDefecte.getCodi());
-		if (metaDocument == null) {
-			throw new NotFoundException(metaDocumentPerDefecte.getCodi(), MetaDocumentEntity.class);
-		}
+				metaDocumentPerDefecte);
 
 		return conversioTipusHelper.convertir(
 				metaDocument,
+				MetaDocumentDto.class);
+	}
+
+	@Override
+	@Transactional
+	public MetaDocumentDto findPerDefecteByMetaExpedient(
+			Long entitatId,
+			Long metaExpedientId,
+			MetaDocumentPerDefecteEnumDto metaDocumentPerDefecte) {
+		logger.debug("Consulta del tipus de document per defecte del procediment (" +
+				"entitatId=" + entitatId + ", " +
+				"metaExpedientId=" + metaExpedientId + ", " +
+				"metaDocumentPerDefecte=" + metaDocumentPerDefecte + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false, false, false);
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
+
+		return conversioTipusHelper.convertir(
+				metaDocumentHelper.getOrCreateMetaDocumentPerDefecte(metaExpedient, metaDocumentPerDefecte),
 				MetaDocumentDto.class);
 	}
 

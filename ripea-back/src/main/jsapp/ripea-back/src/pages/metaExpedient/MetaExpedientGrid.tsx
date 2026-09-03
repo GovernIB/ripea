@@ -50,8 +50,8 @@ export const MetaExpedientForm = ({ isAdmin }: any) => {
         <Grid container direction={'row'} columnSpacing={1} rowSpacing={1} sx={{ pt: 1 }}>
             <GridFormField name="tipusProcedimentServei" required size={5} />
             <GridFormField name="codi" size={7} />
-            <GridFormField name="tipusClassificacio" size={2} required />
-            <GridFormField name="classificacio" size={10} debounce disabled={data?.tipusClassificacio == 'ID'} />
+            <GridFormField name="tipusClassificacio" size={3} required />
+            <GridFormField name="classificacio" size={9} debounce disabled={data?.tipusClassificacio == 'ID'} />
             <Grid size={12} hidden={data?.msgSiaRolsac == null}>
                 <Alert severity={'warning'} sx={{ mt: 0.5 }}>
                     {data.msgSiaRolsac}

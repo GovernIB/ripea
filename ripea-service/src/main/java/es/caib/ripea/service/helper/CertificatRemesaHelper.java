@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import es.caib.ripea.persistence.repository.DocumentRepository;
-import es.caib.ripea.persistence.repository.MetaDocumentRepository;
 
 import java.util.Date;
 
@@ -19,7 +18,7 @@ public class CertificatRemesaHelper {
     private static final Logger LOGGER = LoggerFactory.getLogger(CertificatRemesaHelper.class);
 
     @Autowired private DocumentRepository documentRepository;
-    @Autowired private MetaDocumentRepository metaDocumentRepository;
+    @Autowired private MetaDocumentHelper metaDocumentHelper;
     @Autowired private DocumentNotificacioHelper documentNotificacioHelper;
     @Autowired private DocumentHelper documentHelper;
     @Autowired private ContingutHelper contingutHelper;
@@ -55,15 +54,9 @@ public class CertificatRemesaHelper {
                 + " ja està incorporat al contingut de l'expedient " + expedient.getId() + ".");
         }
 
-        MetaDocumentEntity metaDocument = metaDocumentRepository
-            .findByMetaExpedientAndCodi(
-                expedient.getMetaExpedient(),
-                MetaDocumentPerDefecteEnumDto.NOTIB_JUSTIFICANT_RECEPCIO.getCodi());
-
-        if (metaDocument == null) {
-            throw new Exception("No s'ha trobat el MetaDocument per defecte NOTIB_JUSTIFICANT_RECEPCIO per al procediment "
-                + expedient.getMetaExpedient().getCodi());
-        }
+        MetaDocumentEntity metaDocument = metaDocumentHelper.getOrCreateMetaDocumentPerDefecte(
+            expedient.getMetaExpedient(),
+            MetaDocumentPerDefecteEnumDto.NOTIB_JUSTIFICANT_RECEPCIO);
 
         byte[] contingutCertificat = documentNotificacioHelper.getCertificacio(interessatEnviament.getId());
         if (contingutCertificat == null || contingutCertificat.length==0) {

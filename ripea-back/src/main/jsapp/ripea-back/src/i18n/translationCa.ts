@@ -1652,7 +1652,7 @@ const translationCa = {
             detail: {
                 title: "Detall de tipus de document",
             },
-            reservat: "Els documents reservats NOTIB_JUSTIFICANT_RECEPCIO, REGISTRE_JUSTIFICANT_ENTRADA i NOTIFICACIO_MULTIPLE només poden ser editats per un administrador.",
+            reservat: "Els documents reservats NOTIB_JUSTIFICANT_RECEPCIO, REGISTRE_JUSTIFICANT_ENTRADA, NOTIFICACIO_MULTIPLE i OTROS només poden ser editats per un administrador.",
             tabs: {
                 dades: "Dades",
                 nti: "Dades NTI",

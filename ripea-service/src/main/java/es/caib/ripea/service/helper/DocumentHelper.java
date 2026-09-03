@@ -87,7 +87,6 @@ import es.caib.ripea.service.intf.dto.TipusImportEnumDto;
 import es.caib.ripea.service.intf.exception.ArxiuJaGuardatException;
 import es.caib.ripea.service.intf.exception.ContingutNotUniqueException;
 import es.caib.ripea.service.intf.exception.DocumentAlreadyImportedException;
-import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.ValidacioFirmaException;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.utils.Utils;
@@ -113,6 +112,7 @@ public class DocumentHelper {
 	@Autowired private DocumentPublicacioRepository documentPublicacioRepository;
 	@Autowired private MessageHelper messageHelper;
 	@Autowired private MetaDocumentRepository metaDocumentRepository;
+	@Autowired private MetaDocumentHelper metaDocumentHelper;
 	
 	public DocumentDto crearDocument(
 			Long entitatId,
@@ -2087,13 +2087,9 @@ public class DocumentHelper {
 			List<Long> documentIds) throws Exception {
 
 		ExpedientEntity expedient = pare.getExpedientPare();
-		String codiMetaDocument = MetaDocumentPerDefecteEnumDto.NOTIFICACIO_MULTIPLE.getCodi();
-		MetaDocumentEntity metaDocument = metaDocumentRepository.findByMetaExpedientAndCodi(
+		MetaDocumentEntity metaDocument = metaDocumentHelper.getOrCreateMetaDocumentPerDefecte(
 				expedient.getMetaExpedient(),
-				codiMetaDocument);
-		if (metaDocument == null) {
-			throw new NotFoundException(codiMetaDocument, MetaDocumentEntity.class);
-		}
+				MetaDocumentPerDefecteEnumDto.NOTIFICACIO_MULTIPLE);
 
 		FitxerDto fitxer = isConcatenacioPdfsPermesa(documentIds)
 				? concatenarDocumentsPdf(entitatId, documentIds)

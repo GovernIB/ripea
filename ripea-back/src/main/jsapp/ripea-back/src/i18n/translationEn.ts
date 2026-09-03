@@ -1651,7 +1651,7 @@ const translationEn = {
             detail: {
                 title: "Document type details",
             },
-            reservat: "The reserved document types NOTIB_JUSTIFICANT_RECEPCIO, REGISTRE_JUSTIFICANT_ENTRADA and NOTIFICACIO_MULTIPLE can only be edited by an administrator.",
+            reservat: "The reserved document types NOTIB_JUSTIFICANT_RECEPCIO, REGISTRE_JUSTIFICANT_ENTRADA, NOTIFICACIO_MULTIPLE and OTROS can only be edited by an administrator.",
             tabs: {
                 dades: "Data",
                 nti: "NTI data",

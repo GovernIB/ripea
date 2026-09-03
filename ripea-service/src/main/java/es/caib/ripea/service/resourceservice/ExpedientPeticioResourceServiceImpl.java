@@ -41,7 +41,6 @@ import es.caib.ripea.persistence.entity.resourcerepository.RegistreResourceRepos
 import es.caib.ripea.persistence.repository.ExecucioMassivaContingutRepository;
 import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
-import es.caib.ripea.persistence.repository.MetaDocumentRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
@@ -120,7 +119,6 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 
 	private final OrganGestorRepository organGestorRepository;
 	private final MetaExpedientRepository metaExpedientRepository;
-	private final MetaDocumentRepository metaDocumentRepository;
 	private final ExpedientPeticioRepository expedientPeticioRepository;
 	private final ExpedientRepository expedientRepository;
 	private final RegistreResourceRepository registreResourceRepository;
@@ -631,13 +629,11 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
             if (metaExpedientId == null) {
                 return null;
             }
-            MetaExpedientEntity metaExpedient = metaExpedientRepository.findById(metaExpedientId).orElse(null);
-            if (metaExpedient == null) {
-                return null;
-            }
-            MetaDocumentEntity metaDocument = metaDocumentRepository.findByMetaExpedientAndCodi(
-                    metaExpedient,
-                    MetaDocumentPerDefecteEnumDto.REGISTRE_JUSTIFICANT_ENTRADA.getCodi());
+            //Si el procediment no te el tipus de document propi del justificant es crea ara. Cal fer-ho
+            //en una transaccio a part perque l onChange dels formularis es de nomes lectura.
+            MetaDocumentEntity metaDocument = metaDocumentHelper.getOrCreateMetaDocumentPerDefecteNewTransaction(
+                    metaExpedientId,
+                    MetaDocumentPerDefecteEnumDto.REGISTRE_JUSTIFICANT_ENTRADA);
             return metaDocument != null && metaDocument.isActiu() ? metaDocument.getId() : null;
         }
 

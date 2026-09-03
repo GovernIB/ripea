@@ -735,13 +735,13 @@ class MetaDocumentHelperTest {
         MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
         when(metaExpedient.getId()).thenReturn(META_EXPEDIENT_ID);
         when(metaDocumentRepository.findByMetaExpedientAndCodi(any(), any())).thenReturn(null);
-        when(metaDocumentRepository.countByMetaExpedient(metaExpedient)).thenReturn(0, 1, 2);
+        when(metaDocumentRepository.countByMetaExpedient(metaExpedient)).thenReturn(0, 1, 2, 3);
         when(metaDocumentRepository.save(any(MetaDocumentEntity.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
         List<MetaDocumentEntity> creats = helper.crearMetaDocumentsPerDefecte(metaExpedient);
 
-        assertThat(creats).hasSize(3);
+        assertThat(creats).hasSize(4);
 
         MetaDocumentEntity justificantRecepcio = creats.get(0);
         assertThat(justificantRecepcio.getCodi()).isEqualTo(MetaDocumentPerDefecteEnumDto.NOTIB_JUSTIFICANT_RECEPCIO.getCodi());
@@ -768,11 +768,40 @@ class MetaDocumentHelperTest {
         assertThat(notificacioMultiple.getNtiEstadoElaboracion()).isEqualTo(DocumentNtiEstadoElaboracionEnumDto.EE99);
         assertThat(notificacioMultiple.getOrdre()).isEqualTo(2);
 
+        MetaDocumentEntity otros = creats.get(3);
+        assertThat(otros.getCodi()).isEqualTo(MetaDocumentPerDefecteEnumDto.OTROS.getCodi());
+        assertThat(otros.getNom()).isEqualTo("Otros");
+        assertThat(otros.getDescripcio()).isEqualTo("Altres documents del procediment");
+        assertThat(otros.getNtiTipoDocumental()).isEqualTo("TD99");
+        assertThat(otros.getNtiEstadoElaboracion()).isEqualTo(DocumentNtiEstadoElaboracionEnumDto.EE01);
+        assertThat(otros.getOrdre()).isEqualTo(3);
+
+        // Nomes OTROS queda marcat com a tipus de document per defecte del procediment.
+        assertThat(otros.isPerDefecte()).isTrue();
+        assertThat(justificantRecepcio.isPerDefecte()).isFalse();
+        assertThat(justificantEntrada.isPerDefecte()).isFalse();
+        assertThat(notificacioMultiple.isPerDefecte()).isFalse();
+
         assertThat(creats).allSatisfy(metaDocument -> {
             assertThat(metaDocument.getMultiplicitat()).isEqualTo(MultiplicitatEnumDto.M_0_N);
             assertThat(metaDocument.getNtiOrigen()).isEqualTo(NtiOrigenEnumDto.O1);
             assertThat(metaDocument.getMetaExpedient()).isSameAs(metaExpedient);
         });
+    }
+
+    @Test
+    void crearMetaDocumentsPerDefecte_quanJaHiHaTipusPerDefecte_noElSubstitueix() {
+        MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
+        when(metaExpedient.getId()).thenReturn(META_EXPEDIENT_ID);
+        when(metaDocumentRepository.findByMetaExpedientAndCodi(any(), any())).thenReturn(null);
+        when(metaDocumentRepository.findByMetaExpedientAndPerDefecteTrue(metaExpedient))
+                .thenReturn(mock(MetaDocumentEntity.class));
+        when(metaDocumentRepository.save(any(MetaDocumentEntity.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        List<MetaDocumentEntity> creats = helper.crearMetaDocumentsPerDefecte(metaExpedient);
+
+        assertThat(creats).allSatisfy(metaDocument -> assertThat(metaDocument.isPerDefecte()).isFalse());
     }
 
     @Test
@@ -806,6 +835,45 @@ class MetaDocumentHelperTest {
         assertThat(creats).hasSize(1);
         assertThat(creats.get(0).getCodi()).isEqualTo(MetaDocumentPerDefecteEnumDto.REGISTRE_JUSTIFICANT_ENTRADA.getCodi());
         assertThat(creats.get(0).getOrdre()).isEqualTo(3);
+        verify(metaDocumentRepository).save(any(MetaDocumentEntity.class));
+    }
+
+    // =========================================================================
+    // getOrCreateMetaDocumentPerDefecte
+    // =========================================================================
+
+    @Test
+    void getOrCreateMetaDocumentPerDefecte_quanElProcedimentJaElTe_elRetornaSenseCrearlo() {
+        MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
+        MetaDocumentEntity existent = mock(MetaDocumentEntity.class);
+        when(metaDocumentRepository.findByMetaExpedientAndCodi(
+                metaExpedient, MetaDocumentPerDefecteEnumDto.NOTIB_JUSTIFICANT_RECEPCIO.getCodi()))
+                .thenReturn(existent);
+
+        MetaDocumentEntity resultat = helper.getOrCreateMetaDocumentPerDefecte(
+                metaExpedient, MetaDocumentPerDefecteEnumDto.NOTIB_JUSTIFICANT_RECEPCIO);
+
+        assertThat(resultat).isSameAs(existent);
+        verify(metaDocumentRepository, never()).save(any(MetaDocumentEntity.class));
+    }
+
+    @Test
+    void getOrCreateMetaDocumentPerDefecte_quanNoHiEs_elCrea() {
+        MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
+        when(metaExpedient.getId()).thenReturn(META_EXPEDIENT_ID);
+        when(metaDocumentRepository.findByMetaExpedientAndCodi(any(), any())).thenReturn(null);
+        when(metaDocumentRepository.countByMetaExpedient(metaExpedient)).thenReturn(5);
+        when(metaDocumentRepository.save(any(MetaDocumentEntity.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        MetaDocumentEntity resultat = helper.getOrCreateMetaDocumentPerDefecte(
+                metaExpedient, MetaDocumentPerDefecteEnumDto.REGISTRE_JUSTIFICANT_ENTRADA);
+
+        assertThat(resultat).isNotNull();
+        assertThat(resultat.getCodi()).isEqualTo(MetaDocumentPerDefecteEnumDto.REGISTRE_JUSTIFICANT_ENTRADA.getCodi());
+        assertThat(resultat.getNtiTipoDocumental()).isEqualTo("TD11");
+        assertThat(resultat.getMetaExpedient()).isSameAs(metaExpedient);
+        assertThat(resultat.getOrdre()).isEqualTo(5);
         verify(metaDocumentRepository).save(any(MetaDocumentEntity.class));
     }
 

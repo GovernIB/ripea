@@ -488,7 +488,8 @@ public class MetaDocumentHelper {
 	 * Crea els tipus de document que tot procediment ha de tenir per defecte
 	 * ({@link MetaDocumentPerDefecteEnumDto}), tots amb multiplicitat 0..N i origen
 	 * administració; el nom, la descripció, el tipus documental i l'estat d'elaboració
-	 * els aporta cada constant de l'enumerat.
+	 * els aporta cada constant de l'enumerat, que també indica quin d'ells queda marcat com
+	 * a tipus de document per defecte del procediment.
 	 *
 	 * És idempotent: no crea el tipus de document si el procediment ja en té un
 	 * amb el mateix codi.
@@ -508,6 +509,56 @@ public class MetaDocumentHelper {
 		}
 
 		return metaDocumentsCreats;
+	}
+
+	/**
+	 * Obte el tipus de document per defecte indicat dins el procediment i, si no hi es, el crea.
+	 *
+	 * Tot procediment els te des de l'alta, pero es poden haver perdut: un procediment importat
+	 * d'un fitxer generat abans que existissin no els porta, i un administrador d'entitat els pot
+	 * esborrar. Els processos que necessiten un d'aquests tipus per classificar un document no
+	 * poden quedar bloquejats per aixo, aixi que l'obtenen sempre per aqui.
+	 *
+	 * @param metaExpedient procediment del qual es vol el tipus de document.
+	 * @param metaDocumentPerDefecte tipus de document per defecte que es necessita.
+	 * @return el tipus de document del procediment, acabat de crear si no hi era.
+	 */
+	public MetaDocumentEntity getOrCreateMetaDocumentPerDefecte(
+			MetaExpedientEntity metaExpedient,
+			MetaDocumentPerDefecteEnumDto metaDocumentPerDefecte) {
+
+		MetaDocumentEntity metaDocument = findByCodiAndProcediment(metaExpedient, metaDocumentPerDefecte.getCodi());
+		if (metaDocument == null) {
+			logger.info("El procediment no te el tipus de document per defecte i es crea ("
+					+ "metaExpedientId=" + metaExpedient.getId() + ", "
+					+ "codi=" + metaDocumentPerDefecte.getCodi() + ")");
+			metaDocument = crearMetaDocumentPerDefecte(metaExpedient, metaDocumentPerDefecte);
+		}
+		return metaDocument;
+	}
+
+	/**
+	 * Igual que {@link #getOrCreateMetaDocumentPerDefecte(MetaExpedientEntity, MetaDocumentPerDefecteEnumDto)}
+	 * pero en una transaccio propia, per a qui treballa en una transaccio de nomes lectura: l'onChange
+	 * dels formularis REACT es @Transactional(readOnly = true) i alli la creacio no s'arribaria a
+	 * escriure mai a la base de dades (Spring hi deixa el flush en manual).
+	 *
+	 * L'entitat que retorna queda despresa quan la transaccio nova acaba, aixi que nomes se n'han de
+	 * llegir camps simples (id, codi, actiu), mai relacions.
+	 *
+	 * @return el tipus de document del procediment, o null si el procediment no existeix.
+	 */
+	@org.springframework.transaction.annotation.Transactional(
+			propagation = org.springframework.transaction.annotation.Propagation.REQUIRES_NEW)
+	public MetaDocumentEntity getOrCreateMetaDocumentPerDefecteNewTransaction(
+			Long metaExpedientId,
+			MetaDocumentPerDefecteEnumDto metaDocumentPerDefecte) {
+
+		MetaExpedientEntity metaExpedient = metaExpedientRepository.findById(metaExpedientId).orElse(null);
+		if (metaExpedient == null) {
+			return null;
+		}
+		return getOrCreateMetaDocumentPerDefecte(metaExpedient, metaDocumentPerDefecte);
 	}
 
 	private MetaDocumentEntity crearMetaDocumentPerDefecte(
@@ -535,6 +586,13 @@ public class MetaDocumentHelper {
 						metaDocumentRepository.countByMetaExpedient(metaExpedient))
 						.descripcio(metaDocumentPerDefecte.getDescripcio())
 						.build());
+
+		// El tipus per defecte del procediment nomes es marca si encara no n'hi ha cap: aixi no
+		// se'n poden acabar tenint dos si el procediment ja en tenia un de marcat.
+		if (metaDocumentPerDefecte.isPerDefecte()
+				&& metaDocumentRepository.findByMetaExpedientAndPerDefecteTrue(metaExpedient) == null) {
+			metaDocument.updatePerDefecte(true);
+		}
 
 		contingutLogHelper.logProcedimentObjecte(
 				metaExpedient.getId(),

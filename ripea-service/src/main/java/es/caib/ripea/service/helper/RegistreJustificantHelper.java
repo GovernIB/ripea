@@ -10,7 +10,6 @@ import es.caib.ripea.persistence.entity.ExpedientPeticioEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
-import es.caib.ripea.persistence.repository.MetaDocumentRepository;
 import es.caib.ripea.service.intf.dto.MetaDocumentPerDefecteEnumDto;
 import es.caib.ripea.service.intf.utils.RegistreJustificantUtils;
 
@@ -22,7 +21,7 @@ public class RegistreJustificantHelper {
 
     @Autowired private ExpedientPeticioRepository expedientPeticioRepository;
     @Autowired private DocumentRepository documentRepository;
-    @Autowired private MetaDocumentRepository metaDocumentRepository;
+    @Autowired private MetaDocumentHelper metaDocumentHelper;
     @Autowired private ExpedientHelper expedientHelper;
 
     /**
@@ -69,14 +68,9 @@ public class RegistreJustificantHelper {
                 + " ja està incorporat al contingut de l'expedient " + expedient.getId() + ".");
         }
 
-        MetaDocumentEntity metaDocument = metaDocumentRepository.findByMetaExpedientAndCodi(
+        MetaDocumentEntity metaDocument = metaDocumentHelper.getOrCreateMetaDocumentPerDefecte(
             expedient.getMetaExpedient(),
-            MetaDocumentPerDefecteEnumDto.REGISTRE_JUSTIFICANT_ENTRADA.getCodi());
-
-        if (metaDocument == null) {
-            throw new Exception("No s'ha trobat el MetaDocument per defecte REGISTRE_JUSTIFICANT_ENTRADA per al procediment "
-                + expedient.getMetaExpedient().getCodi());
-        }
+            MetaDocumentPerDefecteEnumDto.REGISTRE_JUSTIFICANT_ENTRADA);
 
         expedientHelper.crearDocFromJustificantRegistreUuid(
             expedient.getId(),

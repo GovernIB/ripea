@@ -26,8 +26,8 @@ const CODI_DOC1      = 'DOC_PW_REACT_01';
 const NOM_DOC1       = 'document tipus doc pw react 1';
 const CODI_DOC2      = 'DOC_PW_REACT_02';
 // Tot procediment nou es crea amb els tipus de document per defecte
-// NOTIB_JUSTIFICANT_RECEPCIO, REGISTRE_JUSTIFICANT_ENTRADA i NOTIFICACIO_MULTIPLE.
-const NUM_DOCS_DEFECTE = 3;
+// NOTIB_JUSTIFICANT_RECEPCIO, REGISTRE_JUSTIFICANT_ENTRADA, NOTIFICACIO_MULTIPLE i OTROS.
+const NUM_DOCS_DEFECTE = 4;
 const NOM_DOC1_MOD   = 'doc modificat pw react 1';
 const DESC_DOC1_MOD  = 'descripció modificada doc 1 react';
 

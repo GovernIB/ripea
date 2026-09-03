@@ -301,15 +301,35 @@ public interface MetaDocumentService {
 	 *            Id del contingut: l'expedient mateix o qualsevol contingut de dins seu.
 	 * @param metaDocumentPerDefecte
 	 *            El tipus de document per defecte que es vol recuperar.
-	 * @return El tipus de document per defecte del procediment de l'expedient.
+	 * @return El tipus de document per defecte del procediment de l'expedient, acabat de crear
+	 *         si el procediment no el tenia.
 	 * @throws NotFoundException
-	 *             Si el contingut no penja de cap expedient o si el procediment no té
-	 *             el tipus de document indicat.
+	 *             Si el contingut no penja de cap expedient.
 	 */
 	@PreAuthorize("isAuthenticated()")
 	MetaDocumentDto findPerDefecteByContingut(
 			Long entitatId,
 			Long contingutId,
+			MetaDocumentPerDefecteEnumDto metaDocumentPerDefecte);
+
+	/**
+	 * Consulta un dels tipus de document que tot procediment té per defecte
+	 * ({@link MetaDocumentPerDefecteEnumDto}) i, si el procediment no el té, el crea.
+	 *
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param metaExpedientId
+	 *            Id del procediment.
+	 * @param metaDocumentPerDefecte
+	 *            El tipus de document per defecte que es vol recuperar.
+	 * @return El tipus de document per defecte del procediment, acabat de crear si no el tenia.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'entitat o el procediment.
+	 */
+	@PreAuthorize("isAuthenticated()")
+	MetaDocumentDto findPerDefecteByMetaExpedient(
+			Long entitatId,
+			Long metaExpedientId,
 			MetaDocumentPerDefecteEnumDto metaDocumentPerDefecte);
 
 	/**

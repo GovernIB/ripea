@@ -295,6 +295,7 @@ public class PluginHelper {
 	@Autowired private EventHelper eventHelper;
 	@Autowired private ContingutLogHelper contingutLogHelper;
 	@Autowired private MetaDocumentRepository metaDocumentRepository;
+	@Autowired private MetaDocumentHelper metaDocumentHelper;
 	@Autowired private EmailHelper emailHelper;
 	@Autowired private ContingutHelper contingutHelper;
 	@Autowired private DocumentNotificacioHelper documentNotificacioHelper;
@@ -5557,9 +5558,9 @@ public class PluginHelper {
 				
 				if (!certificacioJaGuardat) {
 					
-					MetaDocumentEntity metaDocument = metaDocumentRepository.findByMetaExpedientAndCodi(
+					MetaDocumentEntity metaDocument = metaDocumentHelper.getOrCreateMetaDocumentPerDefecte(
 							notificacio.getExpedient().getMetaExpedient(),
-							MetaDocumentPerDefecteEnumDto.NOTIB_JUSTIFICANT_RECEPCIO.getCodi());
+							MetaDocumentPerDefecteEnumDto.NOTIB_JUSTIFICANT_RECEPCIO);
 
 					DocumentDto document = contingutHelper.generarDocumentDto(
 							documentEnviamentInteressatEntity,
