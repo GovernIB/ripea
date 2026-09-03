@@ -24,7 +24,7 @@ import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
-import es.caib.ripea.service.intf.dto.MetaDocumentTipusGenericEnumDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentPerDefecteEnumDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
 import es.caib.ripea.service.intf.dto.PinbalServeiDto;
@@ -256,29 +256,6 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 	
 	@Transactional(readOnly = true)
 	@Override
-	public PaginaDto<MetaDocumentDto> findWithoutMetaExpedient(
-			Long entitatId,
-			PaginacioParamsDto paginacioParams) {
-		logger.debug("Consulta dels meta-documents sense meta-expedient (" +
-				"entitatId=" + entitatId + ", " +
-				"paginacioParams=" + paginacioParams + ")");
-
-		PaginaDto<MetaDocumentDto> resposta;
-			resposta = paginacioHelper.toPaginaDto(
-					metaDocumentRepository.findWithoutMetaExpedient(
-							paginacioParams.getFiltre() == null,
-							paginacioParams.getFiltre() != null ? paginacioParams.getFiltre() : "",
-							paginacioHelper.toSpringDataSort(paginacioParams)),
-					MetaDocumentDto.class);
-		metaNodeHelper.omplirMetaDadesPerMetaNodes(resposta.getContingut());
-		metaNodeHelper.omplirPermisosPerMetaNodes(
-				resposta.getContingut(),
-				true);
-		return resposta;
-	}
-	
-	@Transactional(readOnly = true)
-	@Override
 	public List<MetaDocumentDto> findByMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId) {
@@ -406,36 +383,37 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 	}
 
 	@Override
-	@Transactional
-	public MetaDocumentDto findByTipusGeneric(
-			Long entitatId, 
-			MetaDocumentTipusGenericEnumDto tipusGeneric) {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+	@Transactional(readOnly = true)
+	public MetaDocumentDto findPerDefecteByContingut(
+			Long entitatId,
+			Long contingutId,
+			MetaDocumentPerDefecteEnumDto metaDocumentPerDefecte) {
+		logger.debug("Consulta del tipus de document per defecte del procediment (" +
+				"entitatId=" + entitatId + ", " +
+				"contingutId=" + contingutId + ", " +
+				"metaDocumentPerDefecte=" + metaDocumentPerDefecte + ")");
+		entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				true,
 				false,
 				false, false, false);
-		
-		MetaDocumentEntity metaDocumentEntity = metaDocumentRepository.findByEntitatAndTipusGeneric(
-				false,
-				entitat,
-				tipusGeneric);
-		
-		if (metaDocumentEntity != null) {
-			return conversioTipusHelper.convertir(
-					metaDocumentEntity, 
-					MetaDocumentDto.class);
-		} else {
-			logger.error(
-					"Error a l'hora de recuperar el metaDocument (" +
-					"entitatId=" + entitat.getId() + 
-					"metaDocumentTipus=" + tipusGeneric+ ")");
-			throw new RuntimeException(
-					"Error a l'hora de recuperar el metaDocument (" +
-							"entitatId=" + entitat.getId() + 
-							"metaDocumentTipus=" + tipusGeneric+ ")");
+
+		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(contingutId);
+		ExpedientEntity expedient = contingut.getExpedientPare();
+		if (expedient == null) {
+			throw new NotFoundException(contingutId, ExpedientEntity.class);
 		}
-		
+
+		MetaDocumentEntity metaDocument = metaDocumentHelper.findByCodiAndProcediment(
+				expedient.getMetaExpedient(),
+				metaDocumentPerDefecte.getCodi());
+		if (metaDocument == null) {
+			throw new NotFoundException(metaDocumentPerDefecte.getCodi(), MetaDocumentEntity.class);
+		}
+
+		return conversioTipusHelper.convertir(
+				metaDocument,
+				MetaDocumentDto.class);
 	}
 
 	@Transactional(readOnly = true)

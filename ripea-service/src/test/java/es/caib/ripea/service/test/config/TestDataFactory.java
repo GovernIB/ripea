@@ -145,7 +145,6 @@ public class TestDataFactory {
                     "SERIE_0" + i,
                     "SIA00" + i,
                     false,   // notificacioActiva
-                    false,   // permetMetadocsGenerals
                     data.entitat,
                     null,    // pare
                     null,    // organGestor
@@ -240,7 +239,7 @@ public class TestDataFactory {
         MetaExpedientEntity metaExp4 = MetaExpedientEntity.getBuilder(
                 "PROC_04", "Procediment 4", "Descripció del procediment 4",
                 "SERIE_04", "SIA004",
-                false, false, data.entitat, null, null, false, false, false
+                false, data.entitat, null, null, false, false, false
         ).tipusClassificacio(TipusClassificacioEnumDto.SIA)
          .tipusProcedimentServei(TipusProcedimentServeiEnum.SERVEI)
          .build();
@@ -251,7 +250,7 @@ public class TestDataFactory {
         MetaExpedientEntity metaExp5 = MetaExpedientEntity.getBuilder(
                 "PROC_05", "Procediment 5", "Descripció del procediment 5",
                 "SERIE_05", "SIA005",
-                false, false, data.entitat, null, null, false, false, false
+                false, data.entitat, null, null, false, false, false
         ).tipusClassificacio(TipusClassificacioEnumDto.SIA).build();
         metaExp5.setGrupPerDefecte(data.grup);
         metaExp5.updateActiu(false);
@@ -261,7 +260,7 @@ public class TestDataFactory {
         MetaExpedientEntity metaExp6 = MetaExpedientEntity.getBuilder(
                 "PROC_06", "Procediment 6", "Descripció del procediment 6",
                 "SERIE_06", "SIA006",
-                false, false, data.entitat, null, data.organs.get(0), false, false, false
+                false, data.entitat, null, data.organs.get(0), false, false, false
         ).tipusClassificacio(TipusClassificacioEnumDto.SIA).build();
         metaExp6.setGrupPerDefecte(data.grup);
         data.metaExpedients.add(metaExpedientRepository.save(metaExp6));
@@ -270,7 +269,7 @@ public class TestDataFactory {
         MetaExpedientEntity metaExp7 = MetaExpedientEntity.getBuilder(
                 "PROC_07", "Procediment 7", "Descripció del procediment 7",
                 "SERIE_07", "SIA007",
-                false, false, data.entitat, null, data.organs.get(1), false, false, false
+                false, data.entitat, null, data.organs.get(1), false, false, false
         ).tipusClassificacio(TipusClassificacioEnumDto.SIA).build();
         metaExp7.setGrupPerDefecte(data.grup);
         data.metaExpedients.add(metaExpedientRepository.save(metaExp7));
@@ -290,7 +289,7 @@ public class TestDataFactory {
         MetaExpedientEntity metaExp8 = MetaExpedientEntity.getBuilder(
                 "PROC_08", "Procediment 8", "Descripció del procediment 8",
                 "SERIE_08", "SIA008",
-                false, false, data.entitat2, null, null, false, false, false
+                false, data.entitat2, null, null, false, false, false
         ).tipusClassificacio(TipusClassificacioEnumDto.SIA).build();
         data.metaExpedients.add(metaExpedientRepository.save(metaExp8));
 

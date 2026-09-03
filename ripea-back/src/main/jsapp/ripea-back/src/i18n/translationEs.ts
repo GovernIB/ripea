@@ -2041,7 +2041,6 @@ const translationEs = {
                 pendents: "Expedientes pendientes de distribución",
                 comunicades: "Anotaciones comunicadas",
 
-                documents: "Tipos de documentos",
                 documentDada: "Metadatos del tipo de documento: {{nom}}",
                 nti: "Tipos documentales NTI",
                 dominis: "Dominios",

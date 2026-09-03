@@ -3,7 +3,6 @@ package es.caib.ripea.persistence.repository;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
-import es.caib.ripea.service.intf.dto.MetaDocumentTipusGenericEnumDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -73,38 +72,12 @@ public interface MetaDocumentRepository extends JpaRepository<MetaDocumentEntity
 			@Param("filtre") String filtre,	
 			Sort sort);
 	
-	@Query(	"from " +
-			"    MetaDocumentEntity md " +
-			"where " +
-			"    md.metaExpedient is null " +
-			"and (:esNullFiltre = true or lower(md.codi) like lower('%'||:filtre||'%') or lower(md.nom) like lower('%'||:filtre||'%')) ")
-	List<MetaDocumentEntity> findWithoutMetaExpedient(
-			@Param("esNullFiltre") boolean esNullFiltre,
-			@Param("filtre") String filtre,	
-			Sort sort);
-
-	@Query(	"from " +
-			"    MetaDocumentEntity md " +
-			"where " +
-			"    md.metaExpedient is null ")
-	List<MetaDocumentEntity> findWithoutMetaExpedient();
-	
 	List<MetaDocumentEntity> findByMetaExpedientIdIn(
 			List<Long> metaExpedientIds);
 
 	List<MetaDocumentEntity> findByEntitat(
 			EntitatEntity entitat);
 
-	@Query(	"from " +
-			"    MetaDocumentEntity md " +
-			"where " +
-			"   (:esNullEntitat = true or md.entitat = :entitat) " +
-			"and md.metaDocumentTipusGeneric = :metaDocumentTipusGeneric")
-	MetaDocumentEntity findByEntitatAndTipusGeneric(
-			@Param("esNullEntitat") boolean esNullEntitat,
-			@Param("entitat") EntitatEntity entitat,
-			@Param("metaDocumentTipusGeneric") MetaDocumentTipusGenericEnumDto metaDocumentTipusGeneric);
-	
 	@Query(	"from " +
 			"    MetaDocumentEntity md " +
 			"where (md.metaExpedient = :metaExpedient) " +

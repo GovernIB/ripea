@@ -63,8 +63,6 @@ public class MetaExpedientEntity extends MetaNodeEntity {
     private String expressioNumero;
     @Column(name = "not_activa", nullable = false)
     private boolean notificacioActiva;
-    @Column(name = "PERMET_METADOCS_GENERALS", nullable = false)
-    private boolean permetMetadocsGenerals;
     @Column(name = "PERMIS_DIRECTE")
     private boolean permisDirecte = false;
     
@@ -188,7 +186,6 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 			String serieDocumental,
 			String expressioNumero,
 			boolean notificacioActiva,
-			boolean permetMetadocsGenerals,
 			MetaExpedientEntity pare,
 			OrganGestorEntity organGestor,
 			boolean gestioAmbGrupsActiva, 
@@ -202,7 +199,6 @@ public class MetaExpedientEntity extends MetaNodeEntity {
         this.notificacioActiva = notificacioActiva;
         this.pare = pare;
         this.codiPropi = codi;
-        this.permetMetadocsGenerals = permetMetadocsGenerals;
         this.organGestor = organGestor;
         this.gestioAmbGrupsActiva = gestioAmbGrupsActiva;
         this.tipusClassificacio = tipusClassificacio;
@@ -234,7 +230,6 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 			String serieDocumental,
 			String classificacio,
 			boolean notificacioActiva,
-			boolean permetMetadocsGenerals,
 			EntitatEntity entitat,
 			MetaExpedientEntity pare,
 			OrganGestorEntity organGestor,
@@ -250,7 +245,6 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 				entitat,
 				pare,
 				notificacioActiva,
-				permetMetadocsGenerals,
 				organGestor,
 				gestioAmbGrupsActiva,
 				interessatObligatori,
@@ -269,7 +263,6 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 				EntitatEntity entitat,
 				MetaExpedientEntity pare,
 				boolean notificacioActiva,
-				boolean permetMetadocsGenerals,
 				OrganGestorEntity organGestor,
 				boolean gestioAmbGrupsActiva,
 				boolean interessatObligatori,
@@ -286,7 +279,6 @@ public class MetaExpedientEntity extends MetaNodeEntity {
             built.notificacioActiva = notificacioActiva;
             built.codiPropi = codi;
             built.entitatPropia = entitat;
-            built.permetMetadocsGenerals = permetMetadocsGenerals;
             built.organGestor = organGestor;
             built.gestioAmbGrupsActiva = gestioAmbGrupsActiva;
             built.interessatObligatori = interessatObligatori;

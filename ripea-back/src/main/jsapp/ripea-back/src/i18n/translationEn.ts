@@ -2040,7 +2040,6 @@ const translationEn = {
                 pendents: "Cases pending distribution",
                 comunicades: "Communicated annotations",
 
-                documents: "Document types",
                 documentDada: "Metadata of the document type: {{nom}}",
                 nti: "NTI document types",
                 dominis: "Domains",

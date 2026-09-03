@@ -161,7 +161,6 @@ public class MetaExpedientResource extends MetaNodeResource {
 	@Size(max = 100)
 	private String expressioNumero;
 	private boolean notificacioActiva;
-	private boolean permetMetadocsGenerals;
 	private boolean gestioAmbGrupsActiva;
 	private boolean permisDirecte = false;
 	private MetaExpedientRevisioEstatEnumDto revisioEstat;

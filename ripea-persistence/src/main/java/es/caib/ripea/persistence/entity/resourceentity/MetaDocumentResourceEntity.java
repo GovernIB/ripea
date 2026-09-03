@@ -23,7 +23,6 @@ import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
-import es.caib.ripea.service.intf.dto.MetaDocumentTipusGenericEnumDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
 import es.caib.ripea.service.intf.model.MetaDocumentResource;
@@ -80,9 +79,6 @@ public class MetaDocumentResourceEntity extends MetaNodeResourceEntity<MetaDocum
 	private boolean firmaBiometricaActiva;
 	@Column(name = "biometrica_lectura")
 	private boolean biometricaLectura;
-	@Column(name = "meta_document_tipus_gen", length = 256)
-	@Enumerated(EnumType.STRING)
-	private MetaDocumentTipusGenericEnumDto metaDocumentTipusGeneric;
 	@Enumerated(EnumType.STRING)
 	@Column(name = "portafirmes_fluxtip", length = 256)
 	private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;

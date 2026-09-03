@@ -673,10 +673,6 @@ public class MetaDocumentHelper {
 		List<MetaDocumentEntity> metaDocumentsDelMetaExpedient = metaDocumentRepository.findByMetaExpedientAndActiuTrue(
 				expedient != null ? expedient.getMetaExpedient() : metaExpedient);
 		
-		if (expedient != null ? expedient.getMetaExpedient().isPermetMetadocsGenerals() : metaExpedient.isPermetMetadocsGenerals()) {
-			metaDocumentsDelMetaExpedient.addAll(metaDocumentRepository.findWithoutMetaExpedient());
-		}
-		
 		if (expedient != null) {
 			
 			// Nomes retorna els documents que no s'hagin esborrat

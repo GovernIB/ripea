@@ -1,40 +1,25 @@
 package es.caib.ripea.back.controller;
 
-import es.caib.ripea.back.command.MetaDocumentCommand;
-import es.caib.ripea.back.helper.DatatablesHelper;
-import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.ripea.back.helper.EntitatHelper;
-import es.caib.ripea.back.helper.EnumHelper;
-import es.caib.ripea.back.helper.ExceptionHelper;
-import es.caib.ripea.back.helper.MissatgesHelper;
-import es.caib.ripea.back.helper.RolHelper;
-import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.model.sse.CreacioFluxFinalitzatEvent;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.EventService;
 import es.caib.ripea.service.intf.service.MetaDocumentService;
 import es.caib.ripea.service.intf.service.PortafirmesFluxService;
-import es.caib.ripea.service.intf.service.TipusDocumentalService;
 import es.caib.ripea.service.intf.utils.Utils;
-import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 /**
- * Controlador per al manteniment de meta-documents NO ASOCIATS A CAP META-EXPEDIENT.
+ * Controlador dels serveis de flux de firma de portafirmes dels tipus de document.
  *
  * @author Limit Tecnologies <limit@limit.es>
  */
@@ -44,164 +29,9 @@ import java.util.List;
 public class MetaDocumentController extends BaseAdminController {
 
 	@Autowired private MetaDocumentService metaDocumentService;
-	@Autowired private TipusDocumentalService tipusDocumentalService;
 	@Autowired private AplicacioService aplicacioService;
 	@Autowired private PortafirmesFluxService portafirmesFluxService;
 	@Autowired private EventService eventService;
-
-	@RequestMapping(method = RequestMethod.GET)
-	public String getAll(HttpServletRequest request, Model model) {
-		return "metaDocumentList";
-	}
-
-	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
-	@ResponseBody
-	public DatatablesResponse datatable(HttpServletRequest request) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
-		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(
-				request,
-				metaDocumentService.findWithoutMetaExpedient(
-						entitatActual.getId(),
-						DatatablesHelper.getPaginacioDtoFromRequest(request)));
-		return dtr;
-	}
-
-	@RequestMapping(value = "/new", method = RequestMethod.GET)
-	public String getNew(HttpServletRequest request, Model model) {
-		return get(request, null, model);
-	}
-
-	@RequestMapping(value = "/{metaDocumentId}", method = RequestMethod.GET)
-	public String get(HttpServletRequest request, @PathVariable Long metaDocumentId, Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
-		MetaDocumentDto metaDocument = null;
-		if (metaDocumentId != null) {
-			metaDocument = metaDocumentService.findById(entitatActual.getId(), null, metaDocumentId);
-		}
-		MetaDocumentCommand command = null;
-		if (metaDocument != null) {
-			command = MetaDocumentCommand.asCommand(metaDocument);
-		} else {
-			command = new MetaDocumentCommand();
-		}
-		command.setEntitatId(entitatActual.getId());
-		command.setComu(false); //inicialitzarm per el atribut required del camp portafirmesResponsables del form
-		model.addAttribute(command);
-		emplenarModelForm(request, model);
-		return "metaExpedientMetaDocumentForm";
-	}
-
-	@RequestMapping(method = RequestMethod.POST)
-	public String save(
-			HttpServletRequest request,
-			@Valid MetaDocumentCommand command,
-			BindingResult bindingResult,
-			Model model) throws IOException {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
-		
-		boolean tipusDocumentPortafirmes = aplicacioService.propertyBooleanFindByKey(PropertyConfig.TIPUS_DOC_PORTAFIRMES_ACTIU);
-		if (command.isFirmaPortafirmesActiva() && tipusDocumentPortafirmes && Utils.isEmpty(command.getPortafirmesDocumentTipus())) {
-			bindingResult.rejectValue("portafirmesDocumentTipus", "NotNull");
-		}
-		
-		if (bindingResult.hasErrors()) {
-			emplenarModelForm(request, model);
-			request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
-			return "metaExpedientMetaDocumentForm";
-		}
-		if (command.getId() != null) {
-			metaDocumentService.update(
-					entitatActual.getId(),
-					MetaDocumentCommand.asDto(command),
-					command.getPlantilla().getOriginalFilename(),
-					command.getPlantilla().getContentType(),
-					command.getPlantilla().getBytes());
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:metaDocument",
-					"metadocument.controller.modificat.ok",
-					new Object[] { command.getNom() });
-		} else {
-			OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
-			String rolActual = RolHelper.getRolActual(request);
-			metaDocumentService.create(
-					entitatActual.getId(),
-					command.getMetaExpedientId(),
-					MetaDocumentCommand.asDto(command),
-					command.getPlantilla().getOriginalFilename(),
-					command.getPlantilla().getContentType(),
-					command.getPlantilla().getBytes(),
-					rolActual, 
-					organActual != null ? organActual.getId() : null);
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:metaDocument",
-					"metadocument.controller.creat.ok",
-					new Object[] { command.getNom() });
-		}
-	}
-
-	@RequestMapping(value = "/{metaDocumentId}/delete", method = RequestMethod.GET)
-	public String delete(HttpServletRequest request, @PathVariable Long metaDocumentId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
-		try {
-			MetaDocumentDto metaDocumentDto = metaDocumentService.delete(
-					entitatActual.getId(), 
-					null, 
-					metaDocumentId, 
-					RolHelper.getRolActual(request), 
-					null);
-			return getAjaxControllerReturnValueSuccess(
-					request,
-					"redirect:../../metaDocument",
-					"metadocument.controller.esborrat.ok",
-					new Object[] { metaDocumentDto.getNom() });
-		} catch (Exception ex) {
-			if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, DataIntegrityViolationException.class) ||
-					ExceptionHelper.isExceptionOrCauseInstanceOf(ex, ConstraintViolationException.class))
-				return getAjaxControllerReturnValueError(
-						request,
-						"redirect:../../esborrat",
-						"metadocument.controller.esborrar.error.fk",
-						ex);
-			else {
-				throw ex;
-			}
-
-		}
-	}
-
-	@RequestMapping(value = "/{metaDocumentId}/enable", method = RequestMethod.GET)
-	public String enable(HttpServletRequest request, @PathVariable Long metaDocumentId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrganOrDissenyador(request);
-		MetaDocumentDto metaDocumentDto = metaDocumentService.updateActiu(
-				entitatActual.getId(), 
-				null, 
-				metaDocumentId, 
-				true,
-				RolHelper.getRolActual(request));
-		return getAjaxControllerReturnValueSuccess(
-				request,
-				"redirect:../../metaDocument",
-				"metadocument.controller.activat.ok",
-				new Object[] { metaDocumentDto.getNom() });
-	}
-
-	@RequestMapping(value = "/{metaDocumentId}/disable", method = RequestMethod.GET)
-	public String disable(HttpServletRequest request, @PathVariable Long metaDocumentId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrganOrDissenyador(request);
-		MetaDocumentDto metaDocumentDto = metaDocumentService.updateActiu(
-				entitatActual.getId(), 
-				null, 
-				metaDocumentId, 
-				false, 
-				RolHelper.getRolActual(request));
-		return getAjaxControllerReturnValueSuccess(
-				request,
-				"redirect:../../metaDocument",
-				"metadocument.controller.desactivat.ok",
-				new Object[] { metaDocumentDto.getNom() });
-	}
 
 	@RequestMapping(value = "/findAll", method = RequestMethod.GET)
 	@ResponseBody
@@ -306,28 +136,5 @@ public class MetaDocumentController extends BaseAdminController {
 		return portafirmesFluxService.esborrarPlantilla(plantillaId);
 	}
 
-	public void emplenarModelForm(
-			HttpServletRequest request,
-			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
-		
-		boolean tipusDocumentPortafirmes = aplicacioService.propertyBooleanFindByKey(PropertyConfig.TIPUS_DOC_PORTAFIRMES_ACTIU);
-		if (tipusDocumentPortafirmes) {
-			List<PortafirmesDocumentTipusDto> tipus = metaDocumentService.portafirmesFindDocumentTipus();
-			model.addAttribute("portafirmesDocumentTipus", tipus);
-		}
-		model.addAttribute("isPortafirmesDocumentTipusSuportat", tipusDocumentPortafirmes);
-		model.addAttribute("byMetaExpedient", false);
-		// Dades nti
-		model.addAttribute("ntiOrigenOptions", EnumHelper.getOptionsForEnum(NtiOrigenEnumDto.class, "document.nti.origen.enum."));
-		List<TipusDocumentalDto> tipusDocumental = tipusDocumentalService.findByEntitat(entitatActual.getId());
-		model.addAttribute("ntiTipusDocumentalOptions", tipusDocumental);
-		model.addAttribute("ntiEstatElaboracioOptions", EnumHelper.getOptionsForEnum(DocumentNtiEstadoElaboracionEnumDto.class, "document.nti.estela.enum."));
-		model.addAttribute("isFirmaBiometrica", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.FIRMA_BIOMETRICA_ACTIVA)));
-		model.addAttribute("bloquejarCamps", false);
-		model.addAttribute("consultar", false);
-		loadServeisPinbal(model, false);
-	}
-	
 	private static final Logger logger = LoggerFactory.getLogger(MetaDocumentController.class);
 }

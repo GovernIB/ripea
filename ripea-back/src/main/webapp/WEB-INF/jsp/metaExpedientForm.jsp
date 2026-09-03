@@ -463,9 +463,6 @@ function calculateClassificacioId() {
 				</div>
 				<rip:inputText name="expressioNumero" textKey="metaexpedient.form.camp.expressio.numero" comment="metaexpedient.form.camp.expressio.numero.comentari" readonly="${bloquejarCamps}"/>
 				
-				<c:if test="${isDocumentsGeneralsEnabled}">
-					<rip:inputCheckbox name="permetMetadocsGenerals" textKey="metaexpedient.form.camp.metadocs.nolligats.permetre" disabled="${bloquejarCamps}"/>
-				</c:if>
 				<rip:inputCheckbox name="gestioAmbGrupsActiva" textKey="metaexpedient.form.camp.gestioAmbGrupsActiva" disabled="${bloquejarCamps}"/>
 				
 				<c:if test="${isObligarInteressatActiu}">

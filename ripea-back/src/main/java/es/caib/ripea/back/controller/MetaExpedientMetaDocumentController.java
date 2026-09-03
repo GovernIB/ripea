@@ -442,7 +442,6 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 			model.addAttribute("portafirmesDocumentTipus", tipus);
 		}
 		model.addAttribute("isPortafirmesDocumentTipusSuportat", tipusDocumentPortafirmes);
-		model.addAttribute("byMetaExpedient", true);
 		// Dades nti
 		model.addAttribute(
 				"ntiOrigenOptions",

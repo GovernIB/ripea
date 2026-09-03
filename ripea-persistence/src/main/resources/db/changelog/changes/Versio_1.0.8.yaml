@@ -127,3 +127,67 @@ databaseChangeLog:
             splitStatements: false
             stripComments: true
             relativeToChangelogFile: true
+  - changeSet:
+      id: RIPEA_1.0.8_METADOC_GENERIC_DOCUMENTS_1
+      author: limit
+      changes:
+        - sqlFile:
+            dbms: oracle
+            path: ../scripts/oracle/1.0.8/Versio_1.0.8_DML_3.sql
+            splitStatements: false
+            stripComments: true
+            relativeToChangelogFile: true
+        - sqlFile:
+            dbms: postgresql
+            path: ../scripts/postgres/1.0.8/Versio_1.0.8_DML_3.sql
+            splitStatements: false
+            stripComments: true
+            relativeToChangelogFile: true
+  - changeSet:
+      id: RIPEA_1.0.8_METADOC_TIPUS_GENERIC_1
+      author: limit
+      changes:
+        - sqlFile:
+            dbms: oracle
+            path: ../scripts/oracle/1.0.8/Versio_1.0.8_DDL_6.sql
+            splitStatements: true
+            stripComments: true
+            relativeToChangelogFile: true
+        - sqlFile:
+            dbms: postgresql
+            path: ../scripts/postgres/1.0.8/Versio_1.0.8_DDL_6.sql
+            splitStatements: true
+            stripComments: true
+            relativeToChangelogFile: true
+  - changeSet:
+      id: RIPEA_1.0.8_METAEXP_PERMET_METADOCS_GENERALS_1
+      author: limit
+      changes:
+        - sqlFile:
+            dbms: oracle
+            path: ../scripts/oracle/1.0.8/Versio_1.0.8_DDL_7.sql
+            splitStatements: true
+            stripComments: true
+            relativeToChangelogFile: true
+        - sqlFile:
+            dbms: postgresql
+            path: ../scripts/postgres/1.0.8/Versio_1.0.8_DDL_7.sql
+            splitStatements: true
+            stripComments: true
+            relativeToChangelogFile: true
+  - changeSet:
+      id: RIPEA_1.0.8_DOCUMENTS_GENERALS_CONFIG_1
+      author: limit
+      changes:
+        - sqlFile:
+            dbms: oracle
+            path: ../scripts/oracle/1.0.8/Versio_1.0.8_DML_4.sql
+            splitStatements: true
+            stripComments: true
+            relativeToChangelogFile: true
+        - sqlFile:
+            dbms: postgresql
+            path: ../scripts/postgres/1.0.8/Versio_1.0.8_DML_4.sql
+            splitStatements: true
+            stripComments: true
+            relativeToChangelogFile: true

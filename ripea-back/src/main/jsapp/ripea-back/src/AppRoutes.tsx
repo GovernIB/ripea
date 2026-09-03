@@ -33,7 +33,6 @@ import PermisOrganGestorGrid from "./pages/user/configurar/PermisOrganGestorGrid
 import PermisMetaExpedientGrid from "./pages/user/configurar/PermisMetaExpedientGrid.tsx";
 import AdjuntarAnnexosPendentsGrid from "./pages/user/accionsMassives/AdjuntarAnnexosPendentsGrid.tsx";
 import DominiGrid from "./pages/user/configurar/DominiGrid.tsx";
-import MetaDocumentGrid from "./pages/metaDocument/MetaDocumentGrid.tsx";
 import MetaDadaGrid from "./pages/metaExpedient/details/elements/MetaDadaGrid.tsx";
 import {rols, useUserSession} from "./components/Session.tsx";
 import {UrlInstruccioGrid} from "./pages/user/configurar/UrlInstruccioGrid.tsx";
@@ -185,7 +184,6 @@ const AppRoutes: React.FC = () => {
             <Route path="organgestor/:id/permis" element={<PermisOrganGestorGrid/>} />
             <Route path="permis" element={<PermisEntitatGrid/>} />
             <Route path="domini" element={<DominiGrid/>} />
-            <Route path="metaDocument" element={<MetaDocumentGrid/>} />
             <Route element={<ProtectedRoute params={['isUrlInstruccioEnabled']}/>}>
                 <Route path="urlInstruccio" element={<UrlInstruccioGrid/>} />
             </Route>

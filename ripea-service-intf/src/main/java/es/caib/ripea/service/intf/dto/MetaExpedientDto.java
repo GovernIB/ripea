@@ -24,7 +24,6 @@ public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Seriali
     private int grupsCount;
 	@JsonIgnore
     private List<MetaDocumentDto> metaDocuments;
-    private boolean permetMetadocsGenerals;
     private OrganGestorDto organGestor;
     private boolean gestioAmbGrupsActiva;
     private boolean permisDirecte = false;

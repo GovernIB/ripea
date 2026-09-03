@@ -30,7 +30,6 @@ public class SessioHelper {
 	private static String capColorFons = null;
 	private static String capColorLletra = null;
 	private static boolean habilitarTipusDocument = false;
-	private static boolean habilitarDocumentsGenerals = false;
 	private static boolean habilitarDominis = false;
 	private static boolean isReactActiu = false;
 
@@ -95,7 +94,6 @@ public class SessioHelper {
                 capColorFons = aplicacioService.propertyFindByNom(PropertyConfig.CAPSALERA_FONS);
                 capColorLletra = aplicacioService.propertyFindByNom(PropertyConfig.CAPSALERA_LLETRA);
                 habilitarTipusDocument = aplicacioService.propertyBooleanFindByKey(PropertyConfig.TIPUS_DOCUMENT_ACTIUS, false);
-                habilitarDocumentsGenerals = aplicacioService.propertyBooleanFindByKey(PropertyConfig.DOCUMENTS_GENERALS_ACTIUS, false);
                 habilitarDominis = aplicacioService.propertyBooleanFindByKey(PropertyConfig.DOMINIS_HABILITATS);
                 isReactActiu = aplicacioService.propertyBooleanFindByKey(PropertyConfig.REACT_ACTIU);
 				propietatsInicialitzades = true;
@@ -106,7 +104,6 @@ public class SessioHelper {
 			request.getSession().setAttribute("SessionHelper.capsaleraColorFons", capColorFons);
 			request.getSession().setAttribute("SessionHelper.capsaleraColorLletra", capColorLletra);
 			request.getSession().setAttribute("SessionHelper.isTipusDocumentsEnabled", habilitarTipusDocument);
-			request.getSession().setAttribute("SessionHelper.isDocumentsGeneralsEnabled", habilitarDocumentsGenerals);
 			request.getSession().setAttribute("SessionHelper.isDominisEnabled", habilitarDominis);
 			request.getSession().setAttribute("SessionHelper.isReactActiu", isReactActiu);
 			request.getSession().setAttribute(SESSION_ATTRIBUTE_IDIOMA_USUARI, idioma_usuari);

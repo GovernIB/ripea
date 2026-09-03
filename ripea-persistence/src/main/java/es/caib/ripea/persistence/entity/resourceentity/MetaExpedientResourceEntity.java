@@ -53,9 +53,6 @@ public class MetaExpedientResourceEntity extends MetaNodeResourceEntity<MetaExpe
 	private String expressioNumero;
 	@Column(name = "not_activa", nullable = false)
 	private boolean notificacioActiva;
-
-	@Column(name = "PERMET_METADOCS_GENERALS", nullable = false)
-	private boolean permetMetadocsGenerals;
     @Column(name = "PERMIS_DIRECTE")
     private boolean permisDirecte = false;
 

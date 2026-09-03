@@ -104,7 +104,6 @@ public class TestDataFactory {
                     "SERIE_0" + i,
                     "SIA00" + i,
                     false,   // notificacioActiva
-                    false,   // permetMetadocsGenerals
                     data.entitat,
                     null,    // pare
                     null,    // organGestor

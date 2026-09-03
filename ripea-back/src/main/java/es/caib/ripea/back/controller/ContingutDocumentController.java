@@ -1025,6 +1025,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		
 		documentHelper.generarFitxerZip(
 				entitatActual.getId(),
+				pareId,
 				documentService, 
 				contingutService,
 				entitatActual, 
@@ -1327,6 +1328,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				
 				DocumentGenericCommand command = documentHelper.generarFitxerZip(
 						entitatActual.getId(),
+						expedientId,
 						documentService, 
 						contingutService,
 						entitatActual, 
@@ -1397,6 +1399,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		try {
 			DocumentGenericCommand command = documentHelper.concatenarDocuments(
 					entitatActual.getId(),
+					expedientId,
 					documentService, 
 					contingutService,
 					entitatActual, 

@@ -8,7 +8,7 @@ import javax.ejb.Stateless;
 import es.caib.ripea.ejb.base.AbstractServiceEjb;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
-import es.caib.ripea.service.intf.dto.MetaDocumentTipusGenericEnumDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentPerDefecteEnumDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
 import es.caib.ripea.service.intf.dto.PinbalServeiDto;
@@ -121,16 +121,6 @@ public class MetaDocumentServiceEjb extends AbstractServiceEjb<MetaDocumentServi
 
 	@Override
 	@RolesAllowed("**")
-	public PaginaDto<MetaDocumentDto> findWithoutMetaExpedient(
-			Long entitatId,
-			PaginacioParamsDto paginacioParams) {
-		return delegateService.findWithoutMetaExpedient(
-				entitatId,
-				paginacioParams);
-	}
-	
-	@Override
-	@RolesAllowed("**")
 	public List<MetaDocumentDto> findByEntitat(
 			Long entitatId) throws NotFoundException {
 		return delegateService.findByEntitat(entitatId);
@@ -200,12 +190,14 @@ public class MetaDocumentServiceEjb extends AbstractServiceEjb<MetaDocumentServi
 
 	@Override
 	@RolesAllowed("**")
-	public MetaDocumentDto findByTipusGeneric(
-			Long entitatId, 
-			MetaDocumentTipusGenericEnumDto tipusGeneric) {
-		return delegateService.findByTipusGeneric(
-				entitatId, 
-				tipusGeneric);
+	public MetaDocumentDto findPerDefecteByContingut(
+			Long entitatId,
+			Long contingutId,
+			MetaDocumentPerDefecteEnumDto metaDocumentPerDefecte) {
+		return delegateService.findPerDefecteByContingut(
+				entitatId,
+				contingutId,
+				metaDocumentPerDefecte);
 	}
 
 	@Override

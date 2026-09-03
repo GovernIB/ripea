@@ -47,7 +47,6 @@ const TITLES: any = {
     // '/organgestor/:id/permis': "page.user.menu.organPermis",
     '/permis': "page.user.menu.permisos",
     '/domini': "page.user.menu.dominis",
-    '/metaDocument': "page.user.menu.documents",
     '/urlInstruccio': "page.user.menu.url",
 };
 

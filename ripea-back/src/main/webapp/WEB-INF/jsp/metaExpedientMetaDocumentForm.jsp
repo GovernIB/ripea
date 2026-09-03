@@ -493,15 +493,7 @@ pageContext.setAttribute("metadocumentFluxtipEnumOptions", es.caib.ripea.back.he
 		<div class="alert well-sm alert-info"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="metadocument.reservat.modificacio.alerta"/></div>
 	</c:if>
 
-    <!-- Reutilitzaió del formulari per metaDocuments amb procediment associat o sense -->
-    <c:choose>
-        <c:when test="${byMetaExpedient}">
-            <c:set var="formAction"><rip:modalUrl value="/metaExpedient/${metaDocumentCommand.metaExpedientId}/metaDocument"/></c:set>
-        </c:when>
-        <c:otherwise>
-            <c:set var="formAction"><rip:modalUrl value="/metaDocument"/></c:set>
-        </c:otherwise>
-    </c:choose>
+    <c:set var="formAction"><rip:modalUrl value="/metaExpedient/${metaDocumentCommand.metaExpedientId}/metaDocument"/></c:set>
 	
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="metaDocumentCommand" enctype="multipart/form-data">
 		<ul class="nav nav-tabs" role="tablist">
@@ -625,7 +617,7 @@ pageContext.setAttribute("metadocumentFluxtipEnumOptions", es.caib.ripea.back.he
 					</c:choose>
 				</button>	
 			</c:if>	
-			<a href="<c:url value="/metaDocument"/>" class="btn btn-default modal-cancel" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
+			<a href="<c:url value="/metaExpedient/${metaDocumentCommand.metaExpedientId}/metaDocument"/>" class="btn btn-default modal-cancel" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>
 	<div class="flux_container"></div>

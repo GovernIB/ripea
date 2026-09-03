@@ -1,14 +1,12 @@
 import {useTranslation} from "react-i18next";
 import {
-    GridPage,
     MuiDialog,
     useFormContext,
     useMuiDataGridApiRef,
     useResourceApiService
 } from "reactlib";
-import {CardPage} from "../../components/CardData.tsx";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
-import {Alert, Typography, Grid, Icon, Badge, Box} from "@mui/material";
+import {Alert, Grid, Box} from "@mui/material";
 import GridFormField, {FileFormField, GridButton} from "../../components/GridFormField.tsx";
 import * as builder from "../../util/springFilterUtils.ts";
 import TabComponent from "../../components/TabComponent.tsx";
@@ -16,8 +14,6 @@ import {useMemo, useState} from "react";
 import Load from "../../components/Load.tsx";
 import Iframe from "../../components/Iframe.tsx";
 import {useFluxFinalitzatSession} from "../../components/SseClient.tsx";
-import {useMetaDocumentActions} from "./details/MetaDocumentActions.tsx";
-import LinkIcon from "../../components/LinkIcon.tsx";
 
 const useFluxActions = () => {
     const {
@@ -232,78 +228,3 @@ export const MetaDocumentForm = () => {
         </Box>
     );
 };
-
-// Grid
-const sortModel: any = [{field: 'nom', sort: 'asc'}]
-const perspectives = ["COUNT_METADADES"];
-const editPerspectives = ["PORTAFIRMES_RESPONSABLES"];
-
-const MetaDocumentGrid = () => {
-    const {t} = useTranslation();
-    const apiRef = useMuiDataGridApiRef();
-    
-    const refresh = () => {
-        apiRef?.current?.refresh?.();
-    }
-
-    const {actions} = useMetaDocumentActions(refresh);
-    const columns = useMemo(() => [
-        {
-            field: 'codi',
-            flex: 1,
-        },
-        {
-            field: 'nom',
-            flex: 1,
-        },
-        {
-            field: 'actiu',
-            flex: 0.5,
-            renderCell: (params:any) => (params?.row?.actiu && <Icon>check</Icon>),
-        },
-        {
-            field: 'id',
-            headerName: '',
-            flex: 0.5,
-            sortable: false,
-            renderCell: (params:any) => <LinkIcon
-                aria-label="key" 
-                color="inherit"
-                title={t('page.metaDada.plural')}
-                to={`/metaDocument/${params?.row?.id}/metaDada`}
-            >
-                <Badge badgeContent={params?.row?.numMetadades} color="primary" showZero>
-                    <Typography sx={{fontSize: '1rem', paddingRight: '10px'}}>{t('page.metaDada.plural')}</Typography>
-                </Badge>
-            </LinkIcon>
-        },
-    ], [t]);
-
-    return <GridPage autoHeight>
-        <CardPage title={t('page.user.menu.documents')}>
-            <StyledMuiGrid
-                apiRef={apiRef}
-                resourceName={"metaDocumentResource"}
-				persistentStateKey={"metaDocumentResource_generics"}
-                popupEditUpdateActive
-                popupEditFormDialogResourceTitle={t('page.metaDocument.title')}
-                popupEditFormContent={<MetaDocumentForm/>}
-                columns={columns}
-                toolbarShowQuickFilter
-                filter={builder.eq("metaExpedient", null)}
-                sortModel={sortModel}
-                perspectives={perspectives}
-                rowAdditionalActions={actions}
-                popupEditFormComponentProps={{ perspectives: editPerspectives }}
-                popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'lg' }}
-                toolbarCreateTitle={t('page.metaDocument.action.new.label')}
-                popupEditFormI18nKeys={{
-                    createSuccess: 'page.metaDocument.action.new.ok',
-                    updateSuccess: 'page.metaDocument.action.update.ok',
-                    deleteSuccess: 'page.metaDocument.action.delete.ok',
-                }}
-            />
-        </CardPage>
-    </GridPage>
-}
-export default MetaDocumentGrid;

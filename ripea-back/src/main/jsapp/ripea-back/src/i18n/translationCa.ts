@@ -2041,7 +2041,6 @@ const translationCa = {
                 pendents: "Expedients pendents de distribució",
                 comunicades: "Anotacions comunicades",
 
-                documents: "Tipus de documents",
                 documentDada: "Meta-dades del tipus de document: {{nom}}",
                 nti: "Tipus documentals NTI",
                 dominis: "Dominis",

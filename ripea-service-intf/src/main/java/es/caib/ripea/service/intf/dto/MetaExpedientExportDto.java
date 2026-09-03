@@ -30,7 +30,6 @@ public class MetaExpedientExportDto extends MetaNodeAmbMetaDadesDto implements S
     private int expedientTasquesCount;
     private int expedientDominisCount;
     private int grupsCount;
-    private boolean permetMetadocsGenerals;
     private OrganGestorDto organGestor;    
     private boolean gestioAmbGrupsActiva;
     private boolean permisDirecte;

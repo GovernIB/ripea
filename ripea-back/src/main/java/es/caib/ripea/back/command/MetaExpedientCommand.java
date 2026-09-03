@@ -52,7 +52,6 @@ public class MetaExpedientCommand {
 
 	private boolean notificacioActiva;
 	private boolean permisDirecte = false;
-	private boolean permetMetadocsGenerals;
 
 	private Long pareId;
 	private Long entitatId;
@@ -106,10 +105,6 @@ public class MetaExpedientCommand {
 
 	public void setNotificacioActiva(boolean notificacioActiva) {
 		this.notificacioActiva = notificacioActiva;
-	}
-
-	public void setPermetMetadocsGenerals(boolean permetMetadocsGenerals) {
-		this.permetMetadocsGenerals = permetMetadocsGenerals;
 	}
 
 	public void setPareId(Long pareId) {

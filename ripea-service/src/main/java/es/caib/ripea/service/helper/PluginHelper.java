@@ -212,7 +212,6 @@ import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentPerDefecteEnumDto;
-import es.caib.ripea.service.intf.dto.MetaDocumentTipusGenericEnumDto;
 import es.caib.ripea.service.intf.dto.MunicipiDto;
 import es.caib.ripea.service.intf.dto.NivellAdministracioDto;
 import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
@@ -5558,26 +5557,15 @@ public class PluginHelper {
 				
 				if (!certificacioJaGuardat) {
 					
-					String prefixNom = "Certificació";
-					MetaDocumentEntity metaDocument = metaDocumentRepository.findByEntitatAndTipusGeneric(
-							true,
-							null,
-							MetaDocumentTipusGenericEnumDto.ACUSE_RECIBO_NOTIFICACION);
-					
-					//No ha trobat el metaDocument generic ACUSE_RECIBO_NOTIFICACION (nomes l'utilitza la APB)
-					//Llavors anam a cercar el metaDocument de tipus del procediment.
-					if (metaDocument==null) {
-				        metaDocument = metaDocumentRepository.findByMetaExpedientAndCodi(
-				        		notificacio.getExpedient().getMetaExpedient(),
-				        		MetaDocumentPerDefecteEnumDto.NOTIB_JUSTIFICANT_RECEPCIO.getCodi());
-				        prefixNom = "Justificant enviament notib";
-					}
+					MetaDocumentEntity metaDocument = metaDocumentRepository.findByMetaExpedientAndCodi(
+							notificacio.getExpedient().getMetaExpedient(),
+							MetaDocumentPerDefecteEnumDto.NOTIB_JUSTIFICANT_RECEPCIO.getCodi());
 
 					DocumentDto document = contingutHelper.generarDocumentDto(
 							documentEnviamentInteressatEntity,
 							metaDocument,
 							resposta,
-							prefixNom);
+							"Justificant enviament notib");
 
 					document = documentHelper.crearDocument(
 							null,

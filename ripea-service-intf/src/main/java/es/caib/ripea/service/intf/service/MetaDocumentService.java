@@ -174,20 +174,6 @@ public interface MetaDocumentService {
 			PaginacioParamsDto paginacioParams) throws NotFoundException;
 
 	/**
-	 * Llistat paginat amb tots els meta-documents sense meta-expedient.
-	 * 
-	 * @param entitatId
-	 *            Id de l'ent
-	 * @param paginacioParams
-	 *            Peràmetres per a dur a terme la paginació del resultats.
-	 * @return La pàgina de meta-documents.
-	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public PaginaDto<MetaDocumentDto> findWithoutMetaExpedient(
-			Long entitatId,
-			PaginacioParamsDto paginacioParams);
-	
-	/**
 	 * Llistat paginat amb tots els meta-documents de l'entitat.
 	 * 
 	 * @param entitatId
@@ -305,18 +291,26 @@ public interface MetaDocumentService {
 			Long metaDocumentId);
 	
 	/**
-	 * Consulta la llista de tipus de document del plugin de portafirmes.
-	 * 
+	 * Consulta un dels tipus de document que tot procediment té per defecte
+	 * ({@link MetaDocumentPerDefecteEnumDto}) dins el procediment de l'expedient al qual
+	 * pertany el contingut indicat.
+	 *
 	 * @param entitatId
 	 *            Id de l'entitat.
-	 * @param tipusGeneric
-	 *            El tipus genèric del que es volen recuperar el tipus.
-	 * @return El tipus de document genèric o null si el plugin no suporta la consulta.
+	 * @param contingutId
+	 *            Id del contingut: l'expedient mateix o qualsevol contingut de dins seu.
+	 * @param metaDocumentPerDefecte
+	 *            El tipus de document per defecte que es vol recuperar.
+	 * @return El tipus de document per defecte del procediment de l'expedient.
+	 * @throws NotFoundException
+	 *             Si el contingut no penja de cap expedient o si el procediment no té
+	 *             el tipus de document indicat.
 	 */
 	@PreAuthorize("isAuthenticated()")
-	MetaDocumentDto findByTipusGeneric(
+	MetaDocumentDto findPerDefecteByContingut(
 			Long entitatId,
-			MetaDocumentTipusGenericEnumDto tipusGeneric);
+			Long contingutId,
+			MetaDocumentPerDefecteEnumDto metaDocumentPerDefecte);
 
 	/**
 	 * Consulta els meta-documents actius i amb l'opció de Portafirmes activa donat un procediment 

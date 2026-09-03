@@ -260,7 +260,6 @@ public class PropertyConfig {
 	public static final String INCORPORAR_JUSTIFICANT								= "es.caib.ripea.incorporar.justificant";
 	public static final String METAEXPEDIENT_REVISIO_ACTIVA							= "es.caib.ripea.metaexpedients.revisio.activa";
 	public static final String INCORPORACIO_ANOTACIO_DUPLICADA						= "es.caib.ripea.incorporacio.anotacions.duplicada";
-	public static final String DOCUMENTS_GENERALS_ACTIUS							= "es.caib.ripea.habilitar.documentsgenerals";
 	public static final String TIPUS_DOCUMENT_ACTIUS								= "es.caib.ripea.habilitar.tipusdocument";
 	public static final String ADMIN_ORGAN_GESTIO_PERMISOS							= "es.caib.ripea.procediment.gestio.permis.administrador.organ";
 	public static final String DOMINIS_HABILITATS									= "es.caib.ripea.habilitar.dominis";

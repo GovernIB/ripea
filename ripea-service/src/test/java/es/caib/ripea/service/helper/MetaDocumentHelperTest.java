@@ -771,7 +771,6 @@ class MetaDocumentHelperTest {
         assertThat(creats).allSatisfy(metaDocument -> {
             assertThat(metaDocument.getMultiplicitat()).isEqualTo(MultiplicitatEnumDto.M_0_N);
             assertThat(metaDocument.getNtiOrigen()).isEqualTo(NtiOrigenEnumDto.O1);
-            assertThat(metaDocument.getMetaDocumentTipusGeneric()).isNull();
             assertThat(metaDocument.getMetaExpedient()).isSameAs(metaExpedient);
         });
     }
@@ -911,11 +910,10 @@ class MetaDocumentHelperTest {
     // =========================================================================
 
     @Test
-    void findMetaDocumentsDisponiblesPerCreacio_senseExpedient_senseGenerics_retornaMetadocsDelProcediment() {
+    void findMetaDocumentsDisponiblesPerCreacio_senseExpedient_retornaMetadocsDelProcediment() {
         EntitatEntity entitat = mock(EntitatEntity.class);
         MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
         MetaDocumentEntity doc = mock(MetaDocumentEntity.class);
-        when(metaExpedient.isPermetMetadocsGenerals()).thenReturn(false);
         when(metaDocumentRepository.findByMetaExpedientAndActiuTrue(metaExpedient))
                 .thenReturn(Collections.singletonList(doc));
 
@@ -923,25 +921,6 @@ class MetaDocumentHelperTest {
                 entitat, null, metaExpedient, false);
 
         assertThat(resultat).containsExactly(doc);
-        verify(metaDocumentRepository, never()).findWithoutMetaExpedient();
-    }
-
-    @Test
-    void findMetaDocumentsDisponiblesPerCreacio_senseExpedient_ambGenerics_retornaTambeGenerics() {
-        EntitatEntity entitat = mock(EntitatEntity.class);
-        MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
-        MetaDocumentEntity docProcediment = mock(MetaDocumentEntity.class);
-        MetaDocumentEntity docGeneric = mock(MetaDocumentEntity.class);
-        when(metaExpedient.isPermetMetadocsGenerals()).thenReturn(true);
-        when(metaDocumentRepository.findByMetaExpedientAndActiuTrue(metaExpedient))
-                .thenReturn(new ArrayList<>(Collections.singletonList(docProcediment)));
-        when(metaDocumentRepository.findWithoutMetaExpedient())
-                .thenReturn(Collections.singletonList(docGeneric));
-
-        List<MetaDocumentEntity> resultat = helper.findMetaDocumentsDisponiblesPerCreacio(
-                entitat, null, metaExpedient, false);
-
-        assertThat(resultat).contains(docProcediment, docGeneric);
     }
 
     @Test
@@ -951,7 +930,6 @@ class MetaDocumentHelperTest {
         MetaDocumentEntity metaDoc = mock(MetaDocumentEntity.class);
         DocumentEntity docExistent = mock(DocumentEntity.class);
 
-        when(metaExpedient.isPermetMetadocsGenerals()).thenReturn(false);
         when(metaDoc.getMultiplicitat()).thenReturn(MultiplicitatEnumDto.M_1);
         when(docExistent.getMetaNode()).thenReturn(metaDoc);
 
@@ -975,7 +953,6 @@ class MetaDocumentHelperTest {
         MetaDocumentEntity metaDoc = mock(MetaDocumentEntity.class);
         DocumentEntity docExistent = mock(DocumentEntity.class);
 
-        when(metaExpedient.isPermetMetadocsGenerals()).thenReturn(false);
         when(metaDoc.getMultiplicitat()).thenReturn(MultiplicitatEnumDto.M_0_N);
         when(docExistent.getMetaNode()).thenReturn(metaDoc);
 
@@ -998,7 +975,6 @@ class MetaDocumentHelperTest {
         MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
         MetaDocumentEntity metaDoc = mock(MetaDocumentEntity.class);
 
-        when(metaExpedient.isPermetMetadocsGenerals()).thenReturn(false);
 
         ExpedientEntity expedient = mock(ExpedientEntity.class);
         when(expedient.getMetaExpedient()).thenReturn(metaExpedient);
@@ -1024,7 +1000,6 @@ class MetaDocumentHelperTest {
         MetaDocumentEntity docPinbal = mock(MetaDocumentEntity.class);
         MetaDocumentEntity docNoPinbal = mock(MetaDocumentEntity.class);
 
-        when(metaExpedient.isPermetMetadocsGenerals()).thenReturn(false);
         when(docPinbal.isPinbalActiu()).thenReturn(true);
         when(docPinbal.getNom()).thenReturn("DocPinbal");
         when(docNoPinbal.isPinbalActiu()).thenReturn(false);
@@ -1048,7 +1023,6 @@ class MetaDocumentHelperTest {
         MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
         MetaDocumentEntity docNoPinbal = mock(MetaDocumentEntity.class);
 
-        when(metaExpedient.isPermetMetadocsGenerals()).thenReturn(false);
         when(docNoPinbal.isPinbalActiu()).thenReturn(false);
 
         ExpedientEntity expedient = mock(ExpedientEntity.class);
@@ -1261,7 +1235,6 @@ class MetaDocumentHelperTest {
         when(entityComprovarHelper.comprovarContingut(99L)).thenReturn(contingut);
         when(contingutHelper.getExpedientSuperior(contingut, true, false, false, null)).thenReturn(expedient);
         when(expedient.getMetaExpedient()).thenReturn(metaExpedient);
-        when(metaExpedient.isPermetMetadocsGenerals()).thenReturn(false);
         when(metaDocumentRepository.findByMetaExpedientAndActiuTrue(metaExpedient))
                 .thenReturn(Collections.singletonList(doc));
         when(documentRepository.findByExpedientAndEsborrat(expedient, 0)).thenReturn(Collections.emptyList());
@@ -1280,7 +1253,6 @@ class MetaDocumentHelperTest {
         MetaDocumentEntity doc = mock(MetaDocumentEntity.class);
 
         when(metaExpedientRepository.findById(META_EXPEDIENT_ID)).thenReturn(Optional.of(metaExpedient));
-        when(metaExpedient.isPermetMetadocsGenerals()).thenReturn(false);
         when(metaDocumentRepository.findByMetaExpedientAndActiuTrue(metaExpedient))
                 .thenReturn(Collections.singletonList(doc));
 
@@ -1306,7 +1278,6 @@ class MetaDocumentHelperTest {
                 .thenReturn(document);
         when(contingutHelper.getExpedientSuperior(document, true, false, false, null)).thenReturn(expedient);
         when(expedient.getMetaExpedient()).thenReturn(metaExpedient);
-        when(metaExpedient.isPermetMetadocsGenerals()).thenReturn(false);
         when(metaDocumentRepository.findByMetaExpedientAndActiuTrue(metaExpedient))
                 .thenReturn(new ArrayList<>(Collections.singletonList(docDisponible)));
         when(documentRepository.findByExpedientAndEsborrat(expedient, 0)).thenReturn(Collections.emptyList());
@@ -1331,7 +1302,6 @@ class MetaDocumentHelperTest {
                 .thenReturn(document);
         when(contingutHelper.getExpedientSuperior(document, true, false, false, null)).thenReturn(expedient);
         when(expedient.getMetaExpedient()).thenReturn(metaExpedient);
-        when(metaExpedient.isPermetMetadocsGenerals()).thenReturn(false);
         when(metaDocumentRepository.findByMetaExpedientAndActiuTrue(metaExpedient))
                 .thenReturn(new ArrayList<>(Collections.singletonList(docDisponible)));
         when(documentRepository.findByExpedientAndEsborrat(expedient, 0)).thenReturn(Collections.emptyList());

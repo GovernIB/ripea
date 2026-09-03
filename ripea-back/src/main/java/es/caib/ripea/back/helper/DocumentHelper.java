@@ -43,14 +43,16 @@ public class DocumentHelper {
 	
 	public DocumentGenericCommand concatenarDocuments(
 			Long entitatId,
+			Long contingutId,
 			DocumentService documentService,
 			ContingutService contingutService,
 			EntitatDto entitatActual,
 			Map<String, Long> ordre) {
 		DocumentGenericCommand command = new DocumentGenericCommand();
-		MetaDocumentDto metaDocument = metaDocumentService.findByTipusGeneric(
-				entitatId, 
-				MetaDocumentTipusGenericEnumDto.NOTIFICACION);
+		MetaDocumentDto metaDocument = metaDocumentService.findPerDefecteByContingut(
+				entitatId,
+				contingutId,
+				MetaDocumentPerDefecteEnumDto.NOTIFICACIO_MULTIPLE);
 		
 		FitxerDto fitxer;
 		PDDocument resultat = new PDDocument();
@@ -95,6 +97,7 @@ public class DocumentHelper {
 	
 	public DocumentGenericCommand generarFitxerZip(
 			Long entitatId,
+			Long contingutId,
 			DocumentService documentService,
 			ContingutService contingutService,
 			EntitatDto entitatActual,
@@ -112,9 +115,10 @@ public class DocumentHelper {
 		if (metaDocumentId != null) {
 			metaDocument = metaDocumentService.findById(metaDocumentId);
 		} else {
-			metaDocument = metaDocumentService.findByTipusGeneric(
-					entitatId, 
-					MetaDocumentTipusGenericEnumDto.NOTIFICACION);
+			metaDocument = metaDocumentService.findPerDefecteByContingut(
+					entitatId,
+					contingutId,
+					MetaDocumentPerDefecteEnumDto.NOTIFICACIO_MULTIPLE);
 		}
 
 		

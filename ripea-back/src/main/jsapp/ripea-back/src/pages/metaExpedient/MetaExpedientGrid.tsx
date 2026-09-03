@@ -65,7 +65,6 @@ export const MetaExpedientForm = ({ isAdmin }: any) => {
             <GridFormField name="organGestor" size={8} required hidden={data?.procedimentComu} />
             <GridFormField name="expressioNumero" componentProps={{ helperText: t('page.metaExpedient.detall.expressioNumero') }} />
 
-            <GridFormField name="permetMetadocsGenerals" size={6} />
             <GridFormField name="gestioAmbGrupsActiva" size={6} />
             {/* Només visible si la propietat PERMETRE_OBLIGAR_INTERESSAT està activa,
                 igual que a metaExpedientForm.jsp (<c:if test="${isObligarInteressatActiu}">). */}

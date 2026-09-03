@@ -154,13 +154,6 @@ export const useMenuAdmin = () => {
                         to: '/metaExpedient',
                     },
                     {
-                        id: 'documents',
-                        title: t('page.user.menu.documents'),
-                        // icon: '',
-                        to: '/metaDocument',
-                        hidden: !user?.sessionScope?.isDocumentsGeneralsEnabled,
-                    },
-                    {
                         id: 'nti',
                         title: t('page.user.menu.nti'),
                         // icon: '',

@@ -62,10 +62,6 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	@Column(name = "biometrica_lectura")
 	private boolean biometricaLectura;
 	
-	@Column(name = "meta_document_tipus_gen", length = 256)
-	@Enumerated(EnumType.STRING)
-	private MetaDocumentTipusGenericEnumDto metaDocumentTipusGeneric;
-	
 	@Enumerated(EnumType.STRING)
 	@Column(name = "portafirmes_fluxtip", length = 256)
 	private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
@@ -121,9 +117,6 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	}
 	public MetaDocumentFirmaSequenciaTipusEnumDto getPortafirmesSequenciaTipus() {
 		return portafirmesSequenciaTipus;
-	}
-	public MetaDocumentTipusGenericEnumDto getMetaDocumentTipusGeneric() {
-		return metaDocumentTipusGeneric;
 	}
 	public String getPortafirmesCustodiaTipus() {
 		return portafirmesCustodiaTipus;

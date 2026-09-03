@@ -999,7 +999,6 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		target.setDescripcio(metaExpedientExport.getDescripcio());
 		target.setSerieDocumental(metaExpedientExport.getSerieDocumental());
 		
-		target.setPermetMetadocsGenerals(metaExpedientExport.isPermetMetadocsGenerals());
 		target.setGestioAmbGrupsActiva(metaExpedientExport.isGestioAmbGrupsActiva());
 		target.setInteressatObligatori(metaExpedientExport.isInteressatObligatori());
 		target.setPermisDirecte(metaExpedientExport.isPermisDirecte());

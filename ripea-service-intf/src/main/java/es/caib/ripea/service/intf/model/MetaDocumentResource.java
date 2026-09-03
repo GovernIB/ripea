@@ -16,7 +16,6 @@ import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
-import es.caib.ripea.service.intf.dto.MetaDocumentTipusGenericEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
@@ -103,7 +102,6 @@ public class MetaDocumentResource extends MetaNodeResource {
     private String ntiTipoDocumental;
 	private boolean firmaBiometricaActiva;
 	private boolean biometricaLectura;
-	private MetaDocumentTipusGenericEnumDto metaDocumentTipusGeneric;
     private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus = MetaDocumentFirmaFluxTipusEnumDto.SIMPLE;
 	private String codiPropi;
 	private boolean pinbalActiu;

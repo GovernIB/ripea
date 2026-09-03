@@ -115,7 +115,6 @@ import es.caib.ripea.service.intf.dto.InteressatDto;
 import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
-import es.caib.ripea.service.intf.dto.MetaDocumentTipusGenericEnumDto;
 import es.caib.ripea.service.intf.dto.MetaExpedientDto;
 import es.caib.ripea.service.intf.dto.MetaNodeDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
@@ -719,16 +718,6 @@ public class ContingutHelper {
 
 		Map<MetaDocumentDto, List<ContingutDto>> mapPerTipusDocument = new LinkedHashMap<>();
 		List<MetaDocumentEntity> metaDocuments = metaDocumentRepository.findByMetaExpedientAndActiuTrueOrderByOrdreAsc(expedient.getMetaExpedient());
-
-        if (getPropertyGuardarCertificacioExpedient()) {
-            MetaDocumentEntity metaDocumentAcuseRebut = metaDocumentRepository.findByEntitatAndTipusGeneric(
-                    true,
-                    null,
-                    MetaDocumentTipusGenericEnumDto.ACUSE_RECIBO_NOTIFICACION);
-
-            if (metaDocumentAcuseRebut != null)
-                metaDocuments.add(metaDocumentAcuseRebut);
-        }
 
 		for (MetaDocumentEntity metaDocument : metaDocuments) {
 			List<DocumentEntity> documents = documentRepository.findByExpedientAndMetaNodeAndEsborrat(expedient, metaDocument, NO_ESBORRAT);
@@ -3648,9 +3637,6 @@ public class ContingutHelper {
 	public int getArxiuMaxReintentsDocuments() {
 		String arxiuMaxReintentsDocuments = configHelper.getConfig(PropertyConfig.MAX_REINTENTS_DOCUMENTS);
 		return arxiuMaxReintentsDocuments != null && !arxiuMaxReintentsDocuments.isEmpty() ? Integer.valueOf(arxiuMaxReintentsDocuments) : 0;
-	}
-	private boolean getPropertyGuardarCertificacioExpedient() {
-		return configHelper.getAsBoolean(PropertyConfig.GUARDAR_CERTIFICACIO_EXPEDIENT);
 	}
 	private static final Logger logger = LoggerFactory.getLogger(ContingutHelper.class);
 

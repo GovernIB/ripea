@@ -256,7 +256,6 @@ public class MetaExpedientController extends BaseAdminController {
 		}
 		
 		model.addAttribute("isRolActualAdminOrgan", RolHelper.isRolActualAdministradorOrgan(request));
-		model.addAttribute("isDocumentsGeneralsEnabled", aplicacioService.propertyBooleanFindByKey(PropertyConfig.DOCUMENTS_GENERALS_ACTIUS, false));
 		model.addAttribute("metaExpedientDto", metaExpedient);
 		model.addAttribute("tipus", EnumHelper.getOptionsForEnum(TipusClassificacioEnumDto.class, "tipus.classificacio."));
 		

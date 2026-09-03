@@ -193,7 +193,6 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         Properties props = aplicacioService.getConfigs(Arrays.asList(
                 PropertyConfig.CONVERSIO_DEFINITIU,
                 PropertyConfig.VALIDACIO_URL_IMPRIMIBLES,
-                PropertyConfig.DOCUMENTS_GENERALS_ACTIUS,
                 PropertyConfig.TIPUS_DOCUMENT_ACTIUS,
                 PropertyConfig.GENERAR_URL_INSTRUCCIO,
                 PropertyConfig.MAX_UPLOAD_FILE,
@@ -227,7 +226,6 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
 
         response.put("isConvertirDefinitiuActiu", Boolean.parseBoolean(props.getProperty(PropertyConfig.CONVERSIO_DEFINITIU)));
         response.put("isUrlValidacioDefinida", props.getProperty(PropertyConfig.VALIDACIO_URL_IMPRIMIBLES)!=null);
-        response.put("isDocumentsGeneralsEnabled", Boolean.parseBoolean(props.getProperty(PropertyConfig.DOCUMENTS_GENERALS_ACTIUS)));
         response.put("isTipusDocumentsEnabled", Boolean.parseBoolean(props.getProperty(PropertyConfig.TIPUS_DOCUMENT_ACTIUS)));       
         response.put("isUrlInstruccioEnabled", Boolean.parseBoolean(props.getProperty(PropertyConfig.GENERAR_URL_INSTRUCCIO)));
         response.put("maxUploadFileSize", props.getProperty(PropertyConfig.MAX_UPLOAD_FILE));
