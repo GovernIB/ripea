@@ -151,8 +151,8 @@ import lombok.experimental.FieldNameConstants;
                         formClass = DocumentResource.ResumIaFormAction.class),
 				@ResourceArtifact(
 						type = ResourceArtifactType.ACTION,
-						code = DocumentResource.ACTION_MASSIVE_NOTIFICAR_ZIP_CODE,
-						formClass = DocumentResource.NotificarDocumentsZipFormAction.class),
+						code = DocumentResource.ACTION_MASSIVE_NOTIFICAR_CODE,
+						formClass = NodeResource.MassiveAction.class),
 				@ResourceArtifact(
 						type = ResourceArtifactType.ACTION,
 						code = DocumentResource.ACTION_MASSIVE_CANVI_TIPUS_CODE,
@@ -201,7 +201,7 @@ public class DocumentResource extends NodeResource {
     public static final String ACTION_VIA_FIRMA = "VIA_FIRMA";
 	//Accions massives desde la pipella de contingut
 	public static final String REPORT_DESCARREGAR_MASSIU = "DESCARREGAR_MASSIU";
-    public static final String ACTION_MASSIVE_NOTIFICAR_ZIP_CODE = "MASSIVE_NOTIFICAR_ZIP";
+    public static final String ACTION_MASSIVE_NOTIFICAR_CODE = "MASSIVE_NOTIFICAR";
     public static final String ACTION_MASSIVE_CANVI_TIPUS_CODE = "MASSIVE_CANVI_TIPUS";
     public static final String REPORT_DESCARREGAR_VERSIO_CODE = "DESCARREGAR_VERSIO";
 
@@ -637,23 +637,6 @@ public class DocumentResource extends NodeResource {
     	private FileReference adjunt;
     }
     
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @FieldNameConstants
-    public static class NotificarDocumentsZipFormAction extends MassiveAction {
-    	@NotNull
-    	private NtiOrigenEnumDto ntiOrigen;
-    	@NotNull
-    	private DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion;
-        @NotNull
-        @ResourceField(onChangeActive = true)
-        private ResourceReference<MetaDocumentResource, Long> metaDocument;
-
-        @Transient
-        private ResourceReference<ExpedientResource, Long> expedient;
-    }
-
     @Getter
     @Setter
     @NoArgsConstructor

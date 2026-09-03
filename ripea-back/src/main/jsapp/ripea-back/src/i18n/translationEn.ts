@@ -1089,9 +1089,17 @@ const translationEn = {
                 },
                 notificarMasiva: {
                     label: "Notify or communicate...",
-                    button: "Notify",
-                    title: "Generate document to notify",
-                    ok: "A zip with the selected items has been generated",
+                    ok: "The document with the selected items has been generated",
+                    error: {
+                        noFirmats: "Unsigned documents cannot be notified: {{noms}}",
+                    },
+                    ordre: {
+                        title: "Document order",
+                        description: "Choose the order in which the documents will be combined into the generated PDF.",
+                        button: "Combine",
+                        pujar: "Move up",
+                        baixar: "Move down",
+                    },
                 },
                 comunicar: {
                     label: "Communicate...",

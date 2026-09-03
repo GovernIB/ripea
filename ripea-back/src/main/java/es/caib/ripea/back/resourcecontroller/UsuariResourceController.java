@@ -222,11 +222,13 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
                 PropertyConfig.CARPETES_PER_DEFECTE,
                 PropertyConfig.CARPETES_RESTRINGIR_ACTIU,
                 PropertyConfig.PERMETRE_OBLIGAR_INTERESSAT,
+                PropertyConfig.CONCATENAR_MULTIPLES_PDFS,
                 PropertyConfig.MAX_RESULTS_SELECT));
 
         response.put("isConvertirDefinitiuActiu", Boolean.parseBoolean(props.getProperty(PropertyConfig.CONVERSIO_DEFINITIU)));
         response.put("isUrlValidacioDefinida", props.getProperty(PropertyConfig.VALIDACIO_URL_IMPRIMIBLES)!=null);
         response.put("isTipusDocumentsEnabled", Boolean.parseBoolean(props.getProperty(PropertyConfig.TIPUS_DOCUMENT_ACTIUS)));       
+        response.put("isConcatenarPdfsActiu", Boolean.parseBoolean(props.getProperty(PropertyConfig.CONCATENAR_MULTIPLES_PDFS)));
         response.put("isUrlInstruccioEnabled", Boolean.parseBoolean(props.getProperty(PropertyConfig.GENERAR_URL_INSTRUCCIO)));
         response.put("maxUploadFileSize", props.getProperty(PropertyConfig.MAX_UPLOAD_FILE));
         response.put("isDominisEnabled", Boolean.parseBoolean(props.getProperty(PropertyConfig.DOMINIS_HABILITATS)));

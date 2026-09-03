@@ -1090,9 +1090,17 @@ const translationCa = {
                 },
                 notificarMasiva: {
                     label: "Notifica o comunica...",
-                    button: "Notifica",
-                    title: "Generar document per notificar",
-                    ok: "S'ha generat un zip dels elements seleccionats",
+                    ok: "S'ha generat el document amb els elements seleccionats",
+                    error: {
+                        noFirmats: "No es poden notificar documents sense firmar: {{noms}}",
+                    },
+                    ordre: {
+                        title: "Ordre dels documents",
+                        description: "Trieu l'ordre en què s'han de combinar els documents dins el PDF que es generarà.",
+                        button: "Combina",
+                        pujar: "Mou cap amunt",
+                        baixar: "Mou cap avall",
+                    },
                 },
                 comunicar: {
                     label: "Comunica...",

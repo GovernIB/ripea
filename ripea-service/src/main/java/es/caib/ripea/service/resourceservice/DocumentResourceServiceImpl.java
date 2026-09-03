@@ -35,6 +35,7 @@ import es.caib.plugins.arxiu.api.Document;
 import es.caib.ripea.persistence.entity.ContingutEntity;
 import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.ViaFirmaUsuariEntity;
 import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
@@ -129,7 +130,6 @@ import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.DocumentResource.IniciarFirmaNavegador;
 import es.caib.ripea.service.intf.model.DocumentResource.NewDocPinbalForm;
-import es.caib.ripea.service.intf.model.DocumentResource.NotificarDocumentsZipFormAction;
 import es.caib.ripea.service.intf.model.DocumentResource.NotificarFormAction;
 import es.caib.ripea.service.intf.model.DocumentResource.UpdateTipusDocumentFormAction;
 import es.caib.ripea.service.intf.model.DocumentResource.ViaFirmaForm;
@@ -215,7 +215,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         register(DocumentResource.ACTION_RESUM_IA, new ResumIaActionExecutor());
         //Accions massives desde la pipella de contingut
         register(DocumentResource.REPORT_DESCARREGAR_MASSIU, new DescarregarDocumentsMassiuZipGenerator());
-        register(DocumentResource.ACTION_MASSIVE_NOTIFICAR_ZIP_CODE, new NotificarDocumentsZipActionExecutor());
+        register(DocumentResource.ACTION_MASSIVE_NOTIFICAR_CODE, new NotificarDocumentsActionExecutor());
         register(DocumentResource.ACTION_MASSIVE_CANVI_TIPUS_CODE, new CanviTipusDocumentsActionExecutor());
         register(DocumentResource.ACTION_GET_CSV_LINK, new CsvLinkActionExecutor());
         register(DocumentResource.ACTION_CONVERTIR_DEFINITIU, new ConvertirDefinitiuActionExecutor());
@@ -1010,66 +1010,55 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         public void onChange(Serializable id, DocumentResource.DescarregarVersionFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, DocumentResource.DescarregarVersionFormAction target) {}
     }
 
-    private class NotificarDocumentsZipActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.NotificarDocumentsZipFormAction, DocumentResource> {
+    /**
+     * Prepara el document a notificar a partir dels documents seleccionats a la graella de
+     * contingut de l'expedient.
+     *
+     * Amb un unic document no es genera res: es retorna el document seleccionat. Amb mes d'un,
+     * es genera el document que els agrupa (un unic PDF si es pot concatenar, si no un zip) amb
+     * el tipus de document NOTIFICACIO_MULTIPLE del procediment. Els documents es combinen en
+     * l'ordre en que arriben, que es el que ha triat l'usuari al dialeg d'ordenacio.
+     */
+    private class NotificarDocumentsActionExecutor implements ActionExecutor<DocumentResourceEntity, MassiveAction, DocumentResource> {
 
-		@Override
-		public void onChange(Serializable id, NotificarDocumentsZipFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, NotificarDocumentsZipFormAction target) {
-            if (NotificarDocumentsZipFormAction.Fields.metaDocument.equals(fieldName)) {
-                if (fieldValue != null) {
-                    ResourceReference<MetaDocumentResource, Long> resourceReference = (ResourceReference<MetaDocumentResource, Long>) fieldValue;
-                    Optional<MetaDocumentResourceEntity> optionalDocumentResource = metaDocumentResourceRepository.findById(resourceReference.getId());
-                    optionalDocumentResource.ifPresent(metaDocumentResourceEntity -> {
-                        target.setNtiOrigen(metaDocumentResourceEntity.getNtiOrigen());
-                        target.setNtiEstadoElaboracion(metaDocumentResourceEntity.getNtiEstadoElaboracion());
-                    });
-                } else {
-                    target.setNtiOrigen(null);
-                    target.setNtiEstadoElaboracion(null);
+        @Override
+        public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
+
+        @Override
+        public DocumentResource exec(String code, DocumentResourceEntity entity, MassiveAction params) throws ActionExecutionException {
+            try {
+                EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+                List<Long> documentIds = params.getIds();
+                DocumentEntity primerDocument = documentRepository.findById(documentIds.get(0)).get();
+                ExpedientEntity expedient = primerDocument.getExpedientPare();
+
+                if (documentIds.size() == 1) {
+                    return documentPerNotificar(primerDocument.getId(), primerDocument.getNom(), expedient.getId());
                 }
+
+                DocumentDto documentDto = documentHelper.crearDocumentNotificacioMultiple(
+                        entitatEntity.getId(),
+                        expedient,
+                        documentIds);
+                return documentPerNotificar(documentDto.getId(), documentDto.getNom(), expedient.getId());
+
+            } catch (Exception e) {
+                excepcioLogHelper.addExcepcio("/expedient/NotificarDocumentsActionExecutor", e);
+                String msg = messageHelper.getMessage("document.notificarDocuments.reject")+": "+e.getMessage();
+                throw new ActionExecutionException(DocumentResource.class, null, code, msg);
             }
         }
 
-		@Override
-		public DocumentResource exec(String code, DocumentResourceEntity entity, NotificarDocumentsZipFormAction params) throws ActionExecutionException {
-    		try {	    		
-	    		
-	    		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
-        		FitxerDto fitxerDto = documentHelper.getZipFromDocumentsIds(entitatEntity.getId(), params.getIds());
-        		ContingutEntity pare = contingutRepository.findById(params.getExpedient().getId()).get();
-        		DocumentDto documentDto = new DocumentDto();
-            	MetaNodeDto metaNode = new MetaNodeDto();
-            	metaNode.setId(params.getMetaDocument().getId());
-            	documentDto.setMetaNode(metaNode);
-            	documentDto.setPareId(null);
-            	documentDto.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
-            	documentDto.setNom(fitxerDto.getNom());
-            	documentDto.setData(Calendar.getInstance().getTime());
-            	documentDto.setNtiOrigen(params.getNtiOrigen());
-            	documentDto.setNtiEstadoElaboracion(params.getNtiEstadoElaboracion());
-            	documentDto.setFitxerContingut(fitxerDto.getContingut());
-            	documentDto.setFitxerContentType(fitxerDto.getContentType());
-            	documentDto.setFitxerTamany((long)fitxerDto.getContentType().length());
-            	documentDto.setFitxerNom(fitxerDto.getNom());
-            	documentDto.setAmbFirma(false);
-            	documentDto.setData(Calendar.getInstance().getTime());
-            	documentDto = documentHelper.crearDocument(entitatEntity.getId(), documentDto, pare, true, false, true);
-
-            	DocumentResourceEntity newZipFile = new DocumentResourceEntity();
-        		newZipFile.setId(documentDto.getId());
-        		newZipFile.setNom(documentDto.getNom());
-        		//newZipFile.setExpedient(expedientResourceRepository.findById(params.getExpedient().getId()).get());
-        		ExpedientResourceEntity ere = new ExpedientResourceEntity();
-        		ere.setId(params.getExpedient().getId());
-        		newZipFile.setExpedient(ere);
-        		
-        		return objectMappingHelper.newInstanceMap(newZipFile, DocumentResource.class);
-        		
-			} catch (Exception e) {
-				excepcioLogHelper.addExcepcio("/expedient/NotificarDocumentsZipActionExecutor", e);
-				String msg = messageHelper.getMessage("document.notificarDocuments.reject")+": "+e.getMessage();
-				throw new ActionExecutionException(DocumentResource.class, null, code, msg);
-			}
-		}
+        /** Nomes cal el minim que el client necessita per obrir el dialeg de notificacio. */
+        private DocumentResource documentPerNotificar(Long documentId, String nom, Long expedientId) {
+            DocumentResourceEntity document = new DocumentResourceEntity();
+            document.setId(documentId);
+            document.setNom(nom);
+            ExpedientResourceEntity expedient = new ExpedientResourceEntity();
+            expedient.setId(expedientId);
+            document.setExpedient(expedient);
+            return objectMappingHelper.newInstanceMap(document, DocumentResource.class);
+        }
     }
     private class MoureCopiarVincularActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.MoureFormAction, DocumentResource> {
 

@@ -19,6 +19,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.pdfbox.multipdf.PDFMergerUtility;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +72,8 @@ import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentTipusFirmaEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentPerDefecteEnumDto;
+import es.caib.ripea.service.intf.dto.MetaNodeDto;
 import es.caib.ripea.service.intf.dto.ImportacioRegistreParamsDto;
 import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
@@ -83,6 +87,7 @@ import es.caib.ripea.service.intf.dto.TipusImportEnumDto;
 import es.caib.ripea.service.intf.exception.ArxiuJaGuardatException;
 import es.caib.ripea.service.intf.exception.ContingutNotUniqueException;
 import es.caib.ripea.service.intf.exception.DocumentAlreadyImportedException;
+import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.ValidacioFirmaException;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.utils.Utils;
@@ -2059,6 +2064,109 @@ public class DocumentHelper {
 			resultat.setContentType("application/zip");
 		}
 		return resultat;
+	}
+	
+	/** Content type dels documents que es poden combinar en un unic PDF. */
+	private static final String CONTENT_TYPE_PDF = "application/pdf";
+	
+	/**
+	 * Genera el document que agrupa els documents seleccionats per notificar-los conjuntament i
+	 * l'afegeix a l'expedient amb el tipus de document NOTIFICACIO_MULTIPLE.
+	 *
+	 * Si es pot concatenar ({@link #isConcatenacioPdfsPermesa(List)}) es genera un unic PDF amb els
+	 * documents en l'ordre rebut; en cas contrari es genera un zip amb tots els documents.
+	 *
+	 * @param entitatId entitat actual.
+	 * @param pare contingut on penjara el document generat (l'expedient dels documents).
+	 * @param documentIds documents a agrupar, en l'ordre en que s'han de combinar.
+	 * @return el document creat.
+	 */
+	public DocumentDto crearDocumentNotificacioMultiple(
+			Long entitatId,
+			ContingutEntity pare,
+			List<Long> documentIds) throws Exception {
+
+		ExpedientEntity expedient = pare.getExpedientPare();
+		String codiMetaDocument = MetaDocumentPerDefecteEnumDto.NOTIFICACIO_MULTIPLE.getCodi();
+		MetaDocumentEntity metaDocument = metaDocumentRepository.findByMetaExpedientAndCodi(
+				expedient.getMetaExpedient(),
+				codiMetaDocument);
+		if (metaDocument == null) {
+			throw new NotFoundException(codiMetaDocument, MetaDocumentEntity.class);
+		}
+
+		FitxerDto fitxer = isConcatenacioPdfsPermesa(documentIds)
+				? concatenarDocumentsPdf(entitatId, documentIds)
+				: getZipFromDocumentsIds(entitatId, documentIds);
+
+		MetaNodeDto metaNode = new MetaNodeDto();
+		metaNode.setId(metaDocument.getId());
+		DocumentDto documentDto = new DocumentDto();
+		documentDto.setMetaNode(metaNode);
+		documentDto.setPareId(null);
+		documentDto.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
+		documentDto.setNom(fitxer.getNom());
+		documentDto.setData(new Date());
+		documentDto.setNtiOrigen(metaDocument.getNtiOrigen());
+		documentDto.setNtiEstadoElaboracion(metaDocument.getNtiEstadoElaboracion());
+		documentDto.setFitxerNom(fitxer.getNom());
+		documentDto.setFitxerContentType(fitxer.getContentType());
+		documentDto.setFitxerContingut(fitxer.getContingut());
+		documentDto.setFitxerTamany((long) fitxer.getContingut().length);
+		documentDto.setAmbFirma(false);
+
+		return crearDocument(entitatId, documentDto, pare, true, false, true);
+	}
+	
+	/**
+	 * Indica si els documents indicats es poden combinar en un unic PDF: nomes si la concatenacio
+	 * esta activada ({@link PropertyConfig#CONCATENAR_MULTIPLES_PDFS}) i tots els documents son PDF.
+	 */
+	public boolean isConcatenacioPdfsPermesa(List<Long> documentIds) {
+		if (!configHelper.getAsBoolean(PropertyConfig.CONCATENAR_MULTIPLES_PDFS)) {
+			return false;
+		}
+		for (Long documentId : documentIds) {
+			DocumentEntity document = documentRepository.findById(documentId).orElse(null);
+			if (document == null || !CONTENT_TYPE_PDF.equals(document.getFitxerContentType())) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	/**
+	 * Combina en un unic PDF les versions imprimibles dels documents indicats, respectant l'ordre
+	 * de la llista.
+	 *
+	 * Els documents origen no es poden tancar fins despres de guardar el resultat: PDFBox llegeix
+	 * el seu contingut de forma diferida mentre escriu el document combinat.
+	 */
+	public FitxerDto concatenarDocumentsPdf(Long entitatId, List<Long> documentIds) throws IOException {
+		PDFMergerUtility merger = new PDFMergerUtility();
+		List<PDDocument> origens = new ArrayList<PDDocument>();
+		try (PDDocument resultat = new PDDocument(); ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+			for (Long documentId : documentIds) {
+				FitxerDto fitxer = getImprimibleOrOriginal(entitatId, documentId);
+				PDDocument origen = PDDocument.load(fitxer.getContingut());
+				origens.add(origen);
+				merger.appendDocument(resultat, origen);
+			}
+			resultat.save(baos);
+			FitxerDto concatenat = new FitxerDto();
+			concatenat.setNom("notificacio_" + System.currentTimeMillis() + ".pdf");
+			concatenat.setContentType(CONTENT_TYPE_PDF);
+			concatenat.setContingut(baos.toByteArray());
+			return concatenat;
+		} finally {
+			for (PDDocument origen : origens) {
+				try {
+					origen.close();
+				} catch (IOException ex) {
+					logger.warn("No s'ha pogut tancar un dels documents PDF concatenats", ex);
+				}
+			}
+		}
 	}
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)

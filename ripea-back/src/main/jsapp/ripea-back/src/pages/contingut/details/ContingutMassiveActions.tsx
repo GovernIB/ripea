@@ -81,7 +81,7 @@ const useContingutMassiveActions = (entity:any, refresh?: () => void) => {
     const {handleMassiveShow: handleMoure, content: contentMoure} = useMoure(refresh)
     // const {handleMassiveShow: handleCopiar, content: contentCopiar} = useCopiar(refresh)
     // const {handleMassiveShow: handleVincular, content: contentVincular} = useVincular(refresh)
-    const {handleMassiveShow: handleNotificar, content: contentNotificar} = useNotificarMassive(entity, refresh)
+    const {handleMassiveShow: handleNotificar, content: contentNotificar} = useNotificarMassive(refresh)
     const {handleMassiveShow: handleCanviTipus, content: contentCanviTipus} = useCanviTipus(entity, refresh)
 
     const actions = [
