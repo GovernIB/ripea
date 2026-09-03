@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +56,9 @@ import es.caib.ripea.persistence.repository.command.GrupRepositoryCommnand;
 import es.caib.ripea.service.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.ErrorsValidacioTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
+import es.caib.ripea.service.intf.dto.ValidacioErrorDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.PermissionDeniedException;
 import es.caib.ripea.service.intf.exception.ValidationException;
@@ -840,6 +843,40 @@ public class EntityComprovarHelper {
 
 	}
 	
+	public boolean comprovarSiEsPotTancarAmbDocumentsFaltants(ExpedientEntity expedient, List<ValidacioErrorDto> errorsValidacio) {
+
+		if (errorsValidacio == null || errorsValidacio.isEmpty()) {
+			return false;
+		}
+		if (!configHelper.getAsBoolean(PropertyConfig.TANCAR_AMB_DOCUMENTS_FALTANTS)) {
+			return false;
+		}
+		String rolActual = configHelper.getRolActual();
+		if (rolActual == null || !comprovarRolActualAdminEntitatOAdminOrganDelExpedient(expedient, rolActual)) {
+			return false;
+		}
+		for (ValidacioErrorDto error: errorsValidacio) {
+			if (!esErrorDocumentFaltant(error)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public static boolean esErrorDocumentFaltant(ValidacioErrorDto error) {
+		return ErrorsValidacioTipusEnumDto.MULTIPLICITAT.equals(error.getTipusValidacio()) && error.isErrorMetaDocument();
+	}
+
+	public static List<String> getNomsDocumentsFaltants(List<ValidacioErrorDto> errorsValidacio) {
+		if (errorsValidacio == null) {
+			return new ArrayList<String>();
+		}
+		return errorsValidacio.stream()
+				.filter(EntityComprovarHelper::esErrorDocumentFaltant)
+				.map(error -> error.getMetaDocument().getNom())
+				.collect(Collectors.toList());
+	}
+
 	public boolean comprovarSiExpedientAgafatPerUsuariActual(ExpedientEntity expedient) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		

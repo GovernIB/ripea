@@ -597,6 +597,8 @@ public class ContingutHelper {
 
         List<ValidacioErrorDto> errorsValidacio = cacheHelper.findErrorsValidacioPerNode(expedient.getId());
         dto.setValid(errorsValidacio.isEmpty());
+        dto.setMetaDocumentsFaltants(EntityComprovarHelper.getNomsDocumentsFaltants(errorsValidacio));
+        dto.setPotTancarAmbDocumentsFaltants(entityComprovarHelper.comprovarSiEsPotTancarAmbDocumentsFaltants(expedient, errorsValidacio));
         dto.setNotificacionsCaducades(expedientHelper.expedientTeNotificacionsCaducades(expedient));
 		dto.setNumSeguidors(expedient.getSeguidors().size());
 		dto.setNumComentaris(expedient.getComentaris().size());

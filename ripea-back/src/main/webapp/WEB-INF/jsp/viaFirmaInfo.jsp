@@ -52,10 +52,12 @@ pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.ripea.back.h
 					<td><strong><spring:message code="viafirma.info.camp.estat"/></strong></td>
 					<td><spring:message code="portafirmes.estat.enum.${viafirma.estat}"/></td>
 				</tr>
-				<tr>
-					<td><strong><spring:message code="viafirma.info.camp.tipusDestinatari"/></strong></td>
-					<td><spring:message code="via.firma.tipus.destinatari.enum.${viafirma.tipusDestinatari}"/></td>
-				</tr>
+				<c:if test="${not empty viafirma.tipusDestinatari}">
+					<tr>
+						<td><strong><spring:message code="viafirma.info.camp.tipusDestinatari"/></strong></td>
+						<td><spring:message code="via.firma.tipus.destinatari.enum.${viafirma.tipusDestinatari}"/></td>
+					</tr>
+				</c:if>
 				<c:if test="${viafirma.tipusDestinatari == 'TABLET'}">
 					<tr>
 						<td><strong><spring:message code="viafirma.info.camp.codiusuari"/></strong></td>

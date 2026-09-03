@@ -68,6 +68,7 @@ public class ExpedientHelper2 {
 	@Autowired private DocumentNotificacioRepository documentNotificacioRepository;
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private ExpedientTascaRepository expedientTascaRepository;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
  
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void checkIfExpedientCanBeClosed(Long entitatId, Long expedientId, Long[] documentsPerFirmar) {
@@ -79,7 +80,7 @@ public class ExpedientHelper2 {
 			throw new ValidationException("No es pot tancar un expedient amb execucions massives pendents de finalitzar");
 		}
 		List<ValidacioErrorDto> errorsExp = cacheHelper.findErrorsValidacioPerNode(expedient.getId());
-		if (!errorsExp.isEmpty()) {
+		if (!errorsExp.isEmpty() && !entityComprovarHelper.comprovarSiEsPotTancarAmbDocumentsFaltants(expedient, errorsExp)) {
 			throw new ValidationException("No es pot tancar un expedient amb errors de validació");
 		}
 		if (CollectionUtils.isEmpty(documentRepository.findByExpedientAndEsborrat(expedient, 0))) {

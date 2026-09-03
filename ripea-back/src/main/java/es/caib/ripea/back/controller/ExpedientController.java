@@ -2341,6 +2341,9 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				entitatActual.getId(),
 				expedientId);
 		model.addAttribute("esborranys", esborranys);
+		if (expedient.isPotTancarAmbDocumentsFaltants()) {
+			model.addAttribute("metaDocumentsFaltants", expedient.getMetaDocumentsFaltants());
+		}
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientController.class);

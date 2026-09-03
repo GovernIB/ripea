@@ -1655,7 +1655,7 @@ public class ExpedientHelper {
 
 		expedientHelper2.closeExpedientDbAndArxiu(expedientId, motiu);
 
-		return expedientRepository.getOne(expedientId);
+		return expedientRepository.findById(expedientId).orElse(null);
 	}
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
