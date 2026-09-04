@@ -35,6 +35,7 @@ import es.caib.plugins.arxiu.api.Document;
 import es.caib.ripea.persistence.entity.ContingutEntity;
 import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.MetaDocumentFluxPortafibEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.ViaFirmaUsuariEntity;
 import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
@@ -57,6 +58,7 @@ import es.caib.ripea.persistence.repository.DocumentPortafirmesRepository;
 import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.ExecucioMassivaContingutRepository;
+import es.caib.ripea.persistence.repository.MetaDocumentFluxPortafibRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.firma.DocumentFirmaPortafirmesHelper;
 import es.caib.ripea.service.firma.DocumentFirmaViaFirmaHelper;
@@ -185,6 +187,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private final EntitatRepository entitatRepository;
     private final InteressatGrupResourceRepository interessatGrupResourceRepository;
     private final ExecucioMassivaContingutRepository execucioMassivaContingutRepository;
+    private final MetaDocumentFluxPortafibRepository metaDocumentFluxPortafibRepository;
 
     @PostConstruct
     public void init() {
@@ -1943,6 +1946,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         		DocumentResourceEntity documentResourceEntity = documentResourceRepository.findById(documentId).get();
         		MetaDocumentResourceEntity metaDocumentResourceEntity = documentResourceEntity.getMetaDocument();
         		target.setPortafirmesFluxTipus(metaDocumentResourceEntity.getPortafirmesFluxTipus());
+        		target.setMetaDocumentId(metaDocumentResourceEntity.getId());
         		
         		if (MetaDocumentFirmaFluxTipusEnumDto.SIMPLE.equals(metaDocumentResourceEntity.getPortafirmesFluxTipus())) {
         			List<ResourceReference<UsuariResource, String>> responsables = new ArrayList<>();
@@ -1970,6 +1974,14 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     				target.setUrlInicioFlujoFirma(transaccioResponse.getUrlRedireccio());
     				target.setIdTransaccio(transaccioResponse.getIdTransaccio());
     			}
+        		
+        		//Si el tipus de document només té definit un únic flux de firma, aquest queda seleccionat per defecte
+        		if (MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB.equals(metaDocumentResourceEntity.getPortafirmesFluxTipus())) {
+        			List<MetaDocumentFluxPortafibEntity> fluxosMetaDocument = metaDocumentFluxPortafibRepository.findByMetaDocumentId(metaDocumentResourceEntity.getId());
+        			if (fluxosMetaDocument.size() == 1) {
+        				target.setPortafirmesEnviarFluxId(fluxosMetaDocument.get(0).getPortafirmesFluxId());
+        			}
+        		}
         		
         	} else { //És un camp concret el que s'ha canviat
         		if (DocumentResource.EnviarPortafirmesFormAction.Fields.portafirmesEnviarFluxId.equals(fieldName)) {

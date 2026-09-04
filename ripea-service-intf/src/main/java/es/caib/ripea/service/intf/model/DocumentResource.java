@@ -603,6 +603,7 @@ public class DocumentResource extends NodeResource {
         private MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus = MetaDocumentFirmaSequenciaTipusEnumDto.SERIE;
 
         // FLUX
+        @Transient private Long metaDocumentId;
         @Transient
         @ResourceField(enumType = true, onChangeActive = true)
     	private String portafirmesEnviarFluxId;
