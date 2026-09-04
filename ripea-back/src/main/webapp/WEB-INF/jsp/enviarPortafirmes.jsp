@@ -491,6 +491,11 @@
 	                        }
 	                    });
 	                    
+	                    //Si el tipus de document només té definit un únic flux de firma, aquest queda seleccionat per defecte
+	                    if (plantillaActual == '' && itemsProcediment.length == 1) {
+	                        plantillaActual = itemsProcediment[0].id;
+	                    }
+	                    
 	                    if (itemsProcediment.length > 0) {
 	                        selPlantilles.append("<optgroup label='<spring:message code='metadocument.form.camp.portafirmes.flux.group.proc'/>'>");
 	                        $.each(itemsProcediment, function(i, val) {
@@ -525,7 +530,7 @@
 					selPlantilles.select2(select2Options);
 					if (plantillaActual != '') {
 						selPlantilles.val(plantillaActual);
-						selPlantilles.change();
+						//El trigger('change') final sobre el select ja notifica select2 i carrega la previsualització del flux
 						$(".portafirmesEnviarFluxId_btn_edicio").attr("title", "<spring:message code="metadocument.form.camp.portafirmes.flux.editar"/>");
 					}
 				},

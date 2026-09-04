@@ -169,7 +169,7 @@ const EnviarPortafirmesForm = forwardRef((_props, ref) => {
                                     value: data?.fluxCreat?.fluxId,
                                     description: data?.fluxCreat?.nom +' - '+ data?.fluxCreat?.descripcio,
                                },
-                               metaDocumentId: data?.metaDocument?.id,
+                               metaDocumentId: data?.metaDocumentId ?? data?.metaDocument?.id,
                             }}
                            autocomplete
                            required/>
