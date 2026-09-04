@@ -807,6 +807,7 @@ const translationEs = {
                 borradors: "Este expediente contiene borradores que serán eliminados al cerrarlo. A continuación tiene la possibilidad de marcar los borradores para que sean firmados con firma de servidor antes del cierre del expediente y así se evitará su eliminación. Si los documentos contienen alguna firma inválida, éstas serán eliminadas, y se volverá a firmar el documento en servidor.",
                 notificacio: "Este expediente contiene notificaciones caducadas no finalizadas. Se intentará actualitzar su estado. Si llega nueva información de las notificaciones pendientes, se guardará el justificante de recepción en RIPEA, pero no en el Archivo digital.",
                 documents: "Este expediente contiene documentos de anexos de anotaciones con errores. Se intentarán reprocesar al cerrar, y en caso de que no sea posible moverlos, se guardará una copia de éstos en el Archivo digital sin las firmas originales (tanto el documento original como la copia, se podrán seguir consultando desde la pestaña de contenido del expediente).",
+                documentsFaltants: "Este expediente no tiene todos los tipos de documentos obligatorios. Como administrador puede cerrarlo igualmente, indicando el motivo del cierre. Los tipos de documentos que faltan son:",
                 errorEnviament: "Este expediente tiene envíos con errores",
                 errorNotificacio: "Este expediente tiene notificaciones con errores",
                 ambEnviamentsPendents: "Este expediente tiene envíos pendientes de Portafirmas",

@@ -68,9 +68,11 @@ public class ExpedientDto extends NodeDto {
 	private boolean potReobrir;
 	private PrioritatEnumDto prioritat;
 	private String prioritatMotiu;
+	private boolean potTancarAmbDocumentsFaltants;
+	private List<String> metaDocumentsFaltants;
 
 	public boolean isPotTancar() {
-		return isValid() && conteDocuments && !conteDocumentsEnProcessDeFirma && !conteDocumentsDePortafirmesNoCustodiats && !isConteDocumentsPendentsReintentsArxiu();
+		return (isValid() || potTancarAmbDocumentsFaltants) && conteDocuments && !conteDocumentsEnProcessDeFirma && !conteDocumentsDePortafirmesNoCustodiats && !isConteDocumentsPendentsReintentsArxiu();
 	}
 	
 	public MetaExpedientDto getMetaExpedient() {

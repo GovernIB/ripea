@@ -1,0 +1,2 @@
+Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values
+('0','CONTINGUT','es.caib.ripea.expedient.tancar.documents.faltants','false','Permetre als administradors tancar expedients als quals falten tipus de documents',42,'BOOL','1','1','0','1','0');

@@ -807,6 +807,7 @@ const translationCa = {
                 borradors: "Aquest expedient conté esborranys que s’eliminaran en tancar-lo. Pot marcar-los per signar-los amb signatura de servidor i evitar-ne l’eliminació. Les firmes no vàlides seran eliminades i es tornaran a signar.",
                 notificacio: "Aquest expedient conté notificacions caducades no finalitzades. Es provarà d’actualitzar-ne l’estat. Les noves dades es desaran a RIPEA, però no a l’arxiu digital.",
                 documents: "Aquest expedient conté documents d’anotacions amb errors. Es provaran de reprocesar i, si no és possible, es guardarà una còpia sense signatures originals a l’arxiu digital.",
+                documentsFaltants: "Aquest expedient no té tots els tipus de documents obligatoris. Com a administrador el podeu tancar igualment, indicant el motiu del tancament. Els tipus de documents que falten són:",
                 errorEnviament: "Aquest expedient té enviaments amb errors",
                 errorNotificacio: "Aquest expedient té notificacions amb errors",
                 ambEnviamentsPendents: "Aquest expedient té enviaments pendents de Portasignatures",

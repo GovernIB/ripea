@@ -32,6 +32,7 @@ import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.DocumentEnviamentInteressatEntity;
 import es.caib.ripea.persistence.entity.DocumentNotificacioEntity;
 import es.caib.ripea.persistence.entity.DocumentPortafirmesEntity;
+import es.caib.ripea.persistence.entity.DocumentViaFirmaEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExecucioMassivaContingutEntity;
 import es.caib.ripea.persistence.entity.ExecucioMassivaEntity;
@@ -73,6 +74,7 @@ import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.DocumentEnviamentInteressatDto;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioDto;
 import es.caib.ripea.service.intf.dto.DocumentPortafirmesDto;
+import es.caib.ripea.service.intf.dto.DocumentViaFirmaDto;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaContingutDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaDto;
@@ -919,8 +921,56 @@ public class ConversioTipusHelper {
 						resultat.setErrorDescripcio(source.getErrorDescripcio());
 						return resultat;
 					}
-				});		
-		
+				});
+
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<DocumentViaFirmaEntity, DocumentViaFirmaDto>() {
+					@Override
+					public DocumentViaFirmaDto convert(DocumentViaFirmaEntity source,
+							Type<? extends DocumentViaFirmaDto> destinationType, MappingContext mappingContext) {
+						DocumentViaFirmaDto resultat = new DocumentViaFirmaDto();
+						resultat.setId(source.getId());
+						resultat.setEstat(source.getEstat());
+						resultat.setAssumpte(source.getAssumpte());
+						resultat.setObservacions(source.getObservacions());
+						resultat.setEnviatData(source.getEnviatData());
+						resultat.setProcessatData(source.getProcessatData());
+						resultat.setCancelatData(source.getCancelatData());
+						resultat.setIntentNum(source.getIntentNum());
+						DocumentDto doc = new DocumentDto();
+						doc.setId(source.getDocument().getId());
+						doc.setNom(source.getDocument().getNom());
+						doc.setPareId(source.getDocument().getPareId());
+						resultat.setDocument(doc);
+						resultat.setError(source.isError());
+						resultat.setErrorDescripcio(source.getErrorDescripcio());
+						//Dades especifiques de viaFirma:
+						resultat.setTitol(source.getTitol());
+						resultat.setDescripcio(source.getDescripcio());
+						resultat.setCodiDispositiu(source.getCodiDispositiu());
+						resultat.setLecturaObligatoria(String.valueOf(source.isLecturaObligatoria()));
+						resultat.setMessageCode(source.getMessageCode());
+						resultat.setCallbackEstat(source.getCallbackEstat());
+						resultat.setTipusDestinatari(source.getTipusDestinatari());
+						resultat.setCodiUsuari(source.getCodiUsuari());
+						resultat.setSignantEmail(source.getSignantEmail());
+						//Dades de auditoria
+						resultat.setCreatedDate(
+								source.getCreatedDate() != null ?
+										Date.from(source.getCreatedDate().get().atZone(ZoneId.systemDefault()).toInstant()) : null);
+						if (source.getCreatedBy() != null && source.getCreatedBy().isPresent()) {
+			      			UsuariEntity ue = usuariRepository.findByCodi(source.getCreatedBy().get());
+			      			UsuariDto uDto = new UsuariDto();
+			      			uDto.setCodi(ue.getCodi());
+			      			uDto.setNom(ue.getNom());
+			      			uDto.setNif(ue.getNif());
+			      			uDto.setEmail(ue.getEmail());
+			      			resultat.setCreatedBy(uDto);
+						}
+						return resultat;
+					}
+				});
+
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<DocumentEntity, SeguimentArxiuPendentsDto>() {
 					@Override

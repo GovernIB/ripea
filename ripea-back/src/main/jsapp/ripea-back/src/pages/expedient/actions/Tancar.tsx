@@ -79,6 +79,9 @@ const TancarForm = () => {
             documentObligatorisAlTancar: entities?.flatMap?.((e:any) => e?.documentObligatorisAlTancar),
             conteNotificacionsCaducades: entities?.some?.((e:any) => e?.conteNotificacionsCaducades),
             conteDocumentsDeAnotacionesNoMogutsASerieFinal: entities?.some?.((e:any) => e?.conteDocumentsDeAnotacionesNoMogutsASerieFinal),
+            metaDocumentsFaltants: Array.from(new Set(entities
+                ?.filter?.((e:any) => e?.potTancarAmbDocumentsFaltants)
+                ?.flatMap?.((e:any) => e?.metaDocumentsFaltants ?? []) ?? [])),
         }
     },[entities])
 
@@ -151,6 +154,14 @@ const TancarForm = () => {
             </Grid>
             <Grid size={12} hidden={!temp?.conteDocumentsDeAnotacionesNoMogutsASerieFinal}>
                 <Alert severity={"warning"}>{t('page.expedient.alert.documents')}</Alert>
+            </Grid>
+            <Grid size={12} hidden={!temp?.metaDocumentsFaltants?.length}>
+                <Alert severity={"warning"}>
+                    {t('page.expedient.alert.documentsFaltants')}
+                    <ul>
+                        {temp?.metaDocumentsFaltants?.map?.((nom: any) => <li key={nom}>{nom}</li>)}
+                    </ul>
+                </Alert>
             </Grid>
 
             <GridFormField name="motiu" type={"textarea"} required/>

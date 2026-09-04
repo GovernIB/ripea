@@ -83,6 +83,17 @@
 				<spring:message code="contingut.expedient.tancar.annex"/>
 			</div>
 		</c:if>
+		<c:if test="${!empty metaDocumentsFaltants}">
+			<div class="alert well-sm alert-warning">
+				<span class="fa fa-warning"></span>
+				<spring:message code="contingut.expedient.tancar.documents.faltants"/>
+				<ul>
+					<c:forEach var="metaDocumentFaltant" items="${metaDocumentsFaltants}">
+						<li>${metaDocumentFaltant}</li>
+					</c:forEach>
+				</ul>
+			</div>
+		</c:if>
 		<rip:inputTextarea name="motiu" textKey="contingut.expedient.tancar.form.camp.motiu" required="true"/>
 		<div id="modal-botons" class="well">
 			<button type="submit" id="btnSubmit" class="btn btn-success" data-noloading="true"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/></button>

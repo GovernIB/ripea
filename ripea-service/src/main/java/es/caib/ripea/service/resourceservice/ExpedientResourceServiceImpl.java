@@ -799,6 +799,11 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         }
     }
 
+    private void aplicarDocumentsFaltants(ExpedientEntity expedientEntity, ExpedientResource resource) {
+        resource.setMetaDocumentsFaltants(EntityComprovarHelper.getNomsDocumentsFaltants(resource.getErrors()));
+        resource.setPotTancarAmbDocumentsFaltants(entityComprovarHelper.comprovarSiEsPotTancarAmbDocumentsFaltants(expedientEntity, resource.getErrors()));
+    }
+
     private class AvisosPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
     	@Override
 		public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
@@ -810,6 +815,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 			resource.setAmbEnviamentsPendents(cacheHelper.hasEnviamentsPortafirmesPendentsPerExpedient(expedientEntity.getId()));
 			resource.setAmbNotificacionsPendents(cacheHelper.hasNotificacionsPendentsPerExpedient(expedientEntity));
 			resource.setNumAlert(entity.getAlertes().size());
+	        aplicarDocumentsFaltants(expedientEntity, resource);
     	}
     }    
     
@@ -825,6 +831,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	        //Calcular esValid, s'utilitza posteriorment
 	        resource.setErrors(cacheHelper.findErrorsValidacioPerNode(entity.getId()));
 	        resource.setValid(resource.getErrors().isEmpty());
+	        aplicarDocumentsFaltants(expedientEntity, resource);
 	        
 	        resource.setConteDocuments(CollectionUtils.isNotEmpty(documentResourceRepository.findByExpedientAndEsborrat(entity, 0)));
 	        resource.setConteDocumentsDefinitius(documentResourceRepository.expedientHasDocumentsDefinitius(entity));
@@ -832,7 +839,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	        resource.setConteDocumentsDePortafirmesNoCustodiats(CollectionUtils.isNotEmpty(documentResourceRepository.findDocumentsDePortafirmesNoCustodiats(entity)));
 	        resource.setConteDocumentsPendentsReintentsArxiu(CollectionUtils.isNotEmpty(documentResourceRepository.findDocumentsPendentsReintentsArxiu(entity, contingutHelper.getArxiuMaxReintentsDocuments())));
 	        resource.setPotTancar(
-	                resource.isValid()
+	                (resource.isValid() || resource.isPotTancarAmbDocumentsFaltants())
 	                        && resource.isConteDocuments()
 	                        && !resource.isConteDocumentsEnProcessDeFirma()
 	                        && !resource.isConteDocumentsDePortafirmesNoCustodiats()
@@ -840,7 +847,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 //	                        && !resource.isConteDocumentsDeAnotacionesNoMogutsASerieFinal()
 	        );
 	        if(!resource.isPotTancar()) {
-	            if (!resource.isValid()) resource.setTancarDisabledMessage(messageHelper.getMessage("contingut.errors.expedient.validacio"));
+	            if (!resource.isValid() && !resource.isPotTancarAmbDocumentsFaltants()) resource.setTancarDisabledMessage(messageHelper.getMessage("contingut.errors.expedient.validacio"));
 	            if (!resource.isConteDocuments()) resource.setTancarDisabledMessage(messageHelper.getMessage("disabled.button.msg.noConteCapDocument"));
 	            if (resource.isConteDocumentsEnProcessDeFirma()) resource.setTancarDisabledMessage(messageHelper.getMessage("disabled.button.msg.conteDocumentsEnProcessDeFirma"));
 	            if (resource.isConteDocumentsDePortafirmesNoCustodiats()) resource.setTancarDisabledMessage(messageHelper.getMessage("disabled.button.msg.conteDocumentsDePortafirmesNoCustodiats"));

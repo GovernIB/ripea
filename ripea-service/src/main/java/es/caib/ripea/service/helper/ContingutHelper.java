@@ -597,6 +597,8 @@ public class ContingutHelper {
 
         List<ValidacioErrorDto> errorsValidacio = cacheHelper.findErrorsValidacioPerNode(expedient.getId());
         dto.setValid(errorsValidacio.isEmpty());
+        dto.setMetaDocumentsFaltants(EntityComprovarHelper.getNomsDocumentsFaltants(errorsValidacio));
+        dto.setPotTancarAmbDocumentsFaltants(entityComprovarHelper.comprovarSiEsPotTancarAmbDocumentsFaltants(expedient, errorsValidacio));
         dto.setNotificacionsCaducades(expedientHelper.expedientTeNotificacionsCaducades(expedient));
 		dto.setNumSeguidors(expedient.getSeguidors().size());
 		dto.setNumComentaris(expedient.getComentaris().size());
@@ -2504,10 +2506,18 @@ public class ContingutHelper {
 				pluginHelper.arxiuExpedientEsborrar(
 						(ExpedientEntity)contingut);
 			} else if (contingut instanceof DocumentEntity) {
-				DocumentTipusEnumDto documentTipus = ((DocumentEntity)contingut).getDocumentTipus();
-				if (!documentTipus.equals(DocumentTipusEnumDto.IMPORTAT)) {
-					pluginHelper.arxiuDocumentEsborrar(
-							(DocumentEntity)contingut);
+				DocumentEntity document = (DocumentEntity)contingut;
+				if (DocumentTipusEnumDto.IMPORTAT.equals(document.getDocumentTipus())) {
+					// #1889
+					if (isPermesEsborrarFinals()) {
+						String nouUuid = pluginHelper.arxiuDocumentMoure(
+								document.getArxiuUuid(),
+								null,
+								null); //-> zona provisional
+						document.updateArxiu(nouUuid);
+					}
+				} else {
+					pluginHelper.arxiuDocumentEsborrar(document);
 				}
 			} else if (contingut instanceof CarpetaEntity) {
 				pluginHelper.arxiuCarpetaEsborrar(
