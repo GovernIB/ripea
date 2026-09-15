@@ -490,7 +490,9 @@ public class PinbalHelper {
 				interessat,
 				finalitat,
 				consentiment);
-		solicitud.setLlocSolicitud(provinciaCodi, municipiCodi);
+		solicitud.setLlocSolicitud(
+				darrersCaracters(provinciaCodi, LONGITUD_PROVINCIA_SOLICITUD),
+				darrersCaracters(municipiCodi, LONGITUD_MUNICIPI_SOLICITUD));
 		solicitud.setConsultaPerDocumentIdentitat(interessat.getDocumentTipus().toString(), interessat.getDocumentNum(), null);
 
 		try {
@@ -640,8 +642,8 @@ public class PinbalHelper {
 				pinbalConsulta.getFinalitat(),
 				pinbalConsulta.getConsentiment());
 		
-		solicitud.setProvinciaSolicitud(pinbalConsulta.getProvinciaCodi());
-		solicitud.setMunicipioSolicitud(pinbalConsulta.getMunicipiCodi());
+		solicitud.setProvinciaSolicitud(darrersCaracters(pinbalConsulta.getProvinciaCodi(), LONGITUD_PROVINCIA_SOLICITUD));
+		solicitud.setMunicipioSolicitud(darrersCaracters(pinbalConsulta.getMunicipiCodi(), LONGITUD_MUNICIPI_SOLICITUD));
 		if (pinbalConsulta.getNombreAnysHistoric() != null) {
 			solicitud.setNumeroAnyos(String.valueOf(pinbalConsulta.getNombreAnysHistoric()));
 		}
@@ -980,6 +982,19 @@ public class PinbalHelper {
 					null);
 			throw new PinbalException(ex, "getJustificante");
 		}
+	}
+
+	/** Longituds màximes de ProvinciaSolicitud i MunicipioSolicitud segons l'esquema SCSP de SCDCPAJU i SCDHPAJU */
+	private static final int LONGITUD_PROVINCIA_SOLICITUD = 2;
+	private static final int LONGITUD_MUNICIPI_SOLICITUD = 3;
+
+	/** Si el codi supera la longitud indicada, retorna els darrers caràcters (p.ex. municipi "07040" -> "040") */
+	private static String darrersCaracters(String codi, int longitud) {
+		if (codi == null) {
+			return null;
+		}
+		String codiNet = codi.trim();
+		return codiNet.length() > longitud ? codiNet.substring(codiNet.length() - longitud) : codiNet;
 	}
 
 	private void emplenarSolicitudBase(
