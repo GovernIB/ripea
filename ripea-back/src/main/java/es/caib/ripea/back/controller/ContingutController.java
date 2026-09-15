@@ -228,7 +228,6 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			model.addAttribute("isPermesEsborrarFinals", aplicacioService.propertyBooleanFindByKey(PropertyConfig.PERMATRE_ESBORRAR_FINAL, true));
 			model.addAttribute("isCreacioCarpetesLogica", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CARPETES_LOGIQUES_ACTIVES)));
 			model.addAttribute("isGenerarUrlsInstruccioActiu", isGenerarUrlsInstruccioActiu());
-			model.addAttribute("isNotificacioMultipleGenerarDocumentVisible", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.NOTIFICAR_MULTIPLE_GENERAR_DOC_VISIBLE)));
 			model.addAttribute("isConcatentarMultiplePDFs", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CONCATENAR_MULTIPLES_PDFS)));
 			model.addAttribute("isExportacioExcelActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.EXPORTACIO_EXCEL)));
 			model.addAttribute("isExpedientExpanditPerDefecte", aplicacioService.getUsuariActual().isExpedientExpandit());

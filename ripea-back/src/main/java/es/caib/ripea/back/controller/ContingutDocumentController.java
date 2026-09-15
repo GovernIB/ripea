@@ -114,6 +114,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 
 	private static final String SESSION_ATTRIBUTE_SELECCIO = "ContingutDocumentController.session.seleccio";
 	private static final String SESSION_ATTRIBUTE_ORDRE = "ContingutDocumentController.session.ordre";
+	private static final String SESSION_ATTRIBUTE_CONCATENAR = "ContingutDocumentController.session.concatenar";
 	private static final String SESSION_ATTRIBUTE_RETURN_SCANNED = "DigitalitzacioController.session.scanned";
 	private static final String SESSION_ATTRIBUTE_RETURN_SIGNED = "DigitalitzacioController.session.signed";
 	private static final String SESSION_ATTRIBUTE_RETURN_IDTRANSACCIO = "DigitalitzacioController.session.idTransaccio";
@@ -1035,6 +1036,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				null, 
 				tascaId,
 				null,
+				null,
 				null);
 		
 		reportContent = baos.toByteArray();
@@ -1171,36 +1173,22 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		}
 	}
 
+	/**
+	 * Modal per triar el tipus de document del document que agrupa els documents seleccionats.
+	 *
+	 * Nomes s'hi arriba quan la propietat es.caib.ripea.notificacio.multiple.tipusdoc esta
+	 * activada, i un cop ja s'ha decidit si el document generat sera un PDF concatenat o un zip.
+	 */
 	@RequestMapping(value = "/{expedientId}/chooseTipusDocument", method = RequestMethod.GET)
 	public String chooseTipusDocument(
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
 			Model model) {
-		
-		try {
-			
-			@SuppressWarnings("unchecked")
-			Set<Long> docsIdx = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO);
-			
-			if (docsIdx!=null && docsIdx.size()>1) {
-			
-				EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-				model.addAttribute(new DocumentCommand());
-				model.addAttribute(
-						"metaDocuments",
-						metaDocumentService.findActiusPerCreacio(
-								entitatActual.getId(),
-								expedientId, 
-								null,
-								false));
-				model.addAttribute("expedientId", expedientId);
-				
-				return "notificarMultipleDocuemntTipusForm";
 
-			} else {
-				return "redirect:/modal/document/"+docsIdx.iterator().next()+"/notificar";
-			}
-		
+		try {
+			model.addAttribute(new DocumentCommand());
+			ompliModelTipusDocument(request, expedientId, model);
+			return "notificarMultipleDocuemntTipusForm";
 		} catch (Exception e) {
 			logger.error("Error al chooseTipusDocument", e);
 			return getModalControllerReturnValueErrorMessageText(
@@ -1210,9 +1198,9 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					e);
 		}
 	}
-	
 
-	
+
+
 	@RequestMapping(value = "/{expedientId}/chooseTipusDocument", method = RequestMethod.POST)
 	public String chooseTipusDocumentPost(
 			HttpServletRequest request,
@@ -1221,8 +1209,6 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			BindingResult bindingResult,
 			Model model) {
 
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		
 		if (command.getMetaNodeId() == null) {
 			bindingResult.rejectValue("metaNodeId", "NotNull");
 		}
@@ -1232,49 +1218,63 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		if (command.getNtiEstadoElaboracion() == null) {
 			bindingResult.rejectValue("ntiEstadoElaboracion", "NotNull");
 		}
-		
+
 		if (bindingResult.hasErrors()) {
-			model.addAttribute(
-					"metaDocuments",
-					metaDocumentService.findActiusPerCreacio(
-							entitatActual.getId(),
-							expedientId, 
-							null,
-							false));
-			model.addAttribute("expedientId", expedientId);
+			ompliModelTipusDocument(request, expedientId, model);
 			request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
 			return "notificarMultipleDocuemntTipusForm";
 		}
 
-		
-		return concatenarOGenerarZip(
+		return crearDocumentNotificacioMultiple(
 				request,
 				expedientId,
 				command.getMetaNodeId(),
 				command.getNtiOrigen(),
-				command.getNtiEstadoElaboracion(),
-				model);
+				command.getNtiEstadoElaboracion());
 
 	}
-	
-	
+
+	private void ompliModelTipusDocument(
+			HttpServletRequest request,
+			Long expedientId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		model.addAttribute(
+				"metaDocuments",
+				metaDocumentService.findActiusPerCreacio(
+						entitatActual.getId(),
+						expedientId,
+						null,
+						false));
+		model.addAttribute("expedientId", expedientId);
+	}
+
+
+	/**
+	 * Punt d'entrada de la notificacio conjunta de mes d'un document: decideix si el document que
+	 * els agrupa sera un PDF concatenat (tots els documents son PDF i la concatenacio esta
+	 * activada) o un zip amb tots ells.
+	 */
 	@RequestMapping(value = "/{expedientId}/concatenarOGenerarZip", method = RequestMethod.GET)
 	public String concatenarOGenerarZip(
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
-			Long metaDocumentId,
-			NtiOrigenEnumDto ntiOrigen,
-			DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion,
 			Model model) {
-		
+
 		try {
-			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-			
+
 			@SuppressWarnings("unchecked")
 			Set<Long> docsIdx = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
 					request,
 					SESSION_ATTRIBUTE_SELECCIO);
-			
+
+			if (docsIdx == null || docsIdx.isEmpty()) {
+				throw new ValidationException("No s'ha seleccionat cap document per notificar");
+			}
+			if (docsIdx.size() == 1) {
+				return "redirect:/modal/document/" + docsIdx.iterator().next() + "/notificar";
+			}
+
 			List<DocumentDto> documents = new ArrayList<DocumentDto>();
 			boolean totsDocumentsPdf = true;
 			for (Long docId: docsIdx) {
@@ -1283,7 +1283,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 						RolHelper.getRolActual(request),
 						PermissionEnumDto.WRITE, null);
 
-				
+
 				if (document.getDocumentFirmaTipus() == DocumentFirmaTipusEnumDto.SENSE_FIRMA) {
 					throw new ValidationException("El document amb nom '" + document.getNom() + "' no està firmat");
 				}
@@ -1300,78 +1300,40 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 
 			// ========================= CONCATENTAR ===================================
 			if (totsDocumentsPdf && Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CONCATENAR_MULTIPLES_PDFS))) {
-				
+
 				Map<String, Long> ordre = new LinkedHashMap<String, Long>();
-				if (docsIdx != null) {
-					for (Long id: docsIdx) {
-						ordre.put("document-" + id, id);
-					}
+				for (Long id: docsIdx) {
+					ordre.put("document-" + id, id);
 				}
 				RequestSessionHelper.actualitzarObjecteSessio(
 						request,
 						SESSION_ATTRIBUTE_ORDRE,
 						ordre);
-				
-				
+				RequestSessionHelper.actualitzarObjecteSessio(
+						request,
+						SESSION_ATTRIBUTE_CONCATENAR,
+						Boolean.TRUE);
+
+
 				model.addAttribute("documents", documents);
 				model.addAttribute("expedientId", expedientId);
-				
+
 				MissatgesHelper.warning(
-						request, 
+						request,
 						getMessage(
-								request, 
+								request,
 								"contingut.document.form.titol.concatenacio.info"));
 				return "contingutConcatenacioForm";
-				
-			// ========================= GENERAR ZIP ===================================	
+
+			// ========================= GENERAR ZIP ===================================
 			} else {
-				
-				DocumentGenericCommand command = documentHelper.generarFitxerZip(
-						entitatActual.getId(),
-						expedientId,
-						documentService, 
-						contingutService,
-						entitatActual, 
-						docsIdx,
-						null,
-						request, 
-						metaDocumentId, 
-						null,
-						ntiOrigen,
-						ntiEstadoElaboracion);
-				
-				float sizeMB = (command.getFitxerContingut().length / 1024f) / 1024f;
-				if (sizeMB > 10) {
-					throw new ValidationException("Mida del document generat és " + sizeMB + " MB. Només es poden notificar documents que no superin els 10 MB");
-				}
-				
-				DocumentDto document = documentService.create(
-						entitatActual.getId(),
-						expedientId,
-						DocumentGenericCommand.asDto(command),
-						false, 
-						RolHelper.getRolActual(request), 
-						null,
-						true);
 
-				if (metaDocumentId != null) {
-					
-					MissatgesHelper.warning(
-							request, 
-							getMessage(
-									request, 
-									"contingut.document.form.titol.zip.generat"));
-				} else {
-					MissatgesHelper.warning(
-							request, 
-							getMessage(
-									request, 
-									"contingut.document.form.titol.compresio.info"));
-				}
+				RequestSessionHelper.actualitzarObjecteSessio(
+						request,
+						SESSION_ATTRIBUTE_CONCATENAR,
+						Boolean.FALSE);
+				return demanarTipusDocumentOCrear(request, expedientId);
 
-				
-				return "redirect:../../modal/document/" + document.getId() + "/notificar";
-				
 			}
 		} catch (Exception e) {
 			logger.error("Error al concatenarOGenerarZip", e);
@@ -1382,49 +1344,144 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					e);
 		}
 	}
-	
+
+	/** Continuacio del proces un cop l'usuari ha triat l'ordre dels documents a concatenar. */
 	@RequestMapping(value = "/{expedientId}/doCreateConcatenatedDocument", method = RequestMethod.GET)
-	public String concatenarDocuments(
+	public String doCreateConcatenatedDocument(
 			HttpServletRequest request,
-			HttpServletResponse response,
-			@PathVariable Long expedientId,
-			Model model) throws IOException, ClassNotFoundException {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		
-		@SuppressWarnings("unchecked")
-		Map<String, Long> ordre = (Map<String, Long>)RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_ORDRE);
+			@PathVariable Long expedientId) {
+		return demanarTipusDocumentOCrear(request, expedientId);
+	}
+
+	/**
+	 * Demana a l'usuari el tipus de document del document generat quan la propietat
+	 * {@link PropertyConfig#NOTIFICAR_MULTIPLE_TIPUS_DOC} ho indica; si no, el crea directament
+	 * amb el tipus de document NOTIFICACIO_MULTIPLE del procediment.
+	 */
+	private String demanarTipusDocumentOCrear(
+			HttpServletRequest request,
+			Long expedientId) {
+		if (Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.NOTIFICAR_MULTIPLE_TIPUS_DOC))) {
+			return "redirect:/modal/contingut/" + expedientId + "/chooseTipusDocument";
+		}
+		return crearDocumentNotificacioMultiple(request, expedientId, null, null, null);
+	}
+
+	/**
+	 * Genera el document que agrupa els documents seleccionats, l'afegeix a l'expedient i porta
+	 * l'usuari a la pantalla de notificacio.
+	 *
+	 * @param metaDocumentId tipus de document triat per l'usuari; null per aplicar el tipus
+	 *        NOTIFICACIO_MULTIPLE del procediment.
+	 */
+	private String crearDocumentNotificacioMultiple(
+			HttpServletRequest request,
+			Long expedientId,
+			Long metaDocumentId,
+			NtiOrigenEnumDto ntiOrigen,
+			DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion) {
 
 		try {
-			DocumentGenericCommand command = documentHelper.concatenarDocuments(
-					entitatActual.getId(),
-					expedientId,
-					documentService, 
-					contingutService,
-					entitatActual, 
-					ordre);
-			
-			DocumentDto document = documentService.create(
-					entitatActual.getId(),
-					expedientId,
-					DocumentGenericCommand.asDto(command),
-					false, 
-					RolHelper.getRolActual(request), 
-					null,
-					true);
-			
-			return "redirect:../../document/" + document.getId() + "/notificar";
-	
-		} catch (Exception exception) {
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+
+			// El document generat nomes es visible a l'expedient si la propietat ho indica; si no,
+			// es un document VIRTUAL que unicament serveix per fer la notificacio.
+			DocumentTipusEnumDto documentTipus = Boolean.parseBoolean(
+					aplicacioService.propertyFindByNom(PropertyConfig.NOTIFICAR_MULTIPLE_GENERAR_DOC_VISIBLE))
+					? DocumentTipusEnumDto.DIGITAL
+					: DocumentTipusEnumDto.VIRTUAL;
+			boolean concatenar = Boolean.TRUE.equals(
+					RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_CONCATENAR));
+
+			// ========================= CONCATENTAR ===================================
+			if (concatenar) {
+
+				@SuppressWarnings("unchecked")
+				Map<String, Long> ordre = (Map<String, Long>)RequestSessionHelper.obtenirObjecteSessio(
+						request,
+						SESSION_ATTRIBUTE_ORDRE);
+
+				DocumentGenericCommand command = documentHelper.concatenarDocuments(
+						entitatActual.getId(),
+						expedientId,
+						documentService,
+						contingutService,
+						entitatActual,
+						ordre,
+						metaDocumentId,
+						ntiOrigen,
+						ntiEstadoElaboracion,
+						documentTipus);
+
+				DocumentDto document = documentService.create(
+						entitatActual.getId(),
+						expedientId,
+						DocumentGenericCommand.asDto(command),
+						false,
+						RolHelper.getRolActual(request),
+						null,
+						true);
+
+				return "redirect:/modal/document/" + document.getId() + "/notificar";
+
+			// ========================= GENERAR ZIP ===================================
+			} else {
+
+				@SuppressWarnings("unchecked")
+				Set<Long> docsIdx = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
+						request,
+						SESSION_ATTRIBUTE_SELECCIO);
+
+				DocumentGenericCommand command = documentHelper.generarFitxerZip(
+						entitatActual.getId(),
+						expedientId,
+						documentService,
+						contingutService,
+						entitatActual,
+						docsIdx,
+						null,
+						request,
+						metaDocumentId,
+						null,
+						ntiOrigen,
+						ntiEstadoElaboracion,
+						documentTipus);
+
+				float sizeMB = (command.getFitxerContingut().length / 1024f) / 1024f;
+				if (sizeMB > 10) {
+					throw new ValidationException("Mida del document generat és " + sizeMB + " MB. Només es poden notificar documents que no superin els 10 MB");
+				}
+
+				DocumentDto document = documentService.create(
+						entitatActual.getId(),
+						expedientId,
+						DocumentGenericCommand.asDto(command),
+						false,
+						RolHelper.getRolActual(request),
+						null,
+						true);
+
+				MissatgesHelper.warning(
+						request,
+						getMessage(
+								request,
+								metaDocumentId != null
+										? "contingut.document.form.titol.zip.generat"
+										: "contingut.document.form.titol.compresio.info"));
+
+				return "redirect:/modal/document/" + document.getId() + "/notificar";
+
+			}
+		} catch (Exception e) {
+			logger.error("Error al crear el document per notificar els documents seleccionats", e);
 			return getModalControllerReturnValueErrorMessageText(
-					request, 
-					null, 
-					exception.getMessage(),
-					exception);
+					request,
+					"redirect:/contingut/" + expedientId,
+					e.getMessage(),
+					e);
 		}
 	}
-	
+
 	@RequestMapping(value = "/{contingutId}/defintiu", method = RequestMethod.GET)
 	public String defintiu(
 			HttpServletRequest request,

@@ -152,7 +152,7 @@ import lombok.experimental.FieldNameConstants;
 				@ResourceArtifact(
 						type = ResourceArtifactType.ACTION,
 						code = DocumentResource.ACTION_MASSIVE_NOTIFICAR_CODE,
-						formClass = NodeResource.MassiveAction.class),
+						formClass = DocumentResource.NotificarDocumentsFormAction.class),
 				@ResourceArtifact(
 						type = ResourceArtifactType.ACTION,
 						code = DocumentResource.ACTION_MASSIVE_CANVI_TIPUS_CODE,
@@ -618,6 +618,25 @@ public class DocumentResource extends NodeResource {
         //CAMPS NOMES VISIBLES A ACCIO MASSIVA
         private Date dataInici = Calendar.getInstance().getTime();
         private boolean enviarCorreu;
+    }
+    
+    /**
+     * Dades del document que agrupa els documents seleccionats per notificar-los conjuntament.
+     *
+     * Els camps son opcionals: nomes s'informen quan la propietat
+     * {@code es.caib.ripea.notificacio.multiple.tipusdoc} esta activada i, per tant, s'ha demanat
+     * el tipus de document a l'usuari. Si no s'informen s'apliquen les dades del tipus de document
+     * NOTIFICACIO_MULTIPLE del procediment.
+     */
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @FieldNameConstants
+    public static class NotificarDocumentsFormAction extends MassiveAction {
+    	private NtiOrigenEnumDto ntiOrigen;
+    	private DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion;
+        @ResourceField(onChangeActive = true)
+        private ResourceReference<MetaDocumentResource, Long> metaDocument;
     }
     
     @Getter

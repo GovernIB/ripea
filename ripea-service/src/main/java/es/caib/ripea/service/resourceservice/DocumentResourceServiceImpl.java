@@ -130,6 +130,7 @@ import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.DocumentResource.IniciarFirmaNavegador;
 import es.caib.ripea.service.intf.model.DocumentResource.NewDocPinbalForm;
+import es.caib.ripea.service.intf.model.DocumentResource.NotificarDocumentsFormAction;
 import es.caib.ripea.service.intf.model.DocumentResource.NotificarFormAction;
 import es.caib.ripea.service.intf.model.DocumentResource.UpdateTipusDocumentFormAction;
 import es.caib.ripea.service.intf.model.DocumentResource.ViaFirmaForm;
@@ -1016,17 +1017,36 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
      * contingut de l'expedient.
      *
      * Amb un unic document no es genera res: es retorna el document seleccionat. Amb mes d'un,
-     * es genera el document que els agrupa (un unic PDF si es pot concatenar, si no un zip) amb
-     * el tipus de document NOTIFICACIO_MULTIPLE del procediment. Els documents es combinen en
-     * l'ordre en que arriben, que es el que ha triat l'usuari al dialeg d'ordenacio.
+     * es genera el document que els agrupa (un unic PDF si es pot concatenar, si no un zip). Els
+     * documents es combinen en l'ordre en que arriben, que es el que ha triat l'usuari al dialeg
+     * d'ordenacio.
+     *
+     * El tipus de document generat es el que ha triat l'usuari quan la propietat
+     * es.caib.ripea.notificacio.multiple.tipusdoc esta activada; si no, el tipus
+     * NOTIFICACIO_MULTIPLE del procediment.
      */
-    private class NotificarDocumentsActionExecutor implements ActionExecutor<DocumentResourceEntity, MassiveAction, DocumentResource> {
+    private class NotificarDocumentsActionExecutor implements ActionExecutor<DocumentResourceEntity, NotificarDocumentsFormAction, DocumentResource> {
 
         @Override
-        public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
+        public void onChange(Serializable id, NotificarDocumentsFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, NotificarDocumentsFormAction target) {
+            if (NotificarDocumentsFormAction.Fields.metaDocument.equals(fieldName)) {
+                if (fieldValue != null) {
+                    @SuppressWarnings("unchecked")
+                    ResourceReference<MetaDocumentResource, Long> resourceReference = (ResourceReference<MetaDocumentResource, Long>) fieldValue;
+                    Optional<MetaDocumentResourceEntity> optionalDocumentResource = metaDocumentResourceRepository.findById(resourceReference.getId());
+                    optionalDocumentResource.ifPresent(metaDocumentResourceEntity -> {
+                        target.setNtiOrigen(metaDocumentResourceEntity.getNtiOrigen());
+                        target.setNtiEstadoElaboracion(metaDocumentResourceEntity.getNtiEstadoElaboracion());
+                    });
+                } else {
+                    target.setNtiOrigen(null);
+                    target.setNtiEstadoElaboracion(null);
+                }
+            }
+        }
 
         @Override
-        public DocumentResource exec(String code, DocumentResourceEntity entity, MassiveAction params) throws ActionExecutionException {
+        public DocumentResource exec(String code, DocumentResourceEntity entity, NotificarDocumentsFormAction params) throws ActionExecutionException {
             try {
                 EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
                 List<Long> documentIds = params.getIds();
@@ -1037,10 +1057,17 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                     return documentPerNotificar(primerDocument.getId(), primerDocument.getNom(), expedient.getId());
                 }
 
+                if (documentHelper.isTipusDocumentNotificacioMultipleDemanat() && params.getMetaDocument() == null) {
+                    throw new ValidationException(messageHelper.getMessage("document.notificarDocuments.tipusDocument.requerit"));
+                }
+
                 DocumentDto documentDto = documentHelper.crearDocumentNotificacioMultiple(
                         entitatEntity.getId(),
                         expedient,
-                        documentIds);
+                        documentIds,
+                        params.getMetaDocument() != null ? params.getMetaDocument().getId() : null,
+                        params.getNtiOrigen(),
+                        params.getNtiEstadoElaboracion());
                 return documentPerNotificar(documentDto.getId(), documentDto.getNom(), expedient.getId());
 
             } catch (Exception e) {

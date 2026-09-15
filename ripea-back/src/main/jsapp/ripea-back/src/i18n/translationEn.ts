@@ -1094,6 +1094,11 @@ const translationEn = {
                     error: {
                         noFirmats: "Unsigned documents cannot be notified: {{noms}}",
                     },
+                    tipusDoc: {
+                        title: "Type of the document to notify",
+                        description: "Choose the document type to apply to the document generated with the selected documents.",
+                        button: "Generate",
+                    },
                     ordre: {
                         title: "Document order",
                         description: "Choose the order in which the documents will be combined into the generated PDF.",

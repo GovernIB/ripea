@@ -507,6 +507,8 @@ Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values
 ('0','CONTINGUT','es.caib.ripea.notificacio.multiple.document.generat.visible','true','En notificar documents múltiples, guardar el document generat com el document visible a l''usuari','34','BOOL','0','0','0','0','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values
+('0','CONTINGUT','es.caib.ripea.notificacio.multiple.tipusdoc','false','En notificar documents múltiples, demanar a l''usuari el tipus de document del document generat (si no, s''aplica el tipus NOTIFICACIO_MULTIPLE)','34','BOOL','0','0','0','0','0');
+Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values
 ('0','CONTINGUT','es.caib.ripea.expedient.permetre.punts','false','Permetre la creació d''expedients amb punts al nom','35','BOOL','0','0','0','1','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values
 ('0','CONTINGUT','es.caib.ripea.expedient.exportacio.excel','true','Permetre l''exportació de l''índex de l''expedient a EXCEL','36','BOOL','0','0','0','1','0');

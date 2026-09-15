@@ -41,18 +41,31 @@ public class DocumentHelper {
 	@Autowired
 	private MetaDocumentService metaDocumentService;
 	
+	/**
+	 * Genera el PDF que combina els documents indicats per notificar-los conjuntament.
+	 *
+	 * @param metaDocumentId tipus de document triat per l'usuari; null per aplicar el tipus
+	 *        NOTIFICACIO_MULTIPLE del procediment.
+	 * @param documentTipus tipus del document generat (visible a l'expedient o nomes per notificar).
+	 */
 	public DocumentGenericCommand concatenarDocuments(
 			Long entitatId,
 			Long contingutId,
 			DocumentService documentService,
 			ContingutService contingutService,
 			EntitatDto entitatActual,
-			Map<String, Long> ordre) {
+			Map<String, Long> ordre,
+			Long metaDocumentId,
+			NtiOrigenEnumDto ntiOrigen,
+			DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion,
+			DocumentTipusEnumDto documentTipus) {
 		DocumentGenericCommand command = new DocumentGenericCommand();
-		MetaDocumentDto metaDocument = metaDocumentService.findPerDefecteByContingut(
-				entitatId,
-				contingutId,
-				MetaDocumentPerDefecteEnumDto.NOTIFICACIO_MULTIPLE);
+		MetaDocumentDto metaDocument = metaDocumentId != null
+				? metaDocumentService.findById(metaDocumentId)
+				: metaDocumentService.findPerDefecteByContingut(
+						entitatId,
+						contingutId,
+						MetaDocumentPerDefecteEnumDto.NOTIFICACIO_MULTIPLE);
 		
 		FitxerDto fitxer;
 		PDDocument resultat = new PDDocument();
@@ -77,10 +90,10 @@ public class DocumentHelper {
 			command.setNom("notificacio_" + new Date().getTime());
 			command.setData(new Date());
 			command.setMetaNodeId(metaDocument.getId()); //Notificació
-			command.setNtiEstadoElaboracion(metaDocument.getNtiEstadoElaboracion());
+			command.setNtiEstadoElaboracion(ntiEstadoElaboracion != null ? ntiEstadoElaboracion : metaDocument.getNtiEstadoElaboracion());
 			command.setNtiIdDocumentoOrigen(metaDocument.getNtiOrigen().name());
-			command.setNtiOrigen(metaDocument.getNtiOrigen());
-			command.setDocumentTipus(DocumentTipusEnumDto.VIRTUAL);
+			command.setNtiOrigen(ntiOrigen != null ? ntiOrigen : metaDocument.getNtiOrigen());
+			command.setDocumentTipus(documentTipus);
 			command.setFitxerNom(command.getNom() + ".pdf");
 			command.setFitxerContentType("application/pdf");
 			command.setFitxerContingut(resultatOutputStream.toByteArray());
@@ -107,7 +120,8 @@ public class DocumentHelper {
 			Long metaDocumentId, 
 			Long tascaId,
 			NtiOrigenEnumDto ntiOrigen,
-			DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion) {
+			DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion,
+			DocumentTipusEnumDto documentTipus) {
 		
 		DocumentGenericCommand command = new DocumentGenericCommand();
 		
@@ -163,7 +177,7 @@ public class DocumentHelper {
 				command.setNtiEstadoElaboracion(ntiEstadoElaboracion != null ? ntiEstadoElaboracion : metaDocument.getNtiEstadoElaboracion());
 				command.setNtiIdDocumentoOrigen(metaDocument.getNtiOrigen().name());
 				command.setNtiOrigen(ntiOrigen != null ? ntiOrigen : metaDocument.getNtiOrigen());
-				command.setDocumentTipus(metaDocumentId != null ? DocumentTipusEnumDto.DIGITAL : DocumentTipusEnumDto.VIRTUAL);
+				command.setDocumentTipus(documentTipus != null ? documentTipus : DocumentTipusEnumDto.VIRTUAL);
 				command.setFitxerNom(command.getNom() + ".zip");
 				command.setFitxerContentType("application/zip");
 				command.setFitxerContingut(reportContent);

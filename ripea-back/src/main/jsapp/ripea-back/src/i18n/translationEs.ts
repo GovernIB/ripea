@@ -1095,6 +1095,11 @@ const translationEs = {
                     error: {
                         noFirmats: "No se pueden notificar documentos sin firmar: {{noms}}",
                     },
+                    tipusDoc: {
+                        title: "Tipo del documento a notificar",
+                        description: "Elija el tipo de documento que se aplicará al documento generado con los documentos seleccionados.",
+                        button: "Genera",
+                    },
                     ordre: {
                         title: "Orden de los documentos",
                         description: "Elija el orden en que se deben combinar los documentos dentro del PDF que se generará.",

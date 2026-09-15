@@ -1631,7 +1631,7 @@
 					<%---- Button notificar mult ----%>
 					<div class="btn-group">
 						<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.notificar"/>" id="notificar-mult" class="btn-group">
-							<a href="<c:url value="/contingut/${contingut.id}/${isNotificacioMultipleGenerarDocumentVisible ? 'chooseTipusDocument' : 'concatenarOGenerarZip'}"/>" class="btn btn-default" data-toggle="modal" data-refresh-pagina="true">
+							<a href="<c:url value="/contingut/${contingut.id}/concatenarOGenerarZip"/>" class="btn btn-default" data-toggle="modal" data-refresh-pagina="true">
 								<span class="fa fa-envelope-o"></span>
 								<span class="badge seleccioCount">${fn:length(seleccio)}</span>
 							</a>

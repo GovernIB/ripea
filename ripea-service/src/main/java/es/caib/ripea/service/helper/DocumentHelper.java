@@ -87,6 +87,7 @@ import es.caib.ripea.service.intf.dto.TipusImportEnumDto;
 import es.caib.ripea.service.intf.exception.ArxiuJaGuardatException;
 import es.caib.ripea.service.intf.exception.ContingutNotUniqueException;
 import es.caib.ripea.service.intf.exception.DocumentAlreadyImportedException;
+import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.ValidacioFirmaException;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.utils.Utils;
@@ -2071,25 +2072,39 @@ public class DocumentHelper {
 	
 	/**
 	 * Genera el document que agrupa els documents seleccionats per notificar-los conjuntament i
-	 * l'afegeix a l'expedient amb el tipus de document NOTIFICACIO_MULTIPLE.
+	 * l'afegeix a l'expedient.
 	 *
 	 * Si es pot concatenar ({@link #isConcatenacioPdfsPermesa(List)}) es genera un unic PDF amb els
 	 * documents en l'ordre rebut; en cas contrari es genera un zip amb tots els documents.
 	 *
+	 * El tipus de document generat es el que ha triat l'usuari, si n'hi ha; si no, el tipus
+	 * NOTIFICACIO_MULTIPLE del procediment (veure
+	 * {@link PropertyConfig#NOTIFICAR_MULTIPLE_TIPUS_DOC}).
+	 *
 	 * @param entitatId entitat actual.
 	 * @param pare contingut on penjara el document generat (l'expedient dels documents).
 	 * @param documentIds documents a agrupar, en l'ordre en que s'han de combinar.
+	 * @param metaDocumentId tipus de document triat per l'usuari; null per aplicar NOTIFICACIO_MULTIPLE.
+	 * @param ntiOrigen origen NTI triat per l'usuari; null per agafar el del tipus de document.
+	 * @param ntiEstadoElaboracion estat d'elaboracio NTI triat per l'usuari; null per agafar el del
+	 *        tipus de document.
 	 * @return el document creat.
 	 */
 	public DocumentDto crearDocumentNotificacioMultiple(
 			Long entitatId,
 			ContingutEntity pare,
-			List<Long> documentIds) throws Exception {
+			List<Long> documentIds,
+			Long metaDocumentId,
+			NtiOrigenEnumDto ntiOrigen,
+			DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion) throws Exception {
 
 		ExpedientEntity expedient = pare.getExpedientPare();
-		MetaDocumentEntity metaDocument = metaDocumentHelper.getOrCreateMetaDocumentPerDefecte(
-				expedient.getMetaExpedient(),
-				MetaDocumentPerDefecteEnumDto.NOTIFICACIO_MULTIPLE);
+		MetaDocumentEntity metaDocument = metaDocumentId != null
+				? metaDocumentRepository.findById(metaDocumentId).orElseThrow(
+						() -> new NotFoundException(metaDocumentId, MetaDocumentEntity.class))
+				: metaDocumentHelper.getOrCreateMetaDocumentPerDefecte(
+						expedient.getMetaExpedient(),
+						MetaDocumentPerDefecteEnumDto.NOTIFICACIO_MULTIPLE);
 
 		FitxerDto fitxer = isConcatenacioPdfsPermesa(documentIds)
 				? concatenarDocumentsPdf(entitatId, documentIds)
@@ -2100,11 +2115,11 @@ public class DocumentHelper {
 		DocumentDto documentDto = new DocumentDto();
 		documentDto.setMetaNode(metaNode);
 		documentDto.setPareId(null);
-		documentDto.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
+		documentDto.setDocumentTipus(getDocumentTipusNotificacioMultiple());
 		documentDto.setNom(fitxer.getNom());
 		documentDto.setData(new Date());
-		documentDto.setNtiOrigen(metaDocument.getNtiOrigen());
-		documentDto.setNtiEstadoElaboracion(metaDocument.getNtiEstadoElaboracion());
+		documentDto.setNtiOrigen(ntiOrigen != null ? ntiOrigen : metaDocument.getNtiOrigen());
+		documentDto.setNtiEstadoElaboracion(ntiEstadoElaboracion != null ? ntiEstadoElaboracion : metaDocument.getNtiEstadoElaboracion());
 		documentDto.setFitxerNom(fitxer.getNom());
 		documentDto.setFitxerContentType(fitxer.getContentType());
 		documentDto.setFitxerContingut(fitxer.getContingut());
@@ -2112,6 +2127,25 @@ public class DocumentHelper {
 		documentDto.setAmbFirma(false);
 
 		return crearDocument(entitatId, documentDto, pare, true, false, true);
+	}
+	
+	/**
+	 * Indica si s'ha de demanar a l'usuari el tipus de document del document generat en notificar
+	 * mes d'un document; si no, s'aplica el tipus NOTIFICACIO_MULTIPLE del procediment.
+	 */
+	public boolean isTipusDocumentNotificacioMultipleDemanat() {
+		return configHelper.getAsBoolean(PropertyConfig.NOTIFICAR_MULTIPLE_TIPUS_DOC);
+	}
+	
+	/**
+	 * Tipus del document generat en notificar mes d'un document: DIGITAL si s'ha de guardar com un
+	 * document mes de l'expedient, VIRTUAL si nomes ha de servir per fer la notificacio
+	 * ({@link PropertyConfig#NOTIFICAR_MULTIPLE_GENERAR_DOC_VISIBLE}).
+	 */
+	public DocumentTipusEnumDto getDocumentTipusNotificacioMultiple() {
+		return configHelper.getAsBoolean(PropertyConfig.NOTIFICAR_MULTIPLE_GENERAR_DOC_VISIBLE)
+				? DocumentTipusEnumDto.DIGITAL
+				: DocumentTipusEnumDto.VIRTUAL;
 	}
 	
 	/**

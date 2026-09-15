@@ -1,0 +1,2 @@
+Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values
+('0','CONTINGUT','es.caib.ripea.notificacio.multiple.tipusdoc','true','En notificar documents múltiples, demanar a l''usuari el tipus de document del document generat (si no, s''aplica el tipus NOTIFICACIO_MULTIPLE)',34,'BOOL','0','0','0','0','0');
