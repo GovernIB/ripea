@@ -83,6 +83,13 @@ export const useUserSession = () => {
         isUser: value?.rolActual == rols.tothom,
     }), [value])
 
+    // Usuari autenticat sense cap entitat accessible (ni per permís directe ni per rol). Totes les
+    // pantalles, excepte les de superusuari, depenen de l'entitat actual i fallarien al backend.
+    // El superusuari no treballa amb entitats, per això en queda exclòs.
+    const senseEntitat: boolean = useMemo(() =>
+        isInitialized && !!value && value?.rolActual != rols.SUPER && !value?.entitatActualId,
+    [isInitialized, value])
+
     return {
         value,
         // Fals mentre la crida a securityInfo està en curs. Qui decideixi sobre rols o
@@ -91,6 +98,7 @@ export const useUserSession = () => {
         isLoaded: isInitialized,
         rol,
         permisos,
+        senseEntitat,
 
         refresh,
         save: apiSave,

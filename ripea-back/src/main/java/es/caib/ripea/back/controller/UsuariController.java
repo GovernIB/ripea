@@ -233,6 +233,10 @@ public class UsuariController  extends BaseAdminController {
 	
 	/**
 	 * Només per Jboss
+	 *
+	 * Atenció: amb JBossWebSecurityConfig aquesta URL és el logoutRequestMatcher de Spring Security i la resol el
+	 * LogoutFilter abans d'arribar aquí, de manera que aquests evicts no s'executen. Les caches dependents dels rols
+	 * de l'usuari s'invaliden en iniciar la sessió (SessioHelper.processarAutenticacio).
 	 */
 	@RequestMapping(value = "/logout", method = RequestMethod.GET)
 	public String logout(HttpServletRequest request, HttpServletResponse response) {

@@ -47,6 +47,10 @@ public class SessioHelper {
 			UsuariDto usuariActual = null;
 			EntitatDto entitatActual = null;
 			if (autenticacioProcessada == null) {
+				// Els rols de l'usuari arriben amb el token i poden haver canviat a Keycloak des de la darrera
+				// sessió (sense cap acció dins RIPEA que invalidi res). Abans de calcular l'entitat actual es buiden
+				// les caches que en depenen perquè es recalculin amb els rols d'aquesta sessió.
+				aplicacioService.evictCachesUsuariActual();
 				aplicacioService.processarAutenticacioUsuari(true);
 				usuariActual = aplicacioService.getUsuariActual();
 				request.getSession().setAttribute(SESSION_ATTRIBUTE_AUTH_PROCESSADA, new Boolean(true));

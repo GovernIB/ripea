@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 
-import es.caib.ripea.persistence.entity.AclClassEntity;
 import es.caib.ripea.persistence.entity.AclObjectIdentityEntity;
 import es.caib.ripea.persistence.entity.AclSidEntity;
 
@@ -79,6 +78,4 @@ public interface AclObjectIdentityRepository extends JpaRepository<AclObjectIden
 			@Param("objectsIdentityIdx") List<Long> objectsIdentityIdx,
 			@Param("masksIn1") List<Integer> masksIn1, 
     		@Param("masksIn2") List<Integer> masksIn2);
-
-    AclObjectIdentityEntity findByClassnameAndObjectId(AclClassEntity classname, Long id);
 }

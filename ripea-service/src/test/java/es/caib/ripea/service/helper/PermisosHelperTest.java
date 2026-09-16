@@ -47,10 +47,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import es.caib.ripea.persistence.entity.AclSidEntity;
-import es.caib.ripea.persistence.repository.AclClassRepository;
-import es.caib.ripea.persistence.repository.AclEntryRepository;
+import es.caib.ripea.persistence.entity.EntitatEntity;
+import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.repository.AclObjectIdentityRepository;
 import es.caib.ripea.persistence.repository.AclSidRepository;
 import es.caib.ripea.service.intf.dto.PermisDto;
@@ -61,7 +63,8 @@ import es.caib.ripea.service.permission.ExtendedPermission;
  * Tests unitaris per a PermisosHelper.
  *
  * Cobreix els mètodes públics: findPermisos (per objecte i per llista),
- * updatePermis i deletePermis, tant per a permisos per usuari com per rol.
+ * updatePermis i deletePermis, tant per a permisos per usuari com per rol, i la invalidació de les
+ * entitats accessibles quan canvien els permisos d'entitats o òrgans gestors.
  * No arrenca cap context Spring: totes les dependències es proporcionen com a mocks de Mockito.
  */
 @ExtendWith(MockitoExtension.class)
@@ -73,8 +76,6 @@ class PermisosHelperTest {
     @Mock private LookupStrategy lookupStrategy;
     @Mock private MutableAclService aclService;
     @Mock private AclSidRepository aclSidRepository;
-    @Mock private AclEntryRepository aclEntryRepository;
-    @Mock private AclClassRepository aclClassRepository;
     @Mock private AclObjectIdentityRepository aclObjectIdentityRepository;
     @Mock private MessageHelper messageHelper;
     @Mock private CacheHelper cacheHelper;
@@ -393,6 +394,128 @@ class PermisosHelperTest {
 
         verify(acl).deleteAce(0);
         verify(aclService, times(2)).updateAcl(acl);
+    }
+
+    // =========================================================================
+    // Invalidació de les entitats accessibles (caches entitatsUsuari / entitatsUsuariIds)
+    // =========================================================================
+
+    @Test
+    void updatePermis_entitatPerUsuari_evictaNomesLesEntitatsDeLUsuari() {
+        PermisDto permis = buildPermisDto("usuari1", PrincipalTipusEnumDto.USUARI, true, false, false);
+        MutableAcl acl = preparaAclMock(new ArrayList<>());
+        when(aclService.readAclById(any(ObjectIdentity.class))).thenReturn(acl);
+
+        permisosHelper.updatePermis(OBJECT_ID, EntitatEntity.class, permis);
+
+        verify(cacheHelper).evictEntitatsAccessiblesUsuari("usuari1");
+        verify(cacheHelper, never()).evictEntitatsAccessiblesAllUsuaris();
+    }
+
+    @Test
+    void updatePermis_entitatPerRol_evictaLesEntitatsDeTotsElsUsuaris() {
+        PermisDto permis = buildPermisDto("ROL_GESTOR", PrincipalTipusEnumDto.ROL, true, false, false);
+        MutableAcl acl = preparaAclMock(new ArrayList<>());
+        when(aclService.readAclById(any(ObjectIdentity.class))).thenReturn(acl);
+
+        permisosHelper.updatePermis(OBJECT_ID, EntitatEntity.class, permis);
+
+        verify(cacheHelper).evictEntitatsAccessiblesAllUsuaris();
+        verify(cacheHelper, never()).evictEntitatsAccessiblesUsuari(any());
+    }
+
+    @Test
+    void updatePermis_organGestorPerUsuari_evictaLesEntitatsDeLUsuari() {
+        PermisDto permis = buildPermisDto("usuari1", PrincipalTipusEnumDto.USUARI, false, false, true);
+        MutableAcl acl = preparaAclMock(new ArrayList<>());
+        when(aclService.readAclById(any(ObjectIdentity.class))).thenReturn(acl);
+
+        permisosHelper.updatePermis(OBJECT_ID, OrganGestorEntity.class, permis);
+
+        verify(cacheHelper).evictEntitatsAccessiblesUsuari("usuari1");
+    }
+
+    @Test
+    void updatePermis_altraClasse_noEvictaLesEntitatsAccessibles() {
+        PermisDto permis = buildPermisDto("usuari1", PrincipalTipusEnumDto.USUARI, true, false, false);
+        MutableAcl acl = preparaAclMock(new ArrayList<>());
+        when(aclService.readAclById(any(ObjectIdentity.class))).thenReturn(acl);
+
+        permisosHelper.updatePermis(OBJECT_ID, EntidadProva.class, permis);
+
+        verify(cacheHelper, never()).evictEntitatsAccessiblesUsuari(any());
+        verify(cacheHelper, never()).evictEntitatsAccessiblesAllUsuaris();
+    }
+
+    @Test
+    void deletePermis_entitatPerUsuari_evictaLesEntitatsDeLUsuari() {
+        AccessControlEntry ace = buildAce(new PrincipalSid("usuari1"), 100L, ExtendedPermission.READ);
+        MutableAcl acl = preparaAclMock(new ArrayList<>(Collections.singletonList(ace)));
+        when(aclService.readAclById(any(ObjectIdentity.class))).thenReturn(acl);
+
+        permisosHelper.deletePermis(OBJECT_ID, EntitatEntity.class, 100L);
+
+        verify(cacheHelper).evictEntitatsAccessiblesUsuari("usuari1");
+    }
+
+    @Test
+    void revocarPermisUsuari_organGestor_evictaLesEntitatsDeLUsuari() {
+        AccessControlEntry ace = buildAce(new PrincipalSid("usuari1"), 100L, ExtendedPermission.ADMINISTRATION);
+        MutableAcl acl = preparaAclMock(new ArrayList<>(Collections.singletonList(ace)));
+        when(aclService.readAclById(any(ObjectIdentity.class))).thenReturn(acl);
+
+        permisosHelper.revocarPermisUsuari("usuari1", OBJECT_ID, OrganGestorEntity.class, ExtendedPermission.ADMINISTRATION);
+
+        verify(cacheHelper).evictEntitatsAccessiblesUsuari("usuari1");
+    }
+
+    @Test
+    void deleteAcl_entitat_evictaLesEntitatsDeTotsElsUsuaris() {
+        permisosHelper.deleteAcl(OBJECT_ID, EntitatEntity.class);
+
+        verify(cacheHelper).evictEntitatsAccessiblesAllUsuaris();
+    }
+
+    @Test
+    void deleteAcl_evictaLAclCachejada() {
+        permisosHelper.deleteAcl(OBJECT_ID, EntidadProva.class);
+
+        verify(aclService).deleteAcl(argThat(oid -> EntidadProva.class.getName().equals(oid.getType())
+                && OBJECT_ID.equals(oid.getIdentifier())), eq(true));
+        verify(cacheHelper).evictReadAclById(argThat(oid -> EntidadProva.class.getName().equals(oid.getType())
+                && OBJECT_ID.equals(oid.getIdentifier())));
+    }
+
+    @Test
+    void eliminarPermisosOrgan_esborraLAclDeLOrganIEvictaLesCaches() {
+        OrganGestorEntity organ = mock(OrganGestorEntity.class);
+        when(organ.getId()).thenReturn(OBJECT_ID);
+
+        permisosHelper.eliminarPermisosOrgan(organ);
+
+        verify(aclService).deleteAcl(argThat(oid -> OrganGestorEntity.class.getName().equals(oid.getType())
+                && OBJECT_ID.equals(oid.getIdentifier())), eq(true));
+        verify(cacheHelper).evictReadAclById(any(ObjectIdentity.class));
+        verify(cacheHelper).evictEntitatsAccessiblesAllUsuaris();
+    }
+
+    @Test
+    void updatePermis_entitat_ambTransaccioActiva_evictaNomesDespresDelCommit() {
+        PermisDto permis = buildPermisDto("usuari1", PrincipalTipusEnumDto.USUARI, true, false, false);
+        MutableAcl acl = preparaAclMock(new ArrayList<>());
+        when(aclService.readAclById(any(ObjectIdentity.class))).thenReturn(acl);
+        TransactionSynchronizationManager.initSynchronization();
+        try {
+            permisosHelper.updatePermis(OBJECT_ID, EntitatEntity.class, permis);
+
+            verify(cacheHelper, never()).evictEntitatsAccessiblesUsuari(any());
+
+            TransactionSynchronizationManager.getSynchronizations().forEach(TransactionSynchronization::afterCommit);
+
+            verify(cacheHelper).evictEntitatsAccessiblesUsuari("usuari1");
+        } finally {
+            TransactionSynchronizationManager.clearSynchronization();
+        }
     }
 
     // =========================================================================

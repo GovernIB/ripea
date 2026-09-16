@@ -2213,6 +2213,7 @@ const translationCa = {
         },
         notFound: "No trobat",
         forbidden: "No teniu el rol o permís adequat per accedir a aquest recurs.",
+        senseEntitat: "No teniu cap entitat assignada. Contactau amb l'administrador.",
     }
 };
 

@@ -7,6 +7,4 @@ import org.springframework.stereotype.Component;
 @Component
 public interface AclClassRepository extends JpaRepository<AclClassEntity, Long> {
 
-	AclClassEntity findByClassname(String classname);
-
 }

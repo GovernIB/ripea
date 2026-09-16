@@ -2213,6 +2213,7 @@ const translationEn = {
         },
         notFound: "Not Found",
         forbidden: "You do not have the appropriate role or permission to access this resource.",
+        senseEntitat: "You do not have any entity assigned. Please contact the administrator.",
     }
 };
 

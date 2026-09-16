@@ -2213,6 +2213,7 @@ const translationEs = {
         },
         notFound: "No encontrado",
         forbidden: "No tiene el rol o permiso adecuado para acceder a este recurso.",
+        senseEntitat: "No tiene ninguna entidad asignada. Contacte con el administrador.",
     }
 };
 

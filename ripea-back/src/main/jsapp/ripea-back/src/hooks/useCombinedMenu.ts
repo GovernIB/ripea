@@ -23,7 +23,7 @@ export const useCombinedMenu = () => {
     const { t } = useTranslation();
     const { toProgramaAntic } = useToProgramaAntic()
     const location = useLocation();
-    const { rol } = useUserSession();
+    const { rol, senseEntitat } = useUserSession();
 
     const supAdmin = useMenuSupAdmin();
     const admin = useMenuAdmin();
@@ -68,7 +68,8 @@ export const useCombinedMenu = () => {
         ];
 
         menus.forEach(({ condition, data }) => {
-            if (condition) {
+            // Sense entitat no hi ha cap pantalla accessible (AppRoutes mostra l'avís): no s'ofereix cap menú.
+            if (condition && !senseEntitat) {
                 const { appEntries, entries, content: c } = data;
                 header.push(...appEntries);
                 side.push(...filterHiddenEntries(entries));
@@ -77,7 +78,7 @@ export const useCombinedMenu = () => {
         });
 
         return { sideMenuEntries: side, headerActions: header, additionalContents: content };
-    }, [supAdmin, admin, adminLectura, dissenyOrgan, organAdmin, revisor, rol, usuari, accionesMasivas]);
+    }, [supAdmin, admin, adminLectura, dissenyOrgan, organAdmin, revisor, rol, senseEntitat, usuari, accionesMasivas]);
 
     return { sideMenuEntries, headerActions, additionalContents };
 };

@@ -95,6 +95,18 @@ const HomeRedirect = () => {
 };
 
 const AppRoutes: React.FC = () => {
+    const {senseEntitat} = useUserSession();
+    const { t } = useTranslation();
+
+    // Sense cap entitat assignada no es pot mostrar cap pantalla (totes depenen de l'entitat actual i
+    // el backend respondria amb error): es mostra el mateix avís que la interfície clàssica.
+    if (senseEntitat) {
+        return <Routes>
+            <Route path="accessibilitat" element={<Accesibilitat />} />
+            <Route path="*" element={<NotFoundPage message={t('page.senseEntitat')} variant="h4" />} />
+        </Routes>;
+    }
+
     return <Routes>
         <Route path="/" element={<HomeRedirect />} />
 

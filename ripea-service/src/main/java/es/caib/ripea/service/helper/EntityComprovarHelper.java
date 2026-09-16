@@ -390,50 +390,53 @@ public class EntityComprovarHelper {
 			Long entitatId,
 			String rolActual, 
 			Long organGestorId) {
-		
-		EntitatEntity entitat = comprovarEntitat(entitatId);
-		
+
 		List<GrupEntity> grups = new ArrayList<>();
+
+		if (entitatId!=null) {
+
+			EntitatEntity entitat = comprovarEntitat(entitatId);
+
+			List<MetaExpedientEntity> metaExpedientsEnt = metaExpedientHelper.findAmbPermis(
+					entitatId,
+					ExtendedPermission.READ,
+					true,
+					null, 
+					"IPA_ADMIN".equals(rolActual),
+					"IPA_ORGAN_ADMIN".equals(rolActual),
+					null, 
+					false);
 		
-		List<MetaExpedientEntity> metaExpedientsEnt = metaExpedientHelper.findAmbPermis(
-				entitatId,
-				ExtendedPermission.READ,
-				true,
-				null, 
-				"IPA_ADMIN".equals(rolActual),
-				"IPA_ORGAN_ADMIN".equals(rolActual),
-				null, 
-				false);
-		
-		boolean isAnyGestioAmbGrupsActiva = false;
-		for (MetaExpedientEntity metaExpedientEntity : metaExpedientsEnt) {
-			if (metaExpedientEntity.isGestioAmbGrupsActiva()) {
-				isAnyGestioAmbGrupsActiva = true;
-				break;
+			boolean isAnyGestioAmbGrupsActiva = false;
+			for (MetaExpedientEntity metaExpedientEntity : metaExpedientsEnt) {
+				if (metaExpedientEntity.isGestioAmbGrupsActiva()) {
+					isAnyGestioAmbGrupsActiva = true;
+					break;
+				}
 			}
-		}
-		
-		if (isAnyGestioAmbGrupsActiva) {
-
-			List<String> codisOrgansFills = null;
-
-			if (organGestorId != null) {
-				OrganGestorEntity organ = organGestorRepository.getOne(organGestorId);
-				codisOrgansFills = organGestorCacheHelper.getCodisOrgansFills(entitat.getCodi(), organ.getCodi());
-			}
-
-			grups = grupRepositoryCommnand.findByEntitatAndOrgan(entitat, null, codisOrgansFills);
-			if ("tothom".equals(rolActual)) {
-				permisosHelper.filterGrantedAny(
-						grups,
-						new ObjectIdentifierExtractor<GrupEntity>() {
-							public Long getObjectIdentifier(GrupEntity entitat) {
-								return entitat.getId();
-							}
-						},
-						GrupEntity.class,
-						new Permission[] { ExtendedPermission.READ },
-						SecurityContextHolder.getContext().getAuthentication());
+			
+			if (isAnyGestioAmbGrupsActiva) {
+	
+				List<String> codisOrgansFills = null;
+	
+				if (organGestorId != null) {
+					OrganGestorEntity organ = organGestorRepository.getOne(organGestorId);
+					codisOrgansFills = organGestorCacheHelper.getCodisOrgansFills(entitat.getCodi(), organ.getCodi());
+				}
+	
+				grups = grupRepositoryCommnand.findByEntitatAndOrgan(entitat, null, codisOrgansFills);
+				if ("tothom".equals(rolActual)) {
+					permisosHelper.filterGrantedAny(
+							grups,
+							new ObjectIdentifierExtractor<GrupEntity>() {
+								public Long getObjectIdentifier(GrupEntity entitat) {
+									return entitat.getId();
+								}
+							},
+							GrupEntity.class,
+							new Permission[] { ExtendedPermission.READ },
+							SecurityContextHolder.getContext().getAuthentication());
+				}
 			}
 		}
 		return grups;

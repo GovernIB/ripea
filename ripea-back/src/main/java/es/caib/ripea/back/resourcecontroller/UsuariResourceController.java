@@ -113,10 +113,15 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         }
 
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request, entitatService);
-        entitatActual.setOrgansGestors(EntitatHelper.findOrganismesEntitatAmbPermisCacheByRol(request, organGestorService, entitatActual));
+        //El rol super no treballa amb entitats ni amb organs seleccionables 
+        if (entitatActual!=null) {
+        	entitatActual.setOrgansGestors(EntitatHelper.findOrganismesEntitatAmbPermisCacheByRol(request, organGestorService, entitatActual));
+        	entitatService.setConfigEntitat(entitatActual);
+        }
+        
         String rolActual = RolHelper.getRolActual(request);
         aplicacioService.actualitzarRolThreadLocal(rolActual);
-        entitatService.setConfigEntitat(entitatActual);
+        
         OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
         
         List<String> roles = RolHelper.getRolsUsuariActual(request);

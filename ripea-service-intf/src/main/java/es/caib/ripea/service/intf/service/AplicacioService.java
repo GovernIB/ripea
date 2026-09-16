@@ -232,6 +232,14 @@ public interface AplicacioService {
 	@PreAuthorize("isAuthenticated()")
 	public void evictCountAnotacionsPendents(String usuariCodi);
 
+	/**
+	 * Buida les caches de l'usuari actual que depenen dels seus rols: entitats accessibles, òrgans amb permís,
+	 * rols i recompte d'anotacions pendents. Els rols venen del token i poden canviar a Keycloak sense que
+	 * RIPEA en sàpiga res; com que un token nou implica una sessió nova, s'ha d'invocar en iniciar cada sessió.
+	 */
+	@PreAuthorize("isAuthenticated()")
+	public void evictCachesUsuariActual();
+
 	public boolean mostrarLogsRendiment();
 
 	@PreAuthorize("isAuthenticated()")
