@@ -78,7 +78,9 @@ public class OrganGestorResourceServiceImpl extends BaseMutableResourceService<O
         String organActualCodi	 = configHelper.getOrganActualCodi();
         String rolActual		 = configHelper.getRolActual();
         
-		boolean isAdmin 		= "IPA_ADMIN".equals(rolActual);
+		// L'administrador de lectura veu els expedients de tota l'entitat: els selectors d'òrgan (p.ex. el filtre del
+		// llistat d'expedients) han d'oferir-li, com a l'administrador, tots els òrgans de l'entitat
+		boolean isAdmin 		= "IPA_ADMIN".equals(rolActual) || "IPA_ADMIN_LECTURA".equals(rolActual);
 		boolean isAdminOrgan 	= "IPA_ORGAN_ADMIN".equals(rolActual);
 		boolean isDissenyOrgan 	= "IPA_DISSENY".equals(rolActual);
 		boolean isSuper 		= "IPA_SUPER".equals(rolActual);

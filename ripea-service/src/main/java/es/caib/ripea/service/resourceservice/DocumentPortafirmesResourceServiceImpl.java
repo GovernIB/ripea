@@ -65,7 +65,9 @@ public class DocumentPortafirmesResourceServiceImpl extends BaseMutableResourceS
     	String entitatActualCodi = configHelper.getEntitatActualCodi();
     	String rolActual		 = configHelper.getRolActual();
     	
-    	boolean isAdmin = "IPA_ADMIN".equals(rolActual);
+    	// L'administrador de lectura veu, com l'administrador, els enviaments de tots els expedients de l'entitat
+    	// (mateix criteri que el llistat d'expedients a ExpedientHelper.findPermisosPerExpedients)
+    	boolean isAdmin = "IPA_ADMIN".equals(rolActual) || "IPA_ADMIN_LECTURA".equals(rolActual);
     	
         Filter filtreBase = FilterBuilder.and(
                 (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
