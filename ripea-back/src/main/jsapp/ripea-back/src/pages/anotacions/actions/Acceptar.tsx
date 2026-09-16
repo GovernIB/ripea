@@ -12,10 +12,16 @@ import useRegistreInteressatDetail from "../details/RegistreInteressatDetail.tsx
 import {useUserSession} from "@src/components/Session.tsx";
 import {useIframeDialog} from "@src/components/Iframe.tsx";
 import {icons} from "@src/util/icons.ts";
+import {FORM_FIELD_TYPE_TOGGLE_BUTTONS} from "@src/components/FormFieldToggleButtons.tsx";
 
 // Id reservat a la fila del justificant de registre dins la graella d'annexos: el back distingeix el
 // justificant dels annexos reals per aquest 0 (veure AcceptarAnotacioActionExecutor.exec).
 const JUSTIFICANT_ROW_ID = 0;
+
+// Valors de ExpedientPeticioAccioEnumDto: el diàleg s'hi pot obrir amb qualsevol dels dos
+// preseleccionat, i l'usuari el pot canviar sense tancar-lo.
+export const ACCIO_CREAR = 'CREAR';
+export const ACCIO_INCORPORAR = 'INCORPORAR';
 
 // Les metadades del justificant surten d'una consulta a l'Arxiu, així que es demanen amb una perspectiva
 // pròpia i només en obrir el diàleg. El llistat només rep teJustificant (perspectiva REGISTRE).
@@ -29,14 +35,29 @@ const AcceptarTabExpedient = () => {
         builder.eq('actiu', true),
         builder.eq('revisioEstat', "'REVISAT'"),
     );
-    
+
+    // El servidor informa quines accions permet el procediment seleccionat (permís CREATE per a crear
+    // i WRITE per a incorporar) i s'amaga la que no es permet, com fa el JSP amb els radios. Cal
+    // memoritzar-ho: una llista nova a cada render faria recarregar les opcions de la botonera.
+    const hiddenAccioValues = useMemo(() => {
+        const amagats = [];
+        if (data?.potCrear === false) {
+            amagats.push(ACCIO_CREAR);
+        }
+        if (data?.potIncorporar === false) {
+            amagats.push(ACCIO_INCORPORAR);
+        }
+        return amagats.length ? amagats : undefined;
+    }, [data?.potCrear, data?.potIncorporar]);
+
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField name="accio" required/>
+        <GridFormField name="accio" type={FORM_FIELD_TYPE_TOGGLE_BUTTONS}
+            hiddenEnumValues={hiddenAccioValues} required/>
         <GridFormField name="metaExpedient" required
             filter={filterMetaExpedientAnotacioCrear}
             namedQueries={['EXPEDIENT_CREATE']}/>
 
-        {data?.accio == "CREAR" &&
+        {data?.accio == ACCIO_CREAR &&
             <>
                 <GridFormField name="newExpedientTitol" required/>
                 <GridFormField name="prioritat" required/>
@@ -54,7 +75,7 @@ const AcceptarTabExpedient = () => {
 				<GridFormField name="seguidor"/>
             </>
         }
-        {data?.accio == "INCORPORAR" &&
+        {data?.accio == ACCIO_INCORPORAR &&
             <>
                 <GridFormField name="expedient"
                         filter={builder.and(
@@ -364,8 +385,11 @@ const useAcceptar = (refresh?: () => void) => {
     const {temporalMessageShow} = useBaseAppContext();
     const {getOne} = useResourceApiService('expedientPeticioResource');
 
-    const show = (id:any, row:any, justificant:any) :void => {
+    const show = (id:any, row:any, justificant:any, accio?:string) :void => {
         apiRef.current?.show?.(id, {
+            //Només s'informa si el diàleg s'obri des d'una acció que la preselecciona: una clau amb
+            //valor undefined pisaria el valor per defecte del formulari del servidor.
+            ...(accio ? {accio} : {}),
             metaExpedient: row?.metaExpedient,
             registre: row?.registre,
             interessats: row?.registreInfo?.interessats?.map((i:any)=>i.id) || [],
@@ -378,17 +402,17 @@ const useAcceptar = (refresh?: () => void) => {
         })
     }
 
-    const handleShow = (id:any, row:any) :void => {
+    const handleShow = (id:any, row:any, accio?:string) :void => {
         if (!user?.sessionScope?.isIncorporacioJustificantActiva || !row?.teJustificant) {
-            show(id, row, undefined);
+            show(id, row, undefined, accio);
             return;
         }
         // El títol i el nom del fitxer del justificant surten d'una consulta a l'Arxiu: es fa en obrir el
         // diàleg i no per cada fila del llistat. Si la consulta falla la fila s'hi ha d'afegir igualment,
         // sense metadades, perquè l'usuari en pugui triar el tipus de document i el justificant s'incorpori.
         getOne(id, {perspectives: justificantPerspectives})
-            .then((anotacio:any) => show(id, row, anotacio?.registreInfo?.justificant ?? {}))
-            .catch(() => show(id, row, {}));
+            .then((anotacio:any) => show(id, row, anotacio?.registreInfo?.justificant ?? {}, accio))
+            .catch(() => show(id, row, {}, accio));
     }
     const onSuccess = () :void => {
         refresh?.();

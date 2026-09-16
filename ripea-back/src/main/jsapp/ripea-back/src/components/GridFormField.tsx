@@ -19,6 +19,12 @@ export const CombinedIcon = (props:any) => {
     </Box>
 }
 
+// Aire que se deja por encima de cada campo y de cada botón de las rejillas de formulario: sin él,
+// la etiqueta flotante de un campo informado se solapa con el borde inferior del campo de la fila
+// anterior (el row-gap de 8px no basta). Va tanto aquí como en GridFormField porque los dos
+// componentes comparten fila en los buscadores y, si solo lo llevara uno, quedarían desalineados.
+export const GRID_FIELD_PADDING_TOP = '3px';
+
 export const GridButton = (props:any) => {
     const { title, icon, size, children, hidden, sx, iconOnlyBreakpoint = 'md', ...other} = props;
 
@@ -29,7 +35,7 @@ export const GridButton = (props:any) => {
         ? <Icon sx={{mr: (!iconOnly && children) ? 0.5 : 0, ...props.iconSx}}>{icon}</Icon>
         : icon;
 
-    return <Grid title={title} size={size} hidden={hidden}>
+    return <Grid title={title} size={size} hidden={hidden} sx={{ pt: GRID_FIELD_PADDING_TOP }}>
         <Button
             variant="outlined"
             sx={{ borderRadius: '4px', width: '100%', height: '100%', ...sx }}
@@ -160,7 +166,7 @@ const GridFormField = (props:GridFormField) => {
         }
     }, [dataDispatchAction, field, name]);
 
-    return <Grid size={size} hidden={!!hidden}>
+    return <Grid size={size} hidden={!!hidden} sx={{ pt: GRID_FIELD_PADDING_TOP }}>
         <FormField
             name={name}
             disabled={disabled}

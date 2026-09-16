@@ -212,6 +212,14 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
     	private Integer any = Year.now().getValue();
     	private Long sequencia;
         @Transient boolean gestioAmbGrupsActiva;
+        /**
+         * Accions que l'usuari pot triar sobre el procediment seleccionat: crear un expedient nou
+         * requereix permís CREATE i incorporar l'anotació a un existent, permís WRITE. El front
+         * amaga l'opció que no es permet, com fa el JSP amb els radios (expedientPeticioAccept.jsp).
+         * Per defecte totes dues, que és el que val mentre no hi ha cap procediment seleccionat.
+         */
+        @Transient private boolean potCrear = true;
+        @Transient private boolean potIncorporar = true;
         @Transient private boolean disableOrganGestor = false;
         @Transient private String expedientNoTrobatMissatge;
         /**

@@ -58,6 +58,7 @@ import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ErrorsValidacioTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
+import es.caib.ripea.service.intf.dto.PermissionEnumDto;
 import es.caib.ripea.service.intf.dto.ValidacioErrorDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.PermissionDeniedException;
@@ -543,6 +544,30 @@ public class EntityComprovarHelper {
 		}
 		
 		return metaExpedient;
+	}
+
+	/**
+	 * Versió booleana de {@link #comprovarMetaExpedient}: indica si l'usuari actual té el permís
+	 * indicat sobre el procediment en lloc de llançar excepció quan no el té. Pensada per a decidir
+	 * quines opcions s'ofereixen a la interfície abans d'executar-hi cap acció.
+	 */
+	public boolean tePermisMetaExpedient(
+			EntitatEntity entitat,
+			Long metaExpedientId,
+			PermissionEnumDto permission) {
+		try {
+			comprovarMetaExpedient(
+					entitat,
+					metaExpedientId,
+					permission == PermissionEnumDto.READ,
+					permission == PermissionEnumDto.WRITE,
+					permission == PermissionEnumDto.CREATE,
+					permission == PermissionEnumDto.DELETE,
+					false, null, null);
+			return true;
+		} catch (PermissionDeniedException ex) {
+			return false;
+		}
 	}
 
 	public MetaExpedientEntity comprovarAccesMetaExpedient(

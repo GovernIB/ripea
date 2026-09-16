@@ -58,6 +58,7 @@ import es.caib.ripea.service.helper.MessageHelper;
 import es.caib.ripea.service.helper.MetaDocumentHelper;
 import es.caib.ripea.service.helper.PermisosPerAnotacions;
 import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.helper.RolHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
@@ -79,6 +80,7 @@ import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatViewEnumDto;
 import es.caib.ripea.service.intf.dto.InteressatAssociacioAccioEnum;
 import es.caib.ripea.service.intf.dto.MetaDocumentPerDefecteEnumDto;
 import es.caib.ripea.service.intf.dto.NtiTipoDocumentoEnumDto;
+import es.caib.ripea.service.intf.dto.PermissionEnumDto;
 import es.caib.ripea.service.intf.dto.SiNoEnumDto;
 import es.caib.ripea.service.intf.model.ExpedientPeticioResource;
 import es.caib.ripea.service.intf.model.ExpedientPeticioResource.AcceptarAnotacioForm;
@@ -558,6 +560,8 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
                                 Long metaDocJustificantId = metaDocumentJustificantId(metaExpedientResourceEntity.getId());
                                 target.setMetaDocumentJustificantId(metaDocJustificantId);
                                 target.setAnnexos(annexosReiniciats(previous.getAnnexos(), metaDocJustificantId));
+
+                                actualitzarAccionsPermeses(target, metaExpedientResourceEntity.getId());
                             });
                         } else {
                             target.setGestioAmbGrupsActiva(false);
@@ -566,6 +570,9 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
                             target.setSequencia(null);
                             target.setMetaDocumentJustificantId(null);
                             target.setAnnexos(annexosReiniciats(previous.getAnnexos(), null));
+                            //Sense procediment no es pot saber què es permet: s'ofereixen les dues accions.
+                            target.setPotCrear(true);
+                            target.setPotIncorporar(true);
                         }
                         break;
                     case AcceptarAnotacioForm.Fields.any:
@@ -599,6 +606,38 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
                     onChange(id, previous, AcceptarAnotacioForm.Fields.metaExpedient, previous.getMetaExpedient(), answers, previousFieldNames, target);
                 }
                 comprovarExpedientReferenciat(id, target);
+            }
+        }
+
+        /**
+         * Determina quines de les dues accions pot triar l'usuari sobre el procediment seleccionat i,
+         * si només n'hi ha una, la deixa seleccionada. És l'equivalent de les crides
+         * comprovarPermisCreate/comprovarPermisWrite que fa el JSP cada vegada que es canvia de
+         * procediment (veure ExpedientPeticioController i expedientPeticioAccept.jsp), amb el mateix
+         * criteri: els rols d'administrador d'entitat i d'òrgan tenen totes dues accions.
+         * <p>
+         * Si no se'n permet cap no s'amaga res —el formulari no pot quedar sense cap opció triable—,
+         * igual que al JSP; l'execució de l'acció ja comprova els permisos pel seu compte.
+         */
+        private void actualitzarAccionsPermeses(AcceptarAnotacioForm target, Long metaExpedientId) {
+            String rolActual = configHelper.getRolActual();
+            boolean esAdministrador = RolHelper.isAdminEntitat(rolActual) || RolHelper.isAdminOrgan(rolActual);
+            boolean potCrear = true;
+            boolean potIncorporar = true;
+            if (!esAdministrador) {
+                EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+                        configHelper.getEntitatActualCodi(), false, false, false, true, false);
+                potCrear = entityComprovarHelper.tePermisMetaExpedient(entitat, metaExpedientId, PermissionEnumDto.CREATE);
+                potIncorporar = entityComprovarHelper.tePermisMetaExpedient(entitat, metaExpedientId, PermissionEnumDto.WRITE);
+                if (!potCrear && !potIncorporar) {
+                    potCrear = true;
+                    potIncorporar = true;
+                }
+            }
+            target.setPotCrear(potCrear);
+            target.setPotIncorporar(potIncorporar);
+            if (potCrear != potIncorporar) {
+                target.setAccio(potCrear ? ExpedientPeticioAccioEnumDto.CREAR : ExpedientPeticioAccioEnumDto.INCORPORAR);
             }
         }
 

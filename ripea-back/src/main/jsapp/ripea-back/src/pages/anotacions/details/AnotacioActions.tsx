@@ -5,7 +5,7 @@ import {iniciaDescargaBlob} from "../../expedient/details/CommonActions.tsx";
 import useRebutjar from "../actions/Rebutjar.tsx";
 import {useNavigate} from "react-router-dom";
 import {useUserSession} from "../../../components/Session.tsx";
-import useAcceptar from "../actions/Acceptar.tsx";
+import useAcceptar, {ACCIO_CREAR, ACCIO_INCORPORAR} from "../actions/Acceptar.tsx";
 import useSubsanarAnnexos from "../actions/SubsanarAnnexos.tsx";
 import { icons as iconsAppMenu } from '@src/util/icons';
 
@@ -120,6 +120,10 @@ export const useAnexxActions = () => {
     }
 }
 
+// Les accions que resolen una anotació (acceptar-la creant o incorporant-la, i rebutjar-la) només
+// tenen sentit mentre està pendent i no espera el canvi d'estat a Distribució.
+const amagatSiNoPendent = (row:any) => row?.estat != 'PENDENT' || row?.pendentCanviEstatDistribucio;
+
 const useAnotacioActions = (refresh?: () => void) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -143,22 +147,29 @@ const useAnotacioActions = (refresh?: () => void) => {
             label: t('page.anotacio.action.acceptar.label'),
             icon: "check_circle",
             showInMenu: true,
-            onClick: handleAcceptar,
-            hidden: (row:any) => row?.estat != 'PENDENT' || row?.pendentCanviEstatDistribucio,
+            onClick: (id:any, row:any) => handleAcceptar(id, row, ACCIO_CREAR),
+            hidden: amagatSiNoPendent,
+        },
+        {
+            label: t('page.anotacio.action.incorporar.label'),
+            icon: "move_to_inbox",
+            showInMenu: true,
+            onClick: (id:any, row:any) => handleAcceptar(id, row, ACCIO_INCORPORAR),
+            hidden: amagatSiNoPendent,
         },
         {
             label: t('page.anotacio.action.rebutjar.label'),
             icon: "close",
             showInMenu: true,
             onClick: handleRebutjar,
-            hidden: (row:any) => row?.estat != 'PENDENT' || row?.pendentCanviEstatDistribucio,
+            hidden: amagatSiNoPendent,
         },
         {
             label: t('page.anotacio.action.canviProcediment.label'),
             icon: "edit",
             showInMenu: true,
             clickShowUpdateDialog: true,
-            hidden: (row:any) => row?.estat != 'PENDENT' || row?.pendentCanviEstatDistribucio || !rol?.isAdmin,
+            hidden: (row:any) => amagatSiNoPendent(row) || !rol?.isAdmin,
         },
         {
             label: t('page.expedient.title'),

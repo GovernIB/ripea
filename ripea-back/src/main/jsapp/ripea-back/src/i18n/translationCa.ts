@@ -343,8 +343,11 @@ const translationCa = {
                 acceptar: {
                     label: "Accepta...",
                     button: "Accepta",
-                    title: "Acceptar anotació",
+                    title: "Accepta o incorpora anotació",
                     ok: "L'anotació s'ha acceptat correctament",
+                },
+                incorporar: {
+                    label: "Incorpora...",
                 },
                 rebutjar: {
                     label: "Rebutja...",

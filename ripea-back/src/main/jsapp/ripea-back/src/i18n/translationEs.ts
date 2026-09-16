@@ -343,8 +343,11 @@ const translationEs = {
                 acceptar: {
                     label: "Acepta...",
                     button: "Acepta",
-                    title: "Aceptar anotación",
+                    title: "Acepta o incorpora anotación",
                     ok: "La anotación se ha aceptado correctamente",
+                },
+                incorporar: {
+                    label: "Incorpora...",
                 },
                 rebutjar: {
                     label: "Rechaza...",

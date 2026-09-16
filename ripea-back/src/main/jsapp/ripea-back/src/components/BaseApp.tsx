@@ -24,6 +24,7 @@ import drassana from '../assets/drassana.png';
 import UserHeadToolbar from "../pages/user/UserHeadToolbar.tsx";
 import {UserMenu} from "../pages/user/UserMenu.tsx";
 import AppFormFieldReference from './AppFormFieldReference';
+import FormFieldToggleButtons, { FORM_FIELD_TYPE_TOGGLE_BUTTONS } from './FormFieldToggleButtons';
 import {useAlertesSession} from "./SseClient.tsx";
 import {useUserSession} from "./Session";
 import AlertExpand from "./AlertExpand.tsx";
@@ -345,7 +346,10 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
             routerAnyHistoryEntryExist={anyHistoryEntryExist}
             linkComponent={Link}
             marginsDisabled={false}
-            formFieldComponents={[{ type: 'reference', component: AppFormFieldReference }]}
+            formFieldComponents={[
+                { type: 'reference', component: AppFormFieldReference },
+                { type: FORM_FIELD_TYPE_TOGGLE_BUTTONS, component: FormFieldToggleButtons },
+            ]}
             menuEntries={baseAppMenuEntries}
         >
             <CustomLocalizationProvider>

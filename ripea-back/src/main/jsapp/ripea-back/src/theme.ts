@@ -1,6 +1,7 @@
 import { createTheme, darken, emphasize, ThemeOptions } from '@mui/material/styles';
 import { lighten, alpha } from '@mui/material';
 import type {} from '@mui/x-data-grid/themeAugmentation';
+import type {} from '@mui/x-date-pickers/themeAugmentation';
 
 // Colors per defecte
 export const DEFAULT_PRIMARY_COLOR = '#337ab7';
@@ -322,6 +323,18 @@ const baseComponentStyles: ThemeOptions['components'] = {
     MuiInputBase: {
         styleOverrides: {
             root: { fontSize: '14px' },
+        },
+    },
+    // Els camps de data no són MuiInputBase sinó MuiPickersInputBase, així que no reben el fontSize
+    // de sobre i es queden amb els 16px per defecte de MUI: això els fa 40px d'alt contra els 37px
+    // de la resta de camps i els desalinea dins d'una mateixa fila. El botó del calendari s'ajusta
+    // com el dels desplegables (2px de padding, 28px finals) perquè càpiga dins del camp ja ajustat.
+    MuiPickersInputBase: {
+        styleOverrides: {
+            root: {
+                fontSize: '14px',
+                '& .MuiInputAdornment-root .MuiIconButton-root': { padding: '2px' },
+            },
         },
     },
     MuiFormLabel: {

@@ -73,7 +73,6 @@ import es.caib.ripea.service.intf.dto.ProgresActualitzacioDto;
 import es.caib.ripea.service.intf.dto.ReglaDistribucioDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
-import es.caib.ripea.service.intf.exception.PermissionDeniedException;
 import es.caib.ripea.service.intf.service.MetaExpedientService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
@@ -671,20 +670,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				false,
 				false);
 
-		boolean permitted = true;
-		try {
-			entityComprovarHelper.comprovarMetaExpedient(
-					entitat,
-					metaExpedientId,
-					permission == PermissionEnumDto.READ,
-					permission == PermissionEnumDto.WRITE,
-					permission == PermissionEnumDto.CREATE,
-					permission == PermissionEnumDto.DELETE,
-					false, null, null);
-		} catch (PermissionDeniedException ex) {
-			permitted = false;
-		}
-		return permitted;
+		return entityComprovarHelper.tePermisMetaExpedient(entitat, metaExpedientId, permission);
 	}
 
 

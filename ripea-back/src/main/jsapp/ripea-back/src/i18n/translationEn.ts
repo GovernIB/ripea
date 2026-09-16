@@ -343,8 +343,11 @@ const translationEn = {
                 acceptar: {
                     label: "Accept...",
                     button: "Accept",
-                    title: "Accept record",
+                    title: "Accept or incorporate record",
                     ok: "The record has been successfully accepted",
+                },
+                incorporar: {
+                    label: "Incorporate...",
                 },
                 rebutjar: {
                     label: "Reject...",
