@@ -402,7 +402,6 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			throw new SecurityException("Sense permisos per a gestionar aquest organ gestor");
 		}
 		permisosHelper.updatePermis(id, OrganGestorEntity.class, permis);
-		cacheHelper.evictEntitatsAccessiblesAllUsuaris();
 	}
 	@Transactional
 	@Override
@@ -419,7 +418,6 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			throw new SecurityException("Sense permisos per administrar aquesta entitat");
 		}
 		permisosHelper.deletePermis(id, OrganGestorEntity.class, permisId);
-		cacheHelper.evictEntitatsAccessiblesAllUsuaris();
 	}
 	@Transactional
 	@Override

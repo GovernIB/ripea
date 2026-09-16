@@ -237,7 +237,6 @@ public class EntitatServiceImpl implements EntitatService {
 	}
 	@Transactional
 	@Override
-	@CacheEvict(value = "entitatsUsuari", allEntries = true)
 	public void updatePermisSuper(Long id, PermisDto permis) {
 
 		logger.debug("Modificació com a superusuari del permis de l'entitat (id=" + id + ", permis=" + permis + ")");
@@ -246,7 +245,6 @@ public class EntitatServiceImpl implements EntitatService {
 	}
 	@Transactional
 	@Override
-	@CacheEvict(value = "entitatsUsuari", allEntries = true)
 	public void deletePermisSuper(Long id, Long permisId) {
 
 		logger.debug("Eliminació com a superusuari del permis de l'entitat (id=" + id + ", permisId=" + permisId + ")");
@@ -271,7 +269,6 @@ public class EntitatServiceImpl implements EntitatService {
 
 	@Transactional
 	@Override
-	@CacheEvict(value = "entitatsUsuari", allEntries = true)
 	public void updatePermisAdmin(Long id, PermisDto permis) {
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -287,7 +284,6 @@ public class EntitatServiceImpl implements EntitatService {
 
 	@Transactional
 	@Override
-	@CacheEvict(value = "entitatsUsuari", allEntries = true)
 	public void deletePermisAdmin(Long id, Long permisId) {
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();

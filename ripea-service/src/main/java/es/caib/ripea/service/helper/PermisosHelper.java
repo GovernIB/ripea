@@ -1,12 +1,10 @@
 package es.caib.ripea.service.helper;
 
-import es.caib.ripea.persistence.entity.AclClassEntity;
 import es.caib.ripea.persistence.entity.AclEntryEntity;
 import es.caib.ripea.persistence.entity.AclObjectIdentityEntity;
 import es.caib.ripea.persistence.entity.AclSidEntity;
+import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
-import es.caib.ripea.persistence.repository.AclClassRepository;
-import es.caib.ripea.persistence.repository.AclEntryRepository;
 import es.caib.ripea.persistence.repository.AclObjectIdentityRepository;
 import es.caib.ripea.persistence.repository.AclSidRepository;
 import es.caib.ripea.service.intf.dto.ActualitzacioInfo;
@@ -50,8 +48,6 @@ public class PermisosHelper {
 	@Autowired private LookupStrategy lookupStrategy;
 	@Autowired private MutableAclService aclService;
 	@Autowired private AclSidRepository aclSidRepository;
-	@Autowired private AclEntryRepository aclEntryRepository;
-	@Autowired private AclClassRepository aclClassRepository;
 	@Autowired private AclObjectIdentityRepository aclObjectIdentityRepository;
 	@Autowired private MessageHelper messageHelper;
 	@Autowired private CacheHelper cacheHelper;
@@ -563,6 +559,8 @@ public class PermisosHelper {
 		try {
 			ObjectIdentity oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
 			aclService.deleteAcl(oid, true);
+			cacheHelper.evictReadAclById(oid);
+			evictEntitatsAccessibles(objectClass, null);
 		} catch (NotFoundException nfex) {
 		}
 	}
@@ -652,6 +650,7 @@ public class PermisosHelper {
 		}
 		aclService.updateAcl(acl);
 		cacheHelper.evictReadAclById(oid);
+		evictEntitatsAccessibles(objectClass, sid);
 	}
 
 	private void revocarPermisos(
@@ -677,8 +676,31 @@ public class PermisosHelper {
 				acl.deleteAce(index);
 			aclService.updateAcl(acl);
 			cacheHelper.evictReadAclById(oid);
+			evictEntitatsAccessibles(objectClass, sid);
 		} catch (NotFoundException nfex) {
 			// Si no troba l'ACL no fa res
+		}
+	}
+
+	/**
+	 * La llista d'entitats accessibles de cada usuari (caches entitatsUsuari i entitatsUsuariIds) es calcula a
+	 * partir dels permisos sobre entitats i dels permisos d'administració sobre òrgans gestors
+	 * (CacheHelper.findEntitatsPermisosUsuari). Qualsevol canvi en aquests ACLs l'ha d'invalidar, independentment
+	 * de la interfície (JSP o REACT) que l'origini.
+	 *
+	 * L'evict es fa després del commit perquè una petició concurrent no torni a cachejar els permisos antics.
+	 * Si el permís és d'un usuari només s'invalida la seva entrada; si és d'un rol (o no es coneix el destinatari,
+	 * com en esborrar tot l'ACL) s'invaliden totes, ja que no se sap quins usuaris tenen el rol.
+	 */
+	private void evictEntitatsAccessibles(Class<?> objectClass, Sid sid) {
+		if (!EntitatEntity.class.equals(objectClass) && !OrganGestorEntity.class.equals(objectClass)) {
+			return;
+		}
+		if (sid instanceof PrincipalSid) {
+			final String usuariCodi = ((PrincipalSid)sid).getPrincipal();
+			TransactionAfterCommitUtils.run(() -> cacheHelper.evictEntitatsAccessiblesUsuari(usuariCodi));
+		} else {
+			TransactionAfterCommitUtils.run(() -> cacheHelper.evictEntitatsAccessiblesAllUsuaris());
 		}
 	}
 
@@ -878,10 +900,7 @@ public class PermisosHelper {
 	}
 
 	public void eliminarPermisosOrgan(OrganGestorEntity organGestor) {
-		AclClassEntity classname = aclClassRepository.findByClassname("es.caib.ripea.core.entity.OrganGestorEntity");
-		AclObjectIdentityEntity objectIdentity = aclObjectIdentityRepository.findByClassnameAndObjectId(classname, organGestor.getId());
-		List<AclEntryEntity> permisos = aclEntryRepository.findByAclObjectIdentity(objectIdentity);
-		aclEntryRepository.deleteInBatch(permisos);
+		deleteAcl(organGestor.getId(), OrganGestorEntity.class);
 	}
 
 	public Set<PermisDto> findPermisosObjectes(List<Long> objectsId, Permission[] permissions, Permission[] permissions2) {

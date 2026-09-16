@@ -547,6 +547,20 @@ public class AplicacioServiceImpl implements AplicacioService {
 	}
 
 	@Override
+	public void evictCachesUsuariActual() {
+		String usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
+		logger.debug("Evict de les caches dependents dels rols de l'usuari (usuariCodi=" + usuariCodi + ")");
+		cacheHelper.evictEntitatsAccessiblesUsuari(usuariCodi);
+		cacheHelper.evictFindRolsAmbCodi(usuariCodi);
+		cacheHelper.evictCountAnotacionsPendents(usuariCodi);
+		// La clau d'aquestes caches és {entitatId, usuariCodi}: s'evicta l'entrada de l'usuari per a cada entitat
+		for (Long entitatId : entitatRepository.findAllIds()) {
+			cacheHelper.evictOrganismesEntitatAmbPermis(entitatId, usuariCodi);
+			cacheHelper.evictOrganismesEntitatAmbPermisDisseny(entitatId, usuariCodi);
+		}
+	}
+
+	@Override
 	public String propertyBaseUrl() {
 		logger.debug("Consulta de la propietat base URL");
 		return configHelper.getConfig(PropertyConfig.BASE_URL);
