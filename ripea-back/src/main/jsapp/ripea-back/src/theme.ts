@@ -392,6 +392,17 @@ const baseComponentStyles: ThemeOptions['components'] = {
             },
         },
     },
+    MuiDialogContent: {
+        styleOverrides: {
+            root: {
+                // El títol és una barra acolorida: el seu padding no separa el contingut.
+                // lib/Dialog força pt:0 i el botó de tancar queda entre títol i contingut ('~', no '+').
+                '.MuiDialogTitle-root ~ &': {
+                    paddingTop: '8px',
+                },
+            },
+        },
+    },
     MuiCard: {
         styleOverrides: {
             root: {

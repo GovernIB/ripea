@@ -51,7 +51,6 @@ const useAnotacionsComunicadesDetail = () => {
             closeCallback={handleClose}
             title={t('page.tasca.detall.title')}
             componentProps={{ fullWidth: true, maxWidth: 'lg' }}
-            dialogContentProps={{ sx: { pt: 2 } }}
             buttons={[
                 {
                     value: 'close',
