@@ -27,7 +27,6 @@ import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.env.Environment;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
@@ -69,7 +68,6 @@ import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.NodeEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.RegistreAnnexEntity;
-import es.caib.ripea.persistence.entity.TipusDocumentalEntity;
 import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.repository.AlertaRepository;
 import es.caib.ripea.persistence.repository.CarpetaRepository;
@@ -85,7 +83,6 @@ import es.caib.ripea.persistence.repository.ExpedientTascaRepository;
 import es.caib.ripea.persistence.repository.GrupRepository;
 import es.caib.ripea.persistence.repository.MetaDocumentRepository;
 import es.caib.ripea.persistence.repository.RegistreAnnexRepository;
-import es.caib.ripea.persistence.repository.TipusDocumentalRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.plugin.arxiu.ArxiuContingutTipusEnum;
 import es.caib.ripea.plugin.arxiu.ArxiuDocumentContingut;
@@ -123,7 +120,6 @@ import es.caib.ripea.service.intf.dto.PermissionEnumDto;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 import es.caib.ripea.service.intf.dto.ResultDocumentsSenseContingut.ResultDocumentSenseContingut;
 import es.caib.ripea.service.intf.dto.ResultDocumentsSenseContingut.ResultDocumentSenseContingut.ResultDocumentSenseContingutBuilder;
-import es.caib.ripea.service.intf.dto.TipusDocumentalDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.dto.ValidacioErrorDto;
 import es.caib.ripea.service.intf.exception.ArxiuJaGuardatException;
@@ -161,7 +157,7 @@ public class ContingutHelper {
 	@Autowired private MetaExpedientHelper metaExpedientHelper;
 	@Autowired private ExpedientHelper expedientHelper;
 	@Autowired private ExpedientTascaRepository expedientTascaRepository;
-	@Autowired private TipusDocumentalRepository tipusDocumentalRepository;
+	@Autowired private TipusDocumentalHelper tipusDocumentalHelper;
 	@Autowired private IndexHelper indexHelper;
 	@Autowired private MessageHelper messageHelper;
 	@Autowired private ConfigHelper configHelper;
@@ -871,31 +867,14 @@ public class ContingutHelper {
 		dto.setNtiOrigen(document.getNtiOrigen());
 		dto.setNtiEstadoElaboracion(document.getNtiEstadoElaboracion());
 		dto.setNtiTipoDocumental(document.getNtiTipoDocumental());
-		if (document.getNtiTipoDocumental() != null) {
-			setNtiTipoDocumentalNom(dto, document);
-		}
+		dto.setNtiTipoDocumentalNom(tipusDocumentalHelper.getNomTipusDocumental(
+				document.getNtiTipoDocumental(),
+				document.getEntitat().getId(),
+				true));
 		dto.setNtiIdDocumentoOrigen(document.getNtiIdDocumentoOrigen());
 		dto.setNtiTipoFirma(document.getNtiTipoFirma());
 		dto.setNtiCsv(document.getNtiCsv());
 		dto.setNtiCsvRegulacion(document.getNtiCsvRegulacion());
-	}
-
-	private void setNtiTipoDocumentalNom(DocumentDto dto, DocumentEntity document) {
-		TipusDocumentalEntity tipusDocumental = tipusDocumentalRepository.findByCodiAndEntitat(document.getNtiTipoDocumental(), document.getEntitat());
-		if (tipusDocumental != null) {
-			if (LocaleContextHolder.getLocale().toString().equals("ca") && Utils.isNotEmpty(tipusDocumental.getNomCatala())) {
-				dto.setNtiTipoDocumentalNom(tipusDocumental.getNomCatala());
-			} else {
-				dto.setNtiTipoDocumentalNom(tipusDocumental.getNomEspanyol());
-			}
-		} else {
-			List<TipusDocumentalDto> docsAddicionals = pluginHelper.documentTipusAddicionals();
-			for (TipusDocumentalDto docAddicional : docsAddicionals) {
-				if (docAddicional.getCodi().equals(document.getNtiTipoDocumental())) {
-					dto.setNtiTipoDocumentalNom(docAddicional.getNom());
-				}
-			}
-		}
 	}
 
 	private void setEnviamentProperties(DocumentDto dto, DocumentEntity document) {

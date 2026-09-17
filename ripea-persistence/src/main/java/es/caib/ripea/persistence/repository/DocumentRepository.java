@@ -82,6 +82,9 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 
 	int countByExpedient(ExpedientEntity expedient);
 
+	/** Indica si algun document de l'entitat (esborrats inclosos) té assignat el tipus documental (relació pel codi, sense FK). */
+	boolean existsByEntitatIdAndNtiTipoDocumental(Long entitatId, String ntiTipoDocumental);
+
 	int countByExpedientAndEstat(
 			ExpedientEntity expedient,
 			DocumentEstatEnumDto estat);

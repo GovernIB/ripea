@@ -14,10 +14,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.back.command.TipusDocumentalCommand;
 import es.caib.ripea.back.helper.DatatablesHelper;
+import es.caib.ripea.back.helper.ExceptionHelper;
 import es.caib.ripea.back.helper.MissatgesHelper;
 import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.TipusDocumentalDto;
+import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.service.TipusDocumentalService;
 
 @Controller
@@ -86,9 +88,19 @@ public class TipusDocumentalController extends BaseAdminController {
 			return "tipusDocumentalForm";
 		}
 		if (command.getId() != null) {
-			tipusDocumentalService.update(
-					entitatActual.getId(), 
-					TipusDocumentalCommand.asDto(command));
+			try {
+				tipusDocumentalService.update(
+						entitatActual.getId(),
+						TipusDocumentalCommand.asDto(command));
+			} catch (Exception ex) {
+				// No es pot canviar el codi d'un tipus documental en ús: es torna al formulari amb el motiu.
+				Exception validationException = ExceptionHelper.findExceptionInstance(ex, ValidationException.class, 3);
+				if (validationException == null) {
+					throw ex;
+				}
+				MissatgesHelper.error(request, validationException.getMessage());
+				return "tipusDocumentalForm";
+			}
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:../../tipusDocumental",
@@ -111,13 +123,58 @@ public class TipusDocumentalController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long tipusDocumentalId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
-		TipusDocumentalDto tipusDoc = tipusDocumentalService.delete(
-				entitatActual.getId(),
-				tipusDocumentalId);
+		TipusDocumentalDto tipusDoc;
+		try {
+			tipusDoc = tipusDocumentalService.delete(
+					entitatActual.getId(),
+					tipusDocumentalId);
+		} catch (Exception ex) {
+			// No es pot esborrar un tipus documental assignat a tipus de document o documents.
+			Exception validationException = ExceptionHelper.findExceptionInstance(ex, ValidationException.class, 3);
+			if (validationException == null) {
+				throw ex;
+			}
+			return getAjaxControllerReturnValueErrorMessage(
+					request,
+					"redirect:../../tipusDocumental",
+					validationException.getMessage(),
+					null);
+		}
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../tipusDocumental",
 				"tipusdocumental.controller.esborrat.ok",
+				new Object[] { tipusDoc.getNomCatala()!=null?tipusDoc.getNomCatala():tipusDoc.getNomEspanyol() });
+	}
+
+	@RequestMapping(value = "/{tipusDocumentalId}/enable", method = RequestMethod.GET)
+	public String enable(
+			HttpServletRequest request,
+			@PathVariable Long tipusDocumentalId) {
+		return updateActiu(request, tipusDocumentalId, true, "tipusdocumental.controller.activat.ok");
+	}
+
+	@RequestMapping(value = "/{tipusDocumentalId}/disable", method = RequestMethod.GET)
+	public String disable(
+			HttpServletRequest request,
+			@PathVariable Long tipusDocumentalId) {
+		return updateActiu(request, tipusDocumentalId, false, "tipusdocumental.controller.desactivat.ok");
+	}
+
+	private String updateActiu(
+			HttpServletRequest request,
+			Long tipusDocumentalId,
+			boolean actiu,
+			String messageKey) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
+		TipusDocumentalDto tipusDoc = tipusDocumentalService.updateActiu(
+				entitatActual.getId(),
+				tipusDocumentalId,
+				actiu);
+		return getAjaxControllerReturnValueSuccess(
+				request,
+				"redirect:../../tipusDocumental",
+				messageKey,
 				new Object[] { tipusDoc.getNomCatala()!=null?tipusDoc.getNomCatala():tipusDoc.getNomEspanyol() });
 	}
 

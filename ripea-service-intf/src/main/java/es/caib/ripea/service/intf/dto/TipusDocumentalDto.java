@@ -19,6 +19,7 @@ public class TipusDocumentalDto implements Serializable {
 	private String nomEspanyol;
 	private String nomCatala;
 	private String nom;
+	private boolean actiu = true;
 	private EntitatDto entitat;
 	
 	public String getCodiNom() {

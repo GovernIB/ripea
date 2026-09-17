@@ -1512,7 +1512,7 @@ const translationCa = {
             title: "Tipus documental",
             action: {
                 new: {
-                    label: "Afageix tipus documental",
+                    label: "Afegeix tipus documental",
                     ok: "Tipus documental '{{data.codi}}' creat correctament",
                 },
                 update: {
@@ -1520,6 +1520,14 @@ const translationCa = {
                 },
                 delete: {
                     ok: "Tipus documental '{{data.codi}}' esborrat correctament",
+                },
+                activar: {
+                    label: "Activa",
+                    ok: "Tipus documental activat correctament",
+                },
+                desactivar: {
+                    label: "Desactiva",
+                    ok: "Tipus documental desactivat correctament",
                 },
             },
         },

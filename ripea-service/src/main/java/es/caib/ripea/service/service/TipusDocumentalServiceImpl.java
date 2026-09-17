@@ -14,8 +14,10 @@ import es.caib.ripea.persistence.entity.TipusDocumentalEntity;
 import es.caib.ripea.persistence.repository.TipusDocumentalRepository;
 import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.helper.MessageHelper;
 import es.caib.ripea.service.helper.PaginacioHelper;
 import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.helper.TipusDocumentalHelper;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
 import es.caib.ripea.service.intf.dto.TipusDocumentalDto;
@@ -30,7 +32,9 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private PaginacioHelper paginacioHelper;
 	@Autowired private PluginHelper pluginHelper;
-	
+	@Autowired private TipusDocumentalHelper tipusDocumentalHelper;
+	@Autowired private MessageHelper messageHelper;
+
 	@Transactional
 	@Override
 	public TipusDocumentalDto create(
@@ -77,6 +81,11 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 					TipusDocumentalEntity.class);
 		}
 
+		tipusDocumentalHelper.comprovarCanviCodi(
+				tipusDocumentalEntity.getEntitat().getId(),
+				tipusDocumentalEntity.getCodi(),
+				tipusDocumental.getCodi());
+
 		tipusDocumentalEntity.update(
 				tipusDocumental.getCodi(),
 				tipusDocumental.getNomEspanyol(), 
@@ -103,12 +112,46 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 		
 		TipusDocumentalEntity tipusDocumentalEntity = tipusDocumentalRepository.getOne(id);
 
+		// La relació amb tipus de document i documents és pel codi (sense FK): cal comprovar-ho aquí.
+		tipusDocumentalHelper.comprovarEsborrable(
+				tipusDocumentalEntity.getEntitat().getId(),
+				tipusDocumentalEntity.getCodi());
+
 		tipusDocumentalRepository.delete(tipusDocumentalEntity);
 
 		TipusDocumentalDto dto = conversioTipusHelper.convertir(
 				tipusDocumentalEntity,
 				TipusDocumentalDto.class);
 		return dto;
+	}
+
+	@Transactional
+	@Override
+	public TipusDocumentalDto updateActiu(
+			Long entitatId,
+			Long id,
+			boolean actiu) throws NotFoundException {
+		logger.debug("Actualitzant la propietat actiu del tipus documental (" +
+				"entitatId=" + entitatId +
+				", tipusDocumentalId=" + id +
+				", actiu=" + actiu + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				true,
+				false, false, false);
+
+		TipusDocumentalEntity tipusDocumentalEntity = tipusDocumentalRepository.findById(id).orElse(null);
+		if (tipusDocumentalEntity == null || !tipusDocumentalEntity.getEntitat().getId().equals(entitat.getId())) {
+			throw new NotFoundException(
+					id,
+					TipusDocumentalEntity.class);
+		}
+		tipusDocumentalEntity.updateActiu(actiu);
+
+		return conversioTipusHelper.convertir(
+				tipusDocumentalEntity,
+				TipusDocumentalDto.class);
 	}
 
 	@Transactional
@@ -148,20 +191,26 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 	}
 
 	@Override
-	public List<TipusDocumentalDto> findByEntitat(Long entitatId) throws NotFoundException {
+	public List<TipusDocumentalDto> findSeleccionablesByEntitat(Long entitatId, String codiActual) throws NotFoundException {
 
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				false,
-				false, 
+				false,
 				true, false);
 
-		List<TipusDocumentalEntity> tipusDocumentalsEntity = tipusDocumentalRepository.findByEntitatOrderByNomEspanyolAsc(entitat);
+		List<TipusDocumentalEntity> tipusDocumentalsEntity = tipusDocumentalRepository.findSeleccionablesByEntitat(entitat, codiActual);
 		List<TipusDocumentalDto> tipusDocumentalsDto =  conversioTipusHelper.convertirList(
 				tipusDocumentalsEntity,
 				TipusDocumentalDto.class);
-		
+		// Només hi pot haver un desactivat (el que ja té assignat el tipus de document): es marca perquè es vegi a l'opció.
+		for (TipusDocumentalDto tipusDocumentalDto : tipusDocumentalsDto) {
+			if (!tipusDocumentalDto.isActiu()) {
+				tipusDocumentalDto.setNom(tipusDocumentalDto.getNom() + " " + messageHelper.getMessage("tipusdocumental.opcio.inactiu"));
+			}
+		}
+
 		List<TipusDocumentalDto> docsAddicionals = pluginHelper.documentTipusAddicionals();
 		
 		if (docsAddicionals != null  && !docsAddicionals.isEmpty()) {

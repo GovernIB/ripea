@@ -25,6 +25,8 @@ public class TipusDocumentalResourceEntity extends BaseAuditableEntity<TipusDocu
     private String nomEspanyol;
     @Column(name = "nom_catala", length = 256)
     private String nomCatala;
+    @Column(name = "actiu", nullable = false)
+    private boolean actiu = true;
 
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "entitat_id")

@@ -40,19 +40,23 @@ import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.MessageHelper;
 import es.caib.ripea.service.helper.MetaDocumentHelper;
+import es.caib.ripea.service.helper.TipusDocumentalHelper;
 import es.caib.ripea.service.helper.UsuariHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
+import es.caib.ripea.service.intf.base.exception.ResourceNotCreatedException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotDeletedException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
+import es.caib.ripea.service.intf.base.exception.ResourceNotUpdatedException;
 import es.caib.ripea.service.intf.base.model.FieldOption;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.PinbalServeiDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.MetaDocumentFluxPortafibResource;
@@ -76,6 +80,7 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 	private final MetaDocumentFluxPortafibRepository metaDocumentFluxPortafibRepository;
 	private final TipusDocumentalRepository tipusDocumentalRepository;
 	private final MetaDocumentHelper metaDocumentHelper;
+	private final TipusDocumentalHelper tipusDocumentalHelper;
 	private final UsuariHelper usuariHelper;
 	private final EntityComprovarHelper entityComprovarHelper;
 	private final ExcepcioLogHelper excepcioLogHelper;
@@ -87,6 +92,7 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
     	register(MetaDocumentResource.PERSPECTIVE_COUNT_METADADES,			new CountMetaDadesPerspectiveApplicator());
     	register(MetaDocumentResource.PERSPECTIVE_REVISIO_ESTAT,			new RevisioEstatPerspectiveApplicator());
     	register(MetaDocumentResource.PERSPECTIVE_PORTAFIRMES_RESPONSABLES,	new PortafirmesResponsablesPerspectiveApplicator());
+    	register(MetaDocumentResource.PERSPECTIVE_NTI_TIPUS_DOCUMENTAL,		new NtiTipusDocumentalPerspectiveApplicator());
     	register(MetaDocumentResource.ACTION_ACTIVAR_CODE,			new ActivarActionExecutor());
     	register(MetaDocumentResource.ACTION_DESACTIVAR_CODE,		new DesactivarActionExecutor());
     	register(MetaDocumentResource.ACTION_MARCAR_DEFECTE_CODE,	new MarcarPerDefecteActionExecutor());
@@ -101,10 +107,14 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
             String entitatActualCodi = configHelper.getEntitatActualCodi();
             List<TipusDocumentalEntity> tipusDocumentalEntity = tipusDocumentalRepository.findByEntitatCodiOrderByNomEspanyolAsc(entitatActualCodi);
             if (tipusDocumentalEntity != null) {
+                // Els desactivats s'inclouen (marcats) perquè el formulari pugui mostrar el valor dels tipus de document
+                // que ja el tenen assignat: aquest proveïdor no rep el valor actual. Assignar-ne un es rebutja en desar.
+                String sufixInactiu = " " + messageHelper.getMessage("tipusdocumental.opcio.inactiu");
                 for (TipusDocumentalEntity tde : tipusDocumentalEntity) {
+                	String nom = tde.getNomCatala()!=null?tde.getNomCatala():tde.getNomEspanyol();
                 	resultat.add(new FieldOption(
                 			tde.getCodi(),
-                			tde.getNomCatala()!=null?tde.getNomCatala():tde.getNomEspanyol()));
+                			tde.isActiu() ? nom : nom + sufixInactiu));
                 }
             }
             resultat.sort(Comparator.comparing(FieldOption::getDescription));
@@ -210,6 +220,20 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 		}
     }
 
+    private class NtiTipusDocumentalPerspectiveApplicator implements PerspectiveApplicator<MetaDocumentResourceEntity, MetaDocumentResource> {
+		@Override
+		public void applySingle(String code, MetaDocumentResourceEntity entity, MetaDocumentResource resource) throws PerspectiveApplicationException {
+			// Mateix format que la interfície JSP (MetaDocumentDto.getNtiTipusDocumentalCodiNom). No es consulta el
+			// plugin d'arxiu (tipus addicionals) perquè la perspectiva s'aplica a cada fila del llistat.
+			if (Utils.hasValue(entity.getNtiTipoDocumental())) {
+				resource.setNtiTipoDocumentalCodiNom(entity.getNtiTipoDocumental() + " - " + tipusDocumentalHelper.getNomTipusDocumental(
+						entity.getNtiTipoDocumental(),
+						entity.getEntitat() != null ? entity.getEntitat().getId() : null,
+						false));
+			}
+		}
+    }
+
     private class RevisioEstatPerspectiveApplicator implements PerspectiveApplicator<MetaDocumentResourceEntity, MetaDocumentResource> {
 		@Override
 		public void applySingle(String code, MetaDocumentResourceEntity entity, MetaDocumentResource resource) throws PerspectiveApplicationException {
@@ -306,7 +330,12 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 		
 		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 		OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitatEntity.getId(), configHelper.getOrganActualCodi());
-		
+
+		try {
+			tipusDocumentalHelper.comprovarAssignable(entitatEntity.getId(), null, resource.getNtiTipoDocumental());
+		} catch (ValidationException ex) {
+			throw new ResourceNotCreatedException(getResourceClass(), ex.getMessage(), ex);
+		}
 		metaDocumentHelper.create(
 				entitatEntity.getId(),
 				resource.getMetaExpedient()!=null?resource.getMetaExpedient().getId():null,
@@ -334,7 +363,12 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
 			metaDocumentHelper.updateActiu(entitatEntity.getId(), mdre.getMetaExpedient().getId(), id, resource.isActiu(), configHelper.getRolActual());
 			
 		} else {
-		
+
+			try {
+				tipusDocumentalHelper.comprovarAssignable(mdre.getEntitat().getId(), mdre.getNtiTipoDocumental(), resource.getNtiTipoDocumental());
+			} catch (ValidationException ex) {
+				throw new ResourceNotUpdatedException(getResourceClass(), String.valueOf(id), ex.getMessage(), ex);
+			}
 			metaDocumentHelper.update(
 					resource.getMetaExpedient()!=null?resource.getMetaExpedient().getId():null,
 					resourceToMetaDocumentDto(resource),

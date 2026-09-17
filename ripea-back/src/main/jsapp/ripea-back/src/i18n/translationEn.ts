@@ -1520,6 +1520,14 @@ const translationEn = {
                 delete: {
                     ok: "Document type '{{data.codi}}' deleted successfully",
                 },
+                activar: {
+                    label: "Activate",
+                    ok: "Document type activated successfully",
+                },
+                desactivar: {
+                    label: "Deactivate",
+                    ok: "Document type deactivated successfully",
+                },
             },
         },
         metaExpedient: {

@@ -14,7 +14,7 @@ import {esMetaDocumentPerDefecte} from "@src/util/metaDocumentUtils.ts";
 import {useUserSession} from "../../../../components/Session.tsx";
 
 const sortModel: any = [{field: 'ordre', sort: 'asc'}]
-const perspectives = ["COUNT_METADADES"];
+const perspectives = ["COUNT_METADADES", "NTI_TIPUS_DOCUMENTAL"];
 const editPerspectives = ["PORTAFIRMES_RESPONSABLES"];
 const columns: any[] = [
     {
@@ -47,6 +47,8 @@ const columns: any[] = [
     {
         field: 'ntiTipoDocumental',
         flex: 1,
+        // "Codi - nom" resolt al servidor (perspectiva NTI_TIPUS_DOCUMENTAL), igual que a la interfície JSP.
+        renderCell: (params:any) => params?.row?.ntiTipoDocumentalCodiNom ?? params?.formattedValue,
     },
     {
         field: 'firmaPortafirmesActiva',

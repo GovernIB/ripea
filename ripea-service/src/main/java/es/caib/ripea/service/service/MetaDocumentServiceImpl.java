@@ -21,6 +21,7 @@ import es.caib.ripea.service.helper.MetaDocumentHelper;
 import es.caib.ripea.service.helper.MetaNodeHelper;
 import es.caib.ripea.service.helper.PaginacioHelper;
 import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.helper.TipusDocumentalHelper;
 import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
@@ -43,7 +44,8 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 	@Autowired private EntityComprovarHelper entityComprovarHelper;
 	@Autowired private MetaDocumentHelper metaDocumentHelper;
 	@Autowired private MetaExpedientRepository metaExpedientRepository;
-	
+	@Autowired private TipusDocumentalHelper tipusDocumentalHelper;
+
 	@Transactional
 	@Override
 	public MetaDocumentDto create(
@@ -53,7 +55,8 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 			String plantillaNom,
 			String plantillaContentType,
 			byte[] plantillaContingut, String rolActual, Long organId) {
-		
+
+		tipusDocumentalHelper.comprovarAssignable(entitatId, null, metaDocument.getNtiTipoDocumental());
 		MetaDocumentEntity newMetaDocumententity = metaDocumentHelper.create(
 				entitatId,
 				metaExpedientId,
@@ -78,6 +81,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		logger.debug("Actualitzant meta-document existent ( entitatId=" + entitatId + ", metaDocument=" + metaDocument + ")");
 		entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
 		MetaDocumentEntity entity = entityComprovarHelper.comprovarMetaDocument(metaDocument.getId());
+		tipusDocumentalHelper.comprovarAssignable(entitatId, entity.getNtiTipoDocumental(), metaDocument.getNtiTipoDocumental());
 		entity = metaDocumentHelper.update(
 				entity.getMetaExpedient()==null?null:entity.getMetaExpedient().getId(),
 				metaDocument,

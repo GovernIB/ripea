@@ -17,7 +17,18 @@ import es.caib.ripea.persistence.entity.TipusDocumentalEntity;
 public interface TipusDocumentalRepository extends JpaRepository<TipusDocumentalEntity, Long> {
 
 	List<TipusDocumentalEntity> findByEntitatOrderByNomEspanyolAsc(EntitatEntity entitat);
-	
+
+	/** Tipus documentals assignables: els actius més, si s'indica, el que ja té assignat el tipus de document que s'edita. */
+	@Query(	"from " +
+			"    TipusDocumentalEntity tipusDocumental " +
+			"where " +
+			"    tipusDocumental.entitat = :entitat " +
+			"and (tipusDocumental.actiu = true or tipusDocumental.codi = :codiActual) " +
+			"order by tipusDocumental.nomEspanyol asc")
+	List<TipusDocumentalEntity> findSeleccionablesByEntitat(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("codiActual") String codiActual);
+
 	List<TipusDocumentalEntity> findByEntitatCodiOrderByNomEspanyolAsc(String entitatCodi);
 	
 	List<TipusDocumentalEntity> findByCodi(String codi);
@@ -34,6 +45,8 @@ public interface TipusDocumentalRepository extends JpaRepository<TipusDocumental
 			Pageable pageable);
 	
 	TipusDocumentalEntity findByCodiAndEntitat(String codi, EntitatEntity entitat);
+
+	TipusDocumentalEntity findByCodiAndEntitatId(String codi, Long entitatId);
 	
 	@Modifying
 	@Query(value = "DELETE FROM ipa_tipus_documental WHERE entitat_id IN " +

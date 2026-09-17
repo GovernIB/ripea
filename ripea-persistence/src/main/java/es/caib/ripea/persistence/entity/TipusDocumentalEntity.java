@@ -26,7 +26,10 @@ public class TipusDocumentalEntity extends RipeaAuditable<Long> {
 	private String nomEspanyol;
 	@Column(name = "nom_catala", length = 256)
 	private String nomCatala;
-	
+	/** Un tipus documental desactivat no es pot assignar a nous tipus de document, però es conserva per resoldre'n el nom. */
+	@Column(name = "actiu", nullable = false)
+	private boolean actiu = true;
+
 	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "entitat_id")
 	@ForeignKey(name = BaseConfig.DB_PREFIX + "entitat_tipus_doc_fk")
@@ -46,6 +49,14 @@ public class TipusDocumentalEntity extends RipeaAuditable<Long> {
 
 	public String getNomCatala() {
 		return nomCatala;
+	}
+
+	public boolean isActiu() {
+		return actiu;
+	}
+
+	public void updateActiu(boolean actiu) {
+		this.actiu = actiu;
 	}
 
 	public void update(

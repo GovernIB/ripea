@@ -42,7 +42,6 @@ import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.MetaNodeEntity;
 import es.caib.ripea.persistence.entity.NodeEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
-import es.caib.ripea.persistence.entity.TipusDocumentalEntity;
 import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.repository.AlertaRepository;
 import es.caib.ripea.persistence.repository.ContingutRepository;
@@ -53,7 +52,6 @@ import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaDadaRepository;
 import es.caib.ripea.persistence.repository.MetaNodeRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
-import es.caib.ripea.persistence.repository.TipusDocumentalRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.service.helper.ArxiuConversions;
 import es.caib.ripea.service.helper.CacheHelper;
@@ -70,6 +68,7 @@ import es.caib.ripea.service.helper.OrganGestorHelper;
 import es.caib.ripea.service.helper.PaginacioHelper;
 import es.caib.ripea.service.helper.PaginacioHelper.Converter;
 import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.helper.TipusDocumentalHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.AlertaDto;
 import es.caib.ripea.service.intf.dto.ArxiuContingutDto;
@@ -103,7 +102,6 @@ import es.caib.ripea.service.intf.dto.ResultDocumentsSenseContingut.ResultDocume
 import es.caib.ripea.service.intf.dto.ResultDto;
 import es.caib.ripea.service.intf.dto.ResultEnumDto;
 import es.caib.ripea.service.intf.dto.ResultatConsultaDto;
-import es.caib.ripea.service.intf.dto.TipusDocumentalDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.dto.ValidacioErrorDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
@@ -131,7 +129,7 @@ public class ContingutServiceImpl implements ContingutService {
 	@Autowired private PluginHelper pluginHelper;
 	@Autowired private EntityComprovarHelper entityComprovarHelper;
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
-	@Autowired private TipusDocumentalRepository tipusDocumentalRepository;
+	@Autowired private TipusDocumentalHelper tipusDocumentalHelper;
 	@Autowired private MetaExpedientHelper metaExpedientHelper;
 	@Autowired private ExpedientRepository expedientRepository;
 	@Autowired private ContingutsOrfesHelper contingutRepositoryHelper;
@@ -954,34 +952,19 @@ public class ContingutServiceImpl implements ContingutService {
 				arxiuDetall.setEniEstatElaboracio(ArxiuConversions.getEstatElaboracio(metadades.getEstatElaboracio()));
 				
 				if (metadades.getTipusDocumental() != null) {
-					List<TipusDocumentalEntity> tipos = tipusDocumentalRepository.findByCodi(metadades.getTipusDocumental().toString());
-					if (Utils.isNotEmpty(tipos)) {
-						TipusDocumentalDto tipus = conversioTipusHelper.convertir(tipos.get(0), TipusDocumentalDto.class);
-						arxiuDetall.setEniTipusDocumental(tipus.getCodiNom());
-					} else {
-						arxiuDetall.setEniTipusDocumental(metadades.getTipusDocumental().toString());
-					}
+					String codiTipusDocumental = metadades.getTipusDocumental().toString();
+					arxiuDetall.setEniTipusDocumental(codiTipusDocumental + " - " + tipusDocumentalHelper.getNomTipusDocumental(
+							codiTipusDocumental,
+							null,
+							false));
 				}
 
 				if (metadades.getTipusDocumental() == null && metadades.getTipusDocumentalAddicional() != null) {
 					logger.info("Tipus documental addicional: " + metadades.getTipusDocumentalAddicional());
-					TipusDocumentalEntity tipusDocumental = tipusDocumentalRepository.findByCodiAndEntitat(
+					arxiuDetall.setEniTipusDocumentalAddicional(tipusDocumentalHelper.getNomTipusDocumental(
 							metadades.getTipusDocumentalAddicional(),
-							entitat);
-
-					if (tipusDocumental != null) {
-						arxiuDetall.setEniTipusDocumentalAddicional(tipusDocumental.getNomEspanyol());
-					} else {
-						List<TipusDocumentalDto> docsAddicionals = pluginHelper.documentTipusAddicionals();
-						
-						for (TipusDocumentalDto docAddicional : docsAddicionals) {
-							if (docAddicional.getCodi().equals(metadades.getTipusDocumentalAddicional())) {
-								arxiuDetall.setEniTipusDocumentalAddicional(docAddicional.getNom());
-							}
-						}
-					}
-
-					arxiuDetall.setEniTipusDocumentalAddicional(tipusDocumental.getNomEspanyol());
+							entitat.getId(),
+							true));
 				}
 
 				arxiuDetall.setEniOrgans(getOrgansAmbNoms(entitatId, metadades.getOrgans()));

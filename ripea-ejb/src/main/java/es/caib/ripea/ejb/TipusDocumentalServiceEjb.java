@@ -75,10 +75,23 @@ public class TipusDocumentalServiceEjb extends AbstractServiceEjb<TipusDocumenta
 	}
 
 	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public TipusDocumentalDto updateActiu(
+			Long entitatId,
+			Long id,
+			boolean actiu) throws NotFoundException {
+		return delegateService.updateActiu(
+				entitatId,
+				id,
+				actiu);
+	}
+
+	@Override
 	@RolesAllowed("**")
-	public List<TipusDocumentalDto> findByEntitat(
-			Long entitatId) throws NotFoundException {
-		return delegateService.findByEntitat(entitatId);
+	public List<TipusDocumentalDto> findSeleccionablesByEntitat(
+			Long entitatId,
+			String codiActual) throws NotFoundException {
+		return delegateService.findSeleccionablesByEntitat(entitatId, codiActual);
 	}
 
 	@Override

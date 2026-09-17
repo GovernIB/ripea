@@ -22,7 +22,10 @@ public interface MetaDocumentRepository extends JpaRepository<MetaDocumentEntity
 			String codi);
 
 	int countByMetaExpedient(MetaExpedientEntity metaExpedient);
-	
+
+	/** Indica si algun tipus de document de l'entitat té assignat el tipus documental (relació pel codi, sense FK). */
+	boolean existsByEntitatIdAndNtiTipoDocumental(Long entitatId, String ntiTipoDocumental);
+
 	List<MetaDocumentEntity> findByMetaExpedientOrderByOrdreAsc(
 			MetaExpedientEntity metaExpedient);
 	

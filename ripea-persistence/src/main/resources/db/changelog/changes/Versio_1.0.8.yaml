@@ -255,3 +255,35 @@ databaseChangeLog:
             splitStatements: false
             stripComments: true
             relativeToChangelogFile: true
+  - changeSet:
+      id: RIPEA_1.0.8_TIPUS_DOCUMENTAL_ACTIU_1
+      author: limit
+      changes:
+        - sqlFile:
+            dbms: oracle
+            path: ../scripts/oracle/1.0.8/Versio_1.0.8_DDL_8.sql
+            splitStatements: true
+            stripComments: true
+            relativeToChangelogFile: true
+        - sqlFile:
+            dbms: postgresql
+            path: ../scripts/postgres/1.0.8/Versio_1.0.8_DDL_8.sql
+            splitStatements: true
+            stripComments: true
+            relativeToChangelogFile: true
+  - changeSet:
+      id: RIPEA_1.0.8_EXPEDIENT_ORGANPARE_BACKFILL_1
+      author: limit
+      changes:
+        - sqlFile:
+            dbms: oracle
+            path: ../scripts/oracle/1.0.8/Versio_1.0.8_DML_8.sql
+            splitStatements: false
+            stripComments: true
+            relativeToChangelogFile: true
+        - sqlFile:
+            dbms: postgresql
+            path: ../scripts/postgres/1.0.8/Versio_1.0.8_DML_8.sql
+            splitStatements: false
+            stripComments: true
+            relativeToChangelogFile: true

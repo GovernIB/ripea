@@ -63,7 +63,6 @@ import es.caib.ripea.persistence.repository.MetaDadaRepository;
 import es.caib.ripea.persistence.repository.MetaDocumentRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.persistence.repository.PinbalServeiRepository;
-import es.caib.ripea.persistence.repository.TipusDocumentalRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 import es.caib.ripea.service.intf.dto.AlertaDto;
@@ -141,7 +140,7 @@ public class ConversioTipusHelper {
 	@Autowired private OrganGestorHelper organGestorHelper;
 	@Autowired private TascaHelper tascaHelper;
 	@Autowired private MessageHelper messageHelper;
-	@Autowired private TipusDocumentalRepository tipusDocumentalRepository;
+	@Autowired private TipusDocumentalHelper tipusDocumentalHelper;
 	@Autowired private PinbalServeiRepository pinbalServeiRepository;
 	@Autowired private UsuariRepository usuariRepository;
 	@Autowired private ConfigHelper configHelper;
@@ -1163,25 +1162,14 @@ public class ConversioTipusHelper {
 	            @Override
 	            public void mapAtoB(MetaDocumentEntity source, MetaDocumentDto target, MappingContext mappingContext) {
 	            	
-	            	TipusDocumentalEntity tipusDocumental = null;
-					if (source.getMetaExpedient() != null) {
-						tipusDocumental = tipusDocumentalRepository.findByCodiAndEntitat(source.getNtiTipoDocumental(), source.getMetaExpedient().getEntitat());
-					}  else {
-						List<TipusDocumentalEntity> tipusDocumentals = tipusDocumentalRepository.findByCodi(source.getNtiTipoDocumental());
-						tipusDocumental = tipusDocumentals != null && !tipusDocumentals.isEmpty() ? tipusDocumentals.get(0) : null;
-					}
+	            	// El tipus documental es relaciona pel codi i pot no existir a la taula (esborrat o entitat sense
+	            	// tipus documentals inicialitzats): el helper sempre retorna un nom. No es consulten els tipus
+	            	// addicionals del plugin d'arxiu perquè aquesta conversió es fa en llistats (una crida per fila).
+	            	target.setNtiTipoDocumentalNom(tipusDocumentalHelper.getNomTipusDocumental(
+	            			source.getNtiTipoDocumental(),
+	            			source.getEntitat().getId(),
+	            			false));
 
-//					target.setNtiTipoDocumental(tipusDocumental.getCodiEspecific() != null ? tipusDocumental.getCodiEspecific() : tipusDocumental.getCodi());
-	            	// El tipus documental pot no estar donat d'alta a l'entitat (p.ex. entitats sense tipus
-	            	// documentals inicialitzats): en aquest cas es deixa el nom buit en lloc de fer petar la conversió.
-	            	if (tipusDocumental != null) {
-		            	if (LocaleContextHolder.getLocale().toString().equals("ca") && Utils.isNotEmpty(tipusDocumental.getNomCatala())) {
-		            		target.setNtiTipoDocumentalNom(tipusDocumental.getNomCatala());
-						} else {
-							target.setNtiTipoDocumentalNom(tipusDocumental.getNomEspanyol());
-						}
-	            	}
-	            	
 	            	if (source.getFluxosFirma()!=null) {
 	            		String[] arrayIds = new String[source.getFluxosFirma().size()];
 	            		for (int i = 0; i < source.getFluxosFirma().size(); i++) {

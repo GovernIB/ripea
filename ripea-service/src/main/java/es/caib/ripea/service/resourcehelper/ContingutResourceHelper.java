@@ -22,18 +22,16 @@ import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
-import es.caib.ripea.persistence.entity.TipusDocumentalEntity;
 import es.caib.ripea.persistence.entity.resourceentity.ContingutResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.ContingutResourceRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
-import es.caib.ripea.persistence.repository.TipusDocumentalRepository;
 import es.caib.ripea.service.helper.ArxiuConversions;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ContingutHelper;
-import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.helper.TipusDocumentalHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ArxiuContingutDto;
 import es.caib.ripea.service.intf.dto.ArxiuContingutTipusEnumDto;
@@ -45,7 +43,6 @@ import es.caib.ripea.service.intf.dto.ArxiuFirmaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentVersioDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
-import es.caib.ripea.service.intf.dto.TipusDocumentalDto;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.RequiredArgsConstructor;
@@ -54,13 +51,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ContingutResourceHelper {
 
-    private final TipusDocumentalRepository tipusDocumentalRepository;
     private final OrganGestorRepository organGestorRepository;
     private final ContingutResourceRepository contingutResourceRepository;
 
     private final EntityComprovarHelper entityComprovarHelper;
     private final PluginHelper pluginHelper;
-    private final ConversioTipusHelper conversioTipusHelper;
+    private final TipusDocumentalHelper tipusDocumentalHelper;
     private final ContingutHelper contingutHelper;
     private final ConfigHelper configHelper;
 
@@ -169,13 +165,11 @@ public class ContingutResourceHelper {
             arxiuDetall.setEniEstatElaboracio(ArxiuConversions.getEstatElaboracio(metadades.getEstatElaboracio()));
 
             if (metadades.getTipusDocumental() != null) {
-                List<TipusDocumentalEntity> tipos = tipusDocumentalRepository.findByCodi(metadades.getTipusDocumental().toString());
-                if (Utils.isNotEmpty(tipos)) {
-                    TipusDocumentalDto tipus = conversioTipusHelper.convertir(tipos.get(0), TipusDocumentalDto.class);
-                    arxiuDetall.setEniTipusDocumental(tipus.getCodiNom());
-                } else {
-                    arxiuDetall.setEniTipusDocumental(metadades.getTipusDocumental().toString());
-                }
+                String codiTipusDocumental = metadades.getTipusDocumental().toString();
+                arxiuDetall.setEniTipusDocumental(codiTipusDocumental + " - " + tipusDocumentalHelper.getNomTipusDocumental(
+                        codiTipusDocumental,
+                        null,
+                        false));
             }
 
             if (metadades.getTipusDocumental() == null && metadades.getTipusDocumentalAddicional() != null) {
@@ -186,21 +180,10 @@ public class ContingutResourceHelper {
                         false,
                         true, false);
 
-                TipusDocumentalEntity tipusDocumental = tipusDocumentalRepository.findByCodiAndEntitat(
+                arxiuDetall.setEniTipusDocumentalAddicional(tipusDocumentalHelper.getNomTipusDocumental(
                         metadades.getTipusDocumentalAddicional(),
-                        entitat);
-
-                if (tipusDocumental != null) {
-                    arxiuDetall.setEniTipusDocumentalAddicional(tipusDocumental.getNomEspanyol());
-                } else {
-                    List<TipusDocumentalDto> docsAddicionals = pluginHelper.documentTipusAddicionals();
-
-                    for (TipusDocumentalDto docAddicional : docsAddicionals) {
-                        if (docAddicional.getCodi().equals(metadades.getTipusDocumentalAddicional())) {
-                            arxiuDetall.setEniTipusDocumentalAddicional(docAddicional.getNom());
-                        }
-                    }
-                }
+                        entitat.getId(),
+                        true));
             }
 
             arxiuDetall.setEniOrgans(getOrgansAmbNoms(entitatId, metadades.getOrgans()));

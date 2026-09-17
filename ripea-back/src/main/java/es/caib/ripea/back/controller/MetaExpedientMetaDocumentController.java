@@ -125,7 +125,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 		command.setMetaExpedientId(metaExpedientId);
 		command.setComu(metaExpedientService.findById(entitatActual.getId(), metaExpedientId).isComu());
 		model.addAttribute(command);
-		emplenarModelForm(request, model);
+		emplenarModelForm(request, model, command.getNtiTipoDocumental());
 
 		//Els tipus de document creats per defecte a l'alta del procediment només els pot
 		//modificar un administrador d'entitat; per a la resta de rols són de només consulta.
@@ -187,7 +187,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 //		        Because it is not possible to remove error from bindingResult we ignore it.
              
 			} else {
-				emplenarModelForm(request, model);
+				emplenarModelForm(request, model, command.getNtiTipoDocumental());
 				request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());
 				return "metaExpedientMetaDocumentForm";
 			}
@@ -432,7 +432,8 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 
 	public void emplenarModelForm(
 			HttpServletRequest request,
-			Model model) {
+			Model model,
+			String ntiTipoDocumentalActual) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 		organGestorService.actualitzarOrganCodi(SessioHelper.getOrganActual(request));
 		
@@ -446,7 +447,8 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 		model.addAttribute(
 				"ntiOrigenOptions",
 				EnumHelper.getOptionsForEnum(NtiOrigenEnumDto.class, "document.nti.origen.enum."));
-		List<TipusDocumentalDto> tipusDocumental = tipusDocumentalService.findByEntitat(entitatActual.getId());
+		// Els tipus documentals desactivats no es poden assignar, excepte el que ja té assignat el tipus de document.
+		List<TipusDocumentalDto> tipusDocumental = tipusDocumentalService.findSeleccionablesByEntitat(entitatActual.getId(), ntiTipoDocumentalActual);
 		model.addAttribute("ntiTipusDocumentalOptions", tipusDocumental);
 		model.addAttribute(
 				"ntiEstatElaboracioOptions",

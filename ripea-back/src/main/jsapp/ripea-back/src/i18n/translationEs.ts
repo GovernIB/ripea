@@ -1521,6 +1521,14 @@ const translationEs = {
                 delete: {
                     ok: "Tipo documental '{{data.codi}}' eliminado correctamente",
                 },
+                activar: {
+                    label: "Activa",
+                    ok: "Tipo documental activado correctamente",
+                },
+                desactivar: {
+                    label: "Desactiva",
+                    ok: "Tipo documental desactivado correctamente",
+                },
             },
         },
         metaExpedient: {

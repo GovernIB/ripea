@@ -32,12 +32,23 @@
 				<th data-col-name="codi" data-orderable="false"><spring:message code="tipusdocumental.columna.codi"/></th>
 				<th data-col-name="nomEspanyol" data-orderable="false"><spring:message code="tipusdocumental.columna.nom"/></th>
 				<th data-col-name="nomCatala" data-orderable="false"><spring:message code="tipusdocumental.columna.nom.catala"/></th>
+				<th data-col-name="actiu" data-orderable="false" data-template="#cellActiuTemplate" width="5%">
+					<spring:message code="tipusdocumental.columna.actiu"/>
+					<script id="cellActiuTemplate" type="text/x-jsrender">
+						{{if actiu}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
 								<li><a href="tipusDocumental/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+								{{if !actiu}}
+								<li><a href="tipusDocumental/{{:id}}/enable" data-toggle="ajax"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.activar"/></a></li>
+								{{else}}
+								<li><a href="tipusDocumental/{{:id}}/disable" data-toggle="ajax"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.desactivar"/></a></li>
+								{{/if}}
 								<li><a href="tipusDocumental/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="metaexpedient.metadada.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 							</ul>
 						</div>

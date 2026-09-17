@@ -44,6 +44,9 @@ import lombok.experimental.FieldNameConstants;
                         type = ResourceArtifactType.PERSPECTIVE,
                         code = MetaDocumentResource.PERSPECTIVE_PORTAFIRMES_RESPONSABLES),
 				@ResourceArtifact(
+                        type = ResourceArtifactType.PERSPECTIVE,
+                        code = MetaDocumentResource.PERSPECTIVE_NTI_TIPUS_DOCUMENTAL),
+				@ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = MetaDocumentResource.ACTION_ACTIVAR_CODE,
                         requiresId = true),
@@ -70,6 +73,7 @@ public class MetaDocumentResource extends MetaNodeResource {
 	public static final String PERSPECTIVE_COUNT_METADADES			= "COUNT_METADADES";
     public static final String PERSPECTIVE_REVISIO_ESTAT        	= "REVISIO_ESTAT";
     public static final String PERSPECTIVE_PORTAFIRMES_RESPONSABLES = "PORTAFIRMES_RESPONSABLES";
+    public static final String PERSPECTIVE_NTI_TIPUS_DOCUMENTAL     = "NTI_TIPUS_DOCUMENTAL";
 	public static final String ACTION_ACTIVAR_CODE				= "ACTIVAR";
 	public static final String ACTION_DESACTIVAR_CODE			= "DESACTIVAR";
 	public static final String ACTION_MARCAR_DEFECTE_CODE		= "MARCAR_DEFECTE";
@@ -118,6 +122,8 @@ public class MetaDocumentResource extends MetaNodeResource {
     @Transient private List<MetaDadaResource> metaDadesImportacio;
     @Transient private Long importacioId;
     @Transient private MetaExpedientRevisioEstatEnumDto metaExpedientRevisioEstat;
+    /** "Codi - nom" del tipus documental NTI, com el mostra la interfície JSP (perspectiva NTI_TIPUS_DOCUMENTAL). */
+    @Transient private String ntiTipoDocumentalCodiNom;
     
     private static final long serialVersionUID = -4446427656169703518L;
 }
