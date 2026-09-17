@@ -243,6 +243,11 @@
 			<artifactId>commons-compress</artifactId>
 			<version>1.26.1</version>
 		</dependency>
+		<dependency>
+			<!-- Proveïdor de cache amb caducitat i mida màxima (versió gestionada per Spring Boot) -->
+			<groupId>com.github.ben-manes.caffeine</groupId>
+			<artifactId>caffeine</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

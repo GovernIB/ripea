@@ -121,7 +121,7 @@ public class CacheHelper {
 	
 	@Cacheable(value = "tasquesUsuari", key="#usuariCodi")
 	public long countTasquesPendents(String usuariCodi) {
-		logger.debug("Consulta entitats accessibles (usuariCodi=" + usuariCodi + ")");
+		logger.debug("Consulta tasques pendents (usuariCodi=" + usuariCodi + ")");
 		UsuariEntity usuariEntity = usuariRepository.findByCodi(usuariCodi);
 		return expedientTascaRepository.countTasquesPendents(usuariEntity);
 	}
