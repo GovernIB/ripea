@@ -70,4 +70,19 @@ public interface NotificacioPlugin extends RipeaEndpointPluginInfo {
 	public RespostaJustificantEnviamentNotib consultaJustificantEnviament(
 			String identificador) throws SistemaExternException;
 
+	/**
+	 * Consulta si el procediment té l'entrega postal per CIE (Centre d'Impressió i
+	 * Ensobrat) activa per a l'òrgan gestor indicat.
+	 *
+	 * @param codiProcediment codi SIA del procediment.
+	 * @param codiEntitat codi DIR3 de l'entitat.
+	 * @param codiOrgan codi DIR3 de l'òrgan gestor.
+	 * @return true si l'entrega CIE està activa, false en cas contrari.
+	 * @throws SistemaExternException
+	 */
+	public Boolean isProcedimentEntregaCieActiva(
+			String codiProcediment,
+			String codiEntitat,
+			String codiOrgan) throws SistemaExternException;
+
 }

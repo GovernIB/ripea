@@ -1066,6 +1066,10 @@ const translationEn = {
                     button: "Notify",
                     title: "Create document notification",
                     ok: "Notification created successfully",
+                    entregaPostal: {
+                        cieInactiu: "The procedure does not have CIE (Printing and Enveloping Center) postal delivery active in NOTIB for the managing body of the file",
+                        cieNoVerificat: "It could not be verified in NOTIB whether the procedure has CIE (Printing and Enveloping Center) postal delivery active for the managing body of the file. If it does not, NOTIB will reject the postal delivery.",
+                    },
                     alert: {
                         interessatsAmbAvis: {
                             title: "There are notifications with recipients without a NIF/NIE. These notifications cannot be sent to the citizen folder, as a NIF or NIE is required to access it.",

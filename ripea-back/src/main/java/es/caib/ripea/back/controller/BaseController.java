@@ -55,8 +55,8 @@ import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.ContingutService;
 import es.caib.ripea.service.intf.service.DadesExternesService;
+import es.caib.ripea.service.intf.service.DocumentEnviamentService;
 import es.caib.ripea.service.intf.service.ExpedientInteressatService;
-import es.caib.ripea.service.intf.service.OrganGestorService;
 import es.caib.ripea.service.intf.service.PinbalServeiService;
 
 /**
@@ -70,7 +70,7 @@ public class BaseController implements MessageSourceAware {
 	@Autowired private ContingutService contingutService;
 	@Autowired private DadesExternesService dadesExternesService;
 	@Autowired private PinbalServeiService pinbalServeiService;
-	@Autowired private OrganGestorService organGestorService;
+	@Autowired private DocumentEnviamentService documentEnviamentService;
 	@Autowired private AplicacioService aplicacioService;
 	
 	MessageSource messageSource;
@@ -403,12 +403,25 @@ public class BaseController implements MessageSourceAware {
 				"expedientId",
 				document.getExpedientPare().getId());
 
+        // L'enviament postal requereix el permís de l'entitat i que NOTIB tengui el CIE actiu per
+        // al procediment i l'òrgan gestor de l'expedient. Si no es pot verificar, es permet i és
+        // NOTIB qui rebutjarà l'enviament si no hi ha CIE.
         boolean isPermetreEnviamentPostal = entitatActual.isPermetreEnviamentPostal();
-        if ( document.getExpedientPare().getOrganGestorId() != null ) {
-            isPermetreEnviamentPostal = isPermetreEnviamentPostal
-                    || organGestorService.isPermisEnviamentPostalOrganOrAntecesor(
-                    		document.getExpedientPare().getOrganGestorId());
+        String entregaPostalMsg = null;
+        if (!isPermetreEnviamentPostal) {
+            entregaPostalMsg = "notificacio.form.entregapostal.err";
+        } else {
+            Boolean entregaCieActiva = documentEnviamentService.isEntregaPostalCieActiva(
+                    entitatActual.getId(),
+                    documentId);
+            if (Boolean.FALSE.equals(entregaCieActiva)) {
+                isPermetreEnviamentPostal = false;
+                entregaPostalMsg = "notificacio.form.entregapostal.err.cie";
+            } else if (entregaCieActiva == null) {
+                entregaPostalMsg = "notificacio.form.entregapostal.cie.noverificat";
+            }
         }
+        model.addAttribute("entregaPostalMsg", entregaPostalMsg);
 
 		if (isPermetreEnviamentPostal) {
 			if (notificacioConcatenatEntregaPostal != null) {
@@ -418,12 +431,6 @@ public class BaseController implements MessageSourceAware {
 			}
 		} else {
 			model.addAttribute("entregaPostal", false);
-
-            if ( document.getExpedientPare().getOrganGestorId() == null ) {
-                model.addAttribute("entregaPostalMsg", "notificacio.form.entregapostal.err");
-            } else {
-                model.addAttribute("entregaPostalMsg", "notificacio.form.entregapostal.err.desc");
-            }
 		}
 
 		model.addAttribute(

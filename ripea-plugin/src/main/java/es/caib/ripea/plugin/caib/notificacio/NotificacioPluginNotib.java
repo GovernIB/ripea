@@ -1,6 +1,5 @@
 package es.caib.ripea.plugin.caib.notificacio;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -73,6 +72,10 @@ import es.caib.ripea.plugin.notificacio.RespostaJustificantEnviamentNotib;
  */
 public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implements NotificacioPlugin {
 
+	// Codis emprats a l'entorn LOCAL en lloc dels del procediment i l'òrgan de l'expedient
+	private static final String LOCAL_PROCEDIMENT_CODI = "894623";
+	private static final String LOCAL_ORGAN_CODI = "A04027005";
+
 	private boolean test = false; //test = true; //if true then automatic callback with testIdentificador and testReferncia
 	private String testIdentificador = "047a9033-de0e-452e-aada-a51825d0a886";
 	private String testReferencia = "4a1d3b1c-1e7b-4883-8968-54f770a39ee6";
@@ -93,8 +96,8 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 			NotificacioV2 notificacioNotib = new NotificacioV2();
 
 			if ("LOCAL".equals(getEntorn())) {
-				notificacioNotib.setProcedimentCodi("894623");
-				notificacioNotib.setOrganGestor("A04027005");
+				notificacioNotib.setProcedimentCodi(LOCAL_PROCEDIMENT_CODI);
+				notificacioNotib.setOrganGestor(LOCAL_ORGAN_CODI);
 				notificacioNotib.setUsuariCodi("e18225486X");
 			} else {
 				notificacioNotib.setProcedimentCodi(notificacio.getProcedimentCodi());
@@ -185,6 +188,8 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 					//Ja no existeix la funció resetClient a la versió 2.0.1 de notibClient
 					//getNotificacioRestClient().resetClient();
 					respostaAlta = getNotificacioRestClient().alta(notificacioNotib);
+					//getNotificacioRestClient().getProcedimentsCieByEntitat(testIdentificador)
+//					getNotificacioRestClient().isProcedimentEntregaCieActiva(testIdentificador, testReferencia, testIdentificador)
 				} else {
 					throw e1;
 				}
@@ -441,6 +446,31 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 		}
 	}
 	
+	@Override
+	public Boolean isProcedimentEntregaCieActiva(
+			String codiProcediment,
+			String codiEntitat,
+			String codiOrgan) throws SistemaExternException {
+		// Mateixos codis que s'envien a NOTIB en fer l'alta de la notificació
+		if ("LOCAL".equals(getEntorn())) {
+			codiProcediment = LOCAL_PROCEDIMENT_CODI;
+			codiOrgan = LOCAL_ORGAN_CODI;
+		}
+		try {
+			return getNotificacioRestClient().isProcedimentEntregaCieActiva(
+					codiProcediment,
+					codiEntitat,
+					codiOrgan);
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					"No s'ha pogut consultar si l'entrega CIE està activa (" +
+					"codiProcediment=" + codiProcediment + ", " +
+					"codiEntitat=" + codiEntitat + ", " +
+					"codiOrgan=" + codiOrgan + ")",
+					ex);
+		}
+	}
+
 	private es.caib.notib.client.domini.PersonaV2 toPersonaNotib(Persona persona) {
 		es.caib.notib.client.domini.PersonaV2 p = null;
 		if (persona != null) {
@@ -555,7 +585,6 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 					}
 				}
 				
-				SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 				if (response.getAmpliacionesPlazo()!=null && response.getAmpliacionesPlazo().getAmpliacionPlazo()!=null) {
 					for (AmpliacionPlazo ap: response.getAmpliacionesPlazo().getAmpliacionPlazo()) {
 						AmpliacioPlazo apRip = new AmpliacioPlazo();
@@ -567,8 +596,8 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 						ampliacionsPlazo.add(apRip);
 						if (Utils.hasValue(ap.getMensajeError()))
 							descripcions+=ap.getMensajeError()+", ";
-						if (ap.getFechaCaducidad()!=null)
-							descripcions+="Caduca "+dateFormat.format(ap.getFechaCaducidad())+", ";
+						if (Utils.hasValue(ap.getFechaCaducidad()))
+							descripcions+="Caduca "+ap.getFechaCaducidad()+", ";
 					}
 				}
 				

@@ -137,10 +137,12 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 		OrganGestorEntity organGestorEntity = entityComprovarHelper.comprovarPermisOrganGestor(entitatId, organGestorDto.getId(), false);
 		
+		// Els camps d'enviament postal de l'òrgan ja no es mostren als formularis (l'enviament postal
+		// depèn del permís de l'entitat i del CIE de NOTIB): es conserven els valors actuals.
 		organGestorEntity.update(
                 organGestorDto.isUtilitzarCifPinbal(),
-                organGestorDto.isPermetreEnviamentPostal(),
-                organGestorDto.isPermetreEnviamentPostalDescendents()
+                organGestorEntity.isPermetreEnviamentPostal(),
+                organGestorEntity.isPermetreEnviamentPostalDescendents()
         );
 
 		return conversioTipusHelper.convertir(organGestorEntity, OrganGestorDto.class);

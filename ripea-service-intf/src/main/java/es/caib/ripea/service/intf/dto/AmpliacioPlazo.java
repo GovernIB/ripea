@@ -1,12 +1,10 @@
 package es.caib.ripea.service.intf.dto;
 
-import javax.xml.datatype.XMLGregorianCalendar;
-
 public class AmpliacioPlazo {
 	
 	private String estado;
 	private String identificador;
-	private XMLGregorianCalendar fechaCaducidad;
+	private String fechaCaducidad;
 	private String mensajeError;
 	private String codigo;
   
@@ -24,11 +22,11 @@ public class AmpliacioPlazo {
 			String identificador) {
 		this.identificador = identificador;
 	}
-	public XMLGregorianCalendar getFechaCaducidad() {
+	public String getFechaCaducidad() {
 		return fechaCaducidad;
 	}
 	public void setFechaCaducidad(
-			XMLGregorianCalendar fechaCaducidad) {
+			String fechaCaducidad) {
 		this.fechaCaducidad = fechaCaducidad;
 	}
 	public String getMensajeError() {

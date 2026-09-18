@@ -5124,6 +5124,76 @@ public class PluginHelper {
 		return resultat;
 	}
 	
+	/**
+	 * Consulta a NOTIB si el procediment (codi SIA) i l'òrgan gestor de l'expedient tenen
+	 * l'entrega postal per CIE activa. S'empren els mateixos codis que en fer l'enviament.
+	 *
+	 * @return true o false segons respongui NOTIB, o null si no s'ha pogut verificar
+	 *         (procediment sense codi SIA o error en la consulta).
+	 */
+	public Boolean notificacioIsEntregaCieActiva(ExpedientEntity expedientEntity) {
+		MetaExpedientEntity metaExpedient = expedientEntity.getMetaExpedient();
+		if (metaExpedient.getTipusClassificacio() != TipusClassificacioEnumDto.SIA || !Utils.hasValue(metaExpedient.getClassificacio())) {
+			return null;
+		}
+		String codiProcediment = metaExpedient.getClassificacio();
+		String codiEntitat = getNotificacioEntitatCodi(expedientEntity);
+		String codiOrgan = getNotificacioOrganCodi(expedientEntity, codiEntitat);
+
+		String accioDescripcio = "Consulta de l'entrega postal per CIE activa";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("expedientId", expedientEntity.getId().toString());
+		accioParams.put("codiProcediment", codiProcediment);
+		accioParams.put("codiEntitat", codiEntitat);
+		accioParams.put("codiOrgan", codiOrgan);
+
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
+		long t0 = System.currentTimeMillis();
+		String endpoint = null;
+		try {
+			organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedientEntity.getId()));
+			NotificacioPlugin notificacioPlugin = getNotificacioPlugin();
+			endpoint = notificacioPlugin.getEndpointURL();
+			Boolean entregaCieActiva = notificacioPlugin.isProcedimentEntregaCieActiva(
+					codiProcediment,
+					codiEntitat,
+					codiOrgan);
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_NOTIFICACIO,
+					accioDescripcio,
+					endpoint,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+			return entregaCieActiva;
+		} catch (Exception ex) {
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_NOTIFICACIO,
+					accioDescripcio,
+					endpoint,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					"Error en el plugin de notificacions: " + ex.getMessage(),
+					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+			return null;
+		}
+	}
+
+	/** Codi DIR3 de l'entitat que s'informa a NOTIB. */
+	private String getNotificacioEntitatCodi(ExpedientEntity expedientEntity) {
+		String forsarEntitat = getPropertyNotificacioForsarEntitat();
+		return forsarEntitat != null ? forsarEntitat : expedientEntity.getEntitat().getUnitatArrel();
+	}
+
+	/** Codi DIR3 de l'òrgan gestor que s'informa a NOTIB: el de l'expedient o, si no en té, el de l'entitat. */
+	private String getNotificacioOrganCodi(ExpedientEntity expedientEntity, String entitatCodi) {
+		OrganGestorEntity organGestor = expedientEntity.getOrganGestor();
+		return organGestor != null ? organGestor.getCodi() : entitatCodi;
+	}
+
 	public RespostaEnviar notificacioEnviar(
 			DocumentNotificacioDto notificacioDto,
 			ExpedientEntity expedientEntity,
@@ -5147,18 +5217,8 @@ public class PluginHelper {
 		
 		try {
 			Notificacio notificacio = new Notificacio();
-			String forsarEntitat = getPropertyNotificacioForsarEntitat();
-			if (forsarEntitat != null) {
-				notificacio.setEmisorDir3Codi(forsarEntitat);
-			} else {
-				notificacio.setEmisorDir3Codi(expedientEntity.getEntitat().getUnitatArrel());
-			}
-			OrganGestorEntity organGestor = expedientEntity.getOrganGestor();
-			if (organGestor != null) {
-				notificacio.setOrganGestor(organGestor.getCodi());
-			} else {
-				notificacio.setOrganGestor(notificacio.getEmisorDir3Codi());
-			}
+			notificacio.setEmisorDir3Codi(getNotificacioEntitatCodi(expedientEntity));
+			notificacio.setOrganGestor(getNotificacioOrganCodi(expedientEntity, notificacio.getEmisorDir3Codi()));
 			notificacio.setEnviamentTipus(notificacioDto.getTipus() != null ? EnviamentTipus.valueOf(notificacioDto.getTipus().toString()) : null);
 			notificacio.setConcepte(notificacioDto.getAssumpte());
 			notificacio.setDescripcio(notificacioDto.getObservacions());

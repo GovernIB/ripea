@@ -1543,7 +1543,14 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 			target.setAdministracioSirFormat(answers.containsKey(COMPATIBILITAT_EXTENSIO_AVIS));
 
             if (fieldName==null){
-                target.setPermetreEnviamentPostal(ConfigHelper.getEntitat().get().isPermetreEnviamentPostal());
+                boolean permetreEnviamentPostal = ConfigHelper.getEntitat().get().isPermetreEnviamentPostal();
+                target.setPermetreEnviamentPostal(permetreEnviamentPostal);
+                if (permetreEnviamentPostal) {
+                	// Si no es pot verificar el CIE (null) el check queda habilitat i és NOTIB qui decideix
+                	documentRepository.findById((Long)id)
+                			.map(DocumentEntity::getExpedient)
+                			.ifPresent(expedient -> target.setEntregaPostalCie(pluginHelper.notificacioIsEntregaCieActiva(expedient)));
+                }
                	target.setDuracio(configHelper.getAsInt(PropertyConfig.NOTIB_PLUGIN_CADUCA, 10));
                	// Si l'expedient només té un interessat (sense comptar els representants) es
                	// selecciona per defecte, igual que fa el formulari JSP. S'ha d'emprar el setter
