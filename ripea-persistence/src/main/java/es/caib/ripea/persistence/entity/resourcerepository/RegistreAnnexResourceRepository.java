@@ -21,4 +21,10 @@ public interface RegistreAnnexResourceRepository extends BaseRepository<Registre
 	@Query("select count(a) from RegistreAnnexResourceEntity a " +
 			"where a.document.id = :documentId and a.error is not null")
 	long countAnnexosAmbErrorByDocumentId(@Param("documentId") Long documentId);
+
+	//Versió per lots de countAnnexosAmbErrorByDocumentId: ids dels documents que tenen algun annex amb error.
+	//Màxim 1000 ids per crida (límit IN d'Oracle).
+	@Query("select distinct a.document.id from RegistreAnnexResourceEntity a " +
+			"where a.document.id in (:documentIds) and a.error is not null")
+	List<Long> findDocumentIdsAmbAnnexosAmbError(@Param("documentIds") List<Long> documentIds);
 }

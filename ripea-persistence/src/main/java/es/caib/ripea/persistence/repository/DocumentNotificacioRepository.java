@@ -71,6 +71,24 @@ public interface DocumentNotificacioRepository extends JpaRepository<DocumentNot
 			"			n.document.id = :documentId) ")
 	Boolean findErrorLastNotificacioByDocumentId(@Param("documentId") Long documentId);
 
+	/**
+	 * Versió per lots de findLastEstatNotificacioByDocumentId i findErrorLastNotificacioByDocumentId:
+	 * una fila [documentId, notificacioEstat, error] per la darrera notificació (id màxim) de cada document.
+	 * Els documents sense notificacions no hi apareixen. Màxim 1000 ids per crida (límit IN d'Oracle).
+	 */
+	@Query( "select dn.document.id, dn.notificacioEstat, dn.error " +
+			"from " +
+			"	DocumentNotificacioEntity dn " +
+			"where dn.id in ( " +
+			"		select " +
+			"			max(n.id) " +
+			"		from " +
+			"			DocumentNotificacioEntity n " +
+			"		where " +
+			"			n.document.id in (:documentIds) " +
+			"		group by n.document.id) ")
+	List<Object[]> findDarreraNotificacioByDocumentIds(@Param("documentIds") List<Long> documentIds);
+
 	@Query("select " +
 			"	dn " +
 			"from " +

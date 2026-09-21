@@ -40,6 +40,24 @@ public interface DocumentPortafirmesRepository extends JpaRepository<DocumentPor
 			"		where " +
 			"			p.document.id = :documentId) ")
 	Boolean findErrorLastEnviamentPortafirmesByDocumentId(@Param("documentId") Long documentId);
+
+	/**
+	 * Versió per lots de findErrorLastEnviamentPortafirmesByDocumentId: una fila [documentId, error] pel
+	 * darrer enviament (id màxim) de cada document. Els documents sense enviaments no hi apareixen.
+	 * Màxim 1000 ids per crida (límit IN d'Oracle).
+	 */
+	@Query( "select dp.document.id, dp.error " +
+			"from " +
+			"	DocumentPortafirmesEntity dp " +
+			"where dp.id in ( " +
+			"		select " +
+			"			max(p.id) " +
+			"		from " +
+			"			DocumentPortafirmesEntity p " +
+			"		where " +
+			"			p.document.id in (:documentIds) " +
+			"		group by p.document.id) ")
+	List<Object[]> findErrorDarrerEnviamentByDocumentIds(@Param("documentIds") List<Long> documentIds);
 	
 	DocumentPortafirmesEntity findByPortafirmesId(String portafirmesId);
 	

@@ -61,16 +61,17 @@ public class ContingutResourceHelper {
     private final ConfigHelper configHelper;
 
     public boolean contingutHasDocumentsFills(Long contingutPareId) {
-//    	return carpetaResourceRepository.contingutHasDocumentsFills(contingutPareId);
-        List<ContingutResourceEntity> hijos = contingutResourceRepository.findByPareId(contingutPareId);
-        for (ContingutResourceEntity hijo : hijos) {
-            if (ContingutTipusEnumDto.DOCUMENT.equals(hijo.getTipus())) {
-                return true;
-            } else if (contingutHasDocumentsFills(hijo.getId())) {
+        // Es consulten només existència i ids, sense carregar les entitats dels fills (abans es carregaven totes,
+        // documents inclosos, només per mirar-ne el tipus). Com abans, no es filtren els continguts esborrats.
+        if (contingutResourceRepository.existsFillByPareIdAndTipus(contingutPareId, ContingutTipusEnumDto.DOCUMENT)) {
+            return true;
+        }
+        for (Long fillId : contingutResourceRepository.findFillIdsByPareIdAndTipusNot(contingutPareId, ContingutTipusEnumDto.DOCUMENT)) {
+            if (contingutHasDocumentsFills(fillId)) {
                 return true;
             }
         }
-        return false;    	
+        return false;
     }
     
     public ArxiuDetallDto getArxiuDetall(Long entitatId, Long contingutId) {

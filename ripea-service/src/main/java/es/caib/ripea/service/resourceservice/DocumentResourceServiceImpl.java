@@ -8,9 +8,11 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleStartTransactionRequest;
@@ -152,6 +155,9 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 public class DocumentResourceServiceImpl extends BaseMutableResourceService<DocumentResource, Long, DocumentResourceEntity> implements DocumentResourceService {
+
+    // Nombre màxim d'elements d'una clàusula IN (límit d'Oracle) a les consultes per lots.
+    private static final int MAX_IDS_CONSULTA = 1000;
 
     private final ContingutResourceHelper contingutResourceHelper;
     private final PluginHelper pluginHelper;
@@ -507,46 +513,90 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         resource.setFirmaParcial(DocumentEstatEnumDto.FIRMA_PARCIAL.equals(entity.getEstat()));
     }
 
+    /**
+     * Les dades de notificacions, portafirmes, annexos i usuaris es consulten per lots (una consulta de cada
+     * tipus per cada {@link #MAX_IDS_CONSULTA} documents) en lloc de fer-ne diverses per document: la graella
+     * de contingut de l'expedient demana aquesta perspectiva per a tots els documents alhora.
+     */
     private class ResumPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
         @Override
+        public boolean applyMultiple(String code, List<DocumentResourceEntity> entities, List<DocumentResource> resources) throws PerspectiveApplicationException {
+            List<Long> documentIds = entities.stream().map(DocumentResourceEntity::getId).collect(Collectors.toList());
+            // [documentId, notificacioEstat, error] de la darrera notificació de cada document amb notificacions
+            Map<Long, Object[]> darreresNotificacions = new HashMap<>();
+            // error del darrer enviament a portafirmes de cada document amb enviaments
+            Map<Long, Boolean> errorsDarrerEnviament = new HashMap<>();
+            Set<Long> documentsAmbAnnexosAmbError = new HashSet<>();
+            for (List<Long> lot: ListUtils.partition(documentIds, MAX_IDS_CONSULTA)) {
+                for (Object[] fila: documentNotificacioRepository.findDarreraNotificacioByDocumentIds(lot)) {
+                    darreresNotificacions.put((Long)fila[0], fila);
+                }
+                for (Object[] fila: documentPortafirmesRepository.findErrorDarrerEnviamentByDocumentIds(lot)) {
+                    errorsDarrerEnviament.put((Long)fila[0], (Boolean)fila[1]);
+                }
+                documentsAmbAnnexosAmbError.addAll(registreAnnexResourceRepository.findDocumentIdsAmbAnnexosAmbError(lot));
+            }
+            Map<String, UsuariResourceEntity> usuaris = findUsuarisAuditoria(entities);
+
+            for (int i = 0; i < entities.size(); i++) {
+                DocumentResourceEntity entity = entities.get(i);
+                DocumentResource resource = resources.get(i);
+
+                resource.setErrors(cacheHelper.findErrorsValidacioPerNode(entity.getId()));
+                resource.setValid(resource.getErrors().isEmpty());
+
+                Object[] darreraNotificacio = darreresNotificacions.get(entity.getId());
+                resource.setAmbNotificacions(darreraNotificacio != null);
+                DocumentNotificacioEstatEnumDto estatDarreraNotificacio = darreraNotificacio != null ? (DocumentNotificacioEstatEnumDto)darreraNotificacio[1] : null;
+                resource.setEstatDarreraNotificacio(estatDarreraNotificacio != null ? estatDarreraNotificacio.name() : "");
+                Boolean isErrorLastNotificacio = darreraNotificacio != null ? (Boolean)darreraNotificacio[2] : null;
+                resource.setErrorDarreraNotificacio(isErrorLastNotificacio != null ? isErrorLastNotificacio : false);
+
+                Boolean isErrorLastEnviament = errorsDarrerEnviament.get(entity.getId());
+                resource.setErrorEnviamentPortafirmes(isErrorLastEnviament != null ? isErrorLastEnviament : false);
+
+                //Document provinent d'un annex d'anotació que ha quedat amb error: pendent de moure
+                //a la sèrie documental del procediment. Equival a DocumentEntity.isPendentMoverArxiu(),
+                //que és el que fa servir la interfície JSP.
+                resource.setPendentMoverArxiu(documentsAmbAnnexosAmbError.contains(entity.getId()));
+
+                if (entity.getMetaDocument() != null) {
+                    resource.setMetaDocumentInfo(objectMappingHelper.newInstanceMap(
+                            entity.getMetaDocument(),
+                            MetaDocumentResource.class,
+                            "portafirmesResponsables", "serialVersionUID"));
+                }
+
+                UsuariResourceEntity createdBy = entity.getCreatedBy() != null ? usuaris.get(entity.getCreatedBy()) : null;
+                if (createdBy != null) {
+                    resource.setCreatedByFullName(createdBy.getNom() + " (" + createdBy.getCodi() + ")");
+                }
+                UsuariResourceEntity lastModifiedBy = entity.getLastModifiedBy() != null ? usuaris.get(entity.getLastModifiedBy()) : null;
+                if (lastModifiedBy != null) {
+                    resource.setLastModifiedByFullName(lastModifiedBy.getNom() + " (" + lastModifiedBy.getCodi() + ")");
+                }
+            }
+            return true;
+        }
+
+        @Override
         public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
-            resource.setErrors(cacheHelper.findErrorsValidacioPerNode(entity.getId()));
-            resource.setValid(resource.getErrors().isEmpty());
-            resource.setAmbNotificacions(!entity.getNotificacions().isEmpty());
+            applyMultiple(code, Collections.singletonList(entity), Collections.singletonList(resource));
+        }
 
-            DocumentNotificacioEstatEnumDto estatDarreraNotificacio = documentNotificacioRepository.findLastEstatNotificacioByDocumentId(entity.getId());
-            resource.setEstatDarreraNotificacio(estatDarreraNotificacio != null ? estatDarreraNotificacio.name() : "");
-
-            Boolean isErrorLastNotificacio = documentNotificacioRepository.findErrorLastNotificacioByDocumentId(entity.getId());
-            resource.setErrorDarreraNotificacio(isErrorLastNotificacio != null ? isErrorLastNotificacio : false);
-
-            Boolean isErrorLastEnviament = documentPortafirmesRepository.findErrorLastEnviamentPortafirmesByDocumentId(entity.getId());
-            resource.setErrorEnviamentPortafirmes(isErrorLastEnviament != null ? isErrorLastEnviament : false);
-
-            //Document provinent d'un annex d'anotació que ha quedat amb error: pendent de moure
-            //a la sèrie documental del procediment. Equival a DocumentEntity.isPendentMoverArxiu(),
-            //que és el que fa servir la interfície JSP.
-            resource.setPendentMoverArxiu(registreAnnexResourceRepository.countAnnexosAmbErrorByDocumentId(entity.getId()) > 0);
-
-            if (entity.getMetaDocument() != null) {
-                resource.setMetaDocumentInfo(objectMappingHelper.newInstanceMap(
-                        entity.getMetaDocument(),
-                        MetaDocumentResource.class,
-                        "portafirmesResponsables", "serialVersionUID"));
+        private Map<String, UsuariResourceEntity> findUsuarisAuditoria(List<DocumentResourceEntity> entities) {
+            Set<String> codis = new HashSet<>();
+            for (DocumentResourceEntity entity: entities) {
+                if (entity.getCreatedBy() != null) codis.add(entity.getCreatedBy());
+                if (entity.getLastModifiedBy() != null) codis.add(entity.getLastModifiedBy());
             }
-
-            if (entity.getCreatedBy() != null) {
-                UsuariResourceEntity usuariResourceEntity = usuariResourceRepository.findById(entity.getCreatedBy()).orElse(null);
-                if (usuariResourceEntity != null) {
-                    resource.setCreatedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
+            Map<String, UsuariResourceEntity> usuaris = new HashMap<>();
+            for (List<String> lot: ListUtils.partition(new ArrayList<>(codis), MAX_IDS_CONSULTA)) {
+                for (UsuariResourceEntity usuari: usuariResourceRepository.findAllById(lot)) {
+                    usuaris.put(usuari.getId(), usuari);
                 }
             }
-            if (entity.getLastModifiedBy() != null) {
-                UsuariResourceEntity usuariResourceEntity = usuariResourceRepository.findById(entity.getLastModifiedBy()).orElse(null);
-                if (usuariResourceEntity != null) {
-                    resource.setLastModifiedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
-                }
-            }
+            return usuaris;
         }
     }
 
