@@ -285,6 +285,7 @@ public class PropertyConfig {
 	public static final String PUBLICAR_DOCUMENTS_ACTIVA                            = "es.caib.ripea.creacio.documents.publicar.activa";
 	public static final String FIRMA_BIOMETRICA_ACTIVA                              = "es.caib.ripea.documents.firma.biometrica.activa";
 	public static final String VALIDACIO_URL_IMPRIMIBLES                            = "es.caib.ripea.documents.validacio.url";
+	public static final String DESCARREGA_URL_IMPRIMIBLES                           = "es.caib.ripea.documents.descarrega.url";
 	public static final String MOURE_MATEIX_EXPEDIENTS                              = "es.caib.ripea.creacio.documents.moure.mateix.expedient";
 	public static final String IMPORTACIO_RELACIONATS_ACTIVA                        = "es.caib.ripea.importacio.expedient.relacionat.activa";
 	public static final String PERMATRE_ESBORRAR_FINAL                              = "es.caib.ripea.document.esborrar.finals";

@@ -55,6 +55,7 @@ import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.ContingutService;
+import es.caib.ripea.service.intf.utils.Utils;
 
 @Component
 public class IndexBatchHelper {
@@ -294,10 +295,9 @@ public class IndexBatchHelper {
 		        linkStyle.setVerticalAlignment(VerticalAlignment.TOP);
 		       
 		     	// Enllaç descarrega
-		        String enllacDescarrega = "", titolDescarrega = "";
-		        if (getBaseUrl() != null && ! getBaseUrl().isEmpty()) {
+		        String enllacDescarrega = getEnllacDescarrega(document, arxiuDetall), titolDescarrega = "";
+		        if (Utils.hasValue(enllacDescarrega)) {
 		        	titolDescarrega = messageHelper.getMessage("expedient.service.exportacio.index.link.descarregar");
-		        	enllacDescarrega = getBaseUrl() + "/contingut/" + document.getPareId()	+ "/document/" + document.getId() + "/descarregar";
 		        }
 
 		        org.apache.poi.ss.usermodel.Cell cellDescarrega = dataRow.createCell(colIdx++);
@@ -445,10 +445,9 @@ public class IndexBatchHelper {
 			taulaDocuments.addCell(crearCellaContingut(dataCreacio, null, null));
 			
 //			// Enllaç descarrega
-	        String enllacDescarrega = "", titolDescarrega = "-";
-	        if (getBaseUrl() != null && ! getBaseUrl().isEmpty()) {
+	        String enllacDescarrega = getEnllacDescarrega(document, arxiuDetall), titolDescarrega = "-";
+	        if (Utils.hasValue(enllacDescarrega)) {
 	        	titolDescarrega = messageHelper.getMessage("expedient.service.exportacio.index.link.descarregar");
-	        	enllacDescarrega = getBaseUrl() + "/contingut/" + document.getPareId()	+ "/document/" + document.getId() + "/descarregar";
 	        }
 	        
 			taulaDocuments.addCell(crearCellaContingut(titolDescarrega, null, enllacDescarrega));
@@ -616,6 +615,29 @@ public class IndexBatchHelper {
 
 	private String getBaseUrl() throws NoSuchFileException, IOException {
 		return configHelper.getConfig(PropertyConfig.BASE_URL);
+	}
+
+	private String getDescarregaUrl() {
+		return configHelper.getConfig(PropertyConfig.DESCARREGA_URL_IMPRIMIBLES);
+	}
+
+	/**
+	 * Enllaç de descàrrega directa del document (URL configurada + CSV). Si no hi ha URL o CSV, enllaç de descàrrega de RIPEA.
+	 * Retorna buit si no es pot generar cap enllaç.
+	 */
+	private String getEnllacDescarrega(DocumentEntity document, ArxiuDetallDto arxiuDetall) throws NoSuchFileException, IOException {
+		String csv = document.getNtiCsv();
+		if (!Utils.hasValue(csv) && arxiuDetall != null && arxiuDetall.getMetadadesAddicionals() != null) {
+			csv = (String) arxiuDetall.getMetadadesAddicionals().get("csv");
+		}
+		String urlDescarrega = getDescarregaUrl();
+		if (Utils.hasValue(urlDescarrega) && Utils.hasValue(csv)) {
+			return urlDescarrega + csv;
+		}
+		if (Utils.hasValue(getBaseUrl())) {
+			return getBaseUrl() + "/contingut/" + document.getPareId() + "/document/" + document.getId() + "/descarregar";
+		}
+		return "";
 	}
 
 	protected enum DocumentNotificacioEstatEnumCustom {PENDENT, REGISTRAT, ENVIAT, NOTIFICAT};
