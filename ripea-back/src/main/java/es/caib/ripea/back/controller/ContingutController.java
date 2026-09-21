@@ -215,6 +215,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			model.addAttribute("isMostrarCarpetesPerAnotacions", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CARPETES_ANOTACIONS_ACTIVES)));
 			model.addAttribute("isMostrarCopiar", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MOURER_DOCUMENTS_ACTIU)));
 			model.addAttribute("isMostrarVincular", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.VINCULAR_DOCUMENTS_ACTIU)));
+			model.addAttribute("isCercaDocumentsExpedientActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.ARXIU_CERCA_EXPEDIENT_ACTIU)));
 			model.addAttribute("isMostrarPublicar", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.PUBLICAR_DOCUMENTS_ACTIVA)));
 			model.addAttribute("isFirmaBiometrica", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.FIRMA_BIOMETRICA_ACTIVA)));
 			model.addAttribute("isUrlValidacioDefinida", aplicacioService.propertyFindByNom(PropertyConfig.VALIDACIO_URL_IMPRIMIBLES) != null);
@@ -342,6 +343,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		model.addAttribute("contingut", contingut);
 		model.addAttribute("isMostrarCopiar", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.MOURER_DOCUMENTS_ACTIU)));
 		model.addAttribute("isMostrarVincular", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.VINCULAR_DOCUMENTS_ACTIU)));
+		model.addAttribute("isCercaDocumentsExpedientActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.ARXIU_CERCA_EXPEDIENT_ACTIU)));
 		model.addAttribute("isCreacioCarpetesActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CARPETES_CREACIO_ACTIVA)));
 		model.addAttribute("isPermesModificarCustodiats", aplicacioService.propertyBooleanFindByKey(PropertyConfig.MODIFICAR_DOCUMENTS_CUSTODIATS, false));
 		model.addAttribute("isUrlValidacioDefinida", aplicacioService.propertyFindByNom(PropertyConfig.VALIDACIO_URL_IMPRIMIBLES) != null);

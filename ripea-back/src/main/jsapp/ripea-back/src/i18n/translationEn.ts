@@ -264,6 +264,13 @@ const translationEn = {
                     title: "Link content",
                     ok: "Document '{{document}}' linked successfully",
                 },
+                cercaDocuments: {
+                    label: "Search documents...",
+                    title: "Search documents in the record",
+                    text: "Text to search",
+                    search: "Search",
+                    empty: "No document found",
+                },
                 create: {
                     label: "Create content",
                 },

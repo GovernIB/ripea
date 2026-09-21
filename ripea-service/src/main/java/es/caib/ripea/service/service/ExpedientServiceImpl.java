@@ -57,6 +57,7 @@ import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.helper.DateHelper;
 import es.caib.ripea.service.helper.EmailHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.helper.DocumentHelper;
 import es.caib.ripea.service.helper.ExpedientHelper;
 import es.caib.ripea.service.helper.MessageHelper;
 import es.caib.ripea.service.helper.MetaExpedientHelper;
@@ -114,6 +115,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 	@Autowired private ExpedientPeticioRepository expedientPeticioRepository;
 	@Autowired private AlertaRepository alertaRepository;
 	@Autowired private ExpedientHelper expedientHelper;
+	@Autowired private DocumentHelper documentHelper;
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private PermisosHelper permisosHelper;
 	@Autowired private ContingutHelper contingutHelper;
@@ -1077,6 +1079,29 @@ public class ExpedientServiceImpl implements ExpedientService {
 		return expedientsDto;
 	}
 
+
+	@Transactional(readOnly = true)
+	@Override
+	public PaginaDto<DocumentDto> cercaDocumentsExpedient(
+			Long entitatId,
+			Long expedientId,
+			String text,
+			String rolActual,
+			Integer pagina,
+			Integer itemsPerPagina) {
+		logger.trace(
+				"Cercant documents a l'arxiu d'un expedient (" + "entitatId=" + entitatId + ", " + "expedientId=" +
+						expedientId + ", " + "text=" + text + ")");
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				expedientId,
+				false,
+				true,
+				false,
+				false,
+				false,
+				rolActual);
+		return documentHelper.cercaDocumentsExpedient(expedient, text, pagina, itemsPerPagina);
+	}
 
 	@Transactional(readOnly = true)
 	@Override

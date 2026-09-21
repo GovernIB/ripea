@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.back.helper.EntitatHelper;
+import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.ExpedientDto;
 import es.caib.ripea.service.intf.dto.ExpedientSelectorDto;
@@ -127,5 +128,24 @@ public class AjaxExpedientController extends BaseUserOAdminOOrganController {
 		return expedientService.findById(
 				entitat.getId(),
 				id, null);
+	}
+
+	@RequestMapping(value = "/expedient/{expedientId}/cercaDocuments", method = RequestMethod.GET)
+	@ResponseBody
+	public PaginaDto<DocumentDto> cercaDocuments(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			@RequestParam String text,
+			@RequestParam(value = "page", defaultValue = "0") int page,
+			@RequestParam(value = "pageSize", defaultValue = "20") int pageSize,
+			Model model) {
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		return expedientService.cercaDocumentsExpedient(
+				entitat.getId(),
+				expedientId,
+				Utils.trim(text),
+				getRolActual(request),
+				page,
+				pageSize);
 	}
 }

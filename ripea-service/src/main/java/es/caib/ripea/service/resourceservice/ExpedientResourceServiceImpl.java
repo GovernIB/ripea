@@ -125,6 +125,7 @@ import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.ExpedientResource.CanviEstatExpedientFormAction;
 import es.caib.ripea.service.intf.model.ExpedientResource.CanviPrioritatExpedientFormAction;
+import es.caib.ripea.service.intf.model.ExpedientResource.CercaDocumentsFormAction;
 import es.caib.ripea.service.intf.model.ExpedientResource.ExpedientFilterForm;
 import es.caib.ripea.service.intf.model.ExpedientResource.ExportGenericForm;
 import es.caib.ripea.service.intf.model.ExpedientResource.ExportarDocumentMassiu;
@@ -232,6 +233,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         register(ExpedientResource.ACTION_GET_PROGRES_ZIP, new GetProgresZipActionExecutor());
         register(ExpedientResource.ACTION_CANCEL_IMPORT_ZIP, new CancelarImportZipActionExecutor());
         register(ExpedientResource.ACTION_MOURE_TOT_CODE, new MoureTotActionExecutor());
+        register(ExpedientResource.ACTION_CERCA_DOCUMENTS_CODE, new CercaDocumentsActionExecutor());
         
         register(ExpedientResource.PERSPECTIVE_BASE_CODE, new BasicPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_AVISOS_CODE, new AvisosPerspectiveApplicator());
@@ -1887,7 +1889,35 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 			}
 		}
     }
-    
+
+    private class CercaDocumentsActionExecutor implements ActionExecutor<ExpedientResourceEntity, ExpedientResource.CercaDocumentsFormAction, Serializable> {
+
+    	@Override
+		public void onChange(Serializable id, CercaDocumentsFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, CercaDocumentsFormAction target) {}
+
+		@Override
+		public Serializable exec(String code, ExpedientResourceEntity entity, CercaDocumentsFormAction params) throws ActionExecutionException {
+			try {
+				ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+						entity.getId(),
+						false,
+						true,
+						false,
+						false,
+						false,
+						configHelper.getRolActual());
+				return documentHelper.cercaDocumentsExpedient(
+						expedient,
+						params.getText(),
+						params.getPage(),
+						params.getPageSize());
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/expedient/CercaDocumentsActionExecutor", e);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, e.getMessage());
+			}
+		}
+    }
+
     private class GuardarArxiuActionExecutor implements ActionExecutor<ExpedientResourceEntity, MassiveAction, Serializable> {
 
 		@Override

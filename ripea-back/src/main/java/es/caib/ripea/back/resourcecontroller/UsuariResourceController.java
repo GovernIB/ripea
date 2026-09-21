@@ -229,7 +229,8 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
                 PropertyConfig.PERMETRE_OBLIGAR_INTERESSAT,
                 PropertyConfig.CONCATENAR_MULTIPLES_PDFS,
                 PropertyConfig.NOTIFICAR_MULTIPLE_TIPUS_DOC,
-                PropertyConfig.MAX_RESULTS_SELECT));
+                PropertyConfig.MAX_RESULTS_SELECT,
+                PropertyConfig.ARXIU_CERCA_EXPEDIENT_ACTIU));
 
         response.put("isConvertirDefinitiuActiu", Boolean.parseBoolean(props.getProperty(PropertyConfig.CONVERSIO_DEFINITIU)));
         response.put("isUrlValidacioDefinida", props.getProperty(PropertyConfig.VALIDACIO_URL_IMPRIMIBLES)!=null);
@@ -264,6 +265,7 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         response.put("isCarpetesDefecte", Boolean.parseBoolean(props.getProperty(PropertyConfig.CARPETES_PER_DEFECTE)));
         response.put("isRestringirCarpetesActiu", Boolean.parseBoolean(props.getProperty(PropertyConfig.CARPETES_RESTRINGIR_ACTIU)));
         response.put("isObligarInteressatActiu", Boolean.parseBoolean(props.getProperty(PropertyConfig.PERMETRE_OBLIGAR_INTERESSAT)));
+        response.put("isCercaDocumentsExpedientActiu", Boolean.parseBoolean(props.getProperty(PropertyConfig.ARXIU_CERCA_EXPEDIENT_ACTIU)));
         String maxResultsSelects = props.getProperty(PropertyConfig.MAX_RESULTS_SELECT);
         response.put("maxResultSelects", maxResultsSelects!=null?Integer.parseInt(maxResultsSelects):30);
 

@@ -18,6 +18,9 @@
 	#grid-documents .caption .dropdown-menu { text-align: left; }
 	#grid-documents .caption .dropdown-menu li { width: 100%; margin: 0; padding: 0; }
 	#contingut-botons { margin-bottom: .8em; }
+	@media (min-width: 992px) {
+		#cercaDocumentsModal .modal-dialog { width: 1100px; }
+	}
 	.drag_activated { border: 4px dashed #ffd351; height: 200px; width: 100%; background-color: #f5f5f5; display: flex; justify-content: center; align-items: center; flex-direction: column; mask-image: linear-gradient(to top, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0)); -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0)); }
 	.ordre-col { cursor: move; vertical-align: middle !important; }
 	.popover { max-width: none; z-index: 100; cursor: default; width: 500px; }
@@ -1672,6 +1675,13 @@
 					</div>
 					----%>
 				</c:if>
+				<c:if test="${isCercaDocumentsExpedientActiu && !isTasca}">
+					<div class="btn-group" id="cercaDocuments">
+						<button type="button" title="<spring:message code="contingut.boto.menu.cercaDocuments"/>" data-toggle="modal" data-target="#cercaDocumentsModal" class="btn btn-default">
+							<span class="fa fa-search"></span>
+						</button>
+					</div>
+				</c:if>
 				<div class="btn-group" id="vistes">
 					<c:if test="${!isTasca}">
 						<%---- Button treetable per estats  ----%>
@@ -1776,6 +1786,83 @@
 					</div>
 				</c:if>
 			</div>
+
+			<c:if test="${isCercaDocumentsExpedientActiu && !isTasca}">
+				<div class="modal fade" id="cercaDocumentsModal" tabindex="-1" role="dialog" aria-labelledby="cercaDocumentsModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+								<h4 class="modal-title" id="cercaDocumentsModalLabel"><spring:message code="contingut.cercaDocuments.titol"/></h4>
+							</div>
+							<div class="modal-body">
+								<div class="input-group">
+									<input type="text" class="form-control" id="cercaDocumentsText" placeholder="<spring:message code="contingut.cercaDocuments.camp.text"/>"/>
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" id="cercaDocumentsBoto"><span class="fa fa-search"></span> <spring:message code="contingut.cercaDocuments.boto.cercar"/></button>
+									</span>
+								</div>
+								<div id="cercaDocumentsResultats" style="margin-top: 15px; max-height: 350px; overflow-y: auto;"></div>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default" data-dismiss="modal"><spring:message code="comu.boto.tancar"/></button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<script>
+					(function() {
+						function cercarDocumentsExpedient() {
+							var text = $('#cercaDocumentsText').val();
+							var resultatsDiv = $('#cercaDocumentsResultats');
+							if (!text) {
+								return;
+							}
+							resultatsDiv.html('<div class="text-center"><span class="fa fa-spinner fa-spin fa-2x"></span></div>');
+							$.ajax({
+								type: 'GET',
+								url: '<c:url value="/expedientajax/expedient/${expedientId}/cercaDocuments"/>',
+								data: {text: text, page: 0, pageSize: 50},
+								success: function(data) {
+									var items = (data && data.contingut) ? data.contingut : [];
+									resultatsDiv.empty();
+									if (items.length == 0) {
+										resultatsDiv.append('<p class="text-muted"><spring:message code="contingut.cercaDocuments.resultat.buit"/></p>');
+										return;
+									}
+									var llista = $('<ul class="list-group"></ul>');
+									$.each(items, function(i, doc) {
+										var subtitol = doc.metaNode ? ' <small class="text-muted">(' + doc.metaNode.nom + ')</small>' : '';
+										var link = $('<a></a>')
+												.attr('href', '<c:url value="/contingut/"/>' + doc.id)
+												.attr('data-toggle', 'modal')
+												.html('<span class="fa fa-file-text-o"></span>&nbsp;' + doc.nom + subtitol);
+										var item = $('<li class="list-group-item"></li>').append(link);
+										llista.append(item);
+									});
+									resultatsDiv.append(llista);
+									llista.webutilModalEval();
+								},
+								error: function(xhr) {
+									var missatge = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : xhr.statusText;
+									resultatsDiv.html('<p class="text-danger">' + missatge + '</p>');
+								}
+							});
+						}
+						$('#cercaDocumentsBoto').on('click', cercarDocumentsExpedient);
+						$('#cercaDocumentsText').on('keydown', function(event) {
+							if (event.which == 13) {
+								event.preventDefault();
+								cercarDocumentsExpedient();
+							}
+						});
+						$('#cercaDocumentsModal').on('shown.bs.modal', function() {
+							$('#cercaDocumentsText').val('').focus();
+							$('#cercaDocumentsResultats').empty();
+						});
+					})();
+				</script>
+			</c:if>
 
 			<%---- TABLE/GRID OF CONTINGUTS ----%>
 			<div id="loading">

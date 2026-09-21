@@ -19,6 +19,7 @@ import useRowRefresh from "../../hooks/useRowRefresh.ts";
 import DocumentsGridForm from "./DocumentGridForm.tsx";
 import MetaExpedient, {formatMultiplicitat, MultiplicitatStyled} from "./details/MetaExpedient.tsx";
 import useVisualitzar from "./actions/Visualitzar.tsx";
+import useCercaDocumentsExpedient from "./actions/CercaDocumentsExpedient.tsx";
 import {useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro";
 
 enum View {
@@ -254,6 +255,7 @@ const DocumentsGrid = (props: any) => {
     }, [contingutScopeId, entity?.id]);
 
     const {handleOpen: handleVisualitzarOpen, dialog: dialogVisualitzar, isValid} = useVisualitzar();
+    const {handleOpen: handleCercaDocumentsOpen, dialog: dialogCercaDocuments} = useCercaDocumentsExpedient(entity, handleVisualitzarOpen);
     const { createActions, actions, components } = useContingutActions(entity, apiRef, refresh, contingutScopeId, formCarpetaDestiPerScope?.description);
     const { actions: massiveActions, components: massiveComponents } = useContingutMassiveActions(entity, refresh);
 
@@ -664,6 +666,16 @@ const DocumentsGrid = (props: any) => {
                                     }} />,
                             },
                             {
+                                position: 2,
+                                element: <ToolbarButton
+                                    icon={'search'}
+                                    title={t('page.contingut.action.cercaDocuments.label')}
+                                    onClick={() => handleCercaDocumentsOpen()}
+                                    color={'none'}
+                                    hidden={!user?.sessionScope?.isCercaDocumentsExpedientActiu || entity?.id == null}
+                                />,
+                            },
+                            {
                                 position: 3,
                                 element: <MenuActionButton
                                     id={'createDocument'}
@@ -727,6 +739,7 @@ const DocumentsGrid = (props: any) => {
                     {components}
                     {massiveComponents}
                     {dialogVisualitzar}
+                    {dialogCercaDocuments}
                 {/*</DndContext>*/}
 
                 {(entity?.potModificarContingut || entity?.potModificar) && <Box

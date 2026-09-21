@@ -278,6 +278,7 @@ public class PropertyConfig {
 	public static final String IMPORTACIO_ACTIVA									= "es.caib.ripea.creacio.importacio.activa";
 	public static final String MOURER_DOCUMENTS_ACTIU								= "es.caib.ripea.creacio.documents.copiarMoure.activa";
 	public static final String VINCULAR_DOCUMENTS_ACTIU								= "es.caib.ripea.creacio.documents.vincular.activa";
+	public static final String ARXIU_CERCA_EXPEDIENT_ACTIU							= "es.caib.ripea.cerca.documents.expedient.activa";
 	public static final String IMPRIMIBLE_NO_FIRMAT_ACTIU							= "es.caib.ripea.descarregar.imprimible.nofirmats";
 	public static final String REOBRIR_EXPEDIENT_TANCAT								= "es.caib.ripea.expedient.permetre.reobrir";
 	public static final String MODIFICAR_DOCUMENTS_CUSTODIATS                       = "es.caib.ripea.document.modificar.custodiats";

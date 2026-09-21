@@ -65,6 +65,9 @@ import es.caib.distribucio.rest.client.integracio.domini.NtiEstadoElaboracion;
 import es.caib.distribucio.rest.client.integracio.domini.NtiOrigen;
 import es.caib.distribucio.rest.client.integracio.domini.NtiTipoDocumento;
 import es.caib.plugins.arxiu.api.Carpeta;
+import es.caib.plugins.arxiu.api.ConsultaFiltre;
+import es.caib.plugins.arxiu.api.ConsultaOperacio;
+import es.caib.plugins.arxiu.api.ConsultaResultat;
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
@@ -72,6 +75,7 @@ import es.caib.plugins.arxiu.api.DocumentEstat;
 import es.caib.plugins.arxiu.api.DocumentExtensio;
 import es.caib.plugins.arxiu.api.DocumentFormat;
 import es.caib.plugins.arxiu.api.DocumentMetadades;
+import es.caib.plugins.arxiu.api.DocumentRepositori;
 import es.caib.plugins.arxiu.api.DocumentTipusAddicional;
 import es.caib.plugins.arxiu.api.Expedient;
 import es.caib.plugins.arxiu.api.ExpedientEstat;
@@ -80,6 +84,7 @@ import es.caib.plugins.arxiu.api.Firma;
 import es.caib.plugins.arxiu.api.FirmaTipus;
 import es.caib.plugins.arxiu.api.IArxiuPlugin;
 import es.caib.plugins.arxiu.caib.ArxiuConversioHelper;
+import es.caib.plugins.arxiu.caib.ArxiuPluginCaib;
 import es.caib.ripea.persistence.entity.CarpetaEntity;
 import es.caib.ripea.persistence.entity.ContingutEntity;
 import es.caib.ripea.persistence.entity.DispositiuEnviamentEntity;
@@ -2206,6 +2211,50 @@ public class PluginHelper {
 			String extensio) {
 		return getArxiuFormatExtensio(
 				extensio) != null;
+	}
+	
+	public ConsultaResultat arxiuDocumentCercaExpedient(
+			String entitatCodi,
+			String expedientArxiuUuid,
+			String text,
+			Integer pagina,
+			Integer itemsPerPagina) {
+		if (!getPropertyArxiuCercaExpedientActiu()) {
+			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU,
+					"La cerca de documents dins d'un expedient no està activa");
+		}
+		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin(entitatCodi);
+		if (arxiuPluginWrapper.getPlugin() instanceof ArxiuPluginCaib) {
+			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU,
+					"El plugin d'arxiu configurat no permet la cerca de documents dins d'un expedient");
+		}
+
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
+		IntegracioAccioDto integracioAccio = getIntegracioAccioArxiu(
+				expedientArxiuUuid,
+				arxiuPluginWrapper.getEndpoint(),
+				"Cerca de text a documents d'un expedient");
+		try {
+			ConsultaFiltre filtreParent = new ConsultaFiltre();
+			filtreParent.setMetadada("parent");
+			filtreParent.setOperacio(ConsultaOperacio.IGUAL);
+			filtreParent.setValorOperacio1(expedientArxiuUuid);
+
+			ConsultaFiltre filtreText = new ConsultaFiltre();
+			filtreText.setMetadada("all");
+			filtreText.setOperacio(ConsultaOperacio.CONTE);
+			filtreText.setValorOperacio1(text);
+
+			ConsultaResultat resultat = arxiuPluginWrapper.getPlugin().documentConsulta(
+					Arrays.asList(filtreParent, filtreText),
+					pagina,
+					itemsPerPagina,
+					DocumentRepositori.ENI_DOCUMENTO);
+			arxiuEnviamentOk(integracioAccio, sample);
+			return resultat;
+		} catch (Exception ex) {
+			throw arxiuEnviamentError(integracioAccio, sample, ex);
+		}
 	}
 
 	public List<ContingutArxiu> arxiuDocumentObtenirVersions(
@@ -8903,6 +8952,10 @@ public class PluginHelper {
 
 	public boolean getPropertyArxiuFirmaDetallsActiu() {
 		return configHelper.getAsBoolean(PropertyConfig.ARXIU_PLUGIN_FIRMA_DETALLS);
+	}
+
+	public boolean getPropertyArxiuCercaExpedientActiu() {
+		return configHelper.getAsBoolean(PropertyConfig.ARXIU_CERCA_EXPEDIENT_ACTIU);
 	}
 
 	private Integer getPropertyNotificacioRetardNumDies() {

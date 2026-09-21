@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.sun.jersey.core.util.Base64;
 
+import es.caib.plugins.arxiu.api.ConsultaResultat;
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
@@ -74,6 +75,7 @@ import es.caib.ripea.service.intf.dto.ExpedientDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentPerDefecteEnumDto;
 import es.caib.ripea.service.intf.dto.MetaNodeDto;
+import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.ImportacioRegistreParamsDto;
 import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
@@ -1921,7 +1923,45 @@ public class DocumentHelper {
 		}
 		return documentsDto;
 	}
-	
+
+	public PaginaDto<DocumentDto> cercaDocumentsExpedient(
+			ExpedientEntity expedient,
+			String text,
+			Integer pagina,
+			Integer itemsPerPagina) {
+		ConsultaResultat resultat = pluginHelper.arxiuDocumentCercaExpedient(
+				expedient.getEntitat().getCodi(),
+				expedient.getArxiuUuid(),
+				text,
+				pagina,
+				itemsPerPagina);
+
+		List<DocumentDto> documents = new ArrayList<DocumentDto>();
+		if (resultat.getResultats() != null) {
+			for (ContingutArxiu contingutArxiu : resultat.getResultats()) {
+				List<DocumentDto> trobats = findByArxiuUuid(contingutArxiu.getIdentificador());
+				if (!trobats.isEmpty()) {
+					documents.add(trobats.get(0));
+				}
+			}
+		}
+
+		int numPagines = resultat.getNumPagines() != null ? resultat.getNumPagines().intValue() : 0;
+		int paginaActual = resultat.getPaginaActual() != null ? resultat.getPaginaActual().intValue() : 0;
+
+		PaginaDto<DocumentDto> paginaDto = new PaginaDto<DocumentDto>();
+		paginaDto.setNumero(paginaActual);
+		paginaDto.setTamany(documents.size());
+		paginaDto.setTotal(numPagines);
+		paginaDto.setElementsTotal(resultat.getNumRegistres() != null ? resultat.getNumRegistres().longValue() : 0L);
+		paginaDto.setPrimera(paginaActual == 0);
+		paginaDto.setDarrera(numPagines == 0 || paginaActual >= numPagines - 1);
+		paginaDto.setAnteriors(!paginaDto.isPrimera());
+		paginaDto.setPosteriors(!paginaDto.isDarrera());
+		paginaDto.setContingut(documents);
+		return paginaDto;
+	}
+
 	public DocumentEntity findLastDocumentPujatArxiuByExtensio(List<String> contentTypes) {
 		return findLastDocumentPujatArxiuByExtensio(contentTypes, null);
 	}

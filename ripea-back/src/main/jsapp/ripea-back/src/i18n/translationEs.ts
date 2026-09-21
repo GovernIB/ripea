@@ -264,6 +264,13 @@ const translationEs = {
                     title: "Vincular contenido",
                     ok: "Documento '{{document}}' vinculado correctamente",
                 },
+                cercaDocuments: {
+                    label: "Buscar documentos...",
+                    title: "Búsqueda de documentos en el expediente",
+                    text: "Texto a buscar",
+                    search: "Buscar",
+                    empty: "No se ha encontrado ningún documento",
+                },
                 create: {
                     label: "Crea contenido",
                 },

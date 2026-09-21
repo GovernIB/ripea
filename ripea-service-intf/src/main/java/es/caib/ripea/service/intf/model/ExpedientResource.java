@@ -165,7 +165,12 @@ import lombok.experimental.FieldNameConstants;
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_MOURE_TOT_CODE,
                         formClass = ExpedientResource.MoureTotFormAction.class,
-                        requiresId = true),  
+                        requiresId = true),
+                @ResourceArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientResource.ACTION_CERCA_DOCUMENTS_CODE,
+                        formClass = ExpedientResource.CercaDocumentsFormAction.class,
+                        requiresId = true),
                 @ResourceArtifact(
                         type = ResourceArtifactType.REPORT,
                         code = ExpedientResource.REPORT_EXPORT_SELECTED_DOCS,
@@ -275,6 +280,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String ACTION_GET_PROGRES_ZIP = "GET_PROGRES_ZIP";
 	public static final String ACTION_CANCEL_IMPORT_ZIP = "CANCEL_IMPORT_ZIP";
 	public static final String ACTION_MOURE_TOT_CODE = "MOURE_TOT";
+	public static final String ACTION_CERCA_DOCUMENTS_CODE = "CERCA_DOCUMENTS";
 	public static final String REPORT_PLANTILLA_EXCEL_INTERESSATS = "PLANTILLA_EXCEL_INTERESSATS";
 	public static final String REPORT_PLANTILLA_DADES_CSV = "PLANTILLA_DADES_CSV";
 	
@@ -575,6 +581,15 @@ public class ExpedientResource extends NodeResource implements Serializable {
     	@NotNull
     	@ResourceField(descriptionField = "numeroINom")
         private ResourceReference<ExpedientResource, Long> expedientDesti;
+    }
+
+    @Getter
+    @Setter
+    public static class CercaDocumentsFormAction implements Serializable {
+        @NotNull
+        private String text;
+        private Integer page;
+        private Integer pageSize;
     }
     
     @Getter

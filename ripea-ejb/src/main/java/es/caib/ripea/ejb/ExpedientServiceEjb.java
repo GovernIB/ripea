@@ -407,9 +407,27 @@ public class ExpedientServiceEjb extends AbstractServiceEjb<ExpedientService> im
 		return delegateService.findByText(
 				entitatId,
 				text,
-				rolActual, 
+				rolActual,
 				procedimentId,
 				organActual);
+	}
+
+	@Override
+	@RolesAllowed("**")
+	public PaginaDto<DocumentDto> cercaDocumentsExpedient(
+			Long entitatId,
+			Long expedientId,
+			String text,
+			String rolActual,
+			Integer pagina,
+			Integer itemsPerPagina) {
+		return delegateService.cercaDocumentsExpedient(
+				entitatId,
+				expedientId,
+				text,
+				rolActual,
+				pagina,
+				itemsPerPagina);
 	}
 
 	@Override

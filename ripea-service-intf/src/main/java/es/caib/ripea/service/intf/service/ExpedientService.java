@@ -478,10 +478,19 @@ public interface ExpedientService {
 	@PreAuthorize("isAuthenticated()")
 	public List<ExpedientDto> findByText(
 			Long entitatId,
-			String text, 
+			String text,
 			String rolActual,
 			Long procedimentId,
 			Long organActual);
+
+	@PreAuthorize("isAuthenticated()")
+	public PaginaDto<DocumentDto> cercaDocumentsExpedient(
+			Long entitatId,
+			Long expedientId,
+			String text,
+			String rolActual,
+			Integer pagina,
+			Integer itemsPerPagina);
 
 
 	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ADMIN_LECTURA') or hasRole('IPA_ORGAN_ADMIN') or hasRole('IPA_DISSENY')")
