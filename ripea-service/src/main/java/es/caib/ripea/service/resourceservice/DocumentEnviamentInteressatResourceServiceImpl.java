@@ -112,7 +112,7 @@ public class DocumentEnviamentInteressatResourceServiceImpl extends BaseMutableR
 					throw new ReportGenerationException(DocumentEnviamentInteressatResource.class, params.toString(), code, "documentEnviamentInteressat.certificat.massive.reject");
 				} else {
                     return new DownloadableFile(
-	            			"certificacio_"+params.getIds().get(0)+".pdf",
+	            			"Justificant_de_recepcio_"+params.getIds().get(0)+".pdf",
 	            			"application/pdf",
 	            			pluginHelper.notificacioConsultarIDescarregarCertificacio(params.getIds().get(0)));
 				}

@@ -424,7 +424,7 @@ public class DocumentEnviamentController extends BaseUserController {
 			HttpServletResponse response,
 			@PathVariable Long enviamentId) throws IOException {
 		writeFileToResponse(
-				"certificacio.pdf",
+				"Justificant_de_recepcio_"+enviamentId+".pdf",
 				documentService.notificacioConsultarIDescarregarCertificacio(enviamentId),
 				response);
 		return null;

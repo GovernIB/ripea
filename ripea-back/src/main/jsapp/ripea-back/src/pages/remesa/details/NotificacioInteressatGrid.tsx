@@ -31,12 +31,12 @@ const columns = [
 	},
 ]
 
-const useNotificacioInteressatGrid = (refresh?: () => void) => {
+const useNotificacioInteressatGrid = (expedient: any, refresh?: () => void) => {
     const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
 
-    const {actions, components} = useNotificacioInteressatActions(entity, refresh);
+    const {actions, components} = useNotificacioInteressatActions(entity, expedient, refresh);
 
     const handleOpen = (id:any, row:any) => {
         setEntity(row);
