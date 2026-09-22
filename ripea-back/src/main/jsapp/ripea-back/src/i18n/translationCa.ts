@@ -246,8 +246,8 @@ const translationCa = {
             },
             action: {
                 guardarArxiu: {
-                    label: "Desa l'arxiu",
-                    ok: "Element '{{contingut}}' desat a l'arxiu",
+                    label: "Desa a l'Arxiu",
+                    ok: "Element '{{contingut}}' desat a l'Arxiu",
                 },
                 move: {
                     label: "Mou...",
@@ -417,6 +417,12 @@ const translationCa = {
                     ok: "Els annexos s'han subsanat correctament",
                     info: "Selecciona el tipus de document per a cada annex que va quedar amb error en acceptar l'anotació i torna a intentar adjuntar-lo a l'expedient.",
                     tipusDocument: "Tipus de document",
+                },
+                afegirJustificant: {
+                    label: "Afegir justificant a l'expedient",
+                    title: "Afegir justificant de registre a l'expedient",
+                    ok: "El justificant de registre s'ha afegit correctament a l'expedient",
+                    info: "No es va poder incorporar el justificant de registre de l'anotació a l'expedient. Selecciona el tipus de document i torna a intentar afegir-lo.",
                 }
             }
         },

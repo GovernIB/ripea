@@ -246,8 +246,8 @@ const translationEn = {
             },
             action: {
                 guardarArxiu: {
-                    label: "Save to archive",
-                    ok: "Item '{{contingut}}' saved to archive",
+                    label: "Save to Arxiu",
+                    ok: "Item '{{contingut}}' saved to Arxiu",
                 },
                 move: {
                     label: "Move...",
@@ -416,6 +416,12 @@ const translationEn = {
                     ok: "The annexes have been fixed successfully",
                     info: "Select the document type for each annex that ended with an error when accepting the registry entry and retry attaching it to the file.",
                     tipusDocument: "Tipus de document",
+                },
+                afegirJustificant: {
+                    label: "Add receipt to file",
+                    title: "Add registry receipt to file",
+                    ok: "The registry receipt has been added to the file successfully",
+                    info: "The registry receipt of the entry could not be added to the file. Select the document type and retry adding it.",
                 }
             }
         },

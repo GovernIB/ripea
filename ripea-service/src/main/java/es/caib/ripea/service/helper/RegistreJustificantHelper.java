@@ -1,5 +1,6 @@
 package es.caib.ripea.service.helper;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,23 @@ public class RegistreJustificantHelper {
      * @throws Exception si l'anotació no existeix o el procediment no té el tipus de document per defecte.
      */
     public String incorporarJustificantsRegistreExpedient(Long anotacioRegistreId, ExpedientPeticioEntity peticio) throws Exception {
+        return incorporarJustificantRegistreExpedient(anotacioRegistreId, peticio, null);
+    }
+
+    /**
+     * Incorpora el justificant de registre d'una anotació com a document del seu expedient amb el tipus de
+     * document indicat. Si no se n'indica cap, s'usa el REGISTRE_JUSTIFICANT_ENTRADA del procediment.
+     *
+     * Deixa l'error de la incorporació desat al registre de l'anotació perquè l'usuari la pugui tornar a
+     * intentar, i el buida si el justificant s'incorpora o ja hi era.
+     *
+     * @param anotacioRegistreId identificador de l'anotació de registre a processar.
+     * @param peticio anotació a processar.
+     * @param metaDocumentId tipus de document del justificant, o null per usar el per defecte del procediment.
+     * @return missatge descriptiu de l'acció feta, que també queda registrat al log.
+     * @throws Exception si l'anotació no existeix o no s'ha pogut incorporar el justificant.
+     */
+    public String incorporarJustificantRegistreExpedient(Long anotacioRegistreId, ExpedientPeticioEntity peticio, Long metaDocumentId) throws Exception {
 
 //        boolean incorporarJustificant = aplicacioService.propertyBooleanFindByKey(PropertyConfig.INCORPORAR_JUSTIFICANT, false);
 //        
@@ -64,21 +82,33 @@ public class RegistreJustificantHelper {
         boolean jaExisteix = documentRepository.existsByExpedientIdAndFitxerNom(expedient.getId(), fitxerNom);
         
         if (jaExisteix) {
+            if (peticio.getRegistre().getJustificantError() != null) {
+                expedientHelper.updateRegistreJustificantErrorNewTransaction(peticio.getId(), null);
+            }
             return logIRetorna("El justificant de l'anotació " + peticio.getRegistre().getIdentificador()
                 + " ja està incorporat al contingut de l'expedient " + expedient.getId() + ".");
         }
 
-        MetaDocumentEntity metaDocument = metaDocumentHelper.getOrCreateMetaDocumentPerDefecte(
-            expedient.getMetaExpedient(),
-            MetaDocumentPerDefecteEnumDto.REGISTRE_JUSTIFICANT_ENTRADA);
+        try {
+            if (metaDocumentId == null) {
+                metaDocumentId = metaDocumentHelper.getOrCreateMetaDocumentPerDefecte(
+                    expedient.getMetaExpedient(),
+                    MetaDocumentPerDefecteEnumDto.REGISTRE_JUSTIFICANT_ENTRADA).getId();
+            }
 
-        expedientHelper.crearDocFromJustificantRegistreUuid(
-            expedient.getId(),
-            justificantArxiuUuid,
-            peticio.getId(),
-            metaDocument.getId(),
-            fitxerNom,
-            RegistreJustificantUtils.titolJustificant(registreIdentificador));
+            // Si va bé, crearDocFromJustificantRegistreUuid buida l'error dins la seva mateixa transacció.
+            expedientHelper.crearDocFromJustificantRegistreUuid(
+                expedient.getId(),
+                justificantArxiuUuid,
+                peticio.getId(),
+                metaDocumentId,
+                fitxerNom,
+                RegistreJustificantUtils.titolJustificant(registreIdentificador));
+        } catch (Exception ex) {
+            LOGGER.error("Error incorporant el justificant de l'anotació " + registreIdentificador + " a l'expedient " + expedient.getId(), ex);
+            expedientHelper.updateRegistreJustificantErrorNewTransaction(peticio.getId(), ExceptionUtils.getStackTrace(ex));
+            throw ex;
+        }
 
         return logIRetorna("Incorporat el justificant de l'anotació " + anotacioRegistreId
             + (registreIdentificador != null ? " (registre " + registreIdentificador + ")" : "")

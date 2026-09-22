@@ -4,6 +4,7 @@
 package es.caib.ripea.persistence.entity;
 
 import es.caib.ripea.service.intf.config.BaseConfig;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
@@ -93,8 +94,11 @@ public class RegistreEntity extends RipeaAuditable<Long> {
 	private String destiDescripcio;
 	@Column(name = "justificant_arxiu_uuid", length = 256)
 	private String justificantArxiuUuid;
-	
-	
+	/** Error en incorporar el justificant de registre a l'expedient. Null si no n'hi ha cap de pendent. */
+	@Column(name = "justificant_error", length = 4000)
+	private String justificantError;
+
+
 
 	@OneToMany(
 			mappedBy = "registre",
@@ -602,6 +606,14 @@ public class RegistreEntity extends RipeaAuditable<Long> {
 	
 	public String getJustificantArxiuUuid() {
 		return justificantArxiuUuid;
+	}
+
+	public String getJustificantError() {
+		return justificantError;
+	}
+
+	public void updateJustificantError(String justificantError) {
+		this.justificantError = StringUtils.abbreviate(justificantError, 1000);
 	}
 
 	public List<ExpedientPeticioEntity> getExpedientPeticions() {

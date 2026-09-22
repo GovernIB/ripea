@@ -255,8 +255,12 @@ public class ExpedientServiceImpl implements ExpedientService {
 									RegistreJustificantUtils.nomFitxerJustificant(expedientPeticioEntity.getId(), registreIdentificador),
 									RegistreJustificantUtils.titolJustificant(registreIdentificador));
 						} catch (Exception e) {
-							processatOk = false;
+							//Un error amb el justificant no impedeix notificar l'anotació com a processada a
+							//Distribució: es desa perquè es pugui tornar a intentar des del llistat d'anotacions.
 							logger.error("Error crear doc from uuid", e);
+							expedientHelper.updateRegistreJustificantErrorNewTransaction(
+									expedientPeticioId,
+									ExceptionUtils.getStackTrace(e));
 						}
 
 					}
@@ -282,6 +286,13 @@ public class ExpedientServiceImpl implements ExpedientService {
 					expedientHelper.updateRegistreAnnexError(
 							registeAnnexEntity.getId(),
 							"Annex no s'ha processat perque l'expedient no s'ha creat en arxiu");
+				}
+				if (justificantIdMetaDoc != null
+						&& expedientPeticioEntity.getRegistre().getJustificantArxiuUuid() != null
+						&& isIncorporacioJustificantActiva()) {
+					expedientHelper.updateRegistreJustificantErrorNewTransaction(
+							expedientPeticioId,
+							"Justificant no s'ha processat perque l'expedient no s'ha creat en arxiu");
 				}
 				expedientDto.setExpCreatArxiuOk(false);
 			}
@@ -363,6 +374,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 							RegistreJustificantUtils.titolJustificant(registreIdentificador));
 				} catch (Exception e) {
 					logger.error(ExceptionUtils.getStackTrace(e));
+					expedientHelper.updateRegistreJustificantErrorNewTransaction(
+							expedientPeticioId,
+							ExceptionUtils.getStackTrace(e));
 				}
 			}
 		}

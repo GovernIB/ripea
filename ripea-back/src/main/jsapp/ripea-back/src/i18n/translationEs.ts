@@ -246,8 +246,8 @@ const translationEs = {
             },
             action: {
                 guardarArxiu: {
-                    label: "Guarda el archivo",
-                    ok: "Elemento '{{contingut}}' guardado en archivo",
+                    label: "Guarda en Arxiu",
+                    ok: "Elemento '{{contingut}}' guardado en Arxiu",
                 },
                 move: {
                     label: "Mueve...",
@@ -417,6 +417,12 @@ const translationEs = {
                     ok: "Los anexos se han subsanado correctamente",
                     info: "Selecciona el tipo de documento para cada anexo que quedó con error al aceptar la anotación y vuelve a intentar adjuntarlo al expediente.",
                     tipusDocument: "Tipus de document",
+                },
+                afegirJustificant: {
+                    label: "Añadir justificante a expediente",
+                    title: "Añadir justificante de registro al expediente",
+                    ok: "El justificante de registro se ha añadido correctamente al expediente",
+                    info: "No se pudo incorporar el justificante de registro de la anotación al expediente. Selecciona el tipo de documento y vuelve a intentar añadirlo.",
                 }
             }
         },

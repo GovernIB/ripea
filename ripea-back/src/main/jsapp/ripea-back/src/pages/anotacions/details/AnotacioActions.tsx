@@ -7,6 +7,7 @@ import {useNavigate} from "react-router-dom";
 import {useUserSession} from "../../../components/Session.tsx";
 import useAcceptar, {ACCIO_CREAR, ACCIO_INCORPORAR} from "../actions/Acceptar.tsx";
 import useSubsanarAnnexos from "../actions/SubsanarAnnexos.tsx";
+import useAfegirJustificant from "../actions/AfegirJustificant.tsx";
 import { icons as iconsAppMenu } from '@src/util/icons';
 
 export const useActions = (refresh?: () => void) => {
@@ -134,6 +135,7 @@ const useAnotacioActions = (refresh?: () => void) => {
     const {handleShow: handleRebutjar, content: contentRebutjar} = useRebutjar(refresh)
     const {handleShow: handleAcceptar, content: contentAcceptar} = useAcceptar(refresh)
     const {handleShow: handleSubsanarAnnexos, content: contentSubsanarAnnexos} = useSubsanarAnnexos(refresh)
+    const {handleShow: handleAfegirJustificant, content: contentAfegirJustificant} = useAfegirJustificant(refresh)
     const {handleOpen, dialog} = useAnotacioDetail();
 
     const actions = [
@@ -192,6 +194,14 @@ const useAnotacioActions = (refresh?: () => void) => {
             onClick: handleSubsanarAnnexos,
             hidden: (row:any) => !row?.teAnnexosAmbError,
         },
+        {
+            label: t('page.anotacio.action.afegirJustificant.label'),
+            icon: "post_add",
+            showInMenu: true,
+            onClick: handleAfegirJustificant,
+            //Només anotacions acceptades on no es va poder incorporar el justificant (error desat al registre).
+            hidden: (row:any) => row?.estatView != 'ACCEPTAT' || !row?.expedient || !row?.teJustificantAmbError,
+        },
     ];
 
     const components = <>
@@ -199,6 +209,7 @@ const useAnotacioActions = (refresh?: () => void) => {
         {contentRebutjar}
         {contentAcceptar}
         {contentSubsanarAnnexos}
+        {contentAfegirJustificant}
     </>;
 
     return {

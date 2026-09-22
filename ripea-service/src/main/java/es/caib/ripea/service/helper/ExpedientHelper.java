@@ -926,6 +926,21 @@ public class ExpedientHelper {
 
 	}
 
+	/**
+	 * Desa l'error produït en incorporar el justificant de registre de l'anotació a l'expedient, o el buida
+	 * si error és null. Va en una transacció a part perquè la incorporació del justificant
+	 * ({@link #crearDocFromJustificantRegistreUuid}) fa rollback de la seva i l'error s'ha de conservar
+	 * encara que la transacció de qui l'ha cridat també acabi fent rollback.
+	 *
+	 * @param expedientPeticioId anotació del justificant.
+	 * @param error descripció de l'error, o null per indicar que ja no n'hi ha cap de pendent.
+	 */
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void updateRegistreJustificantErrorNewTransaction(Long expedientPeticioId, String error) {
+		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
+		expedientPeticioEntity.getRegistre().updateJustificantError(error);
+	}
+
 	static Map<Long, Object> locks = new ConcurrentHashMap<>();
 
 	@Transactional
@@ -1353,6 +1368,9 @@ public class ExpedientHelper {
 		documentRepository.save(docEntity);
 
 		contingutLogHelper.logCreacio(docEntity, true, true);
+
+		// El justificant ja és a l'expedient: s'esborra l'error d'un intent anterior, si n'hi havia.
+		expedientPeticioEntity.getRegistre().updateJustificantError(null);
 
 		return docEntity;
 	}

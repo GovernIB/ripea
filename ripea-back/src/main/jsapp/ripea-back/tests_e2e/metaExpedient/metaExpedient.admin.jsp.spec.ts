@@ -7,6 +7,9 @@ const DESC_MODIFICADA = 'descripció de prova per playwright';
 
 const DEBUG_ACTIVAT	= true;
 const HUMAN_DELAY	= 1000; //milisegons de retard entre execució de accions
+// Temps màxim perquè l'iframe d'un modal carregui el formulari. Amb els projectes
+// React, JSP i usuari executant-se en paral·lel el servidor pot superar els 5 s per defecte.
+const TIMEOUT_IFRAME	= 15_000;
 
 const CODI_DOC1     = 'DOC_PW_JSP_01';
 const NOM_DOC1      = 'document tipus doc pw 1';
@@ -115,7 +118,7 @@ const crearDocument = async (tipusDocsPage: Page, codi: string, nom: string) => 
     await tipusDocsPage.locator('a[href*="metaDocument/new"]').click();
     await expect(tipusDocsPage.locator('.modal.in')).toBeVisible();
     const frame = tipusDocsPage.locator('.modal.in').frameLocator('.modal-body iframe');
-    await expect(frame.locator('input[name="codi"]')).toBeVisible();
+    await expect(frame.locator('input[name="codi"]')).toBeVisible({ timeout: TIMEOUT_IFRAME });
     await frame.locator('input[name="codi"]').fill(codi);
     await frame.locator('input[name="nom"]').fill(nom);
     await frame.locator('a[href="#dades-nti"]').click();
@@ -162,7 +165,7 @@ const crearMetaDada = async (metaDadesPage: Page, codi: string, nom: string, ful
     await metaDadesPage.locator('a[href*="metaDada/new"]').click();
     await expect(metaDadesPage.locator('.modal.in')).toBeVisible();
     const frame = metaDadesPage.locator('.modal.in').frameLocator('.modal-body iframe');
-    await expect(frame.locator('input[name="codi"]')).toBeVisible();
+    await expect(frame.locator('input[name="codi"]')).toBeVisible({ timeout: TIMEOUT_IFRAME });
     await frame.locator('input[name="codi"]').fill(codi);
     await frame.locator('input[name="nom"]').fill(nom);
     if (full) {
@@ -244,7 +247,7 @@ const crearTasca = async (tascaPage: Page, codi: string, nom: string, full = fal
     await tascaPage.locator('a[href*="tasca/new"]').click();
     await expect(tascaPage.locator('.modal.in')).toBeVisible();
     const frame = tascaPage.locator('.modal.in').frameLocator('.modal-body iframe');
-    await expect(frame.locator('input[name="codi"]')).toBeVisible();
+    await expect(frame.locator('input[name="codi"]')).toBeVisible({ timeout: TIMEOUT_IFRAME });
     await frame.locator('input[name="codi"]').fill(codi);
     await frame.locator('input[name="nom"]').fill(nom);
     await seleccionarResponsable(tascaPage, frame);
@@ -287,7 +290,7 @@ const crearEstat = async (estatPage: Page, codi: string, nom: string) => {
     await estatPage.getByRole('link', { name: /nou estat|nuevo estado/i }).click();
     await expect(estatPage.locator('.modal.in')).toBeVisible();
     const frame = estatPage.locator('.modal.in').frameLocator('.modal-body iframe');
-    await expect(frame.locator('input[name="codi"]')).toBeVisible();
+    await expect(frame.locator('input[name="codi"]')).toBeVisible({ timeout: TIMEOUT_IFRAME });
     await frame.locator('input[name="codi"]').fill(codi);
     await frame.locator('input[name="nom"]').fill(nom);
     // data-refresh-pagina="true" al botó → recàrrega de pàgina o del datatable.
@@ -533,7 +536,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
             await expect(page.locator('.modal.in')).toBeVisible();
             // Esperar que l'iframe hagi carregat el seu contingut (codi intern visible)
             const frame = page.locator('.modal.in').frameLocator('.modal-body iframe');
-            await expect(frame.locator('input[name="codi"]')).toBeVisible();
+            await expect(frame.locator('input[name="codi"]')).toBeVisible({ timeout: TIMEOUT_IFRAME });
         });
 
         await test.step('omplir el formulari dins l\'iframe del modal', async () => {
@@ -616,7 +619,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
             await fila.getByRole('link', { name: /modificar/i }).click();
             await expect(page.locator('.modal.in')).toBeVisible();
             const frame = page.locator('.modal.in').frameLocator('.modal-body iframe');
-            await expect(frame.locator('input[name="codi"]')).toBeVisible();
+            await expect(frame.locator('input[name="codi"]')).toBeVisible({ timeout: TIMEOUT_IFRAME });
         });
 
         await test.step('modificar camps dins l\'iframe del modal', async () => {
@@ -748,7 +751,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
             await fila.getByRole('link', { name: /modificar/i }).click();
             await expect(docMetaDadesPage.locator('.modal.in')).toBeVisible();
             const frame = docMetaDadesPage.locator('.modal.in').frameLocator('.modal-body iframe');
-            await expect(frame.locator('input[name="codi"]')).toBeVisible();
+            await expect(frame.locator('input[name="codi"]')).toBeVisible({ timeout: TIMEOUT_IFRAME });
         });
 
         await test.step('modificar camps de la meta-dada del document', async () => {
@@ -864,7 +867,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
             await fila.getByRole('link', { name: /modificar/i }).click();
             await expect(tipusDocsPage.locator('.modal.in')).toBeVisible();
             const frame = tipusDocsPage.locator('.modal.in').frameLocator('.modal-body iframe');
-            await expect(frame.locator('input[name="codi"]')).toBeVisible();
+            await expect(frame.locator('input[name="codi"]')).toBeVisible({ timeout: TIMEOUT_IFRAME });
         });
 
         await test.step('modificar camps del document', async () => {
@@ -1041,7 +1044,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
             await fila.getByRole('link', { name: /modificar/i }).click();
             await expect(metaDadesPage.locator('.modal.in')).toBeVisible();
             const frame = metaDadesPage.locator('.modal.in').frameLocator('.modal-body iframe');
-            await expect(frame.locator('input[name="codi"]')).toBeVisible();
+            await expect(frame.locator('input[name="codi"]')).toBeVisible({ timeout: TIMEOUT_IFRAME });
         });
 
         await test.step('modificar camps de la meta-dada', async () => {
@@ -1115,7 +1118,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
             await tascaPage.locator('a[href*="tasca/new"]').click();
             await expect(tascaPage.locator('.modal.in')).toBeVisible();
             const frame = tascaPage.locator('.modal.in').frameLocator('.modal-body iframe');
-            await expect(frame.locator('input[name="codi"]')).toBeVisible();
+            await expect(frame.locator('input[name="codi"]')).toBeVisible({ timeout: TIMEOUT_IFRAME });
             await frame.locator('input[name="codi"]').fill(CODI_TASCA1);
             await frame.locator('input[name="nom"]').fill(NOM_TASCA1);
             await seleccionarResponsable(tascaPage, frame);
@@ -1251,7 +1254,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
             await fila.getByRole('link', { name: /modificar/i }).click();
             await expect(tascaPage.locator('.modal.in')).toBeVisible();
             const frame = tascaPage.locator('.modal.in').frameLocator('.modal-body iframe');
-            await expect(frame.locator('input[name="codi"]')).toBeVisible();
+            await expect(frame.locator('input[name="codi"]')).toBeVisible({ timeout: TIMEOUT_IFRAME });
         });
 
         await test.step('modificar camps de la tasca', async () => {
@@ -1350,7 +1353,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
             await fila.getByRole('link', { name: /modificar/i }).click();
             await expect(estatPage.locator('.modal.in')).toBeVisible();
             const frame = estatPage.locator('.modal.in').frameLocator('.modal-body iframe');
-            await expect(frame.locator('input[name="codi"]')).toBeVisible();
+            await expect(frame.locator('input[name="codi"]')).toBeVisible({ timeout: TIMEOUT_IFRAME });
         });
 
         await test.step('modificar nom i activar Inicial', async () => {

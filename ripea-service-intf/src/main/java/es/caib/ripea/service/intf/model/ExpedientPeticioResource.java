@@ -91,6 +91,11 @@ import lombok.experimental.FieldNameConstants;
                         code = ExpedientPeticioResource.ACTION_SUBSANAR_ANNEXOS,
                         formClass = ExpedientPeticioResource.SubsanarAnnexosForm.class,
                         requiresId = true),
+                @ResourceArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExpedientPeticioResource.ACTION_AFEGIR_JUSTIFICANT,
+                        formClass = ExpedientPeticioResource.AfegirJustificantForm.class,
+                        requiresId = true),
         }
 )
 public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
@@ -115,6 +120,8 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
     public static final String ACTION_ESTAT_DISTRIBUCIO = "ESTAT_DISTRIBUCIO";
     public static final String ACTION_CONSULTAR_I_GUARDAR = "CONSULTAR_I_GUARDAR";
     public static final String ACTION_SUBSANAR_ANNEXOS = "SUBSANAR_ANNEXOS";
+    /** Torna a intentar incorporar a l'expedient el justificant de registre d'una anotació acceptada que va fallar. */
+    public static final String ACTION_AFEGIR_JUSTIFICANT = "AFEGIR_JUSTIFICANT";
 
     /**
      * Clau reservada dins {@code AcceptarAnotacioForm.annexos} per al justificant de registre: la resta de
@@ -154,6 +161,11 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
     @Transient private boolean teAnnexosAmbError;
     /** Indica si l'anotació té justificant de registre incorporable, sense consultar-ne les metadades a l'Arxiu. */
     @Transient private boolean teJustificant;
+    /**
+     * Indica si l'anotació està acceptada i no s'ha pogut incorporar el justificant de registre a l'expedient
+     * (error desat a IPA_REGISTRE.JUSTIFICANT_ERROR). L'informa la perspectiva {@link #PERSPECTIVE_REGISTRE_CODE}.
+     */
+    @Transient private boolean teJustificantAmbError;
 
     @Getter
     @Setter
@@ -257,5 +269,15 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
         private Map<Long, String> annexos = new HashMap<>();
         @Transient @ResourceField(enumType = true)
         private String tipusDocument;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @FieldNameConstants
+    public static class AfegirJustificantForm implements Serializable {
+        //Id del meta-document amb què es crearà el justificant. Es proposa el REGISTRE_JUSTIFICANT_ENTRADA del procediment.
+        @NotNull @ResourceField(enumType = true)
+        private String metaDocument;
     }
 }
