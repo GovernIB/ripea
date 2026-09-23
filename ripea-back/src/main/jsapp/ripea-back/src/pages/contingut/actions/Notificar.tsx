@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {Grid, Alert, Icon, Typography} from "@mui/material";
+import {Grid, Alert, Typography} from "@mui/material";
 import {useMuiFormDialogApiRef, useBaseAppContext, useFormContext, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
@@ -106,16 +106,17 @@ const NotificarForm = () => {
         <GridFormField name="estat" required disabled/>
 
 		<GridFormField name="grups" multiple filter={grupsFilter}/>
-        <GridFormField size={9.5} name="interessats" multiple filter={interessatsFilter}/>
+        <GridFormField size={"grow"} name="interessats" multiple filter={interessatsFilter}/>
 
         <GridButton
-            size={2.5}
+            size={"auto"}
+            icon={'person_add'}
+            title={t('page.interessat.action.new.label')}
+            sx={{minWidth: 0, px: 1.75}}
             onClick={()=> {
                 create({expedient: data?.expedient}, onCreateInteressat)
             }}
-        >
-            <Icon>add</Icon>{t('page.interessat.action.new.label')}
-        </GridButton>
+        />
         {content}
 
         <GridFormField name="concepte" required/>

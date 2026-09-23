@@ -120,11 +120,20 @@ $(document).ready(function() {
     });
 	$('#contenidor-contingut').disableSelection();
 });
+
+function tancarModal() {
+	var $modalobj = $(window.frameElement).parent().parent().parent();
+	$('.close', $modalobj).trigger('click');
+}
 </script>
 </head>
 <body>
 <div class="container">
 	<div class="container col-md-12">
+		<div class="alert alert-info" role="status">
+			<span class="fa fa-info-circle" aria-hidden="true"></span>
+			<spring:message code="contingut.document.form.titol.concatenacio.opcions"/>
+		</div>
 		<div><spring:message code="contingut.document.form.titol.concatenacio.ordre"/></div>
 	</div>
 	<hr>
@@ -152,10 +161,21 @@ $(document).ready(function() {
 	<div class="contenidor-botons col-md-12 text-center">
 		<div class="btn-group">
 			<div id="descarregar-mult" class="btn-group">
-				<a href="<c:url value="/contingut/${expedientId}/doCreateConcatenatedDocument"/>" data-toggle="modal" data-refresh-pagina="true" class="btn btn-default"  data-missatge-loading="<spring:message code="concatenacio.pdf.modal.missatge"/>">
-					<span class="fa fa-paperclip"></span>
+				<a href="<c:url value="/contingut/${expedientId}/doCreateConcatenatedDocument"/>" data-toggle="modal" data-refresh-pagina="true" class="btn btn-primary"  data-missatge-loading="<spring:message code="concatenacio.pdf.modal.missatge"/>">
+					<span class="fa fa-file-pdf-o" aria-hidden="true"></span>
 					<spring:message code="concatenacio.form.boto.concatenar"/>
 				</a>
+			</div>
+			<div class="btn-group">
+				<a href="<c:url value="/contingut/${expedientId}/doCreateZipDocument"/>" data-toggle="modal" data-refresh-pagina="true" class="btn btn-primary"  data-missatge-loading="<spring:message code="concatenacio.zip.modal.missatge"/>">
+					<span class="fa fa-file-archive-o" aria-hidden="true"></span>
+					<spring:message code="concatenacio.form.boto.comprimir"/>
+				</a>
+			</div>
+			<div class="btn-group">
+				<button type="button" class="btn btn-default" onclick="tancarModal()">
+					<spring:message code="comu.boto.cancelar"/>
+				</button>
 			</div>
 		</div>
 	</div>

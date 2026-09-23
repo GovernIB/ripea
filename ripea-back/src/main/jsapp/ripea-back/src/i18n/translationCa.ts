@@ -1119,7 +1119,9 @@ const translationCa = {
                     ordre: {
                         title: "Ordre dels documents",
                         description: "Trieu l'ordre en què s'han de combinar els documents dins el PDF que es generarà.",
-                        button: "Combina",
+                        info: "Podeu combinar els documents en un únic PDF, o comprimir-los en un fitxer ZIP. En tots dos casos es generarà un document nou, que serà el que es notifiqui. L'ordre només s'aplica al PDF.",
+                        button: "Combina (PDF)",
+                        buttonZip: "Comprimeix (ZIP)",
                         pujar: "Mou cap amunt",
                         baixar: "Mou cap avall",
                     },

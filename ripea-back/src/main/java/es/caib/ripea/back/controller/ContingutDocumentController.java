@@ -1317,12 +1317,6 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 
 				model.addAttribute("documents", documents);
 				model.addAttribute("expedientId", expedientId);
-
-				MissatgesHelper.warning(
-						request,
-						getMessage(
-								request,
-								"contingut.document.form.titol.concatenacio.info"));
 				return "contingutConcatenacioForm";
 
 			// ========================= GENERAR ZIP ===================================
@@ -1350,6 +1344,25 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 	public String doCreateConcatenatedDocument(
 			HttpServletRequest request,
 			@PathVariable Long expedientId) {
+		RequestSessionHelper.actualitzarObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_CONCATENAR,
+				Boolean.TRUE);
+		return demanarTipusDocumentOCrear(request, expedientId);
+	}
+
+	/**
+	 * Continuacio del proces quan l'usuari, tot i poder combinar els documents en un PDF, ha triat
+	 * comprimir-los en un zip.
+	 */
+	@RequestMapping(value = "/{expedientId}/doCreateZipDocument", method = RequestMethod.GET)
+	public String doCreateZipDocument(
+			HttpServletRequest request,
+			@PathVariable Long expedientId) {
+		RequestSessionHelper.actualitzarObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_CONCATENAR,
+				Boolean.FALSE);
 		return demanarTipusDocumentOCrear(request, expedientId);
 	}
 
@@ -1412,6 +1425,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 						ntiOrigen,
 						ntiEstadoElaboracion,
 						documentTipus);
+				comprovarMidaMaximaNotificacio(request, command);
 
 				DocumentDto document = documentService.create(
 						entitatActual.getId(),
@@ -1447,10 +1461,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 						ntiEstadoElaboracion,
 						documentTipus);
 
-				float sizeMB = (command.getFitxerContingut().length / 1024f) / 1024f;
-				if (sizeMB > 10) {
-					throw new ValidationException("Mida del document generat és " + sizeMB + " MB. Només es poden notificar documents que no superin els 10 MB");
-				}
+				comprovarMidaMaximaNotificacio(request, command);
 
 				DocumentDto document = documentService.create(
 						entitatActual.getId(),
@@ -1479,6 +1490,32 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					"redirect:/contingut/" + expedientId,
 					e.getMessage(),
 					e);
+		}
+	}
+
+	/** Mida maxima per defecte (MB) si la propietat no esta configurada; es la mateixa que aplica NOTIB. */
+	private static final int NOTIFICACIO_MIDA_MAXIMA_MB_PER_DEFECTE = 10;
+
+	/**
+	 * Comprova, abans de crear-lo, que el document generat no superi la mida maxima que accepta NOTIB
+	 * ({@link PropertyConfig#NOTIB_DOCUMENT_MIDA_MAXIMA}, en MB); si no, quedaria a l'expedient un
+	 * document que no es pot notificar.
+	 */
+	private void comprovarMidaMaximaNotificacio(
+			HttpServletRequest request,
+			DocumentGenericCommand command) {
+		int midaMaximaMb;
+		try {
+			midaMaximaMb = Integer.parseInt(aplicacioService.propertyFindByNom(PropertyConfig.NOTIB_DOCUMENT_MIDA_MAXIMA));
+		} catch (Exception ex) {
+			midaMaximaMb = NOTIFICACIO_MIDA_MAXIMA_MB_PER_DEFECTE;
+		}
+		long midaBytes = command.getFitxerContingut().length;
+		if (midaBytes > midaMaximaMb * 1024L * 1024L) {
+			throw new ValidationException(getMessage(
+					request,
+					"document.notificacio.mida.maxima.superada",
+					new Object[] {command.getFitxerNom(), String.format("%.2f", midaBytes / (1024f * 1024f)), midaMaximaMb}));
 		}
 	}
 

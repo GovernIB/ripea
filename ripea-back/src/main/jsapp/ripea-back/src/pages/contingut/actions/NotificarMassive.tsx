@@ -9,19 +9,24 @@ import {useUserSession} from "../../../components/Session.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 
 const CONTENT_TYPE_PDF = 'application/pdf';
+const CODI_METADOC_NOTIFICACIO_MULTIPLE = 'NOTIFICACIO_MULTIPLE';
 
 /** Els mateixos tipus de document que s'ofereixen en crear un document nou a l'expedient. */
+const metaDocumentFilter = (metaExpedientId:any) :string => builder.and(
+    builder.eq('metaExpedient.id', metaExpedientId),
+    builder.eq('actiu', true),
+    builder.eq('pinbalActiu', false),
+)
+const metaDocumentNamedQueries = (expedientId:any) :string[] => [`CREATE_NEW_DOC#${expedientId}`];
+
 const NotificarMassiveForm = () => {
     const {data} = useFormContext();
 
-    const filter = builder.and(
-        builder.eq('metaExpedient.id', data?.metaExpedient?.id),
-        builder.eq('actiu', true),
-        builder.eq('pinbalActiu', false),
-    )
-
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField name="metaDocument" filter={filter} namedQueries={[`CREATE_NEW_DOC#${data?.expedientId}`]} required/>
+        <GridFormField name="metaDocument"
+                       filter={metaDocumentFilter(data?.metaExpedient?.id)}
+                       namedQueries={metaDocumentNamedQueries(data?.expedientId)}
+                       required/>
         <GridFormField name="ntiOrigen" required/>
         <GridFormField name="ntiEstadoElaboracion" required/>
     </Grid>
@@ -47,7 +52,8 @@ const NotificarMassive = (props:any) => {
  * Notificació conjunta dels documents seleccionats a la graella de contingut de l'expedient.
  *
  * - Un sol document: no es genera res, es notifica el document seleccionat.
- * - Tots PDF i concatenació activa: es demana l'ordre i es genera un únic PDF amb tots ells.
+ * - Tots PDF i concatenació activa: l'usuari tria entre combinar-los en un únic PDF, en l'ordre
+ *   que indiqui, o comprimir-los en un zip.
  * - Altrament: es genera un zip amb els documents.
  *
  * En els dos darrers casos, el tipus de document que s'aplica al document generat depèn de la
@@ -64,6 +70,9 @@ const useNotificarMassive = (entity:any, refresh?: () => void) => {
         find: apiFindAll,
         artifactAction: apiAction,
     } = useResourceApiService('documentResource');
+    const {
+        find: apiMetaDocumentFindAll,
+    } = useResourceApiService('metaDocumentResource');
 
     const {handleShow: handleNotificar, content} = useNotificar(refresh)
 
@@ -74,32 +83,59 @@ const useNotificarMassive = (entity:any, refresh?: () => void) => {
     }
 
     // El servidor és qui decideix si combina els documents en un PDF o els comprimeix en un zip,
-    // i els agrupa en l'ordre en què li arriben els identificadors.
-    const generarDocument = (ids:any[]) :void => {
-        apiAction(undefined, {code: 'MASSIVE_NOTIFICAR', data: {ids, massivo: true}})
+    // i els agrupa en l'ordre en què li arriben els identificadors. Amb concatenar a false es
+    // genera un zip encara que es puguin combinar (l'usuari ho ha triat al diàleg d'ordenació).
+    const generarDocument = (ids:any[], concatenar?:boolean) :void => {
+        apiAction(undefined, {code: 'MASSIVE_NOTIFICAR', data: {ids, massivo: true, concatenar}})
             .then(documentGenerat)
             .catch((error:any) => {
                 temporalMessageShow(null, error?.message, 'error');
             });
     }
 
+    // Tipus de document NOTIFICACIO_MULTIPLE del procediment, si existeix i és un dels que
+    // s'ofereixen al desplegable del diàleg. Si no es troba o la consulta falla, el diàleg
+    // s'obre igualment sense tipus preseleccionat.
+    const findMetaDocumentNotificacioMultiple = () :Promise<any> =>
+        apiMetaDocumentFindAll({
+            unpaged: true,
+            filter: builder.and(
+                metaDocumentFilter(entity?.metaExpedient?.id),
+                builder.eq('codi', `'${CODI_METADOC_NOTIFICACIO_MULTIPLE}'`),
+            ),
+            namedQueries: metaDocumentNamedQueries(entity?.id),
+        })
+            .then((resposta:any) => resposta?.rows?.[0])
+            .catch(() => undefined);
+
     // Amb la propietat activada el tipus de document del document generat el tria l'usuari, i és
-    // el propi diàleg qui executa l'acció; si no, es genera directament.
-    const generarDocumentTriantTipus = (ids:any[]) :void => {
+    // el propi diàleg qui executa l'acció; si no, es genera directament. Per defecte es proposa
+    // el tipus NOTIFICACIO_MULTIPLE del procediment amb les seves dades NTI (l'onChange del
+    // servidor només les omple quan l'usuari canvia el tipus).
+    const generarDocumentTriantTipus = (ids:any[], concatenar?:boolean) :void => {
         if (user?.sessionScope?.isNotificacioMultipleTipusDocActiu) {
-            apiRef.current?.show?.(undefined, {
-                ids,
-                massivo: true,
-                metaExpedient: entity?.metaExpedient,
-                expedientId: entity?.id,
+            findMetaDocumentNotificacioMultiple().then((metaDocument:any) => {
+                apiRef.current?.show?.(undefined, {
+                    ids,
+                    massivo: true,
+                    concatenar,
+                    metaExpedient: entity?.metaExpedient,
+                    expedientId: entity?.id,
+                    ...(metaDocument && {
+                        metaDocument: {id: metaDocument.id, description: metaDocument.nom},
+                        ntiOrigen: metaDocument.ntiOrigen,
+                        ntiEstadoElaboracion: metaDocument.ntiEstadoElaboracion,
+                    }),
+                });
             });
         } else {
-            generarDocument(ids);
+            generarDocument(ids, concatenar);
         }
     }
 
     const {handleOpen: handleOrdenarOpen, dialog: dialogOrdenar} = useOrdenarDocuments(
-        (documents:any[]) => generarDocumentTriantTipus(documents.map((doc:any) => doc?.id)));
+        (documents:any[], concatenar:boolean) =>
+            generarDocumentTriantTipus(documents.map((doc:any) => doc?.id), concatenar));
 
     const handleMassiveShow = (ids:any[]) :void => {
         if (!apiIsReady || !ids?.length) {

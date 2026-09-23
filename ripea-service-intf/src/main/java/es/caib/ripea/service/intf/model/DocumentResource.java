@@ -627,12 +627,17 @@ public class DocumentResource extends NodeResource {
      * {@code es.caib.ripea.notificacio.multiple.tipusdoc} esta activada i, per tant, s'ha demanat
      * el tipus de document a l'usuari. Si no s'informen s'apliquen les dades del tipus de document
      * NOTIFICACIO_MULTIPLE del procediment.
+     *
+     * {@code concatenar} a false indica que l'usuari ha triat generar un zip encara que els
+     * documents es puguin combinar en un unic PDF; si no s'informa, o es true, es combinen sempre
+     * que es pugui.
      */
     @Getter
     @Setter
     @NoArgsConstructor
     @FieldNameConstants
     public static class NotificarDocumentsFormAction extends MassiveAction {
+    	private Boolean concatenar;
     	private NtiOrigenEnumDto ntiOrigen;
     	private DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion;
         @ResourceField(onChangeActive = true)

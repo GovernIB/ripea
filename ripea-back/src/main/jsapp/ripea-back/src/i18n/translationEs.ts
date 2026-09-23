@@ -1119,7 +1119,9 @@ const translationEs = {
                     ordre: {
                         title: "Orden de los documentos",
                         description: "Elija el orden en que se deben combinar los documentos dentro del PDF que se generará.",
-                        button: "Combina",
+                        info: "Puede combinar los documentos en un único PDF, o comprimirlos en un fichero ZIP. En ambos casos se generará un nuevo documento, que será el que se notifique. El orden solo se aplica al PDF.",
+                        button: "Combina (PDF)",
+                        buttonZip: "Comprime (ZIP)",
                         pujar: "Mover hacia arriba",
                         baixar: "Mover hacia abajo",
                     },

@@ -335,3 +335,35 @@ databaseChangeLog:
             splitStatements: true
             stripComments: true
             relativeToChangelogFile: true
+  - changeSet:
+      id: RIPEA_1.0.8_DOCUMENT_METADOCUMENT_METANODE_1
+      author: limit
+      changes:
+        - sqlFile:
+            dbms: oracle
+            path: ../scripts/oracle/1.0.8/Versio_1.0.8_DML_9.sql
+            splitStatements: true
+            stripComments: true
+            relativeToChangelogFile: true
+        - sqlFile:
+            dbms: postgresql
+            path: ../scripts/postgres/1.0.8/Versio_1.0.8_DML_9.sql
+            splitStatements: true
+            stripComments: true
+            relativeToChangelogFile: true
+  - changeSet:
+      id: RIPEA_1.0.8_NOTIFICACIO_DOCUMENT_MIDA_MAXIMA_1
+      author: limit
+      changes:
+        - sqlFile:
+            dbms: oracle
+            path: ../scripts/oracle/1.0.8/Versio_1.0.8_DML_10.sql
+            splitStatements: false
+            stripComments: true
+            relativeToChangelogFile: true
+        - sqlFile:
+            dbms: postgresql
+            path: ../scripts/postgres/1.0.8/Versio_1.0.8_DML_10.sql
+            splitStatements: false
+            stripComments: true
+            relativeToChangelogFile: true

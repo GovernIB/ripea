@@ -1115,6 +1115,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                         entitatEntity.getId(),
                         expedient,
                         documentIds,
+                        !Boolean.FALSE.equals(params.getConcatenar()),
                         params.getMetaDocument() != null ? params.getMetaDocument().getId() : null,
                         params.getNtiOrigen(),
                         params.getNtiEstadoElaboracion());

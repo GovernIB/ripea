@@ -2114,8 +2114,9 @@ public class DocumentHelper {
 	 * Genera el document que agrupa els documents seleccionats per notificar-los conjuntament i
 	 * l'afegeix a l'expedient.
 	 *
-	 * Si es pot concatenar ({@link #isConcatenacioPdfsPermesa(List)}) es genera un unic PDF amb els
-	 * documents en l'ordre rebut; en cas contrari es genera un zip amb tots els documents.
+	 * Si l'usuari no ho ha descartat i es pot concatenar ({@link #isConcatenacioPdfsPermesa(List)})
+	 * es genera un unic PDF amb els documents en l'ordre rebut; en cas contrari es genera un zip amb
+	 * tots els documents.
 	 *
 	 * El tipus de document generat es el que ha triat l'usuari, si n'hi ha; si no, el tipus
 	 * NOTIFICACIO_MULTIPLE del procediment (veure
@@ -2124,6 +2125,7 @@ public class DocumentHelper {
 	 * @param entitatId entitat actual.
 	 * @param pare contingut on penjara el document generat (l'expedient dels documents).
 	 * @param documentIds documents a agrupar, en l'ordre en que s'han de combinar.
+	 * @param concatenar false si l'usuari ha triat generar un zip encara que es puguin combinar.
 	 * @param metaDocumentId tipus de document triat per l'usuari; null per aplicar NOTIFICACIO_MULTIPLE.
 	 * @param ntiOrigen origen NTI triat per l'usuari; null per agafar el del tipus de document.
 	 * @param ntiEstadoElaboracion estat d'elaboracio NTI triat per l'usuari; null per agafar el del
@@ -2134,6 +2136,7 @@ public class DocumentHelper {
 			Long entitatId,
 			ContingutEntity pare,
 			List<Long> documentIds,
+			boolean concatenar,
 			Long metaDocumentId,
 			NtiOrigenEnumDto ntiOrigen,
 			DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion) throws Exception {
@@ -2146,9 +2149,11 @@ public class DocumentHelper {
 						expedient.getMetaExpedient(),
 						MetaDocumentPerDefecteEnumDto.NOTIFICACIO_MULTIPLE);
 
-		FitxerDto fitxer = isConcatenacioPdfsPermesa(documentIds)
+		FitxerDto fitxer = concatenar && isConcatenacioPdfsPermesa(documentIds)
 				? concatenarDocumentsPdf(entitatId, documentIds)
 				: getZipFromDocumentsIds(entitatId, documentIds);
+		// Es comprova abans de crear-lo: si no, quedaria a l'expedient un document que no es pot notificar
+		comprovarMidaMaximaNotificacio(fitxer.getNom(), fitxer.getContingut().length);
 
 		MetaNodeDto metaNode = new MetaNodeDto();
 		metaNode.setId(metaDocument.getId());
@@ -2169,6 +2174,41 @@ public class DocumentHelper {
 		return crearDocument(entitatId, documentDto, pare, true, false, true);
 	}
 	
+	/** Mida maxima per defecte (MB) si la propietat no esta configurada; es la mateixa que aplica NOTIB. */
+	private static final int NOTIFICACIO_MIDA_MAXIMA_MB_PER_DEFECTE = 10;
+
+	/**
+	 * Comprova que un document no superi la mida maxima que accepta NOTIB
+	 * ({@link PropertyConfig#NOTIB_DOCUMENT_MIDA_MAXIMA}, en MB).
+	 *
+	 * Els PDF que s'envien per UUID NOTIB els valida amb la mida de la versio imprimible, que es una
+	 * mica mes gran que l'original; per tant, en aquests casos la comprovacio es aproximada.
+	 *
+	 * @param nom nom del document, per al missatge d'error.
+	 * @param midaBytes mida del fitxer en bytes.
+	 * @throws ValidationException si el document supera la mida maxima.
+	 */
+	public void comprovarMidaMaximaNotificacio(String nom, long midaBytes) {
+		int midaMaximaMb = configHelper.getAsInt(PropertyConfig.NOTIB_DOCUMENT_MIDA_MAXIMA, NOTIFICACIO_MIDA_MAXIMA_MB_PER_DEFECTE);
+		if (midaBytes > midaMaximaMb * 1024L * 1024L) {
+			throw new ValidationException(messageHelper.getMessage(
+					"document.notificacio.mida.maxima.superada",
+					new Object[] {nom, String.format("%.2f", midaBytes / (1024f * 1024f)), midaMaximaMb}));
+		}
+	}
+
+	/**
+	 * Mida del fitxer del document en bytes. Si no s'ha guardat a la base de dades es calcula a
+	 * partir del contingut.
+	 */
+	public long getMidaFitxer(DocumentEntity document) {
+		if (document.getFitxerTamany() != null) {
+			return document.getFitxerTamany();
+		}
+		FitxerDto fitxer = getFitxerAssociat(document, null);
+		return fitxer != null && fitxer.getContingut() != null ? fitxer.getContingut().length : 0;
+	}
+
 	/**
 	 * Indica si s'ha de demanar a l'usuari el tipus de document del document generat en notificar
 	 * mes d'un document; si no, s'aplica el tipus NOTIFICACIO_MULTIPLE del procediment.

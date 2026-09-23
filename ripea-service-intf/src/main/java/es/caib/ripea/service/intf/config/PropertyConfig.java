@@ -85,6 +85,7 @@ public class PropertyConfig {
 	public static final String NOTIB_PLUGIN_CADUCA 		= "es.caib.ripea.notificacio.caducitat.num.dies";
 	public static final String NOTIB_PLUGIN_ENTITAT 	= "es.caib.ripea.notificacio.forsar.entitat";
 	public static final String NOTIB_PLUGIN_DEBUG 		= "es.caib.ripea.plugin.notificacio.debug";
+	public static final String NOTIB_DOCUMENT_MIDA_MAXIMA	= "es.caib.ripea.notificacio.document.mida.maxima";
 
 	public static final String FIRMA_SERV_PLUGIN_CLASS			= "es.caib.ripea.plugin.firmaservidor.class";
 	public static final String FIRMA_SERV_PLUGIN_URL			= "es.caib.ripea.plugin.firmaservidor.portafib.endpoint";

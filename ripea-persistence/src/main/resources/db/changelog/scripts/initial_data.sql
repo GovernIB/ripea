@@ -152,6 +152,8 @@ Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION
 ('0','NOTIB','es.caib.ripea.plugin.notificacio.endpointName','SE CAIB','Nom del endpoint del plugin de Notib','3','TEXT','0','0','0','1','0');
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values
 ('0','NOTIB','es.caib.ripea.plugin.notificacio.debug','true','Debug','13','BOOL','0','0','0','0','0');
+Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values
+('0','NOTIB','es.caib.ripea.notificacio.document.mida.maxima','10','Mida màxima (MB) dels documents que es poden notificar, inclosos els ZIP i PDF generats en notificar documents múltiples. Ha de coincidir amb el límit de NOTIB (es.caib.notib.notificacio.document.size)','14','INT','0','0','0','0','0');
 
 Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values
 ('0','FIRMA_SERVIDOR','es.caib.ripea.plugin.firmaservidor.class','es.caib.ripea.plugin.caib.firmaservidor.FirmaSimpleServidorPluginPortafib','Classe per a gestionar la firma servidor','0','FIRMASERVIDOR_CLASS','1','1','0','1','0');

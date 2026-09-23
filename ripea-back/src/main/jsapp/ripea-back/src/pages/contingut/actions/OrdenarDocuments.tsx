@@ -1,13 +1,15 @@
 import {useState} from "react";
 import {MuiDialog} from "reactlib";
 import {useTranslation} from "react-i18next";
-import {Box, Icon, IconButton, List, ListItem, Paper, Typography} from "@mui/material";
+import {Alert, Box, Icon, IconButton, List, ListItem, Paper, Typography} from "@mui/material";
 import {DndContext} from "@dnd-kit/core";
 import {DraggableGridRowHandler, DraggableItem} from "../../../components/DraggableContext.tsx";
 import {dndScreenReaderInstructions} from "../../../util/dndAccessibility.tsx";
 
 /**
  * Diàleg per triar l'ordre en què es combinaran els documents seleccionats dins el PDF final.
+ * L'usuari també pot descartar la combinació i generar un zip amb els documents, en aquest cas
+ * l'ordre no s'aplica.
  *
  * Es pot reordenar arrossegant (com a la resta de llistes ordenables de l'aplicació) i amb els
  * botons de pujar/baixar, que són els que fan la llista accessible per teclat.
@@ -22,7 +24,7 @@ const moure = (documents: any[], desDe: number, finsA: number): any[] => {
     return ordenats;
 }
 
-const useOrdenarDocuments = (onConfirm: (documents: any[]) => void) => {
+const useOrdenarDocuments = (onConfirm: (documents: any[], concatenar: boolean) => void) => {
     const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [documents, setDocuments] = useState<any[]>([]);
@@ -67,6 +69,12 @@ const useOrdenarDocuments = (onConfirm: (documents: any[]) => void) => {
                 componentProps: { variant: 'contained' },
             },
             {
+                value: 'zip',
+                text: t('page.document.action.notificarMasiva.ordre.buttonZip'),
+                icon: 'folder_zip',
+                componentProps: { variant: 'contained' },
+            },
+            {
                 value: 'cancel',
                 text: t('common.cancel'),
                 componentProps: { variant: 'outlined' },
@@ -74,11 +82,14 @@ const useOrdenarDocuments = (onConfirm: (documents: any[]) => void) => {
         ]}
         buttonCallback={(value: any): void => {
             handleClose();
-            if (value === 'concatenar') {
-                onConfirm(documents);
+            if (value === 'concatenar' || value === 'zip') {
+                onConfirm(documents, value === 'concatenar');
             }
         }}
     >
+        <Alert severity={'info'} sx={{ mb: 1 }}>
+            {t('page.document.action.notificarMasiva.ordre.info')}
+        </Alert>
         <Typography variant={'body2'} sx={{ mb: 1 }}>
             {t('page.document.action.notificarMasiva.ordre.description')}
         </Typography>

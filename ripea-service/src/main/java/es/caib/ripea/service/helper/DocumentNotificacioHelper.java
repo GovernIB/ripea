@@ -58,7 +58,10 @@ public class DocumentNotificacioHelper {
 
 		ExpedientEntity expedientEntity = validateExpedientPerNotificacio(documentEntity,
 				  notificacioDto.getTipus());
-		
+		documentHelper.comprovarMidaMaximaNotificacio(
+				documentEntity.getNom(),
+				documentHelper.getMidaFitxer(documentEntity));
+
 		if (!documentEntity.isArxiuEstatDefinitiu() && documentEntity.getDocumentTipus() != DocumentTipusEnumDto.VIRTUAL && !documentEntity.getFitxerContentType().equals("application/zip")) {
 			documentHelper.actualitzarEstatADefinititu(documentEntity.getId());
 		}

@@ -1118,7 +1118,9 @@ const translationEn = {
                     ordre: {
                         title: "Document order",
                         description: "Choose the order in which the documents will be combined into the generated PDF.",
-                        button: "Combine",
+                        info: "You can combine the documents into a single PDF, or compress them into a ZIP file. In both cases a new document will be generated, which is the one that will be notified. The order only applies to the PDF.",
+                        button: "Combine (PDF)",
+                        buttonZip: "Compress (ZIP)",
                         pujar: "Move up",
                         baixar: "Move down",
                     },
