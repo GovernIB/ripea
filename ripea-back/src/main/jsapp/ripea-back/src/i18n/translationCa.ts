@@ -1169,6 +1169,7 @@ const translationCa = {
                 funcionariHabilitatDigitalib: "És necessari ser un funcionari habilitat a DIGITALIB",
                 folder: "En cas de no seleccionar una carpeta s'importaran els documents directament a l'expedient.",
                 scaned: "El procés d'escaneig s'ha realitzat amb èxit.",
+                arxiuDefinitiu: "Els canvis només es guardaran a RIPEA (Arxiu no permet modificar els documents en estat definitiu)",
                 view: "Nomes per PDF, ODT i DOCX",
                 portafirmes: "És necessari seleccionar un procediment i un tipus de document per poder realitzar l'acció massiva",
                 documentsZip: "S'ha de seleccionar com a mínim un document per fer l'importació",

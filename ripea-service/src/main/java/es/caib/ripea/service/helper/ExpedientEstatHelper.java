@@ -109,19 +109,28 @@ public class ExpedientEstatHelper {
 		
 		// if new state has usuari responsable agafar by this user
 		if (estat != null && estat.getResponsableCodi() != null) {
-			agafarByUserWithCodi(
-					entitatId, 
+			agafarByResponsableEstat(
+					entitatId,
 					expedientId,
-					estat.getResponsableCodi());
+					estat);
 		}
-		
+
 		return expedient;
 	}
-	
-	private void agafarByUserWithCodi(
+
+	/**
+	 * Motiu que es registra al log quan l'expedient s'agafa automàticament
+	 * a favor de l'usuari responsable d'un estat.
+	 */
+	public static String getMotiuResponsableEstat(ExpedientEstatEntity estat) {
+		return "Responsable de " + estat.getNom();
+	}
+
+	private void agafarByResponsableEstat(
 			Long entitatId,
 			Long expedientId,
-			String codi) {
+			ExpedientEstatEntity estat) {
+		String codi = estat.getResponsableCodi();
 		logger.debug("Agafant l'expedient com a usuari ("
 				+ "entitatId=" + entitatId + ", "
 				+ "expedientId=" + expedientId + ", "
@@ -131,7 +140,7 @@ public class ExpedientEstatHelper {
 		// Agafa l'expedient. Si l'expedient pertany a un altre usuari li pren
 		UsuariEntity usuariOriginal = expedient.getAgafatPer();
 		UsuariEntity usuariNou = usuariHelper.getUsuariByCodi(codi);
-		
+
 		expedient.updateAgafatPer(usuariNou);
 		if (usuariOriginal != null) {
 			// Avisa a l'usuari que li han pres
@@ -140,11 +149,13 @@ public class ExpedientEstatHelper {
 					usuariOriginal,
 					usuariNou);
 		}
+		// Es registra qui ha agafat l'expedient i el motiu, ja que l'usuari que
+		// provoca el canvi d'estat no és el mateix que acaba tenint l'expedient
 		contingutLogHelper.log(
 				expedient,
 				LogTipusEnumDto.AGAFAR,
-				null,
-				null,
+				codi,
+				getMotiuResponsableEstat(estat),
 				false,
 				false);
 	}

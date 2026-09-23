@@ -1169,6 +1169,7 @@ const translationEs = {
                 funcionariHabilitatDigitalib: "Es necesario ser un funcionario habilitado en DIGITALIB",
                 folder: "En caso de no seleccionar una carpeta se importarán los documentos directamente en el expediente.",
                 scaned: "El proceso de escaneo se ha realizado con éxito.",
+                arxiuDefinitiu: "Los cambios sólo se guardarán en RIPEA (El Archivo digital no permite modificar los documentos en estado definitivo)",
                 view: "Solo para PDF, ODT y DOCX",
                 portafirmes: "Es necesario seleccionar un procedimiento y un tipo de documento para poder realizar la acción masiva",
                 documentsZip: "Se debe seleccionar al menos un documento para realizar la importación",

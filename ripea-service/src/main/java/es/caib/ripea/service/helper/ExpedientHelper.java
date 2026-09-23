@@ -378,7 +378,7 @@ public class ExpedientHelper {
 				expedient.updateEstatAdditional(estatInicial);
 				// if estat has usuari responsable agafar expedient by this user
 				if (estatInicial.getResponsableCodi() != null) {
-					agafar(expedient, estatInicial.getResponsableCodi(), "Responsable de "+estatInicial.getNom());
+					agafar(expedient, estatInicial.getResponsableCodi(), ExpedientEstatHelper.getMotiuResponsableEstat(estatInicial));
 				}
 			}
 

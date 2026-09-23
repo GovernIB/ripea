@@ -1168,6 +1168,7 @@ const translationEn = {
                 funcionariHabilitatDigitalib: "You must be an authorized official in DIGITALIB",
                 folder: "If no folder is selected, documents will be imported directly into the file.",
                 scaned: "The scanning process was successful.",
+                arxiuDefinitiu: "Changes will only be saved in RIPEA (the digital Archive does not allow modifying documents in final state)",
                 view: "Only for PDF, ODT and DOCX",
                 portafirmes: "Es necesario seleccionar un procedimiento y un tipo de documento para poder realizar la acción masiva",
                 documentsZip: "At least one document must be selected to perform the import",

@@ -278,6 +278,36 @@ class ExpedientEstatHelperTest {
     }
 
     @Test
+    void updateEstatAdditional_estatAmbResponsableCodi_logAgafarAmbResponsableIMotiu() {
+        ExpedientEntity expedient = mock(ExpedientEntity.class);
+        ExpedientEstatEntity estatNou = mock(ExpedientEstatEntity.class);
+        when(estatNou.getCodi()).thenReturn("NOU");
+        when(estatNou.getNom()).thenReturn("Estat dos");
+        when(estatNou.getResponsableCodi()).thenReturn("USR001");
+
+        UsuariEntity usuariNou = mock(UsuariEntity.class);
+
+        when(entityComprovarHelper.comprovarExpedient(EXPEDIENT_ID, false, false, true, false, false, null))
+                .thenReturn(expedient);
+        when(expedientEstatRepository.getOne(EXPEDIENT_ESTAT_ID)).thenReturn(estatNou);
+        when(expedient.getEstatAdditional()).thenReturn(null);
+        when(messageHelper.getMessage("expedient.estat.enum.OBERT")).thenReturn("OBERT");
+        when(expedientRepository.getOne(EXPEDIENT_ID)).thenReturn(expedient);
+        when(usuariHelper.getUsuariByCodi("USR001")).thenReturn(usuariNou);
+        when(expedient.getAgafatPer()).thenReturn(null);
+
+        helper.updateEstatAdditional(ENTITAT_ID, EXPEDIENT_ID, EXPEDIENT_ESTAT_ID);
+
+        verify(contingutLogHelper).log(
+                eq(expedient),
+                eq(LogTipusEnumDto.AGAFAR),
+                eq("USR001"),
+                eq("Responsable de Estat dos"),
+                eq(false),
+                eq(false));
+    }
+
+    @Test
     void updateEstatAdditional_estatAmbResponsableIAgafatPerAltreUsuari_avisaPerEmail() {
         ExpedientEntity expedient = mock(ExpedientEntity.class);
         ExpedientEstatEntity estatNou = mock(ExpedientEstatEntity.class);

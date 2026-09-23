@@ -129,6 +129,11 @@ const DocumentsGridForm = ({ setDisabled }:any) => {
     ];
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
+        {id != null && data?.arxiuEstat == 'DEFINITIU' && !user?.sessionScope?.isPermesPropagarModificacioDefinitius &&
+            <Grid size={12}>
+                <Alert severity={"info"}>{t('page.document.alert.arxiuDefinitiu')}</Alert>
+            </Grid>
+        }
         <GridFormField name="metaDocument"
                        namedQueries={
                            apiRef?.current?.getId()
