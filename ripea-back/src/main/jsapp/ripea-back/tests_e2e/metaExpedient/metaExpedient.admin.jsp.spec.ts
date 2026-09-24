@@ -14,9 +14,11 @@ const TIMEOUT_IFRAME	= 15_000;
 const CODI_DOC1     = 'DOC_PW_JSP_01';
 const NOM_DOC1      = 'document tipus doc pw 1';
 const CODI_DOC2     = 'DOC_PW_JSP_02';
-// Tot procediment nou es crea amb els tipus de document per defecte
-// NOTIB_JUSTIFICANT_RECEPCIO, REGISTRE_JUSTIFICANT_ENTRADA, NOTIFICACIO_MULTIPLE i OTROS.
-const NUM_DOCS_DEFECTE = 4;
+// Tot procediment nou es crea amb els tipus de document per defecte NOTIB_JUSTIFICANT_RECEPCIO i
+// REGISTRE_JUSTIFICANT_ENTRADA; NOTIFICACIO_MULTIPLE i OTROS només si les propietats
+// es.caib.ripea.metadocument.defecte.*.actiu de l'entorn estan activades.
+const NUM_DOCS_DEFECTE_MIN = 2;
+const NUM_DOCS_DEFECTE_MAX = 4;
 const NOM_DOC1_MOD  = 'doc modificat pw 1';
 const DESC_DOC1_MOD = 'descripció modificada doc 1';
 
@@ -688,9 +690,13 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
 
         const tipusDocsPage = await anarATipusDocs(page);
 
+        let numDocsDefecte = 0;
         await test.step('verificar que la llista només té els documents per defecte', async () => {
             console.log('  -> verificar que la llista només té els documents per defecte');
-            await expect(getDocRows(tipusDocsPage)).toHaveCount(NUM_DOCS_DEFECTE);
+            await expect(getDocRows(tipusDocsPage).first()).toBeVisible();
+            numDocsDefecte = await getDocRows(tipusDocsPage).count();
+            expect(numDocsDefecte).toBeGreaterThanOrEqual(NUM_DOCS_DEFECTE_MIN);
+            expect(numDocsDefecte).toBeLessThanOrEqual(NUM_DOCS_DEFECTE_MAX);
         });
 
         await test.step('crear el primer document', async () => {
@@ -705,7 +711,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
 
         await test.step('verificar que hi ha dos documents (més els per defecte)', async () => {
             console.log('  -> verificar que hi ha dos documents (més els per defecte)');
-            await expect(getDocRows(tipusDocsPage)).toHaveCount(NUM_DOCS_DEFECTE + 2);
+            await expect(getDocRows(tipusDocsPage)).toHaveCount(numDocsDefecte + 2);
         });
 
         await tipusDocsPage.close();

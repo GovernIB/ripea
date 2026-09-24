@@ -190,14 +190,12 @@ public class MetaDocumentServiceEjb extends AbstractServiceEjb<MetaDocumentServi
 
 	@Override
 	@RolesAllowed("**")
-	public MetaDocumentDto findPerDefecteByContingut(
+	public MetaDocumentDto findNotificacioMultipleAplicableByContingut(
 			Long entitatId,
-			Long contingutId,
-			MetaDocumentPerDefecteEnumDto metaDocumentPerDefecte) {
-		return delegateService.findPerDefecteByContingut(
+			Long contingutId) {
+		return delegateService.findNotificacioMultipleAplicableByContingut(
 				entitatId,
-				contingutId,
-				metaDocumentPerDefecte);
+				contingutId);
 	}
 
 	@Override

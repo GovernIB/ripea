@@ -305,6 +305,8 @@ public class PropertyConfig {
 	public static final String CONCATENAR_MULTIPLES_PDFS                            = "es.caib.ripea.notificacio.multiple.pdf.concatenar";
 	public static final String NOTIFICAR_MULTIPLE_GENERAR_DOC_VISIBLE               = "es.caib.ripea.notificacio.multiple.document.generat.visible";
 	public static final String NOTIFICAR_MULTIPLE_TIPUS_DOC                        = "es.caib.ripea.notificacio.multiple.tipusdoc";
+	public static final String METADOCUMENT_DEFECTE_NOTIFICACIO_MULTIPLE_ACTIU      = "es.caib.ripea.metadocument.defecte.notificacio.multiple.actiu";
+	public static final String METADOCUMENT_DEFECTE_OTROS_ACTIU                     = "es.caib.ripea.metadocument.defecte.otros.actiu";
 	public static final String PERMETRE_PUNTS_NOM_EXPEDIENT                         = "es.caib.ripea.expedient.permetre.punts";
 	public static final String EXPORTACIO_EXCEL                                     = "es.caib.ripea.expedient.exportacio.excel";
 	public static final String EXPORTACIO_INSIDE                                    = "es.caib.ripea.expedient.exportar.inside";

@@ -1073,7 +1073,9 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
      *
      * El tipus de document generat es el que ha triat l'usuari quan la propietat
      * es.caib.ripea.notificacio.multiple.tipusdoc esta activada; si no, el tipus
-     * NOTIFICACIO_MULTIPLE del procediment.
+     * NOTIFICACIO_MULTIPLE del procediment. Si el procediment no el te i esta desactivat
+     * (es.caib.ripea.metadocument.defecte.notificacio.multiple.actiu), el frontal també demana el
+     * tipus a l'usuari i, si no n'arriba cap, l'accio es rebutja.
      */
     private class NotificarDocumentsActionExecutor implements ActionExecutor<DocumentResourceEntity, NotificarDocumentsFormAction, DocumentResource> {
 

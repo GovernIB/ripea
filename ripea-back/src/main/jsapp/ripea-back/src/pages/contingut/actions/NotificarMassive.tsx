@@ -59,6 +59,8 @@ const NotificarMassive = (props:any) => {
  * En els dos darrers casos, el tipus de document que s'aplica al document generat depèn de la
  * propietat es.caib.ripea.notificacio.multiple.tipusdoc: si està activada es demana a l'usuari,
  * si no s'aplica el tipus NOTIFICACIO_MULTIPLE del procediment, que és qui aporta les dades NTI.
+ * Si el procediment no té el tipus NOTIFICACIO_MULTIPLE (es pot haver desactivat amb la propietat
+ * es.caib.ripea.metadocument.defecte.notificacio.multiple.actiu), també es demana a l'usuari.
  */
 const useNotificarMassive = (entity:any, refresh?: () => void) => {
     const { t } = useTranslation();
@@ -108,29 +110,30 @@ const useNotificarMassive = (entity:any, refresh?: () => void) => {
             .then((resposta:any) => resposta?.rows?.[0])
             .catch(() => undefined);
 
-    // Amb la propietat activada el tipus de document del document generat el tria l'usuari, i és
-    // el propi diàleg qui executa l'acció; si no, es genera directament. Per defecte es proposa
-    // el tipus NOTIFICACIO_MULTIPLE del procediment amb les seves dades NTI (l'onChange del
-    // servidor només les omple quan l'usuari canvia el tipus).
+    // Amb la propietat activada, o si el procediment no té el tipus NOTIFICACIO_MULTIPLE, el tipus
+    // de document del document generat el tria l'usuari, i és el propi diàleg qui executa l'acció;
+    // si no, es genera directament. Si existeix, es proposa el tipus NOTIFICACIO_MULTIPLE del
+    // procediment amb les seves dades NTI (l'onChange del servidor només les omple quan l'usuari
+    // canvia el tipus).
     const generarDocumentTriantTipus = (ids:any[], concatenar?:boolean) :void => {
-        if (user?.sessionScope?.isNotificacioMultipleTipusDocActiu) {
-            findMetaDocumentNotificacioMultiple().then((metaDocument:any) => {
-                apiRef.current?.show?.(undefined, {
-                    ids,
-                    massivo: true,
-                    concatenar,
-                    metaExpedient: entity?.metaExpedient,
-                    expedientId: entity?.id,
-                    ...(metaDocument && {
-                        metaDocument: {id: metaDocument.id, description: metaDocument.nom},
-                        ntiOrigen: metaDocument.ntiOrigen,
-                        ntiEstadoElaboracion: metaDocument.ntiEstadoElaboracion,
-                    }),
-                });
+        findMetaDocumentNotificacioMultiple().then((metaDocument:any) => {
+            if (!user?.sessionScope?.isNotificacioMultipleTipusDocActiu && metaDocument) {
+                generarDocument(ids, concatenar);
+                return;
+            }
+            apiRef.current?.show?.(undefined, {
+                ids,
+                massivo: true,
+                concatenar,
+                metaExpedient: entity?.metaExpedient,
+                expedientId: entity?.id,
+                ...(metaDocument && {
+                    metaDocument: {id: metaDocument.id, description: metaDocument.nom},
+                    ntiOrigen: metaDocument.ntiOrigen,
+                    ntiEstadoElaboracion: metaDocument.ntiEstadoElaboracion,
+                }),
             });
-        } else {
-            generarDocument(ids, concatenar);
-        }
+        });
     }
 
     const {handleOpen: handleOrdenarOpen, dialog: dialogOrdenar} = useOrdenarDocuments(

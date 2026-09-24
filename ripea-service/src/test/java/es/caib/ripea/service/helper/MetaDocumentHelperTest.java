@@ -6,6 +6,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -55,6 +57,7 @@ import es.caib.ripea.service.intf.dto.ItemValidacioTascaEnum;
 import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.MetaDocumentDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentPerDefecteEnumDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
@@ -730,10 +733,16 @@ class MetaDocumentHelperTest {
     // crearMetaDocumentsPerDefecte
     // =========================================================================
 
+    /** Activa (o desactiva) tots els tipus de document per defecte que depenen d'una propietat. */
+    private void configurarTipusPerDefecteActius(boolean actius) {
+        when(configHelper.getConfig(anyString(), any(), isNull())).thenReturn(String.valueOf(actius));
+    }
+
     @Test
     void crearMetaDocumentsPerDefecte_procedimentSenseTipusDocument_elsCreaTots() {
         MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
         when(metaExpedient.getId()).thenReturn(META_EXPEDIENT_ID);
+        configurarTipusPerDefecteActius(true);
         when(metaDocumentRepository.findByMetaExpedientAndCodi(any(), any())).thenReturn(null);
         when(metaDocumentRepository.countByMetaExpedient(metaExpedient)).thenReturn(0, 1, 2, 3);
         when(metaDocumentRepository.save(any(MetaDocumentEntity.class)))
@@ -790,9 +799,46 @@ class MetaDocumentHelperTest {
     }
 
     @Test
+    void crearMetaDocumentsPerDefecte_ambPropietatsDesactivades_nomesCreaElsJustificants() {
+        MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
+        when(metaExpedient.getId()).thenReturn(META_EXPEDIENT_ID);
+        configurarTipusPerDefecteActius(false);
+        when(metaDocumentRepository.findByMetaExpedientAndCodi(any(), any())).thenReturn(null);
+        when(metaDocumentRepository.countByMetaExpedient(metaExpedient)).thenReturn(0, 1);
+        when(metaDocumentRepository.save(any(MetaDocumentEntity.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        List<MetaDocumentEntity> creats = helper.crearMetaDocumentsPerDefecte(metaExpedient);
+
+        assertThat(creats).extracting(MetaDocumentEntity::getCodi).containsExactly(
+                MetaDocumentPerDefecteEnumDto.NOTIB_JUSTIFICANT_RECEPCIO.getCodi(),
+                MetaDocumentPerDefecteEnumDto.REGISTRE_JUSTIFICANT_ENTRADA.getCodi());
+        // Sense OTROS, el procediment es queda sense tipus de document per defecte.
+        assertThat(creats).allSatisfy(metaDocument -> assertThat(metaDocument.isPerDefecte()).isFalse());
+    }
+
+    // Si la propietat no existeix, getConfig retorna null i el tipus es considera desactivat.
+    @Test
+    void crearMetaDocumentsPerDefecte_senseLesPropietats_noCreaNiNotificacioMultipleNiOtros() {
+        MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
+        when(metaExpedient.getId()).thenReturn(META_EXPEDIENT_ID);
+        when(configHelper.getConfig(anyString(), any(), isNull())).thenReturn(null);
+        when(metaDocumentRepository.findByMetaExpedientAndCodi(any(), any())).thenReturn(null);
+        when(metaDocumentRepository.save(any(MetaDocumentEntity.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        List<MetaDocumentEntity> creats = helper.crearMetaDocumentsPerDefecte(metaExpedient);
+
+        assertThat(creats).extracting(MetaDocumentEntity::getCodi).doesNotContain(
+                MetaDocumentPerDefecteEnumDto.NOTIFICACIO_MULTIPLE.getCodi(),
+                MetaDocumentPerDefecteEnumDto.OTROS.getCodi());
+    }
+
+    @Test
     void crearMetaDocumentsPerDefecte_quanJaHiHaTipusPerDefecte_noElSubstitueix() {
         MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
         when(metaExpedient.getId()).thenReturn(META_EXPEDIENT_ID);
+        configurarTipusPerDefecteActius(true);
         when(metaDocumentRepository.findByMetaExpedientAndCodi(any(), any())).thenReturn(null);
         when(metaDocumentRepository.findByMetaExpedientAndPerDefecteTrue(metaExpedient))
                 .thenReturn(mock(MetaDocumentEntity.class));
@@ -875,6 +921,177 @@ class MetaDocumentHelperTest {
         assertThat(resultat.getMetaExpedient()).isSameAs(metaExpedient);
         assertThat(resultat.getOrdre()).isEqualTo(5);
         verify(metaDocumentRepository).save(any(MetaDocumentEntity.class));
+    }
+
+    @Test
+    void getOrCreateMetaDocumentPerDefecte_tipusDesactivatIInexistent_retornaNullSenseCrearlo() {
+        MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
+        when(metaExpedient.getId()).thenReturn(META_EXPEDIENT_ID);
+        configurarTipusPerDefecteActius(false);
+        when(metaDocumentRepository.findByMetaExpedientAndCodi(any(), any())).thenReturn(null);
+
+        MetaDocumentEntity resultat = helper.getOrCreateMetaDocumentPerDefecte(
+                metaExpedient, MetaDocumentPerDefecteEnumDto.NOTIFICACIO_MULTIPLE);
+
+        assertThat(resultat).isNull();
+        verify(metaDocumentRepository, never()).save(any(MetaDocumentEntity.class));
+    }
+
+    // Un tipus desactivat no es crea, pero si el procediment ja el te es continua fent servir.
+    @Test
+    void getOrCreateMetaDocumentPerDefecte_tipusDesactivatPeroExistent_elRetorna() {
+        MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
+        MetaDocumentEntity existent = mock(MetaDocumentEntity.class);
+        configurarTipusPerDefecteActius(false);
+        when(metaDocumentRepository.findByMetaExpedientAndCodi(
+                metaExpedient, MetaDocumentPerDefecteEnumDto.NOTIFICACIO_MULTIPLE.getCodi()))
+                .thenReturn(existent);
+
+        MetaDocumentEntity resultat = helper.getOrCreateMetaDocumentPerDefecte(
+                metaExpedient, MetaDocumentPerDefecteEnumDto.NOTIFICACIO_MULTIPLE);
+
+        assertThat(resultat).isSameAs(existent);
+        verify(metaDocumentRepository, never()).save(any(MetaDocumentEntity.class));
+    }
+
+    @Test
+    void getOrCreateMetaDocumentPerDefecte_tipusActivatIInexistent_elCrea() {
+        MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
+        when(metaExpedient.getId()).thenReturn(META_EXPEDIENT_ID);
+        configurarTipusPerDefecteActius(true);
+        when(metaDocumentRepository.findByMetaExpedientAndCodi(any(), any())).thenReturn(null);
+        when(metaDocumentRepository.save(any(MetaDocumentEntity.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        MetaDocumentEntity resultat = helper.getOrCreateMetaDocumentPerDefecte(
+                metaExpedient, MetaDocumentPerDefecteEnumDto.NOTIFICACIO_MULTIPLE);
+
+        assertThat(resultat).isNotNull();
+        assertThat(resultat.getCodi()).isEqualTo(MetaDocumentPerDefecteEnumDto.NOTIFICACIO_MULTIPLE.getCodi());
+    }
+
+    // =========================================================================
+    // findMetaDocumentNotificacioMultipleAplicable
+    // =========================================================================
+
+    /**
+     * Expedient amb el tipus NOTIFICACIO_MULTIPLE al procediment. Els documents de l'expedient
+     * son del tipus indicat (per provar la multiplicitat).
+     */
+    private ExpedientEntity mockExpedientAmbNotificacioMultiple(
+            MetaDocumentEntity notificacioMultiple,
+            boolean actiu,
+            MultiplicitatEnumDto multiplicitat,
+            int documentsDelTipus) {
+        MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
+        ExpedientEntity expedient = mock(ExpedientEntity.class);
+        when(expedient.getMetaExpedient()).thenReturn(metaExpedient);
+        when(notificacioMultiple.getId()).thenReturn(META_DOCUMENT_ID);
+        when(notificacioMultiple.getMultiplicitat()).thenReturn(multiplicitat);
+        when(metaDocumentRepository.findByMetaExpedientAndCodi(
+                metaExpedient, MetaDocumentPerDefecteEnumDto.NOTIFICACIO_MULTIPLE.getCodi()))
+                .thenReturn(notificacioMultiple);
+        // Com el repositori real, nomes retorna els tipus actius del procediment.
+        when(metaDocumentRepository.findByMetaExpedientAndActiuTrue(metaExpedient))
+                .thenReturn(actiu ? new ArrayList<>(Arrays.asList(notificacioMultiple)) : new ArrayList<>());
+        List<DocumentEntity> documents = new ArrayList<>();
+        for (int i = 0; i < documentsDelTipus; i++) {
+            DocumentEntity document = mock(DocumentEntity.class);
+            when(document.getMetaNode()).thenReturn(notificacioMultiple);
+            documents.add(document);
+        }
+        when(documentRepository.findByExpedientAndEsborrat(expedient, 0)).thenReturn(documents);
+        return expedient;
+    }
+
+    @Test
+    void findMetaDocumentNotificacioMultipleAplicable_actiuIDisponible_elRetorna() {
+        MetaDocumentEntity notificacioMultiple = mock(MetaDocumentEntity.class);
+        ExpedientEntity expedient = mockExpedientAmbNotificacioMultiple(
+                notificacioMultiple, true, MultiplicitatEnumDto.M_0_N, 1);
+
+        assertThat(helper.findMetaDocumentNotificacioMultipleAplicable(expedient)).isSameAs(notificacioMultiple);
+    }
+
+    @Test
+    void findMetaDocumentNotificacioMultipleAplicable_inactiu_retornaNull() {
+        MetaDocumentEntity notificacioMultiple = mock(MetaDocumentEntity.class);
+        ExpedientEntity expedient = mockExpedientAmbNotificacioMultiple(
+                notificacioMultiple, false, MultiplicitatEnumDto.M_0_N, 0);
+
+        assertThat(helper.findMetaDocumentNotificacioMultipleAplicable(expedient)).isNull();
+    }
+
+    @Test
+    void findMetaDocumentNotificacioMultipleAplicable_multiplicitatEsgotada_retornaNull() {
+        MetaDocumentEntity notificacioMultiple = mock(MetaDocumentEntity.class);
+        ExpedientEntity expedient = mockExpedientAmbNotificacioMultiple(
+                notificacioMultiple, true, MultiplicitatEnumDto.M_0_1, 1);
+
+        assertThat(helper.findMetaDocumentNotificacioMultipleAplicable(expedient)).isNull();
+    }
+
+    @Test
+    void findMetaDocumentNotificacioMultipleAplicable_pinbal_retornaNull() {
+        MetaDocumentEntity notificacioMultiple = mock(MetaDocumentEntity.class);
+        when(notificacioMultiple.isPinbalActiu()).thenReturn(true);
+        ExpedientEntity expedient = mockExpedientAmbNotificacioMultiple(
+                notificacioMultiple, true, MultiplicitatEnumDto.M_0_N, 0);
+
+        assertThat(helper.findMetaDocumentNotificacioMultipleAplicable(expedient)).isNull();
+    }
+
+    @Test
+    void findMetaDocumentNotificacioMultipleAplicable_inexistentIDesactivat_retornaNull() {
+        MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
+        ExpedientEntity expedient = mock(ExpedientEntity.class);
+        when(expedient.getMetaExpedient()).thenReturn(metaExpedient);
+        configurarTipusPerDefecteActius(false);
+        when(metaDocumentRepository.findByMetaExpedientAndCodi(any(), any())).thenReturn(null);
+
+        assertThat(helper.findMetaDocumentNotificacioMultipleAplicable(expedient)).isNull();
+        verify(metaDocumentRepository, never()).save(any(MetaDocumentEntity.class));
+    }
+
+    // =========================================================================
+    // isMetaDocumentPerDefecteActiu / isCreacioAutomaticaPermesa
+    // =========================================================================
+
+    @Test
+    void isMetaDocumentPerDefecteActiu_resolLaPropietatAmbLEntitatDelProcediment() {
+        EntitatEntity entitat = mock(EntitatEntity.class);
+        when(entitat.getCodi()).thenReturn("ENT1");
+        MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
+        when(metaExpedient.getEntitat()).thenReturn(entitat);
+        when(configHelper.getConfig(PropertyConfig.METADOCUMENT_DEFECTE_OTROS_ACTIU, "ENT1", null)).thenReturn("true");
+
+        assertThat(helper.isMetaDocumentPerDefecteActiu(metaExpedient, MetaDocumentPerDefecteEnumDto.OTROS)).isTrue();
+        verify(configHelper).getConfig(PropertyConfig.METADOCUMENT_DEFECTE_OTROS_ACTIU, "ENT1", null);
+    }
+
+    @Test
+    void isMetaDocumentPerDefecteActiu_tipusSensePropietat_sempreActiu() {
+        MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
+        configurarTipusPerDefecteActius(false);
+
+        assertThat(helper.isMetaDocumentPerDefecteActiu(
+                metaExpedient, MetaDocumentPerDefecteEnumDto.NOTIB_JUSTIFICANT_RECEPCIO)).isTrue();
+        assertThat(helper.isMetaDocumentPerDefecteActiu(
+                metaExpedient, MetaDocumentPerDefecteEnumDto.REGISTRE_JUSTIFICANT_ENTRADA)).isTrue();
+    }
+
+    @Test
+    void isCreacioAutomaticaPermesa_codiNormalOTipusDesactivat() {
+        MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
+        configurarTipusPerDefecteActius(false);
+
+        assertThat(helper.isCreacioAutomaticaPermesa(metaExpedient, "CODI_PROPI")).isTrue();
+        assertThat(helper.isCreacioAutomaticaPermesa(
+                metaExpedient, MetaDocumentPerDefecteEnumDto.REGISTRE_JUSTIFICANT_ENTRADA.getCodi())).isTrue();
+        assertThat(helper.isCreacioAutomaticaPermesa(
+                metaExpedient, MetaDocumentPerDefecteEnumDto.OTROS.getCodi())).isFalse();
+        assertThat(helper.isCreacioAutomaticaPermesa(
+                metaExpedient, MetaDocumentPerDefecteEnumDto.NOTIFICACIO_MULTIPLE.getCodi())).isFalse();
     }
 
     // =========================================================================

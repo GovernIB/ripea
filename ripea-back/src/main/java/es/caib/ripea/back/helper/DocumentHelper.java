@@ -2,6 +2,7 @@ package es.caib.ripea.back.helper;
 
 import es.caib.ripea.back.command.DocumentGenericCommand;
 import es.caib.ripea.service.intf.dto.*;
+import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.service.ContingutService;
 import es.caib.ripea.service.intf.service.DocumentService;
 import es.caib.ripea.service.intf.service.MetaDocumentService;
@@ -42,6 +43,30 @@ public class DocumentHelper {
 	private MetaDocumentService metaDocumentService;
 	
 	/**
+	 * Tipus de document del document generat en notificar mes d'un document: el triat per
+	 * l'usuari o, si no n'ha triat cap, el NOTIFICACIO_MULTIPLE aplicable del procediment.
+	 *
+	 * @throws ValidationException si l'usuari no ha triat cap tipus i no hi ha cap tipus
+	 *         NOTIFICACIO_MULTIPLE aplicable (el controlador ja ho evita demanant-lo).
+	 */
+	private MetaDocumentDto findMetaDocumentNotificacioMultiple(
+			Long entitatId,
+			Long contingutId,
+			Long metaDocumentId) {
+		if (metaDocumentId != null) {
+			return metaDocumentService.findById(metaDocumentId);
+		}
+		MetaDocumentDto metaDocument = metaDocumentService.findNotificacioMultipleAplicableByContingut(
+				entitatId,
+				contingutId);
+		if (metaDocument == null) {
+			throw new ValidationException(
+					MessageHelper.getInstance().getMessage("document.notificarDocuments.tipusDocument.requerit"));
+		}
+		return metaDocument;
+	}
+
+	/**
 	 * Genera el PDF que combina els documents indicats per notificar-los conjuntament.
 	 *
 	 * @param metaDocumentId tipus de document triat per l'usuari; null per aplicar el tipus
@@ -60,12 +85,7 @@ public class DocumentHelper {
 			DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion,
 			DocumentTipusEnumDto documentTipus) {
 		DocumentGenericCommand command = new DocumentGenericCommand();
-		MetaDocumentDto metaDocument = metaDocumentId != null
-				? metaDocumentService.findById(metaDocumentId)
-				: metaDocumentService.findPerDefecteByContingut(
-						entitatId,
-						contingutId,
-						MetaDocumentPerDefecteEnumDto.NOTIFICACIO_MULTIPLE);
+		MetaDocumentDto metaDocument = findMetaDocumentNotificacioMultiple(entitatId, contingutId, metaDocumentId);
 		
 		FitxerDto fitxer;
 		PDDocument resultat = new PDDocument();
@@ -125,15 +145,7 @@ public class DocumentHelper {
 		
 		DocumentGenericCommand command = new DocumentGenericCommand();
 		
-		MetaDocumentDto metaDocument = null;
-		if (metaDocumentId != null) {
-			metaDocument = metaDocumentService.findById(metaDocumentId);
-		} else {
-			metaDocument = metaDocumentService.findPerDefecteByContingut(
-					entitatId,
-					contingutId,
-					MetaDocumentPerDefecteEnumDto.NOTIFICACIO_MULTIPLE);
-		}
+		MetaDocumentDto metaDocument = findMetaDocumentNotificacioMultiple(entitatId, contingutId, metaDocumentId);
 
 		
 		byte[] reportContent = null;

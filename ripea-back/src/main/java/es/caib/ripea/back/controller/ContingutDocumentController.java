@@ -1177,7 +1177,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 	 * Modal per triar el tipus de document del document que agrupa els documents seleccionats.
 	 *
 	 * Nomes s'hi arriba quan la propietat es.caib.ripea.notificacio.multiple.tipusdoc esta
-	 * activada, i un cop ja s'ha decidit si el document generat sera un PDF concatenat o un zip.
+	 * activada o no hi ha cap tipus NOTIFICACIO_MULTIPLE aplicable, i un cop
+	 * ja s'ha decidit si el document generat sera un PDF concatenat o un zip.
 	 */
 	@RequestMapping(value = "/{expedientId}/chooseTipusDocument", method = RequestMethod.GET)
 	public String chooseTipusDocument(
@@ -1368,13 +1369,18 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 
 	/**
 	 * Demana a l'usuari el tipus de document del document generat quan la propietat
-	 * {@link PropertyConfig#NOTIFICAR_MULTIPLE_TIPUS_DOC} ho indica; si no, el crea directament
-	 * amb el tipus de document NOTIFICACIO_MULTIPLE del procediment.
+	 * {@link PropertyConfig#NOTIFICAR_MULTIPLE_TIPUS_DOC} ho indica o quan no hi ha cap tipus
+	 * NOTIFICACIO_MULTIPLE aplicable (inexistent i desactivat, inactiu o no disponible segons la
+	 * multiplicitat, el mateix criteri que a REACT); si no, el crea directament amb el tipus de
+	 * document NOTIFICACIO_MULTIPLE del procediment.
 	 */
 	private String demanarTipusDocumentOCrear(
 			HttpServletRequest request,
 			Long expedientId) {
-		if (Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.NOTIFICAR_MULTIPLE_TIPUS_DOC))) {
+		if (Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.NOTIFICAR_MULTIPLE_TIPUS_DOC))
+				|| metaDocumentService.findNotificacioMultipleAplicableByContingut(
+						getEntitatActualComprovantPermisos(request).getId(),
+						expedientId) == null) {
 			return "redirect:/modal/contingut/" + expedientId + "/chooseTipusDocument";
 		}
 		return crearDocumentNotificacioMultiple(request, expedientId, null, null, null);

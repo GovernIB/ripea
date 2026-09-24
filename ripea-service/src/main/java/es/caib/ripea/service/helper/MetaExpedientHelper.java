@@ -1487,6 +1487,10 @@ public class MetaExpedientHelper {
 
 		if (procedimentImportat.getMetaDocuments() != null) {
 			for (MetaDocumentDto metaDocumentDto : procedimentImportat.getMetaDocuments()) {
+				//Els tipus de document per defecte desactivats no es creen encara que el fitxer els porti.
+				if (!metaDocumentHelper.isCreacioAutomaticaPermesa(metaExpedientEntity, metaDocumentDto.getCodi())) {
+					continue;
+				}
 				MetaDocumentEntity metaDocumentEntity = metaDocumentHelper.create(entitatId, procedimentCreat.getId(), metaDocumentDto, metaDocumentDto.getPlantillaNom(), metaDocumentDto.getPlantillaContentType(), metaDocumentDto.getPlantillaContingut(), rolActual, organId);
 				MetaDocumentDto metaDocumentCreated = conversioTipusHelper.convertir(metaDocumentEntity, MetaDocumentDto.class);
 				if (metaDocumentDto.getMetaDades() != null) {
@@ -1624,6 +1628,12 @@ public class MetaExpedientHelper {
 				//d'entitat: si la importació la fa un altre rol es deixen tal com estan en lloc
 				//d'avortar tota la importació.
 				if (mdE != null && !metaDocumentHelper.potModificar(mdE)) {
+					continue;
+				}
+
+				//Els tipus de document per defecte desactivats no es creen encara que el fitxer els porti;
+				//si el procediment ja el té, s'actualitza igual que la resta.
+				if (mdE == null && !metaDocumentHelper.isCreacioAutomaticaPermesa(procedimentOriginal, metaDocumentDto.getCodi())) {
 					continue;
 				}
 

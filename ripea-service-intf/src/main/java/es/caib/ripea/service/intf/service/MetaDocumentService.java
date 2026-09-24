@@ -291,26 +291,27 @@ public interface MetaDocumentService {
 			Long metaDocumentId);
 	
 	/**
-	 * Consulta un dels tipus de document que tot procediment té per defecte
-	 * ({@link MetaDocumentPerDefecteEnumDto}) dins el procediment de l'expedient al qual
-	 * pertany el contingut indicat.
+	 * Consulta el tipus de document NOTIFICACIO_MULTIPLE que s'aplica automàticament al document
+	 * generat en notificar més d'un document de l'expedient al qual pertany el contingut indicat.
+	 *
+	 * Només s'aplica si és un dels tipus que s'ofereixen en crear un document a l'expedient
+	 * (actiu, no PINBAL i disponible segons la multiplicitat), igual que a la interfície REACT.
+	 * Si el procediment no el té i el tipus està activat
+	 * ({@link MetaDocumentPerDefecteEnumDto#getPropietatActivacio()}), es crea.
 	 *
 	 * @param entitatId
 	 *            Id de l'entitat.
 	 * @param contingutId
 	 *            Id del contingut: l'expedient mateix o qualsevol contingut de dins seu.
-	 * @param metaDocumentPerDefecte
-	 *            El tipus de document per defecte que es vol recuperar.
-	 * @return El tipus de document per defecte del procediment de l'expedient, acabat de crear
-	 *         si el procediment no el tenia.
+	 * @return El tipus NOTIFICACIO_MULTIPLE aplicable, o null si no n'hi ha cap i, per tant, cal
+	 *         demanar el tipus de document a l'usuari.
 	 * @throws NotFoundException
 	 *             Si el contingut no penja de cap expedient.
 	 */
 	@PreAuthorize("isAuthenticated()")
-	MetaDocumentDto findPerDefecteByContingut(
+	MetaDocumentDto findNotificacioMultipleAplicableByContingut(
 			Long entitatId,
-			Long contingutId,
-			MetaDocumentPerDefecteEnumDto metaDocumentPerDefecte);
+			Long contingutId);
 
 	/**
 	 * Consulta un dels tipus de document que tot procediment té per defecte
@@ -322,7 +323,9 @@ public interface MetaDocumentService {
 	 *            Id del procediment.
 	 * @param metaDocumentPerDefecte
 	 *            El tipus de document per defecte que es vol recuperar.
-	 * @return El tipus de document per defecte del procediment, acabat de crear si no el tenia.
+	 * @return El tipus de document per defecte del procediment, acabat de crear si no el tenia;
+	 *         null si no el tenia i el tipus està desactivat
+	 *         ({@link MetaDocumentPerDefecteEnumDto#getPropietatActivacio()}).
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'entitat o el procediment.
 	 */

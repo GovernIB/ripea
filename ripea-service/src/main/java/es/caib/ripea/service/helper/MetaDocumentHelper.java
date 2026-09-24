@@ -485,11 +485,11 @@ public class MetaDocumentHelper {
 	}
 
 	/**
-	 * Crea els tipus de document que tot procediment ha de tenir per defecte
-	 * ({@link MetaDocumentPerDefecteEnumDto}), tots amb multiplicitat 0..N i origen
-	 * administració; el nom, la descripció, el tipus documental i l'estat d'elaboració
-	 * els aporta cada constant de l'enumerat, que també indica quin d'ells queda marcat com
-	 * a tipus de document per defecte del procediment.
+	 * Crea els tipus de document per defecte ({@link MetaDocumentPerDefecteEnumDto}) que estan
+	 * activats per a l'entitat del procediment ({@link #isMetaDocumentPerDefecteActiu}), tots amb
+	 * multiplicitat 0..N i origen administració; el nom, la descripció, el tipus documental i
+	 * l'estat d'elaboració els aporta cada constant de l'enumerat, que també indica quin d'ells
+	 * queda marcat com a tipus de document per defecte del procediment.
 	 *
 	 * És idempotent: no crea el tipus de document si el procediment ja en té un
 	 * amb el mateix codi.
@@ -502,6 +502,9 @@ public class MetaDocumentHelper {
 		List<MetaDocumentEntity> metaDocumentsCreats = new ArrayList<>();
 
 		for (MetaDocumentPerDefecteEnumDto metaDocumentPerDefecte : MetaDocumentPerDefecteEnumDto.values()) {
+			if (!isMetaDocumentPerDefecteActiu(metaExpedient, metaDocumentPerDefecte)) {
+				continue;
+			}
 			MetaDocumentEntity metaDocumentCreat = crearMetaDocumentPerDefecte(metaExpedient, metaDocumentPerDefecte);
 			if (metaDocumentCreat != null) {
 				metaDocumentsCreats.add(metaDocumentCreat);
@@ -512,16 +515,51 @@ public class MetaDocumentHelper {
 	}
 
 	/**
-	 * Obte el tipus de document per defecte indicat dins el procediment i, si no hi es, el crea.
+	 * Indica si el tipus de document per defecte està activat per a l'entitat del procediment.
 	 *
-	 * Tot procediment els te des de l'alta, pero es poden haver perdut: un procediment importat
+	 * Els tipus sense propietat d'activació estan sempre actius; la resta, només si la seva
+	 * propietat val true (resolta a nivell d'entitat i, si no, global). Si la propietat no
+	 * existeix, el tipus es considera desactivat.
+	 */
+	public boolean isMetaDocumentPerDefecteActiu(
+			MetaExpedientEntity metaExpedient,
+			MetaDocumentPerDefecteEnumDto metaDocumentPerDefecte) {
+		String propietatActivacio = metaDocumentPerDefecte.getPropietatActivacio();
+		if (propietatActivacio == null) {
+			return true;
+		}
+		EntitatEntity entitat = metaExpedient.getEntitat();
+		return Boolean.parseBoolean(configHelper.getConfig(
+				propietatActivacio,
+				entitat != null ? entitat.getCodi() : null,
+				null));
+	}
+
+	/**
+	 * Indica si els processos automatics (com la importacio de procediments) poden crear al
+	 * procediment un tipus de document amb el codi indicat: sempre, llevat que el codi sigui el d'un
+	 * tipus de document per defecte desactivat ({@link #isMetaDocumentPerDefecteActiu}).
+	 */
+	public boolean isCreacioAutomaticaPermesa(MetaExpedientEntity metaExpedient, String codi) {
+		return !MetaDocumentPerDefecteEnumDto.isCodiPerDefecte(codi)
+				|| isMetaDocumentPerDefecteActiu(metaExpedient, MetaDocumentPerDefecteEnumDto.valueOf(codi));
+	}
+
+	/**
+	 * Obte el tipus de document per defecte indicat dins el procediment i, si no hi es i esta
+	 * activat ({@link #isMetaDocumentPerDefecteActiu}), el crea.
+	 *
+	 * Els procediments els tenen des de l'alta, pero es poden haver perdut: un procediment importat
 	 * d'un fitxer generat abans que existissin no els porta, i un administrador d'entitat els pot
 	 * esborrar. Els processos que necessiten un d'aquests tipus per classificar un document no
 	 * poden quedar bloquejats per aixo, aixi que l'obtenen sempre per aqui.
 	 *
+	 * Un tipus desactivat no es crea mai, pero si el procediment ja el te es retorna igualment.
+	 *
 	 * @param metaExpedient procediment del qual es vol el tipus de document.
 	 * @param metaDocumentPerDefecte tipus de document per defecte que es necessita.
-	 * @return el tipus de document del procediment, acabat de crear si no hi era.
+	 * @return el tipus de document del procediment, acabat de crear si no hi era; null si el
+	 *         procediment no el te i el tipus esta desactivat.
 	 */
 	public MetaDocumentEntity getOrCreateMetaDocumentPerDefecte(
 			MetaExpedientEntity metaExpedient,
@@ -529,12 +567,48 @@ public class MetaDocumentHelper {
 
 		MetaDocumentEntity metaDocument = findByCodiAndProcediment(metaExpedient, metaDocumentPerDefecte.getCodi());
 		if (metaDocument == null) {
+			if (!isMetaDocumentPerDefecteActiu(metaExpedient, metaDocumentPerDefecte)) {
+				logger.debug("El procediment no te el tipus de document per defecte i no es crea perque esta desactivat ("
+						+ "metaExpedientId=" + metaExpedient.getId() + ", "
+						+ "codi=" + metaDocumentPerDefecte.getCodi() + ")");
+				return null;
+			}
 			logger.info("El procediment no te el tipus de document per defecte i es crea ("
 					+ "metaExpedientId=" + metaExpedient.getId() + ", "
 					+ "codi=" + metaDocumentPerDefecte.getCodi() + ")");
 			metaDocument = crearMetaDocumentPerDefecte(metaExpedient, metaDocumentPerDefecte);
 		}
 		return metaDocument;
+	}
+
+	/**
+	 * Tipus de document NOTIFICACIO_MULTIPLE del procediment de l'expedient que s'aplica
+	 * automaticament al document generat en notificar mes d'un document, si n'hi ha cap d'aplicable.
+	 *
+	 * Nomes s'aplica si es un dels tipus que s'ofereixen en crear un document a l'expedient: actiu,
+	 * no PINBAL i encara disponible segons la multiplicitat. Es el mateix criteri a JSP i a REACT
+	 * (on el frontal el cerca amb el filtre del desplegable i la consulta CREATE_NEW_DOC); si no
+	 * n'hi ha cap d'aplicable, cal demanar el tipus a l'usuari.
+	 *
+	 * Si el procediment no el te i el tipus esta activat, es crea
+	 * ({@link #getOrCreateMetaDocumentPerDefecte}).
+	 *
+	 * @return el tipus NOTIFICACIO_MULTIPLE aplicable, o null si no n'hi ha cap.
+	 */
+	public MetaDocumentEntity findMetaDocumentNotificacioMultipleAplicable(ExpedientEntity expedient) {
+		MetaDocumentEntity metaDocument = getOrCreateMetaDocumentPerDefecte(
+				expedient.getMetaExpedient(),
+				MetaDocumentPerDefecteEnumDto.NOTIFICACIO_MULTIPLE);
+		if (metaDocument == null || metaDocument.isPinbalActiu()) {
+			return null;
+		}
+		// Ja nomes retorna els actius i els que la multiplicitat encara permet afegir a l'expedient.
+		boolean disponible = findMetaDocumentsDisponiblesPerCreacio(
+				expedient.getEntitat(),
+				expedient,
+				null,
+				false).stream().anyMatch(disponiblePerCreacio -> disponiblePerCreacio.getId().equals(metaDocument.getId()));
+		return disponible ? metaDocument : null;
 	}
 
 	/**
@@ -546,7 +620,8 @@ public class MetaDocumentHelper {
 	 * L'entitat que retorna queda despresa quan la transaccio nova acaba, aixi que nomes se n'han de
 	 * llegir camps simples (id, codi, actiu), mai relacions.
 	 *
-	 * @return el tipus de document del procediment, o null si el procediment no existeix.
+	 * @return el tipus de document del procediment, o null si el procediment no existeix o no el te
+	 *         i el tipus esta desactivat.
 	 */
 	@org.springframework.transaction.annotation.Transactional(
 			propagation = org.springframework.transaction.annotation.Propagation.REQUIRES_NEW)
