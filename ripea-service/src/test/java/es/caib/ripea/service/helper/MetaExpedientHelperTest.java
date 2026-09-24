@@ -1703,6 +1703,7 @@ class MetaExpedientHelperTest {
         when(entityComprovarHelper.comprovarEntitatPerMetaExpedients(ENTITAT_ID)).thenReturn(entitat);
         when(metaExpedientRepository.save(any(MetaExpedientEntity.class))).thenReturn(procedimentCreat);
         when(procedimentCreat.getId()).thenReturn(META_EXPEDIENT_ID);
+        when(metaDocumentHelper.isCreacioAutomaticaPermesa(any(), eq("DOC_1"))).thenReturn(true);
         when(metaDocumentHelper.create(any(), any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(metaDocumentEntity);
         MetaDocumentDto convertedMetaDoc = new MetaDocumentDto();
@@ -1783,6 +1784,7 @@ class MetaExpedientHelperTest {
 
         // MetaDocuments: cerca per codi → null → crea
         when(metaDocumentHelper.findByCodiAndProcediment(procedimentOriginal, "DOC_1")).thenReturn(null);
+        when(metaDocumentHelper.isCreacioAutomaticaPermesa(procedimentOriginal, "DOC_1")).thenReturn(true);
         when(metaDocumentHelper.create(any(), any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(metaDocumentEntity);
 
