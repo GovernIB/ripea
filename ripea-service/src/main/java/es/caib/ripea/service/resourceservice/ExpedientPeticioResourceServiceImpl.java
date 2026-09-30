@@ -58,6 +58,7 @@ import es.caib.ripea.service.helper.MessageHelper;
 import es.caib.ripea.service.helper.MetaDocumentHelper;
 import es.caib.ripea.service.helper.PermisosPerAnotacions;
 import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.helper.RegistreJustificantHelper;
 import es.caib.ripea.service.helper.RolHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
@@ -84,6 +85,7 @@ import es.caib.ripea.service.intf.dto.PermissionEnumDto;
 import es.caib.ripea.service.intf.dto.SiNoEnumDto;
 import es.caib.ripea.service.intf.model.ExpedientPeticioResource;
 import es.caib.ripea.service.intf.model.ExpedientPeticioResource.AcceptarAnotacioForm;
+import es.caib.ripea.service.intf.model.ExpedientPeticioResource.AfegirJustificantForm;
 import es.caib.ripea.service.intf.model.ExpedientPeticioResource.RebutjarAnotacioForm;
 import es.caib.ripea.service.intf.model.ExpedientPeticioResource.SubsanarAnnexosForm;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
@@ -114,6 +116,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 	private final EntityComprovarHelper entityComprovarHelper;
 	private final MetaDocumentHelper metaDocumentHelper;
 	private final ExpedientHelper expedientHelper;
+	private final RegistreJustificantHelper registreJustificantHelper;
 	private final MessageHelper messageHelper;
 	private final AnotacioDistribucioHelper anotacioDistribucioHelper;
 	private final ExecucioMassivaHelper execucioMassivaHelper;
@@ -144,6 +147,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
         register(ExpedientPeticioResource.ACTION_CONSULTAR_I_GUARDAR, new ConsultarGuardarAnotacioPendentActionExecutor());
         register(ExpedientPeticioResource.PERSPECTIVE_ANNEXOS_ERROR_CODE, new AnnexosErrorPerspectiveApplicator());
         register(ExpedientPeticioResource.ACTION_SUBSANAR_ANNEXOS, new SubsanarAnnexosActionExecutor());
+        register(ExpedientPeticioResource.ACTION_AFEGIR_JUSTIFICANT, new AfegirJustificantActionExecutor());
 
         register(ExpedientPeticioResource.Fields.metaExpedient, new MetaExpedientOnchangeLogicProcessor());
         register(null, new InitialOnChangeDocumentResourceLogicProcessor());
@@ -344,6 +348,8 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
             //Només s'indica si hi ha justificant per incorporar. Les metadades es carreguen a la perspectiva
             //JUSTIFICANT, que consulta l'Arxiu i per això no es pot aplicar a cada fila d'un llistat.
             resource.setTeJustificant(teJustificant(resource.getRegistreInfo().getJustificantArxiuUuid()));
+            //Només una anotació acceptada (amb expedient) pot tenir pendent tornar a incorporar el justificant.
+            resource.setTeJustificantAmbError(entity.getExpedient() != null && entity.getRegistre().getJustificantError() != null);
         }
     }
 
@@ -818,7 +824,13 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 							}
 
 						} catch (Exception e) {
-							expedientHelper.updateRegistreAnnexError(entry.getKey(), ExceptionUtils.getStackTrace(e));
+							if (entry.getKey()>0) {
+								expedientHelper.updateRegistreAnnexError(entry.getKey(), ExceptionUtils.getStackTrace(e));
+							} else {
+								//La clau del justificant (ANNEX_ID_JUSTIFICANT) no és cap annex: l'error es desa al registre.
+								log.error("Error incorporant el justificant de l'anotació " + expedientPeticioId, e);
+								expedientHelper.updateRegistreJustificantErrorNewTransaction(expedientPeticioId, ExceptionUtils.getStackTrace(e));
+							}
 						}
 					}
 
@@ -840,8 +852,15 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 					//Si ha donat error arxiu, marcam els annexos com a pendents
 	                if (params.getAnnexos()!=null) {
 	                	for (Map.Entry<Long, String> entry : params.getAnnexos().entrySet()) {
-	                		registreAnnexResourceRepository.findById(entry.getKey()).get().setError(
-	                				"Annex no processat perque l'expedient no s'ha creat a l'Arxiu");
+	                		if (entry.getKey()>0) {
+		                		registreAnnexResourceRepository.findById(entry.getKey()).get().setError(
+		                				"Annex no processat perque l'expedient no s'ha creat a l'Arxiu");
+	                		} else if (entity.getRegistre().getJustificantArxiuUuid() != null
+	                				&& configHelper.getAsBoolean(PropertyConfig.INCORPORAR_JUSTIFICANT)) {
+	                			expedientHelper.updateRegistreJustificantErrorNewTransaction(
+	                					expedientPeticioId,
+	                					"Justificant no processat perque l'expedient no s'ha creat a l'Arxiu");
+	                		}
 	                	}
 	                }
 				}
@@ -941,6 +960,108 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
                 throw new ActionExecutionException(getResourceClass(), entity.getId(), code, message);
             }
             return objectMappingHelper.newInstanceMap(entity, ExpedientPeticioResource.class);
+        }
+    }
+
+    /**
+     * Torna a intentar incorporar a l'expedient el justificant de registre d'una anotació acceptada, quan la
+     * incorporació va fallar i l'error va quedar desat al registre (IPA_REGISTRE.JUSTIFICANT_ERROR). Si va bé,
+     * l'error es buida; si torna a fallar, s'hi desa el nou error.
+     */
+    private class AfegirJustificantActionExecutor implements ActionExecutor<ExpedientPeticioResourceEntity, AfegirJustificantForm, Serializable> {
+
+        @Override
+        public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
+            List<FieldOption> resultat = new ArrayList<>();
+            if (AfegirJustificantForm.Fields.metaDocument.equals(fieldName)) {
+                String[] expedientIdParam = requestParameterMap.get("expedientId");
+                if (expedientIdParam != null && expedientIdParam.length > 0 && !expedientIdParam[0].isEmpty()) {
+                    for (MetaDocumentEntity metaDoc : metaDocumentsDisponibles(Long.parseLong(expedientIdParam[0]))) {
+                        resultat.add(new FieldOption(metaDoc.getId().toString(), metaDoc.getNom()));
+                    }
+                    resultat.sort(Comparator.comparing(FieldOption::getDescription));
+                }
+            }
+            return resultat;
+        }
+
+        @Override
+        public void onChange(Serializable id, AfegirJustificantForm previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, AfegirJustificantForm target) {
+            //En obrir el diàleg es proposa el tipus de document propi del justificant, si es pot seleccionar.
+            if (fieldName == null && id != null && previous.getMetaDocument() == null) {
+                ExpedientPeticioEntity peticio = expedientPeticioRepository.findById(Long.valueOf(id.toString())).orElse(null);
+                if (peticio == null || peticio.getExpedient() == null) {
+                    return;
+                }
+                ExpedientEntity expedient = peticio.getExpedient();
+                //Si el procediment no té el tipus de document propi del justificant es crea ara. Cal fer-ho en
+                //una transacció a part perquè l'onChange dels formularis és de només lectura.
+                MetaDocumentEntity metaDocJustificant = metaDocumentHelper.getOrCreateMetaDocumentPerDefecteNewTransaction(
+                        expedient.getMetaExpedient().getId(),
+                        MetaDocumentPerDefecteEnumDto.REGISTRE_JUSTIFICANT_ENTRADA);
+                if (metaDocJustificant != null && metaDocumentsDisponibles(expedient.getId()).stream()
+                        .anyMatch(metaDoc -> metaDoc.getId().equals(metaDocJustificant.getId()))) {
+                    target.setMetaDocument(String.valueOf(metaDocJustificant.getId()));
+                }
+            }
+        }
+
+        /** Tipus de document actius amb què es pot crear un document dins l'expedient, com al subsanar annexos. */
+        private List<MetaDocumentEntity> metaDocumentsDisponibles(Long expedientId) {
+            EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+            List<MetaDocumentEntity> metaDocuments = metaDocumentHelper.findActiusPerCreacio(entitat, expedientId, null, false);
+            return metaDocuments != null ? metaDocuments : new ArrayList<>();
+        }
+
+        @Override
+        public Serializable exec(String code, ExpedientPeticioResourceEntity entity, AfegirJustificantForm params) throws ActionExecutionException {
+            ExpedientPeticioEntity peticio = expedientPeticioRepository.findById(entity.getId()).orElse(null);
+            if (peticio == null || peticio.getExpedient() == null || peticio.getRegistre() == null
+                    || peticio.getRegistre().getJustificantArxiuUuid() == null || peticio.getRegistre().getJustificantError() == null) {
+                throw new ActionExecutionException(getResourceClass(), entity.getId(), code,
+                        messageHelper.getMessage("expedientPeticio.afegirJustificant.noPendent"));
+            }
+            try {
+                //Si l'expedient no s'ha creat a l'Arxiu, s'ha de crear abans de res (com al subsanar annexos).
+                if (peticio.getExpedient().getArxiuUuid() == null) {
+                    Exception errorArxiu = expedientHelper.guardarExpedientArxiu(peticio.getExpedient().getId());
+                    if (errorArxiu != null) {
+                        throw errorArxiu;
+                    }
+                }
+                //Si ja hi és (per exemple, incorporat pel procés massiu) no el torna a crear i només buida l'error.
+                registreJustificantHelper.incorporarJustificantRegistreExpedient(
+                        peticio.getId(),
+                        peticio,
+                        Long.parseLong(params.getMetaDocument()));
+            } catch (Exception e) {
+                expedientHelper.updateRegistreJustificantErrorNewTransaction(peticio.getId(), ExceptionUtils.getStackTrace(e));
+                excepcioLogHelper.addExcepcio("/anotacio/" + entity.getId() + "/AfegirJustificantActionExecutor", e);
+                throw new ActionExecutionException(getResourceClass(), entity.getId(), code,
+                        messageHelper.getMessage("expedientPeticio.afegirJustificant.reject", new Object[]{ExceptionUtils.getRootCauseMessage(e)}));
+            }
+            notificarDistribucioSiPendent(peticio.getId());
+            return objectMappingHelper.newInstanceMap(entity, ExpedientPeticioResource.class);
+        }
+
+        /**
+         * Si l'anotació havia quedat pendent de notificar a Distribució (abans un error del justificant ho impedia
+         * en crear l'expedient des del JSP) i ja no li queda cap annex amb error, es notifica com a processada.
+         * Un error aquí no desfà la incorporació del justificant, que ja s'ha fet.
+         */
+        private void notificarDistribucioSiPendent(Long expedientPeticioId) {
+            ExpedientPeticioEntity peticio = expedientPeticioRepository.getOne(expedientPeticioId);
+            if (!ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT.equals(peticio.getEstat())
+                    || registreAnnexResourceRepository.countAnnexosAmbErrorByRegistreId(peticio.getRegistre().getId()) > 0) {
+                return;
+            }
+            try {
+                expedientHelper.notificarICanviEstatToProcessatNotificat(peticio);
+            } catch (Exception e) {
+                log.error("No s'ha pogut notificar a Distribució l'anotació " + expedientPeticioId + " com a processada", e);
+                peticio.setEstatCanviatDistribucio(false);
+                expedientHelper.updateNotificarError(expedientPeticioId, ExceptionUtils.getStackTrace(e));
+            }
         }
     }
 

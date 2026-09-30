@@ -645,22 +645,20 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.ANO_REBUTJADES_TOTAL.toString(), "Anotacions rebutjades totals").descripcio("Anotacions rebutjades totals a RIPEA").format(Format.LONG));
 		
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.EXP_CREATS.toString(), "Expedients creats").descripcio("Expedients creats a RIPEA dins del dia").format(Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.EXP_CREAT_TOTAL.toString(), "Expedients creats totals").descripcio("Expedients creats a RIPEA fins a la data, tant oberts com tancats").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.EXP_CREATS_TOTAL.toString(), "Expedients creats totals").descripcio("Expedients creats a RIPEA fins a la data, tant oberts com tancats").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.EXP_TANCATS.toString(), "Expedients tancats").descripcio("Expedients tancats a RIPEA dins del dia").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.EXP_TANCATS_TOTAL.toString(), "Expedients tancats totals").descripcio("Expedients tancats a RIPEA fins a la data").format(Format.LONG));
 		
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_FIRMADES.toString(), "Env. portafib firmats").descripcio("Env. portafib firmats a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_FIRMADES_TOTAL.toString(), "Env. portafib firmats totals").descripcio("Env. portafib firmats totals a RIPEA").format(Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_ENVIADES.toString(), "Env. portafib enviats").descripcio("Env. portafib enviats a RIPEA pendents de resposta de portafirmes").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_ENVIADES_TOTAL.toString(), "Env. portafib enviats totals").descripcio("Env. portafib enviats totals a RIPEA pendents de resposta de portafirmes").format(Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_INICIADES.toString(), "Env. portafib iniciats").descripcio("Env. portafib iniciats a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_INICIADES_TOTAL.toString(), "Env. portafib iniciats totals").descripcio("Env. portafib iniciats totals a RIPEA").format(Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_PARCIALS.toString(), "Env. portafib parcials").descripcio("Env. portafib parcials a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_PARCIALS_TOTAL.toString(), "Env. portafib parcials totals").descripcio("Env. portafib parcials totals a RIPEA").format(Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_PAUSADES.toString(), "Env. portafib pausats").descripcio("Env. portafib pausats a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_PAUSADES_TOTAL.toString(), "Env. portafib pausats totals").descripcio("Env. portafib pausats totals a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_REBUTJADES.toString(), "Env. portafib rebutjats").descripcio("Env. portafib rebutjats a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_REBUTJADES_TOTAL.toString(), "Env. portafib rebutjats totals").descripcio("Env. portafib rebutjats totals a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_CANCELADES.toString(), "Env. portafib cancel·lats").descripcio("Env. portafib cancel·lats a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.FIR_CANCELADES_TOTAL.toString(), "Env. portafib cancel·lats totals").descripcio("Env. portafib cancel·lats totals a RIPEA. No es compten a cap altre indicador d'estat de firma").format(Format.LONG));
 
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_ENVIADES.toString(), "Notificacions enviades").descripcio("Notificacions enviades a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_ENVIADES_TOTAL.toString(), "Notificacions enviades totals").descripcio("Notificacions enviades totals a RIPEA").format(Format.LONG));
@@ -773,22 +771,20 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.ANO_REBUTJADES_TOTAL.toString()).valor(efe.getAnotacionsRebutjadesTotal()!=null?efe.getAnotacionsRebutjadesTotal().doubleValue():null));
 		
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.EXP_CREATS.toString()).valor(efe.getExpedientsCreats()!=null?efe.getExpedientsCreats().doubleValue():null));
-		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.EXP_CREAT_TOTAL.toString()).valor(efe.getExpedientsCreatsTotal()!=null?efe.getExpedientsCreatsTotal().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.EXP_CREATS_TOTAL.toString()).valor(efe.getExpedientsCreatsTotal()!=null?efe.getExpedientsCreatsTotal().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.EXP_TANCATS.toString()).valor(efe.getExpedientsTancats()!=null?efe.getExpedientsTancats().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.EXP_TANCATS_TOTAL.toString()).valor(efe.getExpedientsTancatsTotal()!=null?efe.getExpedientsTancatsTotal().doubleValue():null));
 		
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.FIR_FIRMADES.toString()).valor(efe.getFirmesFirmades()!=null?efe.getFirmesFirmades().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.FIR_FIRMADES_TOTAL.toString()).valor(efe.getFirmesFirmadesTotal()!=null?efe.getFirmesFirmadesTotal().doubleValue():null));
-		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.FIR_ENVIADES.toString()).valor(efe.getFirmesEnviades()!=null?efe.getFirmesEnviades().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.FIR_ENVIADES_TOTAL.toString()).valor(efe.getFirmesEnviadesTotal()!=null?efe.getFirmesEnviadesTotal().doubleValue():null));
-		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.FIR_INICIADES.toString()).valor(efe.getFirmesIniciades()!=null?efe.getFirmesIniciades().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.FIR_INICIADES_TOTAL.toString()).valor(efe.getFirmesIniciadesTotal()!=null?efe.getFirmesIniciadesTotal().doubleValue():null));
-		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.FIR_PARCIALS.toString()).valor(efe.getFirmesParcials()!=null?efe.getFirmesParcials().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.FIR_PARCIALS_TOTAL.toString()).valor(efe.getFirmesParcialsTotal()!=null?efe.getFirmesParcialsTotal().doubleValue():null));
-		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.FIR_PAUSADES.toString()).valor(efe.getFirmesPausades()!=null?efe.getFirmesPausades().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.FIR_PAUSADES_TOTAL.toString()).valor(efe.getFirmesPausadesTotal()!=null?efe.getFirmesPausadesTotal().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.FIR_REBUTJADES.toString()).valor(efe.getFirmesRebutjades()!=null?efe.getFirmesRebutjades().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.FIR_REBUTJADES_TOTAL.toString()).valor(efe.getFirmesRebutjadesTotal()!=null?efe.getFirmesRebutjadesTotal().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.FIR_CANCELADES.toString()).valor(efe.getFirmesCancelades()!=null?efe.getFirmesCancelades().doubleValue():null));
+		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.FIR_CANCELADES_TOTAL.toString()).valor(efe.getFirmesCanceladesTotal()!=null?efe.getFirmesCanceladesTotal().doubleValue():null));
 		
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.NOT_ENVIADES.toString()).valor(efe.getNotificacionsEnviades()!=null?efe.getNotificacionsEnviades().doubleValue():null));
 		resultat.add(new Fet().codi(ExplotFetsAmbDimensioDto.FetsEnum.NOT_ENVIADES_TOTAL.toString()).valor(efe.getNotificacionsEnviadesTotal()!=null?efe.getNotificacionsEnviadesTotal().doubleValue():null));
@@ -923,6 +919,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 			dim.setFirmesFirmadesTotal(fet.getFirmadesTotal());
 			dim.setFirmesRebutjadesTotal(fet.getRebutjadesTotal());
 			dim.setFirmesParcialsTotal(fet.getParcialsTotal());
+			dim.setFirmesCanceladesTotal(fet.getCanceladesTotal());
 		}
 
 		List<ExplotFetsAmbDimensioDto> dimensions = new ArrayList<ExplotFetsAmbDimensioDto>(acumulador.values());
@@ -1059,12 +1056,9 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 			dim.setNotificacionsEnvError(variacioDiaria(dim.getNotificacionsEnvErrorTotal(), ahir!=null?ahir.getNotificacionsEnvErrorTotal():null));
 			dim.setNotificacionsFinError(variacioDiaria(dim.getNotificacionsFinErrorTotal(), ahir!=null?ahir.getNotificacionsFinErrorTotal():null));
 
-			dim.setFirmesEnviades(variacioDiaria(dim.getFirmesEnviadesTotal(), ahir!=null?ahir.getFirmesEnviadesTotal():null));
-			dim.setFirmesIniciades(variacioDiaria(dim.getFirmesIniciadesTotal(), ahir!=null?ahir.getFirmesIniciadesTotal():null));
-			dim.setFirmesPausades(variacioDiaria(dim.getFirmesPausadesTotal(), ahir!=null?ahir.getFirmesPausadesTotal():null));
 			dim.setFirmesFirmades(variacioDiaria(dim.getFirmesFirmadesTotal(), ahir!=null?ahir.getFirmesFirmadesTotal():null));
 			dim.setFirmesRebutjades(variacioDiaria(dim.getFirmesRebutjadesTotal(), ahir!=null?ahir.getFirmesRebutjadesTotal():null));
-			dim.setFirmesParcials(variacioDiaria(dim.getFirmesParcialsTotal(), ahir!=null?ahir.getFirmesParcialsTotal():null));
+			dim.setFirmesCancelades(variacioDiaria(dim.getFirmesCanceladesTotal(), ahir!=null?ahir.getFirmesCanceladesTotal():null));
 		}
 	}
 

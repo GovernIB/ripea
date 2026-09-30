@@ -2,11 +2,12 @@ package es.caib.ripea.service.helper;
 
 import java.time.LocalDateTime;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import es.caib.ripea.persistence.entity.*;
@@ -54,9 +55,11 @@ public class EventHelper {
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private CacheHelper cacheHelper;
 	@Autowired private EmailHelper emailHelper;
+	@Autowired private ExcepcioLogHelper excepcioLogHelper;
     @Autowired private ConfigHelper configHelper;
     @Autowired private MessageHelper messageHelper;
     @Autowired private ExpedientTascaRepository expedientTascaRepository;
+    @Autowired private PermisosHelper permisosHelper;
 
     public void notifyAvisosActius() {
     	// El missatge d'avisos viatja buit (és només un trigger): la data la re-consulta el consumidor
@@ -205,31 +208,47 @@ public class EventHelper {
 					organGestorEntity = organGestorRepository.findById(usuariCodi.getOrganId()).orElse(null);
 
 				UsuariEntity usuari = usuariRepository.getOne(usuariCodi.getCodi());
+				// ROL_ACTUAL (BD) és el rol seleccionat per l'usuari (es persisteix a cada canvi i en iniciar
+				// sessió). Només és null si l'usuari no ha iniciat sessió des que SessioHelper el sincronitza;
+				// en aquest cas s'usa el del DTO per no petar a findPermisosPerAnotacions (rolActual.equals).
+				String rolActual = usuari.getRolActual()!=null ? usuari.getRolActual() : usuariCodi.getRolActual();
 
 				// El comptador depèn dels permisos ACL de l'usuari AFECTAT, que es resolen des de la
 				// SecurityContext del fil. Aquest mètode es crida sovint des d'un context aliè
 				// (WS de Distribució, un altre usuari acceptant/rebutjant...), de manera que cal
 				// suplantar la identitat de l'usuari afectat perquè getObjectsIdsWithPermission
 				// resolgui els SEUS permisos i no els del fil que dispara l'esdeveniment.
+				// Les authorities han de ser les mateixes que tindria a la sessió: TOTS els seus rols
+				// (els ACL d'entitat i procediments poden estar donats a rols com IPA_USER_GOIB, no al
+				// rol seleccionat) més 'tothom', que l'aplicació afegeix a tot usuari autenticat.
 				Authentication authPrevia = SecurityContextHolder.getContext().getAuthentication();
 				try {
-					List<GrantedAuthority> authorities = usuari.getRolActual()!=null
-							? Collections.<GrantedAuthority>singletonList(new SimpleGrantedAuthority(usuari.getRolActual()))
-							: Collections.<GrantedAuthority>emptyList();
+					Set<String> rols = new LinkedHashSet<String>(permisosHelper.findRolsAclUsuari(usuari.getCodi()));
+					rols.add(BaseConfig.ROLE_USER);
+					rols.add(rolActual);
+					List<GrantedAuthority> authorities = rols.stream()
+							.map(SimpleGrantedAuthority::new)
+							.collect(Collectors.toList());
 					User principal = new User(usuari.getCodi(), "", authorities);
 					SecurityContextHolder.getContext().setAuthentication(
 							new UsernamePasswordAuthenticationToken(principal, null, authorities));
 
 					return cacheHelper.countAnotacionsPendents(
 							entitatEntity,
-							usuari.getRolActual(),
+							rolActual,
 							usuariCodi.getCodi(),
 							organGestorEntity!=null?organGestorEntity.getId():null);
 				} finally {
 					SecurityContextHolder.getContext().setAuthentication(authPrevia);
 				}
 			}
-		} catch (Exception ex) {}
+		} catch (Exception ex) {
+			if (usuariCodi!=null) {
+				excepcioLogHelper.addExcepcio("EventHelper/getAnotacionsPendents", ex, usuariCodi.getCodi(), usuariCodi.getRolActual());
+			} else {
+				excepcioLogHelper.addExcepcio("EventHelper/getAnotacionsPendents", ex);
+			}
+		}
 
 		return 0l;
 	}

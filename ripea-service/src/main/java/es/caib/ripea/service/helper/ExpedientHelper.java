@@ -56,6 +56,7 @@ import es.caib.distribucio.rest.client.integracio.domini.InteressatTipus;
 import es.caib.distribucio.rest.client.integracio.domini.NtiEstadoElaboracion;
 import es.caib.distribucio.rest.client.integracio.domini.NtiOrigen;
 import es.caib.distribucio.rest.client.integracio.domini.NtiTipoDocumento;
+import es.caib.plugins.arxiu.api.ArxiuNotFoundException;
 import es.caib.plugins.arxiu.api.Carpeta;
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.ContingutTipus;
@@ -378,7 +379,7 @@ public class ExpedientHelper {
 				expedient.updateEstatAdditional(estatInicial);
 				// if estat has usuari responsable agafar expedient by this user
 				if (estatInicial.getResponsableCodi() != null) {
-					agafar(expedient, estatInicial.getResponsableCodi(), "Responsable de "+estatInicial.getNom());
+					agafar(expedient, estatInicial.getResponsableCodi(), ExpedientEstatHelper.getMotiuResponsableEstat(estatInicial));
 				}
 			}
 
@@ -926,6 +927,21 @@ public class ExpedientHelper {
 
 	}
 
+	/**
+	 * Desa l'error produït en incorporar el justificant de registre de l'anotació a l'expedient, o el buida
+	 * si error és null. Va en una transacció a part perquè la incorporació del justificant
+	 * ({@link #crearDocFromJustificantRegistreUuid}) fa rollback de la seva i l'error s'ha de conservar
+	 * encara que la transacció de qui l'ha cridat també acabi fent rollback.
+	 *
+	 * @param expedientPeticioId anotació del justificant.
+	 * @param error descripció de l'error, o null per indicar que ja no n'hi ha cap de pendent.
+	 */
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void updateRegistreJustificantErrorNewTransaction(Long expedientPeticioId, String error) {
+		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
+		expedientPeticioEntity.getRegistre().updateJustificantError(error);
+	}
+
 	static Map<Long, Object> locks = new ConcurrentHashMap<>();
 
 	@Transactional
@@ -1353,6 +1369,9 @@ public class ExpedientHelper {
 		documentRepository.save(docEntity);
 
 		contingutLogHelper.logCreacio(docEntity, true, true);
+
+		// El justificant ja és a l'expedient: s'esborra l'error d'un intent anterior, si n'hi havia.
+		expedientPeticioEntity.getRegistre().updateJustificantError(null);
 
 		return docEntity;
 	}
@@ -3077,14 +3096,26 @@ public class ExpedientHelper {
 		boolean carpetaExistsInArxiu = false;
 
 		if (!contingutHelper.isCarpetaLogica()) {
-			Expedient expedient = pluginHelper.arxiuExpedientConsultar(expedientEntity);
-			if (expedient.getContinguts() != null) {
-				for (ContingutArxiu contingutArxiu : expedient.getContinguts()) {
-					String replacedNom = ArxiuConversioHelper.revisarContingutNom(nom);
-					if (contingutArxiu.getTipus() == ContingutTipus.CARPETA &&
-							contingutArxiu.getNom().equals(replacedNom)) {
-						carpetaExistsInArxiu = true;
-						carpetaUuid = contingutArxiu.getIdentificador();
+			if (carpetaExistsInDB && carpetaEntity.getArxiuUuid() != null) {
+				// La carpeta de la BD ja té uuid: es comprova per uuid, perquè el nom a l'Arxiu el normalitza el
+				// plugin i la cerca per nom pot no trobar-la. Si ja no hi és, es torna a crear.
+				if (existeixCarpetaArxiu(carpetaEntity)) {
+					carpetaExistsInArxiu = true;
+					carpetaUuid = carpetaEntity.getArxiuUuid();
+				} else {
+					carpetaEntity.updateArxiuEsborrat();
+				}
+			} else {
+				// Carpeta nova o sense uuid: es cerca per nom, per si ja es va crear a l'Arxiu en un intent anterior
+				Expedient expedient = pluginHelper.arxiuExpedientConsultar(expedientEntity);
+				if (expedient.getContinguts() != null) {
+					for (ContingutArxiu contingutArxiu : expedient.getContinguts()) {
+						String replacedNom = ArxiuConversioHelper.revisarContingutNom(nom);
+						if (contingutArxiu.getTipus() == ContingutTipus.CARPETA &&
+								contingutArxiu.getNom().equals(replacedNom)) {
+							carpetaExistsInArxiu = true;
+							carpetaUuid = contingutArxiu.getIdentificador();
+						}
 					}
 				}
 			}
@@ -3109,6 +3140,22 @@ public class ExpedientHelper {
 			carpetaId = carpetaDto.getId();
 		}
 		return carpetaId;
+	}
+
+	/**
+	 * Indica si la carpeta existeix a l'Arxiu, consultant-la pel seu uuid.
+	 *
+	 * @return false si l'Arxiu respon que no la troba; qualsevol altre error de l'Arxiu es propaga.
+	 */
+	private boolean existeixCarpetaArxiu(CarpetaEntity carpetaEntity) {
+		try {
+			return pluginHelper.arxiuCarpetaConsultar(carpetaEntity) != null;
+		} catch (SistemaExternException ex) {
+			if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, ArxiuNotFoundException.class)) {
+				return false;
+			}
+			throw ex;
+		}
 	}
 
 	public void importarExpedient(Long entitatId, Long pareId, Long expedientId, String rolActual) {

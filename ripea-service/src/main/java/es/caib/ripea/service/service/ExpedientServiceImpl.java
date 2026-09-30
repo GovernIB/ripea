@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -37,6 +36,7 @@ import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.RegistreAnnexEntity;
 import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.repository.AlertaRepository;
+import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.persistence.repository.ExpedientComentariRepository;
 import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
 import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
@@ -44,7 +44,6 @@ import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.GrupRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
-import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.persistence.repository.RegistreAnnexRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.persistence.repository.command.ExpedientRepositoryCommnand;
@@ -55,9 +54,9 @@ import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ContingutHelper;
 import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.helper.DateHelper;
+import es.caib.ripea.service.helper.DocumentHelper;
 import es.caib.ripea.service.helper.EmailHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
-import es.caib.ripea.service.helper.DocumentHelper;
 import es.caib.ripea.service.helper.ExpedientHelper;
 import es.caib.ripea.service.helper.MessageHelper;
 import es.caib.ripea.service.helper.MetaExpedientHelper;
@@ -255,13 +254,17 @@ public class ExpedientServiceImpl implements ExpedientService {
 									RegistreJustificantUtils.nomFitxerJustificant(expedientPeticioEntity.getId(), registreIdentificador),
 									RegistreJustificantUtils.titolJustificant(registreIdentificador));
 						} catch (Exception e) {
-							processatOk = false;
+							//Un error amb el justificant no impedeix notificar l'anotació com a processada a
+							//Distribució: es desa perquè es pugui tornar a intentar des del llistat d'anotacions.
 							logger.error("Error crear doc from uuid", e);
+							expedientHelper.updateRegistreJustificantErrorNewTransaction(
+									expedientPeticioId,
+									ExceptionUtils.getStackTrace(e));
 						}
 
 					}
 				}
-				if (!expedientHelper.consultaExpedientsAmbImportacio().isEmpty() && ! isIncorporacioDuplicadaPermesa()) {
+				if (errorIncorporacioDuplicada()) {
 					throw new DocumentAlreadyImportedException();
 				}
 				if (processatOk) {
@@ -282,6 +285,13 @@ public class ExpedientServiceImpl implements ExpedientService {
 					expedientHelper.updateRegistreAnnexError(
 							registeAnnexEntity.getId(),
 							"Annex no s'ha processat perque l'expedient no s'ha creat en arxiu");
+				}
+				if (justificantIdMetaDoc != null
+						&& expedientPeticioEntity.getRegistre().getJustificantArxiuUuid() != null
+						&& isIncorporacioJustificantActiva()) {
+					expedientHelper.updateRegistreJustificantErrorNewTransaction(
+							expedientPeticioId,
+							"Justificant no s'ha processat perque l'expedient no s'ha creat en arxiu");
 				}
 				expedientDto.setExpCreatArxiuOk(false);
 			}
@@ -363,10 +373,13 @@ public class ExpedientServiceImpl implements ExpedientService {
 							RegistreJustificantUtils.titolJustificant(registreIdentificador));
 				} catch (Exception e) {
 					logger.error(ExceptionUtils.getStackTrace(e));
+					expedientHelper.updateRegistreJustificantErrorNewTransaction(
+							expedientPeticioId,
+							ExceptionUtils.getStackTrace(e));
 				}
 			}
 		}
-		if (!expedientHelper.consultaExpedientsAmbImportacio().isEmpty() && ! isIncorporacioDuplicadaPermesa()) {
+		if (errorIncorporacioDuplicada()) {
 			throw new DocumentAlreadyImportedException();
 		}
 		if (processatOk) {
@@ -1792,13 +1805,15 @@ public class ExpedientServiceImpl implements ExpedientService {
 		return expedientHelper.isExpedientPendentExecucioMassivaMourerTot(expedientId);
 	}
 
-	private boolean isIncorporacioDuplicadaPermesa() {
-		return configHelper.getAsBoolean(PropertyConfig.INCORPORACIO_ANOTACIO_DUPLICADA);
-	}
-
 	private boolean isIncorporacioJustificantActiva() {
 		return configHelper.getAsBoolean(PropertyConfig.INCORPORAR_JUSTIFICANT);
 	}
 
+	private boolean errorIncorporacioDuplicada() {
+		return	!"LOCAL".equals(configHelper.getConfig(PropertyConfig.ENTORN)) && 
+				!expedientHelper.consultaExpedientsAmbImportacio().isEmpty() && 
+				!configHelper.getAsBoolean(PropertyConfig.INCORPORACIO_ANOTACIO_DUPLICADA);
+	}
+	
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientServiceImpl.class);
 }

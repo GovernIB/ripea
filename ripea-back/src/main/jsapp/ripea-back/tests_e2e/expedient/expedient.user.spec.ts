@@ -55,7 +55,12 @@ const filtrarPerTitol = async (page: Page, titol: string) => {
     // Omplir el camp ABANS de registrar el listener i clicar Filtra: així ens assegurem
     // que el valor ja està compromès al formulari i que el GET que esperem és el del
     // botó Filtra (no pas el de la càrrega inicial en muntar-se el filtre).
-    await page.locator('input[name="nom"]').fill(titol);
+    // Esperar que s'hagi tancat qualsevol diàleg (p.ex. el de creació just després de guardar):
+    // si s'omple el filtre durant la transició de tancament, el valor queda al DOM però no a
+    // l'estat del formulari, i Filtra no llança cap petició nova.
+    await expect(page.locator('[role="dialog"]')).toHaveCount(0, { timeout: 10_000 });
+    // Acotat al filtre: evita coincidir amb el camp "nom" d'un diàleg de l'expedient.
+    await page.locator('.styledFilter input[name="nom"]').fill(titol);
     await humanDelay(page);
     const resp = waitApiGet(page, esGetLlistat);
     await page.locator('.styledFilter').getByRole('button', { name: 'Filtra', exact: true }).click();
@@ -66,7 +71,7 @@ const filtrarPerTitol = async (page: Page, titol: string) => {
 // Esborra una fila d'expedient (obre el menú d'accions, clica Eliminar i confirma).
 const eliminarFila = async (page: Page, fila: Locator) => {
     await obrirMenuAccions(fila);
-    await page.getByRole('menuitem').filter({ hasText: /eliminar/i }).click();
+    await page.getByRole('menuitem').filter({ hasText: /elimina/i }).click();
     const dialog = page.locator('[role="dialog"]');
     await expect(dialog).toBeVisible({ timeout: 5_000 });
     await humanDelay(page);
@@ -188,8 +193,9 @@ test.describe('Gestió d\'Expedients — usuari base', () => {
             // Procediment o servei: primer disponible. En seleccionar-lo, l'òrgan gestor
             // i la seqüència s'omplen automàticament; la prioritat queda "Normal" per defecte.
             await seleccionarOpcioAutocompletament(page, dialog, '[name="metaExpedient"] input[type="text"]');
-            // Esperar que l'òrgan gestor s'hagi autoemplenat abans de continuar.
-            await expect(dialog.locator('[name="organGestor"] input[type="text"]')).not.toHaveValue('', { timeout: 10_000 });
+            // Esperar que l'òrgan gestor s'hagi autoemplenat abans de continuar. Depèn de l'onChange
+            // del procediment (petició al backend), que amb els projectes en paral·lel pot superar 10 s.
+            await expect(dialog.locator('[name="organGestor"] input[type="text"]')).not.toHaveValue('', { timeout: 20_000 });
 
             await dialog.locator('input[name="nom"]').fill(NOM_TEST);
         });
@@ -229,7 +235,7 @@ test.describe('Gestió d\'Expedients — usuari base', () => {
             await humanDelay(page);
             await obrirMenuAccions(fila);
             await humanDelay(page);
-            await page.getByRole('menuitem').filter({ hasText: /modificar/i }).click();
+            await page.getByRole('menuitem').filter({ hasText: /modifica/i }).click();
             await expect(page.locator('[role="dialog"]')).toBeVisible();
             await entityResp;
         });
@@ -286,9 +292,13 @@ test.describe('Gestió d\'Expedients — usuari base', () => {
             await expect(page.getByRole('heading', { name: NOM_MODIFICAT })).toBeVisible({ timeout: 10_000 });
         });
 
-        await test.step('verificar el panell d\'informació de l\'expedient', async () => {
-            logInfo('  -> verificar el panell d\'informació de l\'expedient');
-            await expect(page.getByText(/informaci. de l.expedient|informaci.n del expediente/i)).toBeVisible();
+        await test.step('verificar les dades de l\'expedient a la capçalera', async () => {
+            logInfo('  -> verificar les dades de l\'expedient a la capçalera');
+            // La informació de l'expedient es mostra a la capçalera del detall (ja no hi ha
+            // un panell "Informació de l'expedient"): número, classificació, òrgan gestor...
+            const dadesCapcalera = page.locator('p');
+            await expect(dadesCapcalera.filter({ hasText: /n.mero d.{1,3}expedient/i }).first()).toBeVisible();
+            await expect(dadesCapcalera.filter({ hasText: /.rgano? gestor/i }).first()).toBeVisible();
         });
 
         await test.step('verificar les pestanyes del detall', async () => {

@@ -70,7 +70,8 @@ public class CarpetaHelper {
 				+ "arxiuUuid=" + arxiuUuid + ")");
 		
 		ContingutEntity pare = pareId != null ? contingutRepository.getOne(pareId) : null;
-		if (checkCarpetaUniqueContraint(nom, pare, entitatId)>0) {
+		// Si la carpeta ja existeix a la BD (només falta a l'Arxiu) no s'ha de comprovar el nom: la trobaria a ella mateixa
+		if (!alreadyCreatedInDB && checkCarpetaUniqueContraint(nom, pare, entitatId)>0) {
 			throw new ContingutNotUniqueException();
 		}
 		

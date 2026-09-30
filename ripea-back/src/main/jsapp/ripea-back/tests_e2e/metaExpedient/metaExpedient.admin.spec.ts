@@ -25,9 +25,11 @@ const DESC_MODIFICADA = 'descripció de prova per playwright react';
 const CODI_DOC1      = 'DOC_PW_REACT_01';
 const NOM_DOC1       = 'document tipus doc pw react 1';
 const CODI_DOC2      = 'DOC_PW_REACT_02';
-// Tot procediment nou es crea amb els tipus de document per defecte
-// NOTIB_JUSTIFICANT_RECEPCIO, REGISTRE_JUSTIFICANT_ENTRADA, NOTIFICACIO_MULTIPLE i OTROS.
-const NUM_DOCS_DEFECTE = 4;
+// Tot procediment nou es crea amb els tipus de document per defecte NOTIB_JUSTIFICANT_RECEPCIO i
+// REGISTRE_JUSTIFICANT_ENTRADA; NOTIFICACIO_MULTIPLE i OTROS només si les propietats
+// es.caib.ripea.metadocument.defecte.*.actiu de l'entorn estan activades.
+const NUM_DOCS_DEFECTE_MIN = 2;
+const NUM_DOCS_DEFECTE_MAX = 4;
 const NOM_DOC1_MOD   = 'doc modificat pw react 1';
 const DESC_DOC1_MOD  = 'descripció modificada doc 1 react';
 
@@ -616,9 +618,13 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
         await anarASubPagina(page, 'metaDocument');
 
+        let numDocsDefecte = 0;
         await test.step('verificar que la llista només té els documents per defecte', async () => {
             logInfo('  -> verificar que la llista només té els documents per defecte');
-            await expect(getDocRows(page)).toHaveCount(NUM_DOCS_DEFECTE);
+            await expect(getDocRows(page).first()).toBeVisible();
+            numDocsDefecte = await getDocRows(page).count();
+            expect(numDocsDefecte).toBeGreaterThanOrEqual(NUM_DOCS_DEFECTE_MIN);
+            expect(numDocsDefecte).toBeLessThanOrEqual(NUM_DOCS_DEFECTE_MAX);
         });
 
         await test.step('crear el primer document', async () => {
@@ -633,7 +639,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
         await test.step('verificar que hi ha dos documents (més els per defecte)', async () => {
             logInfo('  -> verificar que hi ha dos documents (més els per defecte)');
-            await expect(getDocRows(page)).toHaveCount(NUM_DOCS_DEFECTE + 2);
+            await expect(getDocRows(page)).toHaveCount(numDocsDefecte + 2);
         });
 
     });

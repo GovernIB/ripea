@@ -2,8 +2,9 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
     testDir: './tests_e2e',
-    // Temps màxim per test
-    timeout: 30_000,
+    // Temps màxim per test. Diversos tests (creació de dos elements amb humanDelay) duren
+    // 20-27 s en solitari; amb els projectes admin, admin-jsp i user en paral·lel superen els 30 s.
+    timeout: 60_000,
     // Reintents en cas de fallada (0 en local, 2 en CI)
     retries: 0,
     // Informe HTML generat a tests_e2e/report/ + llistat per consola

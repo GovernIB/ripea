@@ -79,7 +79,7 @@ public interface ExplotacioFetsRepository extends JpaRepository<ExplotacioFetsEn
 	 * EXPEDIENT *
 	 */
 
-	//EXP_CREAT_TOTAL: expedients creats fins a la data, tant oberts com tancats.
+	//EXP_CREATS_TOTAL: expedients creats fins a la data, tant oberts com tancats.
 	@Query(	"select new es.caib.ripea.service.intf.dto.explotacio.ExplotFetsExpedientsCreatsDto( "
 			+ "e.entitat.id, e.metaNode.id, e.organGestor.id, e.createdBy, "
 			+ "count(e) ) " +
@@ -202,21 +202,27 @@ public interface ExplotacioFetsRepository extends JpaRepository<ExplotacioFetsEn
 	 * PORTAFIRMES *
 	 */
 	//Els enviaments sense estat de callback són els que s'han enviat a portafirmes però encara no
-	//n'hem rebut resposta: es compten a FIR_ENVIADES i no s'exclouen de la consulta.
+	//n'hem rebut resposta: es compten a FIR_ENVIADES_TOTAL i no s'exclouen de la consulta.
+	//Els enviaments cancel·lats a RIPEA només es compten a FIR_CANCELADES_TOTAL: la cancel·lació no
+	//modifica l'estat de callback, i sense excloure'ls seguirien comptant com a enviats, iniciats o
+	//parcials. Així cada enviament es compta a un sol indicador, i COMANDA pot calcular les firmes en
+	//curs com FIR_ENVIADES_TOTAL + FIR_INICIADES_TOTAL + FIR_PAUSADES_TOTAL + FIR_PARCIALS_TOTAL.
 	@Query(	"select new es.caib.ripea.service.intf.dto.explotacio.ExplotFetsPortafirmesDto( "
 			+ "e.expedient.entitat.id, e.expedient.metaExpedient.id, e.expedient.organGestor.id, e.createdBy, "
 			//FIR_ENVIADES_TOTAL
-			+ "sum(case when e.callbackEstat is null then 1 else 0 end), "
+			+ "sum(case when e.estat <> es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto.CANCELAT and e.callbackEstat is null then 1 else 0 end), "
 			//FIR_INICIADES_TOTAL
-			+ "sum(case when e.callbackEstat = es.caib.ripea.service.intf.dto.PortafirmesCallbackEstatEnumDto.INICIAT then 1 else 0 end), "
+			+ "sum(case when e.estat <> es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto.CANCELAT and e.callbackEstat = es.caib.ripea.service.intf.dto.PortafirmesCallbackEstatEnumDto.INICIAT then 1 else 0 end), "
 			//FIR_PAUSADES_TOTAL
-			+ "sum(case when e.callbackEstat = es.caib.ripea.service.intf.dto.PortafirmesCallbackEstatEnumDto.PAUSAT then 1 else 0 end), "
+			+ "sum(case when e.estat <> es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto.CANCELAT and e.callbackEstat = es.caib.ripea.service.intf.dto.PortafirmesCallbackEstatEnumDto.PAUSAT then 1 else 0 end), "
 			//FIR_FIRMADES_TOTAL
-			+ "sum(case when e.callbackEstat = es.caib.ripea.service.intf.dto.PortafirmesCallbackEstatEnumDto.FIRMAT then 1 else 0 end), "
+			+ "sum(case when e.estat <> es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto.CANCELAT and e.callbackEstat = es.caib.ripea.service.intf.dto.PortafirmesCallbackEstatEnumDto.FIRMAT then 1 else 0 end), "
 			//FIR_REBUTJADES_TOTAL
-			+ "sum(case when e.callbackEstat = es.caib.ripea.service.intf.dto.PortafirmesCallbackEstatEnumDto.REBUTJAT then 1 else 0 end), "
+			+ "sum(case when e.estat <> es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto.CANCELAT and e.callbackEstat = es.caib.ripea.service.intf.dto.PortafirmesCallbackEstatEnumDto.REBUTJAT then 1 else 0 end), "
 			//FIR_PARCIALS_TOTAL
-			+ "sum(case when e.callbackEstat = es.caib.ripea.service.intf.dto.PortafirmesCallbackEstatEnumDto.PARCIAL then 1 else 0 end) ) " +
+			+ "sum(case when e.estat <> es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto.CANCELAT and e.callbackEstat = es.caib.ripea.service.intf.dto.PortafirmesCallbackEstatEnumDto.PARCIAL then 1 else 0 end), "
+			//FIR_CANCELADES_TOTAL
+			+ "sum(case when e.estat = es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto.CANCELAT then 1 else 0 end) ) " +
     "from DocumentPortafirmesEntity e " +
 	"where e.createdDate <= :dataFins and e.expedient.esborrat = 0 " +
     "group by e.expedient.entitat.id, e.expedient.metaExpedient.id, e.expedient.organGestor.id, e.createdBy " +

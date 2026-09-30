@@ -40,6 +40,9 @@ import es.caib.ripea.service.intf.service.SegonPlaService;
 @RequestMapping("/userajax") // No podem posar "/ajaxuser" per mor del AjaxInterceptor
 public class AjaxUserController extends BaseUserController {
 
+	/** Espera (ms) entre elements dels processos que criden integracions externes (Arxiu, NOTIB). */
+	private static final int ESPERA_ENTRE_ITERACIONS_INTEGRACIONS_MS = 5000;
+
 	@Autowired private AplicacioService aplicacioService;
 	@Autowired private SegonPlaService segonPlaService;
 	@Autowired private EntitatService entitatService;
@@ -334,6 +337,8 @@ public class AjaxUserController extends BaseUserController {
         model.addAttribute("titolProces", "Afegir els certificats de les remeses com a documents de l'expedient");
         model.addAttribute("urlTotalIteracions", "getExpedientsAmbCertificatRemesa");
         model.addAttribute("urlInteracioIndividual", "executeCertificatsRemesaExpedient");
+        // Espera entre elements per no saturar l'Arxiu/NOTIB: la fa el navegador, no el servidor
+        model.addAttribute("esperaEntreIteracionsMs", ESPERA_ENTRE_ITERACIONS_INTEGRACIONS_MS);
         return "util/processAjax";
     }
 
@@ -351,11 +356,6 @@ public class AjaxUserController extends BaseUserController {
         Model model) {
         try {
             String resultat = aplicacioService.executeCertificatsRemesaExpedient(enviamentInteressatId);
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException ie) {
-                Thread.currentThread().interrupt();
-            }
             return ResponseEntity.ok(resultat);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -371,6 +371,8 @@ public class AjaxUserController extends BaseUserController {
         model.addAttribute("titolProces", "Afegir justificants d'anotacions acceptades com a documents de l'expedient");
         model.addAttribute("urlTotalIteracions", "getExpedientsAmbJustificantRegistre");
         model.addAttribute("urlInteracioIndividual", "executeJustificantsRegistreExpedient");
+        // Espera entre elements per no saturar l'Arxiu/NOTIB: la fa el navegador, no el servidor
+        model.addAttribute("esperaEntreIteracionsMs", ESPERA_ENTRE_ITERACIONS_INTEGRACIONS_MS);
         return "util/processAjax";
     }
 
@@ -388,11 +390,6 @@ public class AjaxUserController extends BaseUserController {
         Model model) {
         try {
             String resultat = aplicacioService.executeJustificantsRegistreExpedient(anotacioRegistreId);
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException ie) {
-                Thread.currentThread().interrupt();
-            }
             return ResponseEntity.ok(resultat);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());

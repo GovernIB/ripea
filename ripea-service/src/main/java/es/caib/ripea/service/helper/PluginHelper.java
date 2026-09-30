@@ -5615,7 +5615,7 @@ public class PluginHelper {
 							documentEnviamentInteressatEntity,
 							metaDocument,
 							resposta,
-							"Justificant enviament notib");
+							"Justificant recepció notib");
 
 					document = documentHelper.crearDocument(
 							null,
@@ -5628,7 +5628,7 @@ public class PluginHelper {
 					if (! document.isAmbFirma()) {
 						try {
 							documentService.documentActualitzarEstat(
-									document.getEntitat().getId(),
+									documentEnviamentInteressatEntity.getNotificacio().getExpedient().getEntitat().getId(),
 									document.getId(),
 									DocumentEstatEnumDto.DEFINITIU);
 						} catch (Exception e) {

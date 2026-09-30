@@ -212,6 +212,7 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
                 PropertyConfig.TANCAMENT_LOGIC,
                 PropertyConfig.CARPETES_LOGIQUES_ACTIVES,
                 PropertyConfig.MODIFICAR_DOCUMENTS_CUSTODIATS,
+                PropertyConfig.PROPAGAR_MODIFICACIO_ARXIU,
                 PropertyConfig.CARPETES_CREACIO_ACTIVA,
                 PropertyConfig.IMPORTACIO_ACTIVA,
                 PropertyConfig.INCORPORAR_JUSTIFICANT,
@@ -250,6 +251,7 @@ public class UsuariResourceController extends BaseMutableResourceController<Usua
         response.put("isTancamentLogicActiu", Boolean.parseBoolean(props.getProperty(PropertyConfig.TANCAMENT_LOGIC)));
         response.put("isCreacioCarpetesLogica", Boolean.parseBoolean(props.getProperty(PropertyConfig.CARPETES_LOGIQUES_ACTIVES)));
         response.put("isPermesModificarCustodiats", Boolean.parseBoolean(props.getProperty(PropertyConfig.MODIFICAR_DOCUMENTS_CUSTODIATS)));
+        response.put("isPermesPropagarModificacioDefinitius", Boolean.parseBoolean(props.getProperty(PropertyConfig.PROPAGAR_MODIFICACIO_ARXIU)));
         response.put("isCreacioCarpetesActiva", Boolean.parseBoolean(props.getProperty(PropertyConfig.CARPETES_CREACIO_ACTIVA)));
         response.put("isMostrarImportacio", Boolean.parseBoolean(props.getProperty(PropertyConfig.IMPORTACIO_ACTIVA)));
         response.put("isIncorporacioJustificantActiva", Boolean.parseBoolean(props.getProperty(PropertyConfig.INCORPORAR_JUSTIFICANT)));

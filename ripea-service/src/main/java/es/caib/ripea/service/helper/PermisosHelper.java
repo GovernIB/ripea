@@ -38,6 +38,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -796,6 +797,23 @@ public class PermisosHelper {
 		if (permis.isDisseny())
 			permissions.add(ExtendedPermission.DISSENY);		
 		return permissions.toArray(new Permission[permissions.size()]);
+	}
+
+	/**
+	 * Rols (del plugin d'usuaris, sense passar per la sessió) amb què s'han de resoldre els permisos ACL
+	 * d'un usuari quan s'avaluen des d'un fil aliè. Inclou el nom original i el mapejat, ja que la sessió
+	 * fa servir el nom original i verificarPermisos(usuariCodi) el mapejat.
+	 */
+	public Set<String> findRolsAclUsuari(String usuariCodi) {
+		Set<String> rols = new LinkedHashSet<String>();
+		List<String> rolsUsuari = cacheHelper.findRolsAmbCodi(usuariCodi);
+		if (rolsUsuari != null) {
+			for (String rol : rolsUsuari) {
+				rols.add(rol);
+				rols.add(getMapeigRol(rol));
+			}
+		}
+		return rols;
 	}
 
 	private String getMapeigRol(String rol) {

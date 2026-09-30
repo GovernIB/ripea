@@ -246,8 +246,8 @@ const translationEs = {
             },
             action: {
                 guardarArxiu: {
-                    label: "Guarda el archivo",
-                    ok: "Elemento '{{contingut}}' guardado en archivo",
+                    label: "Guarda en Arxiu",
+                    ok: "Elemento '{{contingut}}' guardado en Arxiu",
                 },
                 move: {
                     label: "Mueve...",
@@ -417,6 +417,12 @@ const translationEs = {
                     ok: "Los anexos se han subsanado correctamente",
                     info: "Selecciona el tipo de documento para cada anexo que quedó con error al aceptar la anotación y vuelve a intentar adjuntarlo al expediente.",
                     tipusDocument: "Tipus de document",
+                },
+                afegirJustificant: {
+                    label: "Añadir justificante a expediente",
+                    title: "Añadir justificante de registro al expediente",
+                    ok: "El justificante de registro se ha añadido correctamente al expediente",
+                    info: "No se pudo incorporar el justificante de registro de la anotación al expediente. Selecciona el tipo de documento y vuelve a intentar añadirlo.",
                 }
             }
         },
@@ -1113,7 +1119,9 @@ const translationEs = {
                     ordre: {
                         title: "Orden de los documentos",
                         description: "Elija el orden en que se deben combinar los documentos dentro del PDF que se generará.",
-                        button: "Combina",
+                        info: "Puede combinar los documentos en un único PDF, o comprimirlos en un fichero ZIP. En ambos casos se generará un nuevo documento, que será el que se notifique. El orden solo se aplica al PDF.",
+                        button: "Combina (PDF)",
+                        buttonZip: "Comprime (ZIP)",
                         pujar: "Mover hacia arriba",
                         baixar: "Mover hacia abajo",
                     },
@@ -1163,6 +1171,7 @@ const translationEs = {
                 funcionariHabilitatDigitalib: "Es necesario ser un funcionario habilitado en DIGITALIB",
                 folder: "En caso de no seleccionar una carpeta se importarán los documentos directamente en el expediente.",
                 scaned: "El proceso de escaneo se ha realizado con éxito.",
+                arxiuDefinitiu: "Los cambios sólo se guardarán en RIPEA (El Archivo digital no permite modificar los documentos en estado definitivo)",
                 view: "Solo para PDF, ODT y DOCX",
                 portafirmes: "Es necesario seleccionar un procedimiento y un tipo de documento para poder realizar la acción masiva",
                 documentsZip: "Se debe seleccionar al menos un documento para realizar la importación",

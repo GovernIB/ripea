@@ -306,12 +306,12 @@ const columns = [
     },
     {
         field: 'createdDate',
-        flex: 0.7,
+        flex: 0.6,
         valueFormatter: (value: any) => formatDate(value),
     },
     {
         field: 'esborratData',
-        flex: 0.7,
+        flex: 0.6,
         valueFormatter: (value: any) => formatDate(value),
     },
 ]

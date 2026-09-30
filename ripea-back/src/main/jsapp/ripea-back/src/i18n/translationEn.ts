@@ -246,8 +246,8 @@ const translationEn = {
             },
             action: {
                 guardarArxiu: {
-                    label: "Save to archive",
-                    ok: "Item '{{contingut}}' saved to archive",
+                    label: "Save to Arxiu",
+                    ok: "Item '{{contingut}}' saved to Arxiu",
                 },
                 move: {
                     label: "Move...",
@@ -416,6 +416,12 @@ const translationEn = {
                     ok: "The annexes have been fixed successfully",
                     info: "Select the document type for each annex that ended with an error when accepting the registry entry and retry attaching it to the file.",
                     tipusDocument: "Tipus de document",
+                },
+                afegirJustificant: {
+                    label: "Add receipt to file",
+                    title: "Add registry receipt to file",
+                    ok: "The registry receipt has been added to the file successfully",
+                    info: "The registry receipt of the entry could not be added to the file. Select the document type and retry adding it.",
                 }
             }
         },
@@ -1112,7 +1118,9 @@ const translationEn = {
                     ordre: {
                         title: "Document order",
                         description: "Choose the order in which the documents will be combined into the generated PDF.",
-                        button: "Combine",
+                        info: "You can combine the documents into a single PDF, or compress them into a ZIP file. In both cases a new document will be generated, which is the one that will be notified. The order only applies to the PDF.",
+                        button: "Combine (PDF)",
+                        buttonZip: "Compress (ZIP)",
                         pujar: "Move up",
                         baixar: "Move down",
                     },
@@ -1162,6 +1170,7 @@ const translationEn = {
                 funcionariHabilitatDigitalib: "You must be an authorized official in DIGITALIB",
                 folder: "If no folder is selected, documents will be imported directly into the file.",
                 scaned: "The scanning process was successful.",
+                arxiuDefinitiu: "Changes will only be saved in RIPEA (the digital Archive does not allow modifying documents in final state)",
                 view: "Only for PDF, ODT and DOCX",
                 portafirmes: "Es necesario seleccionar un procedimiento y un tipo de documento para poder realizar la acción masiva",
                 documentsZip: "At least one document must be selected to perform the import",

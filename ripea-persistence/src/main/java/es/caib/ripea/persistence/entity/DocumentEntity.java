@@ -45,6 +45,10 @@ import lombok.Setter;
 @Getter @Setter
 public class DocumentEntity extends NodeEntity {
 
+	//TODO: Deute tècnic. El tipus de document es guarda duplicat a IPA_NODE.METANODE_ID (metaNode) i a
+	//IPA_DOCUMENT.METADOCUMENT_ID (metaDocument). Qualsevol mètode que en canviï un ha de canviar l'altre.
+	//Caldria deixar-ne una sola font (p.ex. mapejar aquest camp insertable=false/updatable=false o derivar-lo
+	//de metaNode) i retirar la columna amb Liquibase, tocant també DocumentResourceEntity.
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "metaDocument_id")
 	@ForeignKey(name = BaseConfig.DB_PREFIX + "doc_metadoc_fk")
@@ -327,6 +331,7 @@ public class DocumentEntity extends NodeEntity {
 			String ntiCsv,
 			String ntiCsvRegulacion, 
 			DocumentFirmaTipusEnumDto documentFirmaTipus) {
+		this.metaDocument = metaDocument;
 		this.metaNode = metaDocument;
 		this.nom = nom;
 		this.descripcio = descripcio;

@@ -46,16 +46,16 @@ const DocPinbalForm = () => {
                        namedQueries={[`PINBAL_DOC#${data?.expedient?.id}`]}
                        sortModel={sortModelTipusDocument}/>
 
-        <GridFormField size={9.5} name="titular" filter={titularFilter}/>
+        <GridFormField size={"grow"} name="titular" filter={titularFilter}/>
         <GridButton
-            icon={'add'}
-            size={2.5}
+            size={"auto"}
+            icon={'person_add'}
+            title={t('page.interessat.action.new.label')}
+            sx={{minWidth: 0, px: 1.75}}
             onClick={()=> {
                 create({expedient: data?.expedient}, onCreateInteressat)
             }}
-        >
-            {t('page.interessat.action.new.label')}
-        </GridButton>
+        />
         {content}
 
         <GridFormField name="consentiment" required/>

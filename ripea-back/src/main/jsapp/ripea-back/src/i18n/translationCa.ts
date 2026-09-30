@@ -246,8 +246,8 @@ const translationCa = {
             },
             action: {
                 guardarArxiu: {
-                    label: "Desa l'arxiu",
-                    ok: "Element '{{contingut}}' desat a l'arxiu",
+                    label: "Desa a l'Arxiu",
+                    ok: "Element '{{contingut}}' desat a l'Arxiu",
                 },
                 move: {
                     label: "Mou...",
@@ -417,6 +417,12 @@ const translationCa = {
                     ok: "Els annexos s'han subsanat correctament",
                     info: "Selecciona el tipus de document per a cada annex que va quedar amb error en acceptar l'anotació i torna a intentar adjuntar-lo a l'expedient.",
                     tipusDocument: "Tipus de document",
+                },
+                afegirJustificant: {
+                    label: "Afegir justificant a l'expedient",
+                    title: "Afegir justificant de registre a l'expedient",
+                    ok: "El justificant de registre s'ha afegit correctament a l'expedient",
+                    info: "No es va poder incorporar el justificant de registre de l'anotació a l'expedient. Selecciona el tipus de document i torna a intentar afegir-lo.",
                 }
             }
         },
@@ -1113,7 +1119,9 @@ const translationCa = {
                     ordre: {
                         title: "Ordre dels documents",
                         description: "Trieu l'ordre en què s'han de combinar els documents dins el PDF que es generarà.",
-                        button: "Combina",
+                        info: "Podeu combinar els documents en un únic PDF, o comprimir-los en un fitxer ZIP. En tots dos casos es generarà un document nou, que serà el que es notifiqui. L'ordre només s'aplica al PDF.",
+                        button: "Combina (PDF)",
+                        buttonZip: "Comprimeix (ZIP)",
                         pujar: "Mou cap amunt",
                         baixar: "Mou cap avall",
                     },
@@ -1163,6 +1171,7 @@ const translationCa = {
                 funcionariHabilitatDigitalib: "És necessari ser un funcionari habilitat a DIGITALIB",
                 folder: "En cas de no seleccionar una carpeta s'importaran els documents directament a l'expedient.",
                 scaned: "El procés d'escaneig s'ha realitzat amb èxit.",
+                arxiuDefinitiu: "Els canvis només es guardaran a RIPEA (Arxiu no permet modificar els documents en estat definitiu)",
                 view: "Nomes per PDF, ODT i DOCX",
                 portafirmes: "És necessari seleccionar un procediment i un tipus de document per poder realitzar l'acció massiva",
                 documentsZip: "S'ha de seleccionar com a mínim un document per fer l'importació",

@@ -7,13 +7,18 @@ const DESC_MODIFICADA = 'descripció de prova per playwright';
 
 const DEBUG_ACTIVAT	= true;
 const HUMAN_DELAY	= 1000; //milisegons de retard entre execució de accions
+// Temps màxim perquè l'iframe d'un modal carregui el formulari. Amb els projectes
+// React, JSP i usuari executant-se en paral·lel el servidor pot superar els 5 s per defecte.
+const TIMEOUT_IFRAME	= 15_000;
 
 const CODI_DOC1     = 'DOC_PW_JSP_01';
 const NOM_DOC1      = 'document tipus doc pw 1';
 const CODI_DOC2     = 'DOC_PW_JSP_02';
-// Tot procediment nou es crea amb els tipus de document per defecte
-// NOTIB_JUSTIFICANT_RECEPCIO, REGISTRE_JUSTIFICANT_ENTRADA, NOTIFICACIO_MULTIPLE i OTROS.
-const NUM_DOCS_DEFECTE = 4;
+// Tot procediment nou es crea amb els tipus de document per defecte NOTIB_JUSTIFICANT_RECEPCIO i
+// REGISTRE_JUSTIFICANT_ENTRADA; NOTIFICACIO_MULTIPLE i OTROS només si les propietats
+// es.caib.ripea.metadocument.defecte.*.actiu de l'entorn estan activades.
+const NUM_DOCS_DEFECTE_MIN = 2;
+const NUM_DOCS_DEFECTE_MAX = 4;
 const NOM_DOC1_MOD  = 'doc modificat pw 1';
 const DESC_DOC1_MOD = 'descripció modificada doc 1';
 
@@ -83,6 +88,43 @@ const filtrarPerCodi = async (page: Page, codi: string) => {
     await expect(page.locator('#metaexpedients_processing')).toBeHidden();
 };
 
+// ── Helper: obrir una sub-pàgina del procediment de test en una pestanya nova ──
+//
+// Les sub-pàgines (tipus docs, meta-dades, tasques, estats, grups, permisos) s'obren
+// en una pestanya nova i carreguen el seu datatable per AJAX després del 'load'.
+// Esperar només que #xxx_processing estigui ocult no basta: en entorns lents (DEV)
+// la comprovació s'avalua abans que el datatable mostri l'indicador de càrrega i
+// el test llegeix la taula buida o a mig pintar. Per això el listener de la resposta
+// del datatable es registra a nivell de context (cobreix la pestanya nova) ABANS del
+// clic, i després s'espera que l'indicador de càrrega desaparegui.
+//
+// dinsElements: true si l'enllaç és dins el desplegable "Elements" de la fila.
+const obrirSubPagina = async (
+    page: Page,
+    enllac: RegExp,
+    dinsElements: boolean,
+    esDatatable: (url: string) => boolean,
+    processing: string,
+): Promise<Page> => {
+    await filtrarPerCodi(page, CODI_TEST);
+    await expect(getRows(page)).toHaveCount(1);
+    const fila = getRows(page).first();
+    if (dinsElements) {
+        await fila.getByRole('button', { name: /elements|elementos/i }).click();
+    }
+    const novaPaginaPromise = page.context().waitForEvent('page');
+    const datatablePromise = page.context().waitForEvent('response', {
+        predicate: resp => esDatatable(resp.url()) && resp.status() === 200,
+        timeout: 30_000,
+    });
+    await fila.getByRole('link', { name: enllac }).click();
+    const novaPagina = await novaPaginaPromise;
+    await novaPagina.waitForLoadState('load');
+    await datatablePromise;
+    await expect(novaPagina.locator(processing)).toBeHidden({ timeout: 10_000 });
+    return novaPagina;
+};
+
 // ── Helpers per a Tipus de Documents ─────────────────────────────────────────
 
 const getDocRows = (p: Page) =>
@@ -98,24 +140,15 @@ const quickFilterDocs = async (p: Page, text: string) => {
     await expect(p.locator('#metadocuments_processing')).toBeHidden();
 };
 
-const anarATipusDocs = async (page: Page): Promise<Page> => {
-    await filtrarPerCodi(page, CODI_TEST);
-    await expect(getRows(page)).toHaveCount(1);
-    const fila = getRows(page).first();
-    await fila.getByRole('button', { name: /elements|elementos/i }).click();
-    const tipusDocsPagePromise = page.context().waitForEvent('page');
-    await fila.getByRole('link', { name: /tipus docs|tipos docs/i }).click();
-    const tipusDocsPage = await tipusDocsPagePromise;
-    await tipusDocsPage.waitForLoadState('load');
-    await expect(tipusDocsPage.locator('#metadocuments_processing')).toBeHidden({ timeout: 10_000 });
-    return tipusDocsPage;
-};
+const anarATipusDocs = (page: Page): Promise<Page> =>
+    obrirSubPagina(page, /tipus docs|tipos docs/i, true,
+        url => url.includes('/metaDocument/datatable'), '#metadocuments_processing');
 
 const crearDocument = async (tipusDocsPage: Page, codi: string, nom: string) => {
     await tipusDocsPage.locator('a[href*="metaDocument/new"]').click();
     await expect(tipusDocsPage.locator('.modal.in')).toBeVisible();
     const frame = tipusDocsPage.locator('.modal.in').frameLocator('.modal-body iframe');
-    await expect(frame.locator('input[name="codi"]')).toBeVisible();
+    await expect(frame.locator('input[name="codi"]')).toBeVisible({ timeout: TIMEOUT_IFRAME });
     await frame.locator('input[name="codi"]').fill(codi);
     await frame.locator('input[name="nom"]').fill(nom);
     await frame.locator('a[href="#dades-nti"]').click();
@@ -145,24 +178,15 @@ const quickFilterMeta = async (p: Page, text: string) => {
     await expect(p.locator('#metadades_processing')).toBeHidden();
 };
 
-const anarAMetaDades = async (page: Page): Promise<Page> => {
-    await filtrarPerCodi(page, CODI_TEST);
-    await expect(getRows(page)).toHaveCount(1);
-    const fila = getRows(page).first();
-    await fila.getByRole('button', { name: /elements|elementos/i }).click();
-    const metaDadesPagePromise = page.context().waitForEvent('page');
-    await fila.getByRole('link', { name: /meta-dades|meta-datos/i }).click();
-    const metaDadesPage = await metaDadesPagePromise;
-    await metaDadesPage.waitForLoadState('load');
-    await expect(metaDadesPage.locator('#metadades_processing')).toBeHidden({ timeout: 10_000 });
-    return metaDadesPage;
-};
+const anarAMetaDades = (page: Page): Promise<Page> =>
+    obrirSubPagina(page, /meta-dades|meta-datos/i, true,
+        url => url.includes('/metaDada/datatable'), '#metadades_processing');
 
 const crearMetaDada = async (metaDadesPage: Page, codi: string, nom: string, full = false) => {
     await metaDadesPage.locator('a[href*="metaDada/new"]').click();
     await expect(metaDadesPage.locator('.modal.in')).toBeVisible();
     const frame = metaDadesPage.locator('.modal.in').frameLocator('.modal-body iframe');
-    await expect(frame.locator('input[name="codi"]')).toBeVisible();
+    await expect(frame.locator('input[name="codi"]')).toBeVisible({ timeout: TIMEOUT_IFRAME });
     await frame.locator('input[name="codi"]').fill(codi);
     await frame.locator('input[name="nom"]').fill(nom);
     if (full) {
@@ -213,18 +237,9 @@ const quickFilterTasques = async (p: Page, text: string) => {
     await expect(p.locator('#metadades_processing')).toBeHidden();
 };
 
-const anarATasques = async (page: Page): Promise<Page> => {
-    await filtrarPerCodi(page, CODI_TEST);
-    await expect(getRows(page)).toHaveCount(1);
-    const fila = getRows(page).first();
-    await fila.getByRole('button', { name: /elements|elementos/i }).click();
-    const tascaPagePromise = page.context().waitForEvent('page');
-    await fila.getByRole('link', { name: /tasques|tareas/i }).click();
-    const tascaPage = await tascaPagePromise;
-    await tascaPage.waitForLoadState('load');
-    await expect(tascaPage.locator('#metadades_processing')).toBeHidden({ timeout: 10_000 });
-    return tascaPage;
-};
+const anarATasques = (page: Page): Promise<Page> =>
+    obrirSubPagina(page, /tasques|tareas/i, true,
+        url => url.includes('/tasca/datatable'), '#metadades_processing');
 
 // Selecciona el primer responsable retornat pel suggest d'usuaris amb la cerca 'adm'.
 const seleccionarResponsable = async (tascaPage: Page, frame: ReturnType<typeof tascaPage.frameLocator>) => {
@@ -244,7 +259,7 @@ const crearTasca = async (tascaPage: Page, codi: string, nom: string, full = fal
     await tascaPage.locator('a[href*="tasca/new"]').click();
     await expect(tascaPage.locator('.modal.in')).toBeVisible();
     const frame = tascaPage.locator('.modal.in').frameLocator('.modal-body iframe');
-    await expect(frame.locator('input[name="codi"]')).toBeVisible();
+    await expect(frame.locator('input[name="codi"]')).toBeVisible({ timeout: TIMEOUT_IFRAME });
     await frame.locator('input[name="codi"]').fill(codi);
     await frame.locator('input[name="nom"]').fill(nom);
     await seleccionarResponsable(tascaPage, frame);
@@ -269,25 +284,16 @@ const getEstatRows = (p: Page) =>
 const waitDatatableEstats = (p: Page) =>
     p.waitForResponse(resp => resp.url().includes('/expedientEstat/') && resp.url().includes('/datatable') && resp.status() === 200);
 
-const anarAEstats = async (page: Page): Promise<Page> => {
-    await filtrarPerCodi(page, CODI_TEST);
-    await expect(getRows(page)).toHaveCount(1);
-    const fila = getRows(page).first();
-    await fila.getByRole('button', { name: /elements|elementos/i }).click();
-    const estatPagePromise = page.context().waitForEvent('page');
-    await fila.getByRole('link', { name: /estats|estados/i }).click();
-    const estatPage = await estatPagePromise;
-    await estatPage.waitForLoadState('load');
-    await expect(estatPage.locator('#estats_processing')).toBeHidden({ timeout: 10_000 });
-    return estatPage;
-};
+const anarAEstats = (page: Page): Promise<Page> =>
+    obrirSubPagina(page, /estats|estados/i, true,
+        url => url.includes('/expedientEstat/') && url.includes('/datatable'), '#estats_processing');
 
 const crearEstat = async (estatPage: Page, codi: string, nom: string) => {
     // El botó "Nou estat" és renderitzat pel jsrender template #botonsTemplate via webutil.datatable.js
     await estatPage.getByRole('link', { name: /nou estat|nuevo estado/i }).click();
     await expect(estatPage.locator('.modal.in')).toBeVisible();
     const frame = estatPage.locator('.modal.in').frameLocator('.modal-body iframe');
-    await expect(frame.locator('input[name="codi"]')).toBeVisible();
+    await expect(frame.locator('input[name="codi"]')).toBeVisible({ timeout: TIMEOUT_IFRAME });
     await frame.locator('input[name="codi"]').fill(codi);
     await frame.locator('input[name="nom"]').fill(nom);
     // data-refresh-pagina="true" al botó → recàrrega de pàgina o del datatable.
@@ -309,18 +315,9 @@ const getGrupRows = (p: Page) =>
 const waitDatatableGrups = (p: Page) =>
     p.waitForResponse(resp => resp.url().includes('/grup/datatable') && resp.status() === 200);
 
-const anarAGrups = async (page: Page): Promise<Page> => {
-    await filtrarPerCodi(page, CODI_TEST);
-    await expect(getRows(page)).toHaveCount(1);
-    const fila = getRows(page).first();
-    await fila.getByRole('button', { name: /elements|elementos/i }).click();
-    const grupPagePromise = page.context().waitForEvent('page');
-    await fila.getByRole('link', { name: /grups|grupos/i }).click();
-    const grupPage = await grupPagePromise;
-    await grupPage.waitForLoadState('load');
-    await expect(grupPage.locator('#metadades_processing')).toBeHidden({ timeout: 10_000 });
-    return grupPage;
-};
+const anarAGrups = (page: Page): Promise<Page> =>
+    obrirSubPagina(page, /grups|grupos/i, true,
+        url => url.includes('/grup/datatable'), '#metadades_processing');
 
 const vincularGrupJsp = async (grupPage: Page) => {
     await grupPage.locator('a[href*="grup/relacionar"]').click();
@@ -345,17 +342,9 @@ const getPermisRows = (p: Page) =>
 const waitDatatablePermisos = (p: Page) =>
     p.waitForResponse(resp => resp.url().includes('/permis/datatable') && resp.status() === 200);
 
-const anarAPermisos = async (page: Page): Promise<Page> => {
-    await filtrarPerCodi(page, CODI_TEST);
-    await expect(getRows(page)).toHaveCount(1);
-    const fila = getRows(page).first();
-    const permisosPagePromise = page.context().waitForEvent('page');
-    await fila.getByRole('link', { name: /permisos/i }).click();
-    const permisosPage = await permisosPagePromise;
-    await permisosPage.waitForLoadState('load');
-    await expect(permisosPage.locator('#taulaDades_processing')).toBeHidden({ timeout: 10_000 });
-    return permisosPage;
-};
+const anarAPermisos = (page: Page): Promise<Page> =>
+    obrirSubPagina(page, /permisos/i, false,
+        url => url.includes('/permis/datatable'), '#taulaDades_processing');
 
 // ── Helper: assegurar el rol actiu (menú d'usuari JSP) ───────────────────────
 //
@@ -533,7 +522,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
             await expect(page.locator('.modal.in')).toBeVisible();
             // Esperar que l'iframe hagi carregat el seu contingut (codi intern visible)
             const frame = page.locator('.modal.in').frameLocator('.modal-body iframe');
-            await expect(frame.locator('input[name="codi"]')).toBeVisible();
+            await expect(frame.locator('input[name="codi"]')).toBeVisible({ timeout: TIMEOUT_IFRAME });
         });
 
         await test.step('omplir el formulari dins l\'iframe del modal', async () => {
@@ -616,7 +605,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
             await fila.getByRole('link', { name: /modificar/i }).click();
             await expect(page.locator('.modal.in')).toBeVisible();
             const frame = page.locator('.modal.in').frameLocator('.modal-body iframe');
-            await expect(frame.locator('input[name="codi"]')).toBeVisible();
+            await expect(frame.locator('input[name="codi"]')).toBeVisible({ timeout: TIMEOUT_IFRAME });
         });
 
         await test.step('modificar camps dins l\'iframe del modal', async () => {
@@ -685,9 +674,13 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
 
         const tipusDocsPage = await anarATipusDocs(page);
 
+        let numDocsDefecte = 0;
         await test.step('verificar que la llista només té els documents per defecte', async () => {
             console.log('  -> verificar que la llista només té els documents per defecte');
-            await expect(getDocRows(tipusDocsPage)).toHaveCount(NUM_DOCS_DEFECTE);
+            await expect(getDocRows(tipusDocsPage).first()).toBeVisible();
+            numDocsDefecte = await getDocRows(tipusDocsPage).count();
+            expect(numDocsDefecte).toBeGreaterThanOrEqual(NUM_DOCS_DEFECTE_MIN);
+            expect(numDocsDefecte).toBeLessThanOrEqual(NUM_DOCS_DEFECTE_MAX);
         });
 
         await test.step('crear el primer document', async () => {
@@ -702,7 +695,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
 
         await test.step('verificar que hi ha dos documents (més els per defecte)', async () => {
             console.log('  -> verificar que hi ha dos documents (més els per defecte)');
-            await expect(getDocRows(tipusDocsPage)).toHaveCount(NUM_DOCS_DEFECTE + 2);
+            await expect(getDocRows(tipusDocsPage)).toHaveCount(numDocsDefecte + 2);
         });
 
         await tipusDocsPage.close();
@@ -748,7 +741,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
             await fila.getByRole('link', { name: /modificar/i }).click();
             await expect(docMetaDadesPage.locator('.modal.in')).toBeVisible();
             const frame = docMetaDadesPage.locator('.modal.in').frameLocator('.modal-body iframe');
-            await expect(frame.locator('input[name="codi"]')).toBeVisible();
+            await expect(frame.locator('input[name="codi"]')).toBeVisible({ timeout: TIMEOUT_IFRAME });
         });
 
         await test.step('modificar camps de la meta-dada del document', async () => {
@@ -864,7 +857,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
             await fila.getByRole('link', { name: /modificar/i }).click();
             await expect(tipusDocsPage.locator('.modal.in')).toBeVisible();
             const frame = tipusDocsPage.locator('.modal.in').frameLocator('.modal-body iframe');
-            await expect(frame.locator('input[name="codi"]')).toBeVisible();
+            await expect(frame.locator('input[name="codi"]')).toBeVisible({ timeout: TIMEOUT_IFRAME });
         });
 
         await test.step('modificar camps del document', async () => {
@@ -1041,7 +1034,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
             await fila.getByRole('link', { name: /modificar/i }).click();
             await expect(metaDadesPage.locator('.modal.in')).toBeVisible();
             const frame = metaDadesPage.locator('.modal.in').frameLocator('.modal-body iframe');
-            await expect(frame.locator('input[name="codi"]')).toBeVisible();
+            await expect(frame.locator('input[name="codi"]')).toBeVisible({ timeout: TIMEOUT_IFRAME });
         });
 
         await test.step('modificar camps de la meta-dada', async () => {
@@ -1115,7 +1108,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
             await tascaPage.locator('a[href*="tasca/new"]').click();
             await expect(tascaPage.locator('.modal.in')).toBeVisible();
             const frame = tascaPage.locator('.modal.in').frameLocator('.modal-body iframe');
-            await expect(frame.locator('input[name="codi"]')).toBeVisible();
+            await expect(frame.locator('input[name="codi"]')).toBeVisible({ timeout: TIMEOUT_IFRAME });
             await frame.locator('input[name="codi"]').fill(CODI_TASCA1);
             await frame.locator('input[name="nom"]').fill(NOM_TASCA1);
             await seleccionarResponsable(tascaPage, frame);
@@ -1251,7 +1244,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
             await fila.getByRole('link', { name: /modificar/i }).click();
             await expect(tascaPage.locator('.modal.in')).toBeVisible();
             const frame = tascaPage.locator('.modal.in').frameLocator('.modal-body iframe');
-            await expect(frame.locator('input[name="codi"]')).toBeVisible();
+            await expect(frame.locator('input[name="codi"]')).toBeVisible({ timeout: TIMEOUT_IFRAME });
         });
 
         await test.step('modificar camps de la tasca', async () => {
@@ -1350,7 +1343,7 @@ test.describe('Gestió de Procediments JSP — IPA_ADMIN', () => {
             await fila.getByRole('link', { name: /modificar/i }).click();
             await expect(estatPage.locator('.modal.in')).toBeVisible();
             const frame = estatPage.locator('.modal.in').frameLocator('.modal-body iframe');
-            await expect(frame.locator('input[name="codi"]')).toBeVisible();
+            await expect(frame.locator('input[name="codi"]')).toBeVisible({ timeout: TIMEOUT_IFRAME });
         });
 
         await test.step('modificar nom i activar Inicial', async () => {

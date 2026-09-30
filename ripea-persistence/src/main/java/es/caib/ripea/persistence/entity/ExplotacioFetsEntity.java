@@ -80,18 +80,16 @@ public class ExplotacioFetsEntity extends RipeaPersistable<Long> {
 	@Column(name = "not_fin_err")			private Long notificacionsFinError;
 	@Column(name = "not_fin_err_tot")		private Long notificacionsFinErrorTotal;
 	
-	@Column(name = "fir_enviat")		private Long firmesEnviades;
 	@Column(name = "fir_enviat_tot")	private Long firmesEnviadesTotal;
-	@Column(name = "fir_iniciat")		private Long firmesIniciades;
 	@Column(name = "fir_iniciat_tot")	private Long firmesIniciadesTotal;
-	@Column(name = "fir_pausat")		private Long firmesPausades;
 	@Column(name = "fir_pausat_tot")	private Long firmesPausadesTotal;
+	@Column(name = "fir_parcial_tot")	private Long firmesParcialsTotal;
 	@Column(name = "fir_firmat")		private Long firmesFirmades;
 	@Column(name = "fir_firmat_tot")	private Long firmesFirmadesTotal;
 	@Column(name = "fir_rebutjat")		private Long firmesRebutjades;
 	@Column(name = "fir_rebutjat_tot")	private Long firmesRebutjadesTotal;
-	@Column(name = "fir_parcial")		private Long firmesParcials;
-	@Column(name = "fir_parcial_tot")	private Long firmesParcialsTotal;
+	@Column(name = "fir_cancelat")		private Long firmesCancelades;
+	@Column(name = "fir_cancelat_tot")	private Long firmesCanceladesTotal;
 	
 	public void updateFromDto(ExplotFetsAmbDimensioDto fetsDto) {
 		this.setAnotacionsNoves(fetsDto.getAnotacionsNoves()!=null?fetsDto.getAnotacionsNoves():0l);
@@ -106,16 +104,14 @@ public class ExplotacioFetsEntity extends RipeaPersistable<Long> {
 		this.setExpedientsTancatsTotal(fetsDto.getExpedientsTancatsTotal()!=null?fetsDto.getExpedientsTancatsTotal():0l);
 		this.setFirmesFirmades(fetsDto.getFirmesFirmades()!=null?fetsDto.getFirmesFirmades():0l);
 		this.setFirmesFirmadesTotal(fetsDto.getFirmesFirmadesTotal()!=null?fetsDto.getFirmesFirmadesTotal():0l);
-		this.setFirmesEnviades(fetsDto.getFirmesEnviades()!=null?fetsDto.getFirmesEnviades():0l);
 		this.setFirmesEnviadesTotal(fetsDto.getFirmesEnviadesTotal()!=null?fetsDto.getFirmesEnviadesTotal():0l);
-		this.setFirmesIniciades(fetsDto.getFirmesIniciades()!=null?fetsDto.getFirmesIniciades():0l);
 		this.setFirmesIniciadesTotal(fetsDto.getFirmesIniciadesTotal()!=null?fetsDto.getFirmesIniciadesTotal():0l);
-		this.setFirmesParcials(fetsDto.getFirmesParcials()!=null?fetsDto.getFirmesParcials():0l);
 		this.setFirmesParcialsTotal(fetsDto.getFirmesParcialsTotal()!=null?fetsDto.getFirmesParcialsTotal():0l);
-		this.setFirmesPausades(fetsDto.getFirmesPausades()!=null?fetsDto.getFirmesPausades():0l);
 		this.setFirmesPausadesTotal(fetsDto.getFirmesPausadesTotal()!=null?fetsDto.getFirmesPausadesTotal():0l);
 		this.setFirmesRebutjades(fetsDto.getFirmesRebutjades()!=null?fetsDto.getFirmesRebutjades():0l);
 		this.setFirmesRebutjadesTotal(fetsDto.getFirmesRebutjadesTotal()!=null?fetsDto.getFirmesRebutjadesTotal():0l);
+		this.setFirmesCancelades(fetsDto.getFirmesCancelades()!=null?fetsDto.getFirmesCancelades():0l);
+		this.setFirmesCanceladesTotal(fetsDto.getFirmesCanceladesTotal()!=null?fetsDto.getFirmesCanceladesTotal():0l);
 		this.setNotificacionsEnvError(fetsDto.getNotificacionsEnvError()!=null?fetsDto.getNotificacionsEnvError():0l);
 		this.setNotificacionsEnvErrorTotal(fetsDto.getNotificacionsEnvErrorTotal()!=null?fetsDto.getNotificacionsEnvErrorTotal():0l);
 		this.setNotificacionsEnviades(fetsDto.getNotificacionsEnviades()!=null?fetsDto.getNotificacionsEnviades():0l);

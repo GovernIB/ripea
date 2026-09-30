@@ -65,7 +65,7 @@ const useRemesaActions = (entity:any, refresh?: () => void) => {
     const {actualitzarEstat, justificant} = useActions(refresh)
 
     const {handleOpen: handleDetallOpen, dialog: dialogDetall} = useRemesaDetail();
-    const {handleOpen: handleNotificacioOpen, dialog: dialogNotificacio} = useNotificacioInteressatGrid(refresh);
+    const {handleOpen: handleNotificacioOpen, dialog: dialogNotificacio} = useNotificacioInteressatGrid(entity, refresh);
 
     const actions = [
         {
@@ -93,7 +93,6 @@ const useRemesaActions = (entity:any, refresh?: () => void) => {
             icon: "send",
             showInMenu: true,
             onClick: handleNotificacioOpen,
-            hidden: !entity?.potModificar,
         },
         {
             label: t('page.notificacio.action.justificant.label'),

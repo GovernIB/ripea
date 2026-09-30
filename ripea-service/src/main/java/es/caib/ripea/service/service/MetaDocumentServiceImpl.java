@@ -388,14 +388,12 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 
 	@Override
 	@Transactional
-	public MetaDocumentDto findPerDefecteByContingut(
+	public MetaDocumentDto findNotificacioMultipleAplicableByContingut(
 			Long entitatId,
-			Long contingutId,
-			MetaDocumentPerDefecteEnumDto metaDocumentPerDefecte) {
-		logger.debug("Consulta del tipus de document per defecte del procediment (" +
+			Long contingutId) {
+		logger.debug("Consulta del tipus de document NOTIFICACIO_MULTIPLE aplicable (" +
 				"entitatId=" + entitatId + ", " +
-				"contingutId=" + contingutId + ", " +
-				"metaDocumentPerDefecte=" + metaDocumentPerDefecte + ")");
+				"contingutId=" + contingutId + ")");
 		entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				true,
@@ -408,9 +406,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 			throw new NotFoundException(contingutId, ExpedientEntity.class);
 		}
 
-		MetaDocumentEntity metaDocument = metaDocumentHelper.getOrCreateMetaDocumentPerDefecte(
-				expedient.getMetaExpedient(),
-				metaDocumentPerDefecte);
+		MetaDocumentEntity metaDocument = metaDocumentHelper.findMetaDocumentNotificacioMultipleAplicable(expedient);
 
 		return conversioTipusHelper.convertir(
 				metaDocument,

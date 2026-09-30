@@ -103,6 +103,9 @@ public class RegistreResourceEntity extends BaseAuditableEntity<RegistreResource
     private String destiDescripcio;
     @Column(name = "justificant_arxiu_uuid", length = 256)
     private String justificantArxiuUuid;
+    /** Error en incorporar el justificant de registre a l'expedient. Null si no n'hi ha cap de pendent. */
+    @Column(name = "justificant_error", length = 4000)
+    private String justificantError;
     @Formula("DESTI_CODI||' - '||DESTI_DESCRIPCIO")
     private String destiCodiINom;
 

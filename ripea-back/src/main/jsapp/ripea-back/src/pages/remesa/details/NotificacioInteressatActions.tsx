@@ -30,7 +30,7 @@ export const useActions = () => {
     }
 }
 
-const useNotificacioInteressatActions = (entity:any, refresh?: () => void) => {
+const useNotificacioInteressatActions = (entity:any, expedient:any, refresh?: () => void) => {
     const { t } = useTranslation();
 
     const {certificat} = useActions();
@@ -49,7 +49,7 @@ const useNotificacioInteressatActions = (entity:any, refresh?: () => void) => {
             icon: "edit_calendar",
             showInMenu: true,
             onClick: handleShow,
-            hidden: (row:any) => row?.finalitzat || entity?.notificacioEstat == 'PROCESSADA',
+            hidden: (row:any) => row?.finalitzat || entity?.notificacioEstat == 'PROCESSADA' || !expedient?.potModificar,
         },
         {
             label: t('page.notificacioInteressat.action.certificat.label'),
