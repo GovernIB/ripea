@@ -442,6 +442,8 @@ public class DocumentResource extends NodeResource {
     public static class NewDocPinbalForm implements Serializable {
         @NotNull
         private ResourceReference<ExpedientResource, Long> expedient;
+        // Carpeta de l'expedient on es desarà el document generat. Si no s'informa es desa a l'arrel de l'expedient.
+        private ResourceReference<CarpetaResource, Long> carpeta;
 
     	@NotNull
         @ResourceField(onChangeActive = true, springFilter = "actiu : true")

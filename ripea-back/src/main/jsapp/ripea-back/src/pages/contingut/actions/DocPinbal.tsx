@@ -1,3 +1,4 @@
+import {useMemo} from "react";
 import {useMuiFormDialogApiRef, useBaseAppContext, useFormContext} from "reactlib";
 import {Grid} from "@mui/material";
 import GridFormField, {GridButton} from "../../../components/GridFormField.tsx";
@@ -5,6 +6,7 @@ import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import useCreate from "../../interessats/actions/Create.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
+import {useUserSession} from "../../../components/Session.tsx";
 
 const values = [
     "SVDCCAACPASWS01",
@@ -24,9 +26,15 @@ const values = [
 const CodiServeiPinbalEnum = Object.fromEntries(values.map(v => [v, v]));
 
 const sortModelTipusDocument:any = [{field: 'nom',sort: 'asc'}]
-const DocPinbalForm = () => {
+
+/**
+ * 'carpetaFixada': el diàleg s'ha obert des de dins una carpeta. Igual que al formulari de nou document,
+ * la carpeta es mostra sempre i només es pot canviar si la creació de carpetes està activa.
+ */
+const DocPinbalForm = ({carpetaFixada}: {carpetaFixada?: boolean}) => {
     const {data, apiRef: formApiRef} = useFormContext();
     const { t } = useTranslation()
+    const { value: user } = useUserSession();
 
     const { create, content } = useCreate()
     const onCreateInteressat = (result?:any)=> {
@@ -40,6 +48,13 @@ const DocPinbalForm = () => {
         builder.eq("expedient.id", data?.expedient?.id),
         builder.eq('esRepresentant', false),
     );
+
+    const carpetaFilter: string = useMemo(() => (
+        builder.and(
+            builder.eq("expedient.id", data?.expedient?.id),
+            builder.eq("esborrat", 0),
+        )
+    ), [data?.expedient?.id]);
 
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField name="tipusDocument"
@@ -60,6 +75,14 @@ const DocPinbalForm = () => {
 
         <GridFormField name="consentiment" required/>
         <GridFormField name="finalitat" type={"textarea"}/>
+
+        {(user?.sessionScope?.isCreacioCarpetesActiva || carpetaFixada) &&
+            <GridFormField
+                name="carpeta"
+                filter={carpetaFilter}
+                readOnly={!user?.sessionScope?.isCreacioCarpetesActiva}
+            />
+        }
 
         {/*<Grid size={12} sx={{ my: 1 }} hidden={!data?.codiServeiPinbal}>{data?.codiServeiPinbal}</Grid>*/}
         { values.includes(data?.codiServeiPinbal) &&
@@ -167,7 +190,7 @@ const DocPinbalForm = () => {
     </Grid>
 }
 
-const DocPinbal = (props:any) => {
+const DocPinbal = ({carpetaFixada, ...props}:any) => {
     const { t } = useTranslation();
 
     return <FormActionDialog
@@ -180,18 +203,31 @@ const DocPinbal = (props:any) => {
         ]}
         {...props}
     >
-        <DocPinbalForm/>
+        <DocPinbalForm carpetaFixada={carpetaFixada}/>
     </FormActionDialog>
 }
 
-const useDocPinbal = (entity:any,refresh?: () => void) => {
+const useDocPinbal = (entity:any, refresh?: () => void, contingutPareId?: string | number | null, contingutPareNom?: string | null) => {
     const { t } = useTranslation();
     const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
 
+    // Si s'obre des de dins una carpeta, el document es desa per defecte a aquesta carpeta
+    const carpetaFixada = contingutPareId != null && contingutPareId !== '';
+
     const handleShow = () :void => {
         apiRef.current?.show?.(undefined,{
-            expedient: {id: entity?.id}
+            expedient: {id: entity?.id},
+            ...(carpetaFixada
+                ? {
+                    carpeta: {
+                        id: contingutPareId,
+                        description: contingutPareNom != null && contingutPareNom !== ''
+                            ? contingutPareNom
+                            : String(contingutPareId),
+                    },
+                }
+                : {}),
         })
     }
     const onSuccess = (result:any) :void => {
@@ -201,7 +237,7 @@ const useDocPinbal = (entity:any,refresh?: () => void) => {
 
     return {
         handleShow,
-        content: <DocPinbal apiRef={apiRef} onSuccess={onSuccess}/>
+        content: <DocPinbal apiRef={apiRef} onSuccess={onSuccess} carpetaFixada={carpetaFixada}/>
     }
 }
 export default useDocPinbal;

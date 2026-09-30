@@ -98,6 +98,7 @@ import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ArxiuDetallDto;
 import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ArxiuFirmaDto;
+import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DigitalitzacioPerfilDto;
 import es.caib.ripea.service.intf.dto.DigitalitzacioTransaccioRespostaDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
@@ -1494,10 +1495,9 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 	                consulta.setMunicipiNaixamentSVDDELSEXWS01(params.getMunicipiNaixament());
 	            }
 	
-	            //Com a millora, al crear una petició pinbal, o al crear un document, es podria especificar la carpeta destí.
 	            Exception resultatConsulta = pinbalHelper.pinbalNovaConsulta(
 						entitatEntity.getId(),
-                        params.getExpedient().getId(),
+                        getPareIdDocumentPinbal(params),
                         params.getTipusDocument().getId(),
 						consulta, 
 						configHelper.getRolActual());
@@ -1510,7 +1510,28 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/document/NouDocumentPinbalActionExecutor", e);
 				throw new ActionExecutionException(getResourceClass(), null, code, messageHelper.getMessage("document.nouDocumentPinbal.reject", new Object[]{e.getMessage()}));
-			}				
+			}
+		}
+
+		/**
+		 * Contingut pare on es desarà el document generat: la carpeta indicada o, si no n'hi ha, l'expedient.
+		 * La carpeta ha de ser una carpeta no esborrada del mateix expedient de la petició.
+		 * La resta de comprovacions (expedient modificable, permisos...) les fa PinbalHelper.
+		 */
+		private Long getPareIdDocumentPinbal(NewDocPinbalForm params) {
+			Long expedientId = params.getExpedient().getId();
+			if (params.getCarpeta() == null || params.getCarpeta().getId() == null) {
+				return expedientId;
+			}
+			ContingutEntity carpeta = contingutRepository.findById(params.getCarpeta().getId()).orElse(null);
+			if (carpeta == null
+					|| carpeta.getTipus() != ContingutTipusEnumDto.CARPETA
+					|| carpeta.getEsborrat() != 0
+					|| carpeta.getExpedient() == null
+					|| !expedientId.equals(carpeta.getExpedient().getId())) {
+				throw new ValidationException(messageHelper.getMessage("document.nouDocumentPinbal.carpeta.invalida"));
+			}
+			return carpeta.getId();
 		}
     }
     

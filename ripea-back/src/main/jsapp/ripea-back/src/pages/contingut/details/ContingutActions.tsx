@@ -149,7 +149,7 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
     const { t } = useTranslation();
     const { value: user } = useUserSession();
 
-    const {handleShow: handleDocPinbal, content: contentDocPinbal} = useDocPinbal(entity, refresh)
+    const {handleShow: handleDocPinbal, content: contentDocPinbal} = useDocPinbal(entity, refresh, contingutParentId, contingutParentNom)
     const {handleShow: handleCrearCarpeta, content: contentCrearCarpeta} = useCrearCarpeta(entity, refresh, contingutParentId)
     const {handleShow: handleImportar, content: contentImportar} = useImportar(entity, refresh, contingutParentId, contingutParentNom)
     const {handleOpen: handleImportarExpedient, dialog: dialogImportarExpedient} = useImportarExpedient(entity, refresh)
