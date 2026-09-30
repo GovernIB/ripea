@@ -88,6 +88,43 @@ const filtrarPerCodi = async (page: Page, codi: string) => {
     await expect(page.locator('#metaexpedients_processing')).toBeHidden();
 };
 
+// ── Helper: obrir una sub-pàgina del procediment de test en una pestanya nova ──
+//
+// Les sub-pàgines (tipus docs, meta-dades, tasques, estats, grups, permisos) s'obren
+// en una pestanya nova i carreguen el seu datatable per AJAX després del 'load'.
+// Esperar només que #xxx_processing estigui ocult no basta: en entorns lents (DEV)
+// la comprovació s'avalua abans que el datatable mostri l'indicador de càrrega i
+// el test llegeix la taula buida o a mig pintar. Per això el listener de la resposta
+// del datatable es registra a nivell de context (cobreix la pestanya nova) ABANS del
+// clic, i després s'espera que l'indicador de càrrega desaparegui.
+//
+// dinsElements: true si l'enllaç és dins el desplegable "Elements" de la fila.
+const obrirSubPagina = async (
+    page: Page,
+    enllac: RegExp,
+    dinsElements: boolean,
+    esDatatable: (url: string) => boolean,
+    processing: string,
+): Promise<Page> => {
+    await filtrarPerCodi(page, CODI_TEST);
+    await expect(getRows(page)).toHaveCount(1);
+    const fila = getRows(page).first();
+    if (dinsElements) {
+        await fila.getByRole('button', { name: /elements|elementos/i }).click();
+    }
+    const novaPaginaPromise = page.context().waitForEvent('page');
+    const datatablePromise = page.context().waitForEvent('response', {
+        predicate: resp => esDatatable(resp.url()) && resp.status() === 200,
+        timeout: 30_000,
+    });
+    await fila.getByRole('link', { name: enllac }).click();
+    const novaPagina = await novaPaginaPromise;
+    await novaPagina.waitForLoadState('load');
+    await datatablePromise;
+    await expect(novaPagina.locator(processing)).toBeHidden({ timeout: 10_000 });
+    return novaPagina;
+};
+
 // ── Helpers per a Tipus de Documents ─────────────────────────────────────────
 
 const getDocRows = (p: Page) =>
@@ -103,18 +140,9 @@ const quickFilterDocs = async (p: Page, text: string) => {
     await expect(p.locator('#metadocuments_processing')).toBeHidden();
 };
 
-const anarATipusDocs = async (page: Page): Promise<Page> => {
-    await filtrarPerCodi(page, CODI_TEST);
-    await expect(getRows(page)).toHaveCount(1);
-    const fila = getRows(page).first();
-    await fila.getByRole('button', { name: /elements|elementos/i }).click();
-    const tipusDocsPagePromise = page.context().waitForEvent('page');
-    await fila.getByRole('link', { name: /tipus docs|tipos docs/i }).click();
-    const tipusDocsPage = await tipusDocsPagePromise;
-    await tipusDocsPage.waitForLoadState('load');
-    await expect(tipusDocsPage.locator('#metadocuments_processing')).toBeHidden({ timeout: 10_000 });
-    return tipusDocsPage;
-};
+const anarATipusDocs = (page: Page): Promise<Page> =>
+    obrirSubPagina(page, /tipus docs|tipos docs/i, true,
+        url => url.includes('/metaDocument/datatable'), '#metadocuments_processing');
 
 const crearDocument = async (tipusDocsPage: Page, codi: string, nom: string) => {
     await tipusDocsPage.locator('a[href*="metaDocument/new"]').click();
@@ -150,18 +178,9 @@ const quickFilterMeta = async (p: Page, text: string) => {
     await expect(p.locator('#metadades_processing')).toBeHidden();
 };
 
-const anarAMetaDades = async (page: Page): Promise<Page> => {
-    await filtrarPerCodi(page, CODI_TEST);
-    await expect(getRows(page)).toHaveCount(1);
-    const fila = getRows(page).first();
-    await fila.getByRole('button', { name: /elements|elementos/i }).click();
-    const metaDadesPagePromise = page.context().waitForEvent('page');
-    await fila.getByRole('link', { name: /meta-dades|meta-datos/i }).click();
-    const metaDadesPage = await metaDadesPagePromise;
-    await metaDadesPage.waitForLoadState('load');
-    await expect(metaDadesPage.locator('#metadades_processing')).toBeHidden({ timeout: 10_000 });
-    return metaDadesPage;
-};
+const anarAMetaDades = (page: Page): Promise<Page> =>
+    obrirSubPagina(page, /meta-dades|meta-datos/i, true,
+        url => url.includes('/metaDada/datatable'), '#metadades_processing');
 
 const crearMetaDada = async (metaDadesPage: Page, codi: string, nom: string, full = false) => {
     await metaDadesPage.locator('a[href*="metaDada/new"]').click();
@@ -218,18 +237,9 @@ const quickFilterTasques = async (p: Page, text: string) => {
     await expect(p.locator('#metadades_processing')).toBeHidden();
 };
 
-const anarATasques = async (page: Page): Promise<Page> => {
-    await filtrarPerCodi(page, CODI_TEST);
-    await expect(getRows(page)).toHaveCount(1);
-    const fila = getRows(page).first();
-    await fila.getByRole('button', { name: /elements|elementos/i }).click();
-    const tascaPagePromise = page.context().waitForEvent('page');
-    await fila.getByRole('link', { name: /tasques|tareas/i }).click();
-    const tascaPage = await tascaPagePromise;
-    await tascaPage.waitForLoadState('load');
-    await expect(tascaPage.locator('#metadades_processing')).toBeHidden({ timeout: 10_000 });
-    return tascaPage;
-};
+const anarATasques = (page: Page): Promise<Page> =>
+    obrirSubPagina(page, /tasques|tareas/i, true,
+        url => url.includes('/tasca/datatable'), '#metadades_processing');
 
 // Selecciona el primer responsable retornat pel suggest d'usuaris amb la cerca 'adm'.
 const seleccionarResponsable = async (tascaPage: Page, frame: ReturnType<typeof tascaPage.frameLocator>) => {
@@ -274,18 +284,9 @@ const getEstatRows = (p: Page) =>
 const waitDatatableEstats = (p: Page) =>
     p.waitForResponse(resp => resp.url().includes('/expedientEstat/') && resp.url().includes('/datatable') && resp.status() === 200);
 
-const anarAEstats = async (page: Page): Promise<Page> => {
-    await filtrarPerCodi(page, CODI_TEST);
-    await expect(getRows(page)).toHaveCount(1);
-    const fila = getRows(page).first();
-    await fila.getByRole('button', { name: /elements|elementos/i }).click();
-    const estatPagePromise = page.context().waitForEvent('page');
-    await fila.getByRole('link', { name: /estats|estados/i }).click();
-    const estatPage = await estatPagePromise;
-    await estatPage.waitForLoadState('load');
-    await expect(estatPage.locator('#estats_processing')).toBeHidden({ timeout: 10_000 });
-    return estatPage;
-};
+const anarAEstats = (page: Page): Promise<Page> =>
+    obrirSubPagina(page, /estats|estados/i, true,
+        url => url.includes('/expedientEstat/') && url.includes('/datatable'), '#estats_processing');
 
 const crearEstat = async (estatPage: Page, codi: string, nom: string) => {
     // El botó "Nou estat" és renderitzat pel jsrender template #botonsTemplate via webutil.datatable.js
@@ -314,18 +315,9 @@ const getGrupRows = (p: Page) =>
 const waitDatatableGrups = (p: Page) =>
     p.waitForResponse(resp => resp.url().includes('/grup/datatable') && resp.status() === 200);
 
-const anarAGrups = async (page: Page): Promise<Page> => {
-    await filtrarPerCodi(page, CODI_TEST);
-    await expect(getRows(page)).toHaveCount(1);
-    const fila = getRows(page).first();
-    await fila.getByRole('button', { name: /elements|elementos/i }).click();
-    const grupPagePromise = page.context().waitForEvent('page');
-    await fila.getByRole('link', { name: /grups|grupos/i }).click();
-    const grupPage = await grupPagePromise;
-    await grupPage.waitForLoadState('load');
-    await expect(grupPage.locator('#metadades_processing')).toBeHidden({ timeout: 10_000 });
-    return grupPage;
-};
+const anarAGrups = (page: Page): Promise<Page> =>
+    obrirSubPagina(page, /grups|grupos/i, true,
+        url => url.includes('/grup/datatable'), '#metadades_processing');
 
 const vincularGrupJsp = async (grupPage: Page) => {
     await grupPage.locator('a[href*="grup/relacionar"]').click();
@@ -350,17 +342,9 @@ const getPermisRows = (p: Page) =>
 const waitDatatablePermisos = (p: Page) =>
     p.waitForResponse(resp => resp.url().includes('/permis/datatable') && resp.status() === 200);
 
-const anarAPermisos = async (page: Page): Promise<Page> => {
-    await filtrarPerCodi(page, CODI_TEST);
-    await expect(getRows(page)).toHaveCount(1);
-    const fila = getRows(page).first();
-    const permisosPagePromise = page.context().waitForEvent('page');
-    await fila.getByRole('link', { name: /permisos/i }).click();
-    const permisosPage = await permisosPagePromise;
-    await permisosPage.waitForLoadState('load');
-    await expect(permisosPage.locator('#taulaDades_processing')).toBeHidden({ timeout: 10_000 });
-    return permisosPage;
-};
+const anarAPermisos = (page: Page): Promise<Page> =>
+    obrirSubPagina(page, /permisos/i, false,
+        url => url.includes('/permis/datatable'), '#taulaDades_processing');
 
 // ── Helper: assegurar el rol actiu (menú d'usuari JSP) ───────────────────────
 //

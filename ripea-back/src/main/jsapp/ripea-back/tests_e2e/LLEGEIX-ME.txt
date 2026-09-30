@@ -148,6 +148,17 @@ Exemples:
 El login s'adapta automàticament a l'IdP de cada entorn (Keycloak en
 local, Soffid SAML a dev.caib.es); vegeu auth/login.ts.
 
+Drecera per a DEV (dev.caib.es): playwright.dev.config.ts ja fixa la
+baseURL i llegeix per defecte tests_e2e/auth/credentials.dev.json
+(IGNORAT pel git; mateixa estructura que credentials.json, amb un usuari
+del directori corporatiu amb rol IPA_ADMIN a les entrades admin i user).
+
+  # Procediments (React + JSP) a DEV
+  npx playwright test -c playwright.dev.config.ts tests_e2e/metaExpedient --project=admin --project=admin-jsp --workers=1
+
+Amb --workers=1 els dos projectes no competeixen pel servidor compartit
+(les esperes dels tests estan calibrades per a execució seqüencial).
+
 ATENCIÓ: els tests de procediments creen, modifiquen i esborren dades
 reals a l'entorn on s'executen (codis zz_PLAYWRIGHT_*). Si una
 execució s'interromp a mig camí, el procediment de proves hi queda i

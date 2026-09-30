@@ -22,7 +22,19 @@
 	var currentIteration	= 0;
 	var iterationsOk		= 0;
 	var iterationsKo		= 0;
-	
+
+	// Espera entre elements (ms), opcional per a cada procés (atribut esperaEntreIteracionsMs del controlador).
+	// La fa el navegador: el servidor respon tan bon punt acaba cada element.
+	var esperaEntreIteracionsMs	= parseInt('${esperaEntreIteracionsMs}', 10) || 0;
+	var timerEspera				= null;
+
+	// Servei no disponible (servidor aturat o reiniciant-se): el procés es pausa sense comptar l'element com a error
+	// i es comprova periòdicament si el servidor torna a respondre. /api/* no està protegit a nivell de contenidor,
+	// per tant respon (encara que sigui amb 401/403) sense redirigir al proveïdor d'identitat quan la sessió s'ha perdut.
+	var urlComprovacioServei	= '<c:url value="/api/"/>';
+	var intervalComprovacioMs	= 15000;
+	var timerComprovacio		= null;
+
 	$(document).ready(function() {
 		$.ajax({
 			type: 'GET',
@@ -47,6 +59,8 @@
 		
 		$("button[name='BotoPausa']").on('click', function(e) {
 			procesActiu=false;
+			aturarEspera();
+			aturarComprovacioServei();
 	        $("button[name='BotoReinicia']").prop("disabled", false);
 	        $("button[name='BotoPausa']").prop("disabled", true);
 	        $("#pauseAlert").show();
@@ -79,19 +93,23 @@
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					debugger;
+					if (esErrorServei(jqXHR)) {
+						// No és un error de l'element: no s'avança i es torna a intentar quan el servei respongui
+						pausarPerServeiNoDisponible(jqXHR);
+						return;
+					}
 					currentIteration++;
 					iterationsKo++;
 					$("#elementsKo").html(iterationsKo);
-				    if (jqXHR.status === 0) {
-				        printError("No se pudo conectar con el servidor (ERR_CONNECTION_REFUSED).");
-				    } else {
-				        printError(jqXHR.responseText);
-				    }
+					printError(jqXHR.responseText);
 				},
-				complete: function() {
+				complete: function(jqXHR) {
+					if (esErrorServei(jqXHR)) {
+						return;
+					}
 					updateProgress();
 					if (currentIteration<elementsAiterar.length) {
-						executaIteracio(); //Cridada recursiva per el seguent element
+						programarSeguentIteracio();
 					} else {
 						$("#botonera").hide();
 						$("#progressInfo").html("<b>L'EXECUCIÓ DEL PROCÉS HA FINALITZAT.</b>");
@@ -99,6 +117,114 @@
 				}
 			});
 		}
+	}
+
+	// Llança el següent element, després de l'espera configurada si n'hi ha
+	function programarSeguentIteracio() {
+		if (!procesActiu) {
+			return;
+		}
+		if (esperaEntreIteracionsMs > 0) {
+			$("#progressInfo").html("Esperant " + (esperaEntreIteracionsMs / 1000) + " s abans del següent element ("
+					+ elementsAiterar[currentIteration] + ")...");
+			timerEspera = setTimeout(function() {
+				timerEspera = null;
+				executaIteracio();
+			}, esperaEntreIteracionsMs);
+		} else {
+			executaIteracio(); //Cridada recursiva per el seguent element
+		}
+	}
+
+	function aturarEspera() {
+		if (timerEspera) {
+			clearTimeout(timerEspera);
+			timerEspera = null;
+		}
+	}
+
+	// Respostes que no depenen de l'element: sense connexió (0) o errors del proxy/servidor d'aplicacions (502, 503, 504)
+	function esErrorServei(jqXHR) {
+		return jqXHR.status === 0 || jqXHR.status === 502 || jqXHR.status === 503 || jqXHR.status === 504;
+	}
+
+	function pausarPerServeiNoDisponible(jqXHR) {
+		procesActiu = false;
+		// El procés ja està pausat i es reprèn sol quan el servei torna a estar disponible: cap dels dos botons té sentit
+		$("button[name='BotoReinicia']").prop("disabled", true);
+		$("button[name='BotoPausa']").prop("disabled", true);
+		var estat = jqXHR.status === 0 ? "sense connexió" : "HTTP " + jqXHR.status;
+		printAvis("Servei no disponible (" + estat + ") a l'element " + elementsAiterar[currentIteration]
+				+ ": procés pausat. Es comprovarà cada " + (intervalComprovacioMs / 1000) + " segons si torna a estar disponible.", "coral");
+		$("#progressInfo").html("<b style=\"color: coral;\">Servei no disponible. Esperant que torni a estar disponible...</b>");
+		programarComprovacioServei();
+	}
+
+	function programarComprovacioServei() {
+		aturarComprovacioServei();
+		timerComprovacio = setTimeout(comprovarServei, intervalComprovacioMs);
+	}
+
+	function aturarComprovacioServei() {
+		if (timerComprovacio) {
+			clearTimeout(timerComprovacio);
+			timerComprovacio = null;
+		}
+	}
+
+	// 1r pas: el servidor respon? Qualsevol resposta que no sigui un error de servei (també 401/403) indica que sí.
+	function comprovarServei() {
+		timerComprovacio = null;
+		$.ajax({
+			type: 'GET',
+			url: urlComprovacioServei,
+			cache: false,
+			timeout: 10000,
+			complete: function(jqXHR) {
+				if (esErrorServei(jqXHR)) {
+					$("#progressInfo").html("<b style=\"color: coral;\">Servei no disponible (darrera comprovació: " + horaActual() + "). Esperant que torni a estar disponible...</b>");
+					programarComprovacioServei();
+				} else {
+					comprovarSessio();
+				}
+			}
+		});
+	}
+
+	// 2n pas: la sessió continua vàlida? Si el servidor s'ha reiniciat, la petició autenticada no arriba (redirecció al
+	// proveïdor d'identitat) i cal recarregar la pàgina; la llista d'elements es recalcula i només hi surten els pendents.
+	function comprovarSessio() {
+		$.ajax({
+			type: 'GET',
+			dataType: "json",
+			url: urlTotalIteracions,
+			cache: false,
+			success: function(data) {
+				printAvis("Servei disponible de nou: es reprèn el procés a l'element " + elementsAiterar[currentIteration] + ".", "mediumseagreen");
+				$("button[name='BotoReinicia']").prop("disabled", true);
+				$("button[name='BotoPausa']").prop("disabled", false);
+				procesActiu = true;
+				executaIteracio();
+			},
+			error: function(jqXHR) {
+				printAvis("Servei disponible de nou, però la sessió ha caducat: recarregueu la pàgina per continuar amb els elements pendents.", "mediumseagreen");
+				$("#progressInfo").html("<b>Servei disponible de nou. Recarregueu la pàgina per continuar.</b>");
+				$("button[name='BotoReinicia']").prop("disabled", true);
+				$("button[name='BotoPausa']").prop("disabled", true);
+			}
+		});
+	}
+
+	function printAvis(msg, color) {
+		const p = document.createElement("p");
+		p.style.color = color;
+		p.style.fontWeight = "bold";
+		p.textContent = horaActual() + " - " + msg;
+		document.getElementById("errorsText").appendChild(p);
+	}
+
+	function horaActual() {
+		return new Date().toLocaleTimeString();
 	}
 	
 	function printError(msgError) {

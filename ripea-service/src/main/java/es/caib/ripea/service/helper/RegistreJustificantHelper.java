@@ -89,6 +89,15 @@ public class RegistreJustificantHelper {
                 + " ja està incorporat al contingut de l'expedient " + expedient.getId() + ".");
         }
 
+        // Sense uuid de l'expedient no es pot consultar ni moure res a l'Arxiu: s'informa l'error sense cridar-lo.
+        if (expedient.getArxiuUuid() == null) {
+            String error = "L'expedient " + expedient.getNumero() + " (id " + expedient.getId()
+                + ") no està guardat a l'arxiu digital: cal guardar-lo a l'arxiu abans d'incorporar-hi el justificant.";
+            LOGGER.error("No s'incorpora el justificant de l'anotació " + registreIdentificador + ": " + error);
+            expedientHelper.updateRegistreJustificantErrorNewTransaction(peticio.getId(), error);
+            throw new Exception(error);
+        }
+
         try {
             if (metaDocumentId == null) {
                 metaDocumentId = metaDocumentHelper.getOrCreateMetaDocumentPerDefecte(

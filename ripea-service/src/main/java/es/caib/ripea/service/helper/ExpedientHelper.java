@@ -56,6 +56,7 @@ import es.caib.distribucio.rest.client.integracio.domini.InteressatTipus;
 import es.caib.distribucio.rest.client.integracio.domini.NtiEstadoElaboracion;
 import es.caib.distribucio.rest.client.integracio.domini.NtiOrigen;
 import es.caib.distribucio.rest.client.integracio.domini.NtiTipoDocumento;
+import es.caib.plugins.arxiu.api.ArxiuNotFoundException;
 import es.caib.plugins.arxiu.api.Carpeta;
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.ContingutTipus;
@@ -3095,14 +3096,26 @@ public class ExpedientHelper {
 		boolean carpetaExistsInArxiu = false;
 
 		if (!contingutHelper.isCarpetaLogica()) {
-			Expedient expedient = pluginHelper.arxiuExpedientConsultar(expedientEntity);
-			if (expedient.getContinguts() != null) {
-				for (ContingutArxiu contingutArxiu : expedient.getContinguts()) {
-					String replacedNom = ArxiuConversioHelper.revisarContingutNom(nom);
-					if (contingutArxiu.getTipus() == ContingutTipus.CARPETA &&
-							contingutArxiu.getNom().equals(replacedNom)) {
-						carpetaExistsInArxiu = true;
-						carpetaUuid = contingutArxiu.getIdentificador();
+			if (carpetaExistsInDB && carpetaEntity.getArxiuUuid() != null) {
+				// La carpeta de la BD ja té uuid: es comprova per uuid, perquè el nom a l'Arxiu el normalitza el
+				// plugin i la cerca per nom pot no trobar-la. Si ja no hi és, es torna a crear.
+				if (existeixCarpetaArxiu(carpetaEntity)) {
+					carpetaExistsInArxiu = true;
+					carpetaUuid = carpetaEntity.getArxiuUuid();
+				} else {
+					carpetaEntity.updateArxiuEsborrat();
+				}
+			} else {
+				// Carpeta nova o sense uuid: es cerca per nom, per si ja es va crear a l'Arxiu en un intent anterior
+				Expedient expedient = pluginHelper.arxiuExpedientConsultar(expedientEntity);
+				if (expedient.getContinguts() != null) {
+					for (ContingutArxiu contingutArxiu : expedient.getContinguts()) {
+						String replacedNom = ArxiuConversioHelper.revisarContingutNom(nom);
+						if (contingutArxiu.getTipus() == ContingutTipus.CARPETA &&
+								contingutArxiu.getNom().equals(replacedNom)) {
+							carpetaExistsInArxiu = true;
+							carpetaUuid = contingutArxiu.getIdentificador();
+						}
 					}
 				}
 			}
@@ -3127,6 +3140,22 @@ public class ExpedientHelper {
 			carpetaId = carpetaDto.getId();
 		}
 		return carpetaId;
+	}
+
+	/**
+	 * Indica si la carpeta existeix a l'Arxiu, consultant-la pel seu uuid.
+	 *
+	 * @return false si l'Arxiu respon que no la troba; qualsevol altre error de l'Arxiu es propaga.
+	 */
+	private boolean existeixCarpetaArxiu(CarpetaEntity carpetaEntity) {
+		try {
+			return pluginHelper.arxiuCarpetaConsultar(carpetaEntity) != null;
+		} catch (SistemaExternException ex) {
+			if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, ArxiuNotFoundException.class)) {
+				return false;
+			}
+			throw ex;
+		}
 	}
 
 	public void importarExpedient(Long entitatId, Long pareId, Long expedientId, String rolActual) {
