@@ -67,24 +67,26 @@ public class ExplotFetsAmbDimensioDto {
 	private Long notificacionsFinError;
 	private Long notificacionsFinErrorTotal;
 	
-	private Long firmesEnviades;
+	//Firmes: els estats en curs (enviat, iniciat, pausat, parcial) només tenen total, perquè són
+	//estocs dels quals s'hi entra i se'n surt i sense la data del canvi d'estat no es pot saber
+	//quants n'hi havia en un dia concret. Només els estats finals (firmat, rebutjat, cancel·lat)
+	//tenen dada diària, ja que els seus totals no disminueixen mai.
 	private Long firmesEnviadesTotal;
-	private Long firmesIniciades;
 	private Long firmesIniciadesTotal;
-	private Long firmesPausades;
 	private Long firmesPausadesTotal;
+	private Long firmesParcialsTotal;
 	private Long firmesFirmades;
 	private Long firmesFirmadesTotal;
 	private Long firmesRebutjades;
 	private Long firmesRebutjadesTotal;
-	private Long firmesParcials;
-	private Long firmesParcialsTotal;
+	private Long firmesCancelades;
+	private Long firmesCanceladesTotal;
 	
 	public enum FetsEnum {
 		PROCEDIMENTS_ACTIUS_TOTAL,
 		SERVEIS_ACTIUS_TOTAL,
         EXP_CREATS,
-        EXP_CREAT_TOTAL,
+        EXP_CREATS_TOTAL,
         EXP_TANCATS,
         EXP_TANCATS_TOTAL,
         TAS_PENDENTS,
@@ -129,18 +131,16 @@ public class ExplotFetsAmbDimensioDto {
         NOT_ENVIADES_ERROR_TOTAL,
         NOT_FINALITZADES_ERROR,
         NOT_FINALITZADES_ERROR_TOTAL,
-        FIR_ENVIADES,
         FIR_ENVIADES_TOTAL,
-        FIR_INICIADES,
         FIR_INICIADES_TOTAL,
-        FIR_PAUSADES,
         FIR_PAUSADES_TOTAL,
+        FIR_PARCIALS_TOTAL,
         FIR_FIRMADES,
         FIR_FIRMADES_TOTAL,
         FIR_REBUTJADES,
         FIR_REBUTJADES_TOTAL,
-        FIR_PARCIALS,
-        FIR_PARCIALS_TOTAL
+        FIR_CANCELADES,
+        FIR_CANCELADES_TOTAL
     }
 	
 	public ExplotFetsAmbDimensioDto(Long entitatId, Long procedimentId, Long organId, String usuariCodi) {

@@ -31,5 +31,6 @@ public class ExplotFetsPortafirmesDto {
 	private Long firmadesTotal;
 	private Long rebutjadesTotal;
 	private Long parcialsTotal;
+	private Long canceladesTotal;
 
 }
