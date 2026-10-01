@@ -285,6 +285,7 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
 		if (dto.getProvincia()!=null) { this.provincia =  dto.getProvincia(); }
 		if (dto.getMunicipi()!=null) { this.municipi =  dto.getMunicipi(); }
 		if (dto.getAdresa()!=null) { this.adresa =  dto.getAdresa(); }
+		if (dto.getAdressaTipus()!=null) { this.updateAdressaNormalitzada(dto); }
 		if (dto.getCodiPostal()!=null) { this.codiPostal =  dto.getCodiPostal(); }
 		if (dto.getEmail()!=null) { this.email =  dto.getEmail(); }
 		if (dto.getTelefon()!=null) { this.telefon =  dto.getTelefon(); }

@@ -28,6 +28,7 @@ import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.dto.EntregaPostalTipusEnum;
+import es.caib.ripea.service.intf.dto.EntregaPostalViaTipusEnum;
 import es.caib.ripea.service.intf.dto.InteressatAdministracioDto;
 import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.InteressatDto;
@@ -70,6 +71,9 @@ public class InteressatResourceHelper {
                 if (tipusCell == null || tipusCell.getCellType() != Cell.CELL_TYPE_STRING) continue;
 
                 InteressatResource interessatResource = new InteressatResource();
+                // Sense els valors per defecte del formulari (NACIONAL / CALLE): només el que indiqui l'Excel
+                interessatResource.setAdressaTipus(null);
+                interessatResource.setAdressaTipusVia(null);
                 String tipusInteressat = tipusCell.getStringCellValue().trim();
                 switch (tipusInteressat) {
                     case "PERSONA_FISICA":
@@ -91,13 +95,9 @@ public class InteressatResourceHelper {
                 }
 
                 // Columna 2 endavant
-                for (int col = 2; col <= 18; col++) {
-                    Cell cell = row.getCell(col);
-                    if (cell == null || cell.getCellType() == Cell.CELL_TYPE_BLANK) continue;
-
-                    String value = cell.getCellType() == Cell.CELL_TYPE_STRING
-                            ? cell.getStringCellValue().trim()
-                            : String.valueOf((int) cell.getNumericCellValue());
+                for (int col = 2; col <= ExpedientInteressatHelper.EXCEL_DARRERA_COLUMNA; col++) {
+                    String value = ExpedientInteressatHelper.valorCellaExcel(row.getCell(col));
+                    if (value == null) continue;
 
                     switch (col) {
                         case 2:
@@ -124,6 +124,7 @@ public class InteressatResourceHelper {
                         case 9:
                             interessatResource.setAmbOficinaSir(Boolean.parseBoolean(value));
                             break;
+                        // Adreça postal
                         case 10:
                             interessatResource.setPais(value);
                             break;
@@ -134,25 +135,71 @@ public class InteressatResourceHelper {
                             interessatResource.setMunicipi(value);
                             break;
                         case 13:
-                            interessatResource.setAdresa(value);
-                            break;
-                        case 14:
                             interessatResource.setCodiPostal(value);
                             break;
+                        case 14:
+                            interessatResource.setAdressaTipus(parseEnum(value, EntregaPostalTipusEnum.class));
+                            break;
                         case 15:
-                            interessatResource.setEmail(value);
+                            interessatResource.setAdressaTipusVia(parseEnum(value, EntregaPostalViaTipusEnum.class));
                             break;
                         case 16:
-                            interessatResource.setTelefon(value);
+                            interessatResource.setAdresa(value);
                             break;
                         case 17:
-                            interessatResource.setObservacions(value);
+                            interessatResource.setAdresaApartatCorreus(value);
                             break;
                         case 18:
+                            interessatResource.setAdressaNumCasa(value);
+                            break;
+                        case 19:
+                            interessatResource.setAdresaPuntKm(value);
+                            break;
+                        case 20:
+                            interessatResource.setAdresaPortal(value);
+                            break;
+                        case 21:
+                            interessatResource.setAdresaEscala(value);
+                            break;
+                        case 22:
+                            interessatResource.setAdresaPlanta(value);
+                            break;
+                        case 23:
+                            interessatResource.setAdresaPorta(value);
+                            break;
+                        case 24:
+                            interessatResource.setAdresaBloc(value);
+                            break;
+                        case 25:
+                            interessatResource.setAdresaQualificador(value);
+                            break;
+                        case 26:
+                            interessatResource.setAdresaPoblacio(value);
+                            break;
+                        case 27:
+                            interessatResource.setAdresaComplement(value);
+                            break;
+                        // Contacte
+                        case 28:
+                            interessatResource.setEmail(value);
+                            break;
+                        case 29:
+                            interessatResource.setTelefon(value);
+                            break;
+                        case 30:
+                            interessatResource.setObservacions(value);
+                            break;
+                        case 31:
                             InteressatIdiomaEnumDto idioma = parseEnum(value, InteressatIdiomaEnumDto.class);
                             interessatResource.setPreferenciaIdioma(idioma);
                             break;
                     }
+                }
+
+                // Per defecte, adreça sense normalitzar (text lliure)
+                if (interessatResource.getAdressaTipus() == null || EntregaPostalTipusEnum.SENSE_NORMALITZAR.equals(interessatResource.getAdressaTipus())) {
+                    interessatResource.setAdressaTipus(EntregaPostalTipusEnum.SENSE_NORMALITZAR);
+                    interessatResource.setAdressaTipusVia(null);
                 }
 
                 interessatsExcel.add(interessatResource);
