@@ -30,7 +30,9 @@ import org.springframework.validation.SmartValidator;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
@@ -864,6 +866,17 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
 
         private static final String NOT_COMPATIBLE = "NOT_COMPATIBLE";
 
+        /** Els JSON exportats abans d'alinear l'adreça amb Notib no duen adressaTipus: l'adreça és text lliure
+         *  (si no, s'aplicaria el valor per defecte NACIONAL i la validació exigiria tipus de via i número). */
+        private void marcarAdressaSenseNormalitzar(JsonNode node) {
+            if (node.isObject() && node.has(InteressatResource.Fields.documentNum)
+                    && !node.hasNonNull(InteressatResource.Fields.adressaTipus)) {
+                ((ObjectNode) node).put(InteressatResource.Fields.adressaTipus, EntregaPostalTipusEnum.SENSE_NORMALITZAR.name());
+                ((ObjectNode) node).putNull(InteressatResource.Fields.adressaTipusVia);
+            }
+            node.forEach(this::marcarAdressaSenseNormalitzar);
+        }
+
         @Override
         public void onChange(Serializable id, InteressatResource.ImportarInteressatsFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, InteressatResource.ImportarInteressatsFormAction target) {
 
@@ -877,14 +890,17 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
                                 objectMapper.registerModule(new JavaTimeModule());
                                 objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-                                List<InteressatResource> interesatsIndependents = objectMapper.readValue(
-                                        ((FileReference) fieldValue).getContent(),
+                                JsonNode fitxerJson = objectMapper.readTree(((FileReference) fieldValue).getContent());
+                                marcarAdressaSenseNormalitzar(fitxerJson);
+
+                                List<InteressatResource> interesatsIndependents = objectMapper.convertValue(
+                                        fitxerJson,
                                         new TypeReference<List<InteressatResource>>() {
                                         }
                                 );
 
-                                List<InteressatGrupResource> grupsFitxer = objectMapper.readValue(
-                                        ((FileReference) fieldValue).getContent(),
+                                List<InteressatGrupResource> grupsFitxer = objectMapper.convertValue(
+                                        fitxerJson,
                                         new TypeReference<List<InteressatGrupResource>>() {
                                         }
                                 );

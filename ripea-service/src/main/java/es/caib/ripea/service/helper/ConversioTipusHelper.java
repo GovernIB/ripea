@@ -1255,7 +1255,7 @@ public class ConversioTipusHelper {
 	            @Override
 	            public void mapAtoB(InteressatAdministracioDto source, InteressatResource target, MappingContext mappingContext) {
 	            	InteressatAdministracioDto interessat = (InteressatAdministracioDto) source;
-	            	target.setTipus(InteressatTipusEnum.InteressatPersonaFisicaEntity);
+	            	target.setTipus(InteressatTipusEnum.InteressatAdministracioEntity);
 	            	target.setOrganCodi(interessat.getOrganCodi());
           			target.setOrganNom(interessat.getOrganNom());
           		}

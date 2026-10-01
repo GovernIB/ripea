@@ -1,6 +1,7 @@
 package es.caib.ripea.service.helper;
 
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -37,6 +38,8 @@ import es.caib.ripea.persistence.repository.InteressatGrupRepository;
 import es.caib.ripea.persistence.repository.InteressatRepository;
 import es.caib.ripea.service.intf.base.model.Resource;
 import es.caib.ripea.service.intf.base.model.ResourceReference;
+import es.caib.ripea.service.intf.dto.EntregaPostalTipusEnum;
+import es.caib.ripea.service.intf.dto.EntregaPostalViaTipusEnum;
 import es.caib.ripea.service.intf.dto.InteressatAdministracioDto;
 import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.InteressatDto;
@@ -854,13 +857,9 @@ public class ExpedientInteressatHelper {
 	            }
 
 	            // Columna 2 endavant
-	            for (int col = 2; col <= 18; col++) {
-	                Cell cell = row.getCell(col);
-	                if (cell == null || cell.getCellType() == Cell.CELL_TYPE_BLANK) continue;
-
-	                String value = cell.getCellType() == Cell.CELL_TYPE_STRING
-	                        ? cell.getStringCellValue().trim()
-	                        : String.valueOf((int)cell.getNumericCellValue());
+	            for (int col = 2; col <= EXCEL_DARRERA_COLUMNA; col++) {
+	                String value = valorCellaExcel(row.getCell(col));
+	                if (value == null) continue;
 
 	                switch (col) {
 	                    case 2:
@@ -887,6 +886,7 @@ public class ExpedientInteressatHelper {
 	                    case 9:
 	                        cast(dto, InteressatAdministracioDto.class).ifPresent(d -> d.setAmbOficinaSir(Boolean.parseBoolean(value)));
 	                        break;
+	                    // Adreça postal
 	                    case 10:
 	                        dto.setPais(value);
 	                        break;
@@ -897,25 +897,71 @@ public class ExpedientInteressatHelper {
 	                        dto.setMunicipi(value);
 	                        break;
 	                    case 13:
-	                        dto.setAdresa(value);
-	                        break;
-	                    case 14:
 	                        dto.setCodiPostal(value);
 	                        break;
+	                    case 14:
+	                        dto.setAdressaTipus(parseEnum(value, EntregaPostalTipusEnum.class));
+	                        break;
 	                    case 15:
-	                        dto.setEmail(value);
+	                        dto.setAdressaTipusVia(parseEnum(value, EntregaPostalViaTipusEnum.class));
 	                        break;
 	                    case 16:
-	                        dto.setTelefon(value);
+	                        dto.setAdresa(value);
 	                        break;
 	                    case 17:
-	                        dto.setObservacions(value);
+	                        dto.setAdresaApartatCorreus(value);
 	                        break;
 	                    case 18:
+	                        dto.setAdressaNumCasa(value);
+	                        break;
+	                    case 19:
+	                        dto.setAdresaPuntKm(value);
+	                        break;
+	                    case 20:
+	                        dto.setAdresaPortal(value);
+	                        break;
+	                    case 21:
+	                        dto.setAdresaEscala(value);
+	                        break;
+	                    case 22:
+	                        dto.setAdresaPlanta(value);
+	                        break;
+	                    case 23:
+	                        dto.setAdresaPorta(value);
+	                        break;
+	                    case 24:
+	                        dto.setAdresaBloc(value);
+	                        break;
+	                    case 25:
+	                        dto.setAdresaQualificador(value);
+	                        break;
+	                    case 26:
+	                        dto.setAdresaPoblacio(value);
+	                        break;
+	                    case 27:
+	                        dto.setAdresaComplement(value);
+	                        break;
+	                    // Contacte
+	                    case 28:
+	                        dto.setEmail(value);
+	                        break;
+	                    case 29:
+	                        dto.setTelefon(value);
+	                        break;
+	                    case 30:
+	                        dto.setObservacions(value);
+	                        break;
+	                    case 31:
 	                    	InteressatIdiomaEnumDto idioma = parseEnum(value, InteressatIdiomaEnumDto.class);
 	                        dto.setPreferenciaIdioma(idioma);
 	                        break;
 	                }
+	            }
+	            
+	            // Per defecte, adreça sense normalitzar (text lliure)
+	            if (dto.getAdressaTipus() == null || EntregaPostalTipusEnum.SENSE_NORMALITZAR.equals(dto.getAdressaTipus())) {
+	            	dto.setAdressaTipus(EntregaPostalTipusEnum.SENSE_NORMALITZAR);
+	            	dto.setAdressaTipusVia(null);
 	            }
 	            
 	            interessatsExcel.add(dto);
@@ -1002,6 +1048,24 @@ public class ExpedientInteressatHelper {
             default:
                 throw new RuntimeException("Tipus interessat " + tipus + " no disponible");
         }
+    }
+
+    /** Darrera columna del model Excel d'importació d'interessats (AF: idioma preferent) */
+    public static final int EXCEL_DARRERA_COLUMNA = 31;
+
+    /** Valor d'una cel·la del model Excel com a text, o null si és buida. Els números no perden decimals. */
+    @SuppressWarnings("deprecation") // POI 3.15
+    public static String valorCellaExcel(Cell cell) {
+        if (cell == null || cell.getCellType() == Cell.CELL_TYPE_BLANK) return null;
+        String value;
+        if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+            value = BigDecimal.valueOf(cell.getNumericCellValue()).stripTrailingZeros().toPlainString();
+        } else if (cell.getCellType() == Cell.CELL_TYPE_BOOLEAN) {
+            value = String.valueOf(cell.getBooleanCellValue());
+        } else {
+            value = cell.getStringCellValue().trim();
+        }
+        return value.isEmpty() ? null : value;
     }
 
     private <T> Optional<T> cast(Object obj, Class<T> clazz) {
