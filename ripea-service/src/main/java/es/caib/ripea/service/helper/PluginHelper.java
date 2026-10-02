@@ -248,7 +248,6 @@ import es.caib.ripea.service.intf.dto.config.ConfigDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
 import es.caib.ripea.service.intf.service.AplicacioService;
-import es.caib.ripea.service.intf.service.DocumentService;
 import es.caib.ripea.service.intf.utils.DateUtil;
 import es.caib.ripea.service.intf.utils.Utils;
 import io.micrometer.core.instrument.Timer;
@@ -305,7 +304,6 @@ public class PluginHelper {
 	@Autowired private ContingutHelper contingutHelper;
 	@Autowired private DocumentNotificacioHelper documentNotificacioHelper;
 	@Autowired private ApplicationHelper applicationHelper;
-	@Autowired private DocumentService documentService;
 	@Autowired private MessageHelper messageHelper;	
 	@Autowired private DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
 	@Autowired private ExpedientPeticioRepository expedientPeticioRepository;
@@ -5627,10 +5625,13 @@ public class PluginHelper {
 					
 					if (! document.isAmbFirma()) {
 						try {
-							documentService.documentActualitzarEstat(
-									documentEnviamentInteressatEntity.getNotificacio().getExpedient().getEntitat().getId(),
-									document.getId(),
-									DocumentEstatEnumDto.DEFINITIU);
+							// Es crida el helper i no DocumentService: la consulta d'estat també arriba pel callback de NOTIB
+							// (api-interna, usuari $notib_ripea) sense permisos sobre l'expedient, i l'excepció del servei
+							// marcaria la transacció per rollback encara que aquí es capturi.
+							Long documentCertificacioId = document.getId();
+							DocumentEntity documentCertificacio = documentRepository.findById(documentCertificacioId).orElseThrow(
+									() -> new NotFoundException(documentCertificacioId, DocumentEntity.class));
+							documentHelper.actualitzarEstat(documentCertificacio, DocumentEstatEnumDto.DEFINITIU);
 						} catch (Exception e) {
 							logger.error("Hi ha hagut un error actualitzant l'estat de la certificació {} a definitiu. Error: {}", document.getFitxerNom(), e.getMessage());
 							e.printStackTrace();
