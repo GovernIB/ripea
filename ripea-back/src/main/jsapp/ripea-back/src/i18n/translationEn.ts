@@ -185,6 +185,7 @@ const translationEn = {
         avis: "Notice management",
         exception: "Latest exceptions",
         integracio: "Integration monitoring",
+        usuari: "User management",
         massiu: {
             portafirmes: "Mass action: send documents to the signature portal",
             firmasimpleweb: "Mass action: sign documents from the browser",
@@ -1843,6 +1844,90 @@ const translationEn = {
                 },
             },
         },
+        usuari: {
+            actiu: "Active",
+            baixa: {
+                info: "Deactivated on {{data}} by {{usuari}}.\nReason: {{motiu}}",
+            },
+            action: {
+                permisos: {
+                    label: "Permissions",
+                },
+                baixa: {
+                    label: "Deactivate",
+                    title: "Deactivate user {{usuari}}",
+                    button: "Deactivate",
+                    ok: "User deactivated",
+                },
+                alta: {
+                    label: "Reactivate",
+                    title: "Reactivate user",
+                    confirm: "Are you sure you want to reactivate user {{usuari}}? They will be able to log in and receive emails again.",
+                    ok: "User reactivated",
+                },
+            },
+            permisos: {
+                title: "Permissions of user {{usuari}}",
+                ajuda: "Permissions are shown as they are assigned, either directly to the user or to one of their roles. Inherited permissions (for example, from parent bodies) are not calculated.",
+                rolsError: "The user's roles could not be retrieved: only directly assigned permissions are shown.",
+                senseEntitats: "The user has no permissions assigned.",
+                buit: "No permissions.",
+                capcalera: {
+                    codi: "Code",
+                    nom: "Name",
+                    nif: "NIF",
+                    email: "Email",
+                    rols: "Roles",
+                },
+                entitat: {
+                    administrador: "Entity administrator",
+                    administradorLectura: "Entity administrator (read-only)",
+                    usuari: "Entity user",
+                    numPermisos: "{{num}} permissions on objects",
+                },
+                tipus: {
+                    ENTITY: "Entity",
+                    GRUP: "Groups",
+                    ORGAN: "Managing bodies",
+                    MET_EXP_ORG: "Procedures by managing body",
+                    MET_NOD: "Procedures",
+                },
+                columna: {
+                    tipus: "Type",
+                    objecte: "Object",
+                    organ: "Managing body",
+                    origen: "Origin",
+                    permisos: "Permissions",
+                },
+                origen: {
+                    directe: "Direct",
+                    rol: "Role: {{rol}}",
+                },
+                permis: {
+                    READ: "Read",
+                    WRITE: "Write",
+                    CREATE: "Create",
+                    DELETE: "Delete",
+                    ADMINISTRATION: "Administration",
+                    STATISTICS: "Statistics",
+                    COMU: "Common procedures",
+                    ADM_COMU: "Common administration",
+                    DISSENY: "Design",
+                    ADMINISTRATION_READ: "Administration (read-only)",
+                },
+                orfes: {
+                    title: "Permissions on deleted objects",
+                    ajuda: "These permissions refer to objects that no longer exist. They can be revoked for cleanup, including those assigned to a role.",
+                },
+                revocar: {
+                    label: "Revoke",
+                    title: "Revoke permission",
+                    confirm: "Are you sure you want to revoke all permissions of '{{sid}}' on '{{objecte}}'?",
+                    ok: "Permission revoked",
+                    noRevocable: "Permission assigned to a role: it affects every user with that role and cannot be revoked here",
+                },
+            },
+        },
         avis: {
             title: "Notice",
             action: {
@@ -2058,6 +2143,7 @@ const translationEn = {
                 segonPla: "Restart background tasks...",
                 plugins: "Restart plugins...",
                 avisos: "Notifications",
+                usuaris: "Users",
                 backVersio: "Classic interface",
 
                 anotacions: "Annotations",

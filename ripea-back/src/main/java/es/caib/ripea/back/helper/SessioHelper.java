@@ -7,6 +7,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
+import es.caib.ripea.back.config.BaseWebSecurityConfig;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ContingutVistaEnumDto;
 import es.caib.ripea.service.intf.dto.EntitatDto;
@@ -24,6 +25,8 @@ public class SessioHelper {
 	private static final String SESSION_ATTRIBUTE_IDIOMA_USUARI = "SessionHelper.idiomaUsuari";
 	public static final String SESSION_ATTRIBUTE_ORGAN_ACTUAL_CODI_USUARI = "SessionHelper.organActualCodiUsuari"; // organ derived from current contingut or procediment on which user is working
 	public static final String SESSION_ATTRIBUTE_MOURE_VISTA = "SessioHelper.moureVista";
+	/** Pàgina pública que informa l'usuari donat de baixa (exclosa de l'interceptor de sessió). */
+	public static final String URL_USUARI_INACTIU = "/public/usuariInactiu";
 	
 	private static boolean propietatsInicialitzades = false;
 	private static String capLogo = null;
@@ -53,6 +56,12 @@ public class SessioHelper {
 				aplicacioService.evictCachesUsuariActual();
 				aplicacioService.processarAutenticacioUsuari(true);
 				usuariActual = aplicacioService.getUsuariActual();
+				if (!usuariActual.isActiu() && !isPathPermesUsuariInactiu(request)) {
+					// Usuari donat de baixa: no es marca l'autenticació com a processada, de manera que cada
+					// petició ho torna a comprovar. Només es controla en iniciar la sessió: una sessió ja
+					// oberta abans de la baixa continua fins que caduca.
+					return request.getContextPath() + URL_USUARI_INACTIU;
+				}
 				request.getSession().setAttribute(SESSION_ATTRIBUTE_AUTH_PROCESSADA, new Boolean(true));
 				request.getSession().setAttribute(SESSION_ATTRIBUTE_USUARI_ACTUAL, usuariActual);
 				// Forçam el refresc de l'entitat actual i dels permisos d'administració d'òrgan
@@ -119,6 +128,16 @@ public class SessioHelper {
 		}
 		
 		return resultat;
+	}
+
+	/** Indica si la redirecció retornada per processarAutenticacio és la de l'usuari donat de baixa. */
+	public static boolean isRedireccioUsuariInactiu(HttpServletRequest request, String redireccio) {
+		return redireccio != null && redireccio.equals(request.getContextPath() + URL_USUARI_INACTIU);
+	}
+
+	/** L'usuari donat de baixa ha de poder tancar la sessió per entrar amb un altre usuari. */
+	private static boolean isPathPermesUsuariInactiu(HttpServletRequest request) {
+		return BaseWebSecurityConfig.LOGOUT_URL.equals(request.getServletPath());
 	}
 
 	public static boolean isAutenticacioProcessada(HttpServletRequest request) {

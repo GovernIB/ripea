@@ -1372,6 +1372,14 @@ public class EmailHelper {
 		
 		boolean emailInmediat = (event!=null && (EventTipusEnumDto.ENVIAR_FICHERO.equals(event) || EventTipusEnumDto.AVIS_ERROR_TANCAMENT_ARXIU.equals(event)));
 
+		// Un usuari donat de baixa no rep cap correu, ni tan sols els immediats
+		if (usuari != null && !usuari.isActiu()) {
+			if (cacheHelper.mostrarLogsEmail()) {
+				logger.info("No s'envia correu a l'usuari " + codi + " perquè està donat de baixa");
+			}
+			return;
+		}
+
         if (usuari != null) {
             if (emailInmediat) {
                 addDestinatari = true;

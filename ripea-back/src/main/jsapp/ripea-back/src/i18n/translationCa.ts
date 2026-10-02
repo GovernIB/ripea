@@ -185,6 +185,7 @@ const translationCa = {
         avis: "Gestió d'avisos",
         exception: 'Darreres excepcions produïdes',
         integracio: "Seguiment d'integracions",
+        usuari: "Gestió d'usuaris",
         massiu: {
             portafirmes: "Acció massiva: enviar documents al portafirmes",
             firmasimpleweb: "Acció massiva: firmar documents des del navegador",
@@ -1844,6 +1845,90 @@ const translationCa = {
                 },
             },
         },
+        usuari: {
+            actiu: "Actiu",
+            baixa: {
+                info: "Donat de baixa el {{data}} per {{usuari}}.\nMotiu: {{motiu}}",
+            },
+            action: {
+                permisos: {
+                    label: "Permisos",
+                },
+                baixa: {
+                    label: "Dona de baixa",
+                    title: "Donar de baixa l'usuari {{usuari}}",
+                    button: "Dona de baixa",
+                    ok: "Usuari donat de baixa",
+                },
+                alta: {
+                    label: "Torna a donar d'alta",
+                    title: "Tornar a donar d'alta l'usuari",
+                    confirm: "Segur que voleu tornar a donar d'alta l'usuari {{usuari}}? Podrà tornar a iniciar sessió i rebre correus.",
+                    ok: "Usuari donat d'alta",
+                },
+            },
+            permisos: {
+                title: "Permisos de l'usuari {{usuari}}",
+                ajuda: "Es mostren els permisos tal com estan assignats, directament a l'usuari o a algun dels seus rols. No es calculen els permisos heretats (per exemple, dels òrgans superiors).",
+                rolsError: "No s'han pogut consultar els rols de l'usuari: només es mostren els permisos assignats directament.",
+                senseEntitats: "L'usuari no té cap permís assignat.",
+                buit: "No hi ha permisos.",
+                capcalera: {
+                    codi: "Codi",
+                    nom: "Nom",
+                    nif: "NIF",
+                    email: "Correu electrònic",
+                    rols: "Rols",
+                },
+                entitat: {
+                    administrador: "Administrador de l'entitat",
+                    administradorLectura: "Administrador de l'entitat (lectura)",
+                    usuari: "Usuari de l'entitat",
+                    numPermisos: "{{num}} permisos sobre objectes",
+                },
+                tipus: {
+                    ENTITY: "Entitat",
+                    GRUP: "Grups",
+                    ORGAN: "Òrgans gestors",
+                    MET_EXP_ORG: "Procediments per òrgan gestor",
+                    MET_NOD: "Procediments",
+                },
+                columna: {
+                    tipus: "Tipus",
+                    objecte: "Objecte",
+                    organ: "Òrgan gestor",
+                    origen: "Origen",
+                    permisos: "Permisos",
+                },
+                origen: {
+                    directe: "Directe",
+                    rol: "Rol: {{rol}}",
+                },
+                permis: {
+                    READ: "Consulta",
+                    WRITE: "Modificació",
+                    CREATE: "Creació",
+                    DELETE: "Eliminació",
+                    ADMINISTRATION: "Administració",
+                    STATISTICS: "Estadístiques",
+                    COMU: "Procediments comuns",
+                    ADM_COMU: "Administració de comuns",
+                    DISSENY: "Disseny",
+                    ADMINISTRATION_READ: "Administració (lectura)",
+                },
+                orfes: {
+                    title: "Permisos sobre objectes esborrats",
+                    ajuda: "Aquests permisos fan referència a objectes que ja no existeixen. Es poden revocar per fer neteja, també els assignats a un rol.",
+                },
+                revocar: {
+                    label: "Revoca",
+                    title: "Revocar permís",
+                    confirm: "Segur que voleu revocar tots els permisos de '{{sid}}' sobre '{{objecte}}'?",
+                    ok: "Permís revocat",
+                    noRevocable: "Permís assignat a un rol: afecta tots els usuaris amb aquest rol i no es pot revocar des d'aquí",
+                },
+            },
+        },
         avis: {
             title: "Avis",
             action: {
@@ -2059,6 +2144,7 @@ const translationCa = {
                 segonPla: "Reiniciar tasques en segon pla...",
                 plugins: "Reiniciar plugins...",
                 avisos: "Avisos",
+                usuaris: "Usuaris",
                 backVersio: "Interfície clàssica",
 
                 anotacions: "Anotacions",

@@ -27,6 +27,14 @@ public class SessioInterceptor implements AsyncHandlerInterceptor {
 
 		if (redireccio==null) {
 			return true;
+		} else if (SessioHelper.isRedireccioUsuariInactiu(request, redireccio) && request.getServletPath().startsWith("/api/")) {
+			// Les crides de la interfície REACT no poden seguir una redirecció a una pàgina HTML: es retorna
+			// un 403 amb un codi que el client reconeix per dur l'usuari a la pàgina d'usuari inactiu.
+			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			response.setContentType("application/json");
+			response.setCharacterEncoding("UTF-8");
+			response.getWriter().write("{\"code\":\"USUARI_INACTIU\"}");
+			return false;
 		} else {
 			response.sendRedirect(redireccio);
 			return false;

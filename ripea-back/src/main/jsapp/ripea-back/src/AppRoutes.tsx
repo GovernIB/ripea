@@ -46,6 +46,7 @@ import {Propietats, PropietatsByEntitat} from "./pages/user/propietats/Propietat
 import {ExcepcioGrid} from "./pages/user/monitor/ExcepcioGrid.tsx";
 import {IntegracioGrid} from "./pages/user/monitor/integracio/IntegracioGrid.tsx";
 import Accesibilitat from "./pages/Accesibilitat.tsx";
+import UsuariGrid from "./pages/usuari/UsuariGrid.tsx";
 import Load from "./components/Load.tsx";
 
 const ProtectedRoute = ({ allowedRoles = [], params = [] }: any) => {
@@ -143,6 +144,7 @@ const AppRoutes: React.FC = () => {
             <Route path={"config"} element={<Propietats/>} />
             <Route path={"integracio"} element={<IntegracioGrid/>} />
             <Route path={"excepcio"} element={<ExcepcioGrid/>} />
+            <Route path={"usuari"} element={<UsuariGrid/>} />
         </Route>
 
         {/* Accions massives */}

@@ -18,6 +18,13 @@ export enum rols {
     tothom = 'tothom',
 }
 
+// Pàgina pública de la interfície clàssica que informa l'usuari donat de baixa (SessioHelper.URL_USUARI_INACTIU)
+const URL_USUARI_INACTIU = 'public/usuariInactiu';
+
+// El backend respon amb aquest 403 a les crides /api d'un usuari donat de baixa (SessioInterceptor)
+const isUsuariInactiu = (error: any) =>
+    error?.response?.status === 403 && error?.response?.data?.code === 'USUARI_INACTIU';
+
 let alreadyRequested = false;
 export const useUserSession = () => {
     axios.defaults.withCredentials = true;
@@ -31,6 +38,10 @@ export const useUserSession = () => {
                 save(response.data);
             })
             .catch((error) => {
+                if (isUsuariInactiu(error)) {
+                    window.location.href = apiUrl.replace(/\/api\/?$/, '/') + URL_USUARI_INACTIU;
+                    return;
+                }
                 save(null);
                 console.log(">>>> axios error", error)
             })

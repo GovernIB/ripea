@@ -46,6 +46,12 @@ export const useMenuSupAdmin = () => {
                 to: '/avis',
             },
             {
+                id: 'usuaris',
+                title: t('page.user.menu.usuaris'),
+                icon: 'manage_accounts',
+                to: '/usuari',
+            },
+            {
                 id: 'monitoritzar',
                 title: t('page.user.menu.monitoritzar'),
                 // description: '',

@@ -1,6 +1,7 @@
 package es.caib.ripea.persistence.entity.resourceentity;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -15,6 +16,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import es.caib.ripea.persistence.base.entity.ResourceEntity;
@@ -118,6 +121,21 @@ public class UsuariResourceEntity implements ResourceEntity<UsuariResource, Stri
 	@Column(name="interficie_usuari", length = 5)
 	@Enumerated(EnumType.STRING)
 	private InterficieUsuariEnumDto interficieUsuari = InterficieUsuariEnumDto.REACT;
+
+	// Baixa lògica. Només lectura des del recurs: l'edició del perfil (PUT /usuari) no les ha de poder
+	// modificar. Les escriuen les accions de baixa/alta a través de UsuariEntity.
+	@Column(name = "actiu", insertable = false, updatable = false)
+	private boolean actiu = true;
+
+	@Column(name = "baixa_data", insertable = false, updatable = false)
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date baixaData;
+
+	@Column(name = "baixa_usuari", length = 64, insertable = false, updatable = false)
+	private String baixaUsuari;
+
+	@Column(name = "baixa_motiu", length = 1024, insertable = false, updatable = false)
+	private String baixaMotiu;
 
     @Column(name = "codi", insertable = false, updatable = false)
     private String id;

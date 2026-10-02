@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - changeSet:
+      id: RIPEA_1.0.9_USUARI_BAIXA_1
+      author: limit
+      changes:
+        - sqlFile:
+            dbms: oracle
+            path: ../scripts/oracle/1.0.9/Versio_1.0.9_DDL_1.sql
+            splitStatements: true
+            stripComments: true
+            relativeToChangelogFile: true
+        - sqlFile:
+            dbms: postgresql
+            path: ../scripts/postgres/1.0.9/Versio_1.0.9_DDL_1.sql
+            splitStatements: true
+            stripComments: true
+            relativeToChangelogFile: true

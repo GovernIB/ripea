@@ -13,6 +13,7 @@ const TITLES: any = {
     '/config': "page.user.menu.props",
     '/excepcio': "navigate.exception",
     '/integracio': "navigate.integracio",
+    '/usuari': "navigate.usuari",
 
     // Accions massives
     '/massiu/portafirmes': "navigate.massiu.portafirmes",

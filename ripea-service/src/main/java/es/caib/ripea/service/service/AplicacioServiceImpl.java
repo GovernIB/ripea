@@ -677,6 +677,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		}
 		dto.setProcedimentId(usuari.getProcediment() != null ? usuari.getProcediment().getId() : null);
 		dto.setEntitatPerDefecteId(usuari.getEntitatPerDefecte() != null ? usuari.getEntitatPerDefecte().getId() : null);
+		dto.setActiu(usuari.isActiu());
 		return dto;
 	}
 

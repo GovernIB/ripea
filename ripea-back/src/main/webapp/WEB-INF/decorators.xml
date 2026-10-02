@@ -10,6 +10,7 @@
 		<pattern>/rest/notib*</pattern>
 		<pattern>*/tag*</pattern>
 		<pattern>*/react*</pattern>
+		<pattern>/public/usuariInactiu*</pattern>
 	</excludes>
 	<decorator name="senseCapNiPeus" page="senseCapNiPeus.jsp">
 		<pattern>/scanweb*</pattern>

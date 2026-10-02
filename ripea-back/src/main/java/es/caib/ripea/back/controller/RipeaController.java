@@ -79,6 +79,15 @@ public class RipeaController {
 		}
 	}
 
+	/**
+	 * Pàgina informativa per a l'usuari donat de baixa (vegeu SessioHelper.processarAutenticacio).
+	 * Ruta pública: no passa per l'interceptor de sessió i no està decorada.
+	 */
+	@RequestMapping(value = SessioHelper.URL_USUARI_INACTIU, method = RequestMethod.GET)
+	public String usuariInactiu() {
+		return "usuariInactiu";
+	}
+
 	@RequestMapping(value = ModalHelper.ACCIO_MODAL_TANCAR, method = RequestMethod.GET)
 	@ResponseStatus(value = HttpStatus.OK)
 	public void modalTancar() {}

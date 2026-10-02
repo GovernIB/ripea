@@ -13,6 +13,7 @@ import org.hibernate.annotations.ForeignKey;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -129,6 +130,20 @@ public class UsuariEntity implements Serializable {
 	@Enumerated(EnumType.STRING)
 	private InterficieUsuariEnumDto interficieUsuari;
 
+	/** Baixa lògica: un usuari inactiu no pot iniciar sessió ni rep correus de l'aplicació. */
+	@Column(name = "actiu", nullable = false)
+	private boolean actiu = true;
+
+	@Column(name = "baixa_data")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date baixaData;
+
+	@Column(name = "baixa_usuari", length = 64)
+	private String baixaUsuari;
+
+	@Column(name = "baixa_motiu", length = 1024)
+	private String baixaMotiu;
+
 	public ContingutVistaEnumDto getVistaActual() {
 		return vistaActual;
 	}
@@ -222,6 +237,24 @@ public class UsuariEntity implements Serializable {
 
 	public void updateRolActual(String rolActual) {
 		this.rolActual = rolActual;
+	}
+
+	/**
+	 * Dona de baixa l'usuari desant qui, quan i per què.
+	 */
+	public void updateBaixa(String baixaUsuari, String baixaMotiu) {
+		this.actiu = false;
+		this.baixaData = new Date();
+		this.baixaUsuari = baixaUsuari;
+		this.baixaMotiu = trimAndShorten(baixaMotiu, 1024);
+	}
+
+	/**
+	 * Torna a donar d'alta l'usuari. Les dades de la darrera baixa es conserven com a
+	 * historial i només es mostren mentre l'usuari està inactiu.
+	 */
+	public void updateAlta() {
+		this.actiu = true;
 	}
 
 	public void updateInformacioExpedientExpandit(boolean informacioExpedientExpandit) {

@@ -45,6 +45,8 @@ public class UsuariDto implements Serializable {
 	private boolean expedientExpandit;
 	private MoureDestiVistaEnumDto vistaMoureActual;
 	private InterficieUsuariEnumDto interficieUsuari;
+	/** Baixa lògica: un usuari inactiu no pot iniciar sessió. */
+	private boolean actiu = true;
 
 
 	public String getCodiAndNom() {
