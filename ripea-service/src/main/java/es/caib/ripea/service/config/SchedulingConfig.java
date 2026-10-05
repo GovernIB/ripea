@@ -1,6 +1,8 @@
 package es.caib.ripea.service.config;
 
 import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.IncorporacioDocumentsSegonPlaHelper;
+import es.caib.ripea.service.helper.IncorporacioDocumentsSegonPlaHelper.ProcessadorElement;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.ExecucioMassivaService;
@@ -32,9 +34,11 @@ import org.springframework.security.core.userdetails.User;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 @Slf4j
 @Configuration
@@ -49,12 +53,15 @@ public class SchedulingConfig implements SchedulingConfigurer {
     @Autowired private ConfigHelper configHelper;
     @Autowired private es.caib.ripea.service.helper.ExcepcioLogHelper excepcioLogHelper;
     @Autowired private es.caib.ripea.service.helper.IntegracioHelper integracioHelper;
+    @Autowired private IncorporacioDocumentsSegonPlaHelper incorporacioDocumentsSegonPlaHelper;
 
     private Boolean[] primeraVez = {
             Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE
     };
 
     private static final long DEFAULT_INITIAL_DELAY_MS = 30000L;
+    /** Cada quant es comprova si ha arribat la data d'inici dels processos d'incorporació de documents. */
+    private static final long INTERVAL_COMPROVACIO_INICI_MS = 60000L;
     private ScheduledTaskRegistrar taskRegistrar;
     //Mantenir un registre de les tasques que s'han enregistrat
     private final Map<String, Runnable> tasks = new HashMap<>();
@@ -75,6 +82,8 @@ public class SchedulingConfig implements SchedulingConfigurer {
     private final String codiGenerarEstadistiquesDiaries = "generarEstadistiquesDiaries";
     private final String codiEsborrarExcepcionsMesAntigues = "esborrarExcepcionsMesAntigues";
     private final String codiEsborrarIntegracionsAntigues = "esborrarIntegracionsAntigues";
+    private final String codiIncorporarCertificatsRemeses = "incorporarCertificatsRemeses";
+    private final String codiIncorporarJustificantsRegistre = "incorporarJustificantsRegistre";
 
      @Bean
      public TaskScheduler taskScheduler() {
@@ -490,7 +499,71 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 },
                 getTrigger(codiEsborrarIntegracionsAntigues)
         );
+        addTask(
+                codiIncorporarCertificatsRemeses,
+                () -> executarIncorporacioDocuments(
+                        codiIncorporarCertificatsRemeses,
+                        PropertyConfig.INCORPORAR_CERTIFICATS_REMESES_INICI,
+                        "enviament",
+                        aplicacioService::getExpedientsAmbCertificatRemesa,
+                        aplicacioService::executeCertificatsRemesaExpedient),
+                getTriggerIncorporacioDocuments(codiIncorporarCertificatsRemeses, PropertyConfig.INCORPORAR_CERTIFICATS_REMESES_INICI)
+        );
+        addTask(
+                codiIncorporarJustificantsRegistre,
+                () -> executarIncorporacioDocuments(
+                        codiIncorporarJustificantsRegistre,
+                        PropertyConfig.INCORPORAR_JUSTIFICANTS_REGISTRE_INICI,
+                        "anotacio",
+                        aplicacioService::getExpedientsAmbJustificantRegistre,
+                        aplicacioService::executeJustificantsRegistreExpedient),
+                getTriggerIncorporacioDocuments(codiIncorporarJustificantsRegistre, PropertyConfig.INCORPORAR_JUSTIFICANTS_REGISTRE_INICI)
+        );
     } //Fi de configureTasks
+
+    /**
+     * Processos d'incorporació de documents (certificats de remeses i justificants de registre): la tasca es
+     * comprova cada minut, però només s'executa quan arriba la data i hora de la seva propietat. Cada element es
+     * processa amb la seva pròpia transacció (crida a través del proxy d'AplicacioService) amb l'usuari SYSTEM_RIPEA.
+     */
+    private void executarIncorporacioDocuments(
+            String codiTasca,
+            String propietat,
+            String tipusElement,
+            Supplier<List<Long>> obtenirElements,
+            ProcessadorElement processador) {
+        if (!incorporacioDocumentsSegonPlaHelper.isMomentInici(codiTasca, propietat)) {
+            return;
+        }
+        monitorTasquesService.inici(codiTasca);
+        try {
+            createAuthenticationContext();
+            incorporacioDocumentsSegonPlaHelper.executar(
+                    codiTasca,
+                    propietat,
+                    tipusElement,
+                    obtenirElements,
+                    processador,
+                    progres -> monitorTasquesService.findByCodi(codiTasca).setObservacions(progres));
+            monitorTasquesService.fi(codiTasca);
+        } catch (Throwable th) {
+            tractarErrorTascaSegonPla(th, codiTasca);
+        } finally {
+            IncorporacioDocumentsSegonPlaHelper.netejarContextFil();
+        }
+    }
+
+    /** Comprova cada minut la propietat i mostra al monitor de tasques la data d'inici programada, si n'hi ha. */
+    private Trigger getTriggerIncorporacioDocuments(String codiTasca, String propietat) {
+        return triggerContext -> {
+            long ara = System.currentTimeMillis();
+            Date dataInici = incorporacioDocumentsSegonPlaHelper.getDataInici(propietat);
+            monitorTasquesService.updateProperaExecucio(
+                    codiTasca,
+                    dataInici != null && dataInici.getTime() > ara ? dataInici.getTime() - ara : null);
+            return new Date(ara + INTERVAL_COMPROVACIO_INICI_MS);
+        };
+    }
 
     private Trigger getTrigger(String taskCodi) {
         if (taskCodi.equals(codiTancarExpedientsEnArxiu)) {

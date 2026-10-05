@@ -36,15 +36,9 @@ public class CertificatRemesaHelper {
 
         ExpedientEntity expedient = interessatEnviament.getNotificacio().getExpedient();
 
-        String nif = interessatEnviament.getInteressat() != null
-            ? interessatEnviament.getInteressat().getDocumentNum()
-            : null;
+        String nifPerNom = nifPerNomFitxer(interessatEnviament);
 
-        String nifPerNom = nif != null && !nif.trim().isEmpty()
-            ? nif.trim().replace("/", "_")
-            : "SENSE_NIF";
-
-        String nomFitxer = nomFitxerCertificat(expedient.getId(), interessatEnviament.getId(), nifPerNom);
+        String nomFitxer = nomFitxerCertificat(interessatEnviament);
 
         boolean jaExisteix = documentRepository
             .existsByExpedientIdAndFitxerNom(expedient.getId(), nomFitxer);
@@ -95,13 +89,8 @@ public class CertificatRemesaHelper {
             true,
             true);
 
-        //Borram el backup que es guardava en el gestor documental si existeix
-        if (interessatEnviament.getNotificacio().getEnviamentCertificacioArxiuId()!=null) {
-        	pluginHelper.gestioDocumentalDelete(
-        			interessatEnviament.getNotificacio().getEnviamentCertificacioArxiuId(),
-        			PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS);
-        }
-        
+        pluginHelper.esborrarCopiaCertificacioGestioDocumental(interessatEnviament.getNotificacio());
+
         return logIRetorna("Incorporat el certificat de l'enviament " + interessatEnviament.getId()
             + " (notificació " + interessatEnviament.getNotificacio().getId() + ")"
             + " com a document " + nomFitxer + " al contingut de l'expedient " + expedient.getId() + ".");
@@ -132,8 +121,26 @@ public class CertificatRemesaHelper {
         return nom;
     }
 
-    private String nomFitxerCertificat(Long expedientId, Long enviamentInteressatId, String nif) {
+    /**
+     * Nom del fitxer del justificant de recepció d'un enviament de NOTIB:
+     * NOTIB_JUSTIFICANT_RECEPCIO_&lt;expedientId&gt;_&lt;enviamentInteressatId&gt;_&lt;NIF&gt;.pdf.
+     * És el mateix tant si el certificat s'incorpora en rebre'l de NOTIB (PluginHelper.guardarCertificacio) com
+     * amb el procés massiu d'administració, i és el que permet saber si el certificat d'un enviament concret ja és
+     * a l'expedient: el document no té cap altra referència a l'enviament.
+     */
+    public static String nomFitxerCertificat(DocumentEnviamentInteressatEntity interessatEnviament) {
         return MetaDocumentPerDefecteEnumDto.NOTIB_JUSTIFICANT_RECEPCIO.getCodi()
-            + "_" + expedientId + "_" + enviamentInteressatId + "_" + nif + ".pdf";
+            + "_" + interessatEnviament.getNotificacio().getExpedient().getId()
+            + "_" + interessatEnviament.getId()
+            + "_" + nifPerNomFitxer(interessatEnviament) + ".pdf";
+    }
+
+    private static String nifPerNomFitxer(DocumentEnviamentInteressatEntity interessatEnviament) {
+        String nif = interessatEnviament.getInteressat() != null
+            ? interessatEnviament.getInteressat().getDocumentNum()
+            : null;
+        return nif != null && !nif.trim().isEmpty()
+            ? nif.trim().replace("/", "_")
+            : "SENSE_NIF";
     }
 }

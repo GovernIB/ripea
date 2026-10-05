@@ -248,7 +248,6 @@ import es.caib.ripea.service.intf.dto.config.ConfigDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
 import es.caib.ripea.service.intf.service.AplicacioService;
-import es.caib.ripea.service.intf.service.DocumentService;
 import es.caib.ripea.service.intf.utils.DateUtil;
 import es.caib.ripea.service.intf.utils.Utils;
 import io.micrometer.core.instrument.Timer;
@@ -305,7 +304,6 @@ public class PluginHelper {
 	@Autowired private ContingutHelper contingutHelper;
 	@Autowired private DocumentNotificacioHelper documentNotificacioHelper;
 	@Autowired private ApplicationHelper applicationHelper;
-	@Autowired private DocumentService documentService;
 	@Autowired private MessageHelper messageHelper;	
 	@Autowired private DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
 	@Autowired private ExpedientPeticioRepository expedientPeticioRepository;
@@ -5627,15 +5625,20 @@ public class PluginHelper {
 					
 					if (! document.isAmbFirma()) {
 						try {
-							documentService.documentActualitzarEstat(
-									documentEnviamentInteressatEntity.getNotificacio().getExpedient().getEntitat().getId(),
-									document.getId(),
-									DocumentEstatEnumDto.DEFINITIU);
+							// Es crida el helper i no DocumentService: la consulta d'estat també arriba pel callback de NOTIB
+							// (api-interna, usuari $notib_ripea) sense permisos sobre l'expedient, i l'excepció del servei
+							// marcaria la transacció per rollback encara que aquí es capturi.
+							Long documentCertificacioId = document.getId();
+							DocumentEntity documentCertificacio = documentRepository.findById(documentCertificacioId).orElseThrow(
+									() -> new NotFoundException(documentCertificacioId, DocumentEntity.class));
+							documentHelper.actualitzarEstat(documentCertificacio, DocumentEstatEnumDto.DEFINITIU);
 						} catch (Exception e) {
 							logger.error("Hi ha hagut un error actualitzant l'estat de la certificació {} a definitiu. Error: {}", document.getFitxerNom(), e.getMessage());
 							e.printStackTrace();
 						}
 					}
+
+					esborrarCopiaCertificacioGestioDocumental(notificacio);
 				}
 			}
 		}
@@ -5649,6 +5652,30 @@ public class PluginHelper {
 		//Pot pareixer que guarda una data la primera vegada i ja no es podrá tornar a intentar gurdar per el if,
 		//pero si no hi ha certificació, la data es null.
 		documentEnviamentInteressatEntity.updateEnviamentCertificacioData(resposta.getCertificacioData());
+	}
+
+	/**
+	 * Esborra la còpia de la certificació que les versions anteriors desaven al gestor documental
+	 * (NOT_ENV_CERT_ARXIUID), un cop el certificat ja s'ha incorporat com a document de l'expedient.
+	 * La còpia és de la notificació, no de l'enviament, i no es llegeix enlloc. La referència es buida dins
+	 * la transacció i el fitxer s'esborra després del commit: si la creació del document es desfà, la còpia
+	 * es conserva. Un error esborrant el fitxer només es registra, no desfà la incorporació del certificat.
+	 */
+	public void esborrarCopiaCertificacioGestioDocumental(DocumentNotificacioEntity notificacio) {
+		final String gestioDocumentalId = notificacio.getEnviamentCertificacioArxiuId();
+		if (gestioDocumentalId == null) {
+			return;
+		}
+		final Long notificacioId = notificacio.getId();
+		notificacio.setEnviamentCertificacioArxiuId(null);
+		TransactionAfterCommitUtils.run(() -> {
+			try {
+				gestioDocumentalDelete(gestioDocumentalId, GESDOC_AGRUPACIO_CERTIFICACIONS);
+			} catch (Exception ex) {
+				logger.error("No s'ha pogut esborrar la còpia de la certificació " + gestioDocumentalId
+						+ " de la notificació " + notificacioId + " del gestor documental", ex);
+			}
+		});
 	}
 
 	private void validaSignaturaAgilObtenirFirmes(List<ArxiuFirmaDto> firmes, byte[] documentContingut) {
