@@ -1112,10 +1112,8 @@ public class ContingutHelper {
 		dto.setData(resposta.getCertificacioData());
 		if (resposta.getCertificacioContingut() != null) {
 			logger.debug("[CERT] Generant fitxer certificació...");
-			if (interessatNif != null && interessatNom != null)
-				dto.setFitxerNom("Certificació_" + notificacio.getAssumpte().replaceAll("\\s+","_") + "-" + interessatNif + "-" + interessatNom + ".pdf");
-			else
-				dto.setFitxerNom("Certificació_" + notificacio.getAssumpte().replaceAll("\\s+","_") + ".pdf");
+			// Mateix nom que el procés massiu d'administració (CertificatRemesaHelper): identifica l'enviament
+			dto.setFitxerNom(CertificatRemesaHelper.nomFitxerCertificat(documentEnviamentInteressatEntity));
 			dto.setFitxerContentType("application/pdf");
 			dto.setFitxerContingut(resposta.getCertificacioContingut());
 			dto.setFitxerTamany(Long.valueOf(resposta.getCertificacioContingut().length));

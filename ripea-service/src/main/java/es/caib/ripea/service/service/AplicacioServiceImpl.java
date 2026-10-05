@@ -1035,11 +1035,8 @@ public class AplicacioServiceImpl implements AplicacioService {
     @Override
     @Transactional(readOnly = true)
     public List<Long> getExpedientsAmbCertificatRemesa() {
-        return documentEnviamentInteressatRepository.findAmbCertificatPendentIncorporar()
-            .stream()
-            .map(DocumentEnviamentInteressatEntity::getId)
-            .distinct()
-            .collect(Collectors.toList());
+        return documentEnviamentInteressatRepository.findIdsAmbCertificatPendentIncorporar(
+                MetaDocumentPerDefecteEnumDto.NOTIB_JUSTIFICANT_RECEPCIO.getCodi() + "_");
     }
 
     /**
@@ -1056,6 +1053,7 @@ public class AplicacioServiceImpl implements AplicacioService {
             DocumentEnviamentInteressatEntity enviamentIntEntity = documentEnviamentInteressatRepository.findById(enviamentDestinatariId)
                 .orElseThrow(() -> new Exception("Notificació no trobada"));
 
+            fixarEntitatElement(enviamentIntEntity.getNotificacio().getExpedient().getEntitat());
             return certificatRemesaHelper.crearDocumentsCertificatNotificacio(enviamentIntEntity);
         } catch (Exception ex) {
             throw new Exception("Error al afegir els certificats de la enviament " + enviamentDestinatariId + ": " + ex.getMessage());
@@ -1086,6 +1084,9 @@ public class AplicacioServiceImpl implements AplicacioService {
     	ExpedientPeticioEntity peticio = null;
         try {
         	peticio = expedientPeticioRepository.findById(anotacioRegistreId).orElse(null);
+        	if (peticio != null && peticio.getExpedient() != null) {
+        		fixarEntitatElement(peticio.getExpedient().getEntitat());
+        	}
             return registreJustificantHelper.incorporarJustificantsRegistreExpedient(anotacioRegistreId, peticio);
         } catch (Exception ex) {
         	if (peticio!=null && peticio.getRegistre()!=null) {
@@ -1094,5 +1095,13 @@ public class AplicacioServiceImpl implements AplicacioService {
         		throw new Exception("Error al afegir el justificant de registre de l'anotació " + anotacioRegistreId + ": " + ex.getMessage());
         	}
         }
+    }
+
+    /**
+     * Els plugins (NOTIB, Arxiu, gestor documental) llegeixen la configuració de l'entitat actual del fil. En els
+     * processos en segon pla no hi ha cap petició web que la informi, i cada element pot ser d'una entitat diferent.
+     */
+    private void fixarEntitatElement(EntitatEntity entitat) {
+        ConfigHelper.setEntitat(conversioTipusHelper.convertir(entitat, EntitatDto.class));
     }
 }

@@ -5637,6 +5637,8 @@ public class PluginHelper {
 							e.printStackTrace();
 						}
 					}
+
+					esborrarCopiaCertificacioGestioDocumental(notificacio);
 				}
 			}
 		}
@@ -5650,6 +5652,30 @@ public class PluginHelper {
 		//Pot pareixer que guarda una data la primera vegada i ja no es podrá tornar a intentar gurdar per el if,
 		//pero si no hi ha certificació, la data es null.
 		documentEnviamentInteressatEntity.updateEnviamentCertificacioData(resposta.getCertificacioData());
+	}
+
+	/**
+	 * Esborra la còpia de la certificació que les versions anteriors desaven al gestor documental
+	 * (NOT_ENV_CERT_ARXIUID), un cop el certificat ja s'ha incorporat com a document de l'expedient.
+	 * La còpia és de la notificació, no de l'enviament, i no es llegeix enlloc. La referència es buida dins
+	 * la transacció i el fitxer s'esborra després del commit: si la creació del document es desfà, la còpia
+	 * es conserva. Un error esborrant el fitxer només es registra, no desfà la incorporació del certificat.
+	 */
+	public void esborrarCopiaCertificacioGestioDocumental(DocumentNotificacioEntity notificacio) {
+		final String gestioDocumentalId = notificacio.getEnviamentCertificacioArxiuId();
+		if (gestioDocumentalId == null) {
+			return;
+		}
+		final Long notificacioId = notificacio.getId();
+		notificacio.setEnviamentCertificacioArxiuId(null);
+		TransactionAfterCommitUtils.run(() -> {
+			try {
+				gestioDocumentalDelete(gestioDocumentalId, GESDOC_AGRUPACIO_CERTIFICACIONS);
+			} catch (Exception ex) {
+				logger.error("No s'ha pogut esborrar la còpia de la certificació " + gestioDocumentalId
+						+ " de la notificació " + notificacioId + " del gestor documental", ex);
+			}
+		});
 	}
 
 	private void validaSignaturaAgilObtenirFirmes(List<ArxiuFirmaDto> firmes, byte[] documentContingut) {
