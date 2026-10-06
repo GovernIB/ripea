@@ -1854,6 +1854,9 @@ const translationEs = {
                 permisos: {
                     label: "Permisos",
                 },
+                simulador: {
+                    label: "Simular permisos",
+                },
                 baixa: {
                     label: "Dar de baja",
                     title: "Dar de baja al usuario {{usuari}}",
@@ -1865,6 +1868,225 @@ const translationEs = {
                     title: "Volver a dar de alta al usuario",
                     confirm: "¿Seguro que desea volver a dar de alta al usuario {{usuari}}? Podrá volver a iniciar sesión y recibir correos.",
                     ok: "Usuario dado de alta",
+                },
+            },
+            simulador: {
+                title: "Simulador de permisos: {{usuari}}",
+                ajuda: "Simula la parte de permisos del listado de expedientes o de anotaciones de la interfaz moderna con la identidad del usuario (sus roles de Keycloak) y el rol elegido. Si no eliges ningún elemento, se muestra el alcance de cada vía en la entidad.",
+                simular: "Simular",
+                noAplica: "No interviene con el rol {{rol}}.",
+                discrepancia: "El desglose por vías no coincide con la consulta real del listado. El veredicto de arriba es el de la consulta real; hay que revisar el simulador.",
+                veurePermisos: "Permisos ({{num}})",
+                nombreObjectes: "{{num}} objetos con permiso",
+                nombre: {
+                    EXPEDIENT: "{{num}} expedientes",
+                    ANOTACIO: "{{num}} anotaciones",
+                },
+                recurs: {
+                    EXPEDIENT: "el expediente",
+                    ANOTACIO: "la anotación",
+                },
+                veredicte: {
+                    visible: "{{usuari}} con el rol {{rol}} VE {{recurs}} {{element}} en el listado",
+                    noVisible: "{{usuari}} con el rol {{rol}} NO ve {{recurs}} {{element}} en el listado",
+                    total: {
+                        EXPEDIENT: "{{usuari}} con el rol {{rol}} ve {{num}} expedientes de la entidad {{entitat}}",
+                        ANOTACIO: "{{usuari}} con el rol {{rol}} ve {{num}} anotaciones de la entidad {{entitat}}",
+                    },
+                    error: "La consulta real del listado ha fallado con esta identidad: {{error}}",
+                },
+                estat: {
+                    requisits: {
+                        OK: "Se cumple",
+                        KO: "No se cumple",
+                        NO_APLICA: "No aplica",
+                        AVIS: "Aviso",
+                    },
+                    vies: {
+                        OK: "Concede",
+                        KO: "No concede",
+                        NO_APLICA: "No aplica",
+                        AVIS: "Aviso",
+                    },
+                    restriccions: {
+                        OK: "Se cumple",
+                        KO: "Lo excluye",
+                        NO_APLICA: "No aplica",
+                        AVIS: "Aviso",
+                    },
+                },
+                seccio: {
+                    requisits: {
+                        titol: "Requisitos previos",
+                        ajuda: "Condiciones para que el usuario pueda trabajar con el rol y para que las vías tengan efecto.",
+                    },
+                    vies: {
+                        titol: "Vías de acceso",
+                        ajuda: "Basta con que una vía conceda el acceso.",
+                    },
+                    restriccions: {
+                        titol: "Restricciones",
+                        ajuda: "Deben cumplirse todas las que aplican: si una falla, el elemento queda excluido aunque una vía lo conceda.",
+                    },
+                },
+                parametre: {
+                    procediment: "Procedimiento",
+                    organ: "Órgano",
+                    organExpedient: "Órgano del expediente",
+                    grup: "Grupo",
+                    entitat: "Entidad",
+                    permis: "Permiso requerido",
+                    desti: "Órgano destino",
+                    estat: "Estado de revisión",
+                    numero: "Filas",
+                    comu: "Procedimiento común",
+                    permisDirecte: "Exige permiso directo",
+                    gestioGrups: "Gestión por grupos activa",
+                    rol: "Rol",
+                    esperades: "Filas esperadas",
+                    actuals: "Filas actuales",
+                    faltants: "Órganos que faltan",
+                    sobrants: "Órganos que sobran",
+                    duplicats: "Órganos repetidos",
+                    altreProcediment: "Filas de otro procedimiento",
+                },
+                organpare: {
+                    boto: "Regenerar organpare",
+                    confirmTitol: "Regenerar la cadena de órganos",
+                    confirm: "Se volverá a construir la cadena de órganos (organpare) del expediente {{element}} a partir de su órgano gestor actual y de sus órganos superiores. Puede cambiar los usuarios que lo ven por los permisos de pareja procedimiento-órgano y de procedimientos comunes. ¿Desea continuar?",
+                    ok: "Cadena de órganos regenerada",
+                },
+                comprovacio: {
+                    ROL_KEYCLOAK: {
+                        titol: "Rol asignado en Keycloak",
+                        descripcio: "El usuario debe tener el rol en Keycloak (el rol Usuario lo añade la aplicación a todos).",
+                        suggeriment: "Asignad el rol al usuario en Keycloak.",
+                    },
+                    PERMIS_ENTITAT: {
+                        titol: "Permiso sobre la entidad",
+                        descripcio: "Para poder elegir este rol en la cabecera, el usuario o uno de sus roles necesita el permiso indicado sobre la entidad.",
+                        suggeriment: "Dad el permiso requerido sobre la entidad al usuario o a uno de sus roles.",
+                    },
+                    ORGAN_CAPCALERA: {
+                        titol: "Órgano seleccionable en la cabecera",
+                        descripcio: "Con este rol, el órgano debe aparecer en la cabecera: hace falta el permiso indicado directamente sobre el órgano.",
+                        suggeriment: "Dad el permiso requerido sobre el órgano al usuario o a uno de sus roles.",
+                    },
+                    EXPEDIENT_ORGANPARE: {
+                        titol: "Cadena de órganos del expediente (organpare)",
+                        descripcio: "Compara las filas de IPA_EXPEDIENT_ORGANPARE con la cadena actual de órganos (el órgano del expediente y sus superiores). Las vías 3 y 4 del rol Usuario solo ven el expediente a través de estas filas. En los permisos se muestran los que tiene el usuario sobre los órganos que faltan.",
+                        suggeriment: "Regenerad la cadena de órganos del expediente. Se construye con la jerarquía actual: tras una reestructuración DIR3 puede diferir de la del día de creación.",
+                    },
+                    ANOTACIO_PROCEDIMENT: {
+                        titol: "Procedimiento asignado a la anotación",
+                        descripcio: "Con este rol las anotaciones se filtran por procedimiento: una anotación sin procedimiento no aparece.",
+                        suggeriment: "Asignad un procedimiento a la anotación.",
+                    },
+                    PROCEDIMENT_ACTIU: {
+                        titol: "Procedimiento activo",
+                        descripcio: "Solo cuentan los procedimientos activos.",
+                        suggeriment: "Activad el procedimiento.",
+                    },
+                    PROCEDIMENT_REVISAT: {
+                        titol: "Procedimiento revisado",
+                        descripcio: "Con la revisión de procedimientos activada, solo cuentan los procedimientos en estado REVISAT.",
+                        suggeriment: "Revisad el procedimiento.",
+                    },
+                    EXP_ADMIN_ENTITAT: {
+                        titol: "Administrador de entidad",
+                        descripcio: "Con este rol se ven todos los expedientes de la entidad: no se aplica ninguna vía ni restricción.",
+                        suggeriment: "Comprobad el permiso sobre la entidad y que el expediente no esté borrado.",
+                    },
+                    EXP_VIA1_PROCEDIMENT: {
+                        titol: "Vía 1 · Procedimiento",
+                        descripcio: "Permiso de lectura (READ) sobre el procedimiento del expediente.",
+                        suggeriment: "Dad READ sobre el procedimiento al usuario o a uno de sus roles.",
+                    },
+                    EXP_VIA2_ORGAN: {
+                        titol: "Vía 2 · Órgano de cabecera",
+                        descripcio: "El órgano del expediente es el órgano seleccionado en la cabecera o uno de sus descendientes.",
+                        suggeriment: "Seleccionad en la cabecera un órgano que incluya el órgano del expediente.",
+                    },
+                    EXP_VIA3_PARELLA: {
+                        titol: "Vía 3 · Pareja procedimiento-órgano",
+                        descripcio: "READ sobre la pareja procedimiento-órgano de algún órgano de la cadena del expediente (organpare).",
+                        suggeriment: "Dad READ sobre la pareja procedimiento-órgano al usuario o a uno de sus roles.",
+                    },
+                    EXP_VIA4_COMUNS: {
+                        titol: "Vía 4 · Procedimientos comunes por órgano",
+                        descripcio: "Si el procedimiento es común, COMU y READ (los dos) sobre algún órgano de la cadena del expediente (organpare).",
+                        suggeriment: "Dad COMU y READ sobre el órgano o un ascendiente al usuario o a uno de sus roles.",
+                    },
+                    EXP_VIA5_GRUP: {
+                        titol: "Vía 5 · Grupo",
+                        descripcio: "READ sobre el grupo del expediente, solo si el procedimiento no exige permiso directo.",
+                        suggeriment: "Dad READ sobre el grupo del expediente o, si el procedimiento exige permiso directo, sobre el procedimiento.",
+                    },
+                    EXP_RESTRICCIO_PERMIS_DIRECTE: {
+                        titol: "Restricción A · Permiso directo",
+                        descripcio: "Si el procedimiento exige permiso directo, hace falta READ sobre el procedimiento o sobre la pareja procedimiento-órgano: el permiso sobre el órgano no basta.",
+                        suggeriment: "Dad READ directamente sobre el procedimiento o sobre la pareja procedimiento-órgano.",
+                    },
+                    EXP_RESTRICCIO_ORGANS: {
+                        titol: "Restricción B · Órgano del expediente",
+                        descripcio: "El órgano del expediente debe ser el órgano seleccionado en la cabecera o uno de sus descendientes.",
+                        suggeriment: "Seleccionad en la cabecera un órgano que incluya el órgano del expediente.",
+                    },
+                    EXP_RESTRICCIO_GRUPS: {
+                        titol: "Restricción C · Grupo",
+                        descripcio: "Si el expediente tiene grupo, hace falta READ sobre ese grupo.",
+                        suggeriment: "Dad READ sobre el grupo del expediente al usuario o a uno de sus roles.",
+                    },
+                    ANO_ADMIN_ENTITAT: {
+                        titol: "Administrador de entidad",
+                        descripcio: "Con este rol se ven todas las anotaciones de la entidad, también las que no tienen procedimiento.",
+                        suggeriment: "Comprobad el permiso sobre la entidad.",
+                    },
+                    ANO_ROL_SENSE_LLISTAT: {
+                        titol: "Rol sin listado de anotaciones",
+                        descripcio: "El listado de anotaciones no contempla este rol.",
+                        suggeriment: "Simulad con otro rol.",
+                    },
+                    ANO_ORGAN_DESTI: {
+                        titol: "Órgano destino del registro",
+                        descripcio: "El órgano destino del registro debe ser el órgano seleccionado en la cabecera o uno de sus descendientes.",
+                        suggeriment: "Seleccionad en la cabecera un órgano que incluya el órgano destino de la anotación.",
+                    },
+                    ANO_PROCEDIMENTS_ORGAN: {
+                        titol: "Procedimientos del órgano",
+                        descripcio: "El procedimiento de la anotación debe pertenecer al órgano seleccionado en la cabecera o a sus descendientes.",
+                        suggeriment: "Seleccionad en la cabecera un órgano que incluya el procedimiento de la anotación.",
+                    },
+                    ANO_VIA1_PROCEDIMENT: {
+                        titol: "Vía 1 · Procedimiento",
+                        descripcio: "Permiso de creación o modificación (CREATE o WRITE) sobre el procedimiento.",
+                        suggeriment: "Dad CREATE o WRITE sobre el procedimiento al usuario o a uno de sus roles.",
+                    },
+                    ANO_VIA2_ORGAN: {
+                        titol: "Vía 2 · Órgano",
+                        descripcio: "CREATE o WRITE sobre el órgano vigente del procedimiento o uno de sus ascendientes.",
+                        suggeriment: "Dad CREATE o WRITE sobre el órgano del procedimiento o un ascendiente.",
+                    },
+                    ANO_VIA3_PARELLA: {
+                        titol: "Vía 3 · Pareja procedimiento-órgano",
+                        descripcio: "CREATE o WRITE sobre una pareja procedimiento-órgano de un procedimiento común.",
+                        suggeriment: "Dad CREATE o WRITE sobre la pareja procedimiento-órgano.",
+                    },
+                    ANO_VIA4_COMUNS: {
+                        titol: "Vía 4 · Procedimientos comunes",
+                        descripcio: "Si el procedimiento es común: COMU junto con CREATE o WRITE, o bien ADM_COMU, sobre cualquier órgano.",
+                        suggeriment: "Dad COMU y CREATE o WRITE (o ADM_COMU) sobre un órgano.",
+                    },
+                    ANO_VIA5_GRUP: {
+                        titol: "Vía 5 · Grupo",
+                        descripcio: "READ sobre un grupo vinculado al procedimiento, solo si el procedimiento no exige permiso directo.",
+                        suggeriment: "Dad READ sobre un grupo vinculado al procedimiento.",
+                    },
+                    ANO_RESTRICCIO_GRUPS: {
+                        titol: "Restricción · Gestión por grupos",
+                        descripcio: "Si el procedimiento tiene la gestión por grupos activa, hace falta READ sobre el grupo de la anotación.",
+                        suggeriment: "Dad READ sobre el grupo de la anotación al usuario o a uno de sus roles.",
+                    },
                 },
             },
             permisos: {

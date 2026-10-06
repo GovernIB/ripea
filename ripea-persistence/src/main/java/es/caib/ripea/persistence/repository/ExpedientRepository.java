@@ -888,6 +888,10 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 	@Query(	"select count(e.id) from ExpedientEntity e where e.organGestor = :organGestor")
 	Integer countByOrganGestor(@Param("organGestor") OrganGestorEntity organGestor);
 
+	/** Expedients (oberts, tancats i esborrats) dels òrgans indicats. Màxim 1000 òrgans per crida (Oracle). */
+	@Query(	"select e.id from ExpedientEntity e where e.organGestor.id in (:organIds) order by e.id")
+	List<Long> findIdsByOrganGestorIdIn(@Param("organIds") Collection<Long> organIds);
+
 	@Query(	"from" +
 			"    ExpedientEntity e "
 			+ "where " +

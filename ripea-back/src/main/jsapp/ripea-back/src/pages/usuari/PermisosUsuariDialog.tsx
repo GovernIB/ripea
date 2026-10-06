@@ -26,7 +26,7 @@ import {formatDate} from "../../util/dateUtils.ts";
 // Ordre de les taules dins una entitat (el mateix ordre amb què el backend ordena les files)
 const TIPUS_ORDRE = ['ENTITY', 'GRUP', 'ORGAN', 'MET_EXP_ORG', 'MET_NOD'];
 
-type PermisDetall = {
+export type PermisDetall = {
     id: string,
     tipus: string,
     objectId: number,
@@ -55,7 +55,7 @@ const usePermisosApi = (usuariId?: string) => {
     return {isReady, resum, detall, revocar}
 }
 
-const Origen = ({permis}: { permis: PermisDetall }) => {
+export const Origen = ({permis}: { permis: PermisDetall }) => {
     const {t} = useTranslation();
     return permis.principal === 'USUARI'
         ? <Chip size="small" icon={<Icon>person</Icon>} label={t('page.usuari.permisos.origen.directe')}/>
@@ -63,7 +63,7 @@ const Origen = ({permis}: { permis: PermisDetall }) => {
                 label={t('page.usuari.permisos.origen.rol', {rol: t(`enum.rol.${permis.sid}`, {defaultValue: permis.sid})})}/>
 }
 
-const Permisos = ({permisos}: { permisos: string[] }) => {
+export const Permisos = ({permisos}: { permisos: string[] }) => {
     const {t} = useTranslation();
     return <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 0.5}}>
         {permisos?.map((permis) =>
@@ -86,7 +86,7 @@ const RevocarButton = ({permis, onRevocar}: { permis: PermisDetall, onRevocar: (
     </Tooltip>
 }
 
-const objecteText = (permis: PermisDetall) =>
+export const objecteText = (permis: PermisDetall) =>
     [permis.objecteCodi, permis.objecteNom].filter(Boolean).join(' - ') || `#${permis.objectId}`;
 
 // Amplades fixes (table-layout: fixed) perquè Origen, Permisos i Accions quedin alineades a totes les

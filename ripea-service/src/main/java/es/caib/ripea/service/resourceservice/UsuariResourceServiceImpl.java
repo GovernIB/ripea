@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
 
+import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
 import es.caib.ripea.persistence.repository.UsuariRepository;
@@ -46,6 +47,7 @@ import es.caib.ripea.service.intf.resourceservice.UsuariResourceService;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.resourcehelper.UsuariPermisosResourceHelper;
+import es.caib.ripea.service.resourcehelper.SimuladorPermisosResourceHelper;
 import es.caib.ripea.service.resourcehelper.UsuariResourceHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -67,6 +69,7 @@ public class UsuariResourceServiceImpl extends BaseMutableResourceService<Usuari
     private final UsuariRepository usuariRepository;
     private final ConfigHelper configHelper;
     private final MessageHelper messageHelper;
+    private final SimuladorPermisosResourceHelper simuladorPermisosResourceHelper;
 
     @PostConstruct
     public void init() {
@@ -76,6 +79,8 @@ public class UsuariResourceServiceImpl extends BaseMutableResourceService<Usuari
     	register(UsuariResource.ACTION_REVOCAR_PERMIS, new RevocarPermisActionExecutor());
     	register(UsuariResource.REPORT_PERMISOS_RESUM, new PermisosResumReportGenerator());
     	register(UsuariResource.REPORT_PERMISOS_DETALL, new PermisosDetallReportGenerator());
+    	register(UsuariResource.REPORT_SIMULAR_PERMISOS, new SimularPermisosReportGenerator());
+    	register(UsuariResource.ACTION_REGENERAR_ORGANPARE, new RegenerarOrganpareActionExecutor());
     }
 
     @Override
@@ -244,6 +249,90 @@ public class UsuariResourceServiceImpl extends BaseMutableResourceService<Usuari
 				return new ArrayList<>();
 			}
 			return usuariPermisosResourceHelper.getPermisosDetall(entity.getCodi(), entitatId, orfes);
+		}
+    }
+
+    /** Regenera la cadena d'òrgans (organpare) de l'expedient simulat. Només superusuari. */
+    private class RegenerarOrganpareActionExecutor implements ActionExecutor<UsuariResourceEntity, UsuariResource.RegenerarOrganpareFormAction, Serializable> {
+		@Override
+		public void onChange(Serializable id, UsuariResource.RegenerarOrganpareFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, UsuariResource.RegenerarOrganpareFormAction target) {}
+
+		@Override
+		public Serializable exec(String code, UsuariResourceEntity entity, UsuariResource.RegenerarOrganpareFormAction params) throws ActionExecutionException {
+			comprovarSuperusuari(code, entity.getCodi());
+			try {
+				simuladorPermisosResourceHelper.regenerarOrganpare(params != null ? params.getExpedientId() : null);
+			} catch (IllegalArgumentException ex) {
+				throw new ActionExecutionException(getResourceClass(), entity.getCodi(), code, ex.getMessage());
+			}
+			return params;
+		}
+    }
+
+    /**
+     * Simulador de permisos: per quina via l'usuari, amb el rol triat, veu (o no) un expedient o una anotació
+     * al llistat REACT. Les opcions dels desplegables arriben amb el codi de l'usuari com a paràmetre de la petició.
+     */
+    private class SimularPermisosReportGenerator implements ReportGenerator<UsuariResourceEntity, UsuariResource.SimulacioPermisosForm, UsuariResource.SimulacioPermisosResultat> {
+		@Override
+		public void onChange(Serializable id, UsuariResource.SimulacioPermisosForm previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, UsuariResource.SimulacioPermisosForm target) {}
+
+		@Override
+		public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
+			List<FieldOption> opcions = new ArrayList<>();
+			String usuariCodi = parametre(requestParameterMap, "usuari");
+			if (usuariCodi == null || !BaseConfig.ROLE_SUPER.equals(configHelper.getRolActual())) {
+				return opcions;
+			}
+			if (UsuariResource.SimulacioPermisosForm.Fields.rol.equals(fieldName)) {
+				for (String rol: simuladorPermisosResourceHelper.findRolsSimulables(usuariCodi)) {
+					opcions.add(new FieldOption(rol, messageHelper.getMessage("decorator.menu.rol." + rol)));
+				}
+			} else if (UsuariResource.SimulacioPermisosForm.Fields.entitat.equals(fieldName)) {
+				for (UsuariResource.PermisosEntitatResum entitat: usuariPermisosResourceHelper.getPermisosResum(usuariCodi).getEntitats()) {
+					opcions.add(new FieldOption(String.valueOf(entitat.getEntitatId()), entitat.getEntitatNom() + " (" + entitat.getEntitatCodi() + ")"));
+				}
+			} else if (UsuariResource.SimulacioPermisosForm.Fields.organ.equals(fieldName)) {
+				Long entitatId = parametreLong(requestParameterMap, "entitat");
+				if (entitatId == null) {
+					String recurs = parametre(requestParameterMap, "recurs");
+					entitatId = recurs != null ? simuladorPermisosResourceHelper.findEntitatElement(
+							UsuariResource.SimulacioRecurs.valueOf(recurs),
+							parametreLong(requestParameterMap, "expedient"),
+							parametreLong(requestParameterMap, "anotacio")) : null;
+				}
+				String rol = parametre(requestParameterMap, "rol");
+				if (entitatId != null && rol != null) {
+					for (OrganGestorEntity organ: simuladorPermisosResourceHelper.findOrgansSeleccionables(usuariCodi, rol, entitatId)) {
+						opcions.add(new FieldOption(String.valueOf(organ.getId()), organ.getCodi() + " - " + organ.getNom()));
+					}
+				}
+			}
+			return opcions;
+		}
+
+		@Override
+		public List<UsuariResource.SimulacioPermisosResultat> generateData(String code, UsuariResourceEntity entity, UsuariResource.SimulacioPermisosForm params) throws ReportGenerationException {
+			comprovarSuperusuari(code, entity.getCodi());
+			try {
+				return List.of(simuladorPermisosResourceHelper.simular(entity.getCodi(), params));
+			} catch (IllegalArgumentException ex) {
+				throw new ReportGenerationException(getResourceClass(), entity.getCodi(), code, ex.getMessage());
+			}
+		}
+
+		private String parametre(Map<String, String[]> requestParameterMap, String nom) {
+			String[] valors = requestParameterMap != null ? requestParameterMap.get(nom) : null;
+			return valors != null && valors.length > 0 && valors[0] != null && !valors[0].isEmpty() && !"undefined".equals(valors[0]) ? valors[0] : null;
+		}
+
+		private Long parametreLong(Map<String, String[]> requestParameterMap, String nom) {
+			String valor = parametre(requestParameterMap, nom);
+			try {
+				return valor != null ? Long.valueOf(valor) : null;
+			} catch (NumberFormatException ex) {
+				return null;
+			}
 		}
     }
 

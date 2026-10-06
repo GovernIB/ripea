@@ -138,6 +138,13 @@ public class UsuariPermisosResourceHelper {
 				.collect(Collectors.toList());
 	}
 
+	/** Tots els permisos de l'usuari (directes i dels seus rols), inclosos els d'objectes inexistents. Els usa el simulador de permisos. */
+	public List<PermisDetall> getTotsPermisosDetall(String usuariCodi) {
+		return findPermisos(findSidsUsuari(usuariCodi)).stream()
+				.map(this::toPermisDetall)
+				.collect(Collectors.toList());
+	}
+
 	/**
 	 * Revoca tots els permisos del SID indicat sobre l'objecte. El SID ha de ser l'usuari o un dels
 	 * seus rols, i un permís de rol només es pot revocar si l'objecte ja no existeix (si no, es

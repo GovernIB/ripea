@@ -1853,6 +1853,9 @@ const translationEn = {
                 permisos: {
                     label: "Permissions",
                 },
+                simulador: {
+                    label: "Simulate permissions",
+                },
                 baixa: {
                     label: "Deactivate",
                     title: "Deactivate user {{usuari}}",
@@ -1864,6 +1867,225 @@ const translationEn = {
                     title: "Reactivate user",
                     confirm: "Are you sure you want to reactivate user {{usuari}}? They will be able to log in and receive emails again.",
                     ok: "User reactivated",
+                },
+            },
+            simulador: {
+                title: "Permission simulator: {{usuari}}",
+                ajuda: "Simulates the permission part of the modern interface's file or registry entry list using the user's identity (their Keycloak roles) and the chosen role. If you don't choose an element, the reach of each path in the entity is shown.",
+                simular: "Simulate",
+                noAplica: "Not involved with the role {{rol}}.",
+                discrepancia: "The breakdown by path doesn't match the real list query. The verdict above comes from the real query; the simulator needs to be reviewed.",
+                veurePermisos: "Permissions ({{num}})",
+                nombreObjectes: "{{num}} objects with permission",
+                nombre: {
+                    EXPEDIENT: "{{num}} files",
+                    ANOTACIO: "{{num}} registry entries",
+                },
+                recurs: {
+                    EXPEDIENT: "the file",
+                    ANOTACIO: "the registry entry",
+                },
+                veredicte: {
+                    visible: "{{usuari}} with the role {{rol}} SEES {{recurs}} {{element}} in the list",
+                    noVisible: "{{usuari}} with the role {{rol}} does NOT see {{recurs}} {{element}} in the list",
+                    total: {
+                        EXPEDIENT: "{{usuari}} with the role {{rol}} sees {{num}} files of the entity {{entitat}}",
+                        ANOTACIO: "{{usuari}} with the role {{rol}} sees {{num}} registry entries of the entity {{entitat}}",
+                    },
+                    error: "The real list query failed with this identity: {{error}}",
+                },
+                estat: {
+                    requisits: {
+                        OK: "Met",
+                        KO: "Not met",
+                        NO_APLICA: "Not applicable",
+                        AVIS: "Warning",
+                    },
+                    vies: {
+                        OK: "Grants",
+                        KO: "Doesn't grant",
+                        NO_APLICA: "Not applicable",
+                        AVIS: "Warning",
+                    },
+                    restriccions: {
+                        OK: "Met",
+                        KO: "Excludes it",
+                        NO_APLICA: "Not applicable",
+                        AVIS: "Warning",
+                    },
+                },
+                seccio: {
+                    requisits: {
+                        titol: "Prerequisites",
+                        ajuda: "Conditions for the user to work with the role and for the paths to take effect.",
+                    },
+                    vies: {
+                        titol: "Access paths",
+                        ajuda: "One path granting access is enough.",
+                    },
+                    restriccions: {
+                        titol: "Restrictions",
+                        ajuda: "All applicable ones must be met: if one fails, the element is excluded even if a path grants it.",
+                    },
+                },
+                parametre: {
+                    procediment: "Procedure",
+                    organ: "Body",
+                    organExpedient: "File's body",
+                    grup: "Group",
+                    entitat: "Entity",
+                    permis: "Required permission",
+                    desti: "Destination body",
+                    estat: "Review status",
+                    numero: "Rows",
+                    comu: "Common procedure",
+                    permisDirecte: "Requires direct permission",
+                    gestioGrups: "Group management enabled",
+                    rol: "Role",
+                    esperades: "Expected rows",
+                    actuals: "Current rows",
+                    faltants: "Missing bodies",
+                    sobrants: "Extra bodies",
+                    duplicats: "Repeated bodies",
+                    altreProcediment: "Rows of another procedure",
+                },
+                organpare: {
+                    boto: "Regenerate organpare",
+                    confirmTitol: "Regenerate the chain of bodies",
+                    confirm: "The chain of bodies (organpare) of the file {{element}} will be rebuilt from its current managing body and its parent bodies. It may change which users see it through procedure-body pair and common procedure permissions. Do you want to continue?",
+                    ok: "Chain of bodies regenerated",
+                },
+                comprovacio: {
+                    ROL_KEYCLOAK: {
+                        titol: "Role assigned in Keycloak",
+                        descripcio: "The user must have the role in Keycloak (the User role is added by the application to everyone).",
+                        suggeriment: "Assign the role to the user in Keycloak.",
+                    },
+                    PERMIS_ENTITAT: {
+                        titol: "Permission on the entity",
+                        descripcio: "To choose this role in the header, the user or one of their roles needs the indicated permission on the entity.",
+                        suggeriment: "Grant the required permission on the entity to the user or one of their roles.",
+                    },
+                    ORGAN_CAPCALERA: {
+                        titol: "Body selectable in the header",
+                        descripcio: "With this role the body must appear in the header: the indicated permission is needed directly on the body.",
+                        suggeriment: "Grant the required permission on the body to the user or one of their roles.",
+                    },
+                    EXPEDIENT_ORGANPARE: {
+                        titol: "File's chain of bodies (organpare)",
+                        descripcio: "Compares the IPA_EXPEDIENT_ORGANPARE rows with the current chain of bodies (the file's body and its parents). Paths 3 and 4 of the User role only see the file through these rows. The permissions list shows the user's permissions on the missing bodies.",
+                        suggeriment: "Regenerate the file's chain of bodies. It is built from the current hierarchy: after a DIR3 restructuring it may differ from the one on the creation date.",
+                    },
+                    ANOTACIO_PROCEDIMENT: {
+                        titol: "Procedure assigned to the registry entry",
+                        descripcio: "With this role registry entries are filtered by procedure: an entry without a procedure doesn't appear.",
+                        suggeriment: "Assign a procedure to the registry entry.",
+                    },
+                    PROCEDIMENT_ACTIU: {
+                        titol: "Active procedure",
+                        descripcio: "Only active procedures count.",
+                        suggeriment: "Activate the procedure.",
+                    },
+                    PROCEDIMENT_REVISAT: {
+                        titol: "Reviewed procedure",
+                        descripcio: "With procedure review enabled, only procedures in REVISAT status count.",
+                        suggeriment: "Review the procedure.",
+                    },
+                    EXP_ADMIN_ENTITAT: {
+                        titol: "Entity administrator",
+                        descripcio: "With this role all files of the entity are visible: no path or restriction applies.",
+                        suggeriment: "Check the permission on the entity and that the file isn't deleted.",
+                    },
+                    EXP_VIA1_PROCEDIMENT: {
+                        titol: "Path 1 · Procedure",
+                        descripcio: "Read permission (READ) on the file's procedure.",
+                        suggeriment: "Grant READ on the procedure to the user or one of their roles.",
+                    },
+                    EXP_VIA2_ORGAN: {
+                        titol: "Path 2 · Header body",
+                        descripcio: "The file's body is the body selected in the header or one of its descendants.",
+                        suggeriment: "Select in the header a body that includes the file's body.",
+                    },
+                    EXP_VIA3_PARELLA: {
+                        titol: "Path 3 · Procedure-body pair",
+                        descripcio: "READ on the procedure-body pair of some body in the file's chain (organpare).",
+                        suggeriment: "Grant READ on the procedure-body pair to the user or one of their roles.",
+                    },
+                    EXP_VIA4_COMUNS: {
+                        titol: "Path 4 · Common procedures by body",
+                        descripcio: "If the procedure is common, COMU and READ (both) on some body in the file's chain (organpare).",
+                        suggeriment: "Grant COMU and READ on the body or an ancestor to the user or one of their roles.",
+                    },
+                    EXP_VIA5_GRUP: {
+                        titol: "Path 5 · Group",
+                        descripcio: "READ on the file's group, only if the procedure doesn't require direct permission.",
+                        suggeriment: "Grant READ on the file's group or, if the procedure requires direct permission, on the procedure.",
+                    },
+                    EXP_RESTRICCIO_PERMIS_DIRECTE: {
+                        titol: "Restriction A · Direct permission",
+                        descripcio: "If the procedure requires direct permission, READ on the procedure or on the procedure-body pair is needed: permission on the body isn't enough.",
+                        suggeriment: "Grant READ directly on the procedure or on the procedure-body pair.",
+                    },
+                    EXP_RESTRICCIO_ORGANS: {
+                        titol: "Restriction B · File's body",
+                        descripcio: "The file's body must be the body selected in the header or one of its descendants.",
+                        suggeriment: "Select in the header a body that includes the file's body.",
+                    },
+                    EXP_RESTRICCIO_GRUPS: {
+                        titol: "Restriction C · Group",
+                        descripcio: "If the file has a group, READ on that group is needed.",
+                        suggeriment: "Grant READ on the file's group to the user or one of their roles.",
+                    },
+                    ANO_ADMIN_ENTITAT: {
+                        titol: "Entity administrator",
+                        descripcio: "With this role all registry entries of the entity are visible, including those without a procedure.",
+                        suggeriment: "Check the permission on the entity.",
+                    },
+                    ANO_ROL_SENSE_LLISTAT: {
+                        titol: "Role without a registry entry list",
+                        descripcio: "The registry entry list doesn't handle this role.",
+                        suggeriment: "Simulate with another role.",
+                    },
+                    ANO_ORGAN_DESTI: {
+                        titol: "Registry destination body",
+                        descripcio: "The registry's destination body must be the body selected in the header or one of its descendants.",
+                        suggeriment: "Select in the header a body that includes the entry's destination body.",
+                    },
+                    ANO_PROCEDIMENTS_ORGAN: {
+                        titol: "Procedures of the body",
+                        descripcio: "The entry's procedure must belong to the body selected in the header or its descendants.",
+                        suggeriment: "Select in the header a body that includes the entry's procedure.",
+                    },
+                    ANO_VIA1_PROCEDIMENT: {
+                        titol: "Path 1 · Procedure",
+                        descripcio: "Create or write permission (CREATE or WRITE) on the procedure.",
+                        suggeriment: "Grant CREATE or WRITE on the procedure to the user or one of their roles.",
+                    },
+                    ANO_VIA2_ORGAN: {
+                        titol: "Path 2 · Body",
+                        descripcio: "CREATE or WRITE on the procedure's current body or one of its ancestors.",
+                        suggeriment: "Grant CREATE or WRITE on the procedure's body or an ancestor.",
+                    },
+                    ANO_VIA3_PARELLA: {
+                        titol: "Path 3 · Procedure-body pair",
+                        descripcio: "CREATE or WRITE on a procedure-body pair of a common procedure.",
+                        suggeriment: "Grant CREATE or WRITE on the procedure-body pair.",
+                    },
+                    ANO_VIA4_COMUNS: {
+                        titol: "Path 4 · Common procedures",
+                        descripcio: "If the procedure is common: COMU together with CREATE or WRITE, or ADM_COMU, on any body.",
+                        suggeriment: "Grant COMU and CREATE or WRITE (or ADM_COMU) on a body.",
+                    },
+                    ANO_VIA5_GRUP: {
+                        titol: "Path 5 · Group",
+                        descripcio: "READ on a group linked to the procedure, only if the procedure doesn't require direct permission.",
+                        suggeriment: "Grant READ on a group linked to the procedure.",
+                    },
+                    ANO_RESTRICCIO_GRUPS: {
+                        titol: "Restriction · Group management",
+                        descripcio: "If the procedure has group management enabled, READ on the entry's group is needed.",
+                        suggeriment: "Grant READ on the entry's group to the user or one of their roles.",
+                    },
                 },
             },
             permisos: {

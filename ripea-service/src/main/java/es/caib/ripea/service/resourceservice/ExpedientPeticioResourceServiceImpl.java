@@ -57,6 +57,7 @@ import es.caib.ripea.service.helper.GrupHelper;
 import es.caib.ripea.service.helper.MessageHelper;
 import es.caib.ripea.service.helper.MetaDocumentHelper;
 import es.caib.ripea.service.helper.PermisosPerAnotacions;
+import es.caib.ripea.service.resourcehelper.AnotacioPermisosFiltreHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.helper.RegistreJustificantHelper;
 import es.caib.ripea.service.helper.RolHelper;
@@ -99,6 +100,8 @@ import es.caib.ripea.service.intf.registre.RegistreAnnexNtiOrigenEnum;
 import es.caib.ripea.service.intf.resourceservice.ExpedientPeticioResourceService;
 import es.caib.ripea.service.intf.utils.RegistreJustificantUtils;
 import es.caib.ripea.service.intf.utils.Utils;
+import es.caib.ripea.service.intf.model.UsuariResource;
+import es.caib.ripea.service.intf.config.BaseConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -113,6 +116,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 	private final EmailHelper emailHelper;
 	private final ExcepcioLogHelper excepcioLogHelper;
 	private final ExpedientPeticioHelper expedientPeticioHelper;
+	private final AnotacioPermisosFiltreHelper anotacioPermisosFiltreHelper;
 	private final EntityComprovarHelper entityComprovarHelper;
 	private final MetaDocumentHelper metaDocumentHelper;
 	private final ExpedientHelper expedientHelper;
@@ -210,10 +214,18 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
         List<Filter> filters = new ArrayList<>();
         filters.add((currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null);
 
+        Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
+
+        //Selector d'anotacions del simulador de permisos: el superusuari ha de poder triar qualsevol anotació
+        //de qualsevol entitat (no treballa amb entitat actual) sense que hi intervinguin els seus permisos ACL.
+        //Per a qualsevol altre rol la named query s'ignora i s'aplica el filtre habitual.
+        if (mapaNamedQueries.containsKey(UsuariResource.SIMULADOR_PERMISOS_NAMED_QUERY) && BaseConfig.ROLE_SUPER.equals(configHelper.getRolActual())) {
+        	List<Filter> filtresSimulador = filters.stream().filter(Objects::nonNull).collect(Collectors.toList());
+        	return filtresSimulador.isEmpty() ? null : FilterBuilder.and(filtresSimulador).generate();
+        }
+
         String entitatActualCodi = configHelper.getEntitatActualCodi();
         EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
-
-        Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
 
         //El filtre per entitat s'aplica sempre (consulta genèrica i named queries),
         //excepte el llistat del menú "Consulta > Anotacions comunicades", que no filtra per entitat.
@@ -234,11 +246,9 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
     			String organActualCodi	 = configHelper.getOrganActualCodi();
     			String rolActual		 = configHelper.getRolActual();
 
-    			boolean isAdmin 		= "IPA_ADMIN".equals(rolActual);
-    			boolean isAdminOrgan 	= "IPA_ORGAN_ADMIN".equals(rolActual);
-
-    			//Admin no aplica filtres de permisos
-    			if (!isAdmin) {
+    			//La part de permisos es defineix a AnotacioPermisosFiltreHelper, compartit amb el simulador
+    			//de permisos del superusuari. Admin no aplica filtres de permisos.
+    			if (anotacioPermisosFiltreHelper.isAplicaFiltrePermisos(rolActual)) {
 
 	    			OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), organActualCodi);
 					PermisosPerAnotacions permisosPerAnotacions = expedientPeticioHelper.findPermisosPerAnotacions(
@@ -247,60 +257,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 							rolActual,
 							ogEntity!=null?ogEntity.getId():null);
 
-					//Aplica filtres de permisos per organ
-					if (isAdminOrgan) {
-
-				        String ogId = ExpedientPeticioResource.Fields.registre + "." + RegistreResource.Fields.destiCodi;
-				        Filter filtreOrgansPermesos = null;
-				        List<String> grupsOrgansPermesosClausulesIn = permisosPerAnotacions.getIdsOrganGestorsGruposMil();
-				        if (grupsOrgansPermesosClausulesIn!=null) {
-					        for (String aux: grupsOrgansPermesosClausulesIn) {
-						        if (aux != null && !aux.isEmpty()) {
-					        		filtreOrgansPermesos = FilterBuilder.or(filtreOrgansPermesos, Filter.parse(ogId + " IN (" + aux + ")"));
-						        }
-					        }
-				        }
-
-				        //Sense òrgans permesos no es retornen resultats (igual que la consulta antiga),
-				        //evitant que un filtre nul es perdi a l'AND final.
-                        filters.add(filtreOrgansPermesos!=null ? filtreOrgansPermesos : FilterBuilder.equal("id", 0));
-
-					} else { //Aplica filtres de permisos per procediment
-
-				        String prId = ExpedientPeticioResource.Fields.metaExpedient + ".id";
-				        Filter filtreProcedimentsPermesos = null;
-				        List<String> grupsProcsPermesosClausulesIn = permisosPerAnotacions.getIdsProcedimentsGruposMil();
-				        if (grupsProcsPermesosClausulesIn!=null) {
-					        for (String aux: grupsProcsPermesosClausulesIn) {
-						        if (aux != null && !aux.isEmpty()) {
-					        		filtreProcedimentsPermesos = FilterBuilder.or(filtreProcedimentsPermesos, Filter.parse(prId + " IN (" + aux + ")"));
-						        }
-					        }
-				        }
-
-				        String grId = ExpedientPeticioResource.Fields.grup + ".id";
-				        Filter filtregrupsPermesos = null;
-				        List<String> grupsgrupsPermesosClausulesIn = permisosPerAnotacions.getIdsGrupsGruposMil();
-				        if (grupsgrupsPermesosClausulesIn!=null) {
-					        for (String aux: grupsgrupsPermesosClausulesIn) {
-						        if (aux != null && !aux.isEmpty()) {
-						        	filtregrupsPermesos = FilterBuilder.or(filtregrupsPermesos, Filter.parse(grId + " IN (" + aux + ")"));
-						        }
-					        }
-				        }
-
-				        String grAct = ExpedientPeticioResource.Fields.metaExpedient +"."+ MetaExpedientResource.Fields.gestioAmbGrupsActiva;
-				        Filter notGestioGrupsActiva = FilterBuilder.equal(grAct, false);
-				        Filter filterGEstioGrupsActius = FilterBuilder.or(notGestioGrupsActiva, filtregrupsPermesos);
-
-				        //Sense procediments permesos no es retornen resultats (igual que la consulta antiga).
-				        //Així evitam que FilterBuilder.and(null, ...) elimini la restricció per procediment.
-				        if (filtreProcedimentsPermesos!=null) {
-				        	filters.add(FilterBuilder.and(filtreProcedimentsPermesos, filterGEstioGrupsActius));
-				        } else {
-				        	filters.add(FilterBuilder.equal("id", 0));
-				        }
-					}
+					filters.add(anotacioPermisosFiltreHelper.filtrePermisos(rolActual, permisosPerAnotacions));
     			}
     		} else if (mapaNamedQueries.containsKey("MASSIU_ANOTACIONS_ESTAT")) {
                 filters.add(FilterBuilder.notEqual(ExpedientPeticioResource.Fields.estat, ExpedientPeticioEstatEnumDto.CREAT));

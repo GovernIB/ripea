@@ -1,14 +1,21 @@
 package es.caib.ripea.service.helper;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.MultiValuedMap;
@@ -69,6 +76,12 @@ public class OrganGestorHelper {
 	@Autowired private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
 	@Autowired private MetaExpedientRepository metaExpedientRepository;
 	@Autowired private ExpedientOrganPareRepository expedientOrganPareRepository;
+	@PersistenceContext private EntityManager entityManager;
+
+	/** Límit d'elements d'una clàusula IN a Oracle. */
+	private static final int MIDA_LOT_IN = 1000;
+	/** Expedients per lot en reconstruir organpare després d'una sincronització DIR3. */
+	private static final int MIDA_LOT_RECONSTRUCCIO_ORGANPARE = 100;
 	@Autowired private ExpedientRepository expedientRepository;
 	@Autowired private EntitatRepository entitatRepository;
 	@Autowired private AvisRepository avisRepository;
@@ -124,6 +137,7 @@ public class OrganGestorHelper {
 		List<OrganGestorEntity> organsDividits = new ArrayList<>();
 		List<OrganGestorEntity> organsFusionats = new ArrayList<>();
 		List<OrganGestorEntity> organsSubstituits = new ArrayList<>();
+		Set<Long> organsReparentats = new HashSet<>();
 
 		try {
 			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.organigrama")).infoText(msg("unitat.synchronize.info.organigrama.inici")).build());
@@ -137,7 +151,7 @@ public class OrganGestorHelper {
 			// Sincronitzar òrgans
 			progres.setFase(1); 
 			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.organs")).infoText(msg("unitat.synchronize.info.organs.inici")).build());
-			sincronitzarOrgans(entitatDto.getId(), unitatsWs, obsoleteUnitats, organsDividits, organsFusionats, organsSubstituits, progres);
+			sincronitzarOrgans(entitatDto.getId(), unitatsWs, obsoleteUnitats, organsDividits, organsFusionats, organsSubstituits, organsReparentats, progres);
 			progres.setProgres(27);
 			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.organs")).infoText(msg("unitat.synchronize.info.organs.fi")).build());
 
@@ -166,10 +180,17 @@ public class OrganGestorHelper {
 				actualitzarExpedientsObertsAmbOrgansObsolets(
 						ListUtils.union(organsSubstituits, organsFusionats),
 						progres);
-				progres.setProgres(99);
+				progres.setProgres(95);
 				progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.expedients")).infoText(msg("unitat.synchronize.info.expedients.fi")).build());
 
 			}
+
+			// Reconstruir la cadena d'òrgans (organpare) dels expedients dels òrgans que han canviat de pare
+			progres.setFase(5);
+			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.organpare")).infoText(msg("unitat.synchronize.info.organpare.inici", organsReparentats.size())).build());
+			int expedientsReconstruits = reconstruirExpedientsOrgansReparentats(entitat, organsReparentats, progres);
+			progres.setProgres(99);
+			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.organpare")).infoText(msg("unitat.synchronize.info.organpare.fi", expedientsReconstruits)).build());
 
 //			// Eliminar organs no vigents no utilitzats??
 //			progres.setFase(4);
@@ -708,14 +729,22 @@ public class OrganGestorHelper {
 		}
 	}
 	
-	public void removeOldExpedientOrganPares(
-			ExpedientEntity expedient) {
-		
-		for (ExpedientOrganPareEntity expOrgPare : expedient.getOrganGestorPares()) {
-			expedientOrganPareRepository.delete(expOrgPare);
-		}
+	/**
+	 * Reconstrueix la cadena d'òrgans de l'expedient (IPA_EXPEDIENT_ORGANPARE) a partir del seu òrgan gestor
+	 * actual i de la jerarquia d'òrgans de BD. La llegeixen les vies 3 i 4 del llistat d'expedients.
+	 *
+	 * Les files a esborrar es consulten a BD, no a la col·lecció en memòria de l'expedient: crearExpedientOrganPares
+	 * desa les files noves pel repositori sense afegir-les a la col·lecció, de manera que dues reconstruccions dins
+	 * la mateixa transacció (p. ex. fusió d'òrgan i canvi de pare a la mateixa sincronització DIR3) no esborrarien
+	 * les files de la primera i quedarien duplicades.
+	 */
+	public void reconstruirExpedientOrganPares(ExpedientEntity expedient) {
+		List<ExpedientOrganPareEntity> filesActuals = expedientOrganPareRepository.findByExpedientId(expedient.getId());
+		expedientOrganPareRepository.deleteAll(filesActuals);
+		// Els esborrats s'executen abans de crear les files noves (Hibernate faria primer els inserts)
+		expedientOrganPareRepository.flush();
 		expedient.removeOrganGestorPares();
-
+		crearExpedientOrganPares(expedient, expedient.getOrganGestor());
 	}
 
 
@@ -883,6 +912,7 @@ public class OrganGestorHelper {
 								   List<OrganGestorEntity> organsDividits,
 								   List<OrganGestorEntity> organsFusionats,
 								   List<OrganGestorEntity> organsSubstituits,
+								   Set<Long> organsReparentats,
 								   ProgresActualitzacioDto progres) {
 
 		Map<String, List<String>> organsParesPendentsAssignar = new HashMap<>();
@@ -893,7 +923,7 @@ public class OrganGestorHelper {
 
 		// Agafa totes les unitats del WS i les guarda a BBDD. Si la unitat no existeix la crea, i si existeix la sobreescriu.
 		for (UnitatOrganitzativa unitatWS: unitatsWs) {
-			ActualitzacioInfo info = sincronizarUnitat(unitatWS, entitat, organsParesPendentsAssignar);
+			ActualitzacioInfo info = sincronizarUnitat(unitatWS, entitat, organsParesPendentsAssignar, organsReparentats);
 			progres.addInfo(info);
 			progres.setProgres(2 + (nombreUnitatsProcessades++ * 10 / nombreUnitatsTotal));
 		}
@@ -997,16 +1027,65 @@ public class OrganGestorHelper {
 				
 				logger.info("Organ of expedient " + expedient.getId() + " " + expedient.getNumero() + " " + expedient.getNom());
 				expedient.updateOrganGestor(organDesti);
-				removeOldExpedientOrganPares(
-						expedient);
-				crearExpedientOrganPares(
-						expedient,
-						organDesti);
+				reconstruirExpedientOrganPares(expedient);
 			}
 			
-			progres.setProgres(75 + (24 * nombreOrgansProcessades++ / nombreOrgansTotal));
+			progres.setProgres(75 + (20 * nombreOrgansProcessades++ / nombreOrgansTotal));
 		}
     }
+
+	/**
+	 * Reconstrueix la cadena d'òrgans (organpare) de tots els expedients, oberts i tancats, dels òrgans indicats i
+	 * dels seus descendents, amb la jerarquia ja actualitzada per la sincronització. Es processa per lots: després
+	 * de cada lot es fa flush i es desvinculen els expedients de la sessió perquè la memòria no creixi.
+	 *
+	 * @return nombre d'expedients reconstruïts.
+	 */
+	public int reconstruirExpedientsOrgansReparentats(
+			EntitatEntity entitat,
+			Set<Long> organsReparentats,
+			ProgresActualitzacioDto progres) {
+		if (organsReparentats == null || organsReparentats.isEmpty()) {
+			return 0;
+		}
+		// Subarbre de cada òrgan reparentat (òrgan + descendents), segons els pares ja actualitzats
+		Map<Long, List<Long>> fillsPerPare = new HashMap<>();
+		for (OrganGestorEntity organ: organGestorRepository.findByEntitat(entitat)) {
+			if (organ.getPare() != null) {
+				fillsPerPare.computeIfAbsent(organ.getPare().getId(), k -> new ArrayList<>()).add(organ.getId());
+			}
+		}
+		Set<Long> organsSubarbre = new HashSet<>();
+		Deque<Long> pendents = new ArrayDeque<>(organsReparentats);
+		while (!pendents.isEmpty()) {
+			Long organId = pendents.pop();
+			if (organsSubarbre.add(organId)) {
+				pendents.addAll(fillsPerPare.getOrDefault(organId, new ArrayList<>()));
+			}
+		}
+
+		List<Long> expedientIds = new ArrayList<>();
+		for (List<Long> lotOrgans: ListUtils.partition(new ArrayList<>(organsSubarbre), MIDA_LOT_IN)) {
+			expedientIds.addAll(expedientRepository.findIdsByOrganGestorIdIn(lotOrgans));
+		}
+		logger.info("Reconstruint organpare de " + expedientIds.size() + " expedients (" + organsReparentats.size() + " òrgans reparentats, " + organsSubarbre.size() + " òrgans al subarbre)");
+
+		int total = expedientIds.size();
+		int processats = 0;
+		for (List<Long> lotExpedients: ListUtils.partition(expedientIds, MIDA_LOT_RECONSTRUCCIO_ORGANPARE)) {
+			List<ExpedientEntity> expedients = expedientRepository.findAllById(lotExpedients);
+			for (ExpedientEntity expedient: expedients) {
+				reconstruirExpedientOrganPares(expedient);
+			}
+			expedientOrganPareRepository.flush();
+			for (ExpedientEntity expedient: expedients) {
+				entityManager.detach(expedient);
+			}
+			processats += lotExpedients.size();
+			progres.setProgres(95 + (4 * processats / total));
+		}
+		return total;
+	}
 
 	public void actualitzarOrganCodi(String organCodi) {
 		if (organCodi != null) {
@@ -1098,7 +1177,7 @@ public class OrganGestorHelper {
 		return text;
 	}
 
-	private ActualitzacioInfo sincronizarUnitat(UnitatOrganitzativa unitatWS, EntitatEntity entitat, Map<String, List<String>> organsParesPendentsAssignar) {
+	private ActualitzacioInfo sincronizarUnitat(UnitatOrganitzativa unitatWS, EntitatEntity entitat, Map<String, List<String>> organsParesPendentsAssignar, Set<Long> organsReparentats) {
 		ActualitzacioInfoBuilder infoBuilder = ActualitzacioInfo.builder().isOrgan(true);
 		OrganGestorEntity unitat = null;
 		if (unitatWS != null) {
@@ -1147,6 +1226,14 @@ public class OrganGestorHelper {
 						.nomNou(Utils.isNotEmpty(unitatWS.getDenominacioCooficial()) ? unitatWS.getDenominacioCooficial() : unitatWS.getDenominacio())
 						.estatNou(OrganGestorEntity.getEstat(unitatWS.getEstat()));
 				
+				// Si l'òrgan canvia de pare, les cadenes d'òrgans (organpare) dels expedients del seu subarbre
+				// queden desfasades: es reconstrueixen al final de la sincronització. Si el pare nou encara no
+				// existeix (organPare null) també es registra: se li assignarà en crear-lo.
+				Long pareAnticId = unitat.getPare() != null ? unitat.getPare().getId() : null;
+				Long pareNouId = organPare != null ? organPare.getId() : null;
+				if (!Objects.equals(pareAnticId, pareNouId)) {
+					organsReparentats.add(unitat.getId());
+				}
 				unitat.update(
 						Utils.isNotEmpty(unitatWS.getDenominacioCooficial()) ? unitatWS.getDenominacioCooficial() : unitatWS.getDenominacio(),
 						unitatWS.getDenominacio(),

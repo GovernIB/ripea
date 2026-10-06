@@ -20,6 +20,7 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -52,6 +53,16 @@ import java.util.List;
 						code = UsuariResource.REPORT_PERMISOS_DETALL,
 						formClass = UsuariResource.PermisosDetallForm.class,
 						requiresId = true),
+				@ResourceArtifact(
+						type = ResourceArtifactType.REPORT,
+						code = UsuariResource.REPORT_SIMULAR_PERMISOS,
+						formClass = UsuariResource.SimulacioPermisosForm.class,
+						requiresId = true),
+				@ResourceArtifact(
+						type = ResourceArtifactType.ACTION,
+						code = UsuariResource.ACTION_REGENERAR_ORGANPARE,
+						formClass = UsuariResource.RegenerarOrganpareFormAction.class,
+						requiresId = true),
 		})
 public class UsuariResource extends BaseResource<String> {
 
@@ -63,6 +74,11 @@ public class UsuariResource extends BaseResource<String> {
 	public static final String ACTION_REVOCAR_PERMIS = "REVOCAR_PERMIS";
 	public static final String REPORT_PERMISOS_RESUM = "PERMISOS_RESUM";
 	public static final String REPORT_PERMISOS_DETALL = "PERMISOS_DETALL";
+	public static final String REPORT_SIMULAR_PERMISOS = "SIMULAR_PERMISOS";
+	/** Regenera la cadena d'òrgans (organpare) de l'expedient simulat (des del simulador de permisos). */
+	public static final String ACTION_REGENERAR_ORGANPARE = "REGENERAR_ORGANPARE";
+	/** Named query dels selectors d'element del simulador: sense entitat actual ni ACL (només superusuari). */
+	public static final String SIMULADOR_PERMISOS_NAMED_QUERY = "SIMULADOR_PERMISOS";
 
 	@NotNull
 	@Size(max = 64)
@@ -227,5 +243,106 @@ public class UsuariResource extends BaseResource<String> {
 		private List<ExtendedPermissionEnum> permisos;
 		/** Només els permisos directes de l'usuari (o qualsevol sobre un objecte inexistent) es poden revocar des del visor. */
 		private boolean revocable;
+	}
+
+	// ===============================================================================================
+	// Simulador de permisos (REPORT_SIMULAR_PERMISOS)
+	// ===============================================================================================
+
+	/** Recurs sobre el qual se simula la part de permisos del llistat REACT. */
+	public enum SimulacioRecurs { EXPEDIENT, ANOTACIO }
+
+	/** Resultat de cada comprovació del simulador. */
+	public enum SimulacioEstat {
+		/** La via concedeix o la restricció/requisit es compleix. */
+		OK,
+		/** La via no concedeix o la restricció/requisit no es compleix. */
+		KO,
+		/** No intervé amb el rol simulat. */
+		NO_APLICA,
+		/** Informatiu: no decideix per si sol però pot explicar el resultat. */
+		AVIS
+	}
+
+	/**
+	 * Paràmetres del simulador. L'entitat surt de l'element triat; si no se'n tria cap, s'ha d'indicar.
+	 * L'òrgan només és obligatori per als rols que treballen amb òrgan (IPA_ORGAN_ADMIN, IPA_DISSENY).
+	 */
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	@FieldNameConstants
+	public static class SimulacioPermisosForm implements Serializable {
+		@NotNull
+		@ResourceField(enumType = true)
+		private String rol;
+		@NotNull
+		private SimulacioRecurs recurs;
+		@ResourceField(namedQueries = SIMULADOR_PERMISOS_NAMED_QUERY, descriptionField = "numeroINom")
+		private ResourceReference<ExpedientResource, Long> expedient;
+		@ResourceField(namedQueries = SIMULADOR_PERMISOS_NAMED_QUERY)
+		private ResourceReference<ExpedientPeticioResource, Long> anotacio;
+		/** Id de l'entitat (només sense element). */
+		@ResourceField(enumType = true)
+		private String entitat;
+		/** Id de l'òrgan seleccionat a la capçalera (només IPA_ORGAN_ADMIN i IPA_DISSENY). */
+		@ResourceField(enumType = true)
+		private String organ;
+	}
+
+	/** Expedient del qual es regenera la cadena d'òrgans (organpare). */
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	@FieldNameConstants
+	public static class RegenerarOrganpareFormAction implements Serializable {
+		@NotNull
+		private Long expedientId;
+	}
+
+	/** Resultat del simulador. */
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	public static class SimulacioPermisosResultat implements Serializable {
+		private String usuariCodi;
+		private String rol;
+		private SimulacioRecurs recurs;
+		private String entitatNom;
+		private String organNom;
+		/** Id de l'element simulat (null si se simula sobre tota l'entitat). */
+		private Long elementId;
+		/** Descripció de l'element simulat (null si se simula sobre tota l'entitat). */
+		private String elementDescripcio;
+		private boolean ambElement;
+		/** Resultat de la consulta REAL del llistat amb la identitat de l'usuari: 0/1 amb element, total sense. */
+		private long totalReal;
+		/** Error de la consulta real (p. ex. sense accés a l'entitat). */
+		private String errorConsulta;
+		/** Amb element: el desglose per vies no quadra amb la consulta real (indica que el simulador s'ha de revisar). */
+		private boolean discrepancia;
+		private List<SimulacioComprovacio> requisits;
+		/** Vies: basta que una concedeixi. */
+		private List<SimulacioComprovacio> vies;
+		/** Restriccions: s'han de complir totes les que apliquen. */
+		private List<SimulacioComprovacio> restriccions;
+	}
+
+	/** Una comprovació (requisit, via o restricció) del simulador. */
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	public static class SimulacioComprovacio implements Serializable {
+		/** Codi estable de la comprovació (el front en tradueix el títol i l'explicació). */
+		private String codi;
+		private SimulacioEstat estat;
+		/** Elements que hi passen: 0/1 amb element; nombre d'expedients o anotacions sense element. */
+		private Long nombre;
+		/** Nombre d'objectes amb permís que alimenten la via (procediments, òrgans, parelles, grups...). */
+		private Integer nombreObjectes;
+		/** Paràmetres per a la traducció de l'explicació (noms d'objectes, permisos requerits...). */
+		private Map<String, String> parametres;
+		/** Permisos ACL de l'usuari o dels seus rols sobre els objectes que decideixen la comprovació. */
+		private List<PermisDetall> permisos;
 	}
 }

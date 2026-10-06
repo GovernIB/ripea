@@ -22,6 +22,8 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import lombok.Builder;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.acls.model.Permission;
@@ -533,6 +535,48 @@ public class MetaExpedientHelper {
 				true,
 				false);
 
+		PermisosProcediments permisosProcediments = findPermisosProcediments(entitat, permis, isAdminOrgan);
+		List<MetaExpedientEntity> metaExpedients = findAmbPermisosProcediments(
+				entitat,
+				permisosProcediments,
+				nomesActius,
+				filtreNomOrCodiSia,
+				isAdminEntitat,
+				isAdminOrgan,
+				organId,
+				comu);
+
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("MetaExpedientHelper.findAmbPermis end:  " + (System.currentTimeMillis() - t0) + " ms");
+
+		return metaExpedients;
+	}
+
+	/**
+	 * Llistes de cada via de permís sobre procediments de findAmbPermis, calculades amb els permisos de
+	 * l'usuari autenticat. Separades de la consulta perquè el simulador de permisos del superusuari pugui
+	 * avaluar cada via per separat amb la mateixa consulta (findAmbPermisosProcediments).
+	 */
+	@Getter
+	@Builder(toBuilder = true)
+	public static class PermisosProcediments {
+		/** VIA procediment: permís directe sobre el procediment. */
+		private final List<Long> metaExpedientIds;
+		/** VIA òrgan: òrgans vigents amb permís i els seus descendents. */
+		private final List<String> organCodis;
+		/** VIA parella procediment-òrgan. */
+		private final List<Long> metaExpedientOrganIds;
+		/** VIA comuns: COMU + permís, o ADM_COMU, sobre algun òrgan dona accés a tots els procediments comuns. */
+		private final boolean allComuns;
+		/** VIA grup: READ sobre un grup vinculat al procediment (només procediments sense permís directe). */
+		private final List<Long> grupsIds;
+	}
+
+	public PermisosProcediments findPermisosProcediments(
+			EntitatEntity entitat,
+			Permission permis,
+			boolean isAdminOrgan) {
+
 		long t1 = System.currentTimeMillis();
 		// Cercam els metaExpedients amb permisos assignats directament
 		List<Long> metaExpedientIds = permisosHelper.getObjectsIdsWithPermission(MetaNodeEntity.class, permis);
@@ -571,25 +615,30 @@ public class MetaExpedientHelper {
 		if (cacheHelper.mostrarLogsRendiment())
 			logger.info("MetaExpedientHelper.findAmbPermis organProcedimentsComunsIds (" + (Utils.isNotEmpty(organProcedimentsComunsIds) ? organProcedimentsComunsIds.size() : 0) + ") time:  " + (System.currentTimeMillis() - t4) + " ms");
 
-//		// if there are 1000+ values in IN clause, exception is thrown ORA-01795: el número máximo de expresiones en una lista es 1000
-//		// in issue #1330 unnecessary ids were removed from the lists
-//		// but if despite it there are still 1000+ values new solution must be implemented to not truncate lists.
-//		if (Utils.isBiggerThan(metaExpedientIds, 1000)) {
-//			logger.info("Truncating metaExpedientIds to 1000 to avoid ORA-01795");
-//			metaExpedientIds = metaExpedientIds.subList(0, 1000);
-//		}
-//		if (Utils.isBiggerThan(organCodis, 1000)) {
-//			logger.info("Truncating organIds to 1000 to avoid ORA-01795");
-//			organCodis = organCodis.subList(0, 1000);
-//		}
-//		if (Utils.isBiggerThan(metaExpedientOrganIds, 1000)) {
-//			logger.info("Truncating metaExpedientOrganIds to 1000 to avoid ORA-01795");
-//			metaExpedientOrganIds = metaExpedientOrganIds.subList(0, 1000);
-//		}
-
 		// Cercam els grups amb permis de lectura: donen acces als procediments vinculats,
 		// excepte als que exigeixen permis directe (aquests nomes son seleccionables per la via de permis directe real).
 		List<Long> grupsIdsAmbPermis = Utils.getNullIfEmpty(permisosHelper.getObjectsIdsWithPermission(GrupEntity.class, ExtendedPermission.READ));
+
+		return PermisosProcediments.builder()
+				.metaExpedientIds(metaExpedientIds)
+				.organCodis(organCodis)
+				.metaExpedientOrganIds(metaExpedientOrganIds)
+				.allComuns(accessAllComu)
+				.grupsIds(grupsIdsAmbPermis)
+				.build();
+	}
+
+	public List<MetaExpedientEntity> findAmbPermisosProcediments(
+			EntitatEntity entitat,
+			PermisosProcediments permisosProcediments,
+			boolean nomesActius,
+			String filtreNomOrCodiSia,
+			boolean isAdminEntitat,
+			boolean isAdminOrgan,
+			Long organId,
+			boolean comu) {
+
+		List<Long> grupsIdsAmbPermis = permisosProcediments.getGrupsIds();
 
 		long t5 = System.currentTimeMillis();
 		MetaExpedientFiltre filtre = MetaExpedientFiltre.builder()
@@ -598,13 +647,13 @@ public class MetaExpedientHelper {
 				.filtre(filtreNomOrCodiSia)
 				.esAdminEntitat(isAdminEntitat)
 				.esAdminOrgan(isAdminOrgan)
-				.metaExpedientIdPermesos(metaExpedientIds)
-				.organCodiPermesos(organCodis)
-				.metaExpedientOrganIdPermesos(metaExpedientOrganIds)
+				.metaExpedientIdPermesos(permisosProcediments.getMetaExpedientIds())
+				.organCodiPermesos(permisosProcediments.getOrganCodis())
+				.metaExpedientOrganIdPermesos(permisosProcediments.getMetaExpedientOrganIds())
 				.revisioActiva(isRevisioActiva())
 				.organGestorIComu(comu && organId != null)
 				.organ(organId != null ? organGestorRepository.getOne(organId) : null)
-				.allComuns(accessAllComu)
+				.allComuns(permisosProcediments.isAllComuns())
 				.build();
 //		List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatAndActiuAndFiltreAndPermes(filtre); --> Ho deixam preparat per quan passem a jboss7
 		List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatAndActiuAndFiltreAndPermes(
@@ -638,10 +687,7 @@ public class MetaExpedientHelper {
 				grupsIdsAmbPermis
 				);
 		if (cacheHelper.mostrarLogsRendiment())
-			logger.info("MetaExpedientHelper.findAmbPermis findByEntitatAndActiuAndFiltreAndPermes (" + (Utils.isNotEmpty(organProcedimentsComunsIds) ? organProcedimentsComunsIds.size() : 0) + ") time:  " + (System.currentTimeMillis() - t5) + " ms");
-
-		if (cacheHelper.mostrarLogsRendiment())
-			logger.info("MetaExpedientHelper.findAmbPermis end:  " + (System.currentTimeMillis() - t0) + " ms");
+			logger.info("MetaExpedientHelper.findAmbPermis findByEntitatAndActiuAndFiltreAndPermes (" + (Utils.isNotEmpty(metaExpedients) ? metaExpedients.size() : 0) + ") time:  " + (System.currentTimeMillis() - t5) + " ms");
 
 		return metaExpedients;
 	}

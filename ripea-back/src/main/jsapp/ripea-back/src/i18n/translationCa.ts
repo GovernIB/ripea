@@ -1854,6 +1854,9 @@ const translationCa = {
                 permisos: {
                     label: "Permisos",
                 },
+                simulador: {
+                    label: "Simular permisos",
+                },
                 baixa: {
                     label: "Dona de baixa",
                     title: "Donar de baixa l'usuari {{usuari}}",
@@ -1865,6 +1868,225 @@ const translationCa = {
                     title: "Tornar a donar d'alta l'usuari",
                     confirm: "Segur que voleu tornar a donar d'alta l'usuari {{usuari}}? Podrà tornar a iniciar sessió i rebre correus.",
                     ok: "Usuari donat d'alta",
+                },
+            },
+            simulador: {
+                title: "Simulador de permisos: {{usuari}}",
+                ajuda: "Simula la part de permisos del llistat d'expedients o d'anotacions de la interfície moderna amb la identitat de l'usuari (els seus rols de Keycloak) i el rol triat. Si no tries cap element, es mostra l'abast de cada via a l'entitat.",
+                simular: "Simula",
+                noAplica: "No intervé amb el rol {{rol}}.",
+                discrepancia: "El desglossament per vies no coincideix amb la consulta real del llistat. El veredicte de dalt és el de la consulta real; cal revisar el simulador.",
+                veurePermisos: "Permisos ({{num}})",
+                nombreObjectes: "{{num}} objectes amb permís",
+                nombre: {
+                    EXPEDIENT: "{{num}} expedients",
+                    ANOTACIO: "{{num}} anotacions",
+                },
+                recurs: {
+                    EXPEDIENT: "l'expedient",
+                    ANOTACIO: "l'anotació",
+                },
+                veredicte: {
+                    visible: "{{usuari}} amb el rol {{rol}} VEU {{recurs}} {{element}} al llistat",
+                    noVisible: "{{usuari}} amb el rol {{rol}} NO veu {{recurs}} {{element}} al llistat",
+                    total: {
+                        EXPEDIENT: "{{usuari}} amb el rol {{rol}} veu {{num}} expedients de l'entitat {{entitat}}",
+                        ANOTACIO: "{{usuari}} amb el rol {{rol}} veu {{num}} anotacions de l'entitat {{entitat}}",
+                    },
+                    error: "La consulta real del llistat ha fallat amb aquesta identitat: {{error}}",
+                },
+                estat: {
+                    requisits: {
+                        OK: "Es compleix",
+                        KO: "No es compleix",
+                        NO_APLICA: "No aplica",
+                        AVIS: "Avís",
+                    },
+                    vies: {
+                        OK: "Concedeix",
+                        KO: "No concedeix",
+                        NO_APLICA: "No aplica",
+                        AVIS: "Avís",
+                    },
+                    restriccions: {
+                        OK: "Es compleix",
+                        KO: "L'exclou",
+                        NO_APLICA: "No aplica",
+                        AVIS: "Avís",
+                    },
+                },
+                seccio: {
+                    requisits: {
+                        titol: "Requisits previs",
+                        ajuda: "Condicions perquè l'usuari pugui treballar amb el rol i perquè les vies tinguin efecte.",
+                    },
+                    vies: {
+                        titol: "Vies d'accés",
+                        ajuda: "Basta que una via concedeixi l'accés.",
+                    },
+                    restriccions: {
+                        titol: "Restriccions",
+                        ajuda: "S'han de complir totes les que apliquen: si una falla, l'element queda exclòs encara que una via el concedeixi.",
+                    },
+                },
+                parametre: {
+                    procediment: "Procediment",
+                    organ: "Òrgan",
+                    organExpedient: "Òrgan de l'expedient",
+                    grup: "Grup",
+                    entitat: "Entitat",
+                    permis: "Permís requerit",
+                    desti: "Òrgan destí",
+                    estat: "Estat de revisió",
+                    numero: "Files",
+                    comu: "Procediment comú",
+                    permisDirecte: "Exigeix permís directe",
+                    gestioGrups: "Gestió per grups activa",
+                    rol: "Rol",
+                    esperades: "Files esperades",
+                    actuals: "Files actuals",
+                    faltants: "Òrgans que falten",
+                    sobrants: "Òrgans que sobren",
+                    duplicats: "Òrgans repetits",
+                    altreProcediment: "Files d'un altre procediment",
+                },
+                organpare: {
+                    boto: "Regenera organpare",
+                    confirmTitol: "Regenerar la cadena d'òrgans",
+                    confirm: "Es tornarà a construir la cadena d'òrgans (organpare) de l'expedient {{element}} a partir del seu òrgan gestor actual i dels seus òrgans superiors. Pot canviar els usuaris que el veuen pels permisos de parella procediment-òrgan i de procediments comuns. Voleu continuar?",
+                    ok: "Cadena d'òrgans regenerada",
+                },
+                comprovacio: {
+                    ROL_KEYCLOAK: {
+                        titol: "Rol assignat a Keycloak",
+                        descripcio: "L'usuari ha de tenir el rol a Keycloak (el rol Usuari l'afegeix l'aplicació a tothom).",
+                        suggeriment: "Assignau el rol a l'usuari a Keycloak.",
+                    },
+                    PERMIS_ENTITAT: {
+                        titol: "Permís sobre l'entitat",
+                        descripcio: "Per poder triar aquest rol a la capçalera, l'usuari o un dels seus rols necessita el permís indicat sobre l'entitat.",
+                        suggeriment: "Donau el permís requerit sobre l'entitat a l'usuari o a un dels seus rols.",
+                    },
+                    ORGAN_CAPCALERA: {
+                        titol: "Òrgan seleccionable a la capçalera",
+                        descripcio: "Amb aquest rol, l'òrgan ha d'aparèixer a la capçalera: cal el permís indicat directament sobre l'òrgan.",
+                        suggeriment: "Donau el permís requerit sobre l'òrgan a l'usuari o a un dels seus rols.",
+                    },
+                    EXPEDIENT_ORGANPARE: {
+                        titol: "Cadena d'òrgans de l'expedient (organpare)",
+                        descripcio: "Compara les files d'IPA_EXPEDIENT_ORGANPARE amb la cadena actual d'òrgans (l'òrgan de l'expedient i els seus superiors). Les vies 3 i 4 del rol Usuari només veuen l'expedient a través d'aquestes files. Als permisos es mostren els que té l'usuari sobre els òrgans que falten.",
+                        suggeriment: "Regenerau la cadena d'òrgans de l'expedient. Es construeix amb la jerarquia actual: després d'una reestructuració DIR3 pot diferir de la del dia de creació.",
+                    },
+                    ANOTACIO_PROCEDIMENT: {
+                        titol: "Procediment assignat a l'anotació",
+                        descripcio: "Amb aquest rol les anotacions es filtren per procediment: una anotació sense procediment no apareix.",
+                        suggeriment: "Assignau un procediment a l'anotació.",
+                    },
+                    PROCEDIMENT_ACTIU: {
+                        titol: "Procediment actiu",
+                        descripcio: "Només compten els procediments actius.",
+                        suggeriment: "Activau el procediment.",
+                    },
+                    PROCEDIMENT_REVISAT: {
+                        titol: "Procediment revisat",
+                        descripcio: "Amb la revisió de procediments activada, només compten els procediments en estat REVISAT.",
+                        suggeriment: "Revisau el procediment.",
+                    },
+                    EXP_ADMIN_ENTITAT: {
+                        titol: "Administrador d'entitat",
+                        descripcio: "Amb aquest rol es veuen tots els expedients de l'entitat: no s'aplica cap via ni restricció.",
+                        suggeriment: "Comprovau el permís sobre l'entitat i que l'expedient no estigui esborrat.",
+                    },
+                    EXP_VIA1_PROCEDIMENT: {
+                        titol: "Via 1 · Procediment",
+                        descripcio: "Permís de lectura (READ) sobre el procediment de l'expedient.",
+                        suggeriment: "Donau READ sobre el procediment a l'usuari o a un dels seus rols.",
+                    },
+                    EXP_VIA2_ORGAN: {
+                        titol: "Via 2 · Òrgan de capçalera",
+                        descripcio: "L'òrgan de l'expedient és l'òrgan seleccionat a la capçalera o un dels seus descendents.",
+                        suggeriment: "Seleccionau a la capçalera un òrgan que inclogui l'òrgan de l'expedient.",
+                    },
+                    EXP_VIA3_PARELLA: {
+                        titol: "Via 3 · Parella procediment-òrgan",
+                        descripcio: "READ sobre la parella procediment-òrgan d'algun òrgan de la cadena de l'expedient (organpare).",
+                        suggeriment: "Donau READ sobre la parella procediment-òrgan a l'usuari o a un dels seus rols.",
+                    },
+                    EXP_VIA4_COMUNS: {
+                        titol: "Via 4 · Procediments comuns per òrgan",
+                        descripcio: "Si el procediment és comú, COMU i READ (tots dos) sobre algun òrgan de la cadena de l'expedient (organpare).",
+                        suggeriment: "Donau COMU i READ sobre l'òrgan o un ascendent a l'usuari o a un dels seus rols.",
+                    },
+                    EXP_VIA5_GRUP: {
+                        titol: "Via 5 · Grup",
+                        descripcio: "READ sobre el grup de l'expedient, només si el procediment no exigeix permís directe.",
+                        suggeriment: "Donau READ sobre el grup de l'expedient o, si el procediment exigeix permís directe, sobre el procediment.",
+                    },
+                    EXP_RESTRICCIO_PERMIS_DIRECTE: {
+                        titol: "Restricció A · Permís directe",
+                        descripcio: "Si el procediment exigeix permís directe, cal READ sobre el procediment o sobre la parella procediment-òrgan: el permís sobre l'òrgan no basta.",
+                        suggeriment: "Donau READ directament sobre el procediment o sobre la parella procediment-òrgan.",
+                    },
+                    EXP_RESTRICCIO_ORGANS: {
+                        titol: "Restricció B · Òrgan de l'expedient",
+                        descripcio: "L'òrgan de l'expedient ha de ser l'òrgan seleccionat a la capçalera o un dels seus descendents.",
+                        suggeriment: "Seleccionau a la capçalera un òrgan que inclogui l'òrgan de l'expedient.",
+                    },
+                    EXP_RESTRICCIO_GRUPS: {
+                        titol: "Restricció C · Grup",
+                        descripcio: "Si l'expedient té grup, cal READ sobre aquest grup.",
+                        suggeriment: "Donau READ sobre el grup de l'expedient a l'usuari o a un dels seus rols.",
+                    },
+                    ANO_ADMIN_ENTITAT: {
+                        titol: "Administrador d'entitat",
+                        descripcio: "Amb aquest rol es veuen totes les anotacions de l'entitat, també les que no tenen procediment.",
+                        suggeriment: "Comprovau el permís sobre l'entitat.",
+                    },
+                    ANO_ROL_SENSE_LLISTAT: {
+                        titol: "Rol sense llistat d'anotacions",
+                        descripcio: "El llistat d'anotacions no contempla aquest rol.",
+                        suggeriment: "Simulau amb un altre rol.",
+                    },
+                    ANO_ORGAN_DESTI: {
+                        titol: "Òrgan destí del registre",
+                        descripcio: "L'òrgan destí del registre ha de ser l'òrgan seleccionat a la capçalera o un dels seus descendents.",
+                        suggeriment: "Seleccionau a la capçalera un òrgan que inclogui l'òrgan destí de l'anotació.",
+                    },
+                    ANO_PROCEDIMENTS_ORGAN: {
+                        titol: "Procediments de l'òrgan",
+                        descripcio: "El procediment de l'anotació ha de pertànyer a l'òrgan seleccionat a la capçalera o als seus descendents.",
+                        suggeriment: "Seleccionau a la capçalera un òrgan que inclogui el procediment de l'anotació.",
+                    },
+                    ANO_VIA1_PROCEDIMENT: {
+                        titol: "Via 1 · Procediment",
+                        descripcio: "Permís de creació o modificació (CREATE o WRITE) sobre el procediment.",
+                        suggeriment: "Donau CREATE o WRITE sobre el procediment a l'usuari o a un dels seus rols.",
+                    },
+                    ANO_VIA2_ORGAN: {
+                        titol: "Via 2 · Òrgan",
+                        descripcio: "CREATE o WRITE sobre l'òrgan vigent del procediment o un dels seus ascendents.",
+                        suggeriment: "Donau CREATE o WRITE sobre l'òrgan del procediment o un ascendent.",
+                    },
+                    ANO_VIA3_PARELLA: {
+                        titol: "Via 3 · Parella procediment-òrgan",
+                        descripcio: "CREATE o WRITE sobre una parella procediment-òrgan d'un procediment comú.",
+                        suggeriment: "Donau CREATE o WRITE sobre la parella procediment-òrgan.",
+                    },
+                    ANO_VIA4_COMUNS: {
+                        titol: "Via 4 · Procediments comuns",
+                        descripcio: "Si el procediment és comú: COMU juntament amb CREATE o WRITE, o bé ADM_COMU, sobre qualsevol òrgan.",
+                        suggeriment: "Donau COMU i CREATE o WRITE (o ADM_COMU) sobre un òrgan.",
+                    },
+                    ANO_VIA5_GRUP: {
+                        titol: "Via 5 · Grup",
+                        descripcio: "READ sobre un grup vinculat al procediment, només si el procediment no exigeix permís directe.",
+                        suggeriment: "Donau READ sobre un grup vinculat al procediment.",
+                    },
+                    ANO_RESTRICCIO_GRUPS: {
+                        titol: "Restricció · Gestió per grups",
+                        descripcio: "Si el procediment té la gestió per grups activa, cal READ sobre el grup de l'anotació.",
+                        suggeriment: "Donau READ sobre el grup de l'anotació a l'usuari o a un dels seus rols.",
+                    },
                 },
             },
             permisos: {

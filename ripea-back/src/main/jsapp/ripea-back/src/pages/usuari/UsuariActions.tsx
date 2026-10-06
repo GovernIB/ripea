@@ -3,6 +3,7 @@ import {useBaseAppContext, useResourceApiService} from "reactlib";
 import {useUserSession} from "../../components/Session.tsx";
 import useBaixa from "./actions/Baixa.tsx";
 import {usePermisosUsuariDialog} from "./PermisosUsuariDialog.tsx";
+import {useSimuladorPermisosDialog} from "./SimuladorPermisosDialog.tsx";
 
 const useAlta = (refresh?: () => void) => {
     const {t} = useTranslation();
@@ -36,6 +37,7 @@ export const useUsuariActions = (refresh?: () => void) => {
     const alta = useAlta(refresh);
     const {handleShow: handleBaixa, content: contentBaixa} = useBaixa(refresh);
     const {handleOpen: handlePermisos, dialog: dialogPermisos} = usePermisosUsuariDialog();
+    const {handleOpen: handleSimulador, dialog: dialogSimulador} = useSimuladorPermisosDialog();
 
     const actions = [
         {
@@ -43,6 +45,12 @@ export const useUsuariActions = (refresh?: () => void) => {
             icon: "key",
             showInMenu: true,
             onClick: handlePermisos,
+        },
+        {
+            label: t('page.usuari.action.simulador.label'),
+            icon: "policy",
+            showInMenu: true,
+            onClick: handleSimulador,
         },
         {
             label: t('page.usuari.action.baixa.label'),
@@ -64,6 +72,7 @@ export const useUsuariActions = (refresh?: () => void) => {
     const components = <>
         {contentBaixa}
         {dialogPermisos}
+        {dialogSimulador}
     </>
 
     return {

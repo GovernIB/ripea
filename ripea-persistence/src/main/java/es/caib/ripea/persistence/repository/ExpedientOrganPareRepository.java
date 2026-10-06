@@ -33,6 +33,9 @@ public interface ExpedientOrganPareRepository extends JpaRepository<ExpedientOrg
 	List<MetaExpedientOrganGestorEntity> findMetaExpedientOrganGestorByExpedientId(
 			@Param("expedientId") Long expedientId);
 	
+	/** Files actuals de la cadena d'òrgans de l'expedient (consulta a BD, no la col·lecció en memòria). */
+	List<ExpedientOrganPareEntity> findByExpedientId(Long expedientId);
+
 	@Modifying
  	@Query(value = "UPDATE IPA_EXPEDIENT_ORGANPARE " +
  			"SET CREATEDBY_CODI = CASE WHEN CREATEDBY_CODI = :codiAntic THEN :codiNou ELSE CREATEDBY_CODI END, " +

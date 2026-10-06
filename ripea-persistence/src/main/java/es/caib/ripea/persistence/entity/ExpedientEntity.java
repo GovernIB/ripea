@@ -165,6 +165,11 @@ public class ExpedientEntity extends NodeEntity {
 	private String prioritatMotiu;
 	
 
+	/** Cadena d'òrgans (procediment-òrgan) de l'expedient: la llegeixen les vies 3 i 4 del llistat d'expedients. */
+	public Set<MetaExpedientOrganGestorEntity> getMetaexpedientOrganGestorPares() {
+		return metaexpedientOrganGestorPares;
+	}
+
 	public GrupEntity getGrup() {
 		return grup;
 	}
