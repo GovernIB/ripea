@@ -1938,9 +1938,20 @@ public class DocumentHelper {
 		List<DocumentDto> documents = new ArrayList<DocumentDto>();
 		if (resultat.getResultats() != null) {
 			for (ContingutArxiu contingutArxiu : resultat.getResultats()) {
-				List<DocumentDto> trobats = findByArxiuUuid(contingutArxiu.getIdentificador());
-				if (!trobats.isEmpty()) {
-					documents.add(trobats.get(0));
+				for (DocumentEntity document : documentRepository.findByArxiuUuidAndEsborrat(contingutArxiu.getIdentificador(), 0)) {
+					if (document.getExpedient() == null || !document.getExpedient().getId().equals(expedient.getId())) {
+						continue;
+					}
+					DocumentDto documentDto = (DocumentDto) contingutHelper.toContingutDto(document, false, false);
+					List<Long> carpetesPareIds = new ArrayList<Long>();
+					ContingutEntity pare = document.getPare();
+					while (pare != null && !pare.getId().equals(expedient.getId())) {
+						carpetesPareIds.add(0, pare.getId());
+						pare = pare.getPare();
+					}
+					documentDto.setCarpetesPareIds(carpetesPareIds);
+					documents.add(documentDto);
+					break;
 				}
 			}
 		}

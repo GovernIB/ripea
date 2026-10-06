@@ -1,114 +1,87 @@
-import {useState} from "react";
-import {MuiDialog, useBaseAppContext, useResourceApiService} from "reactlib";
+import {useEffect, useRef, useState} from "react";
+import {useBaseAppContext, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
-import {Box, CircularProgress, Icon, IconButton, InputAdornment, List, ListItemButton, TextField, Typography} from "@mui/material";
-import ContingutIcon from "../details/ContingutIcon.tsx";
+import {Icon, IconButton, InputAdornment, TextField} from "@mui/material";
 
-const CercaDocumentsExpedientContent = (props: any) => {
-    const {expedientId, onSelect} = props;
+const MIN_CARACTERS = 3;
+const ESPERA_MS = 500;
+const MAX_RESULTATS = 100;
+
+export const CercaDocumentsExpedient = (props: {
+    expedientId: any,
+    onChange: (ids: Set<string> | null, text?: string) => void,
+    onLoading: (loading: boolean) => void,
+}) => {
+    const {expedientId, onChange, onLoading} = props;
     const {t} = useTranslation();
     const {artifactAction: apiAction} = useResourceApiService('expedientResource');
     const {temporalMessageShow} = useBaseAppContext();
 
     const [text, setText] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [searched, setSearched] = useState(false);
-    const [results, setResults] = useState<any[]>([]);
-
-    const handleSearch = () => {
-        if (!text || expedientId == null) {
-            return;
+    const peticioActual = useRef(0);
+    const cercant = useRef(false);
+    const setCercant = (value: boolean) => {
+        if (cercant.current !== value) {
+            cercant.current = value;
+            onLoading(value);
         }
-        setLoading(true);
-        apiAction(expedientId, {code: 'CERCA_DOCUMENTS', data: {text, page: 0, pageSize: 50}})
-            .then((result: any) => setResults(result?.contingut ?? []))
-            .catch((error: any) => {
-                setResults([]);
-                temporalMessageShow(null, error?.message, 'error');
-            })
-            .finally(() => {
-                setSearched(true);
-                setLoading(false);
-            });
     };
 
-    return <Box>
-        <TextField
-            fullWidth
-            autoFocus
-            variant={"outlined"}
-            size={"small"}
-            sx={{mt: 2}}
-            label={t('page.contingut.action.cercaDocuments.text')}
-            value={text}
-            onChange={(e: any) => setText(e.target.value)}
-            onKeyDown={(e: any) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleSearch();
-                }
-            }}
-            slotProps={{
-                input: {
-                    endAdornment: <InputAdornment position={"end"}>
-                        <IconButton title={t('page.contingut.action.cercaDocuments.search')} onClick={handleSearch} disabled={!text || loading}>
-                            <Icon>search</Icon>
+    useEffect(() => {
+        const textCerca = text.trim();
+        const peticio = ++peticioActual.current;
+        if (textCerca.length < MIN_CARACTERS || expedientId == null) {
+            setCercant(false);
+            onChange(null);
+            return;
+        }
+        const timeout = setTimeout(() => {
+            setCercant(true);
+            apiAction(expedientId, {code: 'CERCA_DOCUMENTS', data: {text: textCerca, page: 0, pageSize: MAX_RESULTATS}})
+                .then((result: any) => {
+                    if (peticio !== peticioActual.current) return;
+                    const documents: any[] = result?.contingut ?? [];
+                    setCercant(false);
+                    onChange(new Set(documents.map((document: any) => String(document?.id))), textCerca);
+                })
+                .catch((error: any) => {
+                    if (peticio !== peticioActual.current) return;
+                    setCercant(false);
+                    onChange(null);
+                    temporalMessageShow(null, error?.message, 'error');
+                });
+        }, ESPERA_MS);
+        return () => clearTimeout(timeout);
+    }, [text, expedientId]);
+
+    return <TextField
+        size={"small"}
+        variant={"outlined"}
+        sx={{width: 280}}
+        placeholder={t('page.contingut.action.cercaDocuments.text')}
+        value={text}
+        onChange={(e: any) => setText(e.target.value)}
+        onKeyDown={(e: any) => {
+            if (e.key === 'Escape') {
+                setText('');
+            }
+        }}
+        slotProps={{
+            htmlInput: {'aria-label': t('page.contingut.action.cercaDocuments.label')},
+            input: {
+                startAdornment: <InputAdornment position={"start"}>
+                    <Icon fontSize={"small"}>search</Icon>
+                </InputAdornment>,
+                endAdornment: text
+                    ? <InputAdornment position={"end"}>
+                        <IconButton size={"small"} title={t('page.contingut.action.cercaDocuments.clear')} onClick={() => setText('')}>
+                            <Icon fontSize={"small"}>close</Icon>
                         </IconButton>
-                    </InputAdornment>,
-                }
-            }}
-        />
-        <Box sx={{mt: 2, minHeight: '4em'}}>
-            {loading &&
-                <Box sx={{display: 'flex', justifyContent: 'center', py: 2}}>
-                    <CircularProgress size={28}/>
-                </Box>
+                    </InputAdornment>
+                    : undefined,
             }
-            {!loading && searched && results.length === 0 &&
-                <Typography color={"text.secondary"} sx={{px: 1}}>
-                    {t('page.contingut.action.cercaDocuments.empty')}
-                </Typography>
-            }
-            {!loading && results.length > 0 &&
-                <List disablePadding sx={{maxHeight: '50vh', overflowY: 'auto'}}>
-                    {results.map((document: any) => (
-                        <ListItemButton
-                            key={document.id}
-                            divider
-                            onClick={() => onSelect(document.id)}
-                        >
-                            <ContingutIcon entity={document}/>
-                        </ListItemButton>
-                    ))}
-                </List>
-            }
-        </Box>
-    </Box>
+        }}
+    />
 }
 
-export const useCercaDocumentsExpedient = (entity: any, onOpenDocument: (id: any) => void) => {
-    const {t} = useTranslation();
-    const [open, setOpen] = useState(false);
-
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
-
-    const dialog =
-        <MuiDialog
-            open={open}
-            closeCallback={handleClose}
-            title={t('page.contingut.action.cercaDocuments.title')}
-            componentProps={{fullWidth: true, maxWidth: 'lg'}}
-            buttons={[{text: t('common.close'), componentProps: {variant: 'outlined'}, value: false}]}
-            buttonCallback={() => handleClose()}
-        >
-            <CercaDocumentsExpedientContent
-                expedientId={entity?.id}
-                onSelect={(id: any) => onOpenDocument(id)}
-            />
-        </MuiDialog>
-
-    return {open, handleOpen, handleClose, dialog};
-}
-
-export default useCercaDocumentsExpedient;
+export default CercaDocumentsExpedient;

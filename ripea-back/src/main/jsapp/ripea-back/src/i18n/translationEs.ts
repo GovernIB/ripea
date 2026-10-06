@@ -265,11 +265,10 @@ const translationEs = {
                     ok: "Documento '{{document}}' vinculado correctamente",
                 },
                 cercaDocuments: {
-                    label: "Buscar documentos...",
-                    title: "Búsqueda de documentos en el expediente",
-                    text: "Texto a buscar",
-                    search: "Buscar",
-                    empty: "No se ha encontrado ningún documento",
+                    label: "Buscar documentos",
+                    text: "Texto a buscar (mín. 3 caracteres)",
+                    clear: "Limpiar la búsqueda",
+                    noResults: "No se han encontrado resultados",
                 },
                 create: {
                     label: "Crea contenido",
