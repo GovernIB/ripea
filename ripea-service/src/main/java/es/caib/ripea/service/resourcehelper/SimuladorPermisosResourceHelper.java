@@ -98,6 +98,8 @@ public class SimuladorPermisosResourceHelper {
 
 	private static final String NAMED_QUERY_SENSE_PERMISOS = "WITHOUT_PERMISION_CHECK";
 	private static final String NAMED_QUERY_LLISTAT_ANOTACIONS = "LLISTAT_ANOTACIONS";
+	/** Valor buit d'un paràmetre de l'element (el front el mostra com a "(sense ...)"); null vol dir que no s'informa. */
+	private static final String BUIT = "";
 	/** Màxim de files de permisos que s'adjunten a cada comprovació (el total va a nombreObjectes). */
 	private static final int MAX_PERMISOS_COMPROVACIO = 100;
 
@@ -239,7 +241,8 @@ public class SimuladorPermisosResourceHelper {
 			entitatComprovacio = comprovacio("PERMIS_ENTITAT", granted ? SimulacioEstat.OK : SimulacioEstat.KO,
 					params("rol", ctx.rol, "entitat", ctx.entitat.getNom(), "permis", nomPermis(permisEntitat)));
 		}
-		entitatComprovacio.setPermisos(permisosSobre(ctx, ClassType.ENTITY, List.of(ctx.entitat.getId())));
+		ambPermisos(entitatComprovacio, "ENTITAT", permisosSobre(ctx, ClassType.ENTITY, List.of(ctx.entitat.getId())), false,
+				permisEntitat != null ? new ExtendedPermissionEnum[] { ExtendedPermissionEnum.valueOf(nomPermis(permisEntitat)) } : new ExtendedPermissionEnum[0]);
 		resultat.getRequisits().add(entitatComprovacio);
 
 		// Òrgan seleccionable a la capçalera (només rols amb òrgan)
@@ -248,7 +251,7 @@ public class SimuladorPermisosResourceHelper {
 			boolean seleccionable = organs.stream().anyMatch(o -> o.getId().equals(ctx.organ.getId()));
 			SimulacioComprovacio organComprovacio = comprovacio("ORGAN_CAPCALERA", seleccionable ? SimulacioEstat.OK : SimulacioEstat.KO,
 					params("organ", descripcio(ctx.organ), "permis", nomPermis(permisOrganCapcalera(ctx.rol))));
-			organComprovacio.setPermisos(permisosSobre(ctx, ClassType.ORGAN, List.of(ctx.organ.getId())));
+			ambPermisos(organComprovacio, "ORGAN_CAPCALERA", permisosSobre(ctx, ClassType.ORGAN, List.of(ctx.organ.getId())), false, permisOrganCapcaleraEnum(ctx.rol));
 			resultat.getRequisits().add(organComprovacio);
 		}
 	}
@@ -262,6 +265,7 @@ public class SimuladorPermisosResourceHelper {
 		if (expedient != null) {
 			resultat.setElementId(expedient.getId());
 			resultat.setElementDescripcio(expedient.getNumero() + " - " + expedient.getNom());
+			resultat.setProcedimentDescripcio(descripcio(expedient.getMetaExpedient()));
 		}
 
 		// Veredicte: consulta real del llistat
@@ -307,61 +311,113 @@ public class SimuladorPermisosResourceHelper {
 			SimulacioComprovacio admin = comprovacioComptada("EXP_ADMIN_ENTITAT", comptarExpedients(filtreBase), null, params("entitat", ctx.entitat.getNom()));
 			resultat.getVies().add(admin);
 		} else {
-			resultat.getVies().add(viaExpedient(ctx, "EXP_VIA1_PROCEDIMENT", true,
+			boolean comu = expedient != null && expedient.getMetaExpedient().getOrganGestor() == null;
+			boolean permisDirecte = expedient != null && expedient.getMetaExpedient().isPermisDirecte();
+
+			SimulacioComprovacio via1 = viaExpedient(ctx, "EXP_VIA1_PROCEDIMENT", true,
 					expedientPermisosFiltreHelper.filtreVia1Procediments(llistes), filtreBase,
 					llistes.getIdsMetaExpedientsPermesos(),
-					permisosSobre(ctx, ClassType.MET_NOD, idsElementOLlista(procedimentId, llistes.getIdsMetaExpedientsPermesos())),
-					expedient != null ? params("procediment", descripcio(expedient.getMetaExpedient())) : params()));
-			resultat.getVies().add(viaExpedient(ctx, "EXP_VIA2_ORGAN", rolAmbOrgan,
+					params());
+			ambPermisos(via1, expedient != null ? "PROCEDIMENT" : "PROCEDIMENTS",
+					permisosSobre(ctx, ClassType.MET_NOD, idsObjectes(ctx, procedimentId, llistes.getIdsMetaExpedientsPermesos())), false, ExtendedPermissionEnum.READ);
+			resultat.getVies().add(via1);
+
+			SimulacioComprovacio via2 = viaExpedient(ctx, "EXP_VIA2_ORGAN", rolAmbOrgan,
 					expedientPermisosFiltreHelper.filtreVia2Organs(llistes), filtreBase,
 					llistes.getIdsOrgansPermesos(),
-					ctx.organ != null ? permisosSobre(ctx, ClassType.ORGAN, List.of(ctx.organ.getId())) : null,
 					params("organ", ctx.organ != null ? descripcio(ctx.organ) : null,
-							"organExpedient", expedient != null ? descripcio(expedient.getOrganGestor()) : null)));
-			resultat.getVies().add(viaExpedient(ctx, "EXP_VIA3_PARELLA", !rolAmbOrgan,
+							"organExpedient", expedient != null ? buitSiNull(descripcio(expedient.getOrganGestor())) : null));
+			if (ctx.organ != null) {
+				ambPermisos(via2, "ORGAN_CAPCALERA", permisosSobre(ctx, ClassType.ORGAN, List.of(ctx.organ.getId())), false, permisOrganCapcaleraEnum(ctx.rol));
+			}
+			resultat.getVies().add(via2);
+
+			SimulacioComprovacio via3 = viaExpedient(ctx, "EXP_VIA3_PARELLA", !rolAmbOrgan,
 					expedientPermisosFiltreHelper.filtreVia3ParellesProcedimentOrgan(llistes), filtreBase,
 					llistes.getIdsMetaExpedientOrganPairsPermesos(),
-					permisosSobre(ctx, ClassType.MET_EXP_ORG, expedient != null ? parellesIds : llistes.getIdsMetaExpedientOrganPairsPermesos()),
-					params()));
-			resultat.getVies().add(viaExpedient(ctx, "EXP_VIA4_COMUNS", !rolAmbOrgan,
+					params());
+			ambPermisos(via3, expedient != null ? "PARELLES_CADENA" : "PARELLES",
+					permisosSobre(ctx, ClassType.MET_EXP_ORG, expedient != null ? parellesIds : llistes.getIdsMetaExpedientOrganPairsPermesos()), false, ExtendedPermissionEnum.READ);
+			resultat.getVies().add(via3);
+
+			// La via 4 només pot donar accés als procediments comuns: si no ho és, no s'hi adjunten òrgans
+			SimulacioComprovacio via4 = viaExpedient(ctx, "EXP_VIA4_COMUNS", !rolAmbOrgan,
 					expedientPermisosFiltreHelper.filtreVia4ComunsPerOrgan(llistes), filtreBase,
 					llistes.getIdsOrgansAmbProcedimentsComunsPermesos(),
-					permisosSobre(ctx, ClassType.ORGAN, expedient != null ? organsParelles : llistes.getIdsOrgansAmbProcedimentsComunsPermesos()),
-					expedient != null ? params("comu", String.valueOf(expedient.getMetaExpedient().getOrganGestor() == null)) : params()));
-			resultat.getVies().add(viaExpedient(ctx, "EXP_VIA5_GRUP", !rolAmbOrgan,
+					expedient != null ? params("comu", String.valueOf(comu)) : params());
+			if (expedient != null && !comu) {
+				via4.setSuggerimentVariant("NO_COMU");
+			} else {
+				ambPermisos(via4, expedient != null ? "ORGANS_CADENA" : "ORGANS_COMU",
+						permisosSobre(ctx, ClassType.ORGAN, expedient != null ? organsParelles : llistes.getIdsOrgansAmbProcedimentsComunsPermesos()), true,
+						ExtendedPermissionEnum.COMU, ExtendedPermissionEnum.READ);
+			}
+			resultat.getVies().add(via4);
+
+			SimulacioComprovacio via5 = viaExpedient(ctx, "EXP_VIA5_GRUP", !rolAmbOrgan,
 					expedientPermisosFiltreHelper.filtreVia5Grups(llistes), filtreBase,
 					llistes.getIdsGrupsPermesos(),
-					permisosSobre(ctx, ClassType.GRUP, idsElementOLlista(grupId, llistes.getIdsGrupsPermesos())),
 					expedient != null ? params(
-							"grup", expedient.getGrup() != null ? descripcio(expedient.getGrup()) : null,
-							"permisDirecte", String.valueOf(expedient.getMetaExpedient().isPermisDirecte())) : params()));
+							"grup", buitSiNull(expedient.getGrup() != null ? descripcio(expedient.getGrup()) : null),
+							"permisDirecte", String.valueOf(permisDirecte)) : params());
+			if (expedient != null && grupId == null) {
+				via5.setSuggerimentVariant("SENSE_GRUP");
+			} else if (permisDirecte) {
+				via5.setSuggerimentVariant("PERMIS_DIRECTE");
+			}
+			ambPermisos(via5, expedient != null ? "GRUP_EXPEDIENT" : "GRUPS",
+					permisosSobre(ctx, ClassType.GRUP, idsObjectes(ctx, grupId, llistes.getIdsGrupsPermesos())), false, ExtendedPermissionEnum.READ);
+			resultat.getVies().add(via5);
+		}
+
+		// Sense element: expedients de l'entitat i expedients que concedeix alguna via (abans de les restriccions)
+		Filter filtreUnioVies = null;
+		if (ctx.elementId == null) {
+			long totalEntitat = comptarExpedients(filtreBase);
+			long totalVies;
+			if (!aplicaVies) {
+				totalVies = totalEntitat;
+			} else {
+				filtreUnioVies = llistes.capPermis() ? null : expedientPermisosFiltreHelper.filtreVies(llistes);
+				totalVies = filtreUnioVies != null ? comptarExpedients(FilterBuilder.and(filtreBase, filtreUnioVies)) : 0L;
+			}
+			resultat.setTotalEntitat(totalEntitat);
+			resultat.setTotalVies(totalVies);
 		}
 
 		// Restriccions
 		if (aplicaVies && expedientPermisosFiltreHelper.isAplicaRestriccioPermisDirecte(ctx.rol)) {
-			List<PermisDetall> permisosA = new ArrayList<>(permisosSobre(ctx, ClassType.MET_NOD, idsElementOLlista(procedimentId, llistes.getIdsMetaExpedientsPermesos())));
+			List<PermisDetall> permisosA = new ArrayList<>(permisosSobre(ctx, ClassType.MET_NOD, idsObjectes(ctx, procedimentId, llistes.getIdsMetaExpedientsPermesos())));
 			if (expedient != null) {
 				permisosA.addAll(permisosSobre(ctx, ClassType.MET_EXP_ORG, parellesIds));
 			}
-			resultat.getRestriccions().add(restriccioExpedient("EXP_RESTRICCIO_PERMIS_DIRECTE",
-					expedientPermisosFiltreHelper.filtreRestriccioPermisDirecte(llistes), filtreBase, permisosA,
-					expedient != null ? params("permisDirecte", String.valueOf(expedient.getMetaExpedient().isPermisDirecte())) : params()));
+			SimulacioComprovacio restriccioA = restriccioExpedient("EXP_RESTRICCIO_PERMIS_DIRECTE",
+					expedientPermisosFiltreHelper.filtreRestriccioPermisDirecte(llistes), filtreBase,
+					expedient != null ? params("permisDirecte", String.valueOf(expedient.getMetaExpedient().isPermisDirecte())) : params());
+			ambPermisos(restriccioA, "PROCEDIMENT_I_PARELLES", permisosA, false, ExtendedPermissionEnum.READ);
+			exclososExpedients(ctx, resultat, restriccioA, filtreBase, filtreUnioVies, expedientPermisosFiltreHelper.filtreRestriccioPermisDirecte(llistes));
+			resultat.getRestriccions().add(restriccioA);
 		} else {
 			resultat.getRestriccions().add(comprovacio("EXP_RESTRICCIO_PERMIS_DIRECTE", SimulacioEstat.NO_APLICA, params("rol", ctx.rol)));
 		}
 		Filter filtreRestriccioOrgans = expedientPermisosFiltreHelper.filtreRestriccioOrgans(llistes);
 		if (filtreRestriccioOrgans != null) {
-			resultat.getRestriccions().add(restriccioExpedient("EXP_RESTRICCIO_ORGANS", filtreRestriccioOrgans, filtreBase, null,
+			SimulacioComprovacio restriccioB = restriccioExpedient("EXP_RESTRICCIO_ORGANS", filtreRestriccioOrgans, filtreBase,
 					params("organ", ctx.organ != null ? descripcio(ctx.organ) : null,
-							"organExpedient", expedient != null ? descripcio(expedient.getOrganGestor()) : null)));
+							"organExpedient", expedient != null ? buitSiNull(descripcio(expedient.getOrganGestor())) : null));
+			exclososExpedients(ctx, resultat, restriccioB, filtreBase, filtreUnioVies, filtreRestriccioOrgans);
+			resultat.getRestriccions().add(restriccioB);
 		} else {
 			resultat.getRestriccions().add(comprovacio("EXP_RESTRICCIO_ORGANS", SimulacioEstat.NO_APLICA, params("rol", ctx.rol)));
 		}
 		if (aplicaVies && expedientPermisosFiltreHelper.isAplicaRestriccioGrups(ctx.rol)) {
-			resultat.getRestriccions().add(restriccioExpedient("EXP_RESTRICCIO_GRUPS",
+			SimulacioComprovacio restriccioC = restriccioExpedient("EXP_RESTRICCIO_GRUPS",
 					expedientPermisosFiltreHelper.filtreRestriccioGrups(llistes), filtreBase,
-					permisosSobre(ctx, ClassType.GRUP, idsElementOLlista(grupId, llistes.getIdsGrupsPermesos())),
-					expedient != null ? params("grup", expedient.getGrup() != null ? descripcio(expedient.getGrup()) : null) : params()));
+					expedient != null ? params("grup", buitSiNull(expedient.getGrup() != null ? descripcio(expedient.getGrup()) : null)) : params());
+			ambPermisos(restriccioC, expedient != null ? "GRUP_EXPEDIENT" : "GRUPS",
+					permisosSobre(ctx, ClassType.GRUP, idsObjectes(ctx, grupId, llistes.getIdsGrupsPermesos())), false, ExtendedPermissionEnum.READ);
+			exclososExpedients(ctx, resultat, restriccioC, filtreBase, filtreUnioVies, expedientPermisosFiltreHelper.filtreRestriccioGrups(llistes));
+			resultat.getRestriccions().add(restriccioC);
 		} else {
 			resultat.getRestriccions().add(comprovacio("EXP_RESTRICCIO_GRUPS", SimulacioEstat.NO_APLICA, params("rol", ctx.rol)));
 		}
@@ -421,7 +477,9 @@ public class SimuladorPermisosResourceHelper {
 				"sobrants", descripcions(sobrants),
 				"duplicats", descripcions(duplicats),
 				"altreProcediment", filesAltreProcediment > 0 ? String.valueOf(filesAltreProcediment) : null));
-		comprovacio.setPermisos(permisosSobre(ctx, ClassType.ORGAN, faltants.stream().map(OrganGestorEntity::getId).collect(Collectors.toList())));
+		ambPermisos(comprovacio, "ORGANS_FALTANTS",
+				permisosSobre(ctx, ClassType.ORGAN, faltants.stream().map(OrganGestorEntity::getId).collect(Collectors.toList())), true,
+				ExtendedPermissionEnum.COMU, ExtendedPermissionEnum.READ);
 		return comprovacio;
 	}
 
@@ -446,27 +504,43 @@ public class SimuladorPermisosResourceHelper {
 			Filter filtreVia,
 			Filter filtreBase,
 			List<?> llistaObjectes,
-			List<PermisDetall> permisos,
 			Map<String, String> parametres) {
 		if (!aplica) {
 			return comprovacio(codi, SimulacioEstat.NO_APLICA, params("rol", ctx.rol));
 		}
-		SimulacioComprovacio comprovacio = filtreVia == null
+		return filtreVia == null
 				? comprovacioComptada(codi, 0L, 0, parametres)
 				: comprovacioComptada(codi, comptarExpedients(FilterBuilder.and(filtreBase, filtreVia)), mida(llistaObjectes), parametres);
-		comprovacio.setPermisos(permisos);
-		return comprovacio;
 	}
 
 	private SimulacioComprovacio restriccioExpedient(
 			String codi,
 			Filter filtreRestriccio,
 			Filter filtreBase,
-			List<PermisDetall> permisos,
 			Map<String, String> parametres) {
-		SimulacioComprovacio comprovacio = comprovacioComptada(codi, comptarExpedients(FilterBuilder.and(filtreBase, filtreRestriccio)), null, parametres);
-		comprovacio.setPermisos(permisos);
-		return comprovacio;
+		return comprovacioComptada(codi, comptarExpedients(FilterBuilder.and(filtreBase, filtreRestriccio)), null, parametres);
+	}
+
+	/**
+	 * Sense element: expedients que alguna via concedeix i que la restricció exclou. Es calcula per diferència
+	 * (concedits − concedits que compleixen la restricció) i no amb un NOT del filtre, que amb camps nuls (p. ex.
+	 * expedients sense grup) deixaria fora de la comptabilitat justament els casos exclosos.
+	 */
+	private void exclososExpedients(
+			Context ctx,
+			SimulacioPermisosResultat resultat,
+			SimulacioComprovacio restriccio,
+			Filter filtreBase,
+			Filter filtreUnioVies,
+			Filter filtreRestriccio) {
+		if (ctx.elementId != null || resultat.getTotalVies() == null) {
+			return;
+		}
+		long concedits = resultat.getTotalVies();
+		long compleixen = filtreUnioVies != null
+				? comptarExpedients(FilterBuilder.and(filtreBase, filtreUnioVies, filtreRestriccio))
+				: comptarExpedients(FilterBuilder.and(filtreBase, filtreRestriccio));
+		restriccio.setExclosos(Math.max(0L, concedits - compleixen));
 	}
 
 	/** Expedients de l'entitat simulada que compleixen el filtre (sense la part de permisos del llistat). */
@@ -487,7 +561,9 @@ public class SimuladorPermisosResourceHelper {
 		ExpedientPeticioEntity anotacio = ctx.elementId != null ? expedientPeticioRepository.findById(ctx.elementId).orElse(null) : null;
 		MetaExpedientEntity procediment = anotacio != null ? anotacio.getMetaExpedient() : null;
 		if (anotacio != null) {
+			resultat.setElementId(anotacio.getId());
 			resultat.setElementDescripcio(anotacio.getIdentificador());
+			resultat.setProcedimentDescripcio(buitSiNull(procediment != null ? descripcio(procediment) : null));
 		}
 
 		// Veredicte: consulta real del llistat d'anotacions
@@ -507,25 +583,36 @@ public class SimuladorPermisosResourceHelper {
 		boolean perProcediment = BaseConfig.ROLE_USER.equals(ctx.rol) || BaseConfig.ROLE_DISSENY.equals(ctx.rol);
 		if (anotacio != null && perProcediment) {
 			resultat.getRequisits().add(comprovacio("ANOTACIO_PROCEDIMENT", procediment != null ? SimulacioEstat.OK : SimulacioEstat.KO,
-					params("procediment", procediment != null ? descripcio(procediment) : null)));
+					params()));
 		}
 		if (procediment != null && BaseConfig.ROLE_USER.equals(ctx.rol)) {
 			// Condicions de la consulta de procediments permesos (findAmbPermis): actiu i, amb revisió activa, revisat
 			resultat.getRequisits().add(comprovacio("PROCEDIMENT_ACTIU", procediment.isActiu() ? SimulacioEstat.OK : SimulacioEstat.KO,
-					params("procediment", descripcio(procediment))));
+					params()));
 			if (metaExpedientHelper.isRevisioActiva()) {
 				boolean revisat = "REVISAT".equals(String.valueOf(procediment.getRevisioEstat()));
 				resultat.getRequisits().add(comprovacio("PROCEDIMENT_REVISAT", revisat ? SimulacioEstat.OK : SimulacioEstat.KO,
-						params("procediment", descripcio(procediment), "estat", String.valueOf(procediment.getRevisioEstat()))));
+						params("estat", procediment.getRevisioEstat() != null ? procediment.getRevisioEstat().name() : BUIT)));
 			}
 		}
 
+		long totalEntitatAnotacions = ctx.elementId == null ? comptarAnotacions(null) : 0L;
+		if (ctx.elementId == null) {
+			resultat.setTotalEntitat(totalEntitatAnotacions);
+		}
+
 		if (!anotacioPermisosFiltreHelper.isAplicaFiltrePermisos(ctx.rol)) {
+			if (ctx.elementId == null) {
+				resultat.setTotalVies(totalEntitatAnotacions);
+			}
 			// Administrador d'entitat: totes les anotacions de l'entitat
 			resultat.getVies().add(comprovacioComptada("ANO_ADMIN_ENTITAT", comptarAnotacions(filtreElement), null, params("entitat", ctx.entitat.getNom())));
 			resultat.getRestriccions().add(comprovacio("ANO_RESTRICCIO_GRUPS", SimulacioEstat.NO_APLICA, params("rol", ctx.rol)));
 		} else if (BaseConfig.ROLE_ADMIN_LECTURA.equals(ctx.rol)) {
 			// El llistat no contempla aquest rol: no veu cap anotació
+			if (ctx.elementId == null) {
+				resultat.setTotalVies(0L);
+			}
 			resultat.getVies().add(comprovacio("ANO_ROL_SENSE_LLISTAT", SimulacioEstat.KO, params("rol", ctx.rol)));
 			resultat.getRestriccions().add(comprovacio("ANO_RESTRICCIO_GRUPS", SimulacioEstat.NO_APLICA, params("rol", ctx.rol)));
 		} else {
@@ -537,12 +624,15 @@ public class SimuladorPermisosResourceHelper {
 
 			if (anotacioPermisosFiltreHelper.isFiltrePerOrganDesti(ctx.rol)) {
 				Filter filtre = anotacioPermisosFiltreHelper.filtreOrgansDesti(llistes);
+				if (ctx.elementId == null) {
+					resultat.setTotalVies(filtre != null ? comptarAnotacions(filtre) : 0L);
+				}
 				SimulacioComprovacio via = filtre == null
 						? comprovacioComptada("ANO_ORGAN_DESTI", 0L, 0, params())
 						: comprovacioComptada("ANO_ORGAN_DESTI", comptarAnotacions(FilterBuilder.and(filtreElement, filtre)),
 								mida(llistes.getAdminOrganCodisOrganAmbDescendents()),
-								params("organ", descripcio(ctx.organ), "desti", anotacio != null && anotacio.getRegistre() != null ? anotacio.getRegistre().getDestiCodi() : null));
-				via.setPermisos(permisosSobre(ctx, ClassType.ORGAN, List.of(ctx.organ.getId())));
+								params("organ", descripcio(ctx.organ), "desti", anotacio != null ? buitSiNull(anotacio.getRegistre() != null ? anotacio.getRegistre().getDestiCodi() : null) : null));
+				ambPermisos(via, "ORGAN_CAPCALERA", permisosSobre(ctx, ClassType.ORGAN, List.of(ctx.organ.getId())), false, ExtendedPermissionEnum.ADMINISTRATION);
 				resultat.getVies().add(via);
 				resultat.getRestriccions().add(comprovacio("ANO_RESTRICCIO_GRUPS", SimulacioEstat.NO_APLICA, params("rol", ctx.rol)));
 			} else {
@@ -552,21 +642,26 @@ public class SimuladorPermisosResourceHelper {
 							? comprovacioComptada("ANO_PROCEDIMENTS_ORGAN", 0L, 0, params("organ", descripcio(ctx.organ)))
 							: comprovacioComptada("ANO_PROCEDIMENTS_ORGAN", comptarAnotacions(FilterBuilder.and(filtreElement, filtre)),
 									mida(llistes.getProcedimentsPermesos()),
-									params("organ", descripcio(ctx.organ), "procediment", procediment != null ? descripcio(procediment) : null));
-					via.setPermisos(permisosSobre(ctx, ClassType.ORGAN, List.of(ctx.organ.getId())));
+									params("organ", descripcio(ctx.organ)));
+					ambPermisos(via, "ORGAN_CAPCALERA", permisosSobre(ctx, ClassType.ORGAN, List.of(ctx.organ.getId())), false, ExtendedPermissionEnum.DISSENY);
 					resultat.getVies().add(via);
 				} else {
-					afegirViesProcedimentAnotacio(ctx, resultat, filtreElement, procediment);
+					afegirViesProcedimentAnotacio(ctx, resultat, filtreElement, llistes, anotacio, procediment);
 				}
-				SimulacioComprovacio restriccio = comprovacioComptada("ANO_RESTRICCIO_GRUPS",
-						comptarAnotacions(FilterBuilder.and(filtreElement, anotacioPermisosFiltreHelper.filtreGestioGrups(llistes))),
-						null,
-						anotacio != null ? params(
-								"gestioGrups", String.valueOf(procediment != null && procediment.isGestioAmbGrupsActiva()),
-								"grup", anotacio.getGrup() != null ? descripcio(anotacio.getGrup()) : null) : params());
-				restriccio.setPermisos(permisosSobre(ctx, ClassType.GRUP,
-						idsElementOLlista(anotacio != null && anotacio.getGrup() != null ? anotacio.getGrup().getId() : null, llistes.getIdsGrupsPermesos())));
-				resultat.getRestriccions().add(restriccio);
+				// Sense element: anotacions dels procediments permesos (unió de totes les vies, abans de la restricció)
+				Filter filtreProcedimentsPermesos = anotacioPermisosFiltreHelper.filtreProcediments(llistes);
+				if (ctx.elementId == null) {
+					resultat.setTotalVies(filtreProcedimentsPermesos != null ? comptarAnotacions(filtreProcedimentsPermesos) : 0L);
+				}
+				SimulacioComprovacio restriccioGrups = restriccioGrupsAnotacio(ctx, filtreElement, llistes, anotacio, procediment);
+				if (ctx.elementId == null) {
+					// Per diferència, no amb un NOT del filtre (les anotacions sense grup quedarien fora del recompte)
+					long compleixen = filtreProcedimentsPermesos != null
+							? comptarAnotacions(FilterBuilder.and(filtreProcedimentsPermesos, anotacioPermisosFiltreHelper.filtreGestioGrups(llistes)))
+							: 0L;
+					restriccioGrups.setExclosos(Math.max(0L, resultat.getTotalVies() - compleixen));
+				}
+				resultat.getRestriccions().add(restriccioGrups);
 			}
 		}
 
@@ -577,10 +672,48 @@ public class SimuladorPermisosResourceHelper {
 	}
 
 	/**
+	 * Restricció de gestió per grups: si el procediment gestiona per grups, el grup de l'anotació ha d'estar entre
+	 * els grups amb READ de l'usuari. Una anotació sense grup en un procediment amb gestió per grups no la veu ningú
+	 * que no sigui administrador: el que cal és assignar-li un grup, no donar permisos.
+	 */
+	private SimulacioComprovacio restriccioGrupsAnotacio(
+			Context ctx,
+			Filter filtreElement,
+			PermisosPerAnotacions llistes,
+			ExpedientPeticioEntity anotacio,
+			MetaExpedientEntity procediment) {
+		boolean gestioGrups = procediment != null && procediment.isGestioAmbGrupsActiva();
+		Long grupId = anotacio != null && anotacio.getGrup() != null ? anotacio.getGrup().getId() : null;
+		Map<String, String> parametres = anotacio != null
+				? params("gestioGrups", String.valueOf(gestioGrups), "grup", buitSiNull(grupId != null ? descripcio(anotacio.getGrup()) : null))
+				: params();
+		SimulacioComprovacio restriccio = comprovacioComptada("ANO_RESTRICCIO_GRUPS",
+				comptarAnotacions(FilterBuilder.and(filtreElement, anotacioPermisosFiltreHelper.filtreGestioGrups(llistes))),
+				null,
+				parametres);
+		if (anotacio != null && gestioGrups && grupId == null) {
+			String grupsProcediment = procediment.getGrups() != null
+					? procediment.getGrups().stream().map(GrupEntity::getCodi).collect(Collectors.joining(", "))
+					: "";
+			parametres.put("grupsProcediment", buitSiNull(grupsProcediment.isEmpty() ? null : grupsProcediment));
+			restriccio.setSuggerimentVariant(grupsProcediment.isEmpty() ? "SENSE_GRUP_NI_GRUPS" : "SENSE_GRUP");
+		}
+		ambPermisos(restriccio, anotacio != null ? "GRUP_ANOTACIO" : "GRUPS",
+				permisosSobre(ctx, ClassType.GRUP, idsObjectes(ctx, grupId, llistes.getIdsGrupsPermesos())), false, ExtendedPermissionEnum.READ);
+		return restriccio;
+	}
+
+	/**
 	 * Usuari (tothom): procediments amb CREATE o WRITE per 5 vies. Cada via s'avalua amb la mateixa consulta de
 	 * procediments permesos (MetaExpedientHelper.findAmbPermisosProcediments) activant només la seva llista.
 	 */
-	private void afegirViesProcedimentAnotacio(Context ctx, SimulacioPermisosResultat resultat, Filter filtreElement, MetaExpedientEntity procediment) {
+	private void afegirViesProcedimentAnotacio(
+			Context ctx,
+			SimulacioPermisosResultat resultat,
+			Filter filtreElement,
+			PermisosPerAnotacions llistes,
+			ExpedientPeticioEntity anotacio,
+			MetaExpedientEntity procediment) {
 		List<PermisosProcediments> perPermis = List.of(
 				metaExpedientHelper.findPermisosProcediments(ctx.entitat, ExtendedPermission.CREATE, false),
 				metaExpedientHelper.findPermisosProcediments(ctx.entitat, ExtendedPermission.WRITE, false));
@@ -608,44 +741,151 @@ public class SimuladorPermisosResourceHelper {
 			} else {
 				PermisosPerAnotacions llista = new PermisosPerAnotacions();
 				llista.setProcedimentsPermesos(new ArrayList<>(procediments));
+				Filter filtreVia = anotacioPermisosFiltreHelper.filtreProcediments(llista);
+				if ("ANO_VIA5_GRUP".equals(via.getKey())) {
+					// Via 5 "efectiva": el grup que dona accés al procediment també ha de ser el de l'anotació si el
+					// procediment gestiona per grups. És la mateixa restricció que s'aplica a totes les vies, però aquí
+					// s'hi inclou perquè la via respongui si l'usuari veuria l'anotació gràcies als seus grups.
+					filtreVia = FilterBuilder.and(filtreVia, anotacioPermisosFiltreHelper.filtreGestioGrups(llistes));
+				}
 				comprovacio = comprovacioComptada(via.getKey(),
-						comptarAnotacions(FilterBuilder.and(filtreElement, anotacioPermisosFiltreHelper.filtreProcediments(llista))),
+						comptarAnotacions(FilterBuilder.and(filtreElement, filtreVia)),
 						objectes,
 						params());
 			}
 			if (procediment != null) {
-				comprovacio.getParametres().put("procediment", descripcio(procediment));
+				detallViaAnotacio(ctx, comprovacio, via.getKey(), procediment, anotacio, llistes);
 			}
-			comprovacio.setPermisos(permisosViaAnotacio(ctx, via.getKey(), procediment));
 			resultat.getVies().add(comprovacio);
 		}
 	}
 
-	private List<PermisDetall> permisosViaAnotacio(Context ctx, String via, MetaExpedientEntity procediment) {
+	/**
+	 * Permisos, paràmetres i variant de suggeriment de cada via d'anotacions per al procediment de l'anotació. Les vies
+	 * 2 (òrgan) i 3/4 (parella, comuns) són excloents segons si el procediment és comú (sense òrgan gestor).
+	 */
+	private void detallViaAnotacio(
+			Context ctx,
+			SimulacioComprovacio comprovacio,
+			String via,
+			MetaExpedientEntity procediment,
+			ExpedientPeticioEntity anotacio,
+			PermisosPerAnotacions llistes) {
+		boolean comu = procediment.getOrganGestor() == null;
 		switch (via) {
 		case "ANO_VIA1_PROCEDIMENT":
-			return procediment != null ? permisosSobre(ctx, ClassType.MET_NOD, List.of(procediment.getId())) : null;
+			ambPermisos(comprovacio, "PROCEDIMENT", permisosSobre(ctx, ClassType.MET_NOD, List.of(procediment.getId())), false,
+					ExtendedPermissionEnum.CREATE, ExtendedPermissionEnum.WRITE);
+			break;
 		case "ANO_VIA2_ORGAN":
 			// El permís sobre un òrgan s'estén als seus descendents: interessen l'òrgan del procediment i els seus pares
-			return procediment != null && procediment.getOrganGestor() != null
-					? permisosSobre(ctx, ClassType.ORGAN, organGestorHelper.findParesIds(procediment.getOrganGestor().getId(), true))
-					: null;
+			comprovacio.getParametres().put("comu", String.valueOf(comu));
+			if (comu) {
+				comprovacio.setSuggerimentVariant("COMU");
+			} else {
+				ambPermisos(comprovacio, "ORGANS_PROCEDIMENT",
+						permisosSobre(ctx, ClassType.ORGAN, organGestorHelper.findParesIds(procediment.getOrganGestor().getId(), true)), false,
+						ExtendedPermissionEnum.CREATE, ExtendedPermissionEnum.WRITE);
+			}
+			break;
 		case "ANO_VIA3_PARELLA":
-			return procediment != null && procediment.getMetaExpedientOrganGestors() != null
-					? permisosSobre(ctx, ClassType.MET_EXP_ORG, procediment.getMetaExpedientOrganGestors().stream().map(MetaExpedientOrganGestorEntity::getId).collect(Collectors.toList()))
-					: null;
+			comprovacio.getParametres().put("comu", String.valueOf(comu));
+			if (!comu) {
+				comprovacio.setSuggerimentVariant("NO_COMU");
+			} else {
+				ambPermisos(comprovacio, "PARELLES_PROCEDIMENT",
+						permisosSobre(ctx, ClassType.MET_EXP_ORG, procediment.getMetaExpedientOrganGestors() != null
+								? procediment.getMetaExpedientOrganGestors().stream().map(MetaExpedientOrganGestorEntity::getId).collect(Collectors.toList())
+								: new ArrayList<>()), false,
+						ExtendedPermissionEnum.CREATE, ExtendedPermissionEnum.WRITE);
+			}
+			break;
 		case "ANO_VIA4_COMUNS":
-			return limitar(ctx.permisos.stream()
+			comprovacio.getParametres().put("comu", String.valueOf(comu));
+			// La consulta de procediments permesos no filtra per entitat els òrgans amb COMU/ADM_COMU: s'indica si
+			// l'usuari en té en òrgans d'altres entitats, perquè també li donen accés als comuns d'aquesta.
+			Set<Long> organsEntitat = organsEntitat(ctx);
+			List<PermisDetall> permisosComu = ctx.permisos.stream()
 					.filter(p -> ClassType.ORGAN.equals(p.getTipus()))
 					.filter(p -> p.getPermisos().contains(ExtendedPermissionEnum.COMU) || p.getPermisos().contains(ExtendedPermissionEnum.ADM_COMU))
-					.collect(Collectors.toList()));
+					.collect(Collectors.toList());
+			if (permisosComu.stream().anyMatch(p -> !organsEntitat.contains(p.getObjectId()))) {
+				comprovacio.getParametres().put("comuAltraEntitat", "true");
+			}
+			if (!comu) {
+				comprovacio.setSuggerimentVariant("NO_COMU");
+			} else {
+				ambPermisos(comprovacio, "ORGANS_COMU_ENTITAT",
+						limitar(permisosComu.stream().filter(p -> organsEntitat.contains(p.getObjectId())).collect(Collectors.toList())), false,
+						ExtendedPermissionEnum.COMU, ExtendedPermissionEnum.ADM_COMU, ExtendedPermissionEnum.CREATE, ExtendedPermissionEnum.WRITE);
+			}
+			break;
 		case "ANO_VIA5_GRUP":
-			return procediment != null && procediment.getGrups() != null
-					? permisosSobre(ctx, ClassType.GRUP, procediment.getGrups().stream().map(GrupEntity::getId).collect(Collectors.toList()))
-					: null;
+			detallVia5Anotacio(comprovacio, procediment, anotacio, llistes);
+			ambPermisos(comprovacio, "GRUPS_PROCEDIMENT",
+					permisosSobre(ctx, ClassType.GRUP, procediment.getGrups() != null
+							? procediment.getGrups().stream().map(GrupEntity::getId).collect(Collectors.toList())
+							: new ArrayList<>()), false,
+					ExtendedPermissionEnum.READ);
+			break;
 		default:
-			return null;
+			break;
 		}
+	}
+
+	/**
+	 * Via 5 efectiva d'anotacions: READ sobre algun grup del procediment (si no exigeix permís directe) i, si el
+	 * procediment gestiona per grups, READ sobre el grup de l'anotació. Indica quins grups del procediment té l'usuari
+	 * i, si no concedeix, la causa concreta: no té cap grup del procediment, l'anotació no té grup o no en té permís.
+	 */
+	private void detallVia5Anotacio(
+			SimulacioComprovacio comprovacio,
+			MetaExpedientEntity procediment,
+			ExpedientPeticioEntity anotacio,
+			PermisosPerAnotacions llistes) {
+		Map<String, String> parametres = comprovacio.getParametres();
+		boolean permisDirecte = procediment.isPermisDirecte();
+		boolean gestioGrups = procediment.isGestioAmbGrupsActiva();
+		Set<Long> grupsUsuari = llistes.getIdsGrupsPermesos() != null ? new HashSet<>(llistes.getIdsGrupsPermesos()) : new HashSet<>();
+		List<GrupEntity> grupsProcediment = procediment.getGrups() != null ? procediment.getGrups() : new ArrayList<>();
+		List<GrupEntity> grupsAmbPermis = grupsProcediment.stream().filter(g -> grupsUsuari.contains(g.getId())).collect(Collectors.toList());
+		GrupEntity grupAnotacio = anotacio != null ? anotacio.getGrup() : null;
+
+		parametres.put("permisDirecte", String.valueOf(permisDirecte));
+		parametres.put("grupsProcediment", buitSiNull(codis(grupsProcediment)));
+		parametres.put("grupsAmbPermis", buitSiNull(codis(grupsAmbPermis)));
+		if (anotacio != null) {
+			parametres.put("gestioGrups", String.valueOf(gestioGrups));
+			if (gestioGrups) {
+				parametres.put("grup", buitSiNull(grupAnotacio != null ? descripcio(grupAnotacio) : null));
+			}
+		}
+
+		if (permisDirecte) {
+			comprovacio.setSuggerimentVariant("PERMIS_DIRECTE");
+		} else if (grupsProcediment.isEmpty()) {
+			comprovacio.setSuggerimentVariant("SENSE_GRUPS_PROCEDIMENT");
+		} else if (grupsAmbPermis.isEmpty()) {
+			comprovacio.setSuggerimentVariant("SENSE_PERMIS_GRUPS_PROCEDIMENT");
+		} else if (anotacio != null && gestioGrups && grupAnotacio == null) {
+			comprovacio.setSuggerimentVariant("SENSE_GRUP_ANOTACIO");
+		} else if (anotacio != null && gestioGrups && !grupsUsuari.contains(grupAnotacio.getId())) {
+			comprovacio.setSuggerimentVariant("GRUP_ANOTACIO_SENSE_PERMIS");
+		}
+	}
+
+	private static String codis(List<GrupEntity> grups) {
+		return grups.isEmpty() ? null : grups.stream().map(GrupEntity::getCodi).collect(Collectors.joining(", "));
+	}
+
+	/** Ids dels òrgans de l'entitat simulada (es calcula una sola vegada per simulació). */
+	private Set<Long> organsEntitat(Context ctx) {
+		if (ctx.organsEntitat == null) {
+			ctx.organsEntitat = organGestorRepository.findByEntitat(ctx.entitat).stream()
+					.map(OrganGestorEntity::getId)
+					.collect(Collectors.toSet());
+		}
+		return ctx.organsEntitat;
 	}
 
 	private static boolean teObjectes(PermisosProcediments p) {
@@ -739,6 +979,10 @@ public class SimuladorPermisosResourceHelper {
 		}
 	}
 
+	private static ExtendedPermissionEnum permisOrganCapcaleraEnum(String rol) {
+		return BaseConfig.ROLE_DISSENY.equals(rol) ? ExtendedPermissionEnum.DISSENY : ExtendedPermissionEnum.ADMINISTRATION;
+	}
+
 	/** Permís sobre l'òrgan que fa que aparegui a la capçalera (EntitatHelper.findOrganismesEntitatAmbPermisCacheByRol). */
 	private static Permission permisOrganCapcalera(String rol) {
 		return BaseConfig.ROLE_DISSENY.equals(rol) ? ExtendedPermission.DISSENY : ExtendedPermission.ADMINISTRATION;
@@ -767,12 +1011,28 @@ public class SimuladorPermisosResourceHelper {
 		return permisos.size() > MAX_PERMISOS_COMPROVACIO ? new ArrayList<>(permisos.subList(0, MAX_PERMISOS_COMPROVACIO)) : permisos;
 	}
 
-	/** Amb element, només interessa el seu objecte; sense element, tots els de la llista de la via. */
-	private static List<Long> idsElementOLlista(Long idElement, List<Long> llista) {
-		if (idElement != null) {
-			return List.of(idElement);
+	/**
+	 * Objectes dels quals es mostren els permisos. Amb element, només el de l'element (si l'element no en té, cap:
+	 * p. ex. un expedient sense grup no ha de mostrar els grups de l'usuari); sense element, tots els de la via.
+	 */
+	private static List<Long> idsObjectes(Context ctx, Long idObjecteElement, List<Long> llistaVia) {
+		if (ctx.elementId != null) {
+			return idObjecteElement != null ? List.of(idObjecteElement) : new ArrayList<>();
 		}
-		return llista != null ? llista : new ArrayList<>();
+		return llistaVia != null ? llistaVia : new ArrayList<>();
+	}
+
+	/** Adjunta els permisos de la comprovació amb l'objecte al qual es refereixen i els permisos que demana. */
+	private static void ambPermisos(SimulacioComprovacio comprovacio, String objecte, List<PermisDetall> permisos, boolean tots, ExtendedPermissionEnum... requerits) {
+		comprovacio.setPermisos(permisos);
+		comprovacio.setPermisosObjecte(objecte);
+		comprovacio.setPermisosRequerits(List.of(requerits));
+		comprovacio.setPermisosRequeritsTots(tots);
+	}
+
+	/** Valor que l'element no té (p. ex. un expedient sense grup): es mostra com a "(sense ...)" en lloc d'amagar-lo. */
+	private static String buitSiNull(String valor) {
+		return valor != null ? valor : BUIT;
 	}
 
 	private static SimulacioComprovacio comprovacio(String codi, SimulacioEstat estat, Map<String, String> parametres) {
@@ -791,7 +1051,7 @@ public class SimuladorPermisosResourceHelper {
 	}
 
 	private static Map<String, String> params(String... clauValor) {
-		Map<String, String> parametres = new HashMap<>();
+		Map<String, String> parametres = new LinkedHashMap<>();
 		for (int i = 0; i + 1 < clauValor.length; i += 2) {
 			if (clauValor[i + 1] != null) {
 				parametres.put(clauValor[i], clauValor[i + 1]);
@@ -849,5 +1109,6 @@ public class SimuladorPermisosResourceHelper {
 		Long elementId;
 		Set<String> rolsKeycloak;
 		List<PermisDetall> permisos;
+		Set<Long> organsEntitat;
 	}
 }

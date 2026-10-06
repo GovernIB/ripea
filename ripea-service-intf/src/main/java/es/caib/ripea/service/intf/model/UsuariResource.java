@@ -314,9 +314,15 @@ public class UsuariResource extends BaseResource<String> {
 		private Long elementId;
 		/** Descripció de l'element simulat (null si se simula sobre tota l'entitat). */
 		private String elementDescripcio;
+		/** Procediment de l'element (buit si l'anotació no en té; null sense element). Es mostra un sol cop a la capçalera. */
+		private String procedimentDescripcio;
 		private boolean ambElement;
 		/** Resultat de la consulta REAL del llistat amb la identitat de l'usuari: 0/1 amb element, total sense. */
 		private long totalReal;
+		/** Sense element: expedients o anotacions de l'entitat (sense la part de permisos). */
+		private Long totalEntitat;
+		/** Sense element: expedients o anotacions que concedeix alguna via, abans d'aplicar les restriccions. */
+		private Long totalVies;
 		/** Error de la consulta real (p. ex. sense accés a l'entitat). */
 		private String errorConsulta;
 		/** Amb element: el desglose per vies no quadra amb la consulta real (indica que el simulador s'ha de revisar). */
@@ -340,9 +346,25 @@ public class UsuariResource extends BaseResource<String> {
 		private Long nombre;
 		/** Nombre d'objectes amb permís que alimenten la via (procediments, òrgans, parelles, grups...). */
 		private Integer nombreObjectes;
+		/** Restriccions, sense element: elements que alguna via concedeix i que aquesta restricció exclou. */
+		private Long exclosos;
 		/** Paràmetres per a la traducció de l'explicació (noms d'objectes, permisos requerits...). */
 		private Map<String, String> parametres;
-		/** Permisos ACL de l'usuari o dels seus rols sobre els objectes que decideixen la comprovació. */
+		/**
+		 * Variant del suggeriment quan el cas té una causa concreta (p. ex. SENSE_GRUP, NO_COMU, PERMIS_DIRECTE).
+		 * Null: suggeriment genèric de la comprovació.
+		 */
+		private String suggerimentVariant;
+		/**
+		 * Permisos ACL de l'usuari o dels seus rols sobre els objectes que decideixen la comprovació. Amb element,
+		 * només els objectes d'aquell element; sense element, els objectes que alimenten la via.
+		 */
 		private List<PermisDetall> permisos;
+		/** Objectes als quals es refereixen els permisos (p. ex. GRUP_ANOTACIO, ORGANS_FALTANTS), per titular la llista. */
+		private String permisosObjecte;
+		/** Permisos que demana la comprovació (per destacar-los entre els que té l'usuari). */
+		private List<ExtendedPermissionEnum> permisosRequerits;
+		/** Cal tenir TOTS els permisos requerits (p. ex. COMU i READ); si és fals, en basta un. */
+		private boolean permisosRequeritsTots;
 	}
 }

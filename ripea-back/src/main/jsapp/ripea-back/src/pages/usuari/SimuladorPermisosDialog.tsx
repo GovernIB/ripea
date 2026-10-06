@@ -20,7 +20,7 @@ import {
     Typography,
 } from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
-import {objecteText, Origen, PermisDetall, Permisos} from "./PermisosUsuariDialog.tsx";
+import {objecteText, Origen, PermisDetall} from "./PermisosUsuariDialog.tsx";
 
 const ROLS_AMB_ORGAN = ['IPA_ORGAN_ADMIN', 'IPA_DISSENY'];
 
@@ -31,8 +31,17 @@ type Comprovacio = {
     estat: Estat,
     nombre?: number,
     nombreObjectes?: number,
+    /** Restriccions, sense element: elements que alguna via concedeix i que la restricció exclou. */
+    exclosos?: number,
     parametres?: Record<string, string>,
+    /** Variant del suggeriment quan el cas té una causa concreta (SENSE_GRUP, NO_COMU...). */
+    suggerimentVariant?: string,
     permisos?: PermisDetall[],
+    /** Objectes als quals es refereixen els permisos (GRUP_ANOTACIO, ORGANS_FALTANTS...). */
+    permisosObjecte?: string,
+    /** Permisos que demana la comprovació; amb permisosRequeritsTots cal tenir-los tots, si no, en basta un. */
+    permisosRequerits?: string[],
+    permisosRequeritsTots?: boolean,
 }
 
 type Resultat = {
@@ -43,8 +52,13 @@ type Resultat = {
     organNom?: string,
     elementId?: number,
     elementDescripcio?: string,
+    /** Procediment de l'element (buit si l'anotació no en té): es mostra un sol cop a la capçalera. */
+    procedimentDescripcio?: string,
     ambElement: boolean,
     totalReal: number,
+    /** Sense element: elements de l'entitat i elements que concedeix alguna via (abans de les restriccions). */
+    totalEntitat?: number,
+    totalVies?: number,
     errorConsulta?: string,
     discrepancia: boolean,
     requisits: Comprovacio[],
@@ -102,7 +116,39 @@ const EstatChip = ({estat, seccio}: { estat: Estat, seccio: 'requisits' | 'vies'
                  sx={{minWidth: 130, justifyContent: 'flex-start'}}/>
 }
 
-const PARAMETRES_BOOLEANS = ['comu', 'permisDirecte', 'gestioGrups'];
+const PARAMETRES_BOOLEANS = ['comu', 'permisDirecte', 'gestioGrups', 'comuAltraEntitat'];
+
+/**
+ * El detall de permisos de cada comprovació (botó "Permisos (n)") queda ocult per simplificar la modal: la
+ * informació rellevant és la del suggeriment. Es manté el codi per si es vol tornar a mostrar.
+ */
+const MOSTRAR_PERMISOS = false;
+
+/** Permisos d'una fila destacant els que demana la comprovació (no només amb color, per accessibilitat). */
+const PermisosRequerits = ({permisos, requerits}: { permisos: string[], requerits: string[] }) => {
+    const {t} = useTranslation();
+    return <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 0.5}}>
+        {permisos?.map((permis) => {
+            const requerit = requerits.includes(permis);
+            return <Chip key={permis} size="small" color="primary" variant={requerit ? 'filled' : 'outlined'}
+                         icon={requerit ? <Icon>check</Icon> : undefined}
+                         label={t(`page.usuari.permisos.permis.${permis}`, {defaultValue: permis})}
+                         sx={requerit ? {fontWeight: 600} : undefined}/>
+        })}
+    </Box>
+}
+
+/** Valor d'un paràmetre: booleans com a Sí/No, permisos traduïts i buits com a "(sense ...)". */
+const ValorParametre = ({nom, valor}: { nom: string, valor: string }) => {
+    const {t} = useTranslation();
+    if (valor === '') {
+        return <em>{t(`page.usuari.simulador.buit.${nom}`, {defaultValue: t('page.usuari.simulador.buit.generic')})}</em>
+    }
+    if (PARAMETRES_BOOLEANS.includes(nom)) {
+        return <>{t(`enum.siNO.${valor}`)}</>
+    }
+    return <>{nom === 'permis' ? t(`page.usuari.permisos.permis.${valor}`, {defaultValue: valor}) : valor}</>
+}
 
 const ComprovacioFila = ({comprovacio, seccio, recurs, ambElement, onRegenerarOrganpare}: {
     comprovacio: Comprovacio, seccio: 'requisits' | 'vies' | 'restriccions', recurs: string, ambElement: boolean,
@@ -113,6 +159,9 @@ const ComprovacioFila = ({comprovacio, seccio, recurs, ambElement, onRegenerarOr
     const clau = `page.usuari.simulador.comprovacio.${comprovacio.codi}`;
     const parametres = Object.entries(comprovacio.parametres ?? {}).filter(([nom]) => nom !== 'rol');
     const permisos = comprovacio.permisos ?? [];
+    // Nombre d'objectes amb permís que alimenten la via: no depèn de l'element consultat, de manera que només
+    // es mostra sense element i quan també es mostra la llista de permisos (MOSTRAR_PERMISOS).
+    const mostrarObjectes = MOSTRAR_PERMISOS && !ambElement && comprovacio.nombreObjectes != null;
 
     return <Box component="li" sx={{listStyle: 'none', py: 1}}>
         <Box sx={{display: 'flex', gap: 2, alignItems: 'flex-start', flexWrap: {xs: 'wrap', md: 'nowrap'}}}>
@@ -129,35 +178,49 @@ const ComprovacioFila = ({comprovacio, seccio, recurs, ambElement, onRegenerarOr
                         {parametres.map(([nom, valor]) =>
                             <Typography key={nom} variant="body2">
                                 <strong>{t(`page.usuari.simulador.parametre.${nom}`, {defaultValue: nom})}:</strong>{' '}
-                                {PARAMETRES_BOOLEANS.includes(nom)
-                                    ? t(`enum.siNO.${valor}`)
-                                    : nom === 'permis' ? t(`page.usuari.permisos.permis.${valor}`, {defaultValue: valor}) : valor}
+                                <ValorParametre nom={nom} valor={valor}/>
                             </Typography>)}
                     </Box>}
-                {comprovacio.estat !== 'NO_APLICA' && (comprovacio.nombreObjectes != null || (!ambElement && comprovacio.nombre != null)) &&
+                {comprovacio.estat !== 'NO_APLICA' && (mostrarObjectes || (!ambElement && comprovacio.nombre != null)) &&
                     <Typography variant="body2" sx={{mt: 0.5}}>
-                        {!ambElement && comprovacio.nombre != null && t(`page.usuari.simulador.nombre.${recurs}`, {num: comprovacio.nombre})}
-                        {!ambElement && comprovacio.nombre != null && comprovacio.nombreObjectes != null && ' · '}
-                        {comprovacio.nombreObjectes != null && t('page.usuari.simulador.nombreObjectes', {num: comprovacio.nombreObjectes})}
+                        {!ambElement && comprovacio.nombre != null && (seccio === 'restriccions' && comprovacio.exclosos != null
+                            ? t(`page.usuari.simulador.exclosos.${recurs}`, {count: comprovacio.exclosos})
+                            : t(`page.usuari.simulador.nombre.${recurs}`, {num: comprovacio.nombre}))}
+                        {!ambElement && comprovacio.nombre != null && mostrarObjectes && ' · '}
+                        {mostrarObjectes && t('page.usuari.simulador.nombreObjectes', {count: comprovacio.nombreObjectes})}
                     </Typography>}
                 {(comprovacio.estat === 'KO' || comprovacio.estat === 'AVIS') &&
                     <Typography variant="body2" sx={{mt: 0.5, display: 'flex', alignItems: 'center', gap: 0.5}}>
                         <Icon fontSize="small" color="primary" aria-hidden>lightbulb</Icon>
-                        {t(`${clau}.suggeriment`)}
+                        {comprovacio.suggerimentVariant
+                            ? t(`${clau}.suggerimentVariant.${comprovacio.suggerimentVariant}`, comprovacio.parametres ?? {})
+                            : t(`${clau}.suggeriment`, comprovacio.parametres ?? {})}
                     </Typography>}
                 {comprovacio.codi === 'EXPEDIENT_ORGANPARE' && comprovacio.estat === 'AVIS' && onRegenerarOrganpare &&
                     <Button size="small" variant="outlined" sx={{mt: 1}} startIcon={<Icon>build</Icon>} onClick={onRegenerarOrganpare}>
                         {t('page.usuari.simulador.organpare.boto')}
                     </Button>}
             </Box>
-            {comprovacio.estat !== 'NO_APLICA' && permisos.length > 0 &&
+            {MOSTRAR_PERMISOS && comprovacio.estat !== 'NO_APLICA' && permisos.length > 0 &&
                 <Button size="small" variant="text" onClick={() => setObert(!obert)} aria-expanded={obert}
                         endIcon={<Icon>{obert ? 'expand_less' : 'expand_more'}</Icon>}>
                     {t('page.usuari.simulador.veurePermisos', {num: permisos.length})}
                 </Button>}
         </Box>
-        {permisos.length > 0 &&
+        {MOSTRAR_PERMISOS && permisos.length > 0 &&
             <Collapse in={obert} unmountOnExit>
+                {comprovacio.permisosObjecte &&
+                    <Typography variant="body2" sx={{mt: 1}}>
+                        <strong>{t(`page.usuari.simulador.permisosObjecte.${comprovacio.permisosObjecte}`)}</strong>
+                        {comprovacio.permisosRequerits && comprovacio.permisosRequerits.length > 0 && <>
+                            {' · '}
+                            {t(comprovacio.permisosRequeritsTots ? 'page.usuari.simulador.permisosRequerits.tots' : 'page.usuari.simulador.permisosRequerits.algun', {
+                                permisos: comprovacio.permisosRequerits
+                                    .map((permis) => t(`page.usuari.permisos.permis.${permis}`, {defaultValue: permis}))
+                                    .join(comprovacio.permisosRequeritsTots ? ' + ' : ' / '),
+                            })}
+                        </>}
+                    </Typography>}
                 <Table size="small" aria-label={t(`${clau}.titol`)} sx={{mt: 1, tableLayout: 'fixed', '& td, & th': {overflowWrap: 'anywhere'}}}>
                     <TableHead>
                         <TableRow>
@@ -171,7 +234,7 @@ const ComprovacioFila = ({comprovacio, seccio, recurs, ambElement, onRegenerarOr
                             <TableRow key={permis.id}>
                                 <TableCell>{objecteText(permis)}{permis.organ ? ` (${permis.organ})` : ''}</TableCell>
                                 <TableCell><Origen permis={permis}/></TableCell>
-                                <TableCell><Permisos permisos={permis.permisos}/></TableCell>
+                                <TableCell><PermisosRequerits permisos={permis.permisos} requerits={comprovacio.permisosRequerits ?? []}/></TableCell>
                             </TableRow>)}
                     </TableBody>
                 </Table>
@@ -197,6 +260,34 @@ const Seccio = ({titol, ajuda, comprovacions, seccio, resultat, onRegenerarOrgan
     </Paper>
 }
 
+/**
+ * Resum de la causa del veredicte (només amb element): per quines vies hi té accés o, si no el veu, si és perquè cap
+ * via concedeix o perquè una restricció l'exclou. També avisa dels requisits previs que no es compleixen.
+ */
+const ResumCausa = ({resultat}: { resultat: Resultat }) => {
+    const {t} = useTranslation();
+    if (!resultat.ambElement || resultat.errorConsulta) return null;
+    const titols = (comprovacions: Comprovacio[], estat: Estat) => comprovacions
+        .filter((c) => c.estat === estat)
+        .map((c) => t(`page.usuari.simulador.comprovacio.${c.codi}.titol`))
+        .join(', ');
+    const viesOk = titols(resultat.vies, 'OK');
+    const restriccionsKo = titols(resultat.restriccions, 'KO');
+    const requisitsKo = titols(resultat.requisits, 'KO');
+    let causa: string | null = null;
+    if (resultat.totalReal > 0) {
+        causa = viesOk ? t('page.usuari.simulador.resum.visible', {vies: viesOk}) : null;
+    } else if (!viesOk) {
+        causa = t('page.usuari.simulador.resum.capVia');
+    } else if (restriccionsKo) {
+        causa = t('page.usuari.simulador.resum.exclosa', {vies: viesOk, restriccions: restriccionsKo});
+    }
+    return <>
+        {causa && <Typography variant="body2" sx={{mt: 0.5}}>{causa}</Typography>}
+        {requisitsKo && <Typography variant="body2" sx={{mt: 0.5}}>{t('page.usuari.simulador.resum.requisits', {requisits: requisitsKo})}</Typography>}
+    </>
+}
+
 const SimulacioResultat = ({resultat, onRegenerarOrganpare}: { resultat: Resultat, onRegenerarOrganpare?: () => void }) => {
     const {t} = useTranslation();
     const rol = t(`enum.rol.${resultat.rol}`, {defaultValue: resultat.rol});
@@ -213,6 +304,7 @@ const SimulacioResultat = ({resultat, onRegenerarOrganpare}: { resultat: Resulta
                             usuari: resultat.usuariCodi, rol, recurs, element: resultat.elementDescripcio,
                         })}
                     </Typography>
+                    <ResumCausa resultat={resultat}/>
                 </Alert>
                 : <Alert severity="info" sx={{mb: 2}}>
                     <Typography component="h3" variant="subtitle1" sx={{fontWeight: 600}}>
@@ -220,10 +312,18 @@ const SimulacioResultat = ({resultat, onRegenerarOrganpare}: { resultat: Resulta
                             usuari: resultat.usuariCodi, rol, num: resultat.totalReal, entitat: resultat.entitatNom,
                         })}
                     </Typography>
+                    {resultat.totalEntitat != null && resultat.totalVies != null &&
+                        <Typography variant="body2" sx={{mt: 0.5}}>
+                            {t(`page.usuari.simulador.totals.${resultat.recurs}`, {
+                                entitat: resultat.totalEntitat, vies: resultat.totalVies, visibles: resultat.totalReal,
+                            })}
+                        </Typography>}
                 </Alert>}
         {resultat.discrepancia && <Alert severity="warning" sx={{mb: 2}}>{t('page.usuari.simulador.discrepancia')}</Alert>}
         <Typography variant="body2" sx={{mb: 2}}>
             <strong>{t('page.usuari.simulador.parametre.entitat')}:</strong> {resultat.entitatNom}
+            {resultat.procedimentDescripcio != null && <> · <strong>{t('page.usuari.simulador.parametre.procediment')}:</strong>{' '}
+                <ValorParametre nom="procediment" valor={resultat.procedimentDescripcio}/></>}
             {resultat.organNom && <> · <strong>{t('page.usuari.simulador.parametre.organ')}:</strong> {resultat.organNom}</>}
         </Typography>
         <Seccio seccio="requisits" resultat={resultat} comprovacions={resultat.requisits} onRegenerarOrganpare={onRegenerarOrganpare}
@@ -253,8 +353,33 @@ export const useSimuladorPermisosDialog = () => {
         setResultat(undefined);
     }
 
+    /**
+     * Camps obligatoris segons el que s'ha triat: rol i recurs sempre; l'entitat si no hi ha element (amb element surt
+     * d'ell) i l'òrgan per als rols que treballen amb òrgan. Es valida abans d'enviar perquè el backend no respongui
+     * amb un error de generació de l'informe; els errors es mostren al camp com els de validació del servidor.
+     */
+    const campsObligatorisBuits = (data: any): string[] => {
+        const element = data?.recurs === 'EXPEDIENT' ? data?.expedient : data?.recurs === 'ANOTACIO' ? data?.anotacio : null;
+        const buits: string[] = [];
+        if (!data?.rol) buits.push('rol');
+        if (!data?.recurs) buits.push('recurs');
+        if (data?.recurs && element?.id == null && !data?.entitat) buits.push('entitat');
+        if (ROLS_AMB_ORGAN.includes(data?.rol) && !data?.organ && (element?.id != null || data?.entitat)) buits.push('organ');
+        return buits;
+    }
+
     const simular = () => {
         const data = formApiRef.current?.getData?.();
+        const buits = campsObligatorisBuits(data);
+        if (buits.length > 0) {
+            formApiRef.current?.handleSubmissionErrors?.({
+                status: 422,
+                message: t('page.usuari.simulador.campsObligatoris'),
+                errors: buits.map((camp) => ({field: camp, code: 'NotNull', message: t('page.usuari.simulador.campObligatori')})),
+            } as any);
+            temporalMessageShow(null, t('page.usuari.simulador.campsObligatoris'), 'warning');
+            return;
+        }
         setSimulant(true);
         setResultat(undefined);
         artifactReport(usuari.id, {code: 'SIMULAR_PERMISOS', data})
