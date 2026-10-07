@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 @Slf4j
 @Configuration
@@ -60,7 +60,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
     };
 
     private static final long DEFAULT_INITIAL_DELAY_MS = 30000L;
-    /** Cada quant es comprova si ha arribat la data d'inici dels processos d'incorporació de documents. */
+    /** Cada quant es comprova si el cron dels processos d'incorporació de documents té una execució pendent. */
     private static final long INTERVAL_COMPROVACIO_INICI_MS = 60000L;
     private ScheduledTaskRegistrar taskRegistrar;
     //Mantenir un registre de les tasques que s'han enregistrat
@@ -504,6 +504,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 () -> executarIncorporacioDocuments(
                         codiIncorporarCertificatsRemeses,
                         PropertyConfig.INCORPORAR_CERTIFICATS_REMESES_INICI,
+                        PropertyConfig.INCORPORAR_CERTIFICATS_REMESES_DARRER_ID,
                         "enviament",
                         aplicacioService::getExpedientsAmbCertificatRemesa,
                         aplicacioService::executeCertificatsRemesaExpedient),
@@ -514,6 +515,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 () -> executarIncorporacioDocuments(
                         codiIncorporarJustificantsRegistre,
                         PropertyConfig.INCORPORAR_JUSTIFICANTS_REGISTRE_INICI,
+                        PropertyConfig.INCORPORAR_JUSTIFICANTS_REGISTRE_DARRER_ID,
                         "anotacio",
                         aplicacioService::getExpedientsAmbJustificantRegistre,
                         aplicacioService::executeJustificantsRegistreExpedient),
@@ -523,16 +525,17 @@ public class SchedulingConfig implements SchedulingConfigurer {
 
     /**
      * Processos d'incorporació de documents (certificats de remeses i justificants de registre): la tasca es
-     * comprova cada minut, però només s'executa quan arriba la data i hora de la seva propietat. Cada element es
+     * comprova cada minut, però només s'executa quan arriba una execució del cron de la seva propietat. Cada element es
      * processa amb la seva pròpia transacció (crida a través del proxy d'AplicacioService) amb l'usuari SYSTEM_RIPEA.
      */
     private void executarIncorporacioDocuments(
             String codiTasca,
-            String propietat,
+            String propietatCron,
+            String propietatDarrerId,
             String tipusElement,
-            Supplier<List<Long>> obtenirElements,
+            Function<Long, List<Long>> obtenirElements,
             ProcessadorElement processador) {
-        if (!incorporacioDocumentsSegonPlaHelper.isMomentInici(codiTasca, propietat)) {
+        if (!incorporacioDocumentsSegonPlaHelper.isMomentInici(codiTasca, propietatCron)) {
             return;
         }
         monitorTasquesService.inici(codiTasca);
@@ -540,7 +543,8 @@ public class SchedulingConfig implements SchedulingConfigurer {
             createAuthenticationContext();
             incorporacioDocumentsSegonPlaHelper.executar(
                     codiTasca,
-                    propietat,
+                    propietatCron,
+                    propietatDarrerId,
                     tipusElement,
                     obtenirElements,
                     processador,
@@ -553,14 +557,17 @@ public class SchedulingConfig implements SchedulingConfigurer {
         }
     }
 
-    /** Comprova cada minut la propietat i mostra al monitor de tasques la data d'inici programada, si n'hi ha. */
-    private Trigger getTriggerIncorporacioDocuments(String codiTasca, String propietat) {
+    /**
+     * Comprova cada minut el cron de la propietat i mostra al monitor de tasques la propera execució, si n'hi ha. Així
+     * un canvi del cron s'aplica sense reiniciar la tasca, i buidar-lo la desactiva.
+     */
+    private Trigger getTriggerIncorporacioDocuments(String codiTasca, String propietatCron) {
         return triggerContext -> {
             long ara = System.currentTimeMillis();
-            Date dataInici = incorporacioDocumentsSegonPlaHelper.getDataInici(propietat);
+            Date properaExecucio = incorporacioDocumentsSegonPlaHelper.getProperaExecucio(propietatCron);
             monitorTasquesService.updateProperaExecucio(
                     codiTasca,
-                    dataInici != null && dataInici.getTime() > ara ? dataInici.getTime() - ara : null);
+                    properaExecucio != null ? properaExecucio.getTime() - ara : null);
             return new Date(ara + INTERVAL_COMPROVACIO_INICI_MS);
         };
     }

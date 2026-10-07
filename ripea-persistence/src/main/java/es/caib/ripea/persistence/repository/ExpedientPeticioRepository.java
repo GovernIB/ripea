@@ -292,8 +292,10 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 	public int updateUsuariAuditoria(@Param("codiAntic") String codiAntic, @Param("codiNou") String codiNou);
 
     /**
-     * Obté els IDs únics de les anotacions d'expedients oberts i no esborrats que tenen
-     * justificant de registre pendent d'incorporar com a document.
+     * Obté els IDs de les anotacions d'expedients oberts i no esborrats que tenen justificant de
+     * registre pendent d'incorporar com a document, de les més recents a les més antigues, amb id
+     * inferior a darrerId (la darrera anotació tractada pel procés en segon pla, o Long.MAX_VALUE
+     * per obtenir-les totes).
      *
      * El justificant es considera ja incorporat si l'expedient té un document del tipus indicat
      * per codiJustificant (REGISTRE_JUSTIFICANT_ENTRADA de MetaDocumentPerDefecteEnumDto) amb el
@@ -301,9 +303,11 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
      * ExpedientHelper.crearDocFromJustificantRegistreUuid, sigui quina sigui la via d'incorporació.
      *
      * @param codiJustificant codi del tipus de document del justificant de registre.
+     * @param darrerId només es retornen les anotacions amb id inferior.
      */
-    @Query("SELECT DISTINCT p.id FROM ExpedientPeticioEntity p " +
-        "WHERE p.expedient.estat = es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto.OBERT " +
+    @Query("SELECT p.id FROM ExpedientPeticioEntity p " +
+        "WHERE p.id < :darrerId " +
+        "AND p.expedient.estat = es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto.OBERT " +
         "AND p.expedient.esborrat = 0 " +
         "AND p.registre.justificantArxiuUuid IS NOT NULL " +
         "AND NOT EXISTS (" +
@@ -311,6 +315,9 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
         "    WHERE d.expedient = p.expedient " +
         "    AND d.metaDocument.codi = :codiJustificant " +
         "    AND d.numeroRegistre = p.identificador" +
-        ")")
-    List<Long> findExpedientsObertsAmbJustificantPendent(@Param("codiJustificant") String codiJustificant);
+        ") " +
+        "ORDER BY p.id DESC")
+    List<Long> findExpedientsObertsAmbJustificantPendent(
+            @Param("codiJustificant") String codiJustificant,
+            @Param("darrerId") Long darrerId);
 }

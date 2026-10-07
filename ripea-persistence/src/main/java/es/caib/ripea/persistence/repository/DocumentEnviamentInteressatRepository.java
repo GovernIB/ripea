@@ -47,7 +47,8 @@ public interface DocumentEnviamentInteressatRepository extends JpaRepository<Doc
 
     /**
      * Obté els IDs dels enviaments d'expedients oberts i no esborrats que tenen certificació i encara no tenen
-     * el certificat incorporat com a document, dels més recents als més antics.
+     * el certificat incorporat com a document, dels més recents als més antics, amb id inferior a darrerId (el
+     * darrer element tractat pel procés en segon pla, o Long.MAX_VALUE per obtenir-los tots).
      *
      * El certificat es considera ja incorporat si l'expedient té un document (esborrat o no, igual que la
      * comprovació de CertificatRemesaHelper) el nom de fitxer del qual comença per
@@ -57,9 +58,11 @@ public interface DocumentEnviamentInteressatRepository extends JpaRepository<Doc
      * de l'enviament i pot haver canviat des que es va crear el document.
      *
      * @param prefixFitxer codi del tipus de document NOTIB_JUSTIFICANT_RECEPCIO seguit de '_'.
+     * @param darrerId només es retornen els enviaments amb id inferior.
      */
     @Query("SELECT n.id FROM DocumentEnviamentInteressatEntity n " +
-        "WHERE n.notificacio.expedient.estat = es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto.OBERT " +
+        "WHERE n.id < :darrerId " +
+        "AND n.notificacio.expedient.estat = es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto.OBERT " +
         "AND n.notificacio.expedient.esborrat = 0 " +
         "AND n.enviamentCertificacioData IS NOT NULL " +
         "AND NOT EXISTS (" +
@@ -69,5 +72,7 @@ public interface DocumentEnviamentInteressatRepository extends JpaRepository<Doc
         "        = CONCAT(:prefixFitxer, str(n.notificacio.expedient.id), '_', str(n.id), '_')" +
         ") " +
         "ORDER BY n.id DESC")
-    List<Long> findIdsAmbCertificatPendentIncorporar(@Param("prefixFitxer") String prefixFitxer);
+    List<Long> findIdsAmbCertificatPendentIncorporar(
+            @Param("prefixFitxer") String prefixFitxer,
+            @Param("darrerId") Long darrerId);
 }

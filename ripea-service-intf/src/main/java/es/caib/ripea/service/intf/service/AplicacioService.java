@@ -338,11 +338,28 @@ public interface AplicacioService {
     @PreAuthorize("hasRole('IPA_ADMIN')")
     public List<Long> getExpedientsAmbCertificatRemesa();
 
+    /**
+     * Enviaments amb certificat pendent d'incorporar i id inferior a darrerId, dels més recents als més antics.
+     *
+     * @param darrerId darrer enviament tractat, o null per obtenir-los tots.
+     */
+    @PreAuthorize("hasRole('IPA_ADMIN')")
+    public List<Long> getExpedientsAmbCertificatRemesa(Long darrerId);
+
     @PreAuthorize("hasRole('IPA_ADMIN')")
     public String executeCertificatsRemesaExpedient(Long expedientId) throws Exception;
 
     @PreAuthorize("hasRole('IPA_ADMIN')")
     public List<Long> getExpedientsAmbJustificantRegistre();
+
+    /**
+     * Anotacions amb justificant de registre pendent d'incorporar i id inferior a darrerId, de les més recents a les
+     * més antigues.
+     *
+     * @param darrerId darrera anotació tractada, o null per obtenir-les totes.
+     */
+    @PreAuthorize("hasRole('IPA_ADMIN')")
+    public List<Long> getExpedientsAmbJustificantRegistre(Long darrerId);
 
     @PreAuthorize("hasRole('IPA_ADMIN')")
     public String executeJustificantsRegistreExpedient(Long peticioId) throws Exception;
