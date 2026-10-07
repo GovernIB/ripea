@@ -1,5 +1,5 @@
 import {FormField, useMuiFormDialogApiRef, useBaseAppContext, useFormContext} from "reactlib";
-import {Grid, Box, Alert, Typography} from "@mui/material";
+import {Grid, Box, Alert, Typography, Tooltip, Icon} from "@mui/material";
 import {useEffect, useMemo, useState} from "react";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
@@ -70,6 +70,18 @@ const ImportarDocumentMassiveForm = (props:any) => {
             field: 'overwrite',
             headerName: fieldOverwrite.label,
             flex: 0.75,
+            renderHeader: () => <Box display={'flex'} alignItems={'center'} gap={0.5}>
+                <span className="MuiDataGrid-columnHeaderTitle">{fieldOverwrite.label}</span>
+                <Tooltip title={t('page.expedient.action.impDocMass.overwriteHelp')}>
+                    <Icon
+                        fontSize="small"
+                        color="action"
+                        tabIndex={0}
+                        role="img"
+                        aria-label={t('page.expedient.action.impDocMass.overwriteHelp')}
+                    >help_outline</Icon>
+                </Tooltip>
+            </Box>,
             renderCell: (params:any) => {
                 const value = data?.documents.find((d:any) => d.id === params.row.id)?.overwrite
                 return <Box mt={1} width={'100%'}><FormField
@@ -94,7 +106,7 @@ const ImportarDocumentMassiveForm = (props:any) => {
                 }}
             />,
         }
-    ], [apiRef, data.documents, data?.metaExpedientId, fieldFitxer, fieldTipusDocument, updateDocument]);
+    ], [apiRef, data.documents, data?.metaExpedientId, fieldFitxer, fieldTipusDocument, fieldOverwrite, updateDocument, t]);
 
     if (!data?.totsExpedientsMateixProcediment) {
         return <Alert severity={"warning"}>{t('page.expedient.action.impDocMass.warning')}</Alert>

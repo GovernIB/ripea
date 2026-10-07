@@ -70,6 +70,4 @@ public interface DocumentResourceRepository extends BaseRepository<DocumentResou
             @Param("arxiuMaxReintentsDocuments") int arxiuMaxReintentsDocuments);
 
     int countAllByExpedientIdAndEsborrat(Long expedientId, int esborrat);
-
-    List<DocumentResourceEntity> findAllByPareIdAndMetaDocumentIdOrderByCreatedDateDesc(Long pareId, Long metaDocumentId);
 }

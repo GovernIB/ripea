@@ -796,6 +796,7 @@ const translationEn = {
                     title: "Document import",
                     mssg: "The documents you attach will be added to the {{num}} selected case files",
                     warning: "The case files must belong to the same procedure.",
+                    overwriteHelp: "If checked, the document will replace the latest active document of the same type in the case file (for single-occurrence types, the existing document), which will be moved to the recycle bin. If there is none, a new one will be created. Signed, pending-signature or final documents cannot be overwritten: that document will fail, but the import will continue with the remaining documents and case files.",
                 },
                 exportMass: {
                     unic: "Export case...",

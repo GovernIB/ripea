@@ -797,6 +797,7 @@ const translationEs = {
                     title: "Importación de documentos",
                     mssg: "Los documentos que adjunte se incorporarán a los {{num}} expedientes seleccionados",
                     warning: "Los expedientes deben pertenecer al mismo procedimiento.",
+                    overwriteHelp: "Si se marca, el documento sustituirá al último documento activo del mismo tipo en el expediente (si el tipo es único, el documento existente), que se moverá a la papelera. Si no existe ninguno, se creará uno nuevo. No se pueden sobrescribir documentos firmados, pendientes de firma o definitivos: este documento concreto fallará, pero la importación continuará con el resto de documentos y expedientes.",
                 },
                 exportMass: {
                     unic: "Exporta el expediente...",

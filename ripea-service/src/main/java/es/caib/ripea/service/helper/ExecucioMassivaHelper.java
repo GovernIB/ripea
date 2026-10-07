@@ -7,13 +7,16 @@ import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.Principal;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
-import es.caib.ripea.persistence.entity.resourcerepository.DocumentResourceRepository;
-import es.caib.ripea.service.intf.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +40,7 @@ import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.RegistreAnnexEntity;
 import es.caib.ripea.persistence.repository.ContingutRepository;
 import es.caib.ripea.persistence.repository.DocumentNotificacioRepository;
+import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.persistence.repository.ExecucioMassivaContingutRepository;
 import es.caib.ripea.persistence.repository.ExecucioMassivaRepository;
 import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
@@ -46,6 +50,21 @@ import es.caib.ripea.persistence.repository.RegistreAnnexRepository;
 import es.caib.ripea.service.firma.DocumentFirmaPortafirmesHelper;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentAmbTipusDto;
+import es.caib.ripea.service.intf.dto.DocumentDto;
+import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaContingutDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaEstatDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
+import es.caib.ripea.service.intf.dto.FileNameOption;
+import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentDto;
+import es.caib.ripea.service.intf.dto.SignatureInfoDto;
 import es.caib.ripea.service.intf.exception.ArxiuJaGuardatException;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.ValidationException;
@@ -63,6 +82,7 @@ public class ExecucioMassivaHelper {
 	@Autowired private ContingutRepository contingutRepository;
 	@Autowired private MetaDocumentRepository metaDocumentRepository;
 	@Autowired private DocumentNotificacioRepository documentNotificacioRepository;
+	@Autowired private DocumentRepository documentRepository;
 
 	@Autowired private AlertaHelper alertaHelper;
 	@Autowired private MessageHelper messageHelper;
@@ -77,10 +97,8 @@ public class ExecucioMassivaHelper {
 	@Autowired private ContingutHelper contingutHelper;
 	@Autowired private ExpedientPeticioHelper expedientPeticioHelper;
 	@Autowired private DocumentNotificacioHelper documentNotificacioHelper;
-    @Autowired
-    private DocumentResourceRepository documentResourceRepository;
 
-    public FitxerDto descarregarDocumentExecMassiva(Long entitatId, Long execMassivaId) {
+	public FitxerDto descarregarDocumentExecMassiva(Long entitatId, Long execMassivaId) {
 		ExecucioMassivaEntity execucioMassiva = execucioMassivaRepository.findById(execMassivaId).orElse(null);
 		if (execucioMassiva!=null && execucioMassiva.getDocumentNom()!=null) {
 			FitxerDto resultat = new FitxerDto();
@@ -597,87 +615,25 @@ public class ExecucioMassivaHelper {
 
 		        if (ExecucioMassivaTipusDto.IMPORTAR_DOCS.equals(tipus)){
 		        	if (documents!=null) {
-                        StringBuilder e = new StringBuilder();
-		        		for (DocumentAmbTipusDto docExp: documents) {
-
-		        			//Content type ampliat
-		        			String contentTypeDoc = Utils.getFitxerContentType(docExp.getFitxer().getName(), docExp.getFitxer().getContentType());
-
-		        			DocumentDto documentDto = new DocumentDto();
-		        			documentDto.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.SENSE_FIRMA);
-		        	        MetaDocumentDto metaNode = new MetaDocumentDto();
-		        	        metaNode.setId(docExp.getTipusDocument());
-		        	        documentDto.setMetaNode(metaNode);
-		        	        documentDto.setPareId(emc.getElementId());
-		        	        if (docExp.getTipusDocument()==null) {
-		        	        	throw new NotFoundException(docExp.getTipusDocument(), Long.class);
-		        	        }
-		        	        MetaDocumentEntity metaDocumentEntity = metaDocumentRepository.findById(docExp.getTipusDocument()).orElse(null);
-		        	        if (metaDocumentEntity==null) {
-		        	        	throw new NotFoundException(metaDocumentEntity, MetaDocumentEntity.class);
-		        	        }
-		        	        documentDto.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
-		        	        //El nom no es pot repetir dins l'expedient
-		        	        String nomDocument = metaDocumentEntity.getNom()+" "+emc.getElementId()+ " "+emc.getExecucioMassiva().getId();
-		        	        documentDto.setNom(Utils.abbreviate(nomDocument, 1024));
-		        	        documentDto.setDescripcio("Document importat massivament desde el llistat de expedients.");
-		        	        documentDto.setData(Calendar.getInstance().getTime());
-		        	        documentDto.setNtiOrigen(metaDocumentEntity.getNtiOrigen());
-		        	        documentDto.setNtiEstadoElaboracion(metaDocumentEntity.getNtiEstadoElaboracion());
-		        	        documentDto.setNtiIdDocumentoOrigen(null);
-		        	        documentDto.setFitxerNom(docExp.getFitxer().getName());
-		        	        documentDto.setFitxerContingut(docExp.getFitxer().getContent());
-		        	        documentDto.setFitxerContentType(contentTypeDoc);
-
-		        			//1.- comprovar la firma del document com es faria desde el formulari de contingut
-		        			if (Boolean.parseBoolean(configHelper.getConfig(PropertyConfig.DETECCIO_FIRMA_AUTOMATICA))) {
-		                    	SignatureInfoDto signatureInfoDto = pluginHelper.detectaFirmaDocument(
-		                    			docExp.getFitxer().getContent(),
-		                    			contentTypeDoc);
-
-		                    	if (signatureInfoDto.isSigned()) {
-		                    		documentDto.setAmbFirma(true);
-		                    		documentDto.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
-		                    	}
+		        		//Cada document es processa de forma independent: si un falla, es continua amb la resta
+		        		//i l'element de l'execució massiva acaba en error amb el detall dels documents fallits.
+		        		StringBuilder errorsDocuments = new StringBuilder();
+		        		for (int i = 0; i < documents.size(); i++) {
+		        			DocumentAmbTipusDto docExp = documents.get(i);
+		        			try {
+		        				//Si el mateix tipus de document apareix a més d'una fila, el nom generat es repetiria: s'hi afegeix el número de fila
+		        				Long tipusDocument = docExp.getTipusDocument();
+		        				boolean tipusRepetit = tipusDocument != null && documents.stream().filter(d -> tipusDocument.equals(d.getTipusDocument())).count() > 1;
+		        				importarDocumentExpedient(emc, docExp, tipusRepetit ? i + 1 : null);
+		        			} catch (Exception ex) {
+		        				String nomFitxer = docExp.getFitxer() != null ? docExp.getFitxer().getName() : null;
+		        				logger.error("CONTINGUT MASSIU:" + emc.getId() + ". No s'ha pogut importar el document " + nomFitxer + " a l'element " + emc.getElementId(), ex);
+		        				errorsDocuments.append("\r\n - ").append(nomFitxer).append(": ").append(ExceptionHelper.getRootCauseOrItself(ex).getMessage());
 		        			}
-
-                            //2. Eliminar casos de sobreescritura
-                            boolean errorSobreescriure = false;
-                            ContingutEntity pare = contingutRepository.findById(emc.getElementId()).get();
-                            if (docExp.isOverwrite()) {
-                                List<DocumentResourceEntity> docs = documentResourceRepository.findAllByPareIdAndMetaDocumentIdOrderByCreatedDateDesc(pare.getId(), docExp.getTipusDocument());
-                                if (!docs.isEmpty()) {
-                                    DocumentResourceEntity deleteDoc = docs.get(0);
-
-                                    if (DocumentEstatEnumDto.DEFINITIU.equals(deleteDoc.getEstat())
-                                        || DocumentEstatEnumDto.FIRMAT.equals(deleteDoc.getEstat())
-                                        || DocumentEstatEnumDto.CUSTODIAT.equals(deleteDoc.getEstat())
-                                        || DocumentEstatEnumDto.ADJUNT_FIRMAT.equals(deleteDoc.getEstat())
-                                    ) {
-                                        e.append("\n - El document ").append(deleteDoc.getNom()).append(" no es pot sobreescriure");
-                                        errorSobreescriure = true;
-                                    } else {
-                                        documentResourceRepository.delete(deleteDoc);
-                                    }
-                                }
-                            }
-
-		        			//3.- Crear el document per l'expedient (multiplicitat)
-                            if (!errorSobreescriure) {
-                                documentHelper.crearDocument(
-                                    emc.getExecucioMassiva().getEntitat().getId(),
-                                    documentDto,
-                                    pare,
-                                    false,
-                                    false,
-                                    true);
-                            }
 		        		}
-
-                        if (!e.toString().isEmpty()) {
-                            exc = new Exception("Documents amb erros al sobreescriure: " + e);
-                            logger.error(exc.getMessage());
-                        }
+		        		if (errorsDocuments.length() > 0) {
+		        			exc = new ValidationException("No s'han pogut importar els documents següents:" + errorsDocuments);
+		        		}
 		        	}
 		        } else if (ExecucioMassivaTipusDto.PORTASIGNATURES.equals(tipus)){
 					exc = enviarPortafirmes(emc);
@@ -753,6 +709,96 @@ public class ExecucioMassivaHelper {
 		execucioMassivaContingutRepository.save(emc);
 
 		return resultat;
+	}
+
+	/**
+	 * Importa un document a l'expedient de l'element de l'execució massiva.
+	 * Si el document està en mode sobreescriptura, abans s'envia a la paperera el darrer document actiu
+	 * del mateix tipus dins l'expedient (amb multiplicitat única, l'únic que pot existir).
+	 * @param numeroFila si no és null, s'afegeix al nom del document per evitar noms repetits
+	 *                   quan el mateix tipus de document s'importa des de diverses files.
+	 */
+	private void importarDocumentExpedient(ExecucioMassivaContingutEntity emc, DocumentAmbTipusDto docExp, Integer numeroFila) throws IOException {
+
+		Long entitatId = emc.getExecucioMassiva().getEntitat().getId();
+
+		if (docExp.getTipusDocument()==null) {
+			throw new NotFoundException(docExp.getTipusDocument(), Long.class);
+		}
+		MetaDocumentEntity metaDocumentEntity = metaDocumentRepository.findById(docExp.getTipusDocument()).orElse(null);
+		if (metaDocumentEntity==null) {
+			throw new NotFoundException(docExp.getTipusDocument(), MetaDocumentEntity.class);
+		}
+
+		//Content type ampliat
+		String contentTypeDoc = Utils.getFitxerContentType(docExp.getFitxer().getName(), docExp.getFitxer().getContentType());
+
+		DocumentDto documentDto = new DocumentDto();
+		documentDto.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.SENSE_FIRMA);
+		MetaDocumentDto metaNode = new MetaDocumentDto();
+		metaNode.setId(docExp.getTipusDocument());
+		documentDto.setMetaNode(metaNode);
+		documentDto.setPareId(emc.getElementId());
+		documentDto.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
+		//El nom no es pot repetir dins l'expedient
+		String nomDocument = metaDocumentEntity.getNom()+" "+emc.getElementId()+ " "+emc.getExecucioMassiva().getId();
+		String sufixFila = numeroFila != null ? " (" + numeroFila + ")" : "";
+		documentDto.setNom(Utils.abbreviate(nomDocument, 1024 - sufixFila.length()) + sufixFila);
+		documentDto.setDescripcio("Document importat massivament desde el llistat de expedients.");
+		documentDto.setData(Calendar.getInstance().getTime());
+		documentDto.setNtiOrigen(metaDocumentEntity.getNtiOrigen());
+		documentDto.setNtiEstadoElaboracion(metaDocumentEntity.getNtiEstadoElaboracion());
+		documentDto.setNtiIdDocumentoOrigen(null);
+		documentDto.setFitxerNom(docExp.getFitxer().getName());
+		documentDto.setFitxerContingut(docExp.getFitxer().getContent());
+		documentDto.setFitxerContentType(contentTypeDoc);
+
+		//1.- comprovar la firma del document com es faria desde el formulari de contingut
+		if (Boolean.parseBoolean(configHelper.getConfig(PropertyConfig.DETECCIO_FIRMA_AUTOMATICA))) {
+			SignatureInfoDto signatureInfoDto = pluginHelper.detectaFirmaDocument(
+					docExp.getFitxer().getContent(),
+					contentTypeDoc);
+
+			if (signatureInfoDto.isSigned()) {
+				documentDto.setAmbFirma(true);
+				documentDto.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
+			}
+		}
+
+		ContingutEntity pare = contingutRepository.findById(emc.getElementId())
+				.orElseThrow(() -> new NotFoundException(emc.getElementId(), ContingutEntity.class));
+
+		//2.- Mode sobreescriptura: enviar a la paperera el darrer document actiu del mateix tipus
+		if (docExp.isOverwrite()) {
+			ExpedientEntity expedient = (ExpedientEntity) HibernateHelper.deproxy(pare);
+			// Mateixa consulta (per expedient, metaNode i no esborrats) que la validació de multiplicitat de DocumentHelper.crearDocument
+			DocumentEntity documentSobreescriure = documentRepository.findByExpedientAndMetaNodeAndEsborrat(expedient, metaDocumentEntity, 0)
+					.stream()
+					.max(Comparator
+							.comparing((DocumentEntity d) -> d.getCreatedDate().orElse(LocalDateTime.MIN))
+							.thenComparing(DocumentEntity::getId))
+					.orElse(null);
+
+			if (documentSobreescriure != null) {
+				// Només es poden sobreescriure documents en redacció: no signats, sense firma en curs i no definitius a l'Arxiu
+				if (!DocumentEstatEnumDto.REDACCIO.equals(documentSobreescriure.getEstat()) || documentSobreescriure.isArxiuEstatDefinitiu()) {
+					throw new ValidationException(
+							documentSobreescriure.getId(),
+							DocumentEntity.class,
+							"El document \"" + documentSobreescriure.getNom() + "\" no es pot sobreescriure perquè està signat, pendent de firma o és definitiu (estat=" + documentSobreescriure.getEstat() + ")");
+				}
+				contingutHelper.deleteReversible(entitatId, documentSobreescriure, emc.getExecucioMassiva().getRolActual());
+			}
+		}
+
+		//3.- Crear el document per l'expedient (multiplicitat)
+		documentHelper.crearDocument(
+				entitatId,
+				documentDto,
+				pare,
+				false,
+				false,
+				true);
 	}
 
 	private Throwable executarAccioSimpleExpedient(ExecucioMassivaContingutEntity emc, ExecucioMassivaTipusDto accio) {

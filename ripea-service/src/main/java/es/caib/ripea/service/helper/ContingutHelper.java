@@ -1411,7 +1411,23 @@ public class ContingutHelper {
 		if (contingut instanceof ExpedientEntity) {
 			entityComprovarHelper.comprovarEstatExpedient(entitatId, contingutId, ExpedientEstatEnumDto.OBERT);
 		}
-		
+
+		deleteReversible(entitatId, contingut, rolActual);
+	}
+
+	/**
+	 * Esborra de forma reversible (paperera) un contingut ja validat pel cridador.
+	 * No comprova permisos ni que l'expedient estigui agafat per l'usuari actual:
+	 * s'ha d'emprar només des de processos que ja han fet aquesta validació (p.e. execucions massives).
+	 * Sí que valida que no estigui esborrat, que no sigui definitiu (segons la propietat
+	 * PERMATRE_ESBORRAR_FINAL) i que no provengui d'una anotació.
+	 */
+	public void deleteReversible(
+			Long entitatId,
+			ContingutEntity contingut,
+			String rolActual) throws IOException {
+
+		Long contingutId = contingut.getId();
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(contingut.getId()));
 
 		// Comprova que el contingut no estigui esborrat

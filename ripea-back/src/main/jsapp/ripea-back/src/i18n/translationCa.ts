@@ -797,6 +797,7 @@ const translationCa = {
                     title: "Importació de documents",
                     mssg: "Els documents que adjunteu s'incorporaran als {{num}} expedients seleccionats",
                     warning: "Els expedients han de pertànyer al mateix procediment.",
+                    overwriteHelp: "Si es marca, el document substituirà el darrer document actiu del mateix tipus a l'expedient (si el tipus és únic, el document existent), que es mourà a la paperera. Si no n'hi ha cap, se'n crearà un de nou. No es poden sobreescriure documents signats, pendents de firma o definitius: aquest document concret fallarà, però la importació continuarà amb la resta de documents i expedients.",
                 },
                 exportMass: {
                     unic: "Exporta l'expedient...",
