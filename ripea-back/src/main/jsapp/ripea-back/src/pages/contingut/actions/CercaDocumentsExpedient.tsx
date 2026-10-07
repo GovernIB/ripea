@@ -1,10 +1,9 @@
 import {useEffect, useRef, useState} from "react";
 import {useBaseAppContext, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
-import {Icon, IconButton, InputAdornment, TextField} from "@mui/material";
+import {Icon, IconButton, InputAdornment, TextField, Tooltip} from "@mui/material";
 
 const MIN_CARACTERS = 3;
-const ESPERA_MS = 500;
 const MAX_RESULTATS = 100;
 
 export const CercaDocumentsExpedient = (props: {
@@ -27,58 +26,78 @@ export const CercaDocumentsExpedient = (props: {
         }
     };
 
-    useEffect(() => {
-        const textCerca = text.trim();
-        const peticio = ++peticioActual.current;
-        if (textCerca.length < MIN_CARACTERS || expedientId == null) {
-            setCercant(false);
-            onChange(null);
+    const textCerca = text.trim();
+    const textValid = textCerca.replace(/\*/g, '').length >= MIN_CARACTERS;
+
+    const netejar = () => {
+        peticioActual.current++;
+        setText('');
+        setCercant(false);
+        onChange(null);
+    };
+
+    const cercar = () => {
+        if (!textValid || expedientId == null) {
             return;
         }
-        const timeout = setTimeout(() => {
-            setCercant(true);
-            apiAction(expedientId, {code: 'CERCA_DOCUMENTS', data: {text: textCerca, page: 0, pageSize: MAX_RESULTATS}})
-                .then((result: any) => {
-                    if (peticio !== peticioActual.current) return;
-                    const documents: any[] = result?.contingut ?? [];
-                    setCercant(false);
-                    onChange(new Set(documents.map((document: any) => String(document?.id))), textCerca);
-                })
-                .catch((error: any) => {
-                    if (peticio !== peticioActual.current) return;
-                    setCercant(false);
-                    onChange(null);
-                    temporalMessageShow(null, error?.message, 'error');
-                });
-        }, ESPERA_MS);
-        return () => clearTimeout(timeout);
-    }, [text, expedientId]);
+        const peticio = ++peticioActual.current;
+        setCercant(true);
+        apiAction(expedientId, {code: 'CERCA_DOCUMENTS', data: {text: textCerca, page: 0, pageSize: MAX_RESULTATS}})
+            .then((result: any) => {
+                if (peticio !== peticioActual.current) return;
+                const documents: any[] = result?.contingut ?? [];
+                setCercant(false);
+                onChange(new Set(documents.map((document: any) => String(document?.id))), textCerca.replace(/\*/g, ''));
+            })
+            .catch((error: any) => {
+                if (peticio !== peticioActual.current) return;
+                setCercant(false);
+                onChange(null);
+                temporalMessageShow(null, error?.message, 'error');
+            });
+    };
+
+    useEffect(() => {
+        netejar();
+    }, [expedientId]);
 
     return <TextField
         size={"small"}
         variant={"outlined"}
-        sx={{width: 280}}
+        sx={{width: 320}}
         placeholder={t('page.contingut.action.cercaDocuments.text')}
         value={text}
-        onChange={(e: any) => setText(e.target.value)}
+        onChange={(e: any) => {
+            setText(e.target.value);
+            if (!e.target.value) {
+                netejar();
+            }
+        }}
         onKeyDown={(e: any) => {
-            if (e.key === 'Escape') {
-                setText('');
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                cercar();
+            } else if (e.key === 'Escape') {
+                netejar();
             }
         }}
         slotProps={{
             htmlInput: {'aria-label': t('page.contingut.action.cercaDocuments.label')},
             input: {
                 startAdornment: <InputAdornment position={"start"}>
-                    <Icon fontSize={"small"}>search</Icon>
+                    <Tooltip title={<span style={{whiteSpace: 'pre-line'}}>{t('page.contingut.action.cercaDocuments.ajuda')}</span>}>
+                        <Icon fontSize={"small"} color={"action"} sx={{cursor: 'help'}}>help_outline</Icon>
+                    </Tooltip>
                 </InputAdornment>,
-                endAdornment: text
-                    ? <InputAdornment position={"end"}>
-                        <IconButton size={"small"} title={t('page.contingut.action.cercaDocuments.clear')} onClick={() => setText('')}>
+                endAdornment: <InputAdornment position={"end"}>
+                    {text &&
+                        <IconButton size={"small"} title={t('page.contingut.action.cercaDocuments.clear')} onClick={netejar}>
                             <Icon fontSize={"small"}>close</Icon>
-                        </IconButton>
-                    </InputAdornment>
-                    : undefined,
+                        </IconButton>}
+                    <IconButton size={"small"} title={t('page.contingut.action.cercaDocuments.search')} onClick={cercar} disabled={!textValid}>
+                        <Icon fontSize={"small"}>search</Icon>
+                    </IconButton>
+                </InputAdornment>,
             }
         }}
     />

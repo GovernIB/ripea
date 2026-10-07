@@ -268,6 +268,8 @@ const translationEs = {
                     label: "Buscar documentos",
                     text: "Texto a buscar (mín. 3 caracteres)",
                     clear: "Limpiar la búsqueda",
+                    search: "Buscar",
+                    ajuda: "Busca en el nombre, la descripción y el contenido de los documentos.\nPulsa Enter o el botón de buscar para lanzar la búsqueda.\nPuedes usar * para buscar fragmentos de palabras (p. ej. contrat* encuentra contrato, contratación...).",
                     noResults: "No se han encontrado resultados",
                 },
                 create: {

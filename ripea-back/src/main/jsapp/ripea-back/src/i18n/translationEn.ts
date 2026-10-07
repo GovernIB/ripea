@@ -268,6 +268,8 @@ const translationEn = {
                     label: "Search documents",
                     text: "Text to search (min. 3 characters)",
                     clear: "Clear search",
+                    search: "Search",
+                    ajuda: "Searches the name, description and content of the documents.\nPress Enter or the search button to run the search.\nYou can use * to search for parts of words (e.g. contract* finds contract, contractor...).",
                     noResults: "No results found",
                 },
                 create: {

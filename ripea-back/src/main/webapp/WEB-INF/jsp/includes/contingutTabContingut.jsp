@@ -19,7 +19,8 @@
 	#grid-documents .caption .dropdown-menu li { width: 100%; margin: 0; padding: 0; }
 	#contingut-botons { margin-bottom: .8em; }
 	#cercaDocuments { float: left; display: inline-block; margin-left: 4px; text-align: left; }
-	#cercaDocuments .input-group { width: 350px; }
+	#cercaDocuments .input-group { width: 380px; }
+	#cercaDocumentsAjuda { cursor: help; }
 	#cercaDocumentsMissatge { display: inline-block; margin: 7px 0 0 8px; }
 	#cercaDocumentsCarregant { padding: 2em 0; }
 	.cerca-sense-resultats { display: none !important; }
@@ -1612,10 +1613,11 @@
 				<c:if test="${isCercaDocumentsExpedientActiu && !isTasca}">
 					<div id="cercaDocuments">
 						<div class="input-group">
-							<span class="input-group-addon"><span class="fa fa-search"></span></span>
+							<span class="input-group-addon" id="cercaDocumentsAjuda" title="<spring:message code="contingut.cercaDocuments.ajuda"/>"><span class="fa fa-question-circle"></span></span>
 							<input type="text" class="form-control" id="cercaDocumentsText" autocomplete="off" placeholder="<spring:message code="contingut.cercaDocuments.camp.text"/>" title="<spring:message code="contingut.boto.menu.cercaDocuments"/>"/>
 							<span class="input-group-btn">
 								<button type="button" class="btn btn-default" id="cercaDocumentsNetejar" title="<spring:message code="contingut.cercaDocuments.boto.netejar"/>"><span class="fa fa-times"></span></button>
+								<button type="button" class="btn btn-default" id="cercaDocumentsCercar" title="<spring:message code="contingut.cercaDocuments.boto.cercar"/>"><span class="fa fa-search"></span></button>
 							</span>
 						</div>
 					</div>
@@ -1897,7 +1899,6 @@
 						var $text = $('#cercaDocumentsText');
 						var $missatge = $('#cercaDocumentsMissatge');
 						var minimCaracters = 3;
-						var temporitzador = null;
 						var peticioActual = 0;
 
 						function mostrarCercant(cercant) {
@@ -1906,7 +1907,6 @@
 						}
 
 						function netejarCerca() {
-							clearTimeout(temporitzador);
 							peticioActual++;
 							mostrarCercant(false);
 							$missatge.text('');
@@ -1914,8 +1914,12 @@
 							aplicarFiltreCercaDocuments();
 						}
 
-						function cercar(text) {
-							clearTimeout(temporitzador);
+						function cercar() {
+							var text = $.trim($text.val());
+							if (text.replace(/\*/g, '').length < minimCaracters) {
+								$missatge.text('<spring:message code="contingut.cercaDocuments.minim" javaScriptEscape="true"/>');
+								return;
+							}
 							var peticio = ++peticioActual;
 							$missatge.text('');
 							mostrarCercant(true);
@@ -1936,7 +1940,7 @@
 											carpetes.add(String(carpetaId));
 										});
 									});
-									cercaDocumentsFiltre = {documents: documents, carpetes: carpetes, text: text};
+									cercaDocumentsFiltre = {documents: documents, carpetes: carpetes, text: text.replace(/\*/g, '')};
 									aplicarFiltreCercaDocuments();
 								},
 								error: function (xhr) {
@@ -1957,27 +1961,21 @@
 						}
 
 						$text.on('input', function () {
-							var text = $.trim($text.val());
-							if (text.length < minimCaracters) {
+							if (!$.trim($text.val())) {
 								netejarCerca();
-								return;
 							}
-							clearTimeout(temporitzador);
-							temporitzador = setTimeout(function () {
-								cercar(text);
-							}, 500);
 						});
 						$text.on('keydown', function (event) {
 							if (event.which == 13) {
 								event.preventDefault();
-								var text = $.trim($text.val());
-								if (text) {
-									cercar(text);
-								}
+								cercar();
 							} else if (event.which == 27) {
 								$text.val('');
 								netejarCerca();
 							}
+						});
+						$('#cercaDocumentsCercar').on('click', function () {
+							cercar();
 						});
 						$('#cercaDocumentsNetejar').on('click', function () {
 							$text.val('');

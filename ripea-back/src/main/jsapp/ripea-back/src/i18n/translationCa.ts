@@ -268,6 +268,8 @@ const translationCa = {
                     label: "Cerca documents",
                     text: "Text a cercar (mín. 3 caràcters)",
                     clear: "Netejar la cerca",
+                    search: "Cercar",
+                    ajuda: "Cerca al nom, a la descripció i al contingut dels documents.\nPrem Enter o el botó de cercar per llançar la cerca.\nPots emprar * per cercar trossos de paraules (p. ex. contract* troba contracte, contractació...).",
                     noResults: "No s'han trobat resultats",
                 },
                 create: {

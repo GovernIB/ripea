@@ -193,6 +193,19 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 	List<DocumentEntity> findByExpedientAndEsborrat(ExpedientEntity expedient, int esborrat);
 
 	@Query(	"select " +
+			"    d " +
+			"from " +
+			"    DocumentEntity d " +
+			"where " +
+			"d.expedient = :expedient " +
+			"and d.esborrat = 0 " +
+			"and (lower(d.nom) like :text or lower(d.descripcio) like :text) " +
+			"order by d.nom")
+	List<DocumentEntity> findByExpedientAndNomOrDescripcioLike(
+			@Param("expedient") ExpedientEntity expedient,
+			@Param("text") String text);
+
+	@Query(	"select " +
 			"    d.id " +
 			"from " +
 			"    DocumentEntity d " +
