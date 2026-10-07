@@ -19,6 +19,7 @@ const ImportarDocumentMassiveForm = (props:any) => {
 
     const fieldFitxer = fields?.filter(i=>i.name=='file')[0];
     const fieldTipusDocument = fields?.filter(i=>i.name=='tipusDocument')[0];
+    const fieldOverwrite = fields?.filter(i=>i.name=='overwrite')[0];
 
     const updateDocument = (rowId: any, field: string, value: any) => {
         const newDocs = data.documents.map((doc:any) =>
@@ -62,6 +63,22 @@ const ImportarDocumentMassiveForm = (props:any) => {
                         tipusDocument: data.documents.map((doc:any) => doc?.tipusDocument),
                     }}
                     required
+                /></Box>
+            }
+        },
+        {
+            field: 'overwrite',
+            headerName: fieldOverwrite.label,
+            flex: 0.75,
+            renderCell: (params:any) => {
+                const value = data?.documents.find((d:any) => d.id === params.row.id)?.overwrite
+                return <Box mt={1} width={'100%'}><FormField
+                    label={''}
+                    name={'overwrite' + (value ? `#${params?.row?.id}` : '')}
+                    field={fieldOverwrite}
+                    componentProps={{size: "small"}}
+                    value={value}
+                    onChange={(value) => updateDocument(params.row.id, 'overwrite', value)}
                 /></Box>
             }
         },

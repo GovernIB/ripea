@@ -50,7 +50,7 @@ import lombok.experimental.FieldNameConstants;
 						code = ExpedientResource.PERSPECTIVE_BASE_CODE),
         		@ResourceArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
-						code = ExpedientResource.PERSPECTIVE_AVISOS_CODE),        		
+						code = ExpedientResource.PERSPECTIVE_AVISOS_CODE),
 				@ResourceArtifact(
 						type = ResourceArtifactType.REPORT,
 						code = ExpedientResource.REPORT_MASSIVE_EXPORT_PDF_CODE,
@@ -152,7 +152,7 @@ import lombok.experimental.FieldNameConstants;
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_IMPORTAR_CODE,
                         formClass = ExpedientResource.ImportarExpedientFormAction.class,
-                        requiresId = true),                
+                        requiresId = true),
                 @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
                         code = ExpedientResource.ACTION_SYNC_ARXIU,
@@ -250,11 +250,11 @@ import lombok.experimental.FieldNameConstants;
 public class ExpedientResource extends NodeResource implements Serializable {
 
 	private static final long serialVersionUID = 7440910672703796468L;
-	
+
 	public static final String REPORT_MASSIVE_EXPORT_PDF_CODE  = "EXPORT_DOC";
 	public static final String REPORT_MASSIVE_EXPORT_GENERIC   = "EXPORT_GENERIC";
 	public static final String REPORT_MASSIVE_EXPORT_INDEX_ENI = "EXPORT_INDEX_ENI";
-	
+
 	public static final String ACTION_MASSIVE_FOLLOW_CODE = "FOLLOW";
 	public static final String ACTION_MASSIVE_UNFOLLOW_CODE = "UNFOLLOW";
 	public static final String ACTION_MASSIVE_AGAFAR_CODE = "AGAFAR";
@@ -264,14 +264,14 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String ACTION_MASSIVE_REOBRIR_CODE = "REOBRIR";
 	public static final String ACTION_MASSIVE_RELACIONAR_CODE = "RELACIONAR";
 	public static final String ACTION_MASSIVE_IMPORT_DOCS = "IMPORT_DOCS_MASS";
-	
+
 	public static final String ACTION_TANCAR_CODE = "TANCAR";
 	public static final String ACTION_CANVI_PRIORITAT_CODE = "CANVI_PRIORITAT";
 	public static final String ACTION_CANVI_ESTAT_CODE = "CANVI_ESTAT";
 	public static final String ACTION_IMPORTAR_CODE = "IMPORTAR";
 	public static final String REPORT_EXPORT_SELECTED_DOCS = "EXPORT_SELECTED_DOCS";
 	public static final String ACTION_SYNC_ARXIU = "SYNC_ARXIU";
-	public static final String ACTION_GUARDAR_ARXIU = "GUARDAR_ARXIU";	
+	public static final String ACTION_GUARDAR_ARXIU = "GUARDAR_ARXIU";
 	public static final String ACTION_IMPORT_DOCS = "IMPORT_DOCS";
 	public static final String ACTION_IMPORT_INTE = "IMPORT_INTE";
 	public static final String ACTION_GET_PROGRES_SGD = "GET_PROGRES_SGD";
@@ -283,7 +283,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String ACTION_CERCA_DOCUMENTS_CODE = "CERCA_DOCUMENTS";
 	public static final String REPORT_PLANTILLA_EXCEL_INTERESSATS = "PLANTILLA_EXCEL_INTERESSATS";
 	public static final String REPORT_PLANTILLA_DADES_CSV = "PLANTILLA_DADES_CSV";
-	
+
 	public static final String PERSPECTIVE_BASE_CODE = "BASIC";
 	public static final String PERSPECTIVE_AVISOS_CODE = "AVISOS";
 	public static final String PERSPECTIVE_FOLLOWERS = "FOLLOWERS";
@@ -303,7 +303,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String PERSPECTIVE_EN_PROCES_CANVI_ESTAT_CODE = "EN_PROCES_CANVI_ESTAT";
 	public static final String PERSPECTIVE_EN_PROCES_TANCAMENT_CODE = "EN_PROCES_TANCAMENT";
 	public static final String PERSPECTIVE_EN_PROCES_CUSTODIAR_CODE = "EN_PROCES_CUSTODIAR";
-	
+
 
 	public static final String FILTER_CODE = "EXPEDIENT_FILTER";
 	public static final String MASSIVE_CANVI_ESTAT_FILTER_CODE = "MASSIVE_CANVI_ESTAT_FILTER";
@@ -313,7 +313,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	private ExpedientEstatEnumDto estat = ExpedientEstatEnumDto.OBERT;
 //	@NotNull
 	@Size(max = 46)
-	private String ntiClasificacionSia;	
+	private String ntiClasificacionSia;
 //	@NotNull
 	private Date ntiFechaApertura;
 	@NotNull
@@ -347,23 +347,23 @@ public class ExpedientResource extends NodeResource implements Serializable {
     @Transient
     @ResourceField(onChangeActive = true)
     private FileReference exportPdf;
-    
+
     @Transient
     @ResourceField(onChangeActive = true)
     private FileReference exportExcel;
-    
+
     @Transient
     @ResourceField(onChangeActive = true)
     private FileReference exportPdfEni;
-    
+
     @Transient
     @ResourceField(onChangeActive = true)
     private FileReference exportEni;
-    
+
     @Transient
     @ResourceField(onChangeActive = true)
     private FileReference exportInside;
-	
+
 	// Tancat
 	private Date tancatData;
 	@Size(max = 1024)
@@ -379,11 +379,11 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	private Date arxiuIntentData;
 	private int arxiuReintents;
 	private boolean arxiuPropagat;
-	
+
 	// Registre
 	@Size(max = 4000)
 	private String registresImportats;
-	
+
 	// NTI
 	@NotNull
 	@Size(max = 5)
@@ -394,7 +394,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 //	@NotNull
 	@Size(max = 9)
 	private String ntiOrgano;
-	
+
 	// Sistra
 	@Size(max = 16)
 	private String sistraBantelNum;
@@ -403,7 +403,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	private String sistraUnitatAdministrativa;
 	@Size(max = 100)
 	private String sistraClau;
-	
+
 	// Prioritat
 	private PrioritatEnumDto prioritat = PrioritatEnumDto.B_NORMAL;
 	@Size(max = 1024)
@@ -527,6 +527,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
         @Transient private FileReference file;
         @Transient @ResourceField(enumType = true)
         private String tipusDocument;
+        @Transient private boolean overwrite;
     }
 
     @Getter
@@ -541,7 +542,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
             REMOVE,
         }
     }
-    
+
     @Getter
     @Setter
     public static class TancarExpedientFormAction extends MassiveAction {
@@ -549,7 +550,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
         private String motiu;
         private List<Long> documentsPerFirmar;
     }
-    
+
     @Getter
     @Setter
     public static class CanviEstatExpedientFormAction extends MassiveAction {
@@ -557,7 +558,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
         @NotNull
         private ResourceReference<MetaExpedientEstatResource, Long> estatAdditional;
     }
-    
+
     @Getter
     @Setter
     public static class CanviPrioritatExpedientFormAction extends MassiveAction {
@@ -567,14 +568,14 @@ public class ExpedientResource extends NodeResource implements Serializable {
     	@Size(max = 1024)
     	private String prioritatMotiu;
     }
-    
+
     @Getter
     @Setter
     public static class ImportarExpedientFormAction implements Serializable {
         @NotNull
         private ResourceReference<ExpedientResource, Long> expedientOrigen;
     }
-    
+
     @Getter
     @Setter
     public static class MoureTotFormAction implements Serializable {
@@ -591,7 +592,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
         private Integer page;
         private Integer pageSize;
     }
-    
+
     @Getter
     @Setter
     @NoArgsConstructor
@@ -617,7 +618,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
     public static class ImportarInteressatsForm implements Serializable {
     	@NotNull private String numeroRegistre;
     }
-    
+
     @Getter
     @Setter
     @NoArgsConstructor
@@ -664,5 +665,5 @@ public class ExpedientResource extends NodeResource implements Serializable {
         private ResourceReference<GrupResource, Long> grup;
         private boolean mostrarGrups;
     }
-    
+
 }

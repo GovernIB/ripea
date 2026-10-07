@@ -26,12 +26,12 @@ public interface DocumentResourceRepository extends BaseRepository<DocumentResou
 			"from " +
 			"    DocumentResourceEntity c " +
 			"where " +
-			"    c.expedient.id = :expedientId "  + 
+			"    c.expedient.id = :expedientId "  +
 			"and c.documentTipus = 0 " + //= DIGITAL
 			"and c.esborrat = 0 " +
 			"and c.estat = 0 ")
 	Boolean hasFillsEsborranys(@Param("expedientId") Long expedientId);
-    
+
     @Query(	"select " +
             "    c " +
             "from " +
@@ -70,4 +70,6 @@ public interface DocumentResourceRepository extends BaseRepository<DocumentResou
             @Param("arxiuMaxReintentsDocuments") int arxiuMaxReintentsDocuments);
 
     int countAllByExpedientIdAndEsborrat(Long expedientId, int esborrat);
+
+    List<DocumentResourceEntity> findAllByPareIdAndMetaDocumentIdOrderByCreatedDateDesc(Long pareId, Long metaDocumentId);
 }

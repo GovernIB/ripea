@@ -7,14 +7,13 @@ import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
+import es.caib.ripea.persistence.entity.resourcerepository.DocumentResourceRepository;
+import es.caib.ripea.service.intf.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,20 +46,6 @@ import es.caib.ripea.persistence.repository.RegistreAnnexRepository;
 import es.caib.ripea.service.firma.DocumentFirmaPortafirmesHelper;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.config.PropertyConfig;
-import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentAmbTipusDto;
-import es.caib.ripea.service.intf.dto.DocumentDto;
-import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
-import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
-import es.caib.ripea.service.intf.dto.ExecucioMassivaContingutDto;
-import es.caib.ripea.service.intf.dto.ExecucioMassivaDto;
-import es.caib.ripea.service.intf.dto.ExecucioMassivaEstatDto;
-import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
-import es.caib.ripea.service.intf.dto.FileNameOption;
-import es.caib.ripea.service.intf.dto.FitxerDto;
-import es.caib.ripea.service.intf.dto.MetaDocumentDto;
-import es.caib.ripea.service.intf.dto.SignatureInfoDto;
 import es.caib.ripea.service.intf.exception.ArxiuJaGuardatException;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.ValidationException;
@@ -92,8 +77,10 @@ public class ExecucioMassivaHelper {
 	@Autowired private ContingutHelper contingutHelper;
 	@Autowired private ExpedientPeticioHelper expedientPeticioHelper;
 	@Autowired private DocumentNotificacioHelper documentNotificacioHelper;
+    @Autowired
+    private DocumentResourceRepository documentResourceRepository;
 
-	public FitxerDto descarregarDocumentExecMassiva(Long entitatId, Long execMassivaId) {
+    public FitxerDto descarregarDocumentExecMassiva(Long entitatId, Long execMassivaId) {
 		ExecucioMassivaEntity execucioMassiva = execucioMassivaRepository.findById(execMassivaId).orElse(null);
 		if (execucioMassiva!=null && execucioMassiva.getDocumentNom()!=null) {
 			FitxerDto resultat = new FitxerDto();
@@ -113,20 +100,20 @@ public class ExecucioMassivaHelper {
 		}
 		return null;
 	}
-	
+
 	public DownloadableFile getDownloadableFileFromExport(Long entitatId, ExportGenericForm params) throws IOException {
-    	
+
 		List<FitxerDto> fitxersGenerats = new ArrayList<FitxerDto>();
 		DownloadableFile resultat = null;
-				
+
 		if (params.isExportarExcel()) {
 			fitxersGenerats.add(expedientHelper.exportacio(entitatId, new HashSet<>(params.getIds()), "ODS"));
 		}
-		
+
 		if (params.isExportarCsv()) {
 			fitxersGenerats.add(expedientHelper.exportacio(entitatId, new HashSet<>(params.getIds()), "CSV"));
 		}
-		
+
     	if (params.isExportarIndexXls()) {
     		fitxersGenerats.add(expedientHelper.generarIndexExpedients(
     				entitatId,
@@ -134,7 +121,7 @@ public class ExecucioMassivaHelper {
     				false,
     				"XLSX"));
     	}
-    	
+
     	//Seria redundant exportar index PDF haguent marcat la opció de ExportarIndexPdfEni
     	if (params.isExportarIndexPdf()) {
     		fitxersGenerats.add(expedientHelper.generarIndexExpedients(
@@ -143,7 +130,7 @@ public class ExecucioMassivaHelper {
     				false,
     				"PDF"));
     	}
-    	
+
     	if (params.isInlourerEstructEni()) {
     		fitxersGenerats.add(expedientHelper.generarIndexExpedients(
     				entitatId,
@@ -168,14 +155,14 @@ public class ExecucioMassivaHelper {
     	if (params.isExportarInside()) {
     		fitxersGenerats.add(expedientHelper.exportarExpedient(new HashSet<>(params.getIds()), true));
     	}
-    	
+
     	if (fitxersGenerats.size()==1) {
         	resultat = new DownloadableFile(
         			fitxersGenerats.get(0).getNom(),
         			fitxersGenerats.get(0).getContentType(),
         			fitxersGenerats.get(0).getContingut());
     	} else {
-    		
+
     	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
     	    try (ZipOutputStream zipOut = new ZipOutputStream(baos)) {
@@ -194,23 +181,23 @@ public class ExecucioMassivaHelper {
     	        }
 
     	    } // El try-with-resources tanca i finalitza el ZipOutputStream aquí
-    	    
+
         	resultat = new DownloadableFile(
         			"Exportacio_expedient_"+params.getIds().get(0)+".zip",
         			"application/zip",
         			baos.toByteArray());
     	}
-    	
+
     	return resultat;
 	}
-	
+
 	public ByteArrayOutputStream getZipFromDocuments(List<DocumentDto> docsExp) throws IOException {
-		
+
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ZipOutputStream out = new ZipOutputStream(baos);
 		List<String> nomsArxius = new ArrayList<String>();
 		ZipEntry ze;
-		
+
 		if (docsExp != null && docsExp.size() > 0) {
 			for (DocumentDto documentDto : docsExp) {
 				String recursNom = getZipRecursNom(documentDto.getFitxerNom(), nomsArxius);
@@ -226,7 +213,7 @@ public class ExecucioMassivaHelper {
 		out.close();
 		return baos;
 	}
-	
+
 	private String getZipRecursNom(String nomEntrada, List<String> nomsArxius) {
 		int contador = 0;
 		for (String nom : nomsArxius) {
@@ -243,7 +230,7 @@ public class ExecucioMassivaHelper {
 		}
 		return nomEntrada;
 	}
-	
+
 	public List<DocumentDto> getDocumentsForExportacioZip(
 			ExpedientEntity expedient,
 			FileNameOption nomFitxer,
@@ -251,7 +238,7 @@ public class ExecucioMassivaHelper {
 			boolean carpetes,
 			double actualMbFitxer,
 			List<Long> documentsInclosos) {
-		
+
 		List<ContingutEntity> contingutsExp = new ArrayList<>();
 		List<DocumentDto> docsExp = new ArrayList<DocumentDto>();
 		contingutHelper.findDescendants(expedient, contingutsExp, true, false);
@@ -259,18 +246,18 @@ public class ExecucioMassivaHelper {
 		if (contingutsExp != null && contingutsExp.size()>0) {
 
 			for (ContingutEntity contingutExpedient : contingutsExp) {
-				
+
 				if (ContingutTipusEnumDto.DOCUMENT.equals(contingutExpedient.getTipus())) {
-					
+
 					if (documentsInclosos==null || documentsInclosos.contains(contingutExpedient.getId())) {
-						
+
 						DocumentEntity documentEntity = (DocumentEntity)contingutExpedient;
-	
+
 						DocumentDto doc = new DocumentDto();
 						doc.setId(documentEntity.getId());
-	
+
 						FitxerDto fitxerDto = null;
-						
+
 						//Configuració de l'execució massiva: Versió imprimible o original del fitxer
 						if (isVersioImprimible) {
 							try {
@@ -284,11 +271,11 @@ public class ExecucioMassivaHelper {
 							//Si no té uuid l'intentará obtenir el gestorDocumental amb el identificador "getGesDocAdjuntId"
 							fitxerDto = documentHelper.getFitxerAssociat(documentEntity, null);
 						}
-	
+
 						actualMbFitxer = actualMbFitxer + (fitxerDto.getContingut().length / (1024.0 * 1024.0));
-	
+
 						doc.setFitxerContingut(fitxerDto.getContingut());
-	
+
 						String nomDoc = null;
 						//Configuració de l'execució massiva: Nom del fitxer dins el ZIP
 						if (nomFitxer!=null) {
@@ -305,7 +292,7 @@ public class ExecucioMassivaHelper {
 							case TYPE_ORIGINAL:
 								nomDoc = documentEntity.getMetaDocument().getNom().replaceAll("/", "_");
 								nomDoc = nomDoc + " - " + documentEntity.getFitxerNom().replaceAll("/", "_");
-								break;								
+								break;
 							default:
 								nomDoc = documentEntity.getFitxerNom().replaceAll("/", "_");
 								break;
@@ -315,7 +302,7 @@ public class ExecucioMassivaHelper {
 						if (nomDoc==null) {
 							nomDoc = documentEntity.getFitxerNom().replaceAll("/", "_");
 						}
-	
+
 						//Configuració de l'execució massiva: Estructura de carpetes = al expedient
 						if (carpetes) {
 							if (documentEntity.getPare()!=null) {
@@ -329,9 +316,9 @@ public class ExecucioMassivaHelper {
 								}
 							}
 						}
-						
+
 						nomDoc = ("[" + expedient.getNumero() + "] " + expedient.getNom()).replaceAll("/", "_") + "/" + nomDoc;
-						
+
 						doc.setFitxerNom(nomDoc);
 						docsExp.add(doc);
 					}
@@ -343,38 +330,38 @@ public class ExecucioMassivaHelper {
 			doc.setFitxerNom(("[" + expedient.getNumero() + "] " + expedient.getNom()).replaceAll("/", "_") + "/");
 			docsExp.add(doc);
 		}
-		
+
 		return docsExp;
 	}
-	
+
 	public void crearExecucioMassiva(Long entitatId, ExecucioMassivaDto dto, ElementTipusEnumDto elementTipus) throws NotFoundException, ValidationException {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				false,
-				false, 
+				false,
 				true, false);
-		
+
 		ExecucioMassivaEntity execucioMassiva = null;
-		
+
 		Date dataInici;
 		if (dto.getDataInici() == null) {
 			dataInici = new Date();
 		} else {
 			dataInici = dto.getDataInici();
 		}
-		
+
 		if (ExecucioMassivaTipusDto.PORTASIGNATURES.equals(dto.getTipus())) {
 			execucioMassiva = ExecucioMassivaEntity.getBuilder(
 					ExecucioMassivaTipusDto.PORTASIGNATURES,
 					dataInici,
-					dto.getMotiu(), 
+					dto.getMotiu(),
 					dto.getPrioritat(),
 					dto.getPortafirmesResponsablesString(),
 					dto.getPortafirmesSequenciaTipus(),
 					dto.getPortafirmesFluxId(),
 					dto.getPortafirmesTransaccioId(),
-					dto.getDataCaducitat(), 
+					dto.getDataCaducitat(),
 					dto.getEnviarCorreu(), //Aquest camp no aplica, s'enviará el correu si el usuari ho té configurat al perfil.
 					entitat,
 					dto.getRolActual(),
@@ -386,12 +373,12 @@ public class ExecucioMassivaHelper {
 			execucioMassiva.setExpedientDestiId(dto.getExpedientDestiId());
 			execucioMassiva.setIdentificadorAuxiliar(dto.getIdentificadorAuxiliar());
 		}
-		
+
 		int ordre = 0;
 		for (Long contingutId: dto.getContingutIds()) {
-			
+
 			String elementName = null;
-			
+
 			if (elementTipus == ElementTipusEnumDto.EXPEDIENT || elementTipus == ElementTipusEnumDto.DOCUMENT) {
 				elementName = contingutRepository.getOne(contingutId).getNom();
 			} else if (elementTipus == ElementTipusEnumDto.INTERESSAT) {
@@ -410,28 +397,28 @@ public class ExecucioMassivaHelper {
 					execucioMassiva,
 					contingutId,
 					elementName,
-					elementTipus, 
+					elementTipus,
 					ordre++).build();
-			
+
 			execucioMassiva.addContingut(emc);
 		}
 
 		execucioMassivaRepository.save(execucioMassiva);
 	}
-	
+
 	public void saveExecucioMassiva(
 			EntitatEntity entitat,
 			ExecucioMassivaDto execMassDto,
 			List<ExecucioMassivaContingutDto> execElements,
 			ElementTipusEnumDto elementTipus) throws NotFoundException, ValidationException {
-		
+
 		ExecucioMassivaEntity execucioMassiva = ExecucioMassivaEntity.getBuilder(
 				execMassDto.getTipus(),
 				execMassDto.getDataInici(),
 				execMassDto.getDataFi(),
 				entitat,
 				execMassDto.getRolActual()).build();
-	
+
 		execucioMassiva.setCarpetes(execMassDto.getCarpetes());
 		execucioMassiva.setVersioImprimible(execMassDto.getVersioImprimible());
 		execucioMassiva.setNomFitxer(execMassDto.getNomFitxer());
@@ -447,15 +434,15 @@ public class ExecucioMassivaHelper {
 		execucioMassiva.setPortafirmesFirmaParcial(execMassDto.getPortafirmesFirmaParcial());
 		execucioMassiva.setExpedientOrigenId(execMassDto.getExpedientOrigenId());
 		execucioMassiva.setExpedientDestiId(execMassDto.getExpedientDestiId());
-		
+
 		execucioMassiva = execucioMassivaRepository.save(execucioMassiva);
-		
+
 		int ordre = 0;
 		for (ExecucioMassivaContingutDto execElement: execElements) {
-			
+
 			String elementName = null;
 			ElementTipusEnumDto elementTipusContingut = elementTipus;
-			
+
 			if (elementTipus == ElementTipusEnumDto.EXPEDIENT || elementTipus == ElementTipusEnumDto.DOCUMENT) {
 				elementName = contingutRepository.getOne(execElement.getElementId()).getNom();
 			} else if (elementTipus == ElementTipusEnumDto.INTERESSAT) {
@@ -470,32 +457,32 @@ public class ExecucioMassivaHelper {
 			}
 
 			ExecucioMassivaContingutEntity emc = ExecucioMassivaContingutEntity.getBuilder(
-					execucioMassiva, 
-					execElement.getElementId(), 
+					execucioMassiva,
+					execElement.getElementId(),
 					elementName,
-					elementTipusContingut, 
+					elementTipusContingut,
 					ordre++).build();
-			
+
 			emc.updateEstatDataFi(
 					execElement.getEstat(),
 					execElement.getDataFi());
-			
+
 			emc.setError(execElement.getError());
-			
+
 			Throwable excepcioRetorn = ExceptionHelper.getRootCauseOrItself(execElement.getThrowable());
 			if (excepcioRetorn != null) {
 				String error = ExecucioMassivaHelper.getExceptionString(
 						emc,
 						excepcioRetorn);
-				
+
 				emc.updateError(
-						new Date(), 
+						new Date(),
 						error);
 			}
 			execucioMassivaContingutRepository.saveAndFlush(emc);
 		}
 	}
-	
+
 	public List<ExecucioMassivaContingutDto> getMassivaContingutFromIds(List<Long> seleccio) {
 		List<ExecucioMassivaContingutDto> execucioMassivaElements = new ArrayList<ExecucioMassivaContingutDto>();
 		if (seleccio!=null && seleccio.size()>0) {
@@ -510,7 +497,7 @@ public class ExecucioMassivaHelper {
 		}
 		return execucioMassivaElements;
 	}
-	
+
 	/** Id de la següent execució massiva a processar, o null si no n'hi ha cap de pendent. */
 	@Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
 	public Long getIdExecucioMassivaPerProcessar(Date ara) {
@@ -564,21 +551,21 @@ public class ExecucioMassivaHelper {
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
  	public String executarExecucioMassivaContingutNewTransaction(Long execucioMassivaContingutId, List<DocumentAmbTipusDto> documents) {
-		
+
 		Throwable exc = null;
 		String resultat = null;
 		ExecucioMassivaContingutEntity emc = execucioMassivaContingutRepository.findById(execucioMassivaContingutId).orElse(null);
-		
+
 		if (emc == null)
 			throw new NotFoundException(execucioMassivaContingutId, ExecucioMassivaContingutEntity.class);
-		
+
 		if (emc.getEstat() == null || ExecucioMassivaEstatDto.ESTAT_PENDENT.equals(emc.getEstat())) {
-		
+
 			ExecucioMassivaEntity exm = emc.getExecucioMassiva();
 			ExecucioMassivaTipusDto tipus = exm.getTipus();
-			
+
 			try {
-				
+
 				Authentication orgAuthentication = SecurityContextHolder.getContext().getAuthentication();
 				final String user = exm.getCreatedBy().get();
 		        Principal principal = new Principal() {
@@ -586,35 +573,36 @@ public class ExecucioMassivaHelper {
 						return user;
 					}
 				};
-				
+
 				List<String> rolsUsuariActual = pluginHelper.rolsUsuariFindAmbCodi(user);
 				if (rolsUsuariActual.isEmpty())
 					rolsUsuariActual.add("tothom");
-		
+
 				List<SimpleGrantedAuthority> authorities = new ArrayList<SimpleGrantedAuthority>();
 				for (String rol : rolsUsuariActual) {
 					SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(rol);
 					authorities.add(simpleGrantedAuthority);
 				}
-				
+
 				Authentication authentication =  new UsernamePasswordAuthenticationToken(
-						principal, 
+						principal,
 						"N/A",
 						authorities);
 		        SecurityContextHolder.getContext().setAuthentication(authentication);
-		        
+
 		        /**
-		         * Actualitzam la data de INICI de l'item actual de l'execució massiva 
+		         * Actualitzam la data de INICI de l'item actual de l'execució massiva
 		         */
 		        emc.updateDataInici(new Date());
-		        
+
 		        if (ExecucioMassivaTipusDto.IMPORTAR_DOCS.equals(tipus)){
 		        	if (documents!=null) {
+                        StringBuilder e = new StringBuilder();
 		        		for (DocumentAmbTipusDto docExp: documents) {
-		        			
+
 		        			//Content type ampliat
 		        			String contentTypeDoc = Utils.getFitxerContentType(docExp.getFitxer().getName(), docExp.getFitxer().getContentType());
-		        			
+
 		        			DocumentDto documentDto = new DocumentDto();
 		        			documentDto.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.SENSE_FIRMA);
 		        	        MetaDocumentDto metaNode = new MetaDocumentDto();
@@ -630,7 +618,7 @@ public class ExecucioMassivaHelper {
 		        	        }
 		        	        documentDto.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
 		        	        //El nom no es pot repetir dins l'expedient
-		        	        String nomDocument = metaDocumentEntity.getNom()+" "+emc.getElementId()+ " "+emc.getExecucioMassiva().getId(); 
+		        	        String nomDocument = metaDocumentEntity.getNom()+" "+emc.getElementId()+ " "+emc.getExecucioMassiva().getId();
 		        	        documentDto.setNom(Utils.abbreviate(nomDocument, 1024));
 		        	        documentDto.setDescripcio("Document importat massivament desde el llistat de expedients.");
 		        	        documentDto.setData(Calendar.getInstance().getTime());
@@ -640,28 +628,56 @@ public class ExecucioMassivaHelper {
 		        	        documentDto.setFitxerNom(docExp.getFitxer().getName());
 		        	        documentDto.setFitxerContingut(docExp.getFitxer().getContent());
 		        	        documentDto.setFitxerContentType(contentTypeDoc);
-		        			
+
 		        			//1.- comprovar la firma del document com es faria desde el formulari de contingut
 		        			if (Boolean.parseBoolean(configHelper.getConfig(PropertyConfig.DETECCIO_FIRMA_AUTOMATICA))) {
 		                    	SignatureInfoDto signatureInfoDto = pluginHelper.detectaFirmaDocument(
 		                    			docExp.getFitxer().getContent(),
 		                    			contentTypeDoc);
-		                    	
+
 		                    	if (signatureInfoDto.isSigned()) {
 		                    		documentDto.setAmbFirma(true);
 		                    		documentDto.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
 		                    	}
 		        			}
 
-		        			//2.- Crear el document per l'expedient (multiplicitat)
-		        			documentHelper.crearDocument(
-		        					emc.getExecucioMassiva().getEntitat().getId(),
-		        					documentDto,
-		        					contingutRepository.findById(emc.getElementId()).get(),
-		        					false,
-		        					false,
-		        					true);
+                            //2. Eliminar casos de sobreescritura
+                            boolean errorSobreescriure = false;
+                            ContingutEntity pare = contingutRepository.findById(emc.getElementId()).get();
+                            if (docExp.isOverwrite()) {
+                                List<DocumentResourceEntity> docs = documentResourceRepository.findAllByPareIdAndMetaDocumentIdOrderByCreatedDateDesc(pare.getId(), docExp.getTipusDocument());
+                                if (!docs.isEmpty()) {
+                                    DocumentResourceEntity deleteDoc = docs.get(0);
+
+                                    if (DocumentEstatEnumDto.DEFINITIU.equals(deleteDoc.getEstat())
+                                        || DocumentEstatEnumDto.FIRMAT.equals(deleteDoc.getEstat())
+                                        || DocumentEstatEnumDto.CUSTODIAT.equals(deleteDoc.getEstat())
+                                        || DocumentEstatEnumDto.ADJUNT_FIRMAT.equals(deleteDoc.getEstat())
+                                    ) {
+                                        e.append("\n - El document ").append(deleteDoc.getNom()).append(" no es pot sobreescriure");
+                                        errorSobreescriure = true;
+                                    } else {
+                                        documentResourceRepository.delete(deleteDoc);
+                                    }
+                                }
+                            }
+
+		        			//3.- Crear el document per l'expedient (multiplicitat)
+                            if (!errorSobreescriure) {
+                                documentHelper.crearDocument(
+                                    emc.getExecucioMassiva().getEntitat().getId(),
+                                    documentDto,
+                                    pare,
+                                    false,
+                                    false,
+                                    true);
+                            }
 		        		}
+
+                        if (!e.toString().isEmpty()) {
+                            exc = new Exception("Documents amb erros al sobreescriure: " + e);
+                            logger.error(exc.getMessage());
+                        }
 		        	}
 		        } else if (ExecucioMassivaTipusDto.PORTASIGNATURES.equals(tipus)){
 					exc = enviarPortafirmes(emc);
@@ -689,7 +705,7 @@ public class ExecucioMassivaHelper {
 				}
 
 				SecurityContextHolder.getContext().setAuthentication(orgAuthentication);
-				
+
 				if (exc == null) {
 					Long contingutId = emc.getElementId();
 					if (ElementTipusEnumDto.INTERESSAT.equals(emc.getElementTipus())) {
@@ -720,27 +736,27 @@ public class ExecucioMassivaHelper {
 								contingutId);
 					}
 				}
-				
+
 			} catch (Throwable e) {
 				exc = e;
 			}
 		}
-		
+
 		if (exc == null) {
 			emc.updateFinalitzat(new Date());
 		} else {
 			Throwable excepcioRetorn = ExceptionHelper.getRootCauseOrItself(exc);
 			String error = ExecucioMassivaHelper.getExceptionString(emc, excepcioRetorn);
-			emc.updateError(new Date(), error);									
+			emc.updateError(new Date(), error);
 		}
-		
+
 		execucioMassivaContingutRepository.save(emc);
-		
+
 		return resultat;
 	}
 
 	private Throwable executarAccioSimpleExpedient(ExecucioMassivaContingutEntity emc, ExecucioMassivaTipusDto accio) {
-		
+
 		Throwable exc = null;
 		try {
 			if (ExecucioMassivaTipusDto.AGAFAR_EXPEDIENT.equals(accio)){
@@ -764,9 +780,9 @@ public class ExecucioMassivaHelper {
 			logger.error("CONTINGUT MASSIU:" + emc.getId() + ". No s'ha pogut realitzar l'accio "+accio.toString()+" sobre l'element "+emc.getElementId(), ex);
 			exc = ex;
 		}
-		return exc;		
+		return exc;
 	}
-	
+
 	private Throwable retryCreateDocFromAnnex(ExecucioMassivaContingutEntity emc) {
 		Throwable exc = null;
 		try {
@@ -780,7 +796,7 @@ public class ExecucioMassivaHelper {
 		}
 		return exc;
 	}
-	
+
 	private Throwable reintentarCanviEstatDistribucio(ExecucioMassivaContingutEntity emc) {
 		Throwable exc = null;
 		try {
@@ -802,59 +818,59 @@ public class ExecucioMassivaHelper {
 		}
 		return exc;
 	}
-	
+
 	private Throwable custodiarElementsPendents(ExecucioMassivaContingutEntity emc) throws Exception {
-		
+
 		Throwable exc = null;
-		
+
 		try {
 
 			//En el cas de custodiar elements pendents, el ID del element a tractar pot ser:
 			// - expedientId:	ExpedientEntity extends NodeEntity extends ContingutEntity
 			// - documentId:	DocumentEntity  extends NodeEntity extends ContingutEntity
 			// - interessatId:	InteressatEntity (no exten de NodeEntity)
-			
+
 			if (ElementTipusEnumDto.EXPEDIENT.equals(emc.getElementTipus())) {
-				
+
 				exc = expedientHelper.guardarExpedientArxiu(emc.getElementId());
-				
+
 			} else if (ElementTipusEnumDto.INTERESSAT.equals(emc.getElementTipus())) {
-				
+
 				InteressatEntity interessat = entityComprovarHelper.comprovarInteressat(null, emc.getElementId());
 				if (interessat != null && interessat.getExpedient() != null) {
 					exc = expedientInteressatHelper.guardarInteressatsArxiu(interessat.getExpedient().getId());
 				}
 
 			} else if (ElementTipusEnumDto.DOCUMENT.equals(emc.getElementTipus())) {
-				
+
 				DocumentEntity document = (DocumentEntity) entityComprovarHelper.comprovarContingut(emc.getElementId());
-				
+
 				if (document.getArxiuUuid() == null) { //documents uploaded manually in ripea that were not saved in arxiu
-					
+
 					exc = documentHelper.guardarDocumentArxiu(document.getId());
-					
+
 				} else if (document.isPendentMoverArxiu()) { //documents from distribucio that were not moved in arxiu to ripea expedient
-					
+
 					exc = expedientHelper.moveDocumentArxiuNewTransaction(document.getAnnexAnotacioId());
-					
+
 				} else if (document.getGesDocFirmatId() != null) { // documents signed in portafirmes that arrived in callback and were not saved in arxiu
-					
+
 					exc = firmaPortafirmesHelper.portafirmesReintentar(
 							emc.getExecucioMassiva().getEntitat().getId(),
 							document);
 				}
 			}
-			
+
 		} catch (Exception ex) {
 			logger.error("CONTINGUT MASSIU:" + emc.getId() + ". No s'ha pogut custodiar l'element", ex);
 			exc = ex;
 		}
-		
+
 		//Si en algun moment guardant Expedient, documents o interessats, dona error perque ja es troba dins Arxiu, no conta com a error
 		if (exc instanceof ArxiuJaGuardatException) { exc = null; }
-		
+
 		return exc;
-	}	
+	}
 
 	private Throwable tancarExpedients (ExecucioMassivaContingutEntity emc) throws Exception {
 		Throwable exc = null;
@@ -873,7 +889,7 @@ public class ExecucioMassivaHelper {
 		}
 		return exc;
 	}
-	
+
 	private Throwable enviarPortafirmes(ExecucioMassivaContingutEntity emc) throws Exception {
 		Throwable exc = null;
 		try {
@@ -900,13 +916,13 @@ public class ExecucioMassivaHelper {
 		}
 		return exc;
 	}
-	
+
 	public static String getExceptionString(Throwable cause, int retalla) {
 		StringWriter out = new StringWriter();
 		cause.printStackTrace(new PrintWriter(out));
 		return Utils.abbreviate(out.toString(), retalla);
 	}
-	
+
 	public static String getExceptionString(
 			ExecucioMassivaContingutEntity emc,
 			Throwable cause) {
@@ -926,9 +942,9 @@ public class ExecucioMassivaHelper {
 		StringWriter out = new StringWriter();
 		cause.printStackTrace(new PrintWriter(out));
 		finalMessage += out.toString();
-		
+
 		return Utils.abbreviate(finalMessage, 2045);
 	}
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(ExecucioMassivaHelper.class);
 }

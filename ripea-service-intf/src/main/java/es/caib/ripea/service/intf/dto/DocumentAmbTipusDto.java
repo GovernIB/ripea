@@ -8,4 +8,5 @@ import lombok.Setter;
 public class DocumentAmbTipusDto {
 	private FileReference fitxer;
 	private Long tipusDocument;
+    private boolean overwrite;
 }
