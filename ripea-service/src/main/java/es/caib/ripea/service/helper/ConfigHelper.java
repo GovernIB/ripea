@@ -14,6 +14,7 @@ import org.springframework.core.env.EnumerablePropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertySource;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
@@ -676,6 +677,20 @@ public class ConfigHelper {
 
     public void deleteConfigEntitat(String codiEntitat) {
         configRepository.deleteByEntitatCodi(codiEntitat);
+    }
+
+    /**
+     * Desa el valor d'una propietat general en una transacció pròpia. Per als valors que actualitza l'aplicació (p.ex.
+     * el darrer element tractat pels processos en segon pla), que s'han de conservar encara que la transacció del
+     * cridant falli.
+     *
+     * @throws IllegalStateException si la propietat no existeix.
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void updateConfigNewTransaction(String key, String value) {
+        ConfigEntity config = configRepository.findById(key)
+                .orElseThrow(() -> new IllegalStateException("No existeix la propietat " + key));
+        config.update(value);
     }
 
     /*

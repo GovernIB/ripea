@@ -1036,8 +1036,15 @@ public class AplicacioServiceImpl implements AplicacioService {
     @Override
     @Transactional(readOnly = true)
     public List<Long> getExpedientsAmbCertificatRemesa() {
+        return getExpedientsAmbCertificatRemesa(null);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Long> getExpedientsAmbCertificatRemesa(Long darrerId) {
         return documentEnviamentInteressatRepository.findIdsAmbCertificatPendentIncorporar(
-                MetaDocumentPerDefecteEnumDto.NOTIB_JUSTIFICANT_RECEPCIO.getCodi() + "_");
+                MetaDocumentPerDefecteEnumDto.NOTIB_JUSTIFICANT_RECEPCIO.getCodi() + "_",
+                darrerId != null ? darrerId : Long.MAX_VALUE);
     }
 
     /**
@@ -1057,7 +1064,8 @@ public class AplicacioServiceImpl implements AplicacioService {
             fixarEntitatElement(enviamentIntEntity.getNotificacio().getExpedient().getEntitat());
             return certificatRemesaHelper.crearDocumentsCertificatNotificacio(enviamentIntEntity);
         } catch (Exception ex) {
-            throw new Exception("Error al afegir els certificats de la enviament " + enviamentDestinatariId + ": " + ex.getMessage());
+            // Es conserva la causa: el procés en segon pla distingeix per ella els errors de disponibilitat de NOTIB i l'Arxiu
+            throw new Exception("Error al afegir els certificats de la enviament " + enviamentDestinatariId + ": " + ex.getMessage(), ex);
         }
     }
 
@@ -1068,8 +1076,15 @@ public class AplicacioServiceImpl implements AplicacioService {
     @Override
     @Transactional(readOnly = true)
     public List<Long> getExpedientsAmbJustificantRegistre() {
+        return getExpedientsAmbJustificantRegistre(null);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Long> getExpedientsAmbJustificantRegistre(Long darrerId) {
         return expedientPeticioRepository.findExpedientsObertsAmbJustificantPendent(
-                MetaDocumentPerDefecteEnumDto.REGISTRE_JUSTIFICANT_ENTRADA.getCodi());
+                MetaDocumentPerDefecteEnumDto.REGISTRE_JUSTIFICANT_ENTRADA.getCodi(),
+                darrerId != null ? darrerId : Long.MAX_VALUE);
     }
 
     /**
@@ -1091,9 +1106,9 @@ public class AplicacioServiceImpl implements AplicacioService {
             return registreJustificantHelper.incorporarJustificantsRegistreExpedient(anotacioRegistreId, peticio);
         } catch (Exception ex) {
         	if (peticio!=null && peticio.getRegistre()!=null) {
-        		throw new Exception("Error al afegir el justificant de registre de l'anotació " + peticio.getRegistre().getIdentificador() + ": " + ex.getMessage());
+        		throw new Exception("Error al afegir el justificant de registre de l'anotació " + peticio.getRegistre().getIdentificador() + ": " + ex.getMessage(), ex);
         	} else {
-        		throw new Exception("Error al afegir el justificant de registre de l'anotació " + anotacioRegistreId + ": " + ex.getMessage());
+        		throw new Exception("Error al afegir el justificant de registre de l'anotació " + anotacioRegistreId + ": " + ex.getMessage(), ex);
         	}
         }
     }

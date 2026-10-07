@@ -54,10 +54,11 @@ public class CertificatRemesaHelper {
 
         byte[] contingutCertificat = documentNotificacioHelper.getCertificacio(interessatEnviament.getId());
         if (contingutCertificat == null || contingutCertificat.length==0) {
-            String missatge = "No s'ha pogut descarregar el certificat de l'enviament " + interessatEnviament.getId()
-                + " (notificació " + interessatEnviament.getNotificacio().getId() + ").";
-            LOGGER.warn(missatge);
-            return missatge;
+            // És un error: no s'ha incorporat cap document i l'enviament continua pendent
+            throw new Exception("NOTIB no ha retornat el contingut del certificat de l'enviament " + interessatEnviament.getId()
+                + " (notificació " + interessatEnviament.getNotificacio().getId()
+                + ", referència " + interessatEnviament.getEnviamentReferencia()
+                + "): no s'ha incorporat cap document a l'expedient " + expedient.getId() + ".");
         }
 
         DocumentDto document = new DocumentDto();
