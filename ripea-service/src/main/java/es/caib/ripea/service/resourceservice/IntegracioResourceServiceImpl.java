@@ -63,7 +63,7 @@ public class IntegracioResourceServiceImpl extends BaseMutableResourceService<In
 
     @Override
     protected <P> Specification<P> toFindProcessedSpecification(String quickFilter, String filter, String[] namedQueries) {
-    	//Substituir entitat.id (que no existeix al IntegracioResourceEntity), per entitatCodi 
+    	//Substituir entitat.id (que no existeix al IntegracioResourceEntity), per entitatCodi
         return super.toFindProcessedSpecification(quickFilter, translateEntitatFilter(filter), namedQueries);
     }
 
@@ -84,15 +84,17 @@ public class IntegracioResourceServiceImpl extends BaseMutableResourceService<In
         matcher.appendTail(sb);
         return sb.toString();
     }
-	
+
 	@Override
 	protected <P> Specification<P> namedQueryToSpecification(String namedQuery) {
-		try {
-			IntegracioCodiEnum codi = IntegracioCodiEnum.valueOf(namedQuery);
-			return (root, query, cb) -> cb.equal(root.get("codi"), codi);
-		} catch (IllegalArgumentException e) {
-			return null;
-		}
+        return (root, query, cb) -> {
+            try {
+                IntegracioCodiEnum codi = IntegracioCodiEnum.valueOf(namedQuery);
+                return cb.equal(root.get("codi"), codi);
+            } catch (IllegalArgumentException e) {
+                return cb.disjunction();
+            }
+        };
 	}
 
     @PostConstruct
@@ -109,7 +111,7 @@ public class IntegracioResourceServiceImpl extends BaseMutableResourceService<In
 				Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {}
 		@Override
 		public IntegracioDto[] exec(String code, IntegracioResourceEntity entity, Serializable params) throws ActionExecutionException {
-			return integracioHelper.findAll().toArray(new IntegracioDto[0]);
+			return integracioHelper.findEstructure().toArray(new IntegracioDto[0]);
 		}
 	}
 

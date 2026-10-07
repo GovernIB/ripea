@@ -92,6 +92,33 @@ public class IntegracioHelper {
 		integracions.add(novaIntegracio(INTCODI_REGISTRE));
 		return integracions;
 	}
+	public List<IntegracioDto> findEstructure() {
+		List<IntegracioDto> integracions = new ArrayList<IntegracioDto>();
+		integracions.add(novaIntegracio("FIRMA", List.of(
+            novaIntegracio(INTCODI_PFIRMA),
+            novaIntegracio(INTCODI_FIRMASIMPLE),
+            novaIntegracio(INTCODI_FIRMASERV),
+            novaIntegracio(INTCODI_CALLBACK),
+            novaIntegracio(INTCODI_VIAFIRMA),
+            novaIntegracio(INTCODI_VALIDASIG),
+            novaIntegracio(INTCODI_FIRMAAGIL)
+        )));
+		integracions.add(novaIntegracio(INTCODI_ARXIU));
+		integracions.add(novaIntegracio(INTCODI_CONCSV));
+		integracions.add(novaIntegracio(INTCODI_GESDOC));
+		integracions.add(novaIntegracio(INTCODI_PINBAL));
+		integracions.add(novaIntegracio(INTCODI_DISTRIBUCIO));
+		integracions.add(novaIntegracio(INTCODI_USUARIS));
+		integracions.add(novaIntegracio(INTCODI_CONVERT));
+		integracions.add(novaIntegracio(INTCODI_UNITATS));
+		integracions.add(novaIntegracio(INTCODI_DADESEXT));
+		integracions.add(novaIntegracio(INTCODI_NOTIFICACIO));
+		integracions.add(novaIntegracio(INTCODI_DIGITALITZACIO));
+		integracions.add(novaIntegracio(INTCODI_PROCEDIMENT));
+		integracions.add(novaIntegracio(INTCODI_COMANDA));
+		integracions.add(novaIntegracio(INTCODI_REGISTRE));
+		return integracions;
+	}
 
 	public List<IntegracioAccioDto> findAccionsByIntegracioCodi(String integracioCodi, IntegracioFiltreDto filtre) {
 		IntegracioCodiEnum codi;
@@ -275,6 +302,14 @@ public class IntegracioHelper {
 		IntegracioDto integracio = new IntegracioDto();
 		integracio.setCodi(codi);
 		integracio.setNom(messageHelper.getMessage("sistema.extern.codi." + codi));
+		return integracio;
+	}
+
+	public IntegracioDto novaIntegracio(String codi, List<IntegracioDto> subConjunt) {
+		IntegracioDto integracio = new IntegracioDto();
+		integracio.setCodi(codi);
+		integracio.setNom(messageHelper.getMessage("sistema.extern.codi." + codi));
+        integracio.setSubConjunt(subConjunt);
 		return integracio;
 	}
 }

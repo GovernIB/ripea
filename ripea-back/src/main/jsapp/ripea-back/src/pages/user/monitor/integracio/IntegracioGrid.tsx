@@ -89,6 +89,8 @@ export const IntegracioGrid = () => {
             <CardPage title={t('navigate.integracio')}>
                 <IntegracioFilter integracions={integracions} onSpringFilterChange={setSpringFilter} />
 
+                {tabElement}
+
                 <Load value={value} noEffect>
                     <StyledMuiGrid
                         resourceName={'integracioResource'}
@@ -101,12 +103,7 @@ export const IntegracioGrid = () => {
                         // onRefresh={refresh}
                         onRowClick={(params: any) => handleOpen(params?.row?.id)}
                         rowAdditionalActions={actions}
-                        toolbarElementsWithPositions={[
-                            {
-                                position: 0,
-                                element: tabElement,
-                            },
-                        ]}
+                        toolbarHide
                         readOnly
                     />
                 </Load>
