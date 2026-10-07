@@ -664,8 +664,8 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_ENVIADES_TOTAL.toString(), "Notificacions enviades totals").descripcio("Notificacions enviades totals a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_PENDENTS.toString(), "Notificacions pendents").descripcio("Notificacions pendents a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_PENDENTS_TOTAL.toString(), "Notificacions pendents totals").descripcio("Notificacions pendents totals a RIPEA").format(Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_REGISTRADES.toString(), "Notificacions registrades").descripcio("Notificacions pendents totals a RIPEA").format(Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_REGISTRADES_TOTAL.toString(), "Notificacions registrades totals").descripcio("Notificacions registrades a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_REGISTRADES.toString(), "Notificacions registrades").descripcio("Notificacions registrades a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_REGISTRADES_TOTAL.toString(), "Notificacions registrades totals").descripcio("Notificacions registrades totals a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_FINALITZADES.toString(), "Notificacions finalitzades").descripcio("Notificacions finalitzades a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_FINALITZADES_TOTAL.toString(), "Notificacions finalitzades totals").descripcio("Notificacions finalitzades totals a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.NOT_PROCESSADES.toString(), "Notificacions processades").descripcio("Notificacions processades a RIPEA").format(Format.LONG));
@@ -677,11 +677,11 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_OK.toString(), "Enviaments PINBAL processats OK").descripcio("Enviaments PINBAL processats OK a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_ERROR.toString(), "Enviaments PINBAL amb error").descripcio("Enviaments PINBAL amb error a RIPEA").format(Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_OK_TOTAL.toString(), "Enviaments PINBAL totals processats OK").descripcio("Enviaments PINBAL totals processats a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_OK_TOTAL.toString(), "Enviaments PINBAL totals processats OK").descripcio("Enviaments PINBAL totals processats OK a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.PIN_ENVIAMENTS_ERROR_TOTAL.toString(), "Enviaments PINBAL totals amb error").descripcio("Enviaments PINBAL totals amb error a RIPEA").format(Format.LONG));
 		
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_AGAFADES.toString(), "Tasques afagades").descripcio("Tasques afagades a RIPEA").format(Format.LONG));
-		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_AGAFADES_TOTAL.toString(), "Tasques afagades totals").descripcio("Tasques afagades totals a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_AGAFADES.toString(), "Tasques agafades").descripcio("Tasques agafades a RIPEA").format(Format.LONG));
+		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_AGAFADES_TOTAL.toString(), "Tasques agafades totals").descripcio("Tasques agafades totals a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_CANCELADES.toString(), "Tasques cancelades").descripcio("Tasques cancelades a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_CANCELADES_TOTAL.toString(), "Tasques cancelades totals").descripcio("Tasques cancelades totals a RIPEA").format(Format.LONG));
 		resultat.add(new IndicadorDesc(ExplotFetsAmbDimensioDto.FetsEnum.TAS_CREADES.toString(), "Tasques creades").descripcio("Tasques creades a RIPEA").format(Format.LONG));
