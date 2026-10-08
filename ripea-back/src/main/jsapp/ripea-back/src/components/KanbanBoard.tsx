@@ -303,7 +303,7 @@ const KanbanBoard = ({ columns: columnDefs, elements, onCreate, handleDragEnd: o
                     anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                     transformOrigin={{ vertical: 'top', horizontal: 'right' }}
                 >
-                    {selectedTask && actionToItem(selectedTask, actions)}
+                    {selectedTask && actionToItem(selectedTask, actions, handleMenuClose)}
                 </Menu>
             )}
         </Box>

@@ -7,6 +7,7 @@ import FormActionDialog from "../../../components/FormActionDialog.tsx";
 import useCreate from "../../interessats/actions/Create.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import {useUserSession} from "../../../components/Session.tsx";
+import {useSession} from "@src/components/SessionStorageContext.tsx";
 
 const values = [
     "SVDCCAACPASWS01",
@@ -37,11 +38,13 @@ const DocPinbalForm = ({carpetaFixada}: {carpetaFixada?: boolean}) => {
     const { value: user } = useUserSession();
 
     const { create, content } = useCreate()
+    const {value: numInteressats, save: setNumInteressats} = useSession(`expedient-${data?.expedient?.id}-numInteressats`)
     const onCreateInteressat = (result?:any)=> {
         formApiRef?.current?.setFieldValue('titular', {
             id: result?.id,
             description: result?.codiNom
         })
+        setNumInteressats(numInteressats + 1)
     }
 
     const titularFilter: string = builder.and(

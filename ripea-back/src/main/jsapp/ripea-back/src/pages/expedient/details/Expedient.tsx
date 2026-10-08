@@ -30,6 +30,7 @@ import {ErrorPage} from "../../../components/ErrorPage.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import { getReadableTextColor } from '@src/components/StyledLabel.tsx';
 import { icons as iconsAppMenu } from '@src/util/icons';
+import {useSession} from "@src/components/SessionStorageContext.tsx";
 
 const border= { border: '1px solid #e3e3e3', borderRadius: '4px' };
 
@@ -511,13 +512,21 @@ const Expedient = () => {
     }, [user?.conf?.informacioExpedientExpandit]);
 
     const [numContingut, setNumContingut] = useState<number>(expedient?.numContingut);
-    const [numInteressats, setNumInteressats] = useState<number>(expedient?.numInteressats);
+    // const [numInteressats, setNumInteressats] = useState<number>(expedient?.numInteressats);
     const [numTasques, setNumTasques] = useState<number>(expedient?.numTasques);
     const [numDades, setNumDades] = useState<number>(expedient?.numDades);
     const [numAnotacions, setNumAnotacions] = useState<number>(expedient?.numAnotacions);
     const [numRemeses, setNumRemeses] = useState<number>(expedient?.numRemeses);
     const [numPublicacions, setNumPublicacions] = useState<number>(expedient?.numPublicacions);
     const [expanded, setExpanded] = useState<boolean>(!!user?.conf?.informacioExpedientExpandit);
+
+    const {value: numInteressats, save: setNumInteressats, remove: removeNumInteressats} = useSession(`expedient-${id}-numInteressats`)
+    useEffect(() => {
+        setNumInteressats(expedient?.numInteressats)
+        return () => {
+            removeNumInteressats()
+        }
+    }, [expedient]);
 
     const handleToggle = () => {
         const nouValor = !expanded;

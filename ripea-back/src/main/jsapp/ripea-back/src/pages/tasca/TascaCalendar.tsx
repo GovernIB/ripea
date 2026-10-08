@@ -128,7 +128,7 @@ export const TascaCalendar = (props:any) => {
             open={Boolean(anchorPosition)}
             onClose={handleMenuClose}
         >
-            {selectedTask && actionToItem(selectedTask, actions)}
+            {selectedTask && actionToItem(selectedTask, actions, handleMenuClose)}
         </Menu>}
     </>
 }

@@ -9,6 +9,7 @@ import useCreate from "../../interessats/actions/Create.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import {InteressatDetail} from "../../interessats/details/InteressatDetail.tsx";
 import Load from "../../../components/Load.tsx";
+import {useSession} from "@src/components/SessionStorageContext.tsx";
 
 const perspectives = ['REPRESENTANT', 'ADRESSA']
 const AdditionalInfo = (props:any) => {
@@ -53,6 +54,7 @@ const NotificarForm = () => {
     const { t } = useTranslation();
     const { data, apiRef: formApiRef } = useFormContext();
     const { create, content } = useCreate()
+    const {value: numInteressats, save: setNumInteressats} = useSession(`expedient-${data?.expedient?.id}-numInteressats`)
     const extension = data?.nom?.split('.').pop();
 
     const onCreateInteressat = (result?:any)=> {
@@ -60,12 +62,13 @@ const NotificarForm = () => {
             id: result?.id,
             description: result?.codiNom
         }])
+        setNumInteressats(numInteressats + 1)
     }
 
 	const grupsFilter: string = builder.and(
 	    builder.eq("expedient.id", data?.expedient?.id)
 	);
-	
+
     const interessatsFilter: string = builder.and(
         builder.eq("expedient.id", data?.expedient?.id),
         builder.eq('esRepresentant', false),
@@ -94,7 +97,7 @@ const NotificarForm = () => {
                 {t('page.document.action.notificar.alert.administracioSir.title')}<b>{t('page.document.action.notificar.alert.administracioSir.warning')}</b>
             </Alert>
         }
-        {data?.administracioSirFormat && 
+        {data?.administracioSirFormat &&
             <Alert severity={'info'} sx={{ mb: 1 }}>
                     <Typography>{t('page.document.action.notificar.alert.format.document',{extension})}</Typography>
                     <Typography>{t('page.document.action.notificar.alert.format.noSir')}</Typography>
@@ -142,7 +145,7 @@ const NotificarForm = () => {
 const Notificar = (props:any) => {
     const { t } = useTranslation();
 
-    return ( 
+    return (
         <FormActionDialog
             resourceName={"documentResource"}
             action={"NOTIFICAR"}

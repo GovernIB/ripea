@@ -5,10 +5,10 @@ import { MuiForm, FormField, useResourceApiService, useBaseAppContext, useMuiCon
 import { formatDate } from '../util/dateUtils';
 import { useUserSession } from '../components/Session';
 import { useTranslation } from 'react-i18next';
-import { useRef } from 'react';
+import {useRef, useState} from 'react';
 
 const Comments = (props: any) => {
-    const { resourceName, id, resourceReference, readOnly, i18nKeys } = props;
+    const { resourceName, id, resourceReference, onRowCountChange, readOnly, i18nKeys } = props;
     const { value: user } = useUserSession();
     const { isReady: apiIsReady, find: apiFind } = useResourceApiService(resourceName);
     const [comments, setComments] = React.useState<any[]>();
@@ -25,6 +25,7 @@ const Comments = (props: any) => {
         })
             .then((result) => {
                 setComments(result.rows);
+                onRowCountChange?.(result.rows?.length);
                 setTimeout(() => {
                     const contentRef = ref.current?.parentElement;
                     if (contentRef) {
@@ -101,6 +102,7 @@ const Comments = (props: any) => {
 
 export const CommentDialog = (props: any) => {
     const { entity, title, resourceName, resourceReference, onClose, iconStyle, i18nKeys = {}, readOnly = false } = props;
+    const [num, setNum] = useState<number>(entity?.numComentaris ?? 0)
     const [dialogShow, dialogComponent] = useMuiContentDialog();
     const { t } = useBaseAppContext();
     const closeButtons = [
@@ -122,6 +124,7 @@ export const CommentDialog = (props: any) => {
                     resourceReference={resourceReference}
                     readOnly={readOnly}
                     i18nKeys={i18nKeys}
+                    onRowCountChange={(num:number) => setNum(num)}
                 />
             </>,
             closeButtons,
@@ -134,7 +137,7 @@ export const CommentDialog = (props: any) => {
     return (
         <>
             <IconButton title={t('page.comment.label')} aria-label="forum" color="inherit" onClick={handleOpen}>
-                <Badge badgeContent={entity?.numComentaris} color="primary" showZero>
+                <Badge badgeContent={num} color="primary" showZero>
                     <Icon sx={iconStyle}>forum</Icon>
                 </Badge>
             </IconButton>

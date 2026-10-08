@@ -6,15 +6,15 @@ import { useTranslation } from 'react-i18next';
 const ExpedientActionButton = (props: any) => {
     const { entity, variant = 'button', iconStyle, iconButtonStyle } = props;
     const { t } = useTranslation();
-    
+
     const refresh = () => {
         window.location.reload();
     };
-    
+
     const { actions, components } = useCommonActions(refresh);
 
     if (variant === 'icon') {
-        return (
+        return (<>
             <MenuActionButton
                 id={'accionsExpedient'}
                 entity={entity}
@@ -27,13 +27,12 @@ const ExpedientActionButton = (props: any) => {
                 }
                 buttonProps={{ sx: { ...iconButtonStyle } }}
                 actions={actions}
-            >
-                {components}
-            </MenuActionButton>
-        );
+            />
+            {components}
+        </>);
     }
 
-    return (
+    return (<>
         <MenuActionButton
             id={'accionsExpedient'}
             entity={entity}
@@ -46,9 +45,8 @@ const ExpedientActionButton = (props: any) => {
                 disableElevation: true,
             }}
             actions={actions}
-        >
-            {components}
-        </MenuActionButton>
-    );
+        />
+        {components}
+    </>);
 };
 export default ExpedientActionButton;
