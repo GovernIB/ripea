@@ -38,7 +38,7 @@ import es.caib.ripea.service.intf.base.model.UnpagedButSorted;
 
 /**
  * Configuració de Spring MVC.
- * 
+ *
  * @author Limit Tecnologies
  */
 @Configuration("webMvcConfig")
@@ -65,10 +65,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	@Autowired private AccesURLsInstruccioInterceptor accesURLsInstruccioInterceptor;
 	@Autowired private AccesFluxosFirmaUsuariInterceptor accesFluxosFirmaUsuariInterceptor;
 	@Autowired private AccesSuperInterceptor accesSuperInterceptor;
+	@Autowired private CurrentUserHandlerInterceptor currentUserHandlerInterceptor;
 
 	@Value("${es.caib.ripea.maxUploadSize:1000000000}")
 	public long MAX_UPLOAD_SIZE;
-	
+
 	public long getMAX_UPLOAD_SIZE() {
 		return MAX_UPLOAD_SIZE;
 	}
@@ -106,7 +107,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		multipartResolver.setMaxUploadSize(MAX_UPLOAD_SIZE);
 		return multipartResolver;
 	}
-	
+
 	@Override
 	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
 		CustomPageableHandlerMethodArgumentResolver resolver = new CustomPageableHandlerMethodArgumentResolver();
@@ -172,6 +173,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		registry.addInterceptor(seguimentEnviamentsUsuariInterceptor).excludePathPatterns(excludedPathPatterns);
 		registry.addInterceptor(avisosInterceptor).excludePathPatterns(excludedPathPatterns);
 		registry.addInterceptor(fluxFirmaInterceptor).excludePathPatterns(excludedPathPatterns);
+		registry.addInterceptor(currentUserHandlerInterceptor).excludePathPatterns(excludedSessionPathPatterns);
 
 		registry.addInterceptor(accesAdminEntitatOAdminOrganORevisorInterceptor).
 				addPathPatterns(
@@ -251,7 +253,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	/**
 	 * Configura el firewall per permetre caràcters codificats com el % ja que aquests s'usen en la codificació
 	 * dels identificadors en els enllaços públics de descàrrega de documents.
-	 * 
+	 *
 	 * @return
 	 */
 	@Bean

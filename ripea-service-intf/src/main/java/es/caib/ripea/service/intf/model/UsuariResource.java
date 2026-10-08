@@ -18,6 +18,7 @@ import org.springframework.data.annotation.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -133,6 +134,7 @@ public class UsuariResource extends BaseResource<String> {
 
     @Transient
     private List<String> rols;
+    @Transient private LocalDateTime darreraConnexio;
 
     public String getCodiAndNom() {
     	return nom + " (" + codi +")";

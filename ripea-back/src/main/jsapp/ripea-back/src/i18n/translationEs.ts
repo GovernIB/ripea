@@ -2425,6 +2425,8 @@ const translationEs = {
         },
         user: {
             options: {
+                lastConnection: "Fecha y hora de la última conexión del usuario",
+                darreraConnexio: "Última conexión:",
                 perfil: "Mi perfil",
                 manual: "Manual de Usuario",
                 manualAdmin: "Manual de los Administradores",

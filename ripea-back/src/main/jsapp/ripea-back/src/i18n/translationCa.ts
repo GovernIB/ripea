@@ -2425,6 +2425,8 @@ const translationCa = {
         },
         user: {
             options: {
+                lastConnection: "Data i hora de la darrera connexió de l'usuari",
+                darreraConnexio: "Darrera connexió:",
                 perfil: "El meu perfil",
                 manual: "Manual d'usuari",
                 manualAdmin: "Manual dels administradors",

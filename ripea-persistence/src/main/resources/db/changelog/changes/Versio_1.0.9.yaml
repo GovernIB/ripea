@@ -15,3 +15,19 @@ databaseChangeLog:
             splitStatements: true
             stripComments: true
             relativeToChangelogFile: true
+  - changeSet:
+      id: RIPEA_1.0.9_USUARI_DARRERA_CONNEXIO_1885
+      author: limit
+      changes:
+        - sqlFile:
+            dbms: oracle
+            path: ../scripts/oracle/1.0.9/Versio_1.0.9_DDL_1885.sql
+            splitStatements: true
+            stripComments: true
+            relativeToChangelogFile: true
+        - sqlFile:
+            dbms: postgresql
+            path: ../scripts/postgres/1.0.9/Versio_1.0.9_DDL_1885.sql
+            splitStatements: true
+            stripComments: true
+            relativeToChangelogFile: true

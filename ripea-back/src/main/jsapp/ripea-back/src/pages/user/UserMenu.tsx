@@ -1,4 +1,4 @@
-import {FormControl, Icon, ListItemIcon, MenuItem, Select} from "@mui/material";
+import {FormControl, Icon, ListItemIcon, MenuItem, Select, Typography} from "@mui/material";
 import React, {useEffect, useMemo, useState} from "react";
 import {useTranslation} from "react-i18next";
 import {useUserSession} from "../../components/Session.tsx";
@@ -12,6 +12,7 @@ import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Load from "../../components/Load.tsx";
 import {useToProgramaAntic} from "./UserHeadToolbar.tsx";
 import {useNavigate} from "react-router-dom";
+import {formatDate} from "@src/util/dateUtils.ts";
 
 const MenuSelect = (props:any) => {
     const {icon, value, onChange, children, testId, ...other} = props
@@ -105,6 +106,35 @@ export const UserMenu = () => {
     }, [rol]);
 
     return <>
+        {user?.conf?.darreraConnexio && <>
+            <MenuItem
+                title={t('page.user.options.lastConnection')}
+                disableRipple
+                sx={{
+                    '&.MuiButtonBase-root:hover': {
+                        bgcolor: 'transparent',
+                        cursor: 'default',
+                    },
+                    pt: 0,
+                    pb: 0,
+                }}
+                key="darreraConnexio"
+            >
+                <ListItemIcon>
+                    <Icon>schedule</Icon>
+                </ListItemIcon>
+                <ListItemText>
+                    <Typography color="textSecondary" variant={'body2'} sx={{ fontSize: 12, mr: "1ch" }}>
+                        {t('page.user.options.darreraConnexio')}
+                    </Typography>
+                    <Typography color="textSecondary" variant={'body2'}>
+                        {formatDate(user?.conf?.darreraConnexio, 'DD/MM/YY HH:mm')}
+                    </Typography>
+                </ListItemText>
+            </MenuItem>
+            <Divider key="darreraConnexioDivider"></Divider>
+        </>}
+
         <MenuItem onClick={handleOpen}>
             <ListItemIcon><Icon fontSize={"small"}>person</Icon></ListItemIcon>
             <ListItemText>{t('page.user.options.perfil')}</ListItemText>

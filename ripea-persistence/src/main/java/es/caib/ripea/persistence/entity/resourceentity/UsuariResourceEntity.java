@@ -1,5 +1,6 @@
 package es.caib.ripea.persistence.entity.resourceentity;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -21,7 +22,6 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import es.caib.ripea.persistence.base.entity.ResourceEntity;
-import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.model.UsuariResource;
@@ -149,6 +149,11 @@ public class UsuariResourceEntity implements ResourceEntity<UsuariResource, Stri
             inverseForeignKey = @ForeignKey(name = BaseConfig.DB_PREFIX + "carpeta_rel_usu_fk")
     )
     protected List<CarpetaResourceEntity> carpetes = new ArrayList<>();
+
+    @Column(name = "darrer_periode")
+    private LocalDateTime darrerPeriode;
+    @Column(name = "darrera_activitat")
+    private LocalDateTime darreraActivitat;
 
 	@Override
 	public String getId() {
