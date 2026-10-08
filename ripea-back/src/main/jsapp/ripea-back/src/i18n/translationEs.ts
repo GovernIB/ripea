@@ -177,6 +177,7 @@ const translationEs = {
 		},
     },
     navigate: {
+        sitemap: "Mapa del sitio web",
         accessibilitat: "Accesibilidad",
         expedient: "Expedientes",
         expedientPeticio: "Anotaciones de registro",
@@ -2541,6 +2542,10 @@ const translationEs = {
                 noFinalitzades: "Existen notificaciones con un estado que no es final",
                 interessatObligatori: "Falta informar un interesado",
             },
+        },
+        sitemap: {
+            title: "Mapa del sitio web",
+            subtitle: "Acceso directo a todas las secciones principales de la aplicación.",
         },
         accesibilitat: {
             title: "Declaración de Accesibilidad",
