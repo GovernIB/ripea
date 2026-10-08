@@ -35,7 +35,7 @@ import lombok.experimental.FieldNameConstants;
 @NoArgsConstructor
 @MetaExpedientValid
 @ResourceConfig(
-		quickFilterFields = { "codi", "nom" },
+		quickFilterFields = { "codi", "nom", "classificacio" },
 		descriptionField = "nomClassificacio",
         artifacts = {
 				@ResourceArtifact(

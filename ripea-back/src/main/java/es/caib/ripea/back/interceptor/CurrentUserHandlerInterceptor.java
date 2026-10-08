@@ -1,6 +1,6 @@
 package es.caib.ripea.back.interceptor;
 
-import es.caib.ripea.service.helper.UsuarisRefreshHelper;
+import es.caib.ripea.service.intf.service.AplicacioService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 @RequiredArgsConstructor
 public class CurrentUserHandlerInterceptor implements AsyncHandlerInterceptor {
 
-	private final UsuarisRefreshHelper usuarisRefreshHelper;
+	private final AplicacioService aplicacioService;
 
 	@Override
 	public boolean preHandle(
@@ -27,7 +27,7 @@ public class CurrentUserHandlerInterceptor implements AsyncHandlerInterceptor {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (authentication != null && authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken)) {
             try {
-                usuarisRefreshHelper.refreshCurrentUser();
+                aplicacioService.actualitzarDarreraActivitatUsuariActual();
             } catch (Exception e) {
                 log.error("Error refreshing current user", e);
             }

@@ -51,6 +51,13 @@ public interface AplicacioService {
 	public UsuariDto getUsuariActual();
 
 	/**
+	 * Registra l'activitat de l'usuari actual (darrera activitat i darrer període de connexió).
+	 * Com a màxim actualitza la BD un cop cada 5 minuts per usuari.
+	 */
+	@PreAuthorize("isAuthenticated()")
+	public void actualitzarDarreraActivitatUsuariActual();
+
+	/**
 	 * Modifica la configuració de l'usuari actual
 	 *
 	 * @return L'usuari actual.

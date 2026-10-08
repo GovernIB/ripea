@@ -90,6 +90,7 @@ import es.caib.ripea.service.helper.RegistreJustificantHelper;
 import es.caib.ripea.service.helper.RolHelper;
 import es.caib.ripea.service.helper.TipusDocumentalHelper;
 import es.caib.ripea.service.helper.UsuariHelper;
+import es.caib.ripea.service.helper.UsuarisRefreshHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.DiagnosticFiltreDto;
 import es.caib.ripea.service.intf.dto.EntitatDto;
@@ -181,6 +182,7 @@ public class AplicacioServiceImpl implements AplicacioService {
     @Autowired private CertificatRemesaHelper certificatRemesaHelper;
     @Autowired private DocumentNotificacioRepository documentNotificacioRepository;
     @Autowired private RegistreJustificantHelper registreJustificantHelper;
+    @Autowired private UsuarisRefreshHelper usuarisRefreshHelper;
 
 	@Override
 	public void actualitzarEntitatThreadLocal(EntitatDto entitat) {
@@ -320,6 +322,14 @@ public class AplicacioServiceImpl implements AplicacioService {
 		logger.debug("Obtenint usuari actual");
 		return toUsuariDtoAmbRols(
 				usuariRepository.getOne(auth.getName()));
+	}
+
+	// Sense @Transactional: es crida a cada petició i, mentre no passen els 5 minuts del llindar, el helper
+	// retorna sense tocar la BD. Així no s'obre cap transacció (ni s'agafa connexió del pool) innecessàriament;
+	// el save del repositori ja és transaccional.
+	@Override
+	public void actualitzarDarreraActivitatUsuariActual() {
+		usuarisRefreshHelper.refreshCurrentUser();
 	}
 
 	@Transactional

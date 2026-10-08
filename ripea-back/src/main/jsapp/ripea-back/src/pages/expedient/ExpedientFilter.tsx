@@ -10,8 +10,10 @@ const ExpedientFilterForm = () => {
     const {data} = useFormContext()
     const { value: user, rol } = useUserSession();
 
-    const filterMetaExpedient = useMemo(() =>
-        builder.and(builder.eq('organGestor.id', data?.organGestor?.id)),
+    // Mateixos procediments que el selector JSP: actius i revisats amb permís de lectura;
+    // amb òrgan seleccionat, els comuns i els de l'òrgan (es resol al backend)
+    const namedQueriesMetaExpedient = useMemo(() =>
+        [`EXPEDIENT_FILTRE#${data?.organGestor?.id ?? ''}`],
     [data?.organGestor?.id]);
 
     const requestParamsEstat = useMemo(() =>
@@ -28,7 +30,7 @@ const ExpedientFilterForm = () => {
         {(!data?.advanced) && <>
             <GridFormField size={{xs: 12, sm: 6, md: 2}} name="numero"/>
             <GridFormField size={{xs: 12, sm: 6, md: 2}} name="nom"/>
-            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="metaExpedient" filter={filterMetaExpedient}/>
+            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="metaExpedient" namedQueries={namedQueriesMetaExpedient}/>
             <GridFormField size={{xs: 12, sm: 6, md: 2}} name="estatCustom" requestParams={requestParamsEstat} />
             <GridFormField size={{xs: 12, sm: 6, md: 2}} name="dataCreacioInici"/>
         </>}
@@ -38,7 +40,7 @@ const ExpedientFilterForm = () => {
             <GridFormField size={{xs: 12, sm: 6, md: 3}} name="estatCustom" requestParams={requestParamsEstat} />
             <GridFormField size={{xs: 12, sm: 6, md: 3}} name="interessat"/>
             <GridFormField size={{xs: 12, sm: 6, md: 3}} name="organGestor" />
-            <GridFormField size={{xs: 12, sm: 6, md: 3}} name="metaExpedient" filter={filterMetaExpedient}/>
+            <GridFormField size={{xs: 12, sm: 6, md: 3}} name="metaExpedient" namedQueries={namedQueriesMetaExpedient}/>
             <GridFormField size={{xs: 12, sm: 6, md: 3}} name="dataCreacioInici"/>
             <GridFormField size={{xs: 12, sm: 6, md: 3}} name="dataCreacioFinal"/>
 

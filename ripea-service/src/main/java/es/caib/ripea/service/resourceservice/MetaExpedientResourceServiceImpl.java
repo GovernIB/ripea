@@ -223,6 +223,19 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
             		null, //organId
             		false); //comú
             procsPermesosIds = metaExpedientEntityToListLong(metaExpPermesos);
+        } else if (mapaNamedQueries.size()>0 && mapaNamedQueries.containsKey("EXPEDIENT_FILTRE")) {
+        	//Selector de procediments del cercador d'expedients: mateixa consulta que el JSP (MetaExpedientController.findPerLectura).
+        	//Procediments actius i revisats amb permís de lectura. Amb òrgan seleccionat (EXPEDIENT_FILTRE#organId),
+        	//els procediments comuns i els de l'òrgan.
+        	String organIdParam = mapaNamedQueries.get("EXPEDIENT_FILTRE");
+        	Long organId = (organIdParam != null && !organIdParam.isEmpty()) ? Long.valueOf(organIdParam) : null;
+            metaExpPermesos = metaExpedientHelper.findActiusPerLectura(
+            		entitat.getId(),
+            		null, //filtreNomOrCodiSia
+            		rolActual,
+            		organId != null, //comú
+            		organId);
+            procsPermesosIds = metaExpedientEntityToListLong(metaExpPermesos);
         } else if (mapaNamedQueries.size()>0 && mapaNamedQueries.containsKey("CONSULTA_REVISIO_ESTAT")) {
         	//Volem replicar metaExpedientServiceImpl.findByEntitat
         	//Nom comprova cap permis, ja que es un manteniment per admins

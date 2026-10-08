@@ -377,15 +377,12 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			boolean comu,
 			Long organId) {
 
-		List<MetaExpedientEntity> metaExpedientsEnt = metaExpedientHelper.findAmbPermis(
+		List<MetaExpedientEntity> metaExpedientsEnt = metaExpedientHelper.findActiusPerLectura(
 				entitatId,
-				ExtendedPermission.READ,
-				true,
 				filtreNomOrCodiSia,
-				"IPA_ADMIN".equals(rolActual),
-				"IPA_ORGAN_ADMIN".equals(rolActual),
-				organId,
-				comu);
+				rolActual,
+				comu,
+				organId);
 
 		long t0 = System.currentTimeMillis();
 		if (cacheHelper.mostrarLogsRendiment())
@@ -400,6 +397,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedientDto.setId(metaExpedientEntity.getId());
 				metaExpedientDto.setNom(metaExpedientEntity.getNom());
 				metaExpedientDto.setClassificacio(metaExpedientEntity.getClassificacio());
+				metaExpedientDto.setTipusProcedimentServei(metaExpedientEntity.getTipusProcedimentServei());
 				metaExpedientDto.setProcedimentComu(metaExpedientEntity.getOrganGestor() == null);
 				metaExpedientsDto.add(metaExpedientDto);
 

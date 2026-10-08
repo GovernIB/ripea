@@ -439,6 +439,30 @@ public class MetaExpedientHelper {
 		return metaExpedients;
 	}
 
+	/**
+	 * Procediments actius (i revisats, si la revisió està activa) amb permís de lectura, pels selectors de procediment.
+	 * Font única del selector del cercador d'expedients de JSP (MetaExpedientService.findActius) i de REACT
+	 * (named query EXPEDIENT_FILTRE de MetaExpedientResourceServiceImpl).
+	 * L'administrador de lectura veu els mateixos procediments que l'administrador d'entitat.
+	 * Amb comu=true i organId, només retorna els procediments comuns i els de l'òrgan indicat.
+	 */
+	public List<MetaExpedientEntity> findActiusPerLectura(
+			Long entitatId,
+			String filtreNomOrCodiSia,
+			String rolActual,
+			boolean comu,
+			Long organId) {
+		return findAmbPermis(
+				entitatId,
+				ExtendedPermission.READ,
+				true,
+				filtreNomOrCodiSia,
+				"IPA_ADMIN".equals(rolActual) || "IPA_ADMIN_LECTURA".equals(rolActual),
+				"IPA_ORGAN_ADMIN".equals(rolActual),
+				organId,
+				comu);
+	}
+
 	public List<MetaExpedientEntity> findPermesosAccioMassiva(Long entitatId, String rolActual) {
 		return findAmbPermis(
 				entitatId,
