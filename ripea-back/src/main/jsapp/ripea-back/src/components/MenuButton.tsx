@@ -1,7 +1,8 @@
-import React, {ReactElement} from "react";
+import React, {ReactElement, useRef} from "react";
 import {Box, Button, Icon, Menu, MenuItem} from "@mui/material";
 
 type MenuButtonProps = {
+    apiRef?: any,
     id: string;
     hidden?: boolean;
     children?: any;
@@ -15,7 +16,9 @@ type MenuButtonProps = {
 }
 
 const MenuButton = (props:MenuButtonProps) => {
+    const defApiRef = useRef<any>({})
     const {
+        apiRef = defApiRef,
         id,
         hidden,
         children,
@@ -35,6 +38,11 @@ const MenuButton = (props:MenuButtonProps) => {
     const handleClose = () => {
         setAnchorEl(null);
     };
+
+    apiRef.current = {
+        handleOpen: handleClick,
+        handleClose,
+    }
 
     if (hidden){
         return <></>
@@ -88,32 +96,39 @@ type MenuActionButtonProps = MenuButtonProps & {
     actions: any[];
     entity?: any;
 }
-export const actionToItem = (entity:any, actions:any[]) => {
+export const actionToItem = (entity:any, actions:any[], handleClose?: () => void) => {
     return actions.map((action:any, index:number) =>
             !(typeof action.hidden === 'function' ? action.hidden(entity) : action.hidden)
             && (!action?.linkTo && !action?.clickShowUpdateDialog)
             && <div key={`action-${index}`} title={ typeof action.title == 'function' ?action.title?.(entity) :action.title}>
-                <MenuItem onClick={()=>
-                    entity?.id
-                        ? action?.onClick?.(entity?.id, entity)
-                        : action?.onClick?.(entity)
-                } disabled={typeof action?.disabled === 'function' ? action?.disabled(entity) : action?.disabled}>
+                <MenuItem onClick={() => {
+                    if (entity?.id != null) {
+                        action?.onClick?.(entity?.id, entity)
+                    } else {
+                        action?.onClick?.(entity)
+                    }
+                    handleClose?.()
+                }} disabled={typeof action?.disabled === 'function' ? action?.disabled(entity) : action?.disabled}>
                     {action.icon && <Icon>{action.icon}</Icon>}{action.label}
                 </MenuItem>
             </div>
     )
 }
 export const MenuActionButton = (props:MenuActionButtonProps) => {
+    const defApiRef = useRef<any>({})
     const {
+        apiRef = defApiRef,
         entity,
         actions,
-        children,
         ...other
     } = props;
 
-    return <MenuButton {...other}>
-        {actionToItem(entity, actions)}
-        {children}
+    const handleClose = () => {
+        apiRef.current?.handleClose();
+    }
+
+    return <MenuButton apiRef={apiRef} {...other}>
+        {actionToItem(entity, actions, handleClose)}
     </MenuButton>
 }
 export default MenuButton;
