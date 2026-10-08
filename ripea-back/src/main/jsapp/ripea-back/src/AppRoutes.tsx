@@ -46,6 +46,7 @@ import {Propietats, PropietatsByEntitat} from "./pages/user/propietats/Propietat
 import {ExcepcioGrid} from "./pages/user/monitor/ExcepcioGrid.tsx";
 import {IntegracioGrid} from "./pages/user/monitor/integracio/IntegracioGrid.tsx";
 import Accesibilitat from "./pages/Accesibilitat.tsx";
+import Sitemap from "./pages/Sitemap.tsx";
 import UsuariGrid from "./pages/usuari/UsuariGrid.tsx";
 import Load from "./components/Load.tsx";
 
@@ -203,6 +204,7 @@ const AppRoutes: React.FC = () => {
             </Route>
         </Route>
 
+        <Route path="sitemap" element={<Sitemap />} />
         <Route path="accessibilitat" element={<Accesibilitat />} />
         <Route path="*" element={<NotFoundPage />} />
     </Routes>;

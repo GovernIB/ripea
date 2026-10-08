@@ -177,6 +177,7 @@ const translationCa = {
 		},
     },
     navigate: {
+        sitemap: "Mapa del lloc web",
         accessibilitat: "Accessibilitat",
         expedient: "Expedients",
         expedientPeticio: "Anotacions de registre",
@@ -2426,6 +2427,8 @@ const translationCa = {
         },
         user: {
             options: {
+                lastConnection: "Data i hora de la darrera connexió de l'usuari",
+                darreraConnexio: "Darrera connexió:",
                 perfil: "El meu perfil",
                 manual: "Manual d'usuari",
                 manualAdmin: "Manual dels administradors",
@@ -2540,6 +2543,10 @@ const translationCa = {
                 noFinalitzades: "Hi ha notificacions amb un estat que no és final",
                 interessatObligatori: "Falta informar un interessat",
             },
+        },
+        sitemap: {
+            title: "Mapa del lloc web",
+            subtitle: "Accés directe a totes les seccions principals de l’aplicació.",
         },
         accesibilitat: {
             title: "Declaració d'Accessibilitat",

@@ -90,14 +90,14 @@ public class UsuariResourceServiceImpl extends BaseMutableResourceService<Usuari
     	Filter filtreNom1 = FilterBuilder.not(FilterBuilder.like(UsuariResource.Fields.codi, "%SYSTEM%"));
     	Filter filtreNom2 = FilterBuilder.not(FilterBuilder.like(UsuariResource.Fields.codi, "$%"));
     	Filter filtreCodis = null;
-    	
+
     	Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
     	if (mapaNamedQueries.size()>0) {
     		String procedimentPermisQueryKey = "AMB_PERMIS_SOBRE_PROCEDIMENT";
-    		
+
 	    	if (mapaNamedQueries.containsKey(procedimentPermisQueryKey)) {
 	    		String procedimentId = mapaNamedQueries.get(procedimentPermisQueryKey);
-	    		
+
 	    		List<String> codisPermisos = metaExpedientHelper.permisFind(Long.valueOf(procedimentId)).stream()
 	    		        .map(PermisDto::getPrincipalNom)
 	    		        .collect(Collectors.toList());
@@ -109,18 +109,18 @@ public class UsuariResourceServiceImpl extends BaseMutableResourceService<Usuari
 	    		    );
 	    		}
 	    	}
-    	
+
     	}
-    	
+
     	Filter filtreResultat = FilterBuilder.and(
-    			filtreBase, 
-    			filtreNom1, 
+    			filtreBase,
+    			filtreNom1,
     			filtreNom2,
     			filtreCodis);
-    	
+
     	return filtreResultat.generate();
     }
-    
+
     @Override
 	public Page<UsuariResource> findPage(
 			String quickFilter,
@@ -128,9 +128,9 @@ public class UsuariResourceServiceImpl extends BaseMutableResourceService<Usuari
 			String[] namedQueries,
 			String[] perspectives,
 			Pageable pageable) {
-		
+
     	Page<UsuariResource> usuarisBBDD = super.findPage(quickFilter, filter, namedQueries, perspectives, pageable);
-    			
+
     	if (usuarisBBDD==null || usuarisBBDD.isEmpty()) {
     		Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
     		if (mapaNamedQueries.size()>0 && mapaNamedQueries.containsKey("ADD_PLUGIN_USERS") && quickFilter!=null) {
@@ -149,7 +149,7 @@ public class UsuariResourceServiceImpl extends BaseMutableResourceService<Usuari
     			}
     		}
     	}
-    	
+
     	return usuarisBBDD;
 	}
 
@@ -348,7 +348,7 @@ public class UsuariResourceServiceImpl extends BaseMutableResourceService<Usuari
 			return resultat;
 		}
     }
-    
+
     @Transactional(readOnly = true)
     @Override
     public UserPermissionInfo getCurrentUserPermissionInfo() {
@@ -363,10 +363,12 @@ public class UsuariResourceServiceImpl extends BaseMutableResourceService<Usuari
         boolean superusuari = RolHelper.doesCurrentUserHasRol(BaseConfig.ROLE_SUPER);
         Map<Long, PermisosEntitat> permisosEntitat = usuariResourceHelper.getPermisosEntitat(usuariCodi);
 
+        UsuariResource resource = objectMappingHelper.newInstanceMap(usuari, UsuariResource.class);
+        resource.setDarreraConnexio(usuari.getDarrerPeriode());
         return UserPermissionInfo.builder()
                 .codi(usuariCodi)
                 .nom(usuariNom)
-                .conf(objectMappingHelper.newInstanceMap(usuari, UsuariResource.class))
+                .conf(resource)
                 .superusuari(superusuari)
                 .permisosEntitat(permisosEntitat)
                 .build();

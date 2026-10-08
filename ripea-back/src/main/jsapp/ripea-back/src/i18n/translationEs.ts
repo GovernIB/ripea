@@ -177,6 +177,7 @@ const translationEs = {
 		},
     },
     navigate: {
+        sitemap: "Mapa del sitio web",
         accessibilitat: "Accesibilidad",
         expedient: "Expedientes",
         expedientPeticio: "Anotaciones de registro",
@@ -2426,6 +2427,8 @@ const translationEs = {
         },
         user: {
             options: {
+                lastConnection: "Fecha y hora de la última conexión del usuario",
+                darreraConnexio: "Última conexión:",
                 perfil: "Mi perfil",
                 manual: "Manual de Usuario",
                 manualAdmin: "Manual de los Administradores",
@@ -2540,6 +2543,10 @@ const translationEs = {
                 noFinalitzades: "Existen notificaciones con un estado que no es final",
                 interessatObligatori: "Falta informar un interesado",
             },
+        },
+        sitemap: {
+            title: "Mapa del sitio web",
+            subtitle: "Acceso directo a todas las secciones principales de la aplicación.",
         },
         accesibilitat: {
             title: "Declaración de Accesibilidad",
