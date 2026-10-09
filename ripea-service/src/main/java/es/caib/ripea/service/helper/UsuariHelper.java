@@ -13,11 +13,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.entity.ViaFirmaUsuariEntity;
 import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
+import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.PortafirmesCarrecDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
@@ -27,7 +30,10 @@ import es.caib.ripea.service.intf.utils.Utils;
 
 @Component
 public class UsuariHelper {
- 
+
+	/** Usuari amb què s'executen els processos en segon pla (SchedulingConfig). */
+	public static final String CODI_USUARI_SISTEMA = "SYSTEM_RIPEA";
+
 	@Autowired private UsuariRepository usuariRepository;
 	@Autowired private CacheHelper cacheHelper;
 	@Autowired private ConfigHelper configHelper;
@@ -146,6 +152,33 @@ public class UsuariHelper {
 		return usuari;
 	}
 	
+	/**
+	 * Crea a la BD l'usuari de sistema amb què s'executen els processos en segon pla, si encara no hi és. Les entitats
+	 * auditables desen el codi de l'usuari autenticat a CREATEDBY_CODI i LASTMODIFIEDBY_CODI, que tenen FK a IPA_USUARI:
+	 * sense aquest usuari, qualsevol escriptura d'aquests processos falla. Fa el mateix que el pas 2 de l'script
+	 * d'inicialització (scripts/bbdd/1.0/oracle/ripea_08_init.sql), que s'havia d'executar a mà. No es consulta el
+	 * plugin d'usuaris, on aquest usuari no existeix. Sense NIF (la columna l'admet nul): un NIF fictici podria
+	 * coincidir amb el d'un altre usuari de proves i les cerques d'usuaris per NIF el trobarien.
+	 *
+	 * @return true si s'ha creat, false si ja existia.
+	 */
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public boolean crearUsuariSistemaSiNoExisteix() {
+		if (usuariRepository.existsById(CODI_USUARI_SISTEMA)) {
+			return false;
+		}
+		String idioma = getIdiomaPerDefecte();
+		usuariRepository.saveAndFlush(
+				UsuariEntity.getBuilder(
+						CODI_USUARI_SISTEMA,
+						"Usuari de Sistema RIPEA",
+						null,
+						null,
+						idioma != null ? idioma : BaseConfig.DEFAULT_LOCALE).build());
+		logger.info("Creat a la base de dades l'usuari de sistema " + CODI_USUARI_SISTEMA);
+		return true;
+	}
+
 	/**
 	 * A aquest mètode sempre arriben NIFs, que son els responsables de PF.
 	 * Que es guarden a la taula IPA_METADOCUMENT.PORTAFIRMES_RESPONS separats per comes.

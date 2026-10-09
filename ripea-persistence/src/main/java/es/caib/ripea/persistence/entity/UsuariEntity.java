@@ -31,7 +31,7 @@ public class UsuariEntity implements Serializable {
 	private String codi;
 	@Column(name = "nom", length = 200)
 	private String nom;
-	@Column(name = "nif", length = 9, nullable = false)
+	@Column(name = "nif", length = 9)
 	private String nif;
 	@Column(name = "email", length = 200)
 	private String email;
