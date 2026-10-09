@@ -6,14 +6,22 @@ import Iframe from "../../../components/Iframe.tsx";
 import {Firmes} from "../details/DocumentDetail.tsx";
 import {useToProgramaAntic} from "../../user/UserHeadToolbar.tsx";
 import {useActions} from "../details/ContingutActions.tsx";
+import {defaultLayoutPlugin} from "@react-pdf-viewer/default-layout";
 
 const Visualitzar = (props: any) => {
-    const {entity} = props;
+    const {entity, textCerca} = props;
     const { getUrl } = useToProgramaAntic();
+    const layoutPluginInstance = defaultLayoutPlugin();
+    const ressaltarProps = textCerca
+        ? {
+            plugins: [layoutPluginInstance],
+            onDocumentLoad: () => layoutPluginInstance.toolbarPluginInstance.searchPluginInstance.highlight(textCerca),
+        }
+        : {};
 
     return <Load value={entity}>
         <Firmes entity={entity}/>
-        <Iframe isPDF src={getUrl(`contingut/document/${entity?.id}/getImprimibleOrOriginal`)}/>
+        <Iframe isPDF withCredentials src={getUrl(`contingut/document/${entity?.id}/getImprimibleOrOriginal`)} {...ressaltarProps}/>
     </Load>
 }
 
@@ -31,8 +39,10 @@ const useVisualitzar = () => {
 
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
+    const [textCerca, setTextCerca] = useState<string>();
 
     const handleOpen = (id: any) => {
+        setTextCerca(undefined);
         if (apiIsReady && id) {
             apiGetOne(id, {perspectives})
                 .then((app) => setEntity(app))
@@ -44,9 +54,15 @@ const useVisualitzar = () => {
         setOpen(true);
     }
 
+    const handleOpenAmbCerca = (id: any, text?: string) => {
+        handleOpen(id);
+        setTextCerca(text);
+    }
+
     const handleClose = (reason?: string) => {
         if (reason !== 'backdropClick') {
             setEntity(undefined);
+            setTextCerca(undefined);
             setOpen(false);
         }
     };
@@ -86,12 +102,13 @@ const useVisualitzar = () => {
                 handleClose();
             }}
         >
-            <Visualitzar entity={entity}/>
+            <Visualitzar entity={entity} textCerca={textCerca}/>
         </MuiDialog>
 
     return {
         apiIsReady,
         handleOpen,
+        handleOpenAmbCerca,
         handleClose,
         dialog,
         isValid: (row:any) => ['pdf', 'odt', 'docx'].includes(row?.fitxerExtension)

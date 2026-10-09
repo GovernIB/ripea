@@ -3,6 +3,7 @@ package es.caib.ripea.service.config;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.IncorporacioDocumentsSegonPlaHelper;
 import es.caib.ripea.service.helper.IncorporacioDocumentsSegonPlaHelper.ProcessadorElement;
+import es.caib.ripea.service.helper.UsuariHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.ExecucioMassivaService;
@@ -54,6 +55,10 @@ public class SchedulingConfig implements SchedulingConfigurer {
     @Autowired private es.caib.ripea.service.helper.ExcepcioLogHelper excepcioLogHelper;
     @Autowired private es.caib.ripea.service.helper.IntegracioHelper integracioHelper;
     @Autowired private IncorporacioDocumentsSegonPlaHelper incorporacioDocumentsSegonPlaHelper;
+    @Autowired private UsuariHelper usuariHelper;
+
+    /** Si ja s'ha comprovat en aquesta arrencada que l'usuari de sistema existeix a la BD. */
+    private volatile boolean usuariSistemaComprovat = false;
 
     private Boolean[] primeraVez = {
             Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE
@@ -162,12 +167,31 @@ public class SchedulingConfig implements SchedulingConfigurer {
     }
 
     private void createAuthenticationContext() {
+    	comprovarUsuariSistema();
     	if(SecurityContextHolder.getContext().getAuthentication()==null) {
 			// Crear un usuario autenticado simulado
-	        User user = new User("SYSTEM_RIPEA", "", Collections.singletonList(new SimpleGrantedAuthority("IPA_ADMIN")));
+	        User user = new User(UsuariHelper.CODI_USUARI_SISTEMA, "", Collections.singletonList(new SimpleGrantedAuthority("IPA_ADMIN")));
 	        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
 	        SecurityContextHolder.getContext().setAuthentication(authentication);
     	}
+    }
+
+    /**
+     * Crea l'usuari de sistema a la BD si no hi és (les escriptures dels processos el necessiten per la FK d'auditoria).
+     * Només es fa un cop per arrencada. Si falla, p.ex. perquè una altra tasca l'ha creat alhora, es torna a comprovar
+     * a la tasca següent, que ja el trobarà.
+     */
+    private void comprovarUsuariSistema() {
+        if (usuariSistemaComprovat) {
+            return;
+        }
+        try {
+            usuariHelper.crearUsuariSistemaSiNoExisteix();
+            usuariSistemaComprovat = true;
+        } catch (Exception ex) {
+            log.warn("No s'ha pogut comprovar o crear l'usuari de sistema " + UsuariHelper.CODI_USUARI_SISTEMA
+                    + ": es tornarà a intentar a la tasca següent. " + ex.getMessage());
+        }
     }
     
     @Override

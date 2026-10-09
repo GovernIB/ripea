@@ -18,9 +18,13 @@
 	#grid-documents .caption .dropdown-menu { text-align: left; }
 	#grid-documents .caption .dropdown-menu li { width: 100%; margin: 0; padding: 0; }
 	#contingut-botons { margin-bottom: .8em; }
-	@media (min-width: 992px) {
-		#cercaDocumentsModal .modal-dialog { width: 1100px; }
-	}
+	#cercaDocuments { float: left; display: inline-block; margin-left: 4px; text-align: left; }
+	#cercaDocuments .input-group { width: 380px; }
+	#cercaDocumentsAjuda { cursor: help; }
+	#cercaDocumentsMissatge { display: inline-block; margin: 7px 0 0 8px; }
+	#cercaDocumentsCarregant { padding: 2em 0; }
+	.cerca-sense-resultats { display: none !important; }
+	.cerca-ocult { display: none !important; }
 	.drag_activated { border: 4px dashed #ffd351; height: 200px; width: 100%; background-color: #f5f5f5; display: flex; justify-content: center; align-items: center; flex-direction: column; mask-image: linear-gradient(to top, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0)); -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0)); }
 	.ordre-col { cursor: move; vertical-align: middle !important; }
 	.popover { max-width: none; z-index: 100; cursor: default; width: 500px; }
@@ -996,6 +1000,9 @@
 		}
 		
 		var urlDescarrega = "<c:url value="/contingut/document/"/>" + documentId + "/getPDF";
+		if (typeof cercaDocumentsFiltre !== 'undefined' && cercaDocumentsFiltre && cercaDocumentsFiltre.documents.has(String(documentId))) {
+			urlDescarrega += '#search=' + encodeURIComponent(cercaDocumentsFiltre.text);
+		}
 		$('#container').attr('src', urlDescarrega);
 		$('#container').on('load', function() {
 			resumViewer.removeClass('rmodal_loading');
@@ -1399,6 +1406,10 @@
 
 					updateTableEvents();
 
+					if (typeof aplicarFiltreCercaDocuments === 'function') {
+						aplicarFiltreCercaDocuments();
+					}
+
 					if (showAll) {
 						var $fills = $tableDocuments.find('tr[data-pnode="treetable-' + carpetaId + '"]');
 						$fills.each(function () {
@@ -1597,6 +1608,21 @@
 
 					</div>
 				</c:if>
+
+				<%---- cerca de documents de l'expedient ----%>
+				<c:if test="${isCercaDocumentsExpedientActiu && !isTasca}">
+					<div id="cercaDocuments">
+						<div class="input-group">
+							<span class="input-group-addon" id="cercaDocumentsAjuda" title="<spring:message code="contingut.cercaDocuments.ajuda"/>"><span class="fa fa-question-circle"></span></span>
+							<input type="text" class="form-control" id="cercaDocumentsText" autocomplete="off" placeholder="<spring:message code="contingut.cercaDocuments.camp.text"/>" title="<spring:message code="contingut.boto.menu.cercaDocuments"/>"/>
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default" id="cercaDocumentsNetejar" title="<spring:message code="contingut.cercaDocuments.boto.netejar"/>"><span class="fa fa-times"></span></button>
+								<button type="button" class="btn btn-default" id="cercaDocumentsCercar" title="<spring:message code="contingut.cercaDocuments.boto.cercar"/>"><span class="fa fa-search"></span></button>
+							</span>
+						</div>
+					</div>
+					<span id="cercaDocumentsMissatge" class="pull-left text-danger"></span>
+				</c:if>
 				
 				<c:if test="${isTasca}">
 					<a href="<c:url value="/expedientTasca/${tascaId}/comentaris"/>" data-toggle="modal" data-refresh-tancar="true" class="btn btn-default pull-left"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">${tasca.numComentaris}</span></a>
@@ -1674,13 +1700,6 @@
 						</div>
 					</div>
 					----%>
-				</c:if>
-				<c:if test="${isCercaDocumentsExpedientActiu && !isTasca}">
-					<div class="btn-group" id="cercaDocuments">
-						<button type="button" title="<spring:message code="contingut.boto.menu.cercaDocuments"/>" data-toggle="modal" data-target="#cercaDocumentsModal" class="btn btn-default">
-							<span class="fa fa-search"></span>
-						</button>
-					</div>
 				</c:if>
 				<div class="btn-group" id="vistes">
 					<c:if test="${!isTasca}">
@@ -1788,77 +1807,180 @@
 			</div>
 
 			<c:if test="${isCercaDocumentsExpedientActiu && !isTasca}">
-				<div class="modal fade" id="cercaDocumentsModal" tabindex="-1" role="dialog" aria-labelledby="cercaDocumentsModalLabel" aria-hidden="true">
-					<div class="modal-dialog">
-						<div class="modal-content">
-							<div class="modal-header">
-								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-								<h4 class="modal-title" id="cercaDocumentsModalLabel"><spring:message code="contingut.cercaDocuments.titol"/></h4>
-							</div>
-							<div class="modal-body">
-								<div class="input-group">
-									<input type="text" class="form-control" id="cercaDocumentsText" placeholder="<spring:message code="contingut.cercaDocuments.camp.text"/>"/>
-									<span class="input-group-btn">
-										<button type="button" class="btn btn-default" id="cercaDocumentsBoto"><span class="fa fa-search"></span> <spring:message code="contingut.cercaDocuments.boto.cercar"/></button>
-									</span>
-								</div>
-								<div id="cercaDocumentsResultats" style="margin-top: 15px; max-height: 350px; overflow-y: auto;"></div>
-							</div>
-							<div class="modal-footer">
-								<button type="button" class="btn btn-default" data-dismiss="modal"><spring:message code="comu.boto.tancar"/></button>
-							</div>
-						</div>
-					</div>
+				<div id="cercaDocumentsCarregant" class="text-center hidden">
+					<img src="<c:url value="/img/loading.gif"/>"/>
+				</div>
+				<div id="cercaDocumentsSenseResultats" class="text-center text-muted hidden">
+					<h4><spring:message code="contingut.cercaDocuments.resultat.buit"/></h4>
 				</div>
 				<script>
-					(function() {
-						function cercarDocumentsExpedient() {
-							var text = $('#cercaDocumentsText').val();
-							var resultatsDiv = $('#cercaDocumentsResultats');
-							if (!text) {
+					var cercaDocumentsFiltre = null;
+
+					function aplicarFiltreCercaDocuments() {
+						var $files = $('#table-documents tbody tr[data-node]');
+						var $elements = $('#grid-documents > li.element-contingut');
+						if (!cercaDocumentsFiltre) {
+							$files.removeClass('cerca-ocult');
+							$elements.removeClass('cerca-ocult');
+							mostrarSenseResultatsCerca(false);
+							return;
+						}
+						var documents = cercaDocumentsFiltre.documents;
+						var carpetes = cercaDocumentsFiltre.carpetes;
+
+						$elements.each(function () {
+							var id = $(this).attr('id');
+							var esCarpeta = $(this).hasClass('element-droppable');
+							$(this).toggleClass('cerca-ocult', !(esCarpeta ? carpetes.has(id) : documents.has(id)));
+						});
+
+						var vistaCarpetes = ${vistaLlistat ? 'true' : 'false'};
+						var visibles = {};
+						$files.each(function () {
+							var $fila = $(this);
+							var id = $fila.attr('id');
+							var coincideix = $fila.hasClass('isDocument') ? documents.has(id) : (vistaCarpetes && carpetes.has(id));
+							if (!coincideix) {
 								return;
 							}
-							resultatsDiv.html('<div class="text-center"><span class="fa fa-spinner fa-spin fa-2x"></span></div>');
+							var node = $fila.attr('data-node');
+							while (node && !visibles[node]) {
+								visibles[node] = true;
+								node = $files.filter('[data-node="' + node + '"]').attr('data-pnode');
+							}
+						});
+
+						$files.each(function () {
+							var $fila = $(this);
+							var node = $fila.attr('data-node');
+							var visible = visibles[node] === true;
+							$fila.toggleClass('cerca-ocult', !visible);
+							if (!visible) {
+								return;
+							}
+							$fila.show();
+							if ($fila.hasClass('isDocument')) {
+								return;
+							}
+							<c:choose>
+								<c:when test="${isMantenirEstatCarpetaActiu && vistaLlistat}">
+									if ($fila.hasClass('hasFills') && sessionStorage.getItem("nodeState-" + node) !== "expanded") {
+										showCurrentNode(node, $fila.attr('id'));
+										setIcon($fila);
+									}
+								</c:when>
+								<c:when test="${isMantenirEstatCarpetaActiu}">
+									sessionStorage.setItem("nodeState-" + node, "expanded");
+									setIcon($fila);
+								</c:when>
+								<c:otherwise>
+									$fila.addClass('treetable-expanded').removeClass('treetable-collapsed');
+									$fila.find('.treetable-expander').removeClass('fa-angle-right').addClass('fa-angle-down');
+								</c:otherwise>
+							</c:choose>
+						});
+
+						var algunVisible = $elements.filter(':not(.cerca-ocult)').length > 0 || Object.keys(visibles).length > 0;
+						mostrarSenseResultatsCerca(!algunVisible);
+
+						var $visor = $('#resum-viewer');
+						if ($visor.is(':visible') && !(typeof previousDocumentId !== 'undefined' && previousDocumentId != null && documents.has(String(previousDocumentId)))) {
+							closeViewer();
+							$files.css('background', '');
+						}
+					}
+
+					function mostrarSenseResultatsCerca(senseResultats) {
+						$('#cercaDocumentsSenseResultats').toggleClass('hidden', !senseResultats);
+						$('#table-documents, #grid-documents').toggleClass('cerca-sense-resultats', senseResultats);
+					}
+
+					(function () {
+						var $text = $('#cercaDocumentsText');
+						var $missatge = $('#cercaDocumentsMissatge');
+						var minimCaracters = 3;
+						var peticioActual = 0;
+
+						function mostrarCercant(cercant) {
+							$('#cercaDocumentsCarregant').toggleClass('hidden', !cercant);
+							$('#table-documents, #grid-documents').toggleClass('cerca-ocult', cercant);
+						}
+
+						function netejarCerca() {
+							peticioActual++;
+							mostrarCercant(false);
+							$missatge.text('');
+							cercaDocumentsFiltre = null;
+							aplicarFiltreCercaDocuments();
+						}
+
+						function cercar() {
+							var text = $.trim($text.val());
+							if (text.replace(/\*/g, '').length < minimCaracters) {
+								$missatge.text('<spring:message code="contingut.cercaDocuments.minim" javaScriptEscape="true"/>');
+								return;
+							}
+							var peticio = ++peticioActual;
+							$missatge.text('');
+							mostrarCercant(true);
 							$.ajax({
 								type: 'GET',
 								url: '<c:url value="/expedientajax/expedient/${expedientId}/cercaDocuments"/>',
-								data: {text: text, page: 0, pageSize: 50},
-								success: function(data) {
-									var items = (data && data.contingut) ? data.contingut : [];
-									resultatsDiv.empty();
-									if (items.length == 0) {
-										resultatsDiv.append('<p class="text-muted"><spring:message code="contingut.cercaDocuments.resultat.buit"/></p>');
+								data: {text: text, page: 0, pageSize: 100},
+								success: function (data) {
+									if (peticio !== peticioActual) {
 										return;
 									}
-									var llista = $('<ul class="list-group"></ul>');
-									$.each(items, function(i, doc) {
-										var subtitol = doc.metaNode ? ' <small class="text-muted">(' + doc.metaNode.nom + ')</small>' : '';
-										var link = $('<a></a>')
-												.attr('href', '<c:url value="/contingut/"/>' + doc.id)
-												.attr('data-toggle', 'modal')
-												.html('<span class="fa fa-file-text-o"></span>&nbsp;' + doc.nom + subtitol);
-										var item = $('<li class="list-group-item"></li>').append(link);
-										llista.append(item);
+									var items = (data && data.contingut) ? data.contingut : [];
+									var documents = new Set();
+									var carpetes = new Set();
+									$.each(items, function (i, doc) {
+										documents.add(String(doc.id));
+										$.each(doc.carpetesPareIds || [], function (j, carpetaId) {
+											carpetes.add(String(carpetaId));
+										});
 									});
-									resultatsDiv.append(llista);
-									llista.webutilModalEval();
+									cercaDocumentsFiltre = {documents: documents, carpetes: carpetes, text: text.replace(/\*/g, '')};
+									aplicarFiltreCercaDocuments();
 								},
-								error: function(xhr) {
+								error: function (xhr) {
+									if (peticio !== peticioActual) {
+										return;
+									}
 									var missatge = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : xhr.statusText;
-									resultatsDiv.html('<p class="text-danger">' + missatge + '</p>');
+									cercaDocumentsFiltre = null;
+									aplicarFiltreCercaDocuments();
+									$missatge.text(missatge);
+								},
+								complete: function () {
+									if (peticio === peticioActual) {
+										mostrarCercant(false);
+									}
 								}
 							});
 						}
-						$('#cercaDocumentsBoto').on('click', cercarDocumentsExpedient);
-						$('#cercaDocumentsText').on('keydown', function(event) {
-							if (event.which == 13) {
-								event.preventDefault();
-								cercarDocumentsExpedient();
+
+						$text.on('input', function () {
+							if (!$.trim($text.val())) {
+								netejarCerca();
 							}
 						});
-						$('#cercaDocumentsModal').on('shown.bs.modal', function() {
-							$('#cercaDocumentsText').val('').focus();
-							$('#cercaDocumentsResultats').empty();
+						$text.on('keydown', function (event) {
+							if (event.which == 13) {
+								event.preventDefault();
+								cercar();
+							} else if (event.which == 27) {
+								$text.val('');
+								netejarCerca();
+							}
+						});
+						$('#cercaDocumentsCercar').on('click', function () {
+							cercar();
+						});
+						$('#cercaDocumentsNetejar').on('click', function () {
+							$text.val('');
+							netejarCerca();
+							$text.focus();
 						});
 					})();
 				</script>

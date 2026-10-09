@@ -10,10 +10,12 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -1936,11 +1938,28 @@ public class DocumentHelper {
 				itemsPerPagina);
 
 		List<DocumentDto> documents = new ArrayList<DocumentDto>();
+		Set<Long> documentsIds = new HashSet<Long>();
 		if (resultat.getResultats() != null) {
 			for (ContingutArxiu contingutArxiu : resultat.getResultats()) {
-				List<DocumentDto> trobats = findByArxiuUuid(contingutArxiu.getIdentificador());
-				if (!trobats.isEmpty()) {
-					documents.add(trobats.get(0));
+				for (DocumentEntity document : documentRepository.findByArxiuUuidAndEsborrat(contingutArxiu.getIdentificador(), 0)) {
+					if (document.getExpedient() == null || !document.getExpedient().getId().equals(expedient.getId())) {
+						continue;
+					}
+					if (documentsIds.add(document.getId())) {
+						documents.add(toDocumentDtoAmbCarpetesPare(document, expedient));
+					}
+					break;
+				}
+			}
+		}
+
+		int trobatsNomDescripcio = 0;
+		if (pagina == null || pagina == 0) {
+			String textLike = "%" + text.trim().toLowerCase().replace('*', '%') + "%";
+			for (DocumentEntity document : documentRepository.findByExpedientAndNomOrDescripcioLike(expedient, textLike)) {
+				if (documentsIds.add(document.getId())) {
+					documents.add(toDocumentDtoAmbCarpetesPare(document, expedient));
+					trobatsNomDescripcio++;
 				}
 			}
 		}
@@ -1952,13 +1971,25 @@ public class DocumentHelper {
 		paginaDto.setNumero(paginaActual);
 		paginaDto.setTamany(documents.size());
 		paginaDto.setTotal(numPagines);
-		paginaDto.setElementsTotal(resultat.getNumRegistres() != null ? resultat.getNumRegistres().longValue() : 0L);
+		paginaDto.setElementsTotal((resultat.getNumRegistres() != null ? resultat.getNumRegistres().longValue() : 0L) + trobatsNomDescripcio);
 		paginaDto.setPrimera(paginaActual == 0);
 		paginaDto.setDarrera(numPagines == 0 || paginaActual >= numPagines - 1);
 		paginaDto.setAnteriors(!paginaDto.isPrimera());
 		paginaDto.setPosteriors(!paginaDto.isDarrera());
 		paginaDto.setContingut(documents);
 		return paginaDto;
+	}
+
+	private DocumentDto toDocumentDtoAmbCarpetesPare(DocumentEntity document, ExpedientEntity expedient) {
+		DocumentDto documentDto = (DocumentDto) contingutHelper.toContingutDto(document, false, false);
+		List<Long> carpetesPareIds = new ArrayList<Long>();
+		ContingutEntity pare = document.getPare();
+		while (pare != null && !pare.getId().equals(expedient.getId())) {
+			carpetesPareIds.add(0, pare.getId());
+			pare = pare.getPare();
+		}
+		documentDto.setCarpetesPareIds(carpetesPareIds);
+		return documentDto;
 	}
 
 	public DocumentEntity findLastDocumentPujatArxiuByExtensio(List<String> contentTypes) {

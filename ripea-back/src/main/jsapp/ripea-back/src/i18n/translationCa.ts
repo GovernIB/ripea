@@ -267,11 +267,12 @@ const translationCa = {
                     ok: "Document '{{document}}' vinculat correctament",
                 },
                 cercaDocuments: {
-                    label: "Cerca documents...",
-                    title: "Cerca de documents a l'expedient",
-                    text: "Text a cercar",
-                    search: "Cerca",
-                    empty: "No s'ha trobat cap document",
+                    label: "Cerca documents",
+                    text: "Text a cercar (mín. 3 caràcters)",
+                    clear: "Netejar la cerca",
+                    search: "Cercar",
+                    ajuda: "Cerca al nom, a la descripció i al contingut dels documents.\nPrem Enter o el botó de cercar per llançar la cerca.\nPots emprar * per cercar trossos de paraules (p. ex. contract* troba contracte, contractació...).",
+                    noResults: "No s'han trobat resultats",
                 },
                 create: {
                     label: "Crea contingut",

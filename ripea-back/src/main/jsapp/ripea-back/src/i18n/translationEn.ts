@@ -266,11 +266,12 @@ const translationEn = {
                     ok: "Document '{{document}}' linked successfully",
                 },
                 cercaDocuments: {
-                    label: "Search documents...",
-                    title: "Search documents in the record",
-                    text: "Text to search",
+                    label: "Search documents",
+                    text: "Text to search (min. 3 characters)",
+                    clear: "Clear search",
                     search: "Search",
-                    empty: "No document found",
+                    ajuda: "Searches the name, description and content of the documents.\nPress Enter or the search button to run the search.\nYou can use * to search for parts of words (e.g. contract* finds contract, contractor...).",
+                    noResults: "No results found",
                 },
                 create: {
                     label: "Create content",

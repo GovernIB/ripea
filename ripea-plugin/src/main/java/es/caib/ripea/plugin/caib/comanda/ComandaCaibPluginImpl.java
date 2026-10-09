@@ -13,6 +13,7 @@ import javax.ws.rs.client.ClientBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
@@ -22,6 +23,7 @@ import es.caib.comanda.model.management.Tasca;
 import es.caib.comanda.model.management.TascaPage;
 import es.caib.comanda.model.server.monitoring.EstatSalutEnum;
 import es.caib.comanda.model.server.monitoring.SalutInfo;
+import es.caib.comanda.service.management.ApiException;
 import es.caib.comanda.service.management.AppComandaClient;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.comanda.ComandaCaibPlugin;
@@ -113,6 +115,15 @@ public class ComandaCaibPluginImpl extends RipeaAbstractPluginProperties impleme
 			String entorn 	= getProperty(PropertyConfig.getPropertySuffix(PropertyConfig.COMANDA_PLUGIN_ENTORN));
 			String resultat = clientComanda.eliminarAvis(idAvis, appCodi, entorn);
 			return ResponseEntity.ok(resultat);
+		} catch (ApiException ex) {
+			// L'avís s'elimina sempre que l'expedient no té validacions pendents, però pot ser que no s'hagués
+			// enviat mai (p.ex. expedients anteriors a la integració). Si comanda no el troba, el resultat és el
+			// mateix que s'esperava: no hi ha avís. No es tracta com a error per no fer soroll al log ni al monitor.
+			if (ex.getCode() == HttpStatus.NOT_FOUND.value()) {
+				log.debug("L'avís {} no existeix a comanda, no cal eliminar-lo", idAvis);
+				return ResponseEntity.ok(ex.getResponseBody());
+			}
+			throw ex;
 		} finally {
 			tancarClient(clientComanda);
 		}

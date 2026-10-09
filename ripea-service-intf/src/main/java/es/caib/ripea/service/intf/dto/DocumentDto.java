@@ -87,6 +87,7 @@ public class DocumentDto extends NodeDto {
 	private String destiId;
 	
 	private String rutaZip;
+	private List<Long> carpetesPareIds;
 	
 	public String getFitxerExtension() {
 		if (fitxerNom != null) {
