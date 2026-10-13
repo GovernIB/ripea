@@ -363,14 +363,14 @@ function calculateClassificacioId() {
 	<div id="loading" style="display: none;"><div style="text-align: center; padding-bottom: 100px; color: #666666; margin-top: 100px;"><span class="fa fa-circle-o-notch fa-spin fa-3x"></span></div></div>
 	<c:set var="formAction"><rip:modalUrl value="/metaExpedient"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="metaExpedientCommand">
-		<c:if test="${isCarpetaDefecte || (metaExpedientCommand.revisioEstat!=null && isRevisioActiva)}">
+		<c:if test="${isCarpetaDefecte || (metaExpedientCommand.revisioEstat!=null && isRevisioActiva && isRolActualRevisor)}">
 			<ul class="nav nav-tabs" role="tablist">
 				<li role="presentation" class="active"><a href="#dades" aria-controls="dades" role="tab" data-toggle="tab"><spring:message code="metaexpedient.form.camp.tab.dades"/></a></li>
 <%-- 			<li role="presentation"><a href="#notificacions" aria-controls="notificacions" role="tab" data-toggle="tab"><spring:message code="metaexpedient.form.camp.tab.notificacions"/></a></li> --%>
 				<c:if test="${isCarpetaDefecte}">
 					<li role="presentation"><a href="#carpetes" aria-controls="notificacions" role="tab" data-toggle="tab"><spring:message code="metaexpedient.form.camp.tab.carpetes"/></a></li>
 				</c:if>
-				<c:if test="${metaExpedientCommand.revisioEstat!=null && isRevisioActiva}">
+				<c:if test="${metaExpedientCommand.revisioEstat!=null && isRevisioActiva && isRolActualRevisor}">
 					<li role="presentation"><a href="#revisioEstatTab" aria-controls="revisioEstatTab" role="tab" data-toggle="tab"><spring:message code="metaexpedient.form.camp.tab.revisioEstat"/></a></li>
 				</c:if>
 			</ul>
