@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -35,6 +36,7 @@ import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.MetaNodeDto;
 import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
 import es.caib.ripea.service.intf.dto.ProgresProcessamentZipDto;
+import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.model.ImportacioZipDocument;
 import lombok.extern.slf4j.Slf4j;
@@ -86,6 +88,7 @@ public class ZipImportacioHelper {
                 progres.setErrorMsg(messageHelper.getMessage("contingut.boto.crear.document.multiple.error", new Object[] {ex.getMessage()}));
             }
         } finally {
+            MessageHelper.setCurrentLocale(null);
             try {
                 Files.deleteIfExists(tempZip);
                 log.debug("ZIP temporal eliminat: {}", tempZip);
@@ -117,32 +120,36 @@ public class ZipImportacioHelper {
     	ProgresProcessamentZipDto progres = inicialitzarProgres(pareId);
         setNumOperacionsProgres(pareId, numTotalDocs);
         
-        for (ImportacioZipDocument izd: documentsZip) {
-        	if (izd.isImportar()) {
+        try {
+            for (ImportacioZipDocument izd: documentsZip) {
+            	if (izd.isImportar()) {
         		
-                try {
+                    try {
                 	
-                	registrarUbicacio(izd.getRutaCompleta(), ubicacioDocuments);
+                    	registrarUbicacio(izd.getRutaCompleta(), ubicacioDocuments);
                 	
-    	        	processarEntradaZip(
-    	        			entitat.getId(),
-    	        			pareId,
-    	        			izd.getTipusDocument()!=null?izd.getTipusDocument().getId():null,
-    	        			ubicacioDocuments,
-    	        			progres,
-    	        			izd.getRutaCompleta(),
-    	        			izd.getContingut(),
-    	        			rolActual);
-                } catch (Exception ex) {
-                    log.error("Error procesant la següent entrada del fitxer ZIP {}", izd.getRutaCompleta(), ex);
-					progres.addError(
-							messageHelper.getMessage("contingut.boto.crear.document.multiple.entrada.error",
-							new Object[] { izd.getRutaCompleta(), ex.getMessage() }));
-					excepcioLogHelper.addExcepcio("/contingut/" + pareId + "/ImportarDocumentDesdeZip", ex);
-                } finally {
-                    progres.incrementOperacionsRealitzades();
-                }        		
-        	}
+        	        	processarEntradaZip(
+        	        			entitat.getId(),
+        	        			pareId,
+        	        			izd.getTipusDocument()!=null?izd.getTipusDocument().getId():null,
+        	        			ubicacioDocuments,
+        	        			progres,
+        	        			izd.getRutaCompleta(),
+        	        			izd.getContingut(),
+        	        			rolActual);
+                    } catch (Exception ex) {
+                        log.error("Error procesant la següent entrada del fitxer ZIP {}", izd.getRutaCompleta(), ex);
+    					progres.addError(
+    							messageHelper.getMessage("contingut.boto.crear.document.multiple.entrada.error",
+    							new Object[] { izd.getRutaCompleta(), ex.getMessage() }));
+    					excepcioLogHelper.addExcepcio("/contingut/" + pareId + "/ImportarDocumentDesdeZip", ex);
+                    } finally {
+                        progres.incrementOperacionsRealitzades();
+                    }        		
+            	}
+            }
+        } finally {
+            MessageHelper.setCurrentLocale(null);
         }
     }
 
@@ -287,11 +294,11 @@ public class ZipImportacioHelper {
     private void inicialitzarContext(UsuariDto usuari, EntitatDto entitat) {
         createAuthenticationContext(usuari);
         ConfigHelper.setEntitat(entitat);
+        String idioma = usuari.getIdioma() != null ? usuari.getIdioma() : BaseConfig.DEFAULT_LOCALE;
+        MessageHelper.setCurrentLocale(new Locale(idioma));
     }
 
     private void createAuthenticationContext(UsuariDto usuariActual) {
-        if (SecurityContextHolder.getContext().getAuthentication() != null) return;
-
         List<SimpleGrantedAuthority> authorities = Arrays.stream(usuariActual.getRols())
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
