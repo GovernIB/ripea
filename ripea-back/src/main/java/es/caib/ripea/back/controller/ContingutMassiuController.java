@@ -3,6 +3,7 @@ package es.caib.ripea.back.controller;
 import es.caib.ripea.back.command.ContingutMassiuFiltreCommand;
 import es.caib.ripea.back.helper.DatatablesHelper;
 import es.caib.ripea.back.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.back.helper.MissatgesHelper;
 import es.caib.ripea.back.helper.RequestSessionHelper;
 import es.caib.ripea.back.helper.RolHelper;
 import es.caib.ripea.service.intf.dto.*;
@@ -294,6 +295,13 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 					getMessage(request, "accio.massiva.consulta.titol.usuari", new String[]{usuariActual.getNom()}));
 		}
 		execucionsMassives = execucioMassivaService.findExecucionsMassivesPerUsuari(entitatActual.getId(), usuariActual,pagina);
+		//Pot cancel·lar el creador o l'administrador d'entitat (el servei ho torna a comprovar en cancel·lar)
+		boolean isAdministrador = RolHelper.isRolActualAdministrador(request);
+		String codiUsuariActual = aplicacioService.getUsuariActual().getCodi();
+		for (ExecucioMassivaDto exm : execucionsMassives) {
+			exm.setPotCancelar(isAdministrador
+					|| (exm.getCreatedBy() != null && codiUsuariActual.equals(exm.getCreatedBy().getCodi())));
+		}
 		if (execucionsMassives.size() < 8) {
 			model.addAttribute("sumador", 0);
 		} else {
@@ -307,6 +315,34 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 			model.addAttribute("idsDesplegats", (List<Long>)idsDesplegat);
 		}
 		return "consultaExecucionsMassives";
+	}
+
+	@RequestMapping(value = "/{execucioMassivaId}/cancelar", method = RequestMethod.POST)
+	@ResponseBody
+	public boolean cancelar(
+			HttpServletRequest request,
+			@PathVariable Long execucioMassivaId) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		try {
+			ExecucioMassivaProcesEstatDto estat = execucioMassivaService.cancelarExecucioMassiva(
+					entitatActual.getId(),
+					execucioMassivaId,
+					RolHelper.getRolActual(request));
+			MissatgesHelper.success(
+					request,
+					getMessage(
+							request,
+							ExecucioMassivaProcesEstatDto.CANCELADA.equals(estat)
+									? "accio.massiva.cancelar.ok"
+									: "accio.massiva.cancelar.sollicitada"));
+			return true;
+		} catch (Exception ex) {
+			Throwable causa = Utils.getRootCauseOrItself(ex);
+			MissatgesHelper.error(
+					request,
+					getMessage(request, "accio.massiva.cancelar.error", new Object[] {causa.getMessage()}));
+			return false;
+		}
 	}
 
 	@RequestMapping(value = "/consultaContingut/{execucioMassivaId}", method = RequestMethod.GET)

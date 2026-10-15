@@ -13,7 +13,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
@@ -49,10 +57,10 @@ import es.caib.ripea.service.helper.AlertaHelper;
 import es.caib.ripea.service.helper.ApplicationHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ConversioTipusHelper;
-import es.caib.ripea.service.helper.EmailHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.ExceptionHelper;
+import es.caib.ripea.service.helper.ExecucioMassivaCuaHelper;
 import es.caib.ripea.service.helper.ExecucioMassivaHelper;
 import es.caib.ripea.service.helper.ExpedientHelper;
 import es.caib.ripea.service.helper.MessageHelper;
@@ -67,6 +75,7 @@ import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaContingutDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaEstatDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaProcesEstatDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
@@ -90,7 +99,7 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 	@Autowired private MessageHelper messageHelper;
 	@Autowired private ExpedientHelper expedientHelper;
 	@Autowired private PluginHelper pluginHelper;
-	@Autowired private EmailHelper emailHelper;
+	@Autowired private ExecucioMassivaCuaHelper execucioMassivaCuaHelper;
 	@Autowired private ConfigHelper configHelper;
     @Autowired private ExpedientRepository expedientRepository;
     @Autowired private ApplicationHelper applicationHelper;
@@ -105,6 +114,9 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 	private static final String TASCA_CODI = "execucioAccionsMassives";
 
 	private final Map<Long, Object> locks = new ConcurrentHashMap<>();
+	//Si aquest node ja està processant una execució massiva
+	private final AtomicBoolean processant = new AtomicBoolean(false);
+	private ScheduledExecutorService heartbeatExecutor;
 	
 	@Transactional
 	@Override
@@ -177,16 +189,59 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 		return dtos;
 	}
 
+	@PostConstruct
+	public void init() {
+		heartbeatExecutor = Executors.newSingleThreadScheduledExecutor(runnable -> {
+			Thread thread = new Thread(runnable, "ripea-massives-heartbeat");
+			thread.setDaemon(true);
+			return thread;
+		});
+	}
+
+	@PreDestroy
+	public void destroy() {
+		heartbeatExecutor.shutdownNow();
+	}
+
 	@Override
 	public void executeNextMassiveScheduledTask() {
+
+		//Reiniciar la tasca des del monitor la torna a programar mentre l'anterior encara pot estar processant:
+		//en aquest node no s'ha de processar mai més d'una execució alhora.
+		if (!processant.compareAndSet(false, true)) {
+			logger.warn("Execucions massives: encara se n'està processant una en aquest node; no se n'agafa cap altra");
+			return;
+		}
+		try {
+			executarSeguentExecucioMassiva();
+		} finally {
+			processant.set(false);
+		}
+	}
+
+	private void executarSeguentExecucioMassiva() {
 
 		Timer.Sample sample = Timer.start(applicationHelper.getMeterRegistry());
 		logger.trace("Execució tasca periòdica: Execucions massives");
 
-		Long execucioMassivaId = execucioMassivaHelper.getIdExecucioMassivaPerProcessar(new Date());
+		Long execucioMassivaId = execucioMassivaCuaHelper.reclamarExecucioMassivaPerProcessar(new Date());
 		if (execucioMassivaId == null) {
 			return;
 		}
+
+		//El batec demostra a la resta de nodes que aquesta execució no està abandonada, encara que un sol element
+		//(o una exportació sencera) trigui molt.
+		ScheduledFuture<?> heartbeat = heartbeatExecutor.scheduleWithFixedDelay(
+				() -> {
+					try {
+						execucioMassivaCuaHelper.actualitzarHeartbeat(execucioMassivaId);
+					} catch (Throwable th) {
+						logger.warn("No s'ha pogut actualitzar el batec de l'execució massiva (id=" + execucioMassivaId + ")", th);
+					}
+				},
+				ExecucioMassivaCuaHelper.HEARTBEAT_INTERVAL_MS,
+				ExecucioMassivaCuaHelper.HEARTBEAT_INTERVAL_MS,
+				TimeUnit.MILLISECONDS);
 
 		String error = null;
 		try {
@@ -203,14 +258,24 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 				logger.error("No s'ha pogut registrar l'excepció de l'execució massiva (id=" + execucioMassivaId + ")", th2);
 			}
 		} finally {
+			heartbeat.cancel(false);
 			//Passi el que passi, l'execució s'ha de tancar en una transacció nova i aïllada. Si la data de fi no
 			//queda escrita, aquesta mateixa execució torna a ser la primera de la cua a cada cicle i bloqueja
 			//indefinidament totes les posteriors.
+			boolean tancada = false;
 			try {
 				execucioMassivaHelper.finalitzarExecucioMassiva(execucioMassivaId, error);
+				tancada = true;
 			} catch (Throwable th) {
 				logger.error("No s'ha pogut tancar l'execució massiva (id=" + execucioMassivaId + "): bloquejarà la cua "
 						+ "fins que se li informi la data de fi", th);
+			}
+			if (tancada) {
+				try {
+					execucioMassivaHelper.enviarCorreuFinalitzacio(execucioMassivaId);
+				} catch (Throwable th) {
+					logger.error("No s'ha pogut enviar el correu de finalització de l'execució massiva (id=" + execucioMassivaId + ")", th);
+				}
 			}
 			applicationHelper.stopTimer(
 					sample,
@@ -291,9 +356,27 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 
 				for (ExecucioMassivaContingutEntity execucioMassivaItemEntity : execucioMassiva.getContinguts()) {
 
-					String throwable = execucioMassivaHelper.executarExecucioMassivaContingutNewTransaction(
-							execucioMassivaItemEntity.getId(),
-							documents);
+					//La cancel·lació no interromp l'element en curs: s'atura abans del següent i
+					//finalitzarExecucioMassiva() marca com a cancel·lats els que queden
+					if (execucioMassivaCuaHelper.isCancelacioSolicitada(execucioMassivaId)) {
+						logger.info("Execució massiva cancel·lada abans de l'element " + execucioMassivaItemEntity.getId()
+								+ " (id=" + execucioMassivaId + ")");
+						break;
+					}
+
+					String throwable;
+					try {
+						throwable = execucioMassivaHelper.executarExecucioMassivaContingutNewTransaction(
+								execucioMassivaItemEntity.getId(),
+								documents);
+					} catch (Throwable th) {
+						//L'element gestiona els seus errors, però si la seva transacció no es pot confirmar (p.ex. ha
+						//quedat marcada per fer rollback) l'excepció arriba aquí: no ha d'aturar la resta d'elements.
+						logger.error("Error al confirmar l'element " + execucioMassivaItemEntity.getId()
+								+ " de l'execució massiva (id=" + execucioMassivaId + ")", th);
+						throwable = ExecucioMassivaHelper.getExceptionString(ExceptionHelper.getRootCauseOrItself(th), ERROR_TAMANY);
+						execucioMassivaHelper.marcarContingutError(execucioMassivaItemEntity.getId(), throwable);
+					}
 
 					if (throwable != null) {
 						alertaHelper.crearAlerta(
@@ -307,14 +390,16 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 				}
 			}
 		}
+		//El correu de finalització s'envia des de executeNextMassiveScheduledTask() un cop tancada, amb l'estat final.
+	}
 
-//		if (execucioMassiva.getEnviarCorreu()!=null && execucioMassiva.getEnviarCorreu().booleanValue()) {
-		try {
-			emailHelper.execucioMassivaFinalitzada(execucioMassiva);
-		} catch (Exception e) {
-			logger.error("No s'ha pogut enviar el correu de finalització d'accio massiva", e);
-		}
-//		}
+	@Transactional
+	@Override
+	public ExecucioMassivaProcesEstatDto cancelarExecucioMassiva(
+			Long entitatId,
+			Long execucioMassivaId,
+			String rolActual) throws NotFoundException, ValidationException {
+		return execucioMassivaCuaHelper.cancelar(entitatId, execucioMassivaId, rolActual);
 	}
 
 	private Set<Long> contingutsToLongList(List<ExecucioMassivaContingutEntity> continguts) {
@@ -605,7 +690,8 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 			dto.setErrors(errors);
 			dto.setCancelats(cancelats);
 			Long total = Long.valueOf(dto.getContingutIds().size());
-			dto.setExecutades(getPercent((total - pendents), total));
+			//Els cancel·lats tenen data de fi però no s'han executat: no compten com a fets
+			dto.setExecutades(getPercent((total - pendents - cancelats), total));
 			dto.setDocumentNom(exm.getDocumentNom());
 			dtos.add(dto);
 		}

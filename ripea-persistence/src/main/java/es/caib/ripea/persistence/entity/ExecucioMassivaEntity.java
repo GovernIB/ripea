@@ -1,10 +1,12 @@
 package es.caib.ripea.persistence.entity;
 
 import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaProcesEstatDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.service.intf.dto.FileNameOption;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.PortafirmesPrioritatEnumDto;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
@@ -12,9 +14,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/*
+ * @DynamicUpdate: l'estat, la cancel·lació i el batec es modifiquen amb updates condicionals des d'altres
+ * transaccions mentre el procés té l'entitat carregada. Sense això, un update de tota la fila (p.ex. en
+ * desar documentNom) tornaria a escriure els valors antics d'aquestes columnes.
+ */
 @Entity
 @Table(name = BaseConfig.DB_PREFIX + "execucio_massiva")
 @EntityListeners(AuditingEntityListener.class)
+@DynamicUpdate
 public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 
 	private static final int MOTIU_TAMANY = 256;
@@ -81,7 +89,49 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 	
 	@Column(name = "ID_AUX")
 	private Long identificadorAuxiliar;
-	
+
+	@Column(name = "estat", length = 20)
+	@Enumerated(EnumType.STRING)
+	private ExecucioMassivaProcesEstatDto estat;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "cancelacio_data")
+	private Date cancelacioData;
+	@Column(name = "cancelacio_usuari", length = 64)
+	private String cancelacioUsuari;
+	//Node que la processa i darrer batec: permeten reprendre-la si el node cau a mitges
+	@Column(name = "node", length = 255)
+	private String node;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "data_heartbeat")
+	private Date dataHeartbeat;
+
+	@PrePersist
+	private void estatInicial() {
+		if (estat == null) {
+			//Les accions síncrones es desen ja acabades i no han de passar per la cua
+			estat = dataFi == null ? ExecucioMassivaProcesEstatDto.PENDENT : ExecucioMassivaProcesEstatDto.FINALITZADA;
+		}
+	}
+
+	public ExecucioMassivaProcesEstatDto getEstat() {
+		return estat;
+	}
+	public void updateEstat(ExecucioMassivaProcesEstatDto estat) {
+		this.estat = estat;
+	}
+	public Date getCancelacioData() {
+		return cancelacioData;
+	}
+	public String getCancelacioUsuari() {
+		return cancelacioUsuari;
+	}
+	public String getNode() {
+		return node;
+	}
+	public Date getDataHeartbeat() {
+		return dataHeartbeat;
+	}
+
 	public ExecucioMassivaTipusDto getTipus() {
 		return tipus;
 	}

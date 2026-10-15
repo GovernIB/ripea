@@ -55,4 +55,19 @@ public interface ExecucioMassivaService {
 			List<ExecucioMassivaContingutDto> exc,
 			ElementTipusEnumDto elementTipus) throws NotFoundException, ValidationException;
 
+	/**
+	 * Cancel·la una execució massiva. Només ho pot fer el creador o un administrador de l'entitat.
+	 * Si encara no ha començat, es tanca a l'acte. Si està en curs, l'element que s'està processant
+	 * acaba normalment i la resta queden cancel·lats en acabar-lo.
+	 *
+	 * @param rolActual rol actual de l'usuari a la interfície.
+	 * @return CANCELADA si s'ha tancat a l'acte, o EN_CURS si s'ha sol·licitat la cancel·lació.
+	 * @throws ValidationException si el tipus no es pot cancel·lar o l'execució ja ha acabat.
+	 */
+	@PreAuthorize("isAuthenticated()")
+	public ExecucioMassivaProcesEstatDto cancelarExecucioMassiva(
+			Long entitatId,
+			Long execucioMassivaId,
+			String rolActual) throws NotFoundException, ValidationException;
+
 }

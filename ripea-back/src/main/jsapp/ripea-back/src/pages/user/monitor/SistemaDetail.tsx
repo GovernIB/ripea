@@ -4,7 +4,8 @@ import {MuiDialog, useBaseAppContext, useMuiDataGridApiRef, useResourceApiServic
 import TabComponent from "../../../components/TabComponent.tsx";
 import StyledMuiGrid, {ToolbarButton} from "../../../components/StyledMuiGrid.tsx";
 import {ContenidoData, DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
-import {LinearProgress, Grid, Box} from "@mui/material";
+import {Grid, Box, Typography} from "@mui/material";
+import TonalLinearProgress from "../../../components/TonalLinearProgress.tsx";
 import { usePreBaseAppContext } from "@src/components/PreBaseAppProvider.tsx";
 
 const useSistemAction = () => {
@@ -32,12 +33,17 @@ const useSistemAction = () => {
     }
 }
 
+// Ocupació en color tonal amb el percentatge escrit: en to suau la barra sola no té prou contrast
+// i el nivell (normal, avís, crític) no es pot transmetre només amb el color.
 const LinearSpace = ({value, total}: { value:number, total?:number }) => {
     const v = total ?Math.round(value * 100 / total) :value
-    return <LinearProgress variant="determinate"
-                           value={v}
-                           color={v >= 90 ?'error' :v >= 80 ?'warning' :'success'}
-                           sx={{width: '100%', height: 15, borderRadius: '4px'}}/>
+    return <TonalLinearProgress
+        value={v}
+        color={v >= 90 ?'error' :v >= 80 ?'warning' :'success'}
+        sx={{height: 18}}
+    >
+        <Typography variant="caption" fontWeight="inherit">{v}%</Typography>
+    </TonalLinearProgress>
 }
 
 const Sistema = ({system, refresh}:any) => {

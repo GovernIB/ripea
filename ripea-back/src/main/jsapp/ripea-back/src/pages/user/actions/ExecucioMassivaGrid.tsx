@@ -1,7 +1,9 @@
 import {useTranslation} from "react-i18next";
 import {useEffect, useMemo, useRef, useState} from "react";
 import {MuiDialog, useBaseAppContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
-import {Chip, Checkbox, FormControlLabel, LinearProgress, Box, Icon, Tooltip} from "@mui/material";
+import {Chip, Checkbox, FormControlLabel, Icon, Tooltip} from "@mui/material";
+import {tonal, TonalColor} from "../../../util/tonal.ts";
+import TonalLinearProgress from "../../../components/TonalLinearProgress.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import Load from "../../../components/Load.tsx";
@@ -12,9 +14,42 @@ import {iniciaDescargaBlob} from "../../expedient/details/CommonActions.tsx";
 const useActions = () => {
     const { t } = useTranslation()
     const {
-        fieldDownload: apiDownload
+        fieldDownload: apiDownload,
+        artifactAction: apiAction,
     } = useResourceApiService('execucioMassivaResource');
-    const {temporalMessageShow} = useBaseAppContext();
+    const {temporalMessageShow, messageDialogShow} = useBaseAppContext();
+
+    const cancelar = (id: any, refresh?: () => void) => {
+        messageDialogShow(
+            t('page.user.action.massives.cancelar.title'),
+            t('page.user.action.massives.cancelar.confirm'),
+            [{
+                value: true,
+                text: t('common.accepta'),
+                componentProps: { variant: 'contained' }
+            },
+            {
+                value: false,
+                text: t('common.cancel'),
+                componentProps: { variant: 'outlined' }
+            }],
+            {maxWidth: 'sm', fullWidth: true})
+            .then((value: any) => {
+                if (value) {
+                    apiAction(id, {code: 'CANCELAR'})
+                        .then((result: any) => {
+                            refresh?.();
+                            // CANCELADA: no havia començat i ja està tancada; EN_CURS: s'aturarà en acabar l'element actual
+                            temporalMessageShow(null, result === 'CANCELADA'
+                                ? t('page.user.action.massives.cancelar.ok')
+                                : t('page.user.action.massives.cancelar.sollicitadaOk'), 'success');
+                        })
+                        .catch((error) => {
+                            temporalMessageShow(null, error?.message, 'error');
+                        });
+                }
+            });
+    }
 
     const download = (id: any) => {
         apiDownload(id, {fieldName: 'documentNom'})
@@ -28,52 +63,67 @@ const useActions = () => {
     }
 
     return {
-        download
+        download,
+        cancelar,
     }
 }
 
-const StyledLinearProgress = (props: any) => {
-    const {sx, textColor = "white", children, ...other} = props
+const estatChipColor: Record<string, TonalColor> = {
+    'EN_CURS': 'info',
+    'FINALITZADA': 'success',
+}
 
-    return <Box position="relative" width="100%" sx={{ml: 1}}>
-        <LinearProgress variant="determinate" {...other} sx={{width: '100%', borderRadius: '4px', ...sx}}/>
-        <Box
-            color={textColor}
-            position="absolute"
-            top={0}
-            left={0}
-            width="100%"
-            height="100%"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-        >
-            {children}
-        </Box>
-    </Box>
+// Estat del procés. La cancel·lació és al menú d'accions de la fila.
+const EstatCell = (props: any) => {
+    const {row, formattedValue} = props;
+    const {t} = useTranslation();
+
+    const cancelacioSolicitada = !row?.dataFi && !!row?.cancelacioData;
+    const color = cancelacioSolicitada ? 'warning' : estatChipColor[row?.estat];
+
+    // Etiqueta curta perquè la columna no s'hagi d'eixamplar per un estat poc freqüent; el tooltip ho explica
+    return <Tooltip title={cancelacioSolicitada ? t('page.user.action.massives.cancelar.sollicitadaOk') : ''}>
+        <Chip
+            size="small"
+            label={cancelacioSolicitada ? t('page.user.action.massives.cancelar.sollicitada') : formattedValue}
+            variant={row?.estat === 'CANCELADA' ? 'outlined' : 'filled'}
+            sx={color ? tonal(color) : undefined}
+            tabIndex={cancelacioSolicitada ? 0 : undefined}
+        />
+    </Tooltip>
 }
 
 const columns = [
     {
         field: 'tipus',
-        flex: 0.75,
+        flex: 0.85,
+    },
+    {
+        field: 'estat',
+        flex: 0.55,
+        sortable: false,
+        renderCell: (params: any) => <EstatCell {...params}/>,
     },
     {
         field: 'executades',
         flex: 0.5,
         renderCell: (params: any) => {
             const row = params?.row;
-            const value = Math.round(100 - row?.pendents * 100 / row?.executades)
+            // Processats = finalitzats o en error. Els cancel·lats no s'han executat: no compten com a fets
+            // (1 de 3 executat i 2 cancel·lats = 33%, no 100%)
+            const processats = (row?.executades ?? 0) - (row?.pendents ?? 0) - (row?.cancelats ?? 0);
+            const value = row?.executades ? Math.round(processats * 100 / row.executades) : 0
 
             return <>
                 <Chip label={row?.executades} size="small"/>
-                <StyledLinearProgress
+                <TonalLinearProgress
                     color={'success'}
+                    boxSx={{ml: 1}}
                     value={value}
                     sx={{height: '20px'}}
                 >
                     {value}%
-                </StyledLinearProgress>
+                </TonalLinearProgress>
             </>
         }
     },
@@ -81,21 +131,21 @@ const columns = [
         field: 'errors',
         flex: 0.25,
         renderCell: (params: any) =>
-            <Chip label={params?.row?.errors} size="small" color={params?.row?.errors ? 'error' : 'default'}/>
+            <Chip label={params?.row?.errors} size="small" sx={params?.row?.errors ? tonal('error') : undefined}/>
     },
     {
         field: 'dataInici',
-        flex: 0.75,
+        flex: 0.65,
         valueFormatter: (value: any) => formatDate(value),
     },
     {
         field: 'dataFi',
-        flex: 0.75,
+        flex: 0.65,
         valueFormatter: (value: any) => formatDate(value),
     },
     {
         field: 'createdByFullName',
-        flex: 0.5,
+        flex: 0.65,
     },
     {
         field: 'documentNom',
@@ -111,8 +161,9 @@ const ExecucioMassivaGrid = () => {
     const [isRefresh, setRefresh] = useState(false);
     const gridApiRef = useMuiDataGridApiRef();
 
-    const {download} = useActions();
+    const {download, cancelar} = useActions();
     const {handleOpen: handleContingutOpen, dialog: dialogContingut, refresh} = useExecucioMassivaContingut();
+
     const actions: any = [
         {
             label: t('common.detail'),
@@ -126,7 +177,21 @@ const ExecucioMassivaGrid = () => {
             showInMenu: true,
             onClick: download,
             hidden: (row: any) => !row?.documentNom,
-        }
+        },
+        {
+            // Només per a execucions no acabades que l'usuari pot cancel·lar (creador o administrador d'entitat)
+            // i sense cancel·lació ja sol·licitada. Exportacions i moure: visible però deshabilitada.
+            label: t('page.user.action.massives.cancelar.label'),
+            icon: 'block',
+            showInMenu: true,
+            onClick: (id: any) => cancelar(id, () => {
+                gridApiRef?.current?.refresh?.();
+                refresh?.();
+            }),
+            hidden: (row: any) => !!row?.dataFi || !row?.potCancelar || !!row?.cancelacioData,
+            disabled: (row: any) => !row?.cancelable,
+            title: (row: any) => !row?.cancelable ? t('page.user.action.massives.cancelar.noCancelable') : undefined,
+        },
     ]
 
     const intervalRef = useRef<any>(undefined);

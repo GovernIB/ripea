@@ -10,6 +10,7 @@ import es.caib.ripea.ejb.base.AbstractServiceEjb;
 import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaContingutDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaProcesEstatDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
@@ -75,6 +76,15 @@ public class ExecucioMassivaServiceEjb extends AbstractServiceEjb<ExecucioMassiv
 				dto,
 				exc,
 				elementTipus);
+	}
+
+	@Override
+	@RolesAllowed("**")
+	public ExecucioMassivaProcesEstatDto cancelarExecucioMassiva(
+			Long entitatId,
+			Long execucioMassivaId,
+			String rolActual) throws NotFoundException, ValidationException {
+		return delegateService.cancelarExecucioMassiva(entitatId, execucioMassivaId, rolActual);
 	}
 
 }

@@ -2,6 +2,7 @@ import React, {RefObject} from "react";
 import {useMuiDataGridApiRef} from "reactlib";
 import {GridApiPro, useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro";
 import {Grid, Icon} from "@mui/material";
+import {useTheme} from "@mui/material/styles";
 import useRemesaActions from "./details/RemesaActions.tsx";
 import GridFormField from "../../components/GridFormField.tsx";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
@@ -10,15 +11,22 @@ import * as builder from "../../util/springFilterUtils.ts";
 import {useTranslation} from "react-i18next";
 import useRemesaDetail from "./details/RemesaDetail.tsx";
 import {StyledLabel} from "../../components/StyledLabel.tsx";
+import {isTonalColor, tonal, tonalNeutre} from "../../util/tonal.ts";
 import {useNotificacioEstatSession} from "../../components/SseExpedient.tsx";
 import useRowRefresh from "../../hooks/useRowRefresh.ts";
 
+// Etiqueta d'estat en color tonal (vegeu util/tonal.ts). Abans era text blanc sobre el to clar del color,
+// que no arribava al contrast mínim (de 2,2:1 a 3,8:1 al tema clar).
+// La fan servir remeses, publicacions, consultes PINBAL i el monitor d'integracions. Un color que no és de la
+// paleta (p.ex. 'disabled' a publicacions) es mostra en la variant neutra.
 export const EstatMessage = (props:any) => {
     const {title, icon, color, children} = props;
+    const theme = useTheme();
 
     return <StyledLabel
         title={title || (typeof children === 'string' ?children :'')}
-        sx={{ backgroundColor: `${color}.light`, color: 'white' }}
+        // StyledLabel combina el sx amb un spread: cal passar-hi un objecte, no la funció
+        sx={isTonalColor(color) ? tonal(color)(theme) : tonalNeutre(theme)}
         icon={icon}
     >
         {children}

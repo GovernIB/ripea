@@ -2505,6 +2505,15 @@ const translationEs = {
                     detail: "Detalle de la acción masiva: {{tipus}}",
                     ok: "El documento se ha descargado correctamente",
                     pending: "Este elemento se está procesando actualmente",
+                    cancelar: {
+                        label: "Cancelar la ejecución masiva",
+                        title: "Cancelar la ejecución masiva",
+                        confirm: "¿Seguro que desea cancelar esta ejecución masiva? Si está en curso, el elemento que se está procesando terminará y el resto quedarán cancelados.",
+                        ok: "La ejecución masiva se ha cancelado",
+                        sollicitadaOk: "Se ha solicitado la cancelación. El elemento que se está procesando terminará y el resto quedarán cancelados.",
+                        sollicitada: "Cancelando…",
+                        noCancelable: "Las exportaciones y el movimiento entre expedientes no se pueden cancelar: se ejecutan de una sola vez y detenerlas a medias dejaría datos incoherentes.",
+                    },
                 },
             },
             perfil: {

@@ -60,6 +60,7 @@ import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaContingutDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaEstatDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaProcesEstatDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.service.intf.dto.FileNameOption;
 import es.caib.ripea.service.intf.dto.FitxerDto;
@@ -97,6 +98,7 @@ public class ExecucioMassivaHelper {
 	@Autowired private ContingutHelper contingutHelper;
 	@Autowired private ExpedientPeticioHelper expedientPeticioHelper;
 	@Autowired private DocumentNotificacioHelper documentNotificacioHelper;
+	@Autowired private EmailHelper emailHelper;
 
 	public FitxerDto descarregarDocumentExecMassiva(Long entitatId, Long execMassivaId) {
 		ExecucioMassivaEntity execucioMassiva = execucioMassivaRepository.findById(execMassivaId).orElse(null);
@@ -516,19 +518,16 @@ public class ExecucioMassivaHelper {
 		return execucioMassivaElements;
 	}
 
-	/** Id de la següent execució massiva a processar, o null si no n'hi ha cap de pendent. */
-	@Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
-	public Long getIdExecucioMassivaPerProcessar(Date ara) {
-		return execucioMassivaRepository.getMinExecucioMassiva(ara);
-	}
-
 	/**
 	 * Tanca l'execució massiva en una transacció nova i aïllada, hagi anat bé o hagi fallat.
-	 * S'ha de cridar sempre: la cua es calcula amb el min(id) de les execucions sense data de fi, així que una
-	 * execució que no arribi a tenir-la torna a ser la primera a cada cicle i bloqueja totes les posteriors.
+	 * S'ha de cridar sempre: una execució que no arribi a tenir data de fi torna a ser la primera de la cua
+	 * a cada cicle i bloqueja totes les posteriors.
 	 *
-	 * @param error missatge de l'error que ha aturat l'execució, o null si ha acabat correctament. Si s'informa,
-	 *              els elements que no s'hagin arribat a processar queden marcats en estat d'error.
+	 * Si se n'ha sol·licitat la cancel·lació, els elements que no s'hagin arribat a processar queden cancel·lats
+	 * i l'execució, CANCELADA.
+	 *
+	 * @param error missatge de l'error que ha aturat l'execució, o null si ha acabat correctament. Si s'informa
+	 *              i no s'ha cancel·lat, els elements que no s'hagin arribat a processar queden en estat d'error.
 	 */
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void finalitzarExecucioMassiva(Long execucioMassivaId, String error) {
@@ -540,31 +539,67 @@ public class ExecucioMassivaHelper {
 		}
 
 		Date ara = new Date();
+		boolean cancelada = execucioMassiva.getCancelacioData() != null;
 
-		if (error != null) {
+		if (cancelada || error != null) {
 			for (ExecucioMassivaContingutEntity emc : execucioMassiva.getContinguts()) {
 				if (emc.getEstat() == null || ExecucioMassivaEstatDto.ESTAT_PENDENT.equals(emc.getEstat())) {
-					emc.updateError(ara, error);
+					if (cancelada) {
+						emc.updateCancelat(ara);
+					} else {
+						emc.updateError(ara, error);
+					}
 				}
 			}
 		}
 
-		//Esborram el fitxer temporal ZIP amb els Json dels documents del disc. Si no es pot esborrar només queda
-		//un fitxer orfe: no pot impedir que l'execució es tanqui.
+		esborrarFitxerTemporalImportacio(execucioMassiva);
+
+		execucioMassiva.updateEstat(cancelada ? ExecucioMassivaProcesEstatDto.CANCELADA : ExecucioMassivaProcesEstatDto.FINALITZADA);
+		execucioMassiva.updateDataFi(ara);
+		execucioMassivaRepository.save(execucioMassiva);
+	}
+
+	/**
+	 * A IMPORTAR_DOCS, documentNom no és un resultat: és l'identificador al gestor documental del ZIP temporal amb
+	 * els JSON dels documents a importar. Quan l'execució es tanca (acabi, falli o es cancel·li) s'ha d'esborrar i
+	 * buidar documentNom; si no, el llistat el mostra com a document descarregable i el fitxer queda orfe.
+	 * Si no es pot esborrar només queda un fitxer orfe: no pot impedir que l'execució es tanqui.
+	 * S'executa dins la transacció del cridador, que és qui desa l'entitat.
+	 */
+	public void esborrarFitxerTemporalImportacio(ExecucioMassivaEntity execucioMassiva) {
 		if (ExecucioMassivaTipusDto.IMPORTAR_DOCS.equals(execucioMassiva.getTipus()) && Utils.hasValue(execucioMassiva.getDocumentNom())) {
 			try {
 				pluginHelper.gestioDocumentalDelete(
 						execucioMassiva.getDocumentNom(),
 						PluginHelper.GESDOC_AGRUPACIO_DOCS_ESBORRANYS);
 			} catch (Exception e) {
-				logger.error("No s'ha pogut esborrar el fitxer temporal de l'execució massiva (id=" + execucioMassivaId
+				logger.error("No s'ha pogut esborrar el fitxer temporal de l'execució massiva (id=" + execucioMassiva.getId()
 						+ ", documentNom=" + execucioMassiva.getDocumentNom() + ")", e);
 			}
 			execucioMassiva.setDocumentNom(null);
 		}
+	}
 
-		execucioMassiva.updateDataFi(ara);
-		execucioMassivaRepository.save(execucioMassiva);
+	/**
+	 * Marca en error un element que ha fallat fora del seu propi tractament d'errors (p.ex. la seva transacció
+	 * ha quedat marcada per fer rollback i no s'ha pogut confirmar), perquè la resta de l'execució pugui seguir.
+	 */
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void marcarContingutError(Long execucioMassivaContingutId, String error) {
+		ExecucioMassivaContingutEntity emc = execucioMassivaContingutRepository.findById(execucioMassivaContingutId).orElse(null);
+		if (emc != null && (emc.getEstat() == null || ExecucioMassivaEstatDto.ESTAT_PENDENT.equals(emc.getEstat()))) {
+			emc.updateError(new Date(), error);
+		}
+	}
+
+	/** Avisa el creador que l'execució ha acabat. Es crida un cop tancada, perquè el correu dugui l'estat final. */
+	@Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
+	public void enviarCorreuFinalitzacio(Long execucioMassivaId) {
+		ExecucioMassivaEntity execucioMassiva = execucioMassivaRepository.findById(execucioMassivaId).orElse(null);
+		if (execucioMassiva != null) {
+			emailHelper.execucioMassivaFinalitzada(execucioMassiva);
+		}
 	}
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)

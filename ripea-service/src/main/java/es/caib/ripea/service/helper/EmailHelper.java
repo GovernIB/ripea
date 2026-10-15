@@ -49,6 +49,7 @@ import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.EventTipusEnumDto;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaProcesEstatDto;
 import es.caib.ripea.service.intf.dto.ExpedientErrorTancamentDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.GenericDto;
@@ -144,15 +145,17 @@ public class EmailHelper {
 			
 			logger.debug("Enviant correu electrònic per a execució massiva finalitzada (execucioMassivaId=" + em.getId() + ")");
 
-			String subject = getPrefixRipea() + " Execucio massiva finalitzada: " + em.getTipus();
-			
+			boolean cancelada = ExecucioMassivaProcesEstatDto.CANCELADA.equals(em.getEstat());
+			String subject = getPrefixRipea() + (cancelada ? " Execucio massiva cancel·lada: " : " Execucio massiva finalitzada: ") + em.getTipus();
+
 			String text =
-					"Execució massiva finalitzada:\n" +
+					(cancelada ? "Execució massiva cancel·lada:\n" : "Execució massiva finalitzada:\n") +
 					"\tId: " + em.getId() + "\n" +
 					"\tTipus: " + em.getTipus() + "\n" +
 					"\tData Inici: " + em.getDataInici() + "\n" +
 					"\tData Fi: " + em.getDataFi() + "\n" +
-					"\tContinguts: " + em.getContinguts().size() + "\n";
+					"\tContinguts: " + em.getContinguts().size() + "\n" +
+					(cancelada ? "\tCancel·lada per: " + em.getCancelacioUsuari() + " (" + em.getCancelacioData() + ")\n" : "");
 
 			sendOrSaveEmail(em.getCreatedBy().get(), subject, text, EventTipusEnumDto.EXEC_MASSIVA_FINALITZADA);
 				

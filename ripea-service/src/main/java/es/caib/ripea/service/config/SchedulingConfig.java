@@ -155,8 +155,10 @@ public class SchedulingConfig implements SchedulingConfigurer {
     public void rescheduleTask(String taskId, Trigger newTrigger) {
         ScheduledFuture<?> scheduledTask = scheduledTasks.get(taskId);
         if (scheduledTask != null) {
-            // Cancelar la tarea existente
-            scheduledTask.cancel(true);
+            // Cancelar la tarea existente. L'execució massiva en curs no s'interromp: una interrupció a mitges d'un
+            // element el pot deixar fet a l'extern però no a la BD. La nova programació no n'agafa cap altra
+            // mentre aquesta no acabi (ExecucioMassivaServiceImpl.executeNextMassiveScheduledTask).
+            scheduledTask.cancel(!codiExecucioAccionsMassives.equals(taskId));
             // Añadir la tarea con el nuevo trigger
             Runnable task = tasks.get(taskId);
             if (task != null) {

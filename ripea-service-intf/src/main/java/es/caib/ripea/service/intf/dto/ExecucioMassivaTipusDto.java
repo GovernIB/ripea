@@ -26,5 +26,15 @@ public enum ExecucioMassivaTipusDto {
 	EXPORTAR_ENI,
 	EXPORTAR_INSIDE,
 	IMPORTAR_DOCS,
-	MOURE_EXPEDIENT
+	MOURE_EXPEDIENT;
+
+	/**
+	 * Si una execució d'aquest tipus es pot cancel·lar.
+	 * Les exportacions són una sola crida que genera el fitxer de cop, i moure entre expedients
+	 * va en una sola transacció que no desfaria els moviments ja fets a l'Arxiu: cancel·lar-les
+	 * a mitges no aturaria res o deixaria dades incoherents.
+	 */
+	public boolean isCancelable() {
+		return !name().startsWith("EXPORTAR_") && this != MOURE_EXPEDIENT;
+	}
 }

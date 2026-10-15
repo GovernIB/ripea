@@ -51,7 +51,18 @@ public class ExecucioMassivaDto extends AuditoriaDto implements Serializable {
 	
 	private Long identificadorAuxiliar;
 
+	private ExecucioMassivaProcesEstatDto estat;
+	private Date cancelacioData;
+	private String cancelacioUsuari;
+	//Només per a la vista: si l'usuari actual pot cancel·lar-la (creador o administrador d'entitat)
+	private boolean potCancelar;
+
 	public ExecucioMassivaDto() {}
+
+	/** Està en curs i se n'ha demanat la cancel·lació, però l'element actual encara no ha acabat. */
+	public boolean isCancelacioSolicitada() {
+		return dataFi == null && cancelacioData != null;
+	}
 
 	public ExecucioMassivaDto(
 			ExecucioMassivaTipusDto tipus,

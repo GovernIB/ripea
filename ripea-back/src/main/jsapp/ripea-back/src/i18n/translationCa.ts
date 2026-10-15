@@ -2505,6 +2505,15 @@ const translationCa = {
                     detail: "Detall de l'acció massiva: {{tipus}}",
                     ok: "El document s'ha baixat correctament",
                     pending: "Aquest element s'està processant actualment",
+                    cancelar: {
+                        label: "Cancel·lar l'execució massiva",
+                        title: "Cancel·lar l'execució massiva",
+                        confirm: "Segur que voleu cancel·lar aquesta execució massiva? Si està en curs, l'element que s'està processant acabarà i la resta quedaran cancel·lats.",
+                        ok: "L'execució massiva s'ha cancel·lat",
+                        sollicitadaOk: "S'ha sol·licitat la cancel·lació. L'element que s'està processant acabarà i la resta quedaran cancel·lats.",
+                        sollicitada: "Cancel·lant…",
+                        noCancelable: "Les exportacions i el moviment entre expedients no es poden cancel·lar: s'executen d'una sola vegada i aturar-les a mitges deixaria dades incoherents.",
+                    },
                 },
             },
             perfil: {

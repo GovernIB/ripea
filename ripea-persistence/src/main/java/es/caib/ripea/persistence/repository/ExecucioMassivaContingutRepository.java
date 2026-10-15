@@ -20,7 +20,21 @@ import java.util.Optional;
 public interface ExecucioMassivaContingutRepository extends JpaRepository<ExecucioMassivaContingutEntity, Long> {
 	
 	public List<ExecucioMassivaContingutEntity> findByExecucioMassivaOrderByOrdreAsc (ExecucioMassivaEntity execucioMassiva);
-	
+
+	/**
+	 * Passa a cancel·lats els elements que no s'han arribat a processar. Update massiu i condicional perquè
+	 * no trepitgi un element que un altre procés hagi acabat entre la lectura i l'escriptura.
+	 */
+	@Modifying(flushAutomatically = true, clearAutomatically = true)
+	@Query("update ExecucioMassivaContingutEntity c " +
+			"set 	c.estat = :cancelat, c.dataFi = :ara " +
+			"where 	c.execucioMassiva.id = :execucioMassivaId and (c.estat is null or c.estat = :pendent)")
+	int cancelarPendents(
+			@Param("execucioMassivaId") Long execucioMassivaId,
+			@Param("ara") Date ara,
+			@Param("pendent") ExecucioMassivaEstatDto pendent,
+			@Param("cancelat") ExecucioMassivaEstatDto cancelat);
+
 	@Query("select min(e.id) " +
 			"from	ExecucioMassivaContingutEntity e " +
 			"where	e.execucioMassiva.id = :nextMassiu " +

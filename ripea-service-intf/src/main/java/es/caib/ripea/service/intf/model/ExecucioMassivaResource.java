@@ -3,7 +3,11 @@ import java.util.Date;
 
 import org.springframework.data.annotation.Transient;
 
+import es.caib.ripea.service.intf.base.annotation.ResourceArtifact;
+import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
+import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
+import es.caib.ripea.service.intf.dto.ExecucioMassivaProcesEstatDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.service.intf.dto.FileNameOption;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
@@ -17,7 +21,16 @@ import lombok.experimental.FieldNameConstants;
 @Setter
 @NoArgsConstructor
 @FieldNameConstants
+@ResourceConfig(
+        artifacts = {
+                @ResourceArtifact(
+                        type = ResourceArtifactType.ACTION,
+                        code = ExecucioMassivaResource.ACTION_CANCELAR,
+                        requiresId = true),
+        })
 public class ExecucioMassivaResource extends BaseAuditableResource<Long> {
+
+    public static final String ACTION_CANCELAR = "CANCELAR";
 
 	private static final long serialVersionUID = -316479369072429836L;
 	
@@ -41,6 +54,16 @@ public class ExecucioMassivaResource extends BaseAuditableResource<Long> {
     private Boolean portafirmesAvisFirmaParcial;
     private Boolean portafirmesFirmaParcial;
     private String documentNom;
+    private ExecucioMassivaProcesEstatDto estat;
+    private Date cancelacioData;
+    private String cancelacioUsuari;
+
+    //Si el tipus admet cancel·lació (vegeu ExecucioMassivaTipusDto.isCancelable)
+    @Transient
+    private boolean cancelable;
+    //Si l'usuari actual és el creador o té el rol d'administrador d'entitat
+    @Transient
+    private boolean potCancelar;
 
     @Transient
     private int finalitzades;

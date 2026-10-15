@@ -82,4 +82,14 @@ public class ExecucioMassivaResourceEntity extends BaseAuditableEntity<ExecucioM
             cascade = {CascadeType.ALL},
             fetch = FetchType.EAGER)
     private List<ExecucioMassivaContingutResourceEntity> continguts = new ArrayList<>();
+
+    // Només lectura: els escriu el procés en segon pla i la cancel·lació (ExecucioMassivaCuaHelper)
+    @Column(name = "estat", insertable = false, updatable = false)
+    @Enumerated(EnumType.STRING)
+    private ExecucioMassivaProcesEstatDto estat;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "cancelacio_data", insertable = false, updatable = false)
+    private Date cancelacioData;
+    @Column(name = "cancelacio_usuari", insertable = false, updatable = false)
+    private String cancelacioUsuari;
 }

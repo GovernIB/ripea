@@ -52,6 +52,25 @@
 		$("button[name=previousPage]").click(function() {
 			window.location.href = '<c:url value="/modal/massiu/consulta/${pagina - 1}"/>';
 		});
+		$(".exm-cancelar").click(function(event) {
+			//El botó és dins l'enllaç que obre el detall: el clic no ha d'arribar-hi
+			event.preventDefault();
+			event.stopPropagation();
+			if ($(this).hasClass('disabled')) {
+				return;
+			}
+			if (!confirm("<spring:message code="accio.massiva.cancelar.confirmacio" javaScriptEscape="true"/>")) {
+				return;
+			}
+			$.ajax({
+				type: 'POST',
+				url: '<c:url value="/massiu/"/>' + $(this).data("exmid") + '/cancelar',
+				//El resultat (correcte o error) es mostra com a missatge en recarregar
+				complete: function() {
+					reloadPage();
+				}
+			});
+		});
 		$("input[name=refrescarDeu]").click(function(event) {
 			if ($(this).prop('checked')) {
 				refreshInterval = setInterval(reloadPage, 10000);
@@ -248,6 +267,17 @@
         	<div class="row">
 	        	<div class="col-xs-3">
 		          	<spring:message code="accio.massiva.tipus.${exm.tipus}"/>
+		          	<c:choose>
+		          		<c:when test="${exm.cancelacioSolicitada}">
+		          			<span class="label label-warning"><spring:message code="accio.massiva.estat.proces.CANCELACIO_SOLICITADA"/></span>
+		          		</c:when>
+		          		<c:when test="${exm.estat == 'CANCELADA'}">
+		          			<span class="label label-default"><spring:message code="accio.massiva.estat.proces.CANCELADA"/></span>
+		          		</c:when>
+		          		<c:when test="${exm.estat == 'PENDENT' || exm.estat == 'EN_CURS'}">
+		          			<span class="label label-info"><spring:message code="accio.massiva.estat.proces.${exm.estat}"/></span>
+		          		</c:when>
+		          	</c:choose>
 	          	</div>
 	          	<div class="col-xs-2 one-line" id="barra_${exm.id}">
 		          	<div><span class="mass-badge badge in-line-badge">${fn:length(exm.contingutIds)}</span></div> 
@@ -274,6 +304,19 @@
 				<div class="col-xs-1">
 					<c:if test="${! empty exm.documentNom}">
 						<a href="<c:url value="/massiu/${exm.id}/descarregar"/>" title="Descarregar document"><span class="fa fa-download fa-2x"></span></a>
+					</c:if>
+					<c:if test="${empty exm.dataFi && exm.potCancelar && !exm.cancelacioSolicitada}">
+						<c:choose>
+							<c:when test="${exm.tipus.cancelable}">
+								<c:set var="titolCancelar"><spring:message code="accio.massiva.cancelar.boto"/></c:set>
+								<button type="button" class="btn btn-xs btn-danger exm-cancelar" data-exmid="${exm.id}" title="${titolCancelar}" aria-label="${titolCancelar}"><span class="fa fa-ban" aria-hidden="true"></span></button>
+							</c:when>
+							<c:otherwise>
+								<%-- aria-disabled en lloc de disabled: un botó disabled no mostra el title ni rep el clic, que obriria el panell --%>
+								<c:set var="titolNoCancelable"><spring:message code="accio.massiva.cancelar.no.cancelable"/></c:set>
+								<button type="button" class="btn btn-xs btn-default disabled exm-cancelar" aria-disabled="true" title="${titolNoCancelable}" aria-label="${titolNoCancelable}"><span class="fa fa-ban" aria-hidden="true"></span></button>
+							</c:otherwise>
+						</c:choose>
 					</c:if>
 				</div>
           	</div>

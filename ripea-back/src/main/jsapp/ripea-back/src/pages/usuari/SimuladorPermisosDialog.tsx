@@ -20,6 +20,7 @@ import {
     Typography,
 } from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
+import {tonal, TonalColor} from "../../util/tonal.ts";
 import {objecteText, Origen, PermisDetall} from "./PermisosUsuariDialog.tsx";
 
 const ROLS_AMB_ORGAN = ['IPA_ORGAN_ADMIN', 'IPA_DISSENY'];
@@ -99,21 +100,22 @@ const SimuladorForm = ({usuariId}: { usuariId: string }) => {
     </Grid>
 }
 
-const ESTAT_ICONA: Record<Estat, { icon: string, color: any }> = {
+// NO_APLICA no té color: es mostra amb el contorn per defecte
+const ESTAT_ICONA: Record<Estat, { icon: string, color?: TonalColor }> = {
     OK: {icon: 'check_circle', color: 'success'},
     KO: {icon: 'cancel', color: 'error'},
-    NO_APLICA: {icon: 'remove_circle_outline', color: 'default'},
+    NO_APLICA: {icon: 'remove_circle_outline'},
     AVIS: {icon: 'warning', color: 'warning'},
 };
 
-/** Estat amb icona i text (no només color, per accessibilitat). */
+/** Estat amb icona i text (no només color, per accessibilitat), en color tonal. */
 const EstatChip = ({estat, seccio}: { estat: Estat, seccio: 'requisits' | 'vies' | 'restriccions' }) => {
     const {t} = useTranslation();
     const {icon, color} = ESTAT_ICONA[estat];
-    return <Chip size="small" color={color} variant={estat === 'NO_APLICA' ? 'outlined' : 'filled'}
+    return <Chip size="small" variant={color ? 'filled' : 'outlined'}
                  icon={<Icon>{icon}</Icon>}
                  label={t(`page.usuari.simulador.estat.${seccio}.${estat}`)}
-                 sx={{minWidth: 130, justifyContent: 'flex-start'}}/>
+                 sx={[{minWidth: 130, justifyContent: 'flex-start'}, ...(color ? [tonal(color)] : [])]}/>
 }
 
 const PARAMETRES_BOOLEANS = ['comu', 'permisDirecte', 'gestioGrups', 'comuAltraEntitat'];

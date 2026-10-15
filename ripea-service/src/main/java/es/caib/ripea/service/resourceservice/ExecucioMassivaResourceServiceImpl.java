@@ -1,6 +1,7 @@
 package es.caib.ripea.service.resourceservice;
 
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -19,7 +20,10 @@ import es.caib.ripea.persistence.entity.resourceentity.ExecucioMassivaResourceEn
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.helper.ExecucioMassivaCuaHelper;
 import es.caib.ripea.service.helper.ExecucioMassivaHelper;
+import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
+import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaEstatDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
@@ -36,10 +40,28 @@ public class ExecucioMassivaResourceServiceImpl extends BaseMutableResourceServi
 	private final ExecucioMassivaHelper execucioMassivaHelper;
 	private final ConfigHelper configHelper;
 	private final UsuariResourceRepository usuariResourceRepository;
+	private final ExecucioMassivaCuaHelper execucioMassivaCuaHelper;
 
     @PostConstruct
     public void init() {
     	register(ExecucioMassivaResource.Fields.documentNom, new DocumentFieldDownloader());
+    	register(ExecucioMassivaResource.ACTION_CANCELAR, new CancelarActionExecutor());
+    }
+
+    private class CancelarActionExecutor implements ActionExecutor<ExecucioMassivaResourceEntity, Serializable, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {}
+
+		@Override
+		public Serializable exec(String code, ExecucioMassivaResourceEntity entity, Serializable params) throws ActionExecutionException {
+			try {
+				//Els permisos es comproven sobre l'entitat de la mateixa execució massiva
+				return execucioMassivaCuaHelper.cancelar(entity.getEntitat().getId(), entity.getId(), configHelper.getRolActual());
+			} catch (Exception e) {
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, e.getMessage());
+			}
+		}
     }
 
     @Override
@@ -76,6 +98,12 @@ public class ExecucioMassivaResourceServiceImpl extends BaseMutableResourceServi
         resource.setCancelats( contingutMap.containsKey(ExecucioMassivaEstatDto.ESTAT_CANCELAT) ?contingutMap.get(ExecucioMassivaEstatDto.ESTAT_CANCELAT).size() :0);
 
         resource.setExecutades(continguts.size());
+
+        resource.setCancelable(entity.getTipus() != null && entity.getTipus().isCancelable());
+        resource.setPotCancelar(ExecucioMassivaCuaHelper.potCancelar(
+                entity.getCreatedBy(),
+                SecurityContextHolder.getContext().getAuthentication().getName(),
+                configHelper.getRolActual()));
 
         resource.setPortafirmesResponsables(
                 entity.getPortafirmesResponsablesString() != null
