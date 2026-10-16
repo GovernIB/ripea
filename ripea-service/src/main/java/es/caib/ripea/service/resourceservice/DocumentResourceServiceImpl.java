@@ -149,6 +149,7 @@ import es.caib.ripea.service.intf.resourceservice.DocumentResourceService;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
+import es.caib.ripea.service.resourcehelper.PerspectivesLotHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -161,6 +162,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private static final int MAX_IDS_CONSULTA = 1000;
 
     private final ContingutResourceHelper contingutResourceHelper;
+    private final PerspectivesLotHelper perspectivesLotHelper;
     private final PluginHelper pluginHelper;
     private final ConfigHelper configHelper;
     private final PinbalHelper pinbalHelper;
@@ -204,9 +206,12 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         register(DocumentResource.PERSPECTIVE_PATH_CODE, new PathPerspectiveApplicator());
         register(DocumentResource.PERSPECTIVE_FIRMES_CODE, new FirmesPerspectiveApplicator());
         register(DocumentResource.PERSPECTIVE_PROCEDIMENT_CODE, new ProcedimentPerspectiveApplicator());
-        register(DocumentResource.PERSPECTIVE_EN_PROCES_PORTAFIB_CODE, new EnProcesPortafibPerspectiveApplicator());
-        register(DocumentResource.PERSPECTIVE_EN_PROCES_FIRMA_WEB_CODE, new EnProcesFirmaWebPerspectiveApplicator());
-        register(DocumentResource.PERSPECTIVE_EN_PROCES_CUSTODIAR_CODE, new EnProcesCustodiarPerspectiveApplicator());
+        register(DocumentResource.PERSPECTIVE_EN_PROCES_PORTAFIB_CODE, perspectivesLotHelper.execucioMassivaEnCurs(
+                ElementTipusEnumDto.DOCUMENT, ExecucioMassivaTipusDto.PORTASIGNATURES, DocumentResource::setExecucioMassivaPortafibId));
+        register(DocumentResource.PERSPECTIVE_EN_PROCES_FIRMA_WEB_CODE, perspectivesLotHelper.execucioMassivaEnCurs(
+                ElementTipusEnumDto.DOCUMENT, ExecucioMassivaTipusDto.FIRMASIMPLEWEB, DocumentResource::setExecucioMassivaFirmaWebId));
+        register(DocumentResource.PERSPECTIVE_EN_PROCES_CUSTODIAR_CODE, perspectivesLotHelper.execucioMassivaEnCurs(
+                ElementTipusEnumDto.DOCUMENT, ExecucioMassivaTipusDto.CUSTODIAR_ELEMENTS_PENDENTS, DocumentResource::setExecucioMassivaCustodiarId));
         register(DocumentResource.PERSPECTIVE_RESUM_CODE, new ResumPerspectiveApplicator());
         register(DocumentResource.Fields.adjunt, new AdjuntFieldDownloader());
         register(DocumentResource.Fields.firmaAdjunt, new FirmaFieldDownloader());
@@ -626,38 +631,6 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 					entity.getExpedient().getMetaExpedient().getId(),
 					entity.getExpedient().getMetaExpedient().getNom()));
 		}
-    }
-
-    private class EnProcesPortafibPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
-        @Override
-        public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
-            execucioMassivaContingutRepository
-                    .findFirstByElementIdAndElementTipusAndExecucioMassivaTipusAndExecucioMassivaDataFiNull(
-                            entity.getId(),
-                            ElementTipusEnumDto.DOCUMENT,
-                            ExecucioMassivaTipusDto.PORTASIGNATURES)
-                    .ifPresent(contingut -> resource.setExecucioMassivaPortafibId(contingut.getExecucioMassiva().getId()));
-        }
-    }
-    
-    private class EnProcesFirmaWebPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
-        @Override
-        public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
-            execucioMassivaContingutRepository
-                    .findFirstByElementIdAndElementTipusAndExecucioMassivaTipusAndExecucioMassivaDataFiNull(
-                            entity.getId(), ElementTipusEnumDto.DOCUMENT, ExecucioMassivaTipusDto.FIRMASIMPLEWEB)
-                    .ifPresent(contingut -> resource.setExecucioMassivaFirmaWebId(contingut.getExecucioMassiva().getId()));
-        }
-    }
-
-    private class EnProcesCustodiarPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
-        @Override
-        public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
-            execucioMassivaContingutRepository
-                    .findFirstByElementIdAndElementTipusAndExecucioMassivaTipusAndExecucioMassivaDataFiNull(
-                            entity.getId(), ElementTipusEnumDto.DOCUMENT, ExecucioMassivaTipusDto.CUSTODIAR_ELEMENTS_PENDENTS)
-                    .ifPresent(contingut -> resource.setExecucioMassivaCustodiarId(contingut.getExecucioMassiva().getId()));
-        }
     }
 
     private class FirmesPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {

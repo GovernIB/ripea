@@ -55,7 +55,24 @@ public interface ExecucioMassivaContingutRepository extends JpaRepository<Execuc
 
 	Optional<ExecucioMassivaContingutEntity> findFirstByElementIdAndElementTipusAndExecucioMassivaTipusAndExecucioMassivaDataFiNull(
 			Long elementId, ElementTipusEnumDto elementTipus, ExecucioMassivaTipusDto tipus);
-	
+
+	/**
+	 * Versió per lots de findFirstByElementIdAndElementTipusAndExecucioMassivaTipusAndExecucioMassivaDataFiNull per a les
+	 * perspectives EN_PROCES_* dels llistats: retorna [elementId, execucioMassivaId] de cada element que té alguna execució
+	 * massiva del tipus indicat encara en curs (la de menor id si n'hi ha més d'una). Màxim 1000 ids per crida (límit IN d'Oracle).
+	 */
+	@Query("select c.elementId, min(c.execucioMassiva.id) " +
+			"from	ExecucioMassivaContingutEntity c " +
+			"where	c.elementId in (:elementIds) " +
+			"   and	c.elementTipus = :elementTipus " +
+			"   and	c.execucioMassiva.tipus = :tipus " +
+			"   and	c.execucioMassiva.dataFi is null " +
+			"group by c.elementId")
+	List<Object[]> findExecucioMassivaEnCursByElementIds(
+			@Param("elementIds") List<Long> elementIds,
+			@Param("elementTipus") ElementTipusEnumDto elementTipus,
+			@Param("tipus") ExecucioMassivaTipusDto tipus);
+
 	//------------------------------------------------------------------------//
 	
 	@Modifying

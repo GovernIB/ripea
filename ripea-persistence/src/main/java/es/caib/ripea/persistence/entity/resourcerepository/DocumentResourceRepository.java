@@ -70,4 +70,47 @@ public interface DocumentResourceRepository extends BaseRepository<DocumentResou
             @Param("arxiuMaxReintentsDocuments") int arxiuMaxReintentsDocuments);
 
     int countAllByExpedientIdAndEsborrat(Long expedientId, int esborrat);
+
+    // Versions per lots de les consultes anteriors per a la perspectiva BASIC del llistat d'expedients: retornen
+    // els ids dels expedients que compleixen la condició (amb el mateix criteri que la consulta individual).
+    // Màxim 1000 ids per crida (límit IN d'Oracle).
+
+    @Query("select distinct d.expedient.id from DocumentResourceEntity d " +
+            "where d.expedient.id in (:expedientIds) and d.esborrat = 0")
+    List<Long> findExpedientIdsAmbDocuments(@Param("expedientIds") List<Long> expedientIds);
+
+    @Query("select distinct d.expedient.id from DocumentResourceEntity d " +
+            "where d.expedient.id in (:expedientIds) " +
+            "and d.arxiuEstat = es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto.DEFINITIU")
+    List<Long> findExpedientIdsAmbDocumentsDefinitius(@Param("expedientIds") List<Long> expedientIds);
+
+    @Query("select distinct c.expedient.id from DocumentResourceEntity c " +
+            "where c.expedient.id in (:expedientIds) " +
+            "and c.documentTipus = 0 " + //= DIGITAL
+            "and c.esborrat = 0 " +
+            "and c.estat = 0 ")
+    List<Long> findExpedientIdsAmbFillsEsborranys(@Param("expedientIds") List<Long> expedientIds);
+
+    @Query("select distinct c.expedient.id from DocumentResourceEntity c " +
+            "where c.expedient.id in (:expedientIds) " +
+            "and c.esborrat = 0 " +
+            "and (c.estat = es.caib.ripea.service.intf.dto.DocumentEstatEnumDto.FIRMA_PENDENT " +
+            "	or c.estat = es.caib.ripea.service.intf.dto.DocumentEstatEnumDto.FIRMA_PENDENT_VIAFIRMA " +
+            "	or c.estat = es.caib.ripea.service.intf.dto.DocumentEstatEnumDto.FIRMA_PARCIAL)")
+    List<Long> findExpedientIdsAmbDocumentsEnProcesDeFirma(@Param("expedientIds") List<Long> expedientIds);
+
+    @Query("select distinct d.expedient.id from DocumentResourceEntity d " +
+            "where d.expedient.id in (:expedientIds) " +
+            "and d.esborrat = 0 " +
+            "and d.gesDocFirmatId is not null")
+    List<Long> findExpedientIdsAmbDocumentsDePortafirmesNoCustodiats(@Param("expedientIds") List<Long> expedientIds);
+
+    @Query("select distinct d.expedient.id from DocumentResourceEntity d " +
+            "where d.expedient.id in (:expedientIds) " +
+            "and d.esborrat = 0 " +
+            "and d.arxiuUuid = null " +
+            "and d.arxiuReintents < :arxiuMaxReintentsDocuments")
+    List<Long> findExpedientIdsAmbDocumentsPendentsReintentsArxiu(
+            @Param("expedientIds") List<Long> expedientIds,
+            @Param("arxiuMaxReintentsDocuments") int arxiuMaxReintentsDocuments);
 }

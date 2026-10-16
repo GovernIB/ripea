@@ -33,6 +33,7 @@ import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.resourceservice.ContingutResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
+import es.caib.ripea.service.resourcehelper.PerspectivesLotHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,6 +45,7 @@ extends BaseMutableResourceService<ContingutResource, Long, ContingutResourceEnt
 implements ContingutResourceService {
 	
 	private final ConfigHelper configHelper;
+	private final PerspectivesLotHelper perspectivesLotHelper;
 	private final UsuariResourceRepository usuariResourceRepository;
 	private final ExcepcioLogHelper excepcioLogHelper;
 	private final MessageHelper messageHelper;
@@ -57,7 +59,7 @@ implements ContingutResourceService {
 
     @PostConstruct
     public void init() {
-    	register(ContingutResource.PERSPECTIVE_AUDIT_CODE, new AuditoriaPerspectiveApplicator());
+    	register(ContingutResource.PERSPECTIVE_AUDIT_CODE, perspectivesLotHelper.auditoria());
         register(ContingutResource.ACTION_DELETE_CODE, new DeleteDefinitiuActionExecutor());
         register(ContingutResource.ACTION_RECUPERAR_CODE, new RecuperarActionExecutor());
         register(ContingutResource.ACTION_REORDER, new ReorderActionExecutor());
@@ -132,21 +134,6 @@ implements ContingutResourceService {
         }
     }
     
-    private class AuditoriaPerspectiveApplicator implements PerspectiveApplicator<ContingutResourceEntity<ContingutResource>, ContingutResource> {
-        @Override
-        public void applySingle(String code, ContingutResourceEntity<ContingutResource> entity, ContingutResource resource) throws PerspectiveApplicationException {
-        	if (entity.getCreatedBy()!=null) {
-        		UsuariResourceEntity usuariResourceEntity = usuariResourceRepository.findById(entity.getCreatedBy()).orElse(null);
-        		if (usuariResourceEntity!=null) {
-        			resource.setCreatedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
-        		}
-        	}
-        	if (entity.getLastModifiedBy()!=null) {
-        		UsuariResourceEntity usuariResourceEntity = usuariResourceRepository.findById(entity.getLastModifiedBy()).orElse(null);
-        		resource.setLastModifiedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
-        	}
-        }
-    }
     
     private class RecuperarActionExecutor implements ActionExecutor<ContingutResourceEntity<ContingutResource>, MassiveAction, Serializable> {
 

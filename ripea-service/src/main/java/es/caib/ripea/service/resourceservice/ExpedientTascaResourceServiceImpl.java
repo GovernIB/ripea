@@ -60,6 +60,7 @@ import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.ExpedientTascaResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import io.micrometer.core.instrument.Timer;
+import es.caib.ripea.service.resourcehelper.PerspectivesLotHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -69,6 +70,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceService<ExpedientTascaResource, Long, ExpedientTascaResourceEntity> implements ExpedientTascaResourceService {
 
     private final ExpedientTascaResourceRepository expedientTascaResourceRepository;
+    private final PerspectivesLotHelper perspectivesLotHelper;
     private final MetaExpedientTascaResourceRepository metaExpedientTascaResourceRepository;
     private final UsuariResourceRepository usuariResourceRepository;
     
@@ -83,7 +85,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
 	@PostConstruct
 	public void init() {
 		register(ExpedientTascaResource.PERSPECTIVE_RESPONSABLES_CODE, new ResponsablesPerspectiveApplicator());
-		register(ExpedientTascaResource.PERSPECTIVE_AUDIT_CODE, new AuditoriaPerspectiveApplicator());
+		register(ExpedientTascaResource.PERSPECTIVE_AUDIT_CODE, perspectivesLotHelper.auditoria());
 		register(ExpedientTascaResource.PERSPECTIVE_CONTEXT_USUARI_CODE, new ContextUsuariPerspectiveApplicator());
 
         register(ExpedientTascaResource.ACTION_CHANGE_ESTAT_CODE, new ChangeEstatActionExecutor());
@@ -236,21 +238,6 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
 		}
 	}
 	
-    private class AuditoriaPerspectiveApplicator implements PerspectiveApplicator<ExpedientTascaResourceEntity, ExpedientTascaResource> {
-        @Override
-        public void applySingle(String code, ExpedientTascaResourceEntity entity, ExpedientTascaResource resource) throws PerspectiveApplicationException {
-        	if (entity.getCreatedBy()!=null) {
-        		UsuariResourceEntity usuariResourceEntity = usuariResourceRepository.findById(entity.getCreatedBy()).orElse(null);
-        		if (usuariResourceEntity!=null) {
-        			resource.setCreatedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
-        		}
-        	}
-        	if (entity.getLastModifiedBy()!=null) {
-        		UsuariResourceEntity usuariResourceEntity = usuariResourceRepository.findById(entity.getLastModifiedBy()).orElse(null);
-        		resource.setLastModifiedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
-        	}
-        }
-    }
 
     private class ContextUsuariPerspectiveApplicator implements PerspectiveApplicator<ExpedientTascaResourceEntity, ExpedientTascaResource> {
         @Override

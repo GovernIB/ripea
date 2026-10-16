@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -49,8 +50,11 @@ import es.caib.ripea.persistence.entity.resourceentity.DocumentResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
+import es.caib.ripea.persistence.entity.resourcerepository.AlertaResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.DocumentResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.ExpedientComentariResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.ExpedientResourceRepository;
+import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientEstatResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientSequenciaResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.UsuariResourceRepository;
@@ -59,6 +63,7 @@ import es.caib.ripea.persistence.repository.ContingutRepository;
 import es.caib.ripea.persistence.repository.DadaRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.ExecucioMassivaContingutRepository;
+import es.caib.ripea.persistence.repository.ExecucioMassivaRepository;
 import es.caib.ripea.persistence.repository.ExpedientEstatRepository;
 import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
@@ -150,6 +155,7 @@ import es.caib.ripea.service.resourcehelper.ExpedientPermisosFiltreHelper;
 import es.caib.ripea.service.intf.utils.ZipDocumentExtractor;
 import es.caib.ripea.service.permission.ExtendedPermission;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
+import es.caib.ripea.service.resourcehelper.PerspectivesLotHelper;
 import io.micrometer.core.instrument.Timer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -175,8 +181,13 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private final MetaExpedientResourceRepository metaExpedientResourceRepository;
     private final MetaExpedientSequenciaResourceRepository metaExpedientSequenciaResourceRepository;
     private final MetaExpedientRepository metaExpedientRepository;
+    private final MetaExpedientEstatResourceRepository metaExpedientEstatResourceRepository;
+    private final ExpedientComentariResourceRepository expedientComentariResourceRepository;
+    private final AlertaResourceRepository alertaResourceRepository;
+    private final ExecucioMassivaRepository execucioMassivaRepository;
 
     private final ContingutResourceHelper contingutResourceHelper;
+    private final PerspectivesLotHelper perspectivesLotHelper;
     private final ApplicationHelper applicationHelper;
     private final PluginHelper pluginHelper;
     private final CacheHelper cacheHelper;
@@ -254,10 +265,13 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         register(ExpedientResource.PERSPECTIVE_DOCUMENTS_NO_MOGUTS, new DocumentsNoMogutsPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_DOCUMENTS_OBLIGATORIS_TANCAR, new DocumentsObligatorisAlTancarPerspectiveApplicator());
         register(ExpedientResource.PERSPECTIVE_PATH_CODE, new PathPerspectiveApplicator());
-        register(ExpedientResource.PERSPECTIVE_AUDIT_CODE, new AuditoriaPerspectiveApplicator());
-        register(ExpedientResource.PERSPECTIVE_EN_PROCES_CANVI_ESTAT_CODE, new EnProcesCanviEstatPerspectiveApplicator());
-        register(ExpedientResource.PERSPECTIVE_EN_PROCES_TANCAMENT_CODE, new EnProcesTancamentPerspectiveApplicator());
-        register(ExpedientResource.PERSPECTIVE_EN_PROCES_CUSTODIAR_CODE, new EnProcesCustodiarPerspectiveApplicator());
+        register(ExpedientResource.PERSPECTIVE_AUDIT_CODE, perspectivesLotHelper.auditoria());
+        register(ExpedientResource.PERSPECTIVE_EN_PROCES_CANVI_ESTAT_CODE, perspectivesLotHelper.execucioMassivaEnCurs(
+                ElementTipusEnumDto.EXPEDIENT, ExecucioMassivaTipusDto.CANVI_ESTAT, ExpedientResource::setExecucioMassivaCanviEstatId));
+        register(ExpedientResource.PERSPECTIVE_EN_PROCES_TANCAMENT_CODE, perspectivesLotHelper.execucioMassivaEnCurs(
+                ElementTipusEnumDto.EXPEDIENT, ExecucioMassivaTipusDto.TANCAMENT, ExpedientResource::setExecucioMassivaTancamentId));
+        register(ExpedientResource.PERSPECTIVE_EN_PROCES_CUSTODIAR_CODE, perspectivesLotHelper.execucioMassivaEnCurs(
+                ElementTipusEnumDto.EXPEDIENT, ExecucioMassivaTipusDto.CUSTODIAR_ELEMENTS_PENDENTS, ExpedientResource::setExecucioMassivaCustodiarId));
 
         register(ExpedientResource.Fields.metaExpedient, new MetaExpedientOnchangeLogicProcessor());
         register(ExpedientResource.Fields.any, new AnyOnchangeLogicProcessor());
@@ -627,40 +641,149 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         resource.setPotTancarAmbDocumentsFaltants(entityComprovarHelper.comprovarSiEsPotTancarAmbDocumentsFaltants(expedientEntity, resource.getErrors()));
     }
 
+    /**
+     * Carrega d'una vegada les entitats ExpedientEntity (les que fan servir els helpers) dels expedients de la pàgina.
+     * Les cerques posteriors per id dins la mateixa transacció (també les dels helpers de permisos) ja no van a BD.
+     */
+    private Map<Long, ExpedientEntity> findExpedientEntities(List<Long> expedientIds) {
+        Map<Long, ExpedientEntity> expedients = new HashMap<>();
+        for (List<Long> lot: PerspectivesLotHelper.lots(expedientIds)) {
+            for (ExpedientEntity expedient: expedientRepository.findAllById(lot)) {
+                expedients.put(expedient.getId(), expedient);
+            }
+        }
+        return expedients;
+    }
+
+    /**
+     * Carrega d'una vegada els procediments dels expedients (entitat de recurs i entitat de negoci) perquè els proxies
+     * lazy de cada fila es resolguin des de la sessió sense una consulta per procediment.
+     */
+    private void carregarProcediments(List<ExpedientResourceEntity> entities) {
+        Set<Long> metaExpedientIds = entities.stream()
+                .map(ExpedientResourceEntity::getMetaExpedientId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        for (List<Long> lot: PerspectivesLotHelper.lots(metaExpedientIds)) {
+            metaExpedientResourceRepository.findAllById(lot);
+            metaExpedientRepository.findAllById(lot);
+        }
+    }
+
+    /**
+     * Els indicadors de notificacions i portafirmes van per cache (CacheHelper) i es consulten per fila; la resta
+     * (expedient, alertes) es carrega per lots per a tota la pàgina.
+     */
     private class AvisosPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
-    	@Override
-		public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
-    		ExpedientEntity expedientEntity = expedientRepository.findById(entity.getId()).get();
-    		resource.setErrors(cacheHelper.findErrorsValidacioPerNode(entity.getId()));
-	        resource.setValid(resource.getErrors().isEmpty());
-	        resource.setErrorLastEnviament(cacheHelper.hasEnviamentsPortafirmesAmbErrorPerExpedient(expedientEntity));
-			resource.setErrorLastNotificacio(cacheHelper.hasNotificacionsAmbErrorPerExpedient(expedientEntity));
-			resource.setAmbEnviamentsPendents(cacheHelper.hasEnviamentsPortafirmesPendentsPerExpedient(expedientEntity.getId()));
-			resource.setAmbNotificacionsPendents(cacheHelper.hasNotificacionsPendentsPerExpedient(expedientEntity));
-			resource.setNumAlert(entity.getAlertes().size());
-	        aplicarDocumentsFaltants(expedientEntity, resource);
-    	}
-    }    
-    
+        @Override
+        public boolean applyMultiple(String code, List<ExpedientResourceEntity> entities, List<ExpedientResource> resources) throws PerspectiveApplicationException {
+            List<Long> expedientIds = PerspectivesLotHelper.ids(entities);
+            Map<Long, ExpedientEntity> expedients = findExpedientEntities(expedientIds);
+            //Mateix criteri que la col·lecció ContingutResourceEntity.alertes (només les no llegides)
+            Map<Long, Long> numAlertes = PerspectivesLotHelper.mapPerLots(expedientIds, alertaResourceRepository::countNoLlegidesByContingutIds);
+            for (int i = 0; i < entities.size(); i++) {
+                ExpedientResourceEntity entity = entities.get(i);
+                ExpedientResource resource = resources.get(i);
+                ExpedientEntity expedientEntity = expedients.get(entity.getId());
+                resource.setErrors(cacheHelper.findErrorsValidacioPerNode(entity.getId()));
+                resource.setValid(resource.getErrors().isEmpty());
+                resource.setErrorLastEnviament(cacheHelper.hasEnviamentsPortafirmesAmbErrorPerExpedient(expedientEntity));
+                resource.setErrorLastNotificacio(cacheHelper.hasNotificacionsAmbErrorPerExpedient(expedientEntity));
+                resource.setAmbEnviamentsPendents(cacheHelper.hasEnviamentsPortafirmesPendentsPerExpedient(expedientEntity.getId()));
+                resource.setAmbNotificacionsPendents(cacheHelper.hasNotificacionsPendentsPerExpedient(expedientEntity));
+                resource.setNumAlert(numAlertes.getOrDefault(entity.getId(), 0L).intValue());
+                aplicarDocumentsFaltants(expedientEntity, resource);
+            }
+            return true;
+        }
+        @Override
+        public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
+            applyMultiple(code, Collections.singletonList(entity), Collections.singletonList(resource));
+        }
+    }
+
+    /**
+     * Les comprovacions de documents, seguidor i execució massiva es fan amb una consulta per lot per a tota la pàgina.
+     * Les de permisos (comprovarPermisExpedient, comprovarSiEsPotModificarExpedient) i les que van per cache
+     * continuen per fila, sense canvis.
+     */
     private class BasicPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
-		@Override
-		public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
+        @Override
+        public boolean applyMultiple(String code, List<ExpedientResourceEntity> entities, List<ExpedientResource> resources) throws PerspectiveApplicationException {
+            List<Long> expedientIds = PerspectivesLotHelper.ids(entities);
+            carregarProcediments(entities);
+            Map<Long, ExpedientEntity> expedients = findExpedientEntities(expedientIds);
+            String usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
+            //Com abans: el camp seguidor només s'informa si l'usuari actual existeix a la taula d'usuaris
+            boolean usuariExisteix = usuariResourceRepository.existsById(usuariCodi);
+            Set<Long> ambSeguidor = usuariExisteix
+                    ? PerspectivesLotHelper.setPerLots(expedientIds, lot -> expedientResourceRepository.findIdsAmbSeguidor(lot, usuariCodi))
+                    : Collections.emptySet();
+            Set<Long> ambDocuments = PerspectivesLotHelper.setPerLots(expedientIds, documentResourceRepository::findExpedientIdsAmbDocuments);
+            Set<Long> ambDocumentsDefinitius = PerspectivesLotHelper.setPerLots(expedientIds, documentResourceRepository::findExpedientIdsAmbDocumentsDefinitius);
+            Set<Long> ambDocumentsEnProcesDeFirma = PerspectivesLotHelper.setPerLots(expedientIds, documentResourceRepository::findExpedientIdsAmbDocumentsEnProcesDeFirma);
+            Set<Long> ambDocumentsDePortafirmesNoCustodiats = PerspectivesLotHelper.setPerLots(expedientIds, documentResourceRepository::findExpedientIdsAmbDocumentsDePortafirmesNoCustodiats);
+            int arxiuMaxReintentsDocuments = contingutHelper.getArxiuMaxReintentsDocuments();
+            Set<Long> ambDocumentsPendentsReintentsArxiu = PerspectivesLotHelper.setPerLots(
+                    expedientIds,
+                    lot -> documentResourceRepository.findExpedientIdsAmbDocumentsPendentsReintentsArxiu(lot, arxiuMaxReintentsDocuments));
+            Set<Long> ambEsborranys = PerspectivesLotHelper.setPerLots(expedientIds, documentResourceRepository::findExpedientIdsAmbFillsEsborranys);
+            Map<Long, Long> execucionsMoureTot = PerspectivesLotHelper.mapPerLots(
+                    expedientIds,
+                    lot -> execucioMassivaRepository.countByExpedientOrigenIdsAndTipusAndDataFiNull(lot, ExecucioMassivaTipusDto.MOURE_EXPEDIENT));
+
+            for (int i = 0; i < entities.size(); i++) {
+                ExpedientResourceEntity entity = entities.get(i);
+                ExpedientResource resource = resources.get(i);
+                ExpedientEntity expedientEntity = expedients.get(entity.getId());
+                applyBasic(entity, resource, expedientEntity,
+                        usuariExisteix ? ambSeguidor.contains(entity.getId()) : null,
+                        ambDocuments.contains(entity.getId()),
+                        ambDocumentsDefinitius.contains(entity.getId()),
+                        ambDocumentsEnProcesDeFirma.contains(entity.getId()),
+                        ambDocumentsDePortafirmesNoCustodiats.contains(entity.getId()),
+                        ambDocumentsPendentsReintentsArxiu.contains(entity.getId()),
+                        ambEsborranys.contains(entity.getId()),
+                        //Equival a ExpedientHelper.isExpedientPendentExecucioMassivaMourerTot: si hi ha més d'una
+                        //execució sense acabar, la consulta individual (Optional) falla i el mètode retorna false.
+                        execucionsMoureTot.getOrDefault(entity.getId(), 0L) == 1L);
+            }
+            return true;
+        }
+
+        @Override
+        public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
+            applyMultiple(code, Collections.singletonList(entity), Collections.singletonList(resource));
+        }
+
+        private void applyBasic(
+                ExpedientResourceEntity entity,
+                ExpedientResource resource,
+                ExpedientEntity expedientEntity,
+                Boolean seguidor,
+                boolean conteDocuments,
+                boolean conteDocumentsDefinitius,
+                boolean conteDocumentsEnProcessDeFirma,
+                boolean conteDocumentsDePortafirmesNoCustodiats,
+                boolean conteDocumentsPendentsReintentsArxiu,
+                boolean hasEsborranys,
+                boolean pendentExecucioMassiva) {
 	        resource.setGestioAmbGrupsActiva(entity.getMetaExpedient().isGestioAmbGrupsActiva());
-	        usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName())
-	                .ifPresent(usuariResourceEntity -> resource.setSeguidor(entity.getSeguidors().contains(usuariResourceEntity)));
+	        if (seguidor != null) {
+	            resource.setSeguidor(seguidor);
+	        }
 	        resource.setUsuariActualWrite(entityComprovarHelper.comprovarPermisExpedient(entity.getId(), ExtendedPermission.WRITE, "WRITE", false));
-	        ExpedientEntity expedientEntity = expedientRepository.findById(entity.getId()).get();
-    		
+
 	        //Calcular esValid, s'utilitza posteriorment
 	        resource.setErrors(cacheHelper.findErrorsValidacioPerNode(entity.getId()));
 	        resource.setValid(resource.getErrors().isEmpty());
 	        aplicarDocumentsFaltants(expedientEntity, resource);
-	        
-	        resource.setConteDocuments(CollectionUtils.isNotEmpty(documentResourceRepository.findByExpedientAndEsborrat(entity, 0)));
-	        resource.setConteDocumentsDefinitius(documentResourceRepository.expedientHasDocumentsDefinitius(entity));
-	        resource.setConteDocumentsEnProcessDeFirma(CollectionUtils.isNotEmpty(documentResourceRepository.findEnProccessDeFirma(entity)));
-	        resource.setConteDocumentsDePortafirmesNoCustodiats(CollectionUtils.isNotEmpty(documentResourceRepository.findDocumentsDePortafirmesNoCustodiats(entity)));
-	        resource.setConteDocumentsPendentsReintentsArxiu(CollectionUtils.isNotEmpty(documentResourceRepository.findDocumentsPendentsReintentsArxiu(entity, contingutHelper.getArxiuMaxReintentsDocuments())));
+
+	        resource.setConteDocuments(conteDocuments);
+	        resource.setConteDocumentsDefinitius(conteDocumentsDefinitius);
+	        resource.setConteDocumentsEnProcessDeFirma(conteDocumentsEnProcessDeFirma);
+	        resource.setConteDocumentsDePortafirmesNoCustodiats(conteDocumentsDePortafirmesNoCustodiats);
+	        resource.setConteDocumentsPendentsReintentsArxiu(conteDocumentsPendentsReintentsArxiu);
 	        resource.setPotTancar(
 	                (resource.isValid() || resource.isPotTancarAmbDocumentsFaltants())
 	                        && resource.isConteDocuments()
@@ -680,14 +803,14 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
 			resource.setDataDarrerEnviament(cacheHelper.getDataDarrerEnviament(expedientEntity));
 			resource.setPotModificar(entityComprovarHelper.comprovarSiEsPotModificarExpedient(expedientEntity));
-			resource.setHasEsborranys(documentResourceRepository.hasFillsEsborranys(expedientEntity.getId()));
-			resource.setPendentExecucioMassiva(expedientHelper.isExpedientPendentExecucioMassivaMourerTot(expedientEntity.getId()));
-			
+			resource.setHasEsborranys(hasEsborranys);
+			resource.setPendentExecucioMassiva(pendentExecucioMassiva);
+
 			if (expedientEntity.getMetaExpedient()!=null) {
 				resource.setDisableOrganGestor(!expedientEntity.getMetaExpedient().isComu());
 			}
 		}
-    }    
+    }
     
     private class PermisContingutPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
         @Override
@@ -721,22 +844,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         }
     }
     
-    private class AuditoriaPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
-        @Override
-        public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
-        	if (entity.getCreatedBy()!=null) {
-        		UsuariResourceEntity usuariResourceEntity = usuariResourceRepository.findById(entity.getCreatedBy()).orElse(null);
-        		if (usuariResourceEntity!=null) {
-        			resource.setCreatedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
-        		}
-        	}
-        	if (entity.getLastModifiedBy()!=null) {
-        		UsuariResourceEntity usuariResourceEntity = usuariResourceRepository.findById(entity.getLastModifiedBy()).orElse(null);
-        		resource.setLastModifiedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
-        	}
-        }
-    }
-
     private class CountPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
@@ -761,13 +868,36 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
      */
     private class CountResumPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
         @Override
+        public boolean applyMultiple(String code, List<ExpedientResourceEntity> entities, List<ExpedientResource> resources) throws PerspectiveApplicationException {
+            //Es compten per lots en lloc de carregar les col·leccions de cada expedient
+            List<Long> expedientIds = PerspectivesLotHelper.ids(entities);
+            Map<Long, Long> numComentaris = PerspectivesLotHelper.mapPerLots(expedientIds, expedientComentariResourceRepository::countByExpedientIds);
+            Map<Long, Long> numSeguidors = PerspectivesLotHelper.mapPerLots(expedientIds, expedientResourceRepository::countSeguidorsByExpedientIds);
+            for (int i = 0; i < entities.size(); i++) {
+                Long expedientId = entities.get(i).getId();
+                resources.get(i).setNumComentaris(numComentaris.getOrDefault(expedientId, 0L).intValue());
+                resources.get(i).setNumSeguidors(numSeguidors.getOrDefault(expedientId, 0L).intValue());
+            }
+            return true;
+        }
+        @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
-            resource.setNumComentaris(entity.getComentaris().size());
-            resource.setNumSeguidors(entity.getSeguidors().size());
+            applyMultiple(code, Collections.singletonList(entity), Collections.singletonList(resource));
         }
     }
 
     private class InteressatsPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
+        @Override
+        public boolean applyMultiple(String code, List<ExpedientResourceEntity> entities, List<ExpedientResource> resources) throws PerspectiveApplicationException {
+            //Inicialitza d'una vegada la col·lecció d'interessats de tots els expedients de la pàgina
+            for (List<Long> lot: PerspectivesLotHelper.lots(PerspectivesLotHelper.ids(entities))) {
+                expedientResourceRepository.fetchInteressats(lot);
+            }
+            for (int i = 0; i < entities.size(); i++) {
+                applySingle(code, entities.get(i), resources.get(i));
+            }
+            return true;
+        }
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
             List<InteressatResource> interessats = entity.getInteressats().stream()
@@ -787,6 +917,21 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
     private class EstatPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
         @Override
+        public boolean applyMultiple(String code, List<ExpedientResourceEntity> entities, List<ExpedientResource> resources) throws PerspectiveApplicationException {
+            //Carrega d'una vegada els estats perquè els proxies de cada fila es resolguin des de la sessió
+            Set<Long> estatIds = entities.stream()
+                    .map(ExpedientResourceEntity::getEstatAdditionalId)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet());
+            for (List<Long> lot: PerspectivesLotHelper.lots(estatIds)) {
+                metaExpedientEstatResourceRepository.findAllById(lot);
+            }
+            for (int i = 0; i < entities.size(); i++) {
+                applySingle(code, entities.get(i), resources.get(i));
+            }
+            return true;
+        }
+        @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
             if (entity.getEstatAdditional()!=null) {
                 resource.setEstatAdditionalInfo(objectMappingHelper.newInstanceMap(Hibernate.unproxy(entity.getEstatAdditional()), MetaExpedientEstatResource.class));
@@ -795,6 +940,18 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     }
     
     private class RelacionatPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
+        @Override
+        public boolean applyMultiple(String code, List<ExpedientResourceEntity> entities, List<ExpedientResource> resources) throws PerspectiveApplicationException {
+            //Inicialitza d'una vegada les dues col·leccions de relacionats de tots els expedients de la pàgina
+            for (List<Long> lot: PerspectivesLotHelper.lots(PerspectivesLotHelper.ids(entities))) {
+                expedientResourceRepository.fetchRelacionatsAmb(lot);
+                expedientResourceRepository.fetchRelacionatsPer(lot);
+            }
+            for (int i = 0; i < entities.size(); i++) {
+                applySingle(code, entities.get(i), resources.get(i));
+            }
+            return true;
+        }
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
             List<ResourceReference<ExpedientResource, Long>> relacionatsAmb = entity.getRelacionatsAmb().stream()
@@ -877,36 +1034,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                     })
                     .collect(Collectors.toList());
             resource.setSeguidors(seguidors);
-        }
-    }
-
-    private class EnProcesCanviEstatPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
-        @Override
-        public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
-            execucioMassivaContingutRepository
-                    .findFirstByElementIdAndElementTipusAndExecucioMassivaTipusAndExecucioMassivaDataFiNull(
-                            entity.getId(), ElementTipusEnumDto.EXPEDIENT, ExecucioMassivaTipusDto.CANVI_ESTAT)
-                    .ifPresent(contingut -> resource.setExecucioMassivaCanviEstatId(contingut.getExecucioMassiva().getId()));
-        }
-    }
-
-    private class EnProcesTancamentPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
-        @Override
-        public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
-            execucioMassivaContingutRepository
-                    .findFirstByElementIdAndElementTipusAndExecucioMassivaTipusAndExecucioMassivaDataFiNull(
-                            entity.getId(), ElementTipusEnumDto.EXPEDIENT, ExecucioMassivaTipusDto.TANCAMENT)
-                    .ifPresent(contingut -> resource.setExecucioMassivaTancamentId(contingut.getExecucioMassiva().getId()));
-        }
-    }
-
-    private class EnProcesCustodiarPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
-        @Override
-        public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
-            execucioMassivaContingutRepository
-                    .findFirstByElementIdAndElementTipusAndExecucioMassivaTipusAndExecucioMassivaDataFiNull(
-                            entity.getId(), ElementTipusEnumDto.EXPEDIENT, ExecucioMassivaTipusDto.CUSTODIAR_ELEMENTS_PENDENTS)
-                    .ifPresent(contingut -> resource.setExecucioMassivaCustodiarId(contingut.getExecucioMassiva().getId()));
         }
     }
 

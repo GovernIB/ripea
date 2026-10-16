@@ -99,6 +99,7 @@ import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.resourceservice.InteressatResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.resourcehelper.InteressatResourceHelper;
+import es.caib.ripea.service.resourcehelper.PerspectivesLotHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -108,6 +109,7 @@ import lombok.extern.slf4j.Slf4j;
 public class InteressatResourceServiceImpl extends BaseMutableResourceService<InteressatResource, Long, InteressatResourceEntity> implements InteressatResourceService {
 
     private final UnitatOrganitzativaHelper unitatOrganitzativaHelper;
+    private final PerspectivesLotHelper perspectivesLotHelper;
     private final ExpedientInteressatHelper expedientInteressatHelper;
     private final InteressatResourceHelper interessatResourceHelper;
     private final ExcepcioLogHelper excepcioLogHelper;
@@ -133,7 +135,8 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         register(InteressatResource.PERSPECTIVE_REPRESENTANT_CODE, new RespresentantPerspectiveApplicator());
         register(InteressatResource.PERSPECTIVE_ADRESSA_CODE, new AdressaPerspectiveApplicator());
         register(InteressatResource.PERSPECTIVE_PROCEDIMENT_CODE, new ProcedimentPerspectiveApplicator());
-        register(InteressatResource.PERSPECTIVE_EN_PROCES_CUSTODIAR_CODE, new EnProcesCustodiarPerspectiveApplicator());
+        register(InteressatResource.PERSPECTIVE_EN_PROCES_CUSTODIAR_CODE, perspectivesLotHelper.execucioMassivaEnCurs(
+                ElementTipusEnumDto.INTERESSAT, ExecucioMassivaTipusDto.CUSTODIAR_ELEMENTS_PENDENTS, InteressatResource::setExecucioMassivaCustodiarId));
         register(InteressatResource.ACTION_EXPORTAR_CODE, new ExportarReportGenerator());
         register(InteressatResource.ACTION_IMPORTAR_CODE, new ImportarInteressatsActionExecutor());
         register(InteressatResource.ACTION_GUARDAR_ARXIU, new GuardarArxiuActionExecutor());
@@ -546,15 +549,6 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         }
     }
 
-    private class EnProcesCustodiarPerspectiveApplicator implements PerspectiveApplicator<InteressatResourceEntity, InteressatResource> {
-        @Override
-        public void applySingle(String code, InteressatResourceEntity entity, InteressatResource resource) throws PerspectiveApplicationException {
-            execucioMassivaContingutRepository
-                    .findFirstByElementIdAndElementTipusAndExecucioMassivaTipusAndExecucioMassivaDataFiNull(
-                            entity.getId(), ElementTipusEnumDto.INTERESSAT, ExecucioMassivaTipusDto.CUSTODIAR_ELEMENTS_PENDENTS)
-                    .ifPresent(contingut -> resource.setExecucioMassivaCustodiarId(contingut.getExecucioMassiva().getId()));
-        }
-    }
 
     private class NumDocOnchangeLogicProcessor implements OnChangeLogicProcessor<InteressatResource> {
 

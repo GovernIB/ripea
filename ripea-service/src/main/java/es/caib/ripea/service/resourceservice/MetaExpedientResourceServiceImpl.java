@@ -108,6 +108,7 @@ import es.caib.ripea.service.intf.resourceservice.MetaExpedientResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
 import io.micrometer.core.instrument.Timer;
+import es.caib.ripea.service.resourcehelper.PerspectivesLotHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -117,6 +118,7 @@ import lombok.extern.slf4j.Slf4j;
 public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService<MetaExpedientResource, Long, MetaExpedientResourceEntity> implements MetaExpedientResourceService {
 
 	private final ConfigHelper configHelper;
+	private final PerspectivesLotHelper perspectivesLotHelper;
 	private final GrupHelper grupHelper;
 	private final MetaExpedientHelper metaExpedientHelper;
 	private final DistribucioReglaHelper distribucioReglaHelper;
@@ -140,7 +142,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     @PostConstruct
     public void init() {
     	
-    	register(MetaExpedientResource.PERSPECTIVE_AUDIT_CODE,		new AuditoriaPerspectiveApplicator());
+    	register(MetaExpedientResource.PERSPECTIVE_AUDIT_CODE,		perspectivesLotHelper.auditoria());
     	register(MetaExpedientResource.PERSPECTIVE_COMMENTS_CODE,	new ComentarisPerspectiveApplicator());
     	register(MetaExpedientResource.PERSPECTIVE_PERMISOS_CODE,	new PermisosPerspectiveApplicator());
     	register(MetaExpedientResource.PERSPECTIVE_ELEMENTS_CODE,	new ElementsCountPerspectiveApplicator());
@@ -553,21 +555,6 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		}
     }
     
-    private class AuditoriaPerspectiveApplicator implements PerspectiveApplicator<MetaExpedientResourceEntity, MetaExpedientResource> {
-        @Override
-        public void applySingle(String code, MetaExpedientResourceEntity entity, MetaExpedientResource resource) throws PerspectiveApplicationException {
-        	if (entity.getCreatedBy()!=null) {
-        		UsuariResourceEntity usuariResourceEntity = usuariResourceRepository.findById(entity.getCreatedBy()).orElse(null);
-        		if (usuariResourceEntity!=null) {
-        			resource.setCreatedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
-        		}
-        	}
-        	if (entity.getLastModifiedBy()!=null) {
-        		UsuariResourceEntity usuariResourceEntity = usuariResourceRepository.findById(entity.getLastModifiedBy()).orElse(null);
-        		resource.setLastModifiedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
-        	}
-        }
-    }
     
     private class ImportarRolsacActionExecutor implements ActionExecutor<MetaExpedientResourceEntity, MetaExpedientResource.ImportarRolsacFormAction, MetaExpedientResource> {
 		@Override

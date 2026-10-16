@@ -49,6 +49,7 @@ import es.caib.ripea.service.intf.model.RegistreAnnexResource.ReintentarAnnexPen
 import es.caib.ripea.service.intf.model.RegistreResource;
 import es.caib.ripea.service.intf.resourceservice.RegistreAnnexResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
+import es.caib.ripea.service.resourcehelper.PerspectivesLotHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -58,6 +59,7 @@ import lombok.extern.slf4j.Slf4j;
 public class RegistreAnnexResourceServiceImpl extends BaseMutableResourceService<RegistreAnnexResource, Long, RegistreAnnexResourceEntity> implements RegistreAnnexResourceService {
 
 	private final PluginHelper pluginHelper;
+	private final PerspectivesLotHelper perspectivesLotHelper;
 	private final ConfigHelper configHelper;
 	private final MessageHelper messageHelper;
 	private final ExpedientHelper expedientHelper;
@@ -75,7 +77,8 @@ public class RegistreAnnexResourceServiceImpl extends BaseMutableResourceService
     	register(RegistreAnnexResource.REPORT_DOWNLOAD_ANNEX, new DescarregarAnnexReportGenerator());
         register(RegistreAnnexResource.PERSPECTIVE_FIRMES, new AnnexFirmesPerspectiveApplicator());
         register(RegistreAnnexResource.PERSPECTIVE_REGISTRE, new AnnexRegistrePerspectiveApplicator());
-        register(RegistreAnnexResource.PERSPECTIVE_EN_PROCES_ADJUNTAR_ANNEXOS_CODE, new EnProcesAdjuntarAnnexosPerspectiveApplicator());
+        register(RegistreAnnexResource.PERSPECTIVE_EN_PROCES_ADJUNTAR_ANNEXOS_CODE, perspectivesLotHelper.execucioMassivaEnCurs(
+                ElementTipusEnumDto.ANNEX, ExecucioMassivaTipusDto.ADJUNTAR_ANNEXOS_PENDENTS, RegistreAnnexResource::setExecucioMassivaAdjuntarAnnexosId));
         register(RegistreAnnexResource.PERSPECTIVE_DOCUMENT_METADOC_CODE, new DocumentMetaDocPerspectiveApplicator());
         register(RegistreAnnexResource.ACTION_REINTENTAR_CODE, new ReintentarArxiuActionExecutor());
     }
@@ -175,15 +178,6 @@ public class RegistreAnnexResourceServiceImpl extends BaseMutableResourceService
         }
     }
 
-    private class EnProcesAdjuntarAnnexosPerspectiveApplicator implements PerspectiveApplicator<RegistreAnnexResourceEntity, RegistreAnnexResource> {
-        @Override
-        public void applySingle(String code, RegistreAnnexResourceEntity entity, RegistreAnnexResource resource) throws PerspectiveApplicationException {
-            execucioMassivaContingutRepository
-                    .findFirstByElementIdAndElementTipusAndExecucioMassivaTipusAndExecucioMassivaDataFiNull(
-                            entity.getId(), ElementTipusEnumDto.ANNEX, ExecucioMassivaTipusDto.ADJUNTAR_ANNEXOS_PENDENTS)
-                    .ifPresent(contingut -> resource.setExecucioMassivaAdjuntarAnnexosId(contingut.getExecucioMassiva().getId()));
-        }
-    }
 
     private class DescarregarAnnexReportGenerator implements ReportGenerator<RegistreAnnexResourceEntity, Serializable, Serializable> {
 

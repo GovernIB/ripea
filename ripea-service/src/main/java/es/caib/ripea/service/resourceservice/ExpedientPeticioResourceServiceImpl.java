@@ -3,12 +3,14 @@ package es.caib.ripea.service.resourceservice;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -102,6 +104,7 @@ import es.caib.ripea.service.intf.utils.RegistreJustificantUtils;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.resourcehelper.PerspectivesLotHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -111,6 +114,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceService<ExpedientPeticioResource, Long, ExpedientPeticioResourceEntity> implements ExpedientPeticioResourceService {
 
 	private final ConfigHelper configHelper;
+	private final PerspectivesLotHelper perspectivesLotHelper;
 	private final PluginHelper pluginHelper;
 	private final EventHelper eventHelper;
 	private final EmailHelper emailHelper;
@@ -143,7 +147,8 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
         register(ExpedientPeticioResource.PERSPECTIVE_REGISTRE_CODE, new RegistrePerspectiveApplicator());
         register(ExpedientPeticioResource.PERSPECTIVE_JUSTIFICANT_CODE, new JustificantPerspectiveApplicator());
         register(ExpedientPeticioResource.PERSPECTIVE_ESTAT_VIEW_CODE, new EstatViewPerspectiveApplicator());
-        register(ExpedientPeticioResource.PERSPECTIVE_EN_PROCES_ACTUALITZAR_ESTAT_CODE, new EnProcesActualitzarEstatPerspectiveApplicator());
+        register(ExpedientPeticioResource.PERSPECTIVE_EN_PROCES_ACTUALITZAR_ESTAT_CODE, perspectivesLotHelper.execucioMassivaEnCurs(
+                ElementTipusEnumDto.ANOTACIO, ExecucioMassivaTipusDto.ACTUALITZAR_ESTAT_ANOTACIONS, ExpedientPeticioResource::setExecucioMassivaActualitzarEstatId));
         register(ExpedientPeticioResource.REPORT_DOWNLOAD_JUSTIFICANT, new DescarregarJustificantReportGenerator());
         register(ExpedientPeticioResource.ACTION_REBUTJAR_ANOTACIO, new RebutjarAnotacioActionExecutor());
         register(ExpedientPeticioResource.ACTION_ACCEPTAR_ANOTACIO, new AcceptarAnotacioActionExecutor());
@@ -284,7 +289,28 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
     	return null;
     }
 
+    /** Ids dels registres de les anotacions (sense inicialitzar els proxies). */
+    private static List<Long> registreIds(List<ExpedientPeticioResourceEntity> entities) {
+        return entities.stream()
+                .filter(entity -> entity.getRegistre() != null)
+                .map(entity -> entity.getRegistre().getId())
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
     private class RegistrePerspectiveApplicator implements PerspectiveApplicator<ExpedientPeticioResourceEntity, ExpedientPeticioResource> {
+        @Override
+        public boolean applyMultiple(String code, List<ExpedientPeticioResourceEntity> entities, List<ExpedientPeticioResource> resources) throws PerspectiveApplicationException {
+            //Carrega d'una vegada els registres de la pàgina amb els seus interessats: els proxies i la col·lecció
+            //d'interessats de cada fila es resolen des de la sessió sense una consulta per anotació.
+            for (List<Long> lot: PerspectivesLotHelper.lots(registreIds(entities))) {
+                registreResourceRepository.fetchAmbInteressats(lot);
+            }
+            for (int i = 0; i < entities.size(); i++) {
+                applySingle(code, entities.get(i), resources.get(i));
+            }
+            return true;
+        }
         @Override
         public void applySingle(String code, ExpedientPeticioResourceEntity entity, ExpedientPeticioResource resource) throws PerspectiveApplicationException {
 
@@ -414,24 +440,28 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
         }
     }
 
-    private class EnProcesActualitzarEstatPerspectiveApplicator implements PerspectiveApplicator<ExpedientPeticioResourceEntity, ExpedientPeticioResource> {
-        @Override
-        public void applySingle(String code, ExpedientPeticioResourceEntity entity, ExpedientPeticioResource resource) throws PerspectiveApplicationException {
-            execucioMassivaContingutRepository
-                    .findFirstByElementIdAndElementTipusAndExecucioMassivaTipusAndExecucioMassivaDataFiNull(
-                            entity.getId(), ElementTipusEnumDto.ANOTACIO, ExecucioMassivaTipusDto.ACTUALITZAR_ESTAT_ANOTACIONS)
-                    .ifPresent(contingut -> resource.setExecucioMassivaActualitzarEstatId(contingut.getExecucioMassiva().getId()));
-        }
-    }
 
     private class AnnexosErrorPerspectiveApplicator implements PerspectiveApplicator<ExpedientPeticioResourceEntity, ExpedientPeticioResource> {
         @Override
-        public void applySingle(String code, ExpedientPeticioResourceEntity entity, ExpedientPeticioResource resource) throws PerspectiveApplicationException {
+        public boolean applyMultiple(String code, List<ExpedientPeticioResourceEntity> entities, List<ExpedientPeticioResource> resources) throws PerspectiveApplicationException {
             //Només les anotacions acceptades (amb expedient associat) poden tenir annexos en error pendents de subsanar.
-            if (entity.getExpedient() != null && entity.getRegistre() != null) {
-                long annexosAmbError = registreAnnexResourceRepository.countAnnexosAmbErrorByRegistreId(entity.getRegistre().getId());
-                resource.setTeAnnexosAmbError(annexosAmbError > 0);
+            List<ExpedientPeticioResourceEntity> acceptades = entities.stream()
+                    .filter(entity -> entity.getExpedient() != null && entity.getRegistre() != null)
+                    .collect(Collectors.toList());
+            Set<Long> registresAmbAnnexosAmbError = PerspectivesLotHelper.setPerLots(
+                    registreIds(acceptades),
+                    registreAnnexResourceRepository::findRegistreIdsAmbAnnexosAmbError);
+            for (int i = 0; i < entities.size(); i++) {
+                ExpedientPeticioResourceEntity entity = entities.get(i);
+                if (entity.getExpedient() != null && entity.getRegistre() != null) {
+                    resources.get(i).setTeAnnexosAmbError(registresAmbAnnexosAmbError.contains(entity.getRegistre().getId()));
+                }
             }
+            return true;
+        }
+        @Override
+        public void applySingle(String code, ExpedientPeticioResourceEntity entity, ExpedientPeticioResource resource) throws PerspectiveApplicationException {
+            applyMultiple(code, Collections.singletonList(entity), Collections.singletonList(resource));
         }
     }
 

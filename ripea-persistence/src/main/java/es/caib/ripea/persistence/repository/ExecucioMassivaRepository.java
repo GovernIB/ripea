@@ -19,7 +19,19 @@ import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
 public interface ExecucioMassivaRepository extends JpaRepository<ExecucioMassivaEntity, Long> {
 
 	Optional<ExecucioMassivaEntity> findByExpedientOrigenIdAndTipusAndDataFiNull(Long expedientOrigenId, ExecucioMassivaTipusDto tipus);
-	
+
+	//Versió per lots de findByExpedientOrigenIdAndTipusAndDataFiNull: [expedientOrigenId, nombre d'execucions sense acabar].
+	//Màxim 1000 ids per crida (límit IN d'Oracle).
+	@Query("select e.expedientOrigenId, count(e) " +
+			"from	ExecucioMassivaEntity e " +
+			"where	e.expedientOrigenId in (:expedientOrigenIds) " +
+			"   and	e.tipus = :tipus " +
+			"   and	e.dataFi is null " +
+			"group by e.expedientOrigenId")
+	List<Object[]> countByExpedientOrigenIdsAndTipusAndDataFiNull(
+			@Param("expedientOrigenIds") List<Long> expedientOrigenIds,
+			@Param("tipus") ExecucioMassivaTipusDto tipus);
+
 	List<ExecucioMassivaEntity> findByCreatedByAndEntitatIdOrderByCreatedDateDesc(String createdBy, Long entitatId, Pageable pageable);
 	
 	List<ExecucioMassivaEntity> findByEntitatIdOrderByCreatedDateDesc(Long entitatId, Pageable pageable);

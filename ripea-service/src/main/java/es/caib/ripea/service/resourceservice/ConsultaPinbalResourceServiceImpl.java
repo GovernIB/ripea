@@ -20,6 +20,7 @@ import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.resourceservice.ConsultaPinbalResourceService;
+import es.caib.ripea.service.resourcehelper.PerspectivesLotHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,11 +31,12 @@ public class ConsultaPinbalResourceServiceImpl extends BaseMutableResourceServic
 
     
 	private final ConfigHelper configHelper;
+	private final PerspectivesLotHelper perspectivesLotHelper;
 	private final UsuariResourceRepository usuariResourceRepository;
 	
     @PostConstruct
     public void init() {
-    	register(ConsultaPinbalResource.PERSPECTIVE_AUDIT_CODE, new AuditoriaPerspectiveApplicator());
+    	register(ConsultaPinbalResource.PERSPECTIVE_AUDIT_CODE, perspectivesLotHelper.auditoria());
         register(ConsultaPinbalResource.PERSPECTIVE_DOCUMENT_CODE, new DocumentPerspectiveApplicator());
     }
 
@@ -62,21 +64,6 @@ public class ConsultaPinbalResourceServiceImpl extends BaseMutableResourceServic
         return resource;
     }
     
-    private class AuditoriaPerspectiveApplicator implements PerspectiveApplicator<ConsultaPinbalResourceEntity, ConsultaPinbalResource> {
-        @Override
-        public void applySingle(String code, ConsultaPinbalResourceEntity entity, ConsultaPinbalResource resource) throws PerspectiveApplicationException {
-        	if (entity.getCreatedBy()!=null) {
-        		UsuariResourceEntity usuariResourceEntity = usuariResourceRepository.findById(entity.getCreatedBy()).orElse(null);
-        		if (usuariResourceEntity!=null) {
-        			resource.setCreatedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
-        		}
-        	}
-        	if (entity.getLastModifiedBy()!=null) {
-        		UsuariResourceEntity usuariResourceEntity = usuariResourceRepository.findById(entity.getLastModifiedBy()).orElse(null);
-        		resource.setLastModifiedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
-        	}
-        }
-    }
 
     private class DocumentPerspectiveApplicator implements PerspectiveApplicator<ConsultaPinbalResourceEntity, ConsultaPinbalResource> {
         @Override
