@@ -52,7 +52,7 @@ export const PropietatsGroups: React.FC<{
                         ),
                     )
                     :undefined,
-                sorts: ['position,asc'],
+                sorts: ['position,asc', 'key,asc'],
                 unpaged: true,
             };
             apiFind(args).then((response) => {

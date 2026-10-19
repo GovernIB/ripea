@@ -171,7 +171,7 @@ export const PropietatsProps: React.FC<{ quickFilter?: string; entitatCodi?: str
                 builder.eq('group.key', `'${group.id}'`),
             ),
             namedQueries: entitatCodi ?[`BY_ENTITAT#${entitatCodi}`] :undefined,
-            sorts: ['position,asc'],
+            sorts: ['position,asc', 'key,asc'],
             unpaged: true,
         };
         apiFind(args).then((response) => {
