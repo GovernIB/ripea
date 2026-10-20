@@ -11,7 +11,7 @@ const ContingutIcon = (props:any) => {
     const {entity} = props;
     const { t } = useTranslation();
     const { value: user } = useUserSession();
-    
+
     return <Grid display={"flex"} alignItems={"center"}>
         {entity?.tipus=="DOCUMENT" && <DocumentIcon entity={entity}/>}
         {entity?.tipus=="CARPETA" && <CarpetaIcon />}
@@ -25,7 +25,7 @@ const ContingutIcon = (props:any) => {
         {entity?.valid == false && entity?.errors != null && (
             (() => {
                 const llistaErrors = entity?.errors || [];
-                const textTitol = llistaErrors.length > 0 
+                const textTitol = llistaErrors.length > 0
                     ? getResumErrorsText(llistaErrors, t)
                     : t('page.contingut.alert.valid');
 
@@ -87,6 +87,9 @@ const DocumentIcon = (props:any) => {
         {entity?.ambNotificacions && (!entity?.errorDarreraNotificacio
                 ?<>
                     {isInOptions(entity?.estatDarreraNotificacio, 'PENDENT', 'REGISTRADA') &&
+                        <Icon color={"info"} title={t(`enum.estatNotificacio.${entity?.estatDarreraNotificacio}`)}>mail</Icon>}
+
+                    {isInOptions(entity?.estatDarreraNotificacio, 'ENVIADA') &&
                         <Icon color={"info"} title={t(`enum.estatNotificacio.${entity?.estatDarreraNotificacio}`)}>mail</Icon>}
 
                     {isInOptions(entity?.estatDarreraNotificacio, 'ENVIADA_AMB_ERRORS', 'FINALITZADA_AMB_ERRORS') &&
