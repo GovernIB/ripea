@@ -35,7 +35,7 @@ import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.AvisNivellEnumDto;
 import es.caib.ripea.service.intf.dto.IntegracioAccioDto;
 import es.caib.ripea.service.intf.dto.IntegracioAccioEstatEnumDto;
-import es.caib.ripea.service.intf.dto.IntegracioEnumDto;
+import es.caib.ripea.service.intf.dto.IntegracioCodiEnum;
 import es.caib.ripea.service.intf.dto.MetriquesRipeaInfoDto;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.SalutService;
@@ -163,7 +163,7 @@ public class SalutServiceImpl implements SalutService{
 		long novesPeticions = peticionsOkTotals-peticionsOkAnteriors;
 		long resultat = 0; //Si no hi ha hagut noves peticions en aquest periode, pero si anteriors, el promitg del periode es zero
 		if (novesPeticions>0) {
-			resultat = (tempsPromitgTotal*peticionsOkTotals)-(tempsPromitgAnterior*peticionsOkAnteriors) / novesPeticions;
+			resultat = ((tempsPromitgTotal*peticionsOkTotals)-(tempsPromitgAnterior*peticionsOkAnteriors)) / novesPeticions;
 		}
 		return (int) (resultat>0?resultat:0);
 	}
@@ -340,7 +340,9 @@ public class SalutServiceImpl implements SalutService{
 		List<String> endpoints = new ArrayList<String>();
 		Map<String, IntegracioPeticions> peticionsPerEntorn = new HashMap<>();
 		Map<String, MetriquesRipeaInfoDto> acumulacioMetriquesPerEndpoint = new HashMap<String, MetriquesRipeaInfoDto>();
-		
+		//Temps total (ms) de les peticions OK per endpoint, per calcular la mitjana ponderada entre els diferents codis de mètrica
+		Map<String, Double> tempsTotalOkPerEndpoint = new HashMap<String, Double>();
+
 		//Recorrem els diferents codis de metrica (per exemple: portafib, firmaServidor i firmaWeb, son de la mateixa integració)
     	for (String codiMetrica: codesFS) {
     		
@@ -353,17 +355,19 @@ public class SalutServiceImpl implements SalutService{
 	    		Timer timerExpedientError = meterRegistry.find(codiMetrica).tags("resultado", "error", "endpoint", endpoint).timer();
 	    		long exitoAux	= timerExpedientExito!=null?timerExpedientExito.count():0;
 	    		long errorAux	= timerExpedientError!=null?timerExpedientError.count():0;
-	    		int promitgAux	= (int)(timerExpedientExito!=null?timerExpedientExito.mean(TimeUnit.MILLISECONDS):0);
-	        	
+	    		double tempsTotalOkAux = timerExpedientExito!=null?timerExpedientExito.totalTime(TimeUnit.MILLISECONDS):0;
+
 	    		MetriquesRipeaInfoDto aux = acumulacioMetriquesPerEndpoint.get(endpoint)!=null
 	    				?acumulacioMetriquesPerEndpoint.get(endpoint)
 	    						:new MetriquesRipeaInfoDto();
-	    		
+
 	    		aux.setCodi(codiIntegracio);
 	    		aux.setPeticionsError(aux.getPeticionsError()+errorAux);
 	    		aux.setPeticionsOk(aux.getPeticionsOk()+exitoAux);
-	    		//Acumulam promitjos de les peticions de diferents codis de metrica. Despres els haurem de dividir per el nombre total de codis.
-	    		aux.setTempsMitg(aux.getTempsMitg()+promitgAux);
+	    		//La mitjana de l'endpoint es pondera per peticions: temps total / peticions OK (no la suma de mitjanes / nombre de codis)
+	    		double tempsTotalOk = tempsTotalOkPerEndpoint.getOrDefault(endpoint, 0d) + tempsTotalOkAux;
+	    		tempsTotalOkPerEndpoint.put(endpoint, tempsTotalOk);
+	    		aux.setTempsMitg(aux.getPeticionsOk()>0?(int)(tempsTotalOk/aux.getPeticionsOk()):0);
 
 	    		//Anam recollint, per el mateix endpoint, les dades dels diferents codis de metrica que tenim per una integració
 	    		acumulacioMetriquesPerEndpoint.put(endpoint, aux);
@@ -381,7 +385,7 @@ public class SalutServiceImpl implements SalutService{
         	integracioPeticioEndpoint.setTotalOk(entry.getValue().getPeticionsOk()); //Total de Oks fins al moment actual per aquest endpoint
         	integracioPeticioEndpoint.setTotalError(entry.getValue().getPeticionsError()); //Total de errors fins al moment actual per aquest endpoint
         	//Promitg acumulat per el endpoint, de les diferents métriques
-        	integracioPeticioEndpoint.setTotalTempsMig(entry.getValue().getTempsMitg()/codesFS.length);
+        	integracioPeticioEndpoint.setTotalTempsMig(entry.getValue().getTempsMitg());
         	
         	//DADES PARCIALS = DADES TOTALS - DARRERES DADES ENVIADES (VARIABLES STATIC)
         	integracioPeticioEndpoint.setPeticionsOkUltimPeriode(getDadesIntegracioOkPeriodeByCodiAndEndpoint(
@@ -412,39 +416,41 @@ public class SalutServiceImpl implements SalutService{
     		IntegracioApp codiIntegracio,
     		IntegracioPeticions ip) {
     	String endpointBase = "";
-    	long numUsos = 0;
     	if (ip.getPeticionsPerEntorn()!=null && ip.getPeticionsPerEntorn().size()>0) {
+    		long totalOk = 0, totalError = 0, okPeriode = 0, errorPeriode = 0;
+    		//Temps acumulat (mitjana * peticions OK) per fer les mitjanes ponderades entre endpoints
+    		long tempsTotal = 0, tempsPeriode = 0;
+    		long usosPeriodeEndpointBase = -1, usosTotalsEndpointBase = -1;
     		//Sumam els valors totals dels diferents endpoints del codi de integració
 	    	for (Map.Entry<String, IntegracioPeticions> entry : ip.getPeticionsPerEntorn().entrySet()) {
-	    		ip.setTotalOk(ip.getTotalOk()!=null?
-	    				ip.getTotalOk():0+entry.getValue().getTotalOk());
-	    		ip.setTotalError(ip.getTotalError()!=null?
-	    				ip.getTotalError():0+entry.getValue().getTotalError());
-	    		ip.setTotalTempsMig(ip.getTotalTempsMig()!=null?
-	    				ip.getTotalTempsMig():0
-	    				+entry.getValue().getTotalTempsMig());
-	    		ip.setPeticionsOkUltimPeriode(ip.getPeticionsOkUltimPeriode()!=null?
-	    				ip.getPeticionsOkUltimPeriode():0
-	    				+entry.getValue().getPeticionsOkUltimPeriode());
-	    		ip.setPeticionsErrorUltimPeriode(ip.getPeticionsErrorUltimPeriode()!=null?
-	    				ip.getPeticionsErrorUltimPeriode():0
-	    				+entry.getValue().getPeticionsErrorUltimPeriode());
-	    		ip.setTempsMigUltimPeriode(ip.getTempsMigUltimPeriode()!=null?
-	    				ip.getTempsMigUltimPeriode():0
-	    				+entry.getValue().getTempsMigUltimPeriode());
-	    		//Com a endpoint base per el objecte principal de IntegracioSalut, ens quedam amb el que té mes usos
-	    		if (entry.getValue().getPeticionsOkUltimPeriode()+entry.getValue().getPeticionsErrorUltimPeriode()>numUsos) {
-	    			numUsos = entry.getValue().getPeticionsOkUltimPeriode()+entry.getValue().getPeticionsErrorUltimPeriode();
-	    			endpointBase = ip.getEndpoint();
+	    		IntegracioPeticions pe = entry.getValue();
+	    		totalOk += pe.getTotalOk();
+	    		totalError += pe.getTotalError();
+	    		okPeriode += pe.getPeticionsOkUltimPeriode();
+	    		errorPeriode += pe.getPeticionsErrorUltimPeriode();
+	    		tempsTotal += (long)pe.getTotalTempsMig() * pe.getTotalOk();
+	    		tempsPeriode += (long)pe.getTempsMigUltimPeriode() * pe.getPeticionsOkUltimPeriode();
+	    		//Com a endpoint base per el objecte principal de IntegracioSalut, ens quedam amb el que té mes usos al periode (i, si empaten, en total)
+	    		long usosPeriode = pe.getPeticionsOkUltimPeriode() + pe.getPeticionsErrorUltimPeriode();
+	    		long usosTotals = pe.getTotalOk() + pe.getTotalError();
+	    		if (usosPeriode > usosPeriodeEndpointBase || (usosPeriode == usosPeriodeEndpointBase && usosTotals > usosTotalsEndpointBase)) {
+	    			usosPeriodeEndpointBase = usosPeriode;
+	    			usosTotalsEndpointBase = usosTotals;
+	    			endpointBase = entry.getKey();
 	    		}
 	    	}
-	    	
+	    	ip.setTotalOk(totalOk);
+	    	ip.setTotalError(totalError);
+	    	ip.setTotalTempsMig(totalOk>0?(int)(tempsTotal/totalOk):0);
+	    	ip.setPeticionsOkUltimPeriode(okPeriode);
+	    	ip.setPeticionsErrorUltimPeriode(errorPeriode);
+	    	ip.setTempsMigUltimPeriode(okPeriode>0?(int)(tempsPeriode/okPeriode):0);
 	    	ip.setEndpoint(endpointBase);
 	    	
 	    	//Per calcular estat de la integracio, recuperar nomes les darreres 10 peticions
 	    	//Això no es pot obtenir amb les Métriques de spring, hem de consultar al monitor de integracions.
 	    	List<IntegracioAccioDto> darreresIntegracions = aplicacioService.getLastIntegracions(
-	    			integracioComandaToRipeaDto(codiIntegracio),
+	    			integracioComandaToCodiMonitor(codiIntegracio),
 	    			10);
 	    	long darreresOk = 0;
 	    	long darreresKo = 0;
@@ -459,7 +465,7 @@ public class SalutServiceImpl implements SalutService{
 	    	
 	    	return new IntegracioSalut()
 	                .codi(codiIntegracio.toString())
-	                .latencia(ip.getTotalTempsMig()/ip.getPeticionsPerEntorn().size())
+	                .latencia(ip.getTotalTempsMig())
 	                .estat(calculaEstat(darreresOk, darreresKo))
 	                .peticions(ip);
     	} else {
@@ -480,22 +486,26 @@ public class SalutServiceImpl implements SalutService{
     	}
     }
     
-    private IntegracioEnumDto integracioComandaToRipeaDto(IntegracioApp integracioComanda) {
+    /**
+     * Codi amb el qual cada integració es registra al monitor d'integracions (IntegracioHelper.INTCODI_*).
+     * Ha de ser un IntegracioCodiEnum: si no hi coincideix, el monitor no retorna accions i l'estat surt sempre UP.
+     */
+    private IntegracioCodiEnum integracioComandaToCodiMonitor(IntegracioApp integracioComanda) {
     	switch (integracioComanda) {
-    		case PFI: return IntegracioEnumDto.PFIRMA;
-    		case ARX: return IntegracioEnumDto.ARXIU;
-    		case CSV: return IntegracioEnumDto.CONCSV;
-    		case GDC: return IntegracioEnumDto.GESDOC;
-    		case PBL: return IntegracioEnumDto.DADESEXT;
-    		case DIS: return IntegracioEnumDto.DISTRIBUCIO;
-    		case USR: return IntegracioEnumDto.USUARIS;
-    		case CDO: return IntegracioEnumDto.CONVERT;
-    		case DIR: return IntegracioEnumDto.DADESEXT;
-    		case NOT: return IntegracioEnumDto.NOTIFICACIO;
-    		case VIF: return IntegracioEnumDto.VIAFIRMA;
-    		case DIB: return IntegracioEnumDto.DIGITALITZACIO;
-    		case VFI: return IntegracioEnumDto.VALIDASIG;
-    		case RSC: return IntegracioEnumDto.UNITATS;
+    		case PFI: return IntegracioCodiEnum.PORTAFIRMES;
+    		case ARX: return IntegracioCodiEnum.ARXIU;
+    		case CSV: return IntegracioCodiEnum.CONCSV;
+    		case GDC: return IntegracioCodiEnum.GES_DOC;
+    		case PBL: return IntegracioCodiEnum.PINBAL;
+    		case DIS: return IntegracioCodiEnum.DISTRIBUCIO;
+    		case USR: return IntegracioCodiEnum.USUARIS;
+    		case CDO: return IntegracioCodiEnum.CONVERSIO;
+    		case DIR: return IntegracioCodiEnum.DADESEXT;
+    		case NOT: return IntegracioCodiEnum.NOTIB;
+    		case VIF: return IntegracioCodiEnum.FIRMA_VIAFIRMA;
+    		case DIB: return IntegracioCodiEnum.DIGITALITZACIO;
+    		case VFI: return IntegracioCodiEnum.VALIDATE_SIGNATURE;
+    		case RSC: return IntegracioCodiEnum.GESCONADM;
 		default:
 			break;
 		}
@@ -534,7 +544,12 @@ public class SalutServiceImpl implements SalutService{
 		IntegracioPeticions ipCSV = new IntegracioPeticions();
 		ipCSV.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.CSV.toString(), codesFSCSV)); 
 		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.CSV, ipCSV));
-		
+
+		String[] codesFSGDC = {"METRICS@Integracions.gesdoc"}; //create, update, delete i get del plugin de gestió documental
+		IntegracioPeticions ipGDC = new IntegracioPeticions();
+		ipGDC.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.GDC.toString(), codesFSGDC));
+		integracionsSalut.add(getIntegracioSalutAmbTotals(IntegracioApp.GDC, ipGDC));
+
 		String[] codesFSPBL = {"METRICS@Integracions.pinbal"};
 		IntegracioPeticions ipPBL = new IntegracioPeticions();
 		ipPBL.setPeticionsPerEntorn(getPeticionsPerEntorn(IntegracioApp.PBL.toString(), codesFSPBL)); 
@@ -605,21 +620,22 @@ public class SalutServiceImpl implements SalutService{
 		
     	long subsistema_total_exito = 0;
 		long subsistema_total_error = 0;
-		int tempsPromitgSubsistema	= 0;
-    	
+		double tempsTotalOkSubsistema = 0; //ms
+
     	for (String codiMetrica: codesSubsystemMetrics) {
     		Timer timerExpedientExito = meterRegistry.find(codiMetrica).tags("resultado", "exito").timer();
     		Timer timerExpedientError = meterRegistry.find(codiMetrica).tags("resultado", "error").timer();
     		long exitoAux	= timerExpedientExito!=null?timerExpedientExito.count():0;
     		long errorAux	= timerExpedientError!=null?timerExpedientError.count():0;
-    		int promitgAux	= (int)(timerExpedientExito!=null?timerExpedientExito.mean(TimeUnit.MILLISECONDS):0);
+    		double tempsTotalOkAux = timerExpedientExito!=null?timerExpedientExito.totalTime(TimeUnit.MILLISECONDS):0;
     		//Afegir als totals
     		subsistema_total_exito = subsistema_total_exito + exitoAux;
     		subsistema_total_error = subsistema_total_error + errorAux;
-    		tempsPromitgSubsistema = tempsPromitgSubsistema + promitgAux;
+    		tempsTotalOkSubsistema = tempsTotalOkSubsistema + tempsTotalOkAux;
     	}
-    	
-    	int		tempsPromitgActual = subsistema_total_exito==0?0:(int)(tempsPromitgSubsistema/subsistema_total_exito);
+
+    	//Mitjana ponderada per peticions: temps total de les OK / nombre de peticions OK
+    	int		tempsPromitgActual = subsistema_total_exito==0?0:(int)(tempsTotalOkSubsistema/subsistema_total_exito);
     	long	peticionsOkDarrerPeriode = getDadesOkPeriodeByCodi(codi, subsistema_total_exito); 
     	SubsistemaSalut resultat = new SubsistemaSalut()
                 .codi(codi)

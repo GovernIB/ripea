@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,6 +102,7 @@ public class PinbalHelper {
 
 	@Autowired private UsuariHelper usuariHelper;
 	@Autowired private IntegracioHelper integracioHelper;
+	@Autowired private ApplicationHelper applicationHelper;
 	@Autowired private ConfigHelper configHelper;
 	@Autowired private OrganGestorHelper organGestorHelper;
 	@Autowired private ContingutHelper contingutHelper;
@@ -966,6 +968,7 @@ public class PinbalHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
+			registrarMetrica(true, t0);
 			return new FitxerDto(
 					justificante.getNom(),
 					justificante.getContentType(),
@@ -980,6 +983,7 @@ public class PinbalHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					null);
+			registrarMetrica(false, t0);
 			throw new PinbalException(ex, "getJustificante");
 		}
 	}
@@ -1141,6 +1145,7 @@ public class PinbalHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
+			registrarMetrica(true, t0);
 			return respuesta.getAtributos().getIdPeticion();
 		} else {
 			String errorDescripcio = "[" + respuesta.getAtributos().getEstado().getCodigoEstado() + "] " + respuesta.getAtributos().getEstado().getLiteralError();
@@ -1153,6 +1158,7 @@ public class PinbalHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					null);
+			registrarMetrica(false, t0);
 			throw new PinbalException(errorDescripcio);
 		}
 	}
@@ -1162,6 +1168,11 @@ public class PinbalHelper {
 			Exception ex, 
 			String serveiScsp,
 			long t0) {
+		// Una PinbalException dins el try de novaPeticioXxx només pot venir de processarScspRespuesta,
+		// que ja ha registrat l'error al monitor i a les mètriques: no s'ha de tornar a registrar.
+		if (ex instanceof PinbalException) {
+			return (PinbalException)ex;
+		}
 		String recobrimentExceptionPrefix = "es.caib.pinbal.client.recobriment.RecobrimentException: ";
 		String accioDescripcio = "Petició síncrona";
 		String missatge;
@@ -1180,10 +1191,22 @@ public class PinbalHelper {
 				System.currentTimeMillis() - t0,
 				errorDescripcio,
 				ex);
+		registrarMetrica(false, t0);
 		return new PinbalException(
 				missatge,
 				ex,
 				"peticionSincrona");
+	}
+
+	/** Mètrica que SalutServiceImpl.checkIntegracions envia a COMANDA (codi PBL), igual que PluginHelper per a la resta d'integracions. */
+	private void registrarMetrica(boolean ok, long t0) {
+		String endpoint = getPinbalEndpointName();
+		applicationHelper.recordTimer(
+				System.currentTimeMillis() - t0,
+				TimeUnit.MILLISECONDS,
+				"METRICS@Integracions.pinbal",
+				"resultado", ok ? "exito" : "error",
+				"endpoint", Utils.hasValue(endpoint) ? endpoint : "N/D");
 	}
 
 	private Map<String, String> getAccioParams(

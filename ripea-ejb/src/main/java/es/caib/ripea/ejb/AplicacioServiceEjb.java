@@ -13,8 +13,8 @@ import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.ExcepcioLogDto;
 import es.caib.ripea.service.intf.dto.GenericDto;
 import es.caib.ripea.service.intf.dto.IntegracioAccioDto;
+import es.caib.ripea.service.intf.dto.IntegracioCodiEnum;
 import es.caib.ripea.service.intf.dto.IntegracioDto;
-import es.caib.ripea.service.intf.dto.IntegracioEnumDto;
 import es.caib.ripea.service.intf.dto.IntegracioFiltreDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
@@ -96,7 +96,7 @@ public class AplicacioServiceEjb extends AbstractServiceEjb<AplicacioService> im
 
 	@Override
 	@RolesAllowed("**")
-	public List<IntegracioAccioDto> getLastIntegracions(IntegracioEnumDto codiIntegracio, int numElements) {
+	public List<IntegracioAccioDto> getLastIntegracions(IntegracioCodiEnum codiIntegracio, int numElements) {
 		return delegateService.getLastIntegracions(codiIntegracio, numElements);
 	}
 	

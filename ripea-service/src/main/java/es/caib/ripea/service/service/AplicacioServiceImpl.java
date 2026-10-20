@@ -97,8 +97,8 @@ import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.ExcepcioLogDto;
 import es.caib.ripea.service.intf.dto.GenericDto;
 import es.caib.ripea.service.intf.dto.IntegracioAccioDto;
+import es.caib.ripea.service.intf.dto.IntegracioCodiEnum;
 import es.caib.ripea.service.intf.dto.IntegracioDto;
-import es.caib.ripea.service.intf.dto.IntegracioEnumDto;
 import es.caib.ripea.service.intf.dto.IntegracioFiltreDto;
 import es.caib.ripea.service.intf.dto.MetaDocumentPerDefecteEnumDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
@@ -480,7 +480,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	}
 
 	@Override
-	public List<IntegracioAccioDto> getLastIntegracions(IntegracioEnumDto codiIntegracio, int numElements) {
+	public List<IntegracioAccioDto> getLastIntegracions(IntegracioCodiEnum codiIntegracio, int numElements) {
 		List<IntegracioAccioDto> listaAccions = integracioHelper.findAccionsByIntegracioCodi(codiIntegracio.name(), null);
 		if (listaAccions != null) {
 			return listaAccions.subList(0, Math.min(listaAccions.size(), numElements));

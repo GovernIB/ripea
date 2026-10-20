@@ -5791,6 +5791,7 @@ public class PluginHelper {
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
 			applicationHelper.stopTimer(sample, "METRICS@Subsystem_FileSystem.create", "resultado", "exito");
+			stopTimerGestioDocumental(sample, gestioDocumentalPlugin, true);
 			return resultat;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al crear document al gestor documental";
@@ -5804,6 +5805,7 @@ public class PluginHelper {
 					errorDescripcio,
 					ex);
 			applicationHelper.stopTimer(sample, "METRICS@Subsystem_FileSystem.create", "resultado", "error");
+			stopTimerGestioDocumental(sample, gestioDocumentalPlugin, false);
 			throw new SistemaExternException(IntegracioHelper.INTCODI_GESDOC, errorDescripcio, ex);
 		}
 	}
@@ -5813,6 +5815,7 @@ public class PluginHelper {
 			String agrupacio,
 			InputStream contingut) {
 		
+		Timer.Sample sample = Timer.start(applicationHelper.getMeterRegistry());
 		String accioDescripcio = "Update document al gestor documental";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id", id);
@@ -5830,6 +5833,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
+			stopTimerGestioDocumental(sample, gestioDocumentalPlugin, true);
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al update document al gestor documental";
 			integracioHelper.addAccioError(
@@ -5841,6 +5845,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
+			stopTimerGestioDocumental(sample, gestioDocumentalPlugin, false);
 			throw new SistemaExternException(IntegracioHelper.INTCODI_GESDOC, errorDescripcio, ex);
 		}
 	}
@@ -5849,6 +5854,7 @@ public class PluginHelper {
 			String id,
 			String agrupacio) {
 		if (id != null) {
+			Timer.Sample sample = Timer.start(applicationHelper.getMeterRegistry());
 			String accioDescripcio = "Delete document al gestor documental";
 			Map<String, String> accioParams = new HashMap<String, String>();
 			accioParams.put("id", id);
@@ -5866,6 +5872,7 @@ public class PluginHelper {
 						accioParams,
 						IntegracioAccioTipusEnumDto.ENVIAMENT,
 						System.currentTimeMillis() - t0);
+				stopTimerGestioDocumental(sample, gestioDocumentalPlugin, true);
 			} catch (Exception ex) {
 				String errorDescripcio = "Error al eliminar document al gestor documental";
 				integracioHelper.addAccioError(
@@ -5877,6 +5884,7 @@ public class PluginHelper {
 						System.currentTimeMillis() - t0,
 						errorDescripcio,
 						ex);
+				stopTimerGestioDocumental(sample, gestioDocumentalPlugin, false);
 				throw new SistemaExternException(IntegracioHelper.INTCODI_GESDOC, errorDescripcio, ex);
 			}
 		}
@@ -5903,6 +5911,7 @@ public class PluginHelper {
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
 			applicationHelper.stopTimer(sample, "METRICS@Subsystem_FileSystem.get", "resultado", "exito");
+			stopTimerGestioDocumental(sample, gestioDocumentalPlugin, true);
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al consultar document al gestor documental";
 			integracioHelper.addAccioError(
@@ -5914,9 +5923,16 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Subsystem_FileSystem.get", "resultado", "error");	
+			applicationHelper.stopTimer(sample, "METRICS@Subsystem_FileSystem.get", "resultado", "error");
+			stopTimerGestioDocumental(sample, gestioDocumentalPlugin, false);
 			throw new SistemaExternException(IntegracioHelper.INTCODI_GESDOC, errorDescripcio, ex);
 		}
+	}
+
+	/** Mètrica de la integració GDC per a COMANDA (create, update, delete i get del plugin de gestió documental). */
+	private void stopTimerGestioDocumental(Timer.Sample sample, GestioDocumentalPlugin gestioDocumentalPlugin, boolean ok) {
+		String endpoint = gestioDocumentalPlugin.getEndpointURL();
+		applicationHelper.stopTimer(sample, "METRICS@Integracions.gesdoc", "resultado", ok ? "exito" : "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 	}
 
 	public SignaturaResposta firmaServidorFirmar(

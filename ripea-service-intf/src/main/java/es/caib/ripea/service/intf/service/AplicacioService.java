@@ -12,8 +12,8 @@ import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.ExcepcioLogDto;
 import es.caib.ripea.service.intf.dto.GenericDto;
 import es.caib.ripea.service.intf.dto.IntegracioAccioDto;
+import es.caib.ripea.service.intf.dto.IntegracioCodiEnum;
 import es.caib.ripea.service.intf.dto.IntegracioDto;
-import es.caib.ripea.service.intf.dto.IntegracioEnumDto;
 import es.caib.ripea.service.intf.dto.IntegracioFiltreDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
@@ -126,7 +126,7 @@ public interface AplicacioService {
 	@PreAuthorize("hasRole('IPA_SUPER')")
 	IntegracioAccioDto integracioFindOne(Long id);
 
-	public List<IntegracioAccioDto> getLastIntegracions(IntegracioEnumDto codiIntegracio, int numElements);
+	public List<IntegracioAccioDto> getLastIntegracions(IntegracioCodiEnum codiIntegracio, int numElements);
 
 	/**
 	 * Emmagatzema una excepció llençada per un servei.

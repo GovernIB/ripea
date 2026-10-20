@@ -39,12 +39,21 @@ public class ApplicationHelper {
 	}
 	
 	public void stopTimer(Timer.Sample sample, String metricCode, String... tags) {
-        sample.stop(Timer.builder(metricCode)
+        sample.stop(getTimer(metricCode, tags));
+	}
+
+	/** Equivalent a stopTimer per quan la durada ja s'ha mesurat (per exemple, amb un t0 de System.currentTimeMillis()). */
+	public void recordTimer(long durada, TimeUnit unitat, String metricCode, String... tags) {
+		getTimer(metricCode, tags).record(durada, unitat);
+	}
+
+	private Timer getTimer(String metricCode, String... tags) {
+        return Timer.builder(metricCode)
                 .description("Tiempo y resultado")
                 .tags(tags)
                 .publishPercentiles(0.5, 0.75, 0.95, 0.99)
                 .publishPercentileHistogram()
-                .register(meterRegistry));
+                .register(meterRegistry);
 	}
 	
     public String getMetriquesJSON() throws Exception {
