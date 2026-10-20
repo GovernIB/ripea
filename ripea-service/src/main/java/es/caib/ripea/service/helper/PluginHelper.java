@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import es.caib.ripea.service.intf.dto.*;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -178,72 +179,7 @@ import es.caib.ripea.plugin.viafirma.ViaFirmaPlugin;
 import es.caib.ripea.plugin.viafirma.ViaFirmaResponse;
 import es.caib.ripea.plugin.viafirma.ViaFirmaTipusDestinatari;
 import es.caib.ripea.service.intf.config.PropertyConfig;
-import es.caib.ripea.service.intf.dto.AmpliarPlazoForm;
-import es.caib.ripea.service.intf.dto.ArbreDto;
-import es.caib.ripea.service.intf.dto.ArbreNodeDto;
-import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
-import es.caib.ripea.service.intf.dto.ArxiuFirmaDetallDto;
-import es.caib.ripea.service.intf.dto.ArxiuFirmaDto;
-import es.caib.ripea.service.intf.dto.ArxiuFirmaPerfilEnumDto;
-import es.caib.ripea.service.intf.dto.ArxiuFirmaTipusEnumDto;
-import es.caib.ripea.service.intf.dto.ArxiuOperacioEnumDto;
-import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
-import es.caib.ripea.service.intf.dto.DiagnosticFiltreDto;
-import es.caib.ripea.service.intf.dto.DigitalitzacioEstatDto;
-import es.caib.ripea.service.intf.dto.DigitalitzacioPerfilDto;
-import es.caib.ripea.service.intf.dto.DigitalitzacioResultatDto;
-import es.caib.ripea.service.intf.dto.DigitalitzacioTransaccioRespostaDto;
-import es.caib.ripea.service.intf.dto.DocumentDto;
-import es.caib.ripea.service.intf.dto.DocumentEnviamentInteressatDto;
-import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentNotificacioDto;
-import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.service.intf.model.sse.NotificacioEstatCanviatEvent;
-import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentNtiTipoFirmaEnumDto;
-import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
-import es.caib.ripea.service.intf.dto.EntitatDto;
-import es.caib.ripea.service.intf.dto.EntregaPostalTipusEnum;
-import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
-import es.caib.ripea.service.intf.dto.FirmaResultatDto;
-import es.caib.ripea.service.intf.dto.FitxerDto;
-import es.caib.ripea.service.intf.dto.GenericDto;
-import es.caib.ripea.service.intf.dto.ImportacioRegistreParamsDto;
-import es.caib.ripea.service.intf.dto.IntegracioAccioDto;
-import es.caib.ripea.service.intf.dto.IntegracioAccioTipusEnumDto;
-import es.caib.ripea.service.intf.dto.InteressatTipusEnumDto;
-import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
-import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
-import es.caib.ripea.service.intf.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
-import es.caib.ripea.service.intf.dto.MetaDocumentPerDefecteEnumDto;
-import es.caib.ripea.service.intf.dto.MunicipiDto;
-import es.caib.ripea.service.intf.dto.NivellAdministracioDto;
-import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
-import es.caib.ripea.service.intf.dto.PaisDto;
-import es.caib.ripea.service.intf.dto.PortafirmesCarrecDto;
-import es.caib.ripea.service.intf.dto.PortafirmesDocumentTipusDto;
-import es.caib.ripea.service.intf.dto.PortafirmesFluxEstatDto;
-import es.caib.ripea.service.intf.dto.PortafirmesFluxInfoDto;
-import es.caib.ripea.service.intf.dto.PortafirmesFluxRespostaDto;
-import es.caib.ripea.service.intf.dto.PortafirmesFluxReviserDto;
-import es.caib.ripea.service.intf.dto.PortafirmesFluxSignerDto;
-import es.caib.ripea.service.intf.dto.PortafirmesIniciFluxRespostaDto;
-import es.caib.ripea.service.intf.dto.ProcedimentDto;
-import es.caib.ripea.service.intf.dto.ProvinciaDto;
-import es.caib.ripea.service.intf.dto.RespostaAmpliarPlazo;
-import es.caib.ripea.service.intf.dto.Resum;
-import es.caib.ripea.service.intf.dto.SignatureInfoDto;
-import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
-import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
-import es.caib.ripea.service.intf.dto.TipusDocumentalDto;
-import es.caib.ripea.service.intf.dto.TipusImportEnumDto;
-import es.caib.ripea.service.intf.dto.TipusViaDto;
-import es.caib.ripea.service.intf.dto.UnitatOrganitzativaDto;
-import es.caib.ripea.service.intf.dto.UsuariAnotacioDto;
-import es.caib.ripea.service.intf.dto.UsuariDto;
-import es.caib.ripea.service.intf.dto.ValidacioErrorDto;
-import es.caib.ripea.service.intf.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.service.intf.dto.config.ConfigDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
@@ -259,7 +195,7 @@ public class PluginHelper {
 	public static final String GESDOC_AGRUPACIO_ANOTACIONS_REGISTRE_FIR_TMP = "anotacions_registre_fir_tmp";
 	public static final String GESDOC_AGRUPACIO_CERTIFICACIONS = "certificacions";
 	public static final String GESDOC_AGRUPACIO_NOTIFICACIONS = "notificacions";
-	public static final String GESDOC_AGRUPACIO_DOCS_FIRMATS_PORTAFIB = "docsFirmats"; //documents signed by portafib that haven't been saved in arxiu  
+	public static final String GESDOC_AGRUPACIO_DOCS_FIRMATS_PORTAFIB = "docsFirmats"; //documents signed by portafib that haven't been saved in arxiu
 	public static final String GESDOC_AGRUPACIO_DOCS_ADJUNTS = "docsAdjunts"; // documents adjunts when creating document that haven't been saved in arxiu
 	public static final String GESDOC_AGRUPACIO_DOCS_ORIGINALS = "docsOriginals"; // documents amb firma inválida
 	public static final String GESDOC_AGRUPACIO_DOCS_ESBORRANYS = "docsEsborranys"; // firma separada of documents which are saved in arxiu as esborannys
@@ -285,7 +221,7 @@ public class PluginHelper {
 	private Map<String, DistribucioPlugin> distribucioPlugins = new HashMap<>();
 	private Map<String, ComandaCaibPlugin> comandaPlugins = new HashMap<>();
 	private Map<String, RegistrePlugin> registrePlugins = new HashMap<>();
-	
+
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private IntegracioHelper integracioHelper;
 	@Autowired private DocumentHelper documentHelper;
@@ -304,7 +240,7 @@ public class PluginHelper {
 	@Autowired private ContingutHelper contingutHelper;
 	@Autowired private DocumentNotificacioHelper documentNotificacioHelper;
 	@Autowired private ApplicationHelper applicationHelper;
-	@Autowired private MessageHelper messageHelper;	
+	@Autowired private MessageHelper messageHelper;
 	@Autowired private DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
 	@Autowired private ExpedientPeticioRepository expedientPeticioRepository;
 	@Autowired private FluxFirmaUsuariRepository fluxFirmaUsuariRepository;
@@ -323,7 +259,7 @@ public class PluginHelper {
 		accioParams.put("codi", usuariCodi);
 		DadesUsuariPlugin dadesUsuariPlugin = getDadesUsuariPlugin();
 		String endpoint = dadesUsuariPlugin.getEndpointURL();
-		
+
 		try {
 			List<String> rolsDisponibles = dadesUsuariPlugin.findRolsAmbCodi(usuariCodi.toLowerCase());
 			integracioHelper.addAccioOk(
@@ -346,7 +282,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.dadesUsuari", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");	
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.dadesUsuari", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_USUARIS, errorDescripcio, ex);
 		}
 	}
@@ -360,7 +296,7 @@ public class PluginHelper {
 		accioParams.put("codi", usuariCodi);
 		DadesUsuariPlugin dadesUsuariPlugin = getDadesUsuariPlugin();
 		String endpoint = dadesUsuariPlugin.getEndpointURL();
-		
+
 		try {
 			DadesUsuari dadesUsuari = dadesUsuariPlugin.findAmbCodi(usuariCodi.toLowerCase());
 			integracioHelper.addAccioOk(
@@ -447,9 +383,9 @@ public class PluginHelper {
 		accioParams.put("filtre", filtre);
 		DadesUsuariPlugin dadesUsuariPlugin = getDadesUsuariPlugin();
 		String endpoint = dadesUsuariPlugin.getEndpointURL();
-		
+
 		try {
-			List<DadesUsuari> dadesUsuari = dadesUsuariPlugin.findAmbFiltre(filtre);		
+			List<DadesUsuari> dadesUsuari = dadesUsuariPlugin.findAmbFiltre(filtre);
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_USUARIS,
 					accioDescripcio,
@@ -485,7 +421,7 @@ public class PluginHelper {
 		Map<String, NodeDir3> organigrama = null;
 		UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin = getUnitatsOrganitzativesPlugin();
 		String endpoint = unitatsOrganitzativesPlugin.getEndpointURL();
-		
+
 		try {
 			organigrama = unitatsOrganitzativesPlugin.organigrama(codiDir3);
 			integracioHelper.addAccioOk(
@@ -529,7 +465,7 @@ public class PluginHelper {
 		List<UnitatOrganitzativa> unitatsOrganitzatives = null;
 		UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin = getUnitatsOrganitzativesPlugin();
 		String endpoint = unitatsOrganitzativesPlugin.getEndpointURL();
-		
+
 		try {
 			unitatsOrganitzatives = unitatsOrganitzativesPlugin.findAmbPare(
 					pareCodi,
@@ -586,10 +522,10 @@ public class PluginHelper {
 	/**
 	 * Remove from list unitats that are substituted by itself for example if
 	 * webservice returns two elements:
-	 * 
+	 *
 	 * UnitatOrganitzativa(codi=A00000010, estat=E, historicosUO=[A00000010])
 	 * UnitatOrganitzativa(codi=A00000010, estat=V, historicosUO=null)
-	 * 
+	 *
 	 * then remove the first one. That way this transition can be treated by
 	 * application the same way as transition CANVI EN ATRIBUTS
 	 */
@@ -621,9 +557,9 @@ public class PluginHelper {
 		long t0 = System.currentTimeMillis();
 		UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin = getUnitatsOrganitzativesPlugin();
 		String endpoint = unitatsOrganitzativesPlugin.getEndpointURL();
-		
+
 		try {
-			
+
 			List<UnitatOrganitzativa> unitatsOrganitzatives = unitatsOrganitzativesPlugin.findAmbPare(pareCodi);
 			ArbreDto<UnitatOrganitzativaDto> resposta = new ArbreDto<UnitatOrganitzativaDto>(false);
 			// Cerca l'unitat organitzativa arrel
@@ -689,9 +625,9 @@ public class PluginHelper {
 		long t0 = System.currentTimeMillis();
 		UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin = getUnitatsOrganitzativesPlugin();
 		String endpoint = unitatsOrganitzativesPlugin.getEndpointURL();
-		
+
 		try {
-			
+
 			UnitatOrganitzativaDto unitatOrganitzativa = conversioTipusHelper.convertir(
 					unitatsOrganitzativesPlugin.findAmbCodi(
 							codi),
@@ -732,7 +668,7 @@ public class PluginHelper {
 
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		long t0 = System.currentTimeMillis();
-		
+
 		String accioDescripcio = "Consulta d'unitats organitzatives donat un filtre";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("codiUnitat", codiUnitat);
@@ -742,10 +678,10 @@ public class PluginHelper {
 		accioParams.put("codiProvincia", codiProvincia);
 		accioParams.put("codiLocalitat", codiLocalitat);
 		accioParams.put("esUnitatArrel", esUnitatArrel == null ? "null" : esUnitatArrel.toString());
-		
+
 		UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin = getUnitatsOrganitzativesPlugin();
 		String endpoint = unitatsOrganitzativesPlugin.getEndpointURL();
-		
+
 		try {
 			List<UnitatOrganitzativa> units = unitatsOrganitzativesPlugin.cercaUnitats(
 					codiUnitat,
@@ -797,10 +733,10 @@ public class PluginHelper {
 	}
 
 	public void arxiuExpedientActualitzar(ExpedientEntity expedient) {
-		
+
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		long t0 = System.currentTimeMillis();
-		
+
 		//Si venim de un procés en segon pla, no tenim sessió hibernate. Aquest metode fa un deproxy.
 		String organCodiDir3 = organGestorHelper.getOrganCodiFromContingutId(expedient.getId());
 		organGestorHelper.actualitzarOrganCodi(organCodiDir3);
@@ -814,14 +750,14 @@ public class PluginHelper {
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id", expedient.getId().toString());
 		accioParams.put("títol", expedient.getNom());
-		
+
 		MetaExpedientEntity metaExpedient = expedient.getMetaExpedient();
 		accioParams.put("tipus", metaExpedient.getNom());
 		accioParams.put("classificacio", metaExpedient.getClassificacio());
 		accioParams.put("serieDocumental", metaExpedient.getSerieDocumental());
 		accioParams.put("organ", organCodiDir3);
 		accioParams.put("estat", expedient.getEstat().name());
-		
+
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
 		String endpoint = arxiuPluginWrapper.getEndpoint();
 
@@ -900,10 +836,10 @@ public class PluginHelper {
 	}
 
 	public void arxiuExpedientMetadadesActualitzar(ExpedientEntity expedient, MetaDadaEntity metaDada, String valor) {
-		
+
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		long t0 = System.currentTimeMillis();
-		
+
 		String accioDescripcio = "Actualització de les meta-dades d'un expedient";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id",expedient.getId().toString());
@@ -913,10 +849,10 @@ public class PluginHelper {
 		MetaExpedientEntity metaExpedient = expedient.getMetaExpedient();
 		accioParams.put("tipus",metaExpedient.getNom());
 		accioParams.put("estat",expedient.getEstat().name());
-		
+
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
 		String endpoint = arxiuPluginWrapper.getEndpoint();
-		
+
 		try {
 			List<String> interessats = new ArrayList<String>();
 			for (InteressatEntity interessat : expedient.getInteressatsORepresentants()) {
@@ -962,12 +898,12 @@ public class PluginHelper {
 
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		long t0 = System.currentTimeMillis();
-		
+
 		String accioDescripcio = "Consulta d'un expedient per uuid";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
 		String endpoint = arxiuPluginWrapper.getEndpoint();
-		
+
 		try {
 			Expedient arxiuExpedient = arxiuPluginWrapper.getPlugin().expedientDetalls(
 					uuid,
@@ -1000,22 +936,22 @@ public class PluginHelper {
 	public Expedient arxiuExpedientConsultar(ExpedientEntity expedient) {
         return arxiuExpedientConsultar(expedient.getId(), expedient.getNom(), expedient.getMetaExpedient().getNom(), expedient.getArxiuUuid());
 	}
-	
+
 	public Expedient arxiuExpedientConsultar(Long id, String nom, String metaExpedientNom, String arxiuUuid) {
-		
+
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		long t0 = System.currentTimeMillis();
-		
+
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(id));
 		String accioDescripcio = "Consulta d'un expedient";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id",id.toString());
 		accioParams.put("títol",nom);
-		accioParams.put("tipus",metaExpedientNom);		
-		
+		accioParams.put("tipus",metaExpedientNom);
+
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
 		String endpoint = arxiuPluginWrapper.getEndpoint();
-		
+
 		try {
 			Expedient arxiuExpedient = arxiuPluginWrapper.getPlugin().expedientDetalls(
                     arxiuUuid,
@@ -1046,9 +982,9 @@ public class PluginHelper {
 	}
 
 	public void arxiuExpedientEsborrar(ExpedientEntity expedient) {
-		
+
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
-		
+
 		organGestorHelper.actualitzarOrganCodi(
 				organGestorHelper.getOrganCodiFromContingutId(
 						expedient.getId()));
@@ -1066,7 +1002,7 @@ public class PluginHelper {
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
 		String endpoint = arxiuPluginWrapper.getEndpoint();
-		
+
 		try {
 			arxiuPluginWrapper.getPlugin().expedientEsborrar(
 					expedient.getArxiuUuid());
@@ -1134,20 +1070,20 @@ public class PluginHelper {
 	}
 
 	public void arxiuExpedientTancar(ExpedientEntity expedient) {
-		
+
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedient.getId()));
-		
+
 		String accioDescripcio = "Tancament d'un expedient";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id", expedient.getId().toString());
 		accioParams.put("títol", expedient.getNom());
 		accioParams.put("tipus", expedient.getMetaExpedient().getNom());
-		
+
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
 		String endpoint = arxiuPluginWrapper.getEndpoint();
-		
+
 		try {
 			String arxiuUuid = arxiuPluginWrapper.getPlugin().expedientTancar(expedient.getArxiuUuid());
 			if (arxiuUuid != null) {
@@ -1178,7 +1114,7 @@ public class PluginHelper {
 	}
 
 	public void arxiuExpedientReobrir(ExpedientEntity expedient) {
-		
+
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		organGestorHelper.actualitzarOrganCodi(
 				organGestorHelper.getOrganCodiFromContingutId(
@@ -1197,7 +1133,7 @@ public class PluginHelper {
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
 		String endpoint = arxiuPluginWrapper.getEndpoint();
-		
+
 		try {
 			arxiuPluginWrapper.getPlugin().expedientReobrir(
 					expedient.getArxiuUuid());
@@ -1242,7 +1178,7 @@ public class PluginHelper {
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
 		String endpoint = arxiuPluginWrapper.getEndpoint();
-		
+
 		try {
 			String exportacio = arxiuPluginWrapper.getPlugin().expedientExportarEni(
 					expedient.getArxiuUuid());
@@ -1296,7 +1232,7 @@ public class PluginHelper {
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
 		String endpoint = arxiuPluginWrapper.getEndpoint();
-		
+
 		try {
 			arxiuPluginWrapper.getPlugin().expedientLligar(
 					expedientPare.getArxiuUuid(),
@@ -1337,7 +1273,7 @@ public class PluginHelper {
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
 		String endpoint = arxiuPluginWrapper.getEndpoint();
-		
+
 		try {
 			arxiuPluginWrapper.getPlugin().expedientDeslligar(expedientPare.getArxiuUuid(), expedientFill.getArxiuUuid());
 			integracioHelper.addAccioOk(
@@ -1352,12 +1288,12 @@ public class PluginHelper {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
 			integracioHelper.addAccioError(
 					IntegracioHelper.INTCODI_ARXIU,
-					accioDescripcio, 
+					accioDescripcio,
 					arxiuPluginWrapper.getEndpoint(),
-					accioParams, 
-					IntegracioAccioTipusEnumDto.ENVIAMENT, 
-					System.currentTimeMillis() - t0, 
-					errorDescripcio, 
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
 					ex);
 			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
@@ -1370,7 +1306,7 @@ public class PluginHelper {
 			DocumentFirmaTipusEnumDto documentFirmaTipus,
 			List<ArxiuFirmaDto> firmes,
 			ArxiuEstatEnumDto arxiuEstat) {
-		
+
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		organGestorHelper.actualitzarOrganCodi(
 				organGestorHelper.getOrganCodiFromContingutId(
@@ -1401,7 +1337,7 @@ public class PluginHelper {
 						firmes,
 						ArxiuOperacioEnumDto.CREACIO,
 						arxiuEstat);
-				
+
 				try {
 					documentArxiuCreatOModificat = arxiuPluginWrapper.getPlugin().documentCrear(
 							documentArxiu,
@@ -1431,7 +1367,7 @@ public class PluginHelper {
 						throw ex;
 					}
 				}
-				
+
 				document.updateArxiu(documentArxiuCreatOModificat.getIdentificador());
 				document.updateArxiuEstat(arxiuEstat);
 
@@ -1460,19 +1396,19 @@ public class PluginHelper {
 						throw ex;
 					}
 				}
-				
+
 				document.updateArxiu(null);
 				document.updateArxiuEstat(arxiuEstat);
 			}
-			
+
 			Document documentDetalls = arxiuPluginWrapper.getPlugin().documentDetalls(
 					documentArxiuCreatOModificat.getIdentificador(),
 					null,
 					false);
-			
+
 			propagarMetadadesDocument(documentDetalls, document);
 			arxiuEnviamentOk(integracioAccio, sample);
-			
+
 		} catch (Exception ex) {
 			throw arxiuEnviamentError(integracioAccio, sample, ex);
 		}
@@ -1495,7 +1431,7 @@ public class PluginHelper {
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
 		String endpoint = arxiuPluginWrapper.getEndpoint();
-		
+
 		try {
 			String nomExpedient = "EXP_REG_" + expedientNumero + "_" + System.currentTimeMillis();
 
@@ -1561,7 +1497,7 @@ public class PluginHelper {
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
 		String endpoint = arxiuPluginWrapper.getEndpoint();
 		String uuidDocument = null;
-		
+
 		try {
 
 			logger.debug(
@@ -1624,7 +1560,7 @@ public class PluginHelper {
 			applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			logger.debug("Annex Distribució creat:" + uuidDocument);
 			return uuidDocument;
-			
+
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al crear annex de Distribució";
 			integracioHelper.addAccioError(
@@ -1648,12 +1584,12 @@ public class PluginHelper {
 		organGestorHelper.actualitzarOrganCodi(
 				organGestorHelper.getOrganCodiFromContingutId(
 						document.getId()));
-		
+
 		boolean throwExceptionDocumentArxiu = false;
 		if (throwExceptionDocumentArxiu) { // throwExceptionDocumentArxiu = true;
 			throw new RuntimeException("Mock excepcion al actualitzar firma al arxiu");
 		}
-		
+
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
 		IntegracioAccioDto integracioAccio = getIntegracioAccioArxiu(
 				document,
@@ -1680,7 +1616,7 @@ public class PluginHelper {
 		try {
 
 			if (StringUtils.isEmpty(document.getArxiuUuidFirma())) {
-				
+
 				ContingutArxiu contingutArxiu = arxiuPluginWrapper.getPlugin().documentCrear(
 						documentArxiu,
 						contingutPare.getArxiuUuid());
@@ -1692,7 +1628,7 @@ public class PluginHelper {
 			}
 
 			arxiuEnviamentOk(integracioAccio, sample);
-			
+
 		} catch (Exception ex) {
 			throw arxiuEnviamentError(integracioAccio,sample,ex);
 		}
@@ -1737,7 +1673,7 @@ public class PluginHelper {
 	}
 
 	/**
-	 * 
+	 *
 	 * doesn't work correctly with ArxiuPluginCaib, changes firma type in arxiu to
 	 * CSV
 	 */
@@ -1812,9 +1748,9 @@ public class PluginHelper {
 			List<ArxiuFirmaDto> firmes,
 			ArxiuOperacioEnumDto arxiuAccio,
 			ArxiuEstatEnumDto arxiuEstat) {
-		
+
 		boolean esRequereixContingut = true;
-		
+
 		if (documentFirmaTipus == DocumentFirmaTipusEnumDto.SENSE_FIRMA) {
 
 			documentArxiu.setContingut(
@@ -1887,7 +1823,7 @@ public class PluginHelper {
 		}
 
 	}
-	
+
 	private IntegracioAccioDto getIntegracioAccioArxiu(
 			DocumentEntity document,
 			String endpoint,
@@ -2040,7 +1976,7 @@ public class PluginHelper {
         		document!=null?document.getEntitat().getCodi():null,
                 arxiuUuid, versio, ambContingut, ambVersioImprimible);
 	}
-	
+
 	public Document arxiuDocumentConsultar(
 			Long documentId, String documentNom, String documentArxiuUuid, String documentEntitatCodi,
 			String arxiuUuid,
@@ -2080,7 +2016,7 @@ public class PluginHelper {
         accioParams.put("ambVersioImprimible", Boolean.valueOf(ambVersioImprimible).toString());
         accioParams.put("arxiuUuidConsulta", arxiuUuidConsulta);
         String endpoint = arxiuPluginWrapper.getEndpoint();
-        
+
         try {
             Document documentDetalls = arxiuPluginWrapper.getPlugin().documentDetalls(arxiuUuidConsulta, versio, ambContingut);
             if (ambContingut && documentDetalls.getContingut() == null) {
@@ -2210,7 +2146,7 @@ public class PluginHelper {
 		return getArxiuFormatExtensio(
 				extensio) != null;
 	}
-	
+
 	public ConsultaResultat arxiuDocumentCercaExpedient(
 			String entitatCodi,
 			String expedientArxiuUuid,
@@ -2264,7 +2200,7 @@ public class PluginHelper {
                 document.getExpedient().getArxiuUuid()
         );
 	}
-	
+
 	public List<ContingutArxiu> arxiuDocumentObtenirVersions(
 			Long documentId,
             String documentNom,
@@ -2413,7 +2349,7 @@ public class PluginHelper {
 	}
 
 	public ContingutArxiu arxiuDocumentLink(DocumentEntity document, String arxiuUuidDesti) {
-		
+
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		organGestorHelper.actualitzarOrganCodi(
 				organGestorHelper.getOrganCodiFromContingutId(
@@ -2423,13 +2359,13 @@ public class PluginHelper {
 		accioParams.put("id", document.getId().toString());
 		accioParams.put("títol", document.getNom());
 		accioParams.put("arxiuUuidDesti", arxiuUuidDesti);
-		
+
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
 		String endpoint = arxiuPluginWrapper.getEndpoint();
-		
+
 		try {
-			
+
 			// Empram el mètode carpetaCopiar per no disposar d'un mètode específic per
 			// vincular.
 			ContingutArxiu nouContingut = arxiuPluginWrapper.getPlugin().carpetaCopiar(
@@ -2467,12 +2403,12 @@ public class PluginHelper {
 
 		accioParams.put("arxiuUuidOrigen", uuid);
 		accioParams.put("uuidDesti", uuidDesti);
-		
+
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
-		
+
 		try {
-			
+
 			boolean throwException = false;// throwException = true
 			if (throwException) {
 				throw new RuntimeException("Mock excepcion moving document ");
@@ -2552,9 +2488,9 @@ public class PluginHelper {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 		}
 	}
-	
+
 	public String arxiuDocumentMoure(String uuid, String uuidDesti, String uuidExpedientDesti) {
-		
+
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		String accioDescripcio = "Moure document";
 		Map<String, String> accioParams = new HashMap<String, String>();
@@ -2562,13 +2498,13 @@ public class PluginHelper {
 		accioParams.put("arxiuUuidOrigen",uuid);
 		accioParams.put("uuidDesti",uuidDesti);
 		accioParams.put("uuidExpedientDesti",uuidExpedientDesti);
-		
+
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
 		String endpoint = arxiuPluginWrapper.getEndpoint();
-		
+
 		try {
-			
+
 			boolean throwException = false;// throwException = true
 			if (throwException) {
 				throw new RuntimeException("Mock excepcion moving document ");
@@ -2655,9 +2591,9 @@ public class PluginHelper {
 	}
 
 	public String arxiuDocumentExportar(DocumentEntity document) {
-		
+
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
-		
+
 		organGestorHelper.actualitzarOrganCodi(
 				organGestorHelper.getOrganCodiFromContingutId(
 						document.getId()));
@@ -2710,7 +2646,7 @@ public class PluginHelper {
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getConcsvPlugin();
 		String endpoint = arxiuPluginWrapper.getEndpoint();
-		
+
 		try {
 			DocumentContingut documentContingut = arxiuPluginWrapper.getPlugin().documentImprimible(getArxiuUuid);
 			integracioHelper.addAccioOk(
@@ -2737,7 +2673,7 @@ public class PluginHelper {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_CONCSV, errorDescripcio, ex);
 		}
 	}
-	
+
 	public FitxerDto arxiuDocumentVersioImprimible(DocumentEntity document) {
 
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
@@ -2749,7 +2685,7 @@ public class PluginHelper {
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getConcsvPlugin();
 		String endpoint = arxiuPluginWrapper.getEndpoint();
-		
+
 		try {
 			DocumentContingut documentContingut = arxiuPluginWrapper.getPlugin().documentImprimible(document.getArxiuUuid());
 			FitxerDto fitxer = new FitxerDto();
@@ -2788,7 +2724,7 @@ public class PluginHelper {
 			ContingutEntity contingutPare) {
 
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
-		
+
 		organGestorHelper.actualitzarOrganCodi(
 				organGestorHelper.getOrganCodiFromContingutId(
 						carpeta.getId()));
@@ -2860,7 +2796,7 @@ public class PluginHelper {
 	public Carpeta arxiuCarpetaConsultar(CarpetaEntity carpeta) {
 
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
-		
+
 		organGestorHelper.actualitzarOrganCodi(
 				organGestorHelper.getOrganCodiFromContingutId(
 						carpeta.getId()));
@@ -2875,7 +2811,7 @@ public class PluginHelper {
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
 		String endpoint = arxiuPluginWrapper.getEndpoint();
-		
+
 		try {
 			Carpeta carpetaDetalls = arxiuPluginWrapper.getPlugin().carpetaDetalls(
 					carpeta.getArxiuUuid());
@@ -2912,7 +2848,7 @@ public class PluginHelper {
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
 		String endpoint = arxiuPluginWrapper.getEndpoint();
-		
+
 		try {
 			Carpeta arxiuCarpeta = arxiuPluginWrapper.getPlugin().carpetaDetalls(
 					uuid);
@@ -2958,7 +2894,7 @@ public class PluginHelper {
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
 		String endpoint = arxiuPluginWrapper.getEndpoint();
-		
+
 		try {
 			arxiuPluginWrapper.getPlugin().carpetaEsborrar(
 					carpeta.getArxiuUuid());
@@ -2999,7 +2935,7 @@ public class PluginHelper {
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
 		String endpoint = arxiuPluginWrapper.getEndpoint();
-		
+
 		try {
 			ContingutArxiu carpetaCopiada = arxiuPluginWrapper.getPlugin().carpetaCopiar(
 					carpeta.getArxiuUuid(),
@@ -3048,7 +2984,7 @@ public class PluginHelper {
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
 		String endpoint = arxiuPluginWrapper.getEndpoint();
-		
+
 		try {
 			arxiuPluginWrapper.getPlugin().carpetaMoure(
 					carpeta.getArxiuUuid(),
@@ -3083,17 +3019,17 @@ public class PluginHelper {
 		String accioDescripcio = "Importar documents";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("numeroRegistre", params.getNumeroRegistre());
-		
+
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
 		String endpoint = arxiuPluginWrapper.getEndpoint();
-		
+
 		try {
 			String tipusRegistreLabel = null;
 			String dataPresentacioStr = null;
 			String numeroRegistreStr = null;
 			String codiEniStr = null;
-			
+
 			if (params.getTipusImportacio().equals(TipusImportEnumDto.NUMERO_REGISTRE)) {
 				DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 				dataPresentacioStr = "'" + dateFormat.format(params.getDataPresentacioFormatted()) + "'";
@@ -3103,16 +3039,16 @@ public class PluginHelper {
 				codiEniStr = "'" + params.getCodiEni() + "'";
 			}
 			// Aprofitam el mètode documentVersions per fer la importació
-			String paramsJson = "{" + 
-									"'tipusImportacio' : '" + params.getTipusImportacio().name() + "'," + 
-									"'numeroRegistre' : " + numeroRegistreStr + "," + 
-									"'tipusRegistre' : " + tipusRegistreLabel + "," + 
-									"'dataPresentacio' : " + dataPresentacioStr + "," + 
-									"'codiEni' : " + codiEniStr + "" + 
+			String paramsJson = "{" +
+									"'tipusImportacio' : '" + params.getTipusImportacio().name() + "'," +
+									"'numeroRegistre' : " + numeroRegistreStr + "," +
+									"'tipusRegistre' : " + tipusRegistreLabel + "," +
+									"'dataPresentacio' : " + dataPresentacioStr + "," +
+									"'codiEni' : " + codiEniStr + "" +
 								"}";
-			
+
 			List<ContingutArxiu> contingutArxiu = arxiuPluginWrapper.getPlugin().documentVersions(paramsJson);
-			
+
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_ARXIU,
 					accioDescripcio,
@@ -3152,7 +3088,7 @@ public class PluginHelper {
 		long t0 = System.currentTimeMillis();
 		IArxiuPluginWrapper arxiuPluginWrapper = getArxiuPlugin();
 		String endpoint = arxiuPluginWrapper.getEndpoint();
-		
+
 		try {
 //			Document document = arxiuPluginWrapper.getPlugin().documentDetalls(
 //					arxiuUuid,
@@ -3188,7 +3124,7 @@ public class PluginHelper {
 						accioParams,
 						IntegracioAccioTipusEnumDto.ENVIAMENT,
 						System.currentTimeMillis() - t0);
-				applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");				
+				applicationHelper.stopTimer(sample, "METRICS@Integracions.arxiu", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 				return document;
 			}
 			return document;
@@ -3207,7 +3143,7 @@ public class PluginHelper {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 		}
 	}
-	
+
 	public String portafirmesUpload(
 			DocumentEntity document,
 			String motiu,
@@ -3221,12 +3157,12 @@ public class PluginHelper {
 			String transaccioId) {
 
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
-		
+
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(document.getId()));
 		long t0 = System.currentTimeMillis();
 		PortafirmesPlugin portafirmesPlugin = getPortafirmesPlugin();
 		String endpoint = portafirmesPlugin.getEndpointURL();
-		
+
 		Map<String, String> accioParams = getAccioParamsPerPortaFirmesUpload(
 				document,
 				motiu,
@@ -3262,7 +3198,7 @@ public class PluginHelper {
 				portafirmesAnnexos.add(portafirmesAnnex);
 			}
 		}
-		
+
 		List<PortafirmesFluxBloc> flux = new ArrayList<PortafirmesFluxBloc>();
 		if (fluxId == null) {
 			if (MetaDocumentFirmaSequenciaTipusEnumDto.SERIE.equals(fluxTipus)) {
@@ -3284,7 +3220,7 @@ public class PluginHelper {
 			}
 		}
 		try {
-			
+
 			String remitent = "Aplicació RIPEA";
 			UsuariDto usuari = aplicacioService.getUsuariActual();
 			if (usuari != null) {
@@ -3344,9 +3280,9 @@ public class PluginHelper {
 	}
 
 	public PortafirmesDocument portafirmesDownload(DocumentPortafirmesEntity documentPortafirmes) {
-		
+
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
-		
+
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(documentPortafirmes.getDocument().getId()));
 
 		long t0 = System.currentTimeMillis();
@@ -3359,7 +3295,7 @@ public class PluginHelper {
 		PortafirmesPlugin portafirmesPlugin = getPortafirmesPlugin();
 		String endpoint = portafirmesPlugin.getEndpointURL();
 		PortafirmesDocument portafirmesDocument = null;
-		
+
 		try {
 			portafirmesDocument = portafirmesPlugin.download(documentPortafirmes.getPortafirmesId());
 			integracioHelper.addAccioOk(
@@ -3390,7 +3326,7 @@ public class PluginHelper {
 	public void portafirmesDelete(DocumentPortafirmesEntity documentPortafirmes) {
 
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
-		
+
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(documentPortafirmes.getDocument().getId()));
 
 		long t0 = System.currentTimeMillis();
@@ -3402,7 +3338,7 @@ public class PluginHelper {
 		accioParams.put("portafirmesId", Long.valueOf(documentPortafirmes.getPortafirmesId()).toString());
 		PortafirmesPlugin portafirmesPlugin = getPortafirmesPlugin();
 		String endpoint = portafirmesPlugin.getEndpointURL();
-		
+
 		try {
 			portafirmesPlugin.delete(documentPortafirmes.getPortafirmesId());
 			integracioHelper.addAccioOk(
@@ -3430,9 +3366,9 @@ public class PluginHelper {
 	}
 
 	public List<PortafirmesDocumentTipusDto> portafirmesFindDocumentTipus() {
-		
+
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
-		
+
 		String accioDescripcio = "Consulta de tipus de document";
 		long t0 = System.currentTimeMillis();
 		PortafirmesPlugin portafirmesPlugin = getPortafirmesPlugin();
@@ -3488,11 +3424,11 @@ public class PluginHelper {
 		String endpoint = portafirmesPlugin.getEndpointURL();
 		PortafirmesIniciFluxRespostaDto transaccioResponseDto = new PortafirmesIniciFluxRespostaDto();
 		try {
-			
+
 			UsuariDto usuariDto = aplicacioService.getUsuariActual();
 			String idioma = usuariDto.getIdioma();
 			String usuariCodi = usuariDto.getCodi();
-			
+
 			Boolean filtrarPerUsuariActual = aplicacioService.propertyBooleanFindByKey(PropertyConfig.FILTRAR_USUARI_DESCRIPCIO);
 			boolean saveUserActual = false;
 			if (filtrarPerUsuariActual == null || filtrarPerUsuariActual.equals(true)) {
@@ -3535,14 +3471,14 @@ public class PluginHelper {
 	}
 
 	public PortafirmesFluxRespostaDto portafirmesRecuperarFluxDeFirma(String idTransaccio) {
-		
+
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		String accioDescripcio = "Recuperant flux de firma";
 		long t0 = System.currentTimeMillis();
 		PortafirmesFluxRespostaDto respostaDto;
 		PortafirmesPlugin portafirmesPlugin = getPortafirmesPlugin();
 		String endpoint = portafirmesPlugin.getEndpointURL();
-		
+
 		try {
 			respostaDto = new PortafirmesFluxRespostaDto();
 			PortafirmesFluxResposta resposta = portafirmesPlugin.recuperarFluxDeFirmaByIdTransaccio(idTransaccio);
@@ -3580,14 +3516,14 @@ public class PluginHelper {
 	}
 
 	public List<PortafirmesCarrecDto> portafirmesRecuperarCarrecs() {
-		
+
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		String accioDescripcio = "Recuperant els càrrecs disponibles";
 		long t0 = System.currentTimeMillis();
 		List<PortafirmesCarrecDto> carrecsDto = new ArrayList<PortafirmesCarrecDto>();
 		PortafirmesPlugin portafirmesPlugin = getPortafirmesPlugin();
 		String endpoint = portafirmesPlugin.getEndpointURL();
-		
+
 		try {
 			List<PortafirmesCarrec> portafirmesCarrecs = portafirmesPlugin.recuperarCarrecs();
 			for (PortafirmesCarrec portafirmesCarrec : portafirmesCarrecs) {
@@ -3634,7 +3570,7 @@ public class PluginHelper {
 		accioParams.put("carrecId", carrecId);
 		long t0 = System.currentTimeMillis();
 		PortafirmesCarrecDto carrecDto = new PortafirmesCarrecDto();
-		
+
 		logger.info("portafirmesRecuperarCarrec("+carrecId+")");
 		String entitatCodi = configHelper.getEntitatActualCodi();
 		String organCodi = configHelper.getOrganActualCodi();
@@ -3643,7 +3579,7 @@ public class PluginHelper {
 		String endpoint = portafirmesPlugin.getEndpointURL();
 		Properties pps = ((RipeaAbstractPluginProperties) portafirmesPlugin).getPluginProperties();
 		logger.info("portafirmesRecuperarCarrec > properties:"+pps.toString());
-		
+
 		try {
 			PortafirmesCarrec portafirmesCarrec = portafirmesPlugin.recuperarCarrec(carrecId);
 			carrecDto.setCarrecId(
@@ -3692,7 +3628,7 @@ public class PluginHelper {
 		long t0 = System.currentTimeMillis();
 		PortafirmesPlugin portafirmesPlugin = getPortafirmesPlugin();
 		String endpoint = portafirmesPlugin.getEndpointURL();
-		
+
 		try {
 			portafirmesPlugin.tancarTransaccioFlux(idTransaccio);
 			integracioHelper.addAccioOk(
@@ -3725,10 +3661,10 @@ public class PluginHelper {
 		long t0 = System.currentTimeMillis();
 		Map<String, String> accioParams = new HashMap<String, String>();
 		String idioma = aplicacioService.getUsuariActual().getIdioma();
-		
+
 		if (idioma != null)
 			idioma = idioma.toLowerCase();
-		
+
 		accioParams.put("idioma",idioma);
 		List<DigitalitzacioPerfilDto> perfilsDto = new ArrayList<DigitalitzacioPerfilDto>();
 		DigitalitzacioPlugin digitalitzacioPlugin = getDigitalitzacioPlugin();
@@ -4060,7 +3996,7 @@ public class PluginHelper {
 					null,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");			
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de portafirmes";
 			integracioHelper.addAccioError(
@@ -4080,16 +4016,16 @@ public class PluginHelper {
 
 	/**
 	 * Recupera les plantilles de firma disponibles:
-	 * 
+	 *
 	 * Issue 658: Quan es creava un flux de firma, a la descripció per defecte s’hi informava el codi de l’usuari actual per poder després "filtrar"
 	 * els fluxos d’aquell usuari. Això es controla amb la propietat "es.caib.ripea.plugin.portafirmes.flux.filtrar.usuari.descripcio"
-	 * 
+	 *
 	 * - Plantilles del firmant = usuariActual si filtrar=true
 	 * - Totes les plantilles si filtrar=false
-	 * 
+	 *
 	 * - EXTRA: Si li passes metaDocumentId, afegeix les plantilles definides al procediment. (isProcedimentDefault=true)
 	 * - EXTRA: Si li passes addUserFluxes, afegeix les plantilles creades per el usuari actual. (isUsuariActual=true)
-	 * 
+	 *
 	 * La resta de plantilles que no pertanyen ni al prodeciment si al usuari, son les "comunes" del desplegable
 	 */
 	public List<PortafirmesFluxRespostaDto> portafirmesRecuperarPlantillesDisponibles(
@@ -4125,7 +4061,7 @@ public class PluginHelper {
 					respostesDto.add(resposta);
 				}
 			}
-			
+
 			if (addUserFluxes) {
 				List<FluxFirmaUsuariEntity> plantillesUsuari = fluxFirmaUsuariRepository.findByEntitatIdAndUsuariCodi(entitatId, auth.getName());
 				//FLUXOS DE FIRMA CREAT EXPRESSAMENT PER L'USUARI ACTUAL
@@ -4138,7 +4074,7 @@ public class PluginHelper {
 					respostesDto.add(fluxUsuari);
 				}
 			}
-			
+
 			if (metaDocumentId!=null) {
 				List<MetaDocumentFluxPortafibEntity> fluxosProcediment = metaDocumentFluxPortafibRepository.findByMetaDocumentId(metaDocumentId);
 //				List<PortafirmesFluxInfo> fluxosPerDefecteAfegir = new ArrayList<PortafirmesFluxInfo>();
@@ -4173,7 +4109,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");	
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_PFIRMA, errorDescripcio, ex);
 		}
 		return respostesDto;
@@ -4234,7 +4170,7 @@ public class PluginHelper {
 					null,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");			
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.portafirmesFlux", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de portafirmes";
 			integracioHelper.addAccioError(
@@ -4343,7 +4279,7 @@ public class PluginHelper {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_PROCEDIMENT, errorDescripcio, ex);
 		}
 	}
-	
+
 	public List<Pais> dadesExternesPaisosFindAll() {
 
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
@@ -4377,9 +4313,9 @@ public class PluginHelper {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT, errorDescripcio, ex);
 		}
 	}
-	
+
 	public Pais dadesExternesPaisFindByCodi(String codiPais) {
-		
+
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		long t0 = System.currentTimeMillis();
 		String accioDescripcio = "Consulta del pais "+codiPais;
@@ -4488,7 +4424,7 @@ public class PluginHelper {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT, errorDescripcio, ex);
 		}
 	}
-	
+
 	public Provincia dadesExternesProvinciesFindByCodi(String provinciaCodi) {
 
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
@@ -4604,7 +4540,7 @@ public class PluginHelper {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT, errorDescripcio, ex);
 		}
 	}
-	
+
 	public Municipi dadesExternesMunicipisFindByCodi(String provinciaCodi, String municipiCodi) {
 
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
@@ -4690,14 +4626,14 @@ public class PluginHelper {
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		long t0 = System.currentTimeMillis();
 		String accioDescripcio = "Consulta de nivells d'administració";
-		Map<String, String> accioParams = new HashMap<String, String>();		
+		Map<String, String> accioParams = new HashMap<String, String>();
 		DadesExternesPlugin dadesExternesPlugin = getDadesExternesPlugin();
 		String endpoint = dadesExternesPlugin.getEndpointURL();
 		try {
 			List<NivellAdministracioDto> nivellAdministracio = conversioTipusHelper.convertirList(
 					dadesExternesPlugin.nivellAdministracioFindAll(),
 					NivellAdministracioDto.class);
-			
+
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_DADESEXT,
 					accioDescripcio,
@@ -4761,9 +4697,9 @@ public class PluginHelper {
 	}
 
 	public RespostaConsultaRegistre obtenerAsientoRegistral(
-			String codiDir3Entitat, 
-			String numeroRegistreFormatat, 
-			Long tipusRegistre, 
+			String codiDir3Entitat,
+			String numeroRegistreFormatat,
+			Long tipusRegistre,
 			boolean ambAnnexos) {
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		long t0 = System.currentTimeMillis();
@@ -4778,11 +4714,11 @@ public class PluginHelper {
 		String endpoint = registrePlugin.getEndpointURL();
 		try {
 			RespostaConsultaRegistre resposta = registrePlugin.obtenerAsientoRegistral(
-					codiDir3Entitat, 
-					numeroRegistreFormatat, 
-					tipusRegistre, 
+					codiDir3Entitat,
+					numeroRegistreFormatat,
+					tipusRegistre,
 					ambAnnexos);
-			
+
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_REGISTRE,
 					accioDescripcio,
@@ -4807,7 +4743,7 @@ public class PluginHelper {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_REGISTRE, errorDescripcio, ex);
 		}
 	}
-	
+
 	public SignatureInfoDto detectSignedAttachedUsingPdfReader(
 			byte[] documentContingut,
 			String contentType) {
@@ -4852,14 +4788,14 @@ public class PluginHelper {
 			return detectSignedAttachedUsingPdfReader(contingut, contentType);
 		}
 	}
-	
+
 	/**
-	 * Aquesta funció es crida només en el OnChange de la modal de document, al seleccionar un fitxer, 
+	 * Aquesta funció es crida només en el OnChange de la modal de document, al seleccionar un fitxer,
 	 * per saber si donar la opció de adjuntar firma separada o no.
-	 * 
+	 *
 	 * Per tant el documentContingut es el del fitxer adjunt, nomes es comprova si ja té firma o no.
 	 * En cas de no tenir-ne, el usuari podrà adjuntar el fitxer de firma, contingut el qual ja no passarà per aquesta funció.
-	 * 
+	 *
 	 * Quant s'adjunta un segon fitxer que es el de la firma, no es valida per aqui, sino al guardar.
 	 */
 	public SignatureInfoDto detectSignedAttachedUsingValidateSignaturePlugin(
@@ -4870,7 +4806,7 @@ public class PluginHelper {
 		long t0 = System.currentTimeMillis();
 		IValidateSignaturePluginWrapper validaSignaturaPlugin = getValidaSignaturaPlugin();
 		String accioDescripcio = "Validació de firma";
-		
+
 		try {
 
 			ValidateSignatureRequest validationRequest = new ValidateSignatureRequest();
@@ -4883,7 +4819,7 @@ public class PluginHelper {
 			sri.setReturnCertificates(false);
 			sri.setReturnTimeStampInfo(true);
 			validationRequest.setSignatureRequestedInformation(sri);
-			
+
 			ValidateSignatureResponse validateSignatureResponse = validaSignaturaPlugin.getPlugin().validateSignature(validationRequest);
 
 			ValidationStatus validationStatus = validateSignatureResponse.getValidationStatus();
@@ -4921,7 +4857,7 @@ public class PluginHelper {
 						validaSignaturaPlugin!=null?validaSignaturaPlugin.getEndpoint():"Llibreria itextpdf",
 						null,
 						IntegracioAccioTipusEnumDto.ENVIAMENT,
-						System.currentTimeMillis() - t0);				
+						System.currentTimeMillis() - t0);
 				applicationHelper.stopTimer(sample, "METRICS@Integracions.validaFirma", "resultado", "exito", "endpoint", Utils.hasValue(validaSignaturaPlugin.getEndpoint())?validaSignaturaPlugin.getEndpoint():"N/A");
 				return new SignatureInfoDto(false, false, null);
 			} else {
@@ -4940,7 +4876,7 @@ public class PluginHelper {
 			}
 		}
 	}
-	
+
 
 	public List<ArxiuFirmaDto> validaSignaturaObtenirFirmes(String uuid, boolean throwExceptionIfNotValid) {
 		Document arxiuDocument = arxiuDocumentConsultar(null, uuid, null, true, false);
@@ -4952,14 +4888,14 @@ public class PluginHelper {
 				null,
 				throwExceptionIfNotValid);
 	}
-	
+
 	public List<ArxiuFirmaDto> validaSignaturaObtenirFirmes(
 			String nomFitxer,
 			byte[] documentContingut,
 			byte[] firmaContingut,
 			String firmaContentType,
 			boolean throwExceptionIfNotValid) {
-		
+
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		String accioDescripcio = "Obtenir informació de document firmat";
 		Map<String, String> accioParams = new HashMap<String, String>();
@@ -4974,19 +4910,19 @@ public class PluginHelper {
 			accioParams.put("firmaContingut", "<null>");
 		}
 		accioParams.put("firmaContentType", firmaContentType);
-		
+
 		long t0 = System.currentTimeMillis();
 		List<ArxiuFirmaDto> firmes = new ArrayList<ArxiuFirmaDto>();
 		IValidateSignaturePluginWrapper validaSignaturaPlugin = null;
-		
+
 		try {
-		
+
 			if (getPropertyArxiuFirmaDetallsActiu()) {
-				
+
 				validaSignaturaPlugin = getValidaSignaturaPlugin();
-				
+
 				if (nomFitxer==null) {nomFitxer="ContingutFirma";}
-				
+
 				ValidateSignatureRequest validationRequest = new ValidateSignatureRequest();
 				if (firmaContingut != null) {
 					validationRequest.setSignedDocumentData(documentContingut);
@@ -4994,7 +4930,7 @@ public class PluginHelper {
 				} else {
 					validationRequest.setSignatureData(documentContingut);
 				}
-	
+
 				SignatureRequestedInformation sri = new SignatureRequestedInformation();
 				sri.setReturnSignatureTypeFormatProfile(true);
 				sri.setReturnCertificateInfo(true);
@@ -5003,14 +4939,14 @@ public class PluginHelper {
 				sri.setReturnCertificates(true);
 				sri.setReturnTimeStampInfo(true);
 				validationRequest.setSignatureRequestedInformation(sri);
-				
+
 				ValidateSignatureResponse validateSignatureResponse = validaSignaturaPlugin.getPlugin().validateSignature(validationRequest);
-	
+
 				ValidationStatus validationStatus = validateSignatureResponse.getValidationStatus();
 				if (validationStatus.getStatus() != 1 && throwExceptionIfNotValid) {
 					throw new RuntimeException(validationStatus.getErrorMsg());
 				}
-	
+
 				List<ArxiuFirmaDetallDto> detalls = new ArrayList<ArxiuFirmaDetallDto>();
 				ArxiuFirmaDto firma = new ArxiuFirmaDto();
 				if (validateSignatureResponse.getSignatureDetailInfo() != null) {
@@ -5025,20 +4961,20 @@ public class PluginHelper {
 						}
 						InformacioCertificat certificateInfo = signatureInfo.getCertificateInfo();
 						if (certificateInfo != null) {
-							
+
 							if (certificateInfo.getNifResponsable() != null)
 								detall.setResponsableNif(certificateInfo.getNifResponsable());
 							else
 								detall.setResponsableNif(certificateInfo.getEntitatSubscriptoraNif());
-							
+
 							if (certificateInfo.getNomCompletResponsable() != null)
 								detall.setResponsableNom(certificateInfo.getNomCompletResponsable());
 							else
 								detall.setResponsableNom(certificateInfo.getEntitatSubscriptoraNom());
-							
+
 							detall.setEmissorCertificat(certificateInfo.getEmissorOrganitzacio());
 						}
-	
+
 						if (isObtenirDataFirmaFromAtributDocument() && detall.getResponsableNif() != null) {
 							try {
 								PDDocument document = PDDocument.load(new ByteArrayInputStream(documentContingut));
@@ -5074,7 +5010,7 @@ public class PluginHelper {
 					}
 					firmes.add(firma);
 				}
-				
+
 				integracioHelper.addAccioOk(
 						IntegracioHelper.INTCODI_VALIDASIG,
 						accioDescripcio,
@@ -5083,18 +5019,18 @@ public class PluginHelper {
 						IntegracioAccioTipusEnumDto.ENVIAMENT,
 						System.currentTimeMillis() - t0);
 				applicationHelper.stopTimer(sample, "METRICS@Integracions.validaFirma", "resultado", "exito", "endpoint", Utils.hasValue(validaSignaturaPlugin.getEndpoint())?validaSignaturaPlugin.getEndpoint():"N/A");
-				
+
 			} else {
 				ArxiuFirmaDto firma = documentHelper.getArxiuFirmaPades(nomFitxer, documentContingut);
 				firmes = Arrays.asList(firma);
 			}
-			
+
 			if (isValidacioFirmaAgilActiva()) {
 				validaSignaturaAgilObtenirFirmes(firmes, documentContingut);
 			}
-			
+
 			return firmes;
-			
+
 		} catch (Exception ex) {
 			String errorDescripcio = "Error validant la firma del document: " + ex.getMessage();
 			integracioHelper.addAccioError(
@@ -5106,35 +5042,35 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			
+
 			if (validaSignaturaPlugin!=null)
 				applicationHelper.stopTimer(sample, "METRICS@Integracions.validaFirma", "resultado", "error", "endpoint", Utils.hasValue(validaSignaturaPlugin.getEndpoint())?validaSignaturaPlugin.getEndpoint():"N/A");
-			
+
 			throw new SistemaExternException(IntegracioHelper.INTCODI_VALIDASIG, errorDescripcio, ex);
 		}
 	}
 
 	public List<RespostaAmpliarPlazo> ampliarPlazoEnviament(AmpliarPlazoForm documentNotificacioDto) {
-		
+
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		long t0 = System.currentTimeMillis();
 		List<RespostaAmpliarPlazo> resultat = new ArrayList<RespostaAmpliarPlazo>();
 		NotificacioPlugin notificacioPlugin = getNotificacioPlugin();
 		String accioDescripcio = "Ampliar plaç de enviament notib";
 		String endpoint = notificacioPlugin.getEndpointURL();
-		
+
 		if (documentNotificacioDto!=null && documentNotificacioDto.getDocumentEnviamentInteressats()!=null) {
 			for (DocumentEnviamentInteressatDto dei: documentNotificacioDto.getDocumentEnviamentInteressats()) {
 				if (dei.getDiesAmpliacio()!=null && dei.getDiesAmpliacio()>0) {
-				
+
 					Map<String, String> accioParams = new HashMap<String, String>();
 					accioParams.put("referencia", dei.getEnviamentReferencia());
 					accioParams.put("motiu", dei.getMotiu());
 					accioParams.put("dies", dei.getDiesAmpliacio().toString());
-					
+
 					List<String> refs = new ArrayList<String>();
 					refs.add(dei.getEnviamentReferencia());
-					
+
 					try {
 
 						RespostaAmpliarPlazo aux = notificacioPlugin.ampliarPlazo(refs, dei.getMotiu(), dei.getDiesAmpliacio());
@@ -5167,10 +5103,10 @@ public class PluginHelper {
 				}
 			}
 		}
-		
+
 		return resultat;
 	}
-	
+
 	public RespostaEnviar notificacioEnviar(
 			DocumentNotificacioDto notificacioDto,
 			ExpedientEntity expedientEntity,
@@ -5180,18 +5116,18 @@ public class PluginHelper {
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedientEntity.getId()));
 		MetaExpedientEntity metaExpedient = expedientEntity.getMetaExpedient();
-		
+
 		String accioDescripcio = "Enviament d'una notificació electrònica";
 		Map<String, String> accioParams = getNotificacioAccioParams(
 				notificacioDto,
 				expedientEntity,
 				documentEntity,
 				interessat);
-		
+
 		long t0 = System.currentTimeMillis();
 		NotificacioPlugin notificacioPlugin = getNotificacioPlugin();
 		String endpoint = notificacioPlugin.getEndpointURL();
-		
+
 		try {
 			Notificacio notificacio = new Notificacio();
 			String forsarEntitat = getPropertyNotificacioForsarEntitat();
@@ -5224,7 +5160,15 @@ public class PluginHelper {
 				}
 			}
 
-			if (documentEntity.getDocumentTipus().equals(DocumentTipusEnumDto.VIRTUAL) ||
+            if (!InteressatTipusEnum.InteressatAdministracioEntity.equals(interessat.getTipus())
+                && Utils.notEquals(documentEntity.getFitxerContentType(),"application/zip")
+                && Utils.notEquals(documentEntity.getFitxerContentType(),"application/pdf")) {
+                FitxerDto zip = documentHelper.getZipFromDocumentsIds(documentEntity.getEntitat().getId(), List.of(documentEntity.getId()));
+
+                String fitxerNom = documentEntity.getFitxerNom().substring(0, documentEntity.getFitxerNom().lastIndexOf('.')) + ".zip";
+                notificacio.setDocumentArxiuNom(fitxerNom);
+                notificacio.setDocumentArxiuContingut(zip.getContingut());
+            } else if (documentEntity.getDocumentTipus().equals(DocumentTipusEnumDto.VIRTUAL) ||
 				Utils.notEquals(documentEntity.getFitxerContentType(),"application/pdf")) {
 				FitxerDto fitxer = documentHelper.getFitxerAssociat(documentEntity,null);
 				notificacio.setDocumentArxiuNom(fitxer.getNom());
@@ -5251,14 +5195,14 @@ public class PluginHelper {
 
 			// ########## ENTREGA POSTAL ###############
 			if (notificacioDto.isEntregaPostal()) {
-				
+
 				enviament.setEntregaPostalActiva(true);
-				
+
 				InteressatEntity interessatPerAdresa = interessat;
 				if (interessat.getRepresentant() != null) {
 					interessatPerAdresa = interessat.getRepresentant();
 				}
-				
+
 				PaisDto pais = null;
 				if (interessatPerAdresa.getPais()!=null) {
 					pais = dadesExternesHelper.getPaisAmbCodi(interessatPerAdresa.getPais());
@@ -5277,8 +5221,8 @@ public class PluginHelper {
 					}
 				} else {
 					throw new NotFoundException(interessatPerAdresa.getProvincia(), ProvinciaDto.class);
-				}					
-				
+				}
+
 				MunicipiDto municipi = null;
 				if (interessatPerAdresa.getMunicipi() != null) {
 					municipi = dadesExternesHelper.getMunicipiAmbCodi(interessatPerAdresa.getProvincia(), interessatPerAdresa.getMunicipi());
@@ -5292,8 +5236,8 @@ public class PluginHelper {
 				enviament.setEntregaPostalCodiPostal(interessatPerAdresa.getCodiPostal());
 				enviament.setEntregaPostalPaisCodi(pais.getAlfa2());
 				enviament.setEntregaPostalProvinciaCodi(provincia.getCodi());
-				enviament.setEntregaPostalMunicipiCodi(provincia.getCodi() + String.format("%04d",Integer.parseInt(municipi.getCodi())));				
-				
+				enviament.setEntregaPostalMunicipiCodi(provincia.getCodi() + String.format("%04d",Integer.parseInt(municipi.getCodi())));
+
 				//Enviament postal sense normalitzar (versio classica de RIPEA abans de issue #1669
 				if (interessat.getAdressaTipus()==null || EntregaPostalTipusEnum.SENSE_NORMALITZAR.equals(interessat.getAdressaTipus())) {
 					enviament.setEntregaPostalTipus(EntregaPostalTipus.SENSE_NORMALITZAR);
@@ -5318,7 +5262,7 @@ public class PluginHelper {
 					enviament.setEntregaPostalComplement(interessat.getAdresaComplement());
 				}
 			}
-			
+
 			// ########## ENVIAMENT DEH ###############
 			if (interessat.getEntregaDeh() != null && interessat.getEntregaDeh() && Boolean.parseBoolean(
 					configHelper.getConfig(PropertyConfig.NOTIB_PLUGIN_DEH_ACTIVA))) {
@@ -5327,16 +5271,16 @@ public class PluginHelper {
 				enviament.setEntregaDehProcedimentCodi(metaExpedient.getClassificacio());
 				enviament.setEntregaNif(interessat.getDocumentNum());
 			}
-			
+
 			enviaments.add(enviament);
-			
+
 			notificacio.setEnviaments(enviaments);
 			notificacio.setUsuariCodi(usuari.getCodi());
 			notificacio.setServeiTipusEnum(notificacioDto.getServeiTipusEnum());
 
 			// ############## ALTA NOTIFICACIO #######################
 			RespostaEnviar respostaEnviar = notificacioPlugin.enviar(notificacio);
-			
+
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_NOTIFICACIO,
 					accioDescripcio,
@@ -5364,12 +5308,12 @@ public class PluginHelper {
 	}
 
 	public byte[] notificacioConsultarIDescarregarCertificacio(Long documentEnviamentInteressatId) {
-		
+
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		long t0 = System.currentTimeMillis();
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("documentEnviamentInteressatId", documentEnviamentInteressatId.toString());
-		
+
 		DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity = documentEnviamentInteressatRepository.findById(documentEnviamentInteressatId).get();
 		organGestorHelper.actualitzarOrganCodi(
 				organGestorHelper.getOrganCodiFromContingutId(
@@ -5386,7 +5330,7 @@ public class PluginHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.RECEPCIO,
 					System.currentTimeMillis() - t0);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");			
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			return certificacio;
 		} catch (Exception e) {
 			integracioHelper.addAccioError(
@@ -5398,14 +5342,14 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					"Error al accedir al plugin de notificacions",
 					e);
-			applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");			
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 			throw new RuntimeException(e);
 		}
 
 	}
 
 	public RespostaJustificantEnviamentNotib notificacioDescarregarJustificantEnviamentNotib(String identificador) {
-		
+
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		long t0 = System.currentTimeMillis();
 		Map<String, String> accioParams = new HashMap<String, String>();
@@ -5464,36 +5408,36 @@ public class PluginHelper {
 		}
 		accioParams.put("concepte", notificacio.getAssumpte());
 		accioParams.put("referencia", documentEnviamentInteressatEntity.getEnviamentReferencia());
-		
+
 		NotificacioPlugin notificacioPlugin = getNotificacioPlugin();
 		String endpoint = notificacioPlugin.getEndpointURL();
 
 		try {
 
 			RespostaConsultaEstatEnviament resposta = null;
-			
+
 			if (documentEnviamentInteressatEntity.getEnviamentReferencia()!=null) {
-			
+
 				resposta = notificacioPlugin.consultarEnviament(documentEnviamentInteressatEntity.getEnviamentReferencia());
-	
+
 				accioParams.put("isError", String.valueOf(resposta.isError()));
 				accioParams.put("estatResposta", resposta.getEstat()!=null?resposta.getEstat().toString():"null");
-				
+
 				if (!resposta.isError()) {
-				
+
 					documentEnviamentInteressatEntity.updateEnviamentEstat(
 							resposta.getEstat(),
 							resposta.getEstatData(),
 							resposta.getEstatOrigen(),
 							documentEnviamentInteressatEntity.getEnviamentCertificacioData(),
 							resposta.getCertificacioOrigen());
-		
+
 					documentEnviamentInteressatEntity.updateEnviamentInfoRegistre(
 							resposta.getRegistreData(),
 							resposta.getRegistreNumero(),
 							resposta.getRegistreNumeroFormatat(),
 							resposta.getRegistreEstat());
-					
+
 					guardarCertificacio(documentEnviamentInteressatEntity, resposta);
 				} else {
 					documentEnviamentInteressatEntity.updateEnviamentError(
@@ -5506,17 +5450,17 @@ public class PluginHelper {
 
 			RespostaConsultaEstatNotificacio respostaNotificioEstat = notificacioPlugin.consultarNotificacio(
 					notificacio.getNotificacioIdentificador());
-			
+
 			if (!respostaNotificioEstat.isError()) {
-				
+
 				notificacio.updateNotificacioEstat(
 						respostaNotificioEstat.getEstat(),
 						resposta!=null?resposta.getEstatData():Calendar.getInstance().getTime(),
 						respostaNotificioEstat.getDataEnviada(),
 						respostaNotificioEstat.getDataFinalitzada());
-	
+
 				DocumentNotificacioEstatEnumDto estatDespres = notificacio.getNotificacioEstat();
-				
+
 				if (estatAnterior != estatDespres &&
 					estatAnterior != DocumentNotificacioEstatEnumDto.FINALITZADA &&
 					estatAnterior != DocumentNotificacioEstatEnumDto.PROCESSADA) {
@@ -5592,7 +5536,7 @@ public class PluginHelper {
 	}
 
 	public void guardarCertificacio(DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity, RespostaConsultaEstatEnviament resposta) {
-		
+
 		DocumentNotificacioEntity notificacio = documentEnviamentInteressatEntity.getNotificacio();
 
 		boolean certificacioRetornat = resposta.getCertificacioData() != null;
@@ -5600,11 +5544,11 @@ public class PluginHelper {
 		if (certificacioRetornat) {
 
 			if (getPropertyGuardarCertificacioExpedient()) {
-				
+
 				boolean certificacioJaGuardat = documentEnviamentInteressatEntity.getEnviamentCertificacioData() != null;
-				
+
 				if (!certificacioJaGuardat) {
-					
+
 					MetaDocumentEntity metaDocument = metaDocumentHelper.getOrCreateMetaDocumentPerDefecte(
 							notificacio.getExpedient().getMetaExpedient(),
 							MetaDocumentPerDefecteEnumDto.NOTIB_JUSTIFICANT_RECEPCIO);
@@ -5622,7 +5566,7 @@ public class PluginHelper {
 							true,
 							false,
 							true);
-					
+
 					if (! document.isAmbFirma()) {
 						try {
 							// Es crida el helper i no DocumentService: la consulta d'estat també arriba pel callback de NOTIB
@@ -5645,7 +5589,7 @@ public class PluginHelper {
 
 		if (es.caib.ripea.plugin.notificacio.EnviamentEstat.NOTIFICADA.equals(resposta.getEstat())) {
 			logAll(notificacio, LogTipusEnumDto.NOTIFICACIO_CERTIFICADA, null);
-		} else if (es.caib.ripea.plugin.notificacio.EnviamentEstat.REBUTJADA.equals(resposta.getEstat())) { 
+		} else if (es.caib.ripea.plugin.notificacio.EnviamentEstat.REBUTJADA.equals(resposta.getEstat())) {
 			logAll(notificacio, LogTipusEnumDto.NOTIFICACIO_REBUTJADA, null);
 		}
 
@@ -5689,19 +5633,19 @@ public class PluginHelper {
 		try {
 			validaSignaturaAgilPlugin = getValidaSignaturaAgilPlugin();
 			ValidaSignaturaResposta resposta = validaSignaturaAgilPlugin.validaSignatura(documentContingut);
-			
+
 			if (resposta != null && resposta.isValida()) {
 			    if (!firmes.isEmpty()) {
 			        List<ArxiuFirmaDetallDto> detalls = firmes.get(0).getDetalls();
-	
+
 			        if (detalls == null) {
 			            detalls = new ArrayList<>();
 			            firmes.get(0).setDetalls(detalls);
 			        }
-	
+
 			        detalls.addAll(resposta.getFirmaDetalls());
 			    }
-			    
+
 			    integracioHelper.addAccioOk(
 						IntegracioHelper.INTCODI_FIRMAAGIL,
 						accioDescripcio,
@@ -5773,11 +5717,11 @@ public class PluginHelper {
 	public String gestioDocumentalCreate(String agrupacio, InputStream contingut) {
 
 		Timer.Sample sample = Timer.start(applicationHelper.getMeterRegistry());
-		
+
 		String accioDescripcio = "Crear document al gestor documental";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("agrupacio", agrupacio);
-		
+
 		long t0 = System.currentTimeMillis();
 		GestioDocumentalPlugin gestioDocumentalPlugin = getGestioDocumentalPlugin();
 
@@ -5812,12 +5756,12 @@ public class PluginHelper {
 			String id,
 			String agrupacio,
 			InputStream contingut) {
-		
+
 		String accioDescripcio = "Update document al gestor documental";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id", id);
 		accioParams.put("agrupacio", agrupacio);
-		
+
 		long t0 = System.currentTimeMillis();
 		GestioDocumentalPlugin gestioDocumentalPlugin = getGestioDocumentalPlugin();
 
@@ -5853,7 +5797,7 @@ public class PluginHelper {
 			Map<String, String> accioParams = new HashMap<String, String>();
 			accioParams.put("id", id);
 			accioParams.put("agrupacio", agrupacio);
-			
+
 			long t0 = System.currentTimeMillis();
 			GestioDocumentalPlugin gestioDocumentalPlugin = getGestioDocumentalPlugin();
 
@@ -5889,7 +5833,7 @@ public class PluginHelper {
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id", id);
 		accioParams.put("agrupacio", agrupacio);
-		
+
 		long t0 = System.currentTimeMillis();
 		GestioDocumentalPlugin gestioDocumentalPlugin = getGestioDocumentalPlugin();
 
@@ -5914,7 +5858,7 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			applicationHelper.stopTimer(sample, "METRICS@Subsystem_FileSystem.get", "resultado", "error");	
+			applicationHelper.stopTimer(sample, "METRICS@Subsystem_FileSystem.get", "resultado", "error");
 			throw new SistemaExternException(IntegracioHelper.INTCODI_GESDOC, errorDescripcio, ex);
 		}
 	}
@@ -5938,9 +5882,9 @@ public class PluginHelper {
 		try {
 
 			SignaturaResposta firma = firmaServidorPlugin.firmar(fitxer.getNom(), motiu, fitxer.getContingut(), idioma, fitxer.getContentType());
-			
+
 			if (StringUtils.isEmpty(firma.getTipusFirmaEni()) || StringUtils.isEmpty(firma.getPerfilFirmaEni())) {
-				logger.warn("El tipus o perfil de firma s'ha retornat buit i això pot provocar error guardant a l'Arxiu [tipus: " + 
+				logger.warn("El tipus o perfil de firma s'ha retornat buit i això pot provocar error guardant a l'Arxiu [tipus: " +
 						firma.getTipusFirmaEni() + ", perfil: " + firma.getPerfilFirmaEni() + "]");
 				if ("cades".equals(StringUtils.lowerCase(firma.getTipusFirma()))) {
 					logger.warn("Fixant el tipus de firma a TF04 i perfil BES");
@@ -5984,7 +5928,7 @@ public class PluginHelper {
 	}
 
 	public String viaFirmaUpload(DocumentEntity document, DocumentViaFirmaEntity documentViaFirmaEntity) {
-		
+
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		organGestorHelper.actualitzarOrganCodi(
 				organGestorHelper.getOrganCodiFromContingutId(
@@ -6066,9 +6010,9 @@ public class PluginHelper {
 			parametresViaFirma.setTipusDestinatari(
 					ViaFirmaTipusDestinatari.valueOf(documentViaFirmaEntity.getTipusDestinatari().name()));
 			parametresViaFirma.setEmplenable(documentViaFirmaEntity.isEmplenable());
-			
+
 			viaFirmaResponse = viaFirmaPlugin.uploadDocument(parametresViaFirma);
-			
+
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_VIAFIRMA,
 					accioDescripcio,
@@ -6077,9 +6021,9 @@ public class PluginHelper {
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0);
 			applicationHelper.stopTimer(sample, "METRICS@Integracions.viafirma", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
-			
+
 		} catch (Exception ex) {
-			
+
 			String errorDescripcio = "Error al accedir al plugin de viaFirma";
 			integracioHelper.addAccioError(
 					IntegracioHelper.INTCODI_VIAFIRMA,
@@ -6097,7 +6041,7 @@ public class PluginHelper {
 	}
 
 	public ViaFirmaDocument viaFirmaDownload(DocumentViaFirmaEntity documentViaFirma) {
-		
+
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		String accioDescripcio = "Descarregar document firmat";
 		Map<String, String> accioParams = new HashMap<String, String>();
@@ -6115,7 +6059,7 @@ public class PluginHelper {
 		ViaFirmaDocument viaFirmaDocument = null;
 		ViaFirmaPlugin viaFirmaPlugin = getViaFirmaPlugin();
 		String endpoint = viaFirmaPlugin.getEndpointURL();
-		
+
 		try {
 			viaFirmaDocument = viaFirmaPlugin.downloadDocument(
 					documentViaFirma.getCodiUsuari(),
@@ -6188,7 +6132,7 @@ public class PluginHelper {
 		}
 		return viaFirmaDispositiusDto;
 	}
-	
+
 	public String firmaSimpleWebStart(
 			List<FitxerDto> fitxersPerFirmar,
 			String motiu,
@@ -6197,7 +6141,7 @@ public class PluginHelper {
 
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		UsuariDto usuariActual = aplicacioService.getUsuariActual();
-		
+
 		String accioDescripcio = "Iniciant firma simple";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("motiu", motiu);
@@ -6205,7 +6149,7 @@ public class PluginHelper {
 			accioParams.put("usuariActual", usuariActual.getCodiAndNom());
 		accioParams.put("urlReturnToRipea", urlReturnToRipea);
 		accioParams.put("fitxersPerFirmar", Utils.getFileNames(fitxersPerFirmar));
-		
+
 		long t0 = System.currentTimeMillis();
 		FirmaWebPlugin firmaWebPlugin = getFirmaSimpleWebPlugin();
 		String endpoint = firmaWebPlugin.getEndpointURL();
@@ -6246,11 +6190,11 @@ public class PluginHelper {
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		String accioDescripcio = "Finalitzant firma simple";
 		Map<String, String> accioParams = new HashMap<String, String>();
-		accioParams.put("transactionID", transactionID);	
+		accioParams.put("transactionID", transactionID);
 		long t0 = System.currentTimeMillis();
 		FirmaWebPlugin firmaWebPlugin = getFirmaSimpleWebPlugin();
 		String endpoint = firmaWebPlugin.getEndpointURL();
-		
+
 		try {
 			FirmaResultatDto resultat = firmaWebPlugin.firmaSimpleWebEnd(transactionID);
 			integracioHelper.addAccioOk(
@@ -6279,7 +6223,7 @@ public class PluginHelper {
 	}
 
 	public AnotacioRegistreEntrada consultaAnotacio(AnotacioRegistreId anotacioRegistreId) {
-		
+
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		long t0 = System.currentTimeMillis();
 		String accioDescripcio = "Consulta les dades d'una anotació";
@@ -6288,9 +6232,9 @@ public class PluginHelper {
 		accioParams.put("identificador", anotacioRegistreId.getIndetificador());
 		DistribucioPlugin distribucioPlugin = getDistribucioPlugin();
 		String endpoint = distribucioPlugin.getEndpointURL();
-		
+
 		try {
-			
+
 			AnotacioRegistreEntrada resultat = distribucioPlugin.consulta(anotacioRegistreId);
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_DISTRIBUCIO,
@@ -6316,9 +6260,9 @@ public class PluginHelper {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DISTRIBUCIO, errorDescripcio, ex);
 		}
 	}
-	
+
 	public void canviEstatAnotacio(AnotacioRegistreId anotacioRegistreId, Estat estat, String obs) {
-		
+
 		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 		long t0 = System.currentTimeMillis();
 		String accioDescripcio = "Canvi estat d'una anotació";
@@ -6329,7 +6273,7 @@ public class PluginHelper {
 		accioParams.put("observacions", obs);
 		DistribucioPlugin distribucioPlugin = getDistribucioPlugin();
 		String endpoint = distribucioPlugin.getEndpointURL();
-		
+
 		try {
 			distribucioPlugin.canviEstat(anotacioRegistreId, estat, obs);
 			integracioHelper.addAccioOk(
@@ -6355,7 +6299,7 @@ public class PluginHelper {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DISTRIBUCIO, errorDescripcio, ex);
 		}
 	}
-	
+
 	public void comandaTascaSendNoLog(ExpedientTascaEntity tascaEntity) throws Exception {
 		getComandaPlugin().sendTasca(tascaRipeaToComanda(tascaEntity));
 	}
@@ -6447,7 +6391,7 @@ public class PluginHelper {
 		}
 		return params;
 	}
-	
+
 	public void comandaTascaSend(ExpedientTascaEntity tascaEntity) {
 
 		if (configHelper.getAsBoolean(PropertyConfig.COMANDA_PLUGIN_ACTIU)) {
@@ -6487,9 +6431,9 @@ public class PluginHelper {
 			}
 		}
 	}
-	
+
 	private Tasca tascaRipeaToComanda(ExpedientTascaEntity tascaEntity) throws Exception {
-		
+
 		TascaEstat estatTascaComanda = TascaEstat.PENDENT;
 		if (tascaEntity.getEstat()!=null) {
 			switch (tascaEntity.getEstat()) {
@@ -6507,13 +6451,13 @@ public class PluginHelper {
 				break;
 			case REBUTJADA:
 				estatTascaComanda = TascaEstat.FINALITZADA;
-				break;				
+				break;
 			default:
 				estatTascaComanda = TascaEstat.PENDENT;
 				break;
 			}
 		}
-		
+
 		String responsableActual = null;
 		List<String> usuarisAmbPermis = new ArrayList<String>();
 		if (tascaEntity.getResponsables()!=null) {
@@ -6524,19 +6468,19 @@ public class PluginHelper {
 				}
 			}
 		}
-		
+
 		if (tascaEntity.getObservadors()!=null) {
 			for (UsuariEntity observador: tascaEntity.getObservadors()) {
 				usuarisAmbPermis.add(observador.getCodi());
 			}
 		}
-		
+
 		if (tascaEntity.getResponsableActual()!=null && tascaEntity.getResponsableActual().getCodi()!=null) {
 			responsableActual = tascaEntity.getResponsableActual().getCodi();
 		}
-		
+
 		String redireccio = configHelper.getConfig(PropertyConfig.BASE_URL) + "/contingut/"+tascaEntity.getExpedient().getId()+"?tascaId="+tascaEntity.getId()+"&origenTasques=true";
-		
+
 		Tasca resultat = new Tasca()
                 .appCodi(configHelper.getConfig(PropertyConfig.COMANDA_APP_CODI))
                 .entornCodi(configHelper.getConfig(PropertyConfig.COMANDA_PLUGIN_ENTORN))
@@ -6556,19 +6500,19 @@ public class PluginHelper {
 
 		return resultat;
 	}
-	
+
 	private Avis anotacioRipeaToAvisComanda(ExpedientPeticioEntity expedientPeticioEntity) throws Exception {
 		String redireccio = configHelper.getConfig(PropertyConfig.BASE_URL) + "/expedientPeticio/"+expedientPeticioEntity.getId();
-		
+
 		List<UsuariAnotacioDto> usuarisAfectatsAnotacio = emailHelper.dadesUsuarisAfectatsAnotacio(expedientPeticioEntity);
-		
+
 		List<String> usuarisAmbPermis = new ArrayList<String>();
 		if (usuarisAfectatsAnotacio!=null) {
 			for (UsuariAnotacioDto usuariAnotacio: usuarisAfectatsAnotacio) {
 				usuarisAmbPermis.add(usuariAnotacio.getCodi());
 			}
 		}
-		
+
 		Avis avisComanda = new Avis()
                 .appCodi(configHelper.getConfig(PropertyConfig.COMANDA_APP_CODI))
                 .dataFi(DateUtil.toOffsetDateTime(DateUtil.addToDate(expedientPeticioEntity.getDataAlta(), Calendar.MONTH, 3)))
@@ -6580,10 +6524,10 @@ public class PluginHelper {
                 .tipus(AvisTipus.INFO)
                 .redireccio(new URL(redireccio))
                 .usuarisAmbPermis(usuarisAmbPermis);
-		
+
 		return avisComanda;
 	}
-	
+
 	private Avis validacionsRipeaToAvisComanda(ExpedientEntity expedient, List<ValidacioErrorDto> errors) throws Exception {
 		//Els avisos tendran una duració de 10 dies a comanda
 		Date dataFi = DateUtil.addToDate(Calendar.getInstance().getTime(), Calendar.DATE, 10);
@@ -6597,7 +6541,7 @@ public class PluginHelper {
 				if (err.getMetaDada()!=null) {
 					descripcio+= "No s'ha informat la dada: "+err.getMetaDada().getNom();
 				} else if (err.getTipusValidacio()!=null) {
-					
+
 					switch (err.getTipusValidacio()) {
 						case INTERESSATS:
 							descripcio+= "No s'ha informat cap interessat";
@@ -6637,20 +6581,20 @@ public class PluginHelper {
 				descripcio+=". ";
 			}
 		}
-		
+
 		List<String> usuarisAmbPermis = new ArrayList<String>();
 		String usuariResponsable = null;
 		if (expedient.getAgafatPer()!=null) {
 			usuarisAmbPermis.add(expedient.getAgafatPer().getCodi());
 			usuariResponsable = expedient.getAgafatPer().getCodi();
 		}
-		
+
 		if (expedient.getSeguidors()!=null) {
 			for (UsuariEntity seguidor: expedient.getSeguidors()) {
 				usuarisAmbPermis.add(seguidor.getCodi());
 			}
 		}
-		
+
 		String redireccio = configHelper.getConfig(PropertyConfig.BASE_URL) + "/contingut/"+expedient.getId();
 		Avis avisComanda = new Avis()
                 .appCodi(configHelper.getConfig(PropertyConfig.COMANDA_APP_CODI))
@@ -6667,7 +6611,7 @@ public class PluginHelper {
 
 		return avisComanda;
 	}
-	
+
 	public void comandaAvisDelete(ExpedientPeticioEntity expedientPeticioEntity) {
 
 		if (configHelper.getAsBoolean(PropertyConfig.COMANDA_PLUGIN_ACTIU)) {
@@ -6694,12 +6638,12 @@ public class PluginHelper {
 			}
 		}
 	}
-	
+
 	@Transactional(propagation = Propagation.REQUIRED)
 	public void comandaAvisSend(ExpedientPeticioEntity expedientPeticioEntity) {
-		
+
 		if (configHelper.getAsBoolean(PropertyConfig.COMANDA_PLUGIN_ACTIU)) {
-		
+
 			Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 			long t0 = System.currentTimeMillis();
 			String accioDescripcio = "Enviament de un avís";
@@ -6725,17 +6669,17 @@ public class PluginHelper {
 			}
 		}
 	}
-	
+
 	public void comandaAvisSendNoLog(ExpedientEntity expedient, List<ValidacioErrorDto> errors) throws Exception {
 		ComandaCaibPlugin comandaCaibPlugin = getComandaPlugin();
 		Avis avisComanda = validacionsRipeaToAvisComanda(expedient, errors);
 		comandaCaibPlugin.sendAvis(avisComanda);
 	}
-	
+
 	public void comandaAvisSend(ExpedientEntity expedient, List<ValidacioErrorDto> errors) {
-		
+
 		if (configHelper.getAsBoolean(PropertyConfig.COMANDA_PLUGIN_ACTIU)) {
-		
+
 			Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
 			long t0 = System.currentTimeMillis();
 			String accioDescripcio = "Enviament de un avís";
@@ -6764,7 +6708,7 @@ public class PluginHelper {
 			}
 		}
 	}
-	
+
 	private ArbreNodeDto<UnitatOrganitzativaDto> getNodeArbreUnitatsOrganitzatives(
 			UnitatOrganitzativa unitatOrganitzativa,
 			List<UnitatOrganitzativa> unitatsOrganitzatives,
@@ -7498,12 +7442,12 @@ public class PluginHelper {
 			if (!document.isEncrypted()) {
 				/*
 				 * PDFTextStripper pdfStripper = new PDFTextStripper() {
-				 * 
+				 *
 				 * @Override protected void writeString(String text, List<TextPosition>
 				 * textPositions) throws IOException { // Aquí puedes añadir lógica para ignorar
 				 * cabeceras y pies de página if (!isHeaderOrFooter(text)) {
 				 * super.writeString(text, textPositions); } }
-				 * 
+				 *
 				 * private boolean isHeaderOrFooter(String text) { // Implementa tu lógica para
 				 * identificar cabeceras y pies de página return text.contains("Header") ||
 				 * text.contains("Footer"); } };
@@ -7544,12 +7488,12 @@ public class PluginHelper {
 		if (dadesUsuariPlugin != null) {
 			return dadesUsuariPlugin;
 		}
-		
+
 		String pluginClass = getPropertyPluginDadesUsuari();
 		if (Strings.isNullOrEmpty(pluginClass)) {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_USUARIS, "No està configurada la classe per al plugin de dades d'usuari");
 		}
-		
+
 		try {
 			Class<?> clazz = Class.forName( pluginClass);
 			Properties props = configHelper.getGroupPropertiesGeneral(IntegracioHelper.INTCODI_USUARIS);
@@ -7607,7 +7551,7 @@ public class PluginHelper {
 	public IArxiuPluginWrapper getArxiuPlugin() {
         return getArxiuPlugin(configHelper.getEntitatActualCodi());
     }
-	
+
 	public IArxiuPluginWrapper getArxiuPlugin(String entitatCodi) {
 		if (entitatCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
@@ -7615,17 +7559,17 @@ public class PluginHelper {
         String organCodi = configHelper.getOrganActualCodi();
         return getArxiuPlugin(entitatCodi, organCodi);
 	}
-	
+
     public IArxiuPluginWrapper getArxiuPlugin(String entitatCodi, String organCodi) {
 
 		IArxiuPluginWrapper plugin = null;
 		if (organCodi != null) {
-			
+
 			plugin = arxiuPlugins.get(entitatCodi + "." + organCodi);
 			if (plugin != null) { return plugin; }
-			
+
 			String pluginClassOrgan = configHelper.getValueForOrgan(entitatCodi, organCodi, PropertyConfig.ARXIU_PLUGIN_CLASS);
-			
+
 			if (StringUtils.isNotEmpty(pluginClassOrgan)) {
 				try {
 					Class<?> clazz = Class.forName(
@@ -7640,7 +7584,7 @@ public class PluginHelper {
 									ConfigDto.prefix + ".",
 									propiedades);
 					plugin = new IArxiuPluginWrapper(
-							pluginInstance, 
+							pluginInstance,
 							Utils.getEndpointNameFromProperties(propiedades));
 					arxiuPlugins.put(entitatCodi + "." + organCodi, plugin);
 					return plugin;
@@ -7687,7 +7631,7 @@ public class PluginHelper {
 	public IArxiuPluginWrapper getConcsvPlugin() {
         return getConcsvPlugin(configHelper.getEntitatActualCodi());
     }
-	
+
 	public IArxiuPluginWrapper getConcsvPlugin(String entitatCodi) {
 		if (entitatCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
@@ -7695,17 +7639,17 @@ public class PluginHelper {
         String organCodi = configHelper.getOrganActualCodi();
         return getConcsvPlugin(entitatCodi, organCodi);
 	}
-	
+
     public IArxiuPluginWrapper getConcsvPlugin(String entitatCodi, String organCodi) {
 
 		IArxiuPluginWrapper plugin = null;
 		if (organCodi != null) {
-			
+
 			plugin = conCSVPlugins.get(entitatCodi + "." + organCodi);
 			if (plugin != null) { return plugin; }
-			
+
 			String pluginClassOrgan = configHelper.getValueForOrgan(entitatCodi, organCodi, PropertyConfig.ARXIU_CSV_PLUGIN_CLASS);
-			
+
 			if (StringUtils.isNotEmpty(pluginClassOrgan)) {
 				try {
 					Class<?> clazz = Class.forName(
@@ -7720,7 +7664,7 @@ public class PluginHelper {
 									ConfigDto.prefix + ".",
 									propiedades);
 					plugin = new IArxiuPluginWrapper(
-							pluginInstance, 
+							pluginInstance,
 							Utils.getEndpointNameFromProperties(propiedades));
 					conCSVPlugins.put(entitatCodi + "." + organCodi, plugin);
 					return plugin;
@@ -7761,11 +7705,11 @@ public class PluginHelper {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_CONCSV,
 					"Error al crear la instància del plugin d'arxiu digital (conCSV)", ex);
 		}
-	}    
-    
+	}
+
     private PortafirmesPlugin getPortafirmesPlugin(String entitatCodi, String organCodi) {
-    	
-		PortafirmesPlugin plugin = null;		
+
+		PortafirmesPlugin plugin = null;
 		if (cacheHelper.mostrarLogsIntegracio()) {
 			logger.info(
 					"[PFI] Obtenint plugin de portafirmes amb Entitat: '" + entitatCodi + "' i Organ: '"
@@ -7773,10 +7717,10 @@ public class PluginHelper {
 		}
 
 		if (organCodi != null) {
-			
+
 			plugin = portafirmesPlugins.get(entitatCodi + "." + organCodi);
 			if (plugin != null) { return plugin; }
-			
+
 			String pluginClassOrgan = configHelper.getValueForOrgan(entitatCodi, organCodi, PropertyConfig.PORTAFIB_PLUGIN_CLASS);
 			if (StringUtils.isNotEmpty(
 					pluginClassOrgan)) {
@@ -7804,9 +7748,9 @@ public class PluginHelper {
 
 		plugin = portafirmesPlugins.get(entitatCodi);
 		if (plugin != null) { return plugin; }
-		
+
 		String pluginClass = getPropertyPluginPortafirmes();
-		
+
 		if (StringUtils.isEmpty(pluginClass)) {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_PFIRMA,
 					"No està configurada la classe per al plugin de portafirmes");
@@ -7830,14 +7774,14 @@ public class PluginHelper {
 					"Error al crear la instància del plugin de portafirmes", ex);
 		}
 	}
-    
+
 	private PortafirmesPlugin getPortafirmesPlugin() {
 		String entitatCodi = configHelper.getEntitatActualCodi();
 		if (entitatCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
 		String organCodi = configHelper.getOrganActualCodi();
-		
+
 		return getPortafirmesPlugin(entitatCodi, organCodi);
 	}
 
@@ -7849,19 +7793,19 @@ public class PluginHelper {
 		String organCodi = configHelper.getOrganActualCodi();
 		return getConversioPlugin(entitatCodi, organCodi);
 	}
-	
+
 	private ConversioPlugin getConversioPlugin(String entitatCodi, String organCodi) {
 
 		ConversioPlugin plugin = null;
-		
-		if (organCodi != null) {			
+
+		if (organCodi != null) {
 			plugin = conversioPlugins.get(entitatCodi + "." + organCodi);
 			if (plugin != null) { return plugin; }
-			
+
 			String pluginClassOrgan = configHelper.getValueForOrgan(entitatCodi, organCodi, PropertyConfig.CONVERSIO_PLUGIN_CLASS);
-			
+
 			if (StringUtils.isNotEmpty(pluginClassOrgan)) {
-				
+
 				try {
 					Class<?> clazz = Class.forName(
 							pluginClassOrgan);
@@ -7923,18 +7867,18 @@ public class PluginHelper {
 		String organCodi = configHelper.getOrganActualCodi();
 		return getDigitalitzacioPlugin(entitatCodi, organCodi);
 	}
-	
+
 	private DigitalitzacioPlugin getDigitalitzacioPlugin(String entitatCodi, String organCodi) {
 
 		DigitalitzacioPlugin plugin = digitalitzacioPlugins.get(entitatCodi);
 		if (plugin != null) { return plugin; }
-		
+
 		String pluginClass = getPropertyPluginDigitalitzacio();
 		if (StringUtils.isEmpty(pluginClass)) {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DIGITALITZACIO,
 					"No està configurada la classe per al plugin de digitalització");
 		}
-		
+
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (DigitalitzacioPlugin) clazz.getDeclaredConstructor(
@@ -8021,7 +7965,7 @@ public class PluginHelper {
 		String organCodi = configHelper.getOrganActualCodi();
 		return getDadesExternesPlugin(entitatCodi, organCodi);
 	}
-	
+
 	private DistribucioPlugin getDistribucioPlugin() {
 		String entitatCodi = configHelper.getEntitatActualCodi();
 		if (entitatCodi == null) {
@@ -8030,28 +7974,28 @@ public class PluginHelper {
 		String organCodi = configHelper.getOrganActualCodi();
 		return getDistribucioPlugin(entitatCodi, organCodi);
 	}
-	
+
 	private DistribucioPlugin getDistribucioPlugin(String entitatCodi, String organCodi) {
 
 		DistribucioPlugin plugin = distribucioPlugins.get(entitatCodi);
 		if (plugin != null) { return plugin; }
-		
+
 		String pluginClass = getPropertyPluginDistribucioClass();
-		
+
 		if (StringUtils.isEmpty(pluginClass)) {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DISTRIBUCIO, "No està configurada la classe per al plugin de distribucio");
 		}
-		
+
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
-			
+
 			Properties props = null;
 			if (entitatCodi==null || entitatCodi.equals("_BACKGROUND_")) {
 				props = configHelper.getGroupPropertiesGeneral(IntegracioHelper.INTCODI_DISTRIBUCIO);
 			} else {
 				props = configHelper.getGroupPropertiesEntitatOrGeneral(IntegracioHelper.INTCODI_DISTRIBUCIO, entitatCodi);
 			}
-			
+
 			plugin = (DistribucioPlugin) clazz.getDeclaredConstructor(String.class, Properties.class).newInstance(ConfigDto.prefix + ".", props);
 			distribucioPlugins.put(entitatCodi,plugin);
 			return plugin;
@@ -8060,7 +8004,7 @@ public class PluginHelper {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DISTRIBUCIO, "Error al crear la instància del plugin de consulta de distribucio", ex);
 		}
 	}
-	
+
 	private ComandaCaibPlugin getComandaPlugin() {
 		String entitatCodi = configHelper.getEntitatActualCodi();
 		if (entitatCodi == null) {
@@ -8069,18 +8013,18 @@ public class PluginHelper {
 		String organCodi = configHelper.getOrganActualCodi();
 		return getComandaPlugin(entitatCodi, organCodi);
 	}
-	
+
 	private ComandaCaibPlugin getComandaPlugin(String entitatCodi, String organCodi) {
 
 		ComandaCaibPlugin plugin = comandaPlugins.get(entitatCodi);
 		if (plugin != null) { return plugin; }
-		
+
 		String pluginClass = getPropertyPluginComanda();
-		
+
 		if (StringUtils.isEmpty(pluginClass)) {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_COMANDA, "No està configurada la classe per al plugin de comanda");
 		}
-		
+
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (ComandaCaibPlugin) clazz.getDeclaredConstructor(
@@ -8096,19 +8040,19 @@ public class PluginHelper {
 					"Error al crear la instància del plugin de comanda", ex);
 		}
 	}
-	
+
 	private DadesExternesPlugin getDadesExternesPlugin(String entitatCodi, String organCodi) {
 
 		DadesExternesPlugin plugin = dadesExternesPlugins.get(entitatCodi);
 		if (plugin != null) { return plugin; }
-		
+
 		String pluginClass = getPropertyPluginDadesExternes();
-		
+
 		if (StringUtils.isEmpty(pluginClass)) {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT,
 					"No està configurada la classe per al plugin de dades externes");
 		}
-		
+
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (DadesExternesPlugin) clazz.getDeclaredConstructor(
@@ -8171,16 +8115,16 @@ public class PluginHelper {
 		if (entitatCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
-		
+
 		RegistrePlugin plugin = registrePlugins.get(entitatCodi);
 		if (plugin != null) { return plugin; }
-		
+
 		String pluginClass = getPropertyPluginRegistre();
-		
+
 		if (StringUtils.isEmpty(pluginClass)) {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_REGISTRE, "No està configurada la classe per al plugin de registre");
 		}
-		
+
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (RegistrePlugin) clazz.getDeclaredConstructor(
@@ -8196,7 +8140,7 @@ public class PluginHelper {
 					"Error al crear la instància del plugin de registre", ex);
 		}
 	}
-	
+
 	private IValidateSignaturePluginWrapper getValidaSignaturaPlugin() {
 		String entitatCodi = configHelper.getEntitatActualCodi();
 		if (entitatCodi == null) {
@@ -8205,19 +8149,19 @@ public class PluginHelper {
 		String organCodi = configHelper.getOrganActualCodi();
 		return getValidaSignaturaPlugin(entitatCodi, organCodi);
 	}
-	
+
 	private IValidateSignaturePluginWrapper getValidaSignaturaPlugin(String entitatCodi, String organCodi) {
 
 		IValidateSignaturePluginWrapper plugin = null;
-		
+
 		if (organCodi != null) {
 			plugin = validaSignaturaPlugins.get(entitatCodi + "." + organCodi);
 			if (plugin != null) { return plugin; }
-			
+
 			String pluginClassOrgan = configHelper.getValueForOrgan(entitatCodi, organCodi, PropertyConfig.VALIDA_FIRMA_PLUGIN_CLASS);
-			
+
 			if (StringUtils.isNotEmpty(pluginClassOrgan)) {
-				
+
 				try {
 					Class<?> clazz = Class.forName(pluginClassOrgan);
 					Properties propiedades = configHelper.getGroupPropertiesOrganOrEntitatOrGeneral(
@@ -8275,19 +8219,19 @@ public class PluginHelper {
 		String organCodi = configHelper.getOrganActualCodi();
 		return getValidaSignaturaAgilPlugin(entitatCodi, organCodi);
 	}
-	
+
 	private ValidacioSignaturaPlugin getValidaSignaturaAgilPlugin(String entitatCodi, String organCodi) {
 
 		ValidacioSignaturaPlugin plugin = null;
-		
+
 		if (organCodi != null) {
 			plugin = validaSignaturaAgilPlugins.get(entitatCodi + "." + organCodi);
 			if (plugin != null) { return plugin; }
-			
+
 			String pluginClassOrgan = configHelper.getConfig(PropertyConfig.VALIDA_FIRMA_AGIL_PLUGIN_CLASS, entitatCodi, organCodi);
-			
+
 			if (StringUtils.isNotEmpty(pluginClassOrgan)) {
-				
+
 				try {
 					Class<?> clazz = Class.forName(pluginClassOrgan);
 					Properties propiedades = configHelper.getGroupPropertiesOrganOrEntitatOrGeneral(
@@ -8334,7 +8278,7 @@ public class PluginHelper {
 					"Error al crear la instància del plugin de validació de signatures àgils", ex);
 		}
 	}
-	
+
 	private NotificacioPlugin getNotificacioPlugin() {
 		String entitatCodi = configHelper.getEntitatActualCodi();
 		if (entitatCodi == null) {
@@ -8343,20 +8287,20 @@ public class PluginHelper {
 		String organCodi = configHelper.getOrganActualCodi();
 		return getNotificacioPlugin(entitatCodi, organCodi);
 	}
-	
+
 	private NotificacioPlugin getNotificacioPlugin(String entitatCodi, String organCodi) {
 
 		NotificacioPlugin plugin = null;
 
 		if (organCodi != null) {
-			
+
 			plugin = notificacioPlugins.get(entitatCodi + "." + organCodi);
 			if (plugin != null) { return plugin; }
-			
+
 			String pluginClassOrgan = configHelper.getValueForOrgan(entitatCodi, organCodi, PropertyConfig.NOTIB_PLUGIN_CLASS);
-			
+
 			if (StringUtils.isNotEmpty(pluginClassOrgan)) {
-				
+
 				try {
 					Class<?> clazz = Class.forName(pluginClassOrgan);
 					Properties propsPluingNotib = configHelper.getGroupPropertiesOrganOrEntitatOrGeneral(
@@ -8380,13 +8324,13 @@ public class PluginHelper {
 		if (plugin != null) {
 			return plugin;
 		}
-		
+
 		String pluginClass = getPropertyPluginNotificacio();
 		if (StringUtils.isEmpty(pluginClass)) {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_NOTIFICACIO,
 					"No està configurada la classe per al plugin de notificació");
 		}
-		
+
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			Properties propsPluingNotib = configHelper.getGroupPropertiesEntitatOrGeneral(IntegracioHelper.INTCODI_NOTIFICACIO, entitatCodi);
@@ -8412,7 +8356,7 @@ public class PluginHelper {
 		String organCodi = configHelper.getOrganActualCodi();
 		return getFirmaServidorPlugin(entitatCodi, organCodi);
 	}
-	
+
 	private FirmaServidorPlugin getFirmaServidorPlugin(String entitatCodi, String organCodi) {
 
 		FirmaServidorPlugin plugin = null;
@@ -8482,7 +8426,7 @@ public class PluginHelper {
 		String organCodi = configHelper.getOrganActualCodi();
 		return getViaFirmaPlugin(entitatCodi, organCodi);
 	}
-	
+
 	private ViaFirmaPlugin getViaFirmaPlugin(String entitatCodi, String organCodi) {
 
 		ViaFirmaPlugin plugin = viaFirmaPlugins.get(entitatCodi);
@@ -8492,7 +8436,7 @@ public class PluginHelper {
 			return plugin;
 		}
 		viaFirmaPluginConfiguracioProvada = true;
-		
+
 		String pluginClass = getPropertyPluginViaFirma();
 		if (StringUtils.isEmpty(pluginClass)) {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_VIAFIRMA,
@@ -8524,19 +8468,19 @@ public class PluginHelper {
 		String organCodi = configHelper.getOrganActualCodi();
 		return getProcedimentPlugin(entitatCodi, organCodi);
 	}
-	
+
 	private ProcedimentPlugin getProcedimentPlugin(String entitatCodi, String organCodi) {
 
 		ProcedimentPlugin procedimentPlugin = procedimentPlugins.get(entitatCodi);
 		if (procedimentPlugin != null) { return procedimentPlugin; }
-		
+
 		String pluginClass = getPropertyPluginProcediment();
-		
+
 		if (StringUtils.isEmpty(pluginClass)) {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_PROCEDIMENT,
 					"No està configurada la classe per al plugin de procediments");
 		}
-		
+
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			procedimentPlugin = (ProcedimentPlugin) clazz.getDeclaredConstructor(
@@ -8548,33 +8492,33 @@ public class PluginHelper {
 									entitatCodi));
 			procedimentPlugins.put(entitatCodi,procedimentPlugin);
 			return procedimentPlugin;
-			
+
 		} catch (Exception ex) {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_PROCEDIMENT,
 					"Error al crear la instància del plugin de procediments", ex);
 		}
 	}
-	
+
 	private GestioDocumentalPlugin getGestioDocumentalPlugin() {
 		String entitatCodi = configHelper.getEntitatActualCodi();
 		if (entitatCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
 		String organCodi = configHelper.getOrganActualCodi();
-		
+
 		return getGestioDocumentalPlugin(entitatCodi, organCodi);
 	}
-	
+
 	private GestioDocumentalPlugin getGestioDocumentalPlugin(String entitatCodi, String organCodi) {
 
 		GestioDocumentalPlugin plugin = gestioDocumentalPlugins.get(entitatCodi);
 		if (plugin != null) { return plugin; }
-		
+
 		String pluginClass = getPropertyPluginGestioDocumental();
 		if (StringUtils.isEmpty(pluginClass)) {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_GESDOC, "La classe del plugin de gestió documental no està configurada");
 		}
-		
+
 		try {
 			Class<?> clazz = Class.forName(
 					pluginClass);
@@ -8601,14 +8545,14 @@ public class PluginHelper {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
 		String organCodi = configHelper.getOrganActualCodi();
-		
+
 		return getFirmaSimpleWebPlugin(entitatCodi, organCodi);
 	}
-	
+
 	private FirmaWebPlugin getFirmaSimpleWebPlugin(String entitatCodi, String organCodi) {
 
 		FirmaWebPlugin plugin = null;
-		
+
 		if (organCodi != null) {
 			plugin = firmaSimpleWebPlugins.get(
 					entitatCodi + "." + organCodi);
@@ -8888,7 +8832,7 @@ public class PluginHelper {
 				|| "xx".equals(
 						pluginCode)) {
 			validaSignaturaAgilPlugins = new HashMap<>();
-		}	
+		}
 		if ("reg".equals(
 				pluginCode)
 				|| "xx".equals(
@@ -8924,7 +8868,7 @@ public class PluginHelper {
 	private String getPropertyPluginDadesExternes() {
 		return configHelper.getConfig(PropertyConfig.DADESEXT_PLUGIN_DIR3_CLASS);
 	}
-	
+
 	private String getPropertyPluginComanda() {
 		return configHelper.getConfig(PropertyConfig.COMANDA_PLUGIN_CLASS);
 	}
@@ -8936,7 +8880,7 @@ public class PluginHelper {
 	private String getPropertyPluginProcediment() {
 		return configHelper.getConfig(PropertyConfig.ROLSAC_PLUGIN_CLASS);
 	}
-	
+
 	private String getPropertyPluginRegistre() {
 		return configHelper.getConfig(PropertyConfig.REGISTRE_PLUGIN_CLASS);
 	}
@@ -8968,7 +8912,7 @@ public class PluginHelper {
 	private String getPropertyPluginViaFirma() {
 		return configHelper.getConfig(PropertyConfig.VIAFIRMA_PLUGIN_CLASS);
 	}
-	
+
 	private String getPropertyPluginDistribucioClass() {
 		return configHelper.getConfig(PropertyConfig.DISTRIBUCIO_PLUGIN_CLASS);
 	}
@@ -9032,7 +8976,7 @@ public class PluginHelper {
 	private boolean isObtenirDataFirmaFromAtributDocument() {
 		return configHelper.getAsBoolean(PropertyConfig.OBTENIR_DATA_FIRMA_FROM_ATRIBUT_DOC);
 	}
-	
+
 	private boolean isValidacioFirmaAgilActiva() {
 		return configHelper.getAsBoolean(PropertyConfig.VALIDA_FIRMA_AGIL_ACTIVA);
 	}
@@ -9040,7 +8984,7 @@ public class PluginHelper {
 	private String getPropertyPluginValidaSignaturaAgil() {
 		return configHelper.getConfig(PropertyConfig.VALIDA_FIRMA_AGIL_PLUGIN_CLASS);
 	}
-	
+
 	public void setArxiuPlugin(
 			String entitatCodi,
 			IArxiuPluginWrapper arxiuPlugin) {
@@ -9074,7 +9018,7 @@ public class PluginHelper {
 	 * F U N C I O N S   D E   D I A G N O S T I C
 	 * Cridades a les funcions mes lleugeres de cada integració.
 	 */
-	
+
 	public GenericDto integracioDiagnostic(String codi, DiagnosticFiltreDto filtre) {
 		if (codi!=null) {
 			if (codi.equals(IntegracioHelper.INTCODI_PFIRMA)) {
@@ -9160,7 +9104,7 @@ public class PluginHelper {
 					return new GenericDto("integracio.diag.dist.ok", "fa fa-check verd", new Object[] {codi});
 				} else {
 					return new GenericDto("integracio.diag.dist.ko", "fa fa-times vermell", new Object[] {resultatDiagnostic.getMessage()}, resultatDiagnostic);
-				}				
+				}
 			} else if (codi.equals(IntegracioHelper.INTCODI_NOTIFICACIO)) {
 				Exception resultatDiagnostic = notibDiagnostic(filtre);
 				if (resultatDiagnostic==null) {
@@ -9228,7 +9172,7 @@ public class PluginHelper {
 			return new GenericDto("integracio.diag.nf", "fa fa-question-circle taronja", new Object[] {codi});
 		}
 	}
-	
+
 	public Exception portafirmesDiagnostic(DiagnosticFiltreDto filtre) {
 		try {
 			PortafirmesPlugin portafirmesPlugin = getPortafirmesPlugin(filtre.getEntitatCodi(), filtre.getOrganCodi());
@@ -9239,7 +9183,7 @@ public class PluginHelper {
 			return ex;
 		}
 	}
-	
+
 	public Exception portafirmesCallBackDiagnostic(DiagnosticFiltreDto filtre) {
 		try {
 			PortafirmesPlugin portafirmesPlugin = getPortafirmesPlugin(filtre.getEntitatCodi(), filtre.getOrganCodi());
@@ -9250,9 +9194,9 @@ public class PluginHelper {
 			if (ex.getCause().getMessage()!=null && ex.getCause().getMessage().contains("no és el propietari de la petició de firma")) {
 				return null;
 			} else return ex;
-		}			
+		}
 	}
-	
+
 	public Exception firmaSimpleDiagnostic(DiagnosticFiltreDto filtre) {
 		try {
 			FirmaWebPlugin firmaWebPlugin = getFirmaSimpleWebPlugin(filtre.getEntitatCodi(), filtre.getOrganCodi());
@@ -9262,7 +9206,7 @@ public class PluginHelper {
 			return ex;
 		}
 	}
-	
+
 	public Exception firmaServidorDiagnostic(DiagnosticFiltreDto filtre) {
 		try {
 			FirmaServidorPlugin firmaServidorPlugin = getFirmaServidorPlugin(filtre.getEntitatCodi(), filtre.getOrganCodi());
@@ -9280,7 +9224,7 @@ public class PluginHelper {
 			return ex;
 		}
 	}
-	
+
 	public Exception arxiuDiagnostic(DiagnosticFiltreDto filtre) {
 		try {
 			DocumentEntity doc = documentHelper.findLastDocumentPujatArxiuByExtensio(null);
@@ -9295,7 +9239,7 @@ public class PluginHelper {
 			return ex;
 		}
 	}
-	
+
 	public Exception gestorDocumentalDiagnostic(DiagnosticFiltreDto filtre) {
 		try {
 			GestioDocumentalPlugin gestioDocumentalPlugin = getGestioDocumentalPlugin(filtre.getEntitatCodi(), filtre.getOrganCodi());
@@ -9304,9 +9248,9 @@ public class PluginHelper {
 			return null;
 		} catch (Exception ex) {
 			return ex;
-		}			
+		}
 	}
-	
+
 	public Exception dadesUsuariDiagnostic(DiagnosticFiltreDto filtre) {
 		try {
 			DadesUsuariPlugin dadesUsuariPlugin = getDadesUsuariPlugin();
@@ -9315,9 +9259,9 @@ public class PluginHelper {
 			return null;
 		} catch (Exception ex) {
 			return ex;
-		}	
+		}
 	}
-	
+
 	public Exception notibDiagnostic(DiagnosticFiltreDto filtre) {
 		try {
 			NotificacioPlugin notificacioPlugin = getNotificacioPlugin(filtre.getEntitatCodi(), filtre.getOrganCodi());
@@ -9325,9 +9269,9 @@ public class PluginHelper {
 			return null;
 		} catch (Exception ex) {
 			return ex;
-		}	
+		}
 	}
-	
+
 	public Exception viaFirmaDiagnostic(DiagnosticFiltreDto filtre) {
 		try {
 			ViaFirmaPlugin viaFirmaPlugin = getViaFirmaPlugin(filtre.getEntitatCodi(), filtre.getOrganCodi());
@@ -9338,9 +9282,9 @@ public class PluginHelper {
 			return null;
 		} catch (Exception ex) {
 			return ex;
-		}	
+		}
 	}
-	
+
 	public Exception digitalitzacioDiagnostic(DiagnosticFiltreDto filtre) {
 		try {
 			DigitalitzacioPlugin digitalitzacioPlugin = getDigitalitzacioPlugin(filtre.getEntitatCodi(), filtre.getOrganCodi());
@@ -9353,9 +9297,9 @@ public class PluginHelper {
 			}
 		} catch (Exception ex) {
 			return ex;
-		}	
+		}
 	}
-	
+
 	public Exception validaFirmaDiagnostic(DiagnosticFiltreDto filtre) {
 		try {
 			IValidateSignaturePluginWrapper validaSignaturaPlugin = getValidaSignaturaPlugin(filtre.getEntitatCodi(), filtre.getOrganCodi());
@@ -9363,9 +9307,9 @@ public class PluginHelper {
 			return null;
 		} catch (Exception ex) {
 			return ex;
-		}	
+		}
 	}
-	
+
 	public Exception gesConDiagnostic(DiagnosticFiltreDto filtre) {
 		try {
 			ProcedimentPlugin procedimentPlugin = getProcedimentPlugin(filtre.getEntitatCodi(), filtre.getOrganCodi());
@@ -9373,9 +9317,9 @@ public class PluginHelper {
 			return null;
 		} catch (Exception ex) {
 			return ex;
-		}	
+		}
 	}
-	
+
 	public Exception conversioDocumentsDiagnostic(DiagnosticFiltreDto filtre) {
 		try {
 			DocumentEntity doc = documentRepository.findLastConvertible();
@@ -9393,9 +9337,9 @@ public class PluginHelper {
 			}
 		} catch (Exception ex) {
 			return ex;
-		}	
+		}
 	}
-	
+
 	public Exception unitatsOrganitzativesDiagnostic(DiagnosticFiltreDto filtre) {
 		try {
 			EntitatEntity entitat = entitatRepository.findByCodi(filtre.getEntitatCodi());
@@ -9426,23 +9370,23 @@ public class PluginHelper {
 			}
 		} catch (Exception ex) {
 			return ex;
-		}	
+		}
 	}
-	
+
 	public Exception distribucioDiagnostic(DiagnosticFiltreDto filtre) {
 		try {
 			DistribucioPlugin dP = getDistribucioPlugin(filtre.getEntitatCodi(), filtre.getOrganCodi());
-			
+
 			Pageable pageable = PageRequest.of(0, 1);
 			List<ExpedientPeticioEntity> epe = expedientPeticioRepository.findLastAnotacioRebuda(pageable).getContent();
-			
+
 			if (epe!=null && epe.size()>0) {
 				AnotacioRegistreId ar = new AnotacioRegistreId();
 				ar.setClauAcces(epe.get(0).getClauAcces());
 				ar.setIndetificador(epe.get(0).getIdentificador());
-				
+
 				AnotacioRegistreEntrada resultat = dP.consulta(ar);
-				
+
 				if (resultat!=null && resultat.getIdentificador()!=null) {
 					return null;
 				} else {
@@ -9453,9 +9397,9 @@ public class PluginHelper {
 			}
 		} catch (Exception ex) {
 			return ex;
-		}	
+		}
 	}
-	
+
 	public Exception validaFirmaAgilDiagnostic(DiagnosticFiltreDto filtre) {
 		try {
 			ValidacioSignaturaPlugin validaSignaturaPlugin = getValidaSignaturaAgilPlugin(filtre.getEntitatCodi(), filtre.getOrganCodi());
@@ -9463,14 +9407,14 @@ public class PluginHelper {
 			return null;
 		} catch (Exception ex) {
 			return ex;
-		}	
+		}
 	}
-	
+
 	public EstatSalutEnum comandaIntegracioDiagnostic(DiagnosticFiltreDto filtre) throws Exception {
 			ComandaCaibPlugin comandaCaibPlugin = getComandaPlugin(filtre.getEntitatCodi(), filtre.getOrganCodi());
 			return comandaCaibPlugin.getSalutComanda();
 	}
-	
+
 	public Exception concsvIntegracioDiagnostic(DiagnosticFiltreDto filtre) {
 		try {
 			IArxiuPluginWrapper iArxiuPluginWrapper = getConcsvPlugin(filtre.getEntitatCodi(), filtre.getOrganCodi());
@@ -9479,15 +9423,15 @@ public class PluginHelper {
 			return null;
 		} catch (Exception ex) {
 			return ex;
-		}	
+		}
 	}
-	
+
 	//Els fitxers han de estar a la ruta src/main/resources/es/caib/ripea/core
 	private InputStream llegirResourceCore(String finalPath) {
 		ClassLoader classLoader = PluginHelper.class.getClassLoader();
 		return classLoader.getResourceAsStream("es/caib/ripea/core"+finalPath);
 	}
-	
+
 	private byte[] llegirBytesResourceCore(String finalPath) {
 		InputStream inputStream = null;
 		ByteArrayOutputStream bos = null;
@@ -9508,6 +9452,6 @@ public class PluginHelper {
 			if (inputStream!=null) { try {inputStream.close();} catch (Exception ex) {} }
 		}
 	}
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(PluginHelper.class);
 }

@@ -245,10 +245,10 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         register(DocumentResource.ViaFirmaForm.Fields.viaFirmaDispositiuCodi, new ViaFirmaDispositiuOptionsProvider());
         register(null, new InitialOnChangeDocumentResourceLogicProcessor());
     }
-    
+
     @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
-    	
+
         String entitatActualCodi = configHelper.getEntitatActualCodi();
         String rolActual		 = configHelper.getRolActual();
     	EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
@@ -259,7 +259,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 FilterBuilder.equal(ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi,
                 		entitatActualCodi != null?entitatActualCodi:"................................................................................")
         );
-        
+
         //Filtres opcionals, dependran de la namedQuery
         Filter filtreMetaExpedientsPermesos = null;
         Filter filtreDocumentsNotArxiuIds = null;
@@ -273,23 +273,23 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
         Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
     	if (mapaNamedQueries.size()>0) {
-    		
+
     		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitat.getId(), rolActual);
     		boolean nomesAgafats = !rolActual.equals("IPA_ADMIN") && !rolActual.equals("IPA_ORGAN_ADMIN");
     		String codiUsuariActual = SecurityContextHolder.getContext().getAuthentication().getName();
-    		
+
     		if (metaExpedientsPermesos==null || metaExpedientsPermesos.size()==0) {
 				//Sense permisos
 				return FilterBuilder.equal("id", 0).generate();
 			}
-    		
-    		if (mapaNamedQueries.containsKey("MASSIU_PORTAFIRMES") || 
+
+    		if (mapaNamedQueries.containsKey("MASSIU_PORTAFIRMES") ||
     			mapaNamedQueries.containsKey("MASSIU_PASARELA") ||
     			mapaNamedQueries.containsKey("MASSIU_PENDENT_ARXIU") ||
     			mapaNamedQueries.containsKey("MASSIU_ENLLAC_CSV")) {
-	    			
+
     			if (mapaNamedQueries.containsKey("MASSIU_PENDENT_ARXIU")) {
-        			
+
         			List<Long> idsArxiusPendents = documentRepository.findIdsArxiuPendents(
         					entitat,
         					metaExpedientsPermesos,
@@ -300,7 +300,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         					true, null,
         					true, null,
         					true, null);
-        			
+
     		    	List<String> permesosClausulesIn = Utils.getIdsEnGruposMil(idsArxiusPendents);
     		    	if (permesosClausulesIn!=null) {
 	    		        for (String aux: permesosClausulesIn) {
@@ -311,13 +311,13 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     		    	}
 
         		} else {
-    			
-					List<Long> metaExpedientsPermesosIds = new ArrayList<Long>();			
-	    			
+
+					List<Long> metaExpedientsPermesosIds = new ArrayList<Long>();
+
 					for (MetaExpedientEntity mex: metaExpedientsPermesos) {
 						metaExpedientsPermesosIds.add(mex.getId());
 					}
-					
+
 	    			String procedimentId = DocumentResource.Fields.expedient + "." + ExpedientResource.Fields.metaExpedient + ".id";
 			    	List<String> permesosClausulesIn = Utils.getIdsEnGruposMil(metaExpedientsPermesosIds);
 			        for (String aux: permesosClausulesIn) {
@@ -325,13 +325,13 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 				        	filtreMetaExpedientsPermesos = FilterBuilder.or(filtreMetaExpedientsPermesos, Filter.parse(procedimentId + " IN (" + aux + ")"));
 				        }
 			        }
-	
+
 			        String documentEsborratField = ContingutResource.Fields.esborrat;
 			        filtreNoEsborrat = FilterBuilder.equal(documentEsborratField, 0); //NO BORRAT
-			        
+
 			        String documentTipusField = DocumentResource.Fields.documentTipus;
 			        filtreTipusDoc = FilterBuilder.equal(documentTipusField, DocumentTipusEnumDto.DIGITAL.toString()); //DIGITAL
-			        
+
 			        if (mapaNamedQueries.containsKey("MASSIU_ENLLAC_CSV")) {
 			        	String documentEstatField = DocumentResource.Fields.estat;
 			        	filtreEstatDocument = FilterBuilder.or(
@@ -339,15 +339,15 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 			        		FilterBuilder.equal(documentEstatField, DocumentEstatEnumDto.CUSTODIAT.toString()),
 			        		FilterBuilder.equal(documentEstatField, DocumentEstatEnumDto.DEFINITIU.toString())
 	    				);
-	
+
 				        String docAdjuntField = DocumentResource.Fields.gesDocAdjuntId;
 				        filtreNoAdjunt = FilterBuilder.isNull(docAdjuntField);
-	
+
 			        } else {
-	
+
 				        String documentEstatField = DocumentResource.Fields.estat;
 				        filtreEstatDocument = FilterBuilder.equal(documentEstatField, DocumentEstatEnumDto.REDACCIO.toString()); //ESBORRANY
-	
+
 				        if (mapaNamedQueries.containsKey("MASSIU_PORTAFIRMES")) {
 				        	String metaDocPortafirmes = DocumentResource.Fields.metaDocument + "." + MetaDocumentResource.Fields.firmaPortafirmesActiva;
 				        	filtrePfActiu = FilterBuilder.equal(metaDocPortafirmes, true); //ENVIAMENT A PF ACTIU EN EL PROCEDIMENT
@@ -361,7 +361,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 				        }
 			        }
         		}
-		        
+
 		        Filter resultat = FilterBuilder.and(
 		        		filtreBase, //Entitat i filtre del usuari
 		        		filtreMetaExpedientsPermesos,
@@ -373,15 +373,15 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 		        		filtrePfActiu,
 		        		filtreExpedientObert,
 		        		filtreArxiuPendents);
-		        
+
 		        return resultat.generate();
 
     		}
     	}
-        
+
         return filtreBase.generate();
     }
-    
+
     public class InitialOnChangeDocumentResourceLogicProcessor implements OnChangeLogicProcessor<DocumentResource> {
 		@Override
 		public void onChange(Serializable id, DocumentResource previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, DocumentResource target) {
@@ -390,13 +390,13 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 	        target.setFuncionariHabilitatDigitalib(RolHelper.doesCurrentUserHasRol("DIB_USER"));
 	        target.setDeteccioFirmaAutomaticaActiva(configHelper.getAsBoolean(PropertyConfig.DETECCIO_FIRMA_AUTOMATICA));
 	        target.setDocumentFirmaTipus(DocumentFirmaTipusEnumDto.SENSE_FIRMA);
-	        
+
 	        if(previous.getAdjunt()!=null) {
                 new AdjuntOnchangeLogicProcessor().onChange(id, previous, DocumentResource.Fields.adjunt, previous.getAdjunt(), answers, previousFieldNames, target);
             }
 		}
     }
-    
+
     public class PerfilsDigitalitzacioOptionsProvider implements FieldOptionsProvider {
 		public List<FieldOption> getOptions(String fieldName, Map<String,String[]> requestParameterMap) {
 			List<DigitalitzacioPerfilDto> fluxosDto = pluginHelper.digitalitzacioPerfilsDisponibles();
@@ -409,7 +409,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 			return resultat;
 		}
 	}
-    
+
     public class ViaFirmaDispositiuOptionsProvider implements FieldOptionsProvider {
 		@Override
 		public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
@@ -427,14 +427,14 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 			return resultat;
 		}
     }
-    
+
     @Override
     public DocumentResource create(DocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
     	try {
     		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 			ContingutEntity pare = null;
     		if (resource.getCarpeta()!=null) {
-    			pare = contingutRepository.findById(resource.getCarpeta().getId()).get();	
+    			pare = contingutRepository.findById(resource.getCarpeta().getId()).get();
     		} else {
     			pare = contingutRepository.findById(resource.getExpedient().getId()).get();
     		}
@@ -455,7 +455,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     	}
     	return resource;
     }
-    
+
     @Override
     public void delete(Long id, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
     	try {
@@ -468,7 +468,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     		throw new ResourceNotDeletedException(getResourceClass(), String.valueOf(id), messageHelper.getMissatgeError(ex), ex);
     	}
     }
-    
+
     @Override
 	public DocumentResource update(Long id, DocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
     	try {
@@ -486,7 +486,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     	}
     	return resource;
     }
-    
+
     /**
      * Refresca les validacions de l'expedient després d'un canvi (creació, modificació o esborrat d'un document).
      *
@@ -612,7 +612,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
             resource.setTreePath(contingutResourceHelper.getTreePath(entity));
         }
     }
-    
+
     private class ArxiuDocumentPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
         @Override
         public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
@@ -623,7 +623,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
             resource.setArxiu(arxiu);
         }
     }
-    
+
     private class ProcedimentPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
 		@Override
 		public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
@@ -643,17 +643,17 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 	        		} else if (entity.getGesDocAdjuntId()!=null) {
 	        			ByteArrayOutputStream streamDoc = new ByteArrayOutputStream();
 	        			pluginHelper.gestioDocumentalGet(entity.getGesDocAdjuntId(), PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS, streamDoc);
-	        			
+
 	        			ByteArrayOutputStream streamFirma = null;
 	        			if (entity.getGesDocAdjuntFirmaId()!=null) {
 	        				streamFirma = new ByteArrayOutputStream();
 	            			pluginHelper.gestioDocumentalGet(entity.getGesDocAdjuntFirmaId(), PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS, streamFirma);
 	        			}
 	        			resource.setFirmes(pluginHelper.validaSignaturaObtenirFirmes(
-	        					entity.getFitxerNom(), 
-	        					streamDoc.toByteArray(), 
-	        					streamFirma!=null?streamFirma.toByteArray():null, 
-	        					entity.getFitxerContentType(), 
+	        					entity.getFitxerNom(),
+	        					streamDoc.toByteArray(),
+	        					streamFirma!=null?streamFirma.toByteArray():null,
+	        					entity.getFitxerContentType(),
 	        					false));
 	        		}
 	        	}
@@ -666,7 +666,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         	}
         }
     }
-    
+
     private class ArxiuVersionsPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
         @Override
         public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
@@ -675,7 +675,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
             resource.setCsvLinkUrl(configHelper.getConfig(PropertyConfig.CONCSV_BASE_URL));
         }
     }
-    
+
     private class CountPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
         @Override
         public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
@@ -689,7 +689,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private class AdjuntFieldDownloader implements FieldDownloader<DocumentResourceEntity> {
         @Override
         public DownloadableFile download(DocumentResourceEntity entity, String fieldName, OutputStream out) {
-        	
+
         	DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
         			entity.getEntitat().getId(),
         			entity.getId(),
@@ -697,7 +697,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 					false);
 
         	FitxerDto fitxerDto = documentHelper.getFitxerAssociat(document, null);
-        	
+
             return new DownloadableFile(
             		fitxerDto.getNom(),
             		fitxerDto.getContentType(),
@@ -708,7 +708,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private class FirmaFieldDownloader implements FieldDownloader<DocumentResourceEntity> {
         @Override
         public DownloadableFile download(DocumentResourceEntity entity, String fieldName, OutputStream out) {
-        	
+
         	DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
         			entity.getEntitat().getId(),
         			entity.getId(),
@@ -716,7 +716,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 					false);
 
         	FitxerDto fitxerDto = documentHelper.getFitxerFirmaSeparada(document);
-        	
+
             return new DownloadableFile(
             		fitxerDto.getNom(),
             		fitxerDto.getContentType(),
@@ -727,7 +727,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private class ImprimibleFieldDownloader implements FieldDownloader<DocumentResourceEntity> {
         @Override
         public DownloadableFile download(DocumentResourceEntity entity, String fieldName, OutputStream out) {
-        	
+
         	DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
         			entity.getEntitat().getId(),
         			entity.getId(),
@@ -735,7 +735,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 					false);
 
         	FitxerDto fitxerDto = pluginHelper.arxiuDocumentVersioImprimible(document);
-        	
+
             return new DownloadableFile(
             		fitxerDto.getNom(),
             		fitxerDto.getContentType(),
@@ -746,7 +746,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private class OriginalFieldDownloader implements FieldDownloader<DocumentResourceEntity> {
         @Override
         public DownloadableFile download(DocumentResourceEntity entity, String fieldName, OutputStream out) {
-        	
+
         	DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
         			entity.getEntitat().getId(),
         			entity.getId(),
@@ -754,7 +754,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 					false);
 
         	FitxerDto fitxerDto = documentHelper.getContingutOriginal(document);
-        	
+
             return new DownloadableFile(
             		fitxerDto.getNom(),
             		fitxerDto.getContentType(),
@@ -774,13 +774,13 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         		DigitalitzacioTransaccioRespostaDto respostaDto = pluginHelper.digitalitzacioIniciarProces(
         				usuari.getIdioma()!=null?usuari.getIdioma().toString():"ca",
         				fieldValue.toString(),
-        				usuari.toUsuariDto(), 
+        				usuari.toUsuariDto(),
         				urlReturn);
         		target.setDigitalitzacioProcesUrl(respostaDto.getUrlRedireccio());
         	}
         }
     }
-    
+
     private class MetaDocumentOnchangeLogicProcessor implements OnChangeLogicProcessor<DocumentResource> {
         @Override
         public void onChange(Serializable id, DocumentResource previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource target) {
@@ -797,7 +797,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
             }
         }
     }
-    
+
     private class AdjuntOnchangeLogicProcessor implements OnChangeLogicProcessor<DocumentResource> {
 
         @Override
@@ -812,7 +812,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 target.setFitxerContentType(adjunt.getContentType());
 
                 if (Boolean.parseBoolean(configHelper.getConfig(PropertyConfig.DETECCIO_FIRMA_AUTOMATICA))) {
-                	
+
                 	SignatureInfoDto signatureInfoDto = pluginHelper.detectaFirmaDocument(
                 			adjunt.getContent(),
                 			Utils.getFitxerContentType(adjunt.getName(), adjunt.getContentType()));
@@ -871,7 +871,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         public void onChange(Serializable id, DocumentResource previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource target) {
             boolean isDeteccioFirmaAutomaticaActiva = configHelper.getAsBoolean(PropertyConfig.DETECCIO_FIRMA_AUTOMATICA);
             boolean ambFirma = fieldValue != null && (Boolean) fieldValue;
-            
+
             if (isDeteccioFirmaAutomaticaActiva) {
                 if (!DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA.equals(previous.getDocumentFirmaTipus())) {
                     target.setDocumentFirmaTipus(ambFirma
@@ -891,24 +891,24 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         public DocumentResource exec(String code, DocumentResourceEntity entity, DocumentResource.EnviarViaEmailFormAction params) throws ActionExecutionException {
 
         	try {
-        		
+
         		List<String> emails = new ArrayList<String>();
         		List<String> destinataris = new ArrayList<String>();
-        		
+
 	            if (params.getEmail()!=null && !params.getEmail().isEmpty()) {
 	            	emails = Arrays.asList(params.getEmail().split(","));
 	            }
-	            
+
 	            if (params.getResponsables()!=null && !params.getResponsables().isEmpty()) {
 	                destinataris = params.getResponsables().stream()
 	                        .map(ResourceReference::getId)
 	                        .collect(Collectors.toList());
 	            }
-	
+
 	            if (emails!=null || destinataris!=null) {
 	            	emailHelper.enviarDocument(entity.getId(), emails, destinataris, params.getVersioDocument());
 	            }
-	            
+
 	            return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/EnviarViaEmailActionExecutor", e);
@@ -935,7 +935,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
             }
         }
     }
-    
+
     private class CanviTipusDocumentsActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.UpdateTipusDocumentFormAction, DocumentResource> {
 
 		@Override
@@ -943,10 +943,10 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
 		@Override
 		public DocumentResource exec(String code, DocumentResourceEntity entity, UpdateTipusDocumentFormAction params) throws ActionExecutionException {
-    		try {	    		
-	    		
+    		try {
+
     			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
-    			
+
                 if (params!=null) {
                 	Long expedientId = null; //Tots els documents son del mateix expedient.
                 	for (Long id: params.getIds()) {
@@ -962,9 +962,9 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 		afterDbChange(expedientId);
                 	}
                 }
-                
+
                 return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
-                
+
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/expedient/CanviTipusDocumentsActionExecutor", e);
 				String msg = messageHelper.getMessage("document.canviTipus.reject")+": "+e.getMessage();
@@ -976,7 +976,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
 		@Override
 		public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
-		
+
 		@Override
 		public List<Serializable> generateData(String code, DocumentResourceEntity entity, MassiveAction params) throws ReportGenerationException {
 			List<Serializable> parametres = new ArrayList<Serializable>();
@@ -1163,7 +1163,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         @Override
         public void onChange(Serializable id, DocumentResource.MoureFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.MoureFormAction target) {}
     }
-    
+
     private class GuardarArxiuActionExecutor implements ActionExecutor<DocumentResourceEntity, MassiveAction, Serializable> {
 
 		@Override
@@ -1184,7 +1184,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 							null,
 							configHelper.getRolActual());
 					execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.DOCUMENT);
-					
+
 				} else {
 
 					Exception errorGuardant = null;
@@ -1208,7 +1208,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 	        	}
 
 				return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
-				
+
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio(
 						"/document/GuardarArxiuActionExecutor",
@@ -1219,7 +1219,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, message);
 			}
 		}
-		
+
 		private Long annexPendentMourerArxiu(Long documentId) {
 			List<RegistreAnnexResourceEntity> annexosDoc = registreAnnexResourceRepository.findByDocumentId(documentId);
 			if (annexosDoc!=null) {
@@ -1232,7 +1232,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 			return null;
 		}
     }
-    
+
     private class ConvertirDefinitiuActionExecutor implements ActionExecutor<DocumentResourceEntity, MassiveAction, Serializable> {
 
 		@Override
@@ -1262,7 +1262,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 		@Override
 		public void onChange(Serializable id, MassiveAction previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, MassiveAction target) {}
     }
-    
+
     private class CsvLinkActionExecutor implements ActionExecutor<DocumentResourceEntity, MassiveAction, Serializable> {
 
 		@Override
@@ -1287,7 +1287,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 			}
 		}
     }
-    
+
     private class ViaFirmaActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.ViaFirmaForm, Serializable> {
 
         @Override
@@ -1303,7 +1303,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         	}
         	return resultat;
         }
-    	
+
 		@Override
 		public void onChange(Serializable id, ViaFirmaForm previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, ViaFirmaForm target) {
 			if (fieldName==null) {
@@ -1315,7 +1315,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 				if (fieldValue!=null) {
 					Long interessatId = ((ResourceReference<InteressatResource, Long>)fieldValue).getId();
 					InteressatResourceEntity intRes = interessatResourceRepository.findById(interessatId).get();
-					target.setSignantNom(intRes.getNomComplet()); 
+					target.setSignantNom(intRes.getNomComplet());
 					target.setSignantNif(intRes.getDocumentNum());
 					target.setSignantEmail(intRes.getEmail());
 				}
@@ -1341,7 +1341,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 				viaFirmaEnviarDto.setValidateCode(params.getValidateCode());
 				viaFirmaEnviarDto.setRebreCorreu(params.getRebreCorreu());
 				viaFirmaEnviarDto.setEmplenable(params.getEmplenable());
-				
+
 				firmaViaFirmaHelper.viaFirmaEnviar(entitatEntity.getId(), entity.getId(), viaFirmaEnviarDto);
 				return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
 			} catch (Exception e) {
@@ -1418,7 +1418,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 			try {
 				//La entitat ja es comprova a pinbalHelper
 				EntitatEntity entitatEntity = entitatRepository.findByCodi(configHelper.getEntitatActualCodi());
-				
+
 				PinbalConsultaDto consulta = new PinbalConsultaDto();
 				consulta.setInteressatId(params.getTitular().getId());
 				consulta.setFinalitat(params.getFinalitat());
@@ -1441,17 +1441,17 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 	            consulta.setTelefon(params.getTelefon());
 	            consulta.setEmail(params.getEmail());
 	            consulta.setNombreAnysHistoric(params.getNombreAnysHistoric());
-	            consulta.setExercici(params.getExercici());	
+	            consulta.setExercici(params.getExercici());
 	            consulta.setTipusPassaport(params.getTipusPassaport());
 	            consulta.setDataCaducidad(params.getDataCaducidad());
 	            consulta.setDataExpedicion(params.getDataExpedicion());
-	            consulta.setNumeroSoporte(params.getNumeroSoporte());	
+	            consulta.setNumeroSoporte(params.getNumeroSoporte());
 	            consulta.setRegistreCivil(params.getRegistreCivil());
 	            consulta.setTom(params.getTom());
 	            consulta.setPagina(params.getPagina());
 	            consulta.setAusenciaSegundoApellido(params.isAusenciaSegundoApellido());
 	            consulta.setCurs(params.getCurs());
-	
+
 	            if ("SVDRRCCDEFUNCIONWS01".equals(params.getCodiServeiPinbal())){
 	                consulta.setMunicipiRegistreSVDRRCCDEFUNCIONWS01(params.getMunicipiRegistre());
 	                consulta.setMunicipiNaixamentSVDRRCCDEFUNCIONWS01(params.getMunicipiNaixament());
@@ -1467,14 +1467,14 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 	            if ("SVDDELSEXWS01".equals(params.getCodiServeiPinbal())){
 	                consulta.setMunicipiNaixamentSVDDELSEXWS01(params.getMunicipiNaixament());
 	            }
-	
+
 	            Exception resultatConsulta = pinbalHelper.pinbalNovaConsulta(
 						entitatEntity.getId(),
                         getPareIdDocumentPinbal(params),
                         params.getTipusDocument().getId(),
-						consulta, 
+						consulta,
 						configHelper.getRolActual());
-				
+
 	            if (resultatConsulta==null) {
 	            	return params;
 	            } else {
@@ -1507,7 +1507,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 			return carpeta.getId();
 		}
     }
-    
+
     private class IniciarFirmaWebActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.IniciarFirmaNavegador, Serializable> {
 
 		@Override
@@ -1515,27 +1515,27 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
 		@Override
 		public Serializable exec(String code, DocumentResourceEntity entity, IniciarFirmaNavegador params) throws ActionExecutionException {
-			
+
 			String docIdStr = Utils.getIdsSeparatsComa(params.getIds());
-			
+
 			try {
 
     			String dadesURL = params.isMassivo()+"#"+docIdStr+"#"+SecurityContextHolder.getContext().getAuthentication().getName();
 				String paramSecure = Utils.encripta(dadesURL, configHelper.getConfig(PropertyConfig.CLAU_ENCRIPTACIO));
 				String urlReturnToRipea = configHelper.getConfig(PropertyConfig.BASE_URL) + "/modal/document/event/" + paramSecure + "/firmaSimpleWebEnd";
 				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
-				
+
 				List<FitxerDto> fitxersFirma = new ArrayList<FitxerDto>();
 				for (Long idDoc: params.getIds()) {
 					FitxerDto fitxerAfirmar = documentHelper.convertirPdfPerFirmaClient(entitatEntity.getId(), idDoc);
 					fitxerAfirmar.setId(idDoc);
 					fitxersFirma.add(fitxerAfirmar);
 				}
-				
+
 				Map<String, String> result = new HashMap<>();
                 result.put("url", pluginHelper.firmaSimpleWebStart(fitxersFirma, params.getMotiu(), urlReturnToRipea, FirmaSimpleStartTransactionRequest.VIEW_FULLSCREEN));
                 return (Serializable)result;
-                
+
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/document/IniciarFirmaWebActionExecutor", e, docIdStr, "massiu="+params.isMassivo());
 				throw new ActionExecutionException(getResourceClass(), docIdStr, code, messageHelper.getMessage("document.iniciarFirmaWeb.reject", new Object[]{e.getMessage()}));
@@ -1696,6 +1696,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 					}
 					target.setInteressatsAmbAvis(interessatsAmbAvis);
 					target.setAdministracioSir(administracioSir);
+                    if (administracioSir)
+                        target.setTipus(DocumentNotificacioTipusEnumDto.COMUNICACIO);
 					if (!answers.containsKey(COMPATIBILITAT_EXTENSIO_AVIS) && isFormatIncompatible(previous.getTipus(), interesatsFieldValue, id)) {
 						throw new AnswerRequiredException(
 								DocumentResource.class,
@@ -1719,14 +1721,11 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
 				if (llistaInteressats != null && !llistaInteressats.isEmpty()) {
 					boolean teAdministracio = false;
-					boolean tePersonaFisicaOJuridica = false;
 
 					// Analitzam el tipus de cada interessat actual al formulari
 					for (InteressatResourceEntity intEnt : llistaInteressats) {
 						if (InteressatTipusEnum.InteressatAdministracioEntity.equals(intEnt.getTipus())) {
 							teAdministracio = true;
-						} else {
-							tePersonaFisicaOJuridica = true;
 						}
 					}
 
@@ -1734,20 +1733,15 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
 					// Determinació dels canals implicats
 					boolean canalSirActiu = esComunicacio && teAdministracio;
-					boolean canalNoSirActiu = (!esComunicacio && teAdministracio) || tePersonaFisicaOJuridica;
 
 					// Formats permesos per a cada canal
 					Set<String> formatsSir = Set.of("jpg", "jpeg", "odt", "odp", "ods", "odg", "docx", "xlsx", "pptx", "pdf", "png", "rtf", "svg", "tiff", "txt", "xml", "xsig");
-					Set<String> formatsNoSir = Set.of("pdf", "zip");
+//					Set<String> formatsNoSir = Set.of("pdf", "zip");
 
 					boolean formatValidPerSir = formatsSir.contains(extensio);
-					boolean formatValidPerNoSir = formatsNoSir.contains(extensio);
 
 					// Validam si hi ha incompatibilitat en qualque canal actiu
 					if (canalSirActiu && !formatValidPerSir) {
-						return true;
-					}
-					if (canalNoSirActiu && !formatValidPerNoSir) {
 						return true;
 					}
 				}
@@ -1815,10 +1809,10 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 	        	notificacioDto.setEntregaPostal(params.getEntregaPostal() != null && params.getEntregaPostal());
 	        	notificacioDto.setObservacions(params.getDescripcio());
 	        	notificacioDto.setAssumpte(params.getConcepte());
-				notificacioDto.setDataProgramada(params.getDataProgramada()); 
+				notificacioDto.setDataProgramada(params.getDataProgramada());
 				notificacioDto.setRetard(params.getRetard());
 				notificacioDto.setDataCaducitat(params.getDataCaducitat());
-	        	
+
 	        	documentNotificacioHelper.notificacioCreate(entitatEntity.getId(), entity.getId(), notificacioDto);
 
 			} catch (Exception e) {
@@ -1826,7 +1820,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
 				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, message);
 			}
-        	
+
         	return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
 		}
     }
@@ -1843,7 +1837,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
             }
             return map;
         }
-        
+
         private List<String> getNifsResponsables(DocumentResource.EnviarPortafirmesFormAction params) {
 	    	List<String> pfResponsables = new ArrayList<String>();
 	    	if (params.getResponsables()!=null) {
@@ -1905,35 +1899,35 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         public DocumentResource exec(String code, DocumentResourceEntity entity, DocumentResource.EnviarPortafirmesFormAction params) throws ActionExecutionException {
 
         	try {
-        	
+
         		if (!params.isMassivo()) {
-        		
+
         			entity = documentResourceRepository.findById(params.getIds().get(0)).get();
-        			
+
 		        	Long entitatId  = entity.getEntitat().getId();
 		        	Long documentId = entity.getId();
 		        	String rolActual = configHelper.getRolActual();
-		        	
+
 		        	DocumentEntity document = documentHelper.comprovarDocument(
 		        			entitatId,
 							documentId,
 							false,
 							true,
 							false,
-							false, 
-							false, 
+							false,
+							false,
 							rolActual);
-		        	
+
 		        	//Unificar els portafirmes responsables en un array de NIFS
 		        	List<String> pfResponsables = getNifsResponsables(params);
-		        	
+
 		        	List<Long> annexosIds = new ArrayList<Long>();
 		        	if (params.getAnnexos()!=null) {
 		        		for (ResourceReference <DocumentResource, Long> annex: params.getAnnexos()) {
 		        			annexosIds.add(annex.getId());
 		        		}
 		        	}
-		        	
+
 		        	//Enviam com a parametre transactionID si s'ha creat un flux temporal, sino enviam el fluxId
 					firmaPortafirmesHelper.portafirmesEnviar(
 							entitatId,
@@ -1949,22 +1943,22 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 							params.getFluxCreat()!=null?params.getFluxCreat().getFluxId():null,
 							params.isAvisFirmaParcial(),
 							params.isFirmaParcial());
-		        	
+
 		        	return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
-        		
+
         		} else {
-        			
+
 	            	List<ExecucioMassivaContingutDto> elementsMassiva = execucioMassivaHelper.getMassivaContingutFromIds(params.getIds());
-	            	
+
 		        	//Unificar els portafirmes responsables en un array de NIFS
 		        	List<String> pfResponsables = getNifsResponsables(params);
-	            	
+
 	    			ExecucioMassivaDto execMassDto = new ExecucioMassivaDto(
 	    					ExecucioMassivaTipusDto.PORTASIGNATURES,
 	    					params.getDataInici()!=null?params.getDataInici():new Date(),
 	    					null,
 	    					configHelper.getRolActual());
-	    			
+
 	    			execMassDto.setEnviarCorreu(params.isEnviarCorreu());
 	    			execMassDto.setMotiu(params.getMotiu());
 	    			execMassDto.setPrioritat(params.getPrioritat());
@@ -1976,13 +1970,13 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 	    			execMassDto.setRolActual(configHelper.getRolActual());
 	    			execMassDto.setPortafirmesAvisFirmaParcial(params.isAvisFirmaParcial());
 	    			execMassDto.setPortafirmesFirmaParcial(params.isFirmaParcial());
-	    			
+
 	    			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 	    			execucioMassivaHelper.saveExecucioMassiva(entitatEntity, execMassDto, elementsMassiva, ElementTipusEnumDto.DOCUMENT);
-        			
+
 	    			return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);
         		}
-        	
+
 			} catch (Exception e) {
 				String docIdStr = Utils.getIdsSeparatsComa(params.getIds());
 				excepcioLogHelper.addExcepcio("/document/EnviarPortafirmesActionExecutor", e, docIdStr, "massiu="+params.isMassivo());
@@ -1996,20 +1990,20 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
         @Override
         public void onChange(Serializable id, DocumentResource.EnviarPortafirmesFormAction previous, String fieldName, Object fieldValue, Map<String, AnswerRequiredException.AnswerValue> answers, String[] previousFieldNames, DocumentResource.EnviarPortafirmesFormAction target) {
-        	
-        	//S'està inicialitzant el formulari, posam els camps que corresponguin als seus valor per defecte 
+
+        	//S'està inicialitzant el formulari, posam els camps que corresponguin als seus valor per defecte
         	if (fieldName==null) {
         		target.setMostrarFirmaParcial(configHelper.getAsBoolean(PropertyConfig.FIRMA_PARCIAL));
         		target.setMostrarAvisFirmaParcial(configHelper.getAsBoolean(PropertyConfig.AVIS_FIRMA_PARCIAL));
-        		
+
         		//Pot venir com a execució massiva o individual
         		Long documentId = previous.getIds().get(0);
-        		
+
         		DocumentResourceEntity documentResourceEntity = documentResourceRepository.findById(documentId).get();
         		MetaDocumentResourceEntity metaDocumentResourceEntity = documentResourceEntity.getMetaDocument();
         		target.setPortafirmesFluxTipus(metaDocumentResourceEntity.getPortafirmesFluxTipus());
         		target.setMetaDocumentId(metaDocumentResourceEntity.getId());
-        		
+
         		if (MetaDocumentFirmaFluxTipusEnumDto.SIMPLE.equals(metaDocumentResourceEntity.getPortafirmesFluxTipus())) {
         			List<ResourceReference<UsuariResource, String>> responsables = new ArrayList<>();
         			List<String> nifs = new ArrayList<>();
@@ -2036,7 +2030,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     				target.setUrlInicioFlujoFirma(transaccioResponse.getUrlRedireccio());
     				target.setIdTransaccio(transaccioResponse.getIdTransaccio());
     			}
-        		
+
         		//Si el tipus de document només té definit un únic flux de firma, aquest queda seleccionat per defecte
         		if (MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB.equals(metaDocumentResourceEntity.getPortafirmesFluxTipus())) {
         			List<MetaDocumentFluxPortafibEntity> fluxosMetaDocument = metaDocumentFluxPortafibRepository.findByMetaDocumentId(metaDocumentResourceEntity.getId());
@@ -2044,13 +2038,13 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         				target.setPortafirmesEnviarFluxId(fluxosMetaDocument.get(0).getPortafirmesFluxId());
         			}
         		}
-        		
+
         	} else { //És un camp concret el que s'ha canviat
         		if (DocumentResource.EnviarPortafirmesFormAction.Fields.portafirmesEnviarFluxId.equals(fieldName)) {
         			if (fieldValue!=null) {
         			UsuariResourceEntity usuari = usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName()).get();
 	        			target.setPortafirmesFluxUrl(pluginHelper.portafirmesRecuperarUrlPlantilla(
-	        					fieldValue.toString(), 
+	        					fieldValue.toString(),
 	        					usuari.getIdioma()!=null?usuari.getIdioma().toString():"ca",
 	        					null,
 	        					false));
