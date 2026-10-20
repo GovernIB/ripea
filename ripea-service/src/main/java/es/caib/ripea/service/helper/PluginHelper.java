@@ -5160,7 +5160,7 @@ public class PluginHelper {
 				}
 			}
 
-            if (!InteressatTipusEnum.InteressatAdministracioEntity.equals(interessat.getTipus())
+            if (!InteressatTipusEnumDto.ADMINISTRACIO.equals(interessat.getTipus())
                 && Utils.notEquals(documentEntity.getFitxerContentType(),"application/zip")
                 && Utils.notEquals(documentEntity.getFitxerContentType(),"application/pdf")) {
                 FitxerDto zip = documentHelper.getZipFromDocumentsIds(documentEntity.getEntitat().getId(), List.of(documentEntity.getId()));
