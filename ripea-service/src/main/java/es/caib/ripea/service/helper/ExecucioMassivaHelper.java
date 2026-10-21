@@ -748,8 +748,10 @@ public class ExecucioMassivaHelper {
 
 	/**
 	 * Importa un document a l'expedient de l'element de l'execució massiva.
-	 * Si el document està en mode sobreescriptura, abans s'envia a la paperera el darrer document actiu
-	 * del mateix tipus dins l'expedient (amb multiplicitat única, l'únic que pot existir).
+	 * Si el document està en mode sobreescriptura, substitueix el darrer document actiu del mateix tipus dins
+	 * l'expedient (amb multiplicitat única, l'únic que pot existir): primer es valida que es pot enviar a la paperera,
+	 * després es crea el nou i, al final, s'envia l'anterior a la paperera. Així, si la creació falla, l'anterior
+	 * queda intacte (a BBDD i a l'Arxiu) i no cal restaurar-lo.
 	 * @param numeroFila si no és null, s'afegeix al nom del document per evitar noms repetits
 	 *                   quan el mateix tipus de document s'importa des de diverses files.
 	 */
@@ -803,11 +805,13 @@ public class ExecucioMassivaHelper {
 		ContingutEntity pare = contingutRepository.findById(emc.getElementId())
 				.orElseThrow(() -> new NotFoundException(emc.getElementId(), ContingutEntity.class));
 
-		//2.- Mode sobreescriptura: enviar a la paperera el darrer document actiu del mateix tipus
+		//2.- Mode sobreescriptura: localitzar el darrer document actiu del mateix tipus i validar, abans de crear res,
+		//que es podrà enviar a la paperera
+		DocumentEntity documentSobreescriure = null;
 		if (docExp.isOverwrite()) {
 			ExpedientEntity expedient = (ExpedientEntity) HibernateHelper.deproxy(pare);
 			// Mateixa consulta (per expedient, metaNode i no esborrats) que la validació de multiplicitat de DocumentHelper.crearDocument
-			DocumentEntity documentSobreescriure = documentRepository.findByExpedientAndMetaNodeAndEsborrat(expedient, metaDocumentEntity, 0)
+			documentSobreescriure = documentRepository.findByExpedientAndMetaNodeAndEsborrat(expedient, metaDocumentEntity, 0)
 					.stream()
 					.max(Comparator
 							.comparing((DocumentEntity d) -> d.getCreatedDate().orElse(LocalDateTime.MIN))
@@ -822,18 +826,39 @@ public class ExecucioMassivaHelper {
 							DocumentEntity.class,
 							"El document \"" + documentSobreescriure.getNom() + "\" no es pot sobreescriure perquè està signat, pendent de firma o és definitiu (estat=" + documentSobreescriure.getEstat() + ")");
 				}
-				contingutHelper.deleteReversible(entitatId, documentSobreescriure, emc.getExecucioMassiva().getRolActual());
+				// Mateixa restricció que deleteReversible, que es comprova aquí per no crear el nou si l'anterior no es podrà esborrar
+				if (contingutHelper.conteDocumentsAnotacions(documentSobreescriure)) {
+					throw new ValidationException(
+							documentSobreescriure.getId(),
+							DocumentEntity.class,
+							"El document \"" + documentSobreescriure.getNom() + "\" no es pot sobreescriure perquè prové d'una anotació");
+				}
 			}
 		}
 
-		//3.- Crear el document per l'expedient (multiplicitat)
+		//3.- Crear el document per l'expedient (multiplicitat): el document a sobreescriure no compta, s'esborrarà a continuació
 		documentHelper.crearDocument(
 				entitatId,
 				documentDto,
 				pare,
 				false,
 				false,
-				true);
+				true,
+				documentSobreescriure != null ? documentSobreescriure.getId() : null);
+
+		//4.- Enviar a la paperera el document sobreescrit. Les validacions de negoci ja s'han fet al pas 2: aquí només pot
+		//fallar l'Arxiu o la còpia temporal del contingut, i el nou document ja està creat
+		if (documentSobreescriure != null) {
+			try {
+				contingutHelper.deleteReversible(entitatId, documentSobreescriure, emc.getExecucioMassiva().getRolActual());
+			} catch (Exception ex) {
+				logger.error("CONTINGUT MASSIU:" + emc.getId() + ". S'ha importat el document però no s'ha pogut enviar a la paperera el document sobreescrit (id=" + documentSobreescriure.getId() + ")", ex);
+				throw new ValidationException(
+						documentSobreescriure.getId(),
+						DocumentEntity.class,
+						"S'ha importat el document, però l'anterior \"" + documentSobreescriure.getNom() + "\" no s'ha pogut enviar a la paperera: " + ExceptionHelper.getRootCauseOrItself(ex).getMessage());
+			}
+		}
 	}
 
 	private Throwable executarAccioSimpleExpedient(ExecucioMassivaContingutEntity emc, ExecucioMassivaTipusDto accio) {

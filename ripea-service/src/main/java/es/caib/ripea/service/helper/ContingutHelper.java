@@ -2091,6 +2091,13 @@ public class ContingutHelper {
 					contingutOrigen,
 					expedientDesti.getArxiuUuid());
 		}
+
+		// Si el contingut canvia d'expedient, els documents (també els fills d'una carpeta) passen d'un expedient
+		// a l'altre i la validació de tots dos pot canviar (p.ex. tipus de document obligatoris).
+		if (!expedientOrigen.getId().equals(expedientDesti.getId())) {
+			cacheHelper.evictErrorsValidacioAndNotify(expedientOrigen.getId());
+			cacheHelper.evictErrorsValidacioAndNotify(expedientDesti.getId());
+		}
 	}
 
 	public void arxiuCarpetaLogicaPropagarMoviment(
@@ -2313,6 +2320,14 @@ public class ContingutHelper {
 			if (fitxer != null) {
 				fitxerDocumentEsborratEsborrar((DocumentEntity)contingut);
 			}
+		}
+
+		// El contingut recuperat torna a comptar per a la validació de l'expedient (tipus de document obligatoris,
+		// documents sense tipus, notificacions pendents...): sense el evict es manté la validació calculada mentre
+		// era a la paperera.
+		ExpedientEntity expedient = contingut.getExpedientPare();
+		if (expedient != null) {
+			cacheHelper.evictErrorsValidacioAndNotify(expedient.getId());
 		}
 	}
 	

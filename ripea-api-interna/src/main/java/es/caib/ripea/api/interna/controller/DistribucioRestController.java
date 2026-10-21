@@ -2,12 +2,11 @@ package es.caib.ripea.api.interna.controller;
 
 import java.util.List;
 
-import org.springframework.security.access.AccessDeniedException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import es.caib.distribucio.ws.backoffice.AnotacioRegistreId;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.ExpedientPeticioService;
-import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;

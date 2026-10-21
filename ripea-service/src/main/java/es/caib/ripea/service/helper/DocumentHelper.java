@@ -125,7 +125,30 @@ public class DocumentHelper {
 			boolean comprovarMetaExpedient,
 			boolean returnDetail,
 			boolean comprovarMetaDocument) {
-		
+		return crearDocument(
+				entitatId,
+				document,
+				pare,
+				comprovarMetaExpedient,
+				returnDetail,
+				comprovarMetaDocument,
+				null);
+	}
+
+	/**
+	 * @param documentSubstituitId document actiu que el nou substitueix i que el cridador enviarà a la paperera
+	 *                             just després de crear-lo: no compta per a la validació de multiplicitat.
+	 *                             Si és null, es valida la multiplicitat amb tots els documents actius.
+	 */
+	public DocumentDto crearDocument(
+			Long entitatId,
+			DocumentDto document,
+			ContingutEntity pare,
+			boolean comprovarMetaExpedient,
+			boolean returnDetail,
+			boolean comprovarMetaDocument,
+			Long documentSubstituitId) {
+
 		ExpedientEntity expedient = pare.getExpedientPare();
 		
 		EntitatEntity entitat = entitatId != null ? entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false) : null;
@@ -190,7 +213,10 @@ public class DocumentHelper {
 				expedient,
 				metaDocument,
 				0);
-		if (metaDocument != null && documents.size() > 0 && (metaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_1) || metaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_0_1))) {
+		long documentsExistents = documents.stream()
+				.filter(d -> documentSubstituitId == null || !documentSubstituitId.equals(d.getId()))
+				.count();
+		if (metaDocument != null && documentsExistents > 0 && (metaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_1) || metaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_0_1))) {
 			throw new ValidationException(
 					"<creacio>",
 					ExpedientEntity.class,
