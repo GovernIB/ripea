@@ -4781,6 +4781,17 @@ public class PluginHelper {
 		}
 	}
 
+	private boolean isFitxerSignedSenseExcepcio(
+			byte[] contingut,
+			String contentType) {
+		try {
+			return contentType != null && isFitxerSigned(contingut, contentType);
+		} catch (Exception e) {
+			logger.warn("No s'ha pogut comprovar si el fitxer conté firmes", e);
+			return false;
+		}
+	}
+
 	public SignatureInfoDto detectaFirmaDocument(byte[] contingut, String contentType) {
 		if (aplicacioService.getBooleanJbossProperty(PropertyConfig.VALIDATE_SIGNATURE_ATTACHED, true)) {
 			return detectSignedAttachedUsingValidateSignaturePlugin(contingut, contentType);
@@ -4860,6 +4871,22 @@ public class PluginHelper {
 						System.currentTimeMillis() - t0);
 				applicationHelper.stopTimer(sample, "METRICS@Integracions.validaFirma", "resultado", "exito", "endpoint", Utils.hasValue(validaSignaturaPlugin.getEndpoint())?validaSignaturaPlugin.getEndpoint():"N/A");
 				return new SignatureInfoDto(false, false, null);
+			} else if (throwable.getMessage().contains("InvalidNotSignerCertificate") && isFitxerSignedSenseExcepcio(documentContingut, firmaContentType)) {
+				//Hi ha validadors que retornen la firma invàlida com a excepció en lloc de com a status SIGNATURE_INVALID (-2).
+				//Només es tracta com a firma invàlida si el fitxer realment conté firmes, igual que el cas del status.
+				integracioHelper.addAccioOk(
+						IntegracioHelper.INTCODI_VALIDASIG,
+						accioDescripcio,
+						validaSignaturaPlugin!=null?validaSignaturaPlugin.getEndpoint():"Llibreria itextpdf",
+						null,
+						IntegracioAccioTipusEnumDto.ENVIAMENT,
+						System.currentTimeMillis() - t0);
+				applicationHelper.stopTimer(sample, "METRICS@Integracions.validaFirma", "resultado", "exito", "endpoint", Utils.hasValue(validaSignaturaPlugin.getEndpoint())?validaSignaturaPlugin.getEndpoint():"N/A");
+				String missatge = throwable.getMessage();
+				if (!RolHelper.getRolsCurrentUser().contains("IPA_ADMIN")) {
+					missatge = "Error al detectar firma de document. És possible que el document no es pugui guardar al Arxiu.";
+				}
+				return new SignatureInfoDto(true, true, missatge);
 			} else {
 				logger.error("Error al detectar firma de document", e);
 				integracioHelper.addAccioError(
