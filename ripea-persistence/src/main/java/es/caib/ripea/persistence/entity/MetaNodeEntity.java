@@ -129,11 +129,19 @@ public abstract class MetaNodeEntity extends RipeaAuditable<Long> {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!super.equals(obj))
+		// obj pot ser un proxy de Hibernate d'aquesta mateixa entitat: es compara amb l'objecte real perquè el
+		// getClass() i els camps del proxy no coincideixen amb els de l'entitat (veure desferProxy).
+		Object objReal = desferProxy(obj);
+		if (objReal == null)
+			// Proxy sense inicialitzar: només es pot comparar per classe i id, sense inicialitzar-lo
+			return super.equals(obj);
+		if (this == objReal)
+			return true;
+		if (!super.equals(objReal))
 			return false;
-		if (getClass() != obj.getClass())
+		if (getClass() != objReal.getClass())
 			return false;
-		MetaNodeEntity other = (MetaNodeEntity) obj;
+		MetaNodeEntity other = (MetaNodeEntity) objReal;
 		if (codi == null) {
 			if (other.codi != null)
 				return false;

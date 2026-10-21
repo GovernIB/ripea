@@ -416,11 +416,17 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
+		// MetaNodeEntity.equals ja tracta els proxies de Hibernate; aquí cal l'objecte real per comparar-ne
+		// la classe i els camps propis (veure desferProxy).
 		if (!super.equals(obj))
 			return false;
-		if (getClass() != obj.getClass())
+		Object objReal = desferProxy(obj);
+		if (objReal == null)
+			// Proxy sense inicialitzar: super.equals ja n'ha comparat la classe i l'id
+			return true;
+		if (getClass() != objReal.getClass())
 			return false;
-		MetaDocumentEntity other = (MetaDocumentEntity) obj;
+		MetaDocumentEntity other = (MetaDocumentEntity) objReal;
 		if (codi == null) {
 			if (other.codi != null)
 				return false;

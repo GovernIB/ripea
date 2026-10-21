@@ -4,6 +4,8 @@
 package es.caib.ripea.persistence.entity;
 
 import es.caib.ripea.service.intf.config.BaseConfig;
+import org.hibernate.proxy.HibernateProxy;
+import org.hibernate.proxy.LazyInitializer;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.util.ProxyUtils;
 import org.springframework.lang.Nullable;
@@ -91,6 +93,22 @@ public abstract class RipeaPersistable<PK extends Serializable> implements Persi
 		int hashCode = 17;
 		hashCode += null == getId() ? 0 : getId().hashCode() * 31;
 		return hashCode;
+	}
+
+	/**
+	 * Retorna l'objecte real d'un proxy de Hibernate ja inicialitzat, o el mateix objecte si no és un proxy.
+	 * Si és un proxy sense inicialitzar retorna null i no l'inicialitza (pot no haver-hi sessió oberta).
+	 *
+	 * L'han d'emprar els equals que comparen getClass() o accedeixen directament als camps de l'altre objecte:
+	 * un proxy és una subclasse generada, amb els camps sense inicialitzar, i Hibernate el retorna en lloc de
+	 * l'objecte real quan l'entitat ja és a la sessió com a proxy (p.ex. creat per una relació LAZY).
+	 */
+	protected static Object desferProxy(Object obj) {
+		if (obj instanceof HibernateProxy) {
+			LazyInitializer lazyInitializer = ((HibernateProxy) obj).getHibernateLazyInitializer();
+			return lazyInitializer.isUninitialized() ? null : lazyInitializer.getImplementation();
+		}
+		return obj;
 	}
 
 }
