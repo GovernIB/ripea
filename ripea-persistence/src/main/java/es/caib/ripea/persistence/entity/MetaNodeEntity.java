@@ -25,6 +25,9 @@ import java.util.Set;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class MetaNodeEntity extends RipeaAuditable<Long> {
 
+	// Caràcters que es desen de la descripció (la columna és de 4000 bytes i un caràcter UTF-8 n'ocupa fins a 4)
+	public static final int DESCRIPCIO_MAX_LENGTH = 1000;
+
 	@Column(name = "codi", length = 64, nullable = false)
 	protected String codi;
 	@Column(name = "nom", length = 256, nullable = false)
@@ -84,7 +87,7 @@ public abstract class MetaNodeEntity extends RipeaAuditable<Long> {
 			String descripcio) {
 		this.codi = codi;
 		this.nom = nom!=null?nom.trim():null;
-		this.descripcio = StringUtils.abbreviate(descripcio, 1000);
+		this.descripcio = StringUtils.abbreviate(descripcio, DESCRIPCIO_MAX_LENGTH);
 	}
 
 //	public static String truncateToFitUtf8ByteLength(String s, int maxBytes) {

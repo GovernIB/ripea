@@ -24,11 +24,14 @@ import javax.persistence.*;
 @NoArgsConstructor
 public class ContingutLogResourceEntity extends BaseAuditableEntity<ContingutLogResource> {
 
-    @Column(name = "tipus", nullable = false)
+    @Column(name = "tipus", nullable = false, length = 64)
+    @Enumerated(EnumType.STRING)
     private LogTipusEnumDto tipus;
-    @Column(name = "objecte_tipus")
+    @Column(name = "objecte_tipus", length = 64)
+    @Enumerated(EnumType.STRING)
     private LogObjecteTipusEnumDto objecteTipus;
-    @Column(name = "objecte_log_tipus")
+    @Column(name = "objecte_log_tipus", length = 64)
+    @Enumerated(EnumType.STRING)
     private LogTipusEnumDto objecteLogTipus;
     @Column(name = "param1", length = 256)
     private String param1;

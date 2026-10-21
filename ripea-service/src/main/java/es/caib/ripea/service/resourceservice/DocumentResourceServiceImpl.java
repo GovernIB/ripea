@@ -195,7 +195,6 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private final DocumentRepository documentRepository;
     private final EntitatRepository entitatRepository;
     private final InteressatGrupResourceRepository interessatGrupResourceRepository;
-    private final ExecucioMassivaContingutRepository execucioMassivaContingutRepository;
     private final MetaDocumentFluxPortafibRepository metaDocumentFluxPortafibRepository;
 
     @PostConstruct

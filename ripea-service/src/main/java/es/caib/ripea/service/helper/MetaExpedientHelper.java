@@ -1288,6 +1288,20 @@ public class MetaExpedientHelper {
 			List<MetaExpedientEntity> metaExpedients,
 			Locale locale,
 			ProgresActualitzacioDto progresActualitzacioDto) {
+		actualitzarProcediments(entitat, metaExpedients, locale, progresActualitzacioDto, true);
+	}
+
+	/**
+	 * @param registrarHistoric false per al procés en segon pla: només les actualitzacions demanades per un usuari
+	 *                          deixen traça a l'històric d'accions del procediment.
+	 */
+	@Transactional
+	public void actualitzarProcediments(
+			EntitatEntity entitat,
+			List<MetaExpedientEntity> metaExpedients,
+			Locale locale,
+			ProgresActualitzacioDto progresActualitzacioDto,
+			boolean registrarHistoric) {
 
 		ProgresActualitzacioDto progres = null;
 		if (progresActualitzacioDto != null) {
@@ -1359,9 +1373,14 @@ public class MetaExpedientHelper {
 						continue;
 					}
 
+					// Es compara amb la descripció tal com es desaria: si ROLSAC en retorna una de més llarga, la desada
+					// està retallada i sempre semblaria modificada. Oracle desa la cadena buida com a null.
+					String descripcio = StringUtils.abbreviate(
+							StringUtils.defaultIfEmpty(procedimentGga.getResum(), null),
+							MetaNodeEntity.DESCRIPCIO_MAX_LENGTH);
 					ActualitzacioInfo info = infoBuilder.build();
 					info.setNomNou(procedimentGga.getNom());
-					info.setDescripcioNova(procedimentGga.getResum());
+					info.setDescripcioNova(descripcio);
 					info.setComuNou(procedimentGga.isComu());
 					if (!procedimentGga.isComu()) {
 						info.setOrganNou(procedimentGga.getUnitatOrganitzativaCodi());
@@ -1375,7 +1394,6 @@ public class MetaExpedientHelper {
 					}
 
 					String nom = procedimentGga.getNom();
-					String descripcio = procedimentGga.getResum();
 					OrganGestorEntity organGestor;
 					boolean organNoSincronitzat = false;
 
@@ -1399,11 +1417,13 @@ public class MetaExpedientHelper {
 					metaExpedientRepository.flush();
 					progres.addInfo(info, true);
 
-					contingutLogHelper.logProcediment(
-							metaExpedientEntity,
-							LogTipusEnumDto.UPDATE_PROCED_ROLSAC,
-							metaExpedientEntity.getClassificacio(),
-							metaExpedientEntity.getNom());
+					if (registrarHistoric) {
+						contingutLogHelper.logProcediment(
+								metaExpedientEntity,
+								LogTipusEnumDto.UPDATE_PROCED_ROLSAC,
+								metaExpedientEntity.getClassificacio(),
+								metaExpedientEntity.getNom());
+					}
 				}
 
 				modificats++;

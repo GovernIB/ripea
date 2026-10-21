@@ -1,5 +1,6 @@
 package es.caib.ripea.service.intf.dto;
 
+// Es desa pel nom a IPA_CONT_LOG (TIPUS i OBJECTE_LOG_TIPUS): no reanomenar ni eliminar valors amb dades.
 public enum LogTipusEnumDto {
 	CREACIO,
 	CONSULTA,

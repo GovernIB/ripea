@@ -218,7 +218,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 			OrganGestorEntity organGestor,
 			boolean organNoSincronitzat) {
 		this.nom = nom;
-		this.descripcio = StringUtils.abbreviate(descripcio, 1000);
+		this.descripcio = StringUtils.abbreviate(descripcio, DESCRIPCIO_MAX_LENGTH);
 		this.organGestor = organGestor;
 		this.organNoSincronitzat = organNoSincronitzat;
 	}
@@ -270,7 +270,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
             built = new MetaExpedientEntity();
             built.codi = codi;
             built.nom = nom!=null?nom.trim():null;
-            built.descripcio = StringUtils.abbreviate(descripcio, 1000);
+            built.descripcio = StringUtils.abbreviate(descripcio, DESCRIPCIO_MAX_LENGTH);
             built.serieDocumental = serieDocumental;
             built.classificacio = classificacio;
             built.entitat = entitat;

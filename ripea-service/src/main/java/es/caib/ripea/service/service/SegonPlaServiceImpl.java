@@ -504,7 +504,8 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 						entitat,
 						metaExpedientRepository.findByEntitatOrderByNomAsc(entitat),
 						new Locale("ca"),
-						null);
+						null,
+						false);
 			} catch (Exception e) {
 				logger.error("Error al actualitzar procediments en segon pla", e);
 			}

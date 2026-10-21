@@ -59,3 +59,55 @@ databaseChangeLog:
             splitStatements: true
             stripComments: true
             relativeToChangelogFile: true
+  - changeSet:
+      id: RIPEA_1.0.9_CONT_LOG_TIPUS_STRING_1
+      author: limit
+      changes:
+        - sqlFile:
+            dbms: oracle
+            path: ../scripts/oracle/1.0.9/Versio_1.0.9_CONTLOG_1_DDL.sql
+            splitStatements: true
+            stripComments: true
+            relativeToChangelogFile: true
+        - sqlFile:
+            dbms: postgresql
+            path: ../scripts/postgres/1.0.9/Versio_1.0.9_CONTLOG_1_DDL.sql
+            splitStatements: true
+            stripComments: true
+            relativeToChangelogFile: true
+        - sqlFile:
+            dbms: oracle
+            path: ../scripts/oracle/1.0.9/Versio_1.0.9_CONTLOG_2_DML.sql
+            splitStatements: true
+            stripComments: true
+            relativeToChangelogFile: true
+        - sqlFile:
+            dbms: postgresql
+            path: ../scripts/postgres/1.0.9/Versio_1.0.9_CONTLOG_2_DML.sql
+            splitStatements: true
+            stripComments: true
+            relativeToChangelogFile: true
+        - sqlFile:
+            dbms: oracle
+            path: ../scripts/oracle/1.0.9/Versio_1.0.9_CONTLOG_3_DDL.sql
+            splitStatements: true
+            stripComments: true
+            relativeToChangelogFile: true
+        - sqlFile:
+            dbms: postgresql
+            path: ../scripts/postgres/1.0.9/Versio_1.0.9_CONTLOG_3_DDL.sql
+            splitStatements: true
+            stripComments: true
+            relativeToChangelogFile: true
+        - sqlFile:
+            dbms: oracle
+            path: ../scripts/oracle/1.0.9/Versio_1.0.9_CONTLOG_4_DML.sql
+            splitStatements: true
+            stripComments: true
+            relativeToChangelogFile: true
+        - sqlFile:
+            dbms: postgresql
+            path: ../scripts/postgres/1.0.9/Versio_1.0.9_CONTLOG_4_DML.sql
+            splitStatements: true
+            stripComments: true
+            relativeToChangelogFile: true

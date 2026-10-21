@@ -1526,6 +1526,76 @@ class MetaExpedientHelperTest {
         assertThat(progres.getProgres()).isEqualTo(100);
     }
 
+    @Test
+    void actualitzarProcediments_senseRegistrarHistoric_actualitzaPeroNoLogeja() {
+        EntitatEntity entitat = mock(EntitatEntity.class);
+        MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
+        when(entitat.getCodi()).thenReturn("ENT_SEGON_PLA");
+        when(entitat.getId()).thenReturn(ENTITAT_ID);
+        when(entitat.getUnitatArrel()).thenReturn("UNI001");
+
+        when(metaExpedient.getTipusClassificacio()).thenReturn(TipusClassificacioEnumDto.SIA);
+        when(metaExpedient.getClassificacio()).thenReturn("SIA001");
+        when(metaExpedient.getNom()).thenReturn("Nom Antic");
+        when(metaExpedient.getDescripcio()).thenReturn("Desc");
+        when(metaExpedient.isComu()).thenReturn(true);
+
+        ProcedimentDto procedimentWs = new ProcedimentDto();
+        procedimentWs.setNom("Nom Nou");
+        procedimentWs.setResum("Desc");
+        procedimentWs.setComu(true);
+
+        when(pluginHelper.procedimentFindByCodiSia("UNI001", "SIA001")).thenReturn(procedimentWs);
+        when(messageHelper.getMessage(anyString())).thenReturn("");
+        when(messageHelper.getMessage(anyString(), any(Object[].class))).thenReturn("");
+        when(avisRepository.findByEntitatIdAndAssumpte(any(), any())).thenReturn(Collections.emptyList());
+
+        // El procés en segon pla actualitza el procediment però no deixa traça a l'històric
+        helper.actualitzarProcediments(entitat,
+                new ArrayList<>(Collections.singletonList(metaExpedient)),
+                java.util.Locale.getDefault(), new ProgresActualitzacioDto(), false);
+
+        verify(metaExpedient).updateSync("Nom Nou", "Desc", null, false);
+        verify(contingutLogHelper, never()).logProcediment(any(), any(), any(), any());
+    }
+
+    @Test
+    void actualitzarProcediments_ambDescripcioRolsacMesLlargaQueLaDesada_noDetectaCanvi() {
+        EntitatEntity entitat = mock(EntitatEntity.class);
+        MetaExpedientEntity metaExpedient = mock(MetaExpedientEntity.class);
+        when(entitat.getCodi()).thenReturn("ENT_DESC_LLARGA");
+        when(entitat.getId()).thenReturn(ENTITAT_ID);
+        when(entitat.getUnitatArrel()).thenReturn("UNI001");
+
+        // La descripció desada és la de ROLSAC retallada a la mida màxima
+        String descripcioRolsac = org.apache.commons.lang3.StringUtils.repeat("x", 1500);
+        String descripcioDesada = org.apache.commons.lang3.StringUtils.abbreviate(
+                descripcioRolsac,
+                es.caib.ripea.persistence.entity.MetaNodeEntity.DESCRIPCIO_MAX_LENGTH);
+        when(metaExpedient.getTipusClassificacio()).thenReturn(TipusClassificacioEnumDto.SIA);
+        when(metaExpedient.getClassificacio()).thenReturn("SIA001");
+        when(metaExpedient.getNom()).thenReturn("Nom");
+        when(metaExpedient.getDescripcio()).thenReturn(descripcioDesada);
+        when(metaExpedient.isComu()).thenReturn(true);
+
+        ProcedimentDto procedimentWs = new ProcedimentDto();
+        procedimentWs.setNom("Nom");
+        procedimentWs.setResum(descripcioRolsac);
+        procedimentWs.setComu(true);
+
+        when(pluginHelper.procedimentFindByCodiSia("UNI001", "SIA001")).thenReturn(procedimentWs);
+        when(messageHelper.getMessage(anyString())).thenReturn("");
+        when(messageHelper.getMessage(anyString(), any(Object[].class))).thenReturn("");
+        when(avisRepository.findByEntitatIdAndAssumpte(any(), any())).thenReturn(Collections.emptyList());
+
+        helper.actualitzarProcediments(entitat,
+                new ArrayList<>(Collections.singletonList(metaExpedient)),
+                java.util.Locale.getDefault(), new ProgresActualitzacioDto());
+
+        verify(metaExpedient, never()).updateSync(any(), any(), any(), anyBoolean());
+        verify(contingutLogHelper, never()).logProcediment(any(), any(), any(), any());
+    }
+
     // =========================================================================
     // toMetaExpedientDto
     // =========================================================================

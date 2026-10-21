@@ -10,6 +10,7 @@ package es.caib.ripea.service.intf.dto;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+// Es desa pel nom a IPA_CONT_LOG.OBJECTE_TIPUS: no reanomenar ni eliminar valors amb dades.
 public enum LogObjecteTipusEnumDto {
 	//LogContingutTipusEnumDto = expedient
 	CONTINGUT,

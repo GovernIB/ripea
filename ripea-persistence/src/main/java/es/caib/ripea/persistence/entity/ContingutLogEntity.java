@@ -28,7 +28,8 @@ import java.io.Serializable;
 @EntityListeners(AuditingEntityListener.class)
 public class ContingutLogEntity extends RipeaAuditable<Long> {
 
-	@Column(name = "tipus", nullable = false)
+	@Column(name = "tipus", nullable = false, length = 64)
+	@Enumerated(EnumType.STRING)
 	private LogTipusEnumDto tipus; //el tipo de acción sobre el contenido (ej Modificando el expediente)
 	@Column(name = "contingut_id")
 	protected Long contingutId;
@@ -37,9 +38,11 @@ public class ContingutLogEntity extends RipeaAuditable<Long> {
     private LogContingutTipusEnumDto contingutTipus; //indica de qué objeto es el contingutId (CONTINGUT, METANODE, TASCA)
 	@Column(name = "objecte_id", length = 64)
 	private String objecteId;
-	@Column(name = "objecte_tipus")
+	@Column(name = "objecte_tipus", length = 64)
+	@Enumerated(EnumType.STRING)
 	private LogObjecteTipusEnumDto objecteTipus; //objeto que ha generado la creación del log
-	@Column(name = "objecte_log_tipus")
+	@Column(name = "objecte_log_tipus", length = 64)
+	@Enumerated(EnumType.STRING)
 	private LogTipusEnumDto objecteLogTipus; //el tipo de acción sobre el objeto (Ej Creando un interesado)
 	@Column(name = "param1", length = 256)
 	private String param1;
