@@ -532,6 +532,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
             // error del darrer enviament a portafirmes de cada document amb enviaments
             Map<Long, Boolean> errorsDarrerEnviament = new HashMap<>();
             Set<Long> documentsAmbAnnexosAmbError = new HashSet<>();
+            Set<Long> documentsDeAnotacio = new HashSet<>();
             for (List<Long> lot: ListUtils.partition(documentIds, MAX_IDS_CONSULTA)) {
                 for (Object[] fila: documentNotificacioRepository.findDarreraNotificacioByDocumentIds(lot)) {
                     darreresNotificacions.put((Long)fila[0], fila);
@@ -540,6 +541,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                     errorsDarrerEnviament.put((Long)fila[0], (Boolean)fila[1]);
                 }
                 documentsAmbAnnexosAmbError.addAll(registreAnnexResourceRepository.findDocumentIdsAmbAnnexosAmbError(lot));
+                documentsDeAnotacio.addAll(registreAnnexResourceRepository.findDocumentIdsAmbAnnexos(lot));
             }
             Map<String, UsuariResourceEntity> usuaris = findUsuarisAuditoria(entities);
 
@@ -564,6 +566,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 //a la sèrie documental del procediment. Equival a DocumentEntity.isPendentMoverArxiu(),
                 //que és el que fa servir la interfície JSP.
                 resource.setPendentMoverArxiu(documentsAmbAnnexosAmbError.contains(entity.getId()));
+                //Document provinent d'un annex d'anotació: no es pot esborrar. Equival a DocumentDto.documentDeAnotacio del JSP.
+                resource.setDocumentDeAnotacio(documentsDeAnotacio.contains(entity.getId()));
 
                 if (entity.getMetaDocument() != null) {
                     resource.setMetaDocumentInfo(objectMappingHelper.newInstanceMap(

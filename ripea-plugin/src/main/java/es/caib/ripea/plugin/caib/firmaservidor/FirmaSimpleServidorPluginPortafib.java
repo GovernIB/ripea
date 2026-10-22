@@ -123,7 +123,10 @@ public class FirmaSimpleServidorPluginPortafib extends RipeaAbstractPluginProper
 			throw new SistemaExternException("API de firma simple ha tornat status erroni: In PROGRESS ...Unknown Error (???)");
 
 		case FirmaSimpleStatus.STATUS_FINAL_ERROR: // = -1;
-			throw new SistemaExternException("Error durant la realització de les firmes: " + transactionStatus.getErrorMessage() +"\r\n" +transactionStatus.getErrorStackTrace());
+			//L'stacktrace de PortaFIB només va al log: dins el missatge de l'excepció arribava a l'usuari
+			//(missatges de ~20.000 caràcters) i feia fallar el registre al monitor i a IPA_EXCEPCIO_LOG.
+			logger.error("Error durant la realització de les firmes: " + transactionStatus.getErrorMessage() + "\r\n" + transactionStatus.getErrorStackTrace());
+			throw new SistemaExternException("Error durant la realització de les firmes: " + transactionStatus.getErrorMessage());
 
 		case FirmaSimpleStatus.STATUS_CANCELLED: // = -2;
 			throw new SistemaExternException("S'ha cancel·lat el procés de firmat.");

@@ -43,6 +43,14 @@ public class IntegracioHelper {
 	// ja ha retornat i un try/catch intern ja no el veuria.
 	@Lazy @Autowired private IntegracioHelper self;
 
+	/** Longituds de les columnes de IPA_INTEGRACIO_ACCIO. Es retalla també per bytes: amb AL32UTF8 un VARCHAR2
+	 *  no admet més de 4000 bytes i un missatge d'error massa llarg (p.ex. amb l'stacktrace d'un servei extern)
+	 *  feia fallar l'insert (ORA-12899 / ORA-01461) i l'acció no quedava registrada al monitor. */
+	private static final int LONGITUD_DESCRIPCIO = 1024;
+	private static final int LONGITUD_ENDPOINT = 1024;
+	private static final int LONGITUD_ERROR = 2000;
+	private static final int MAX_BYTES_VARCHAR = 4000;
+
 	public static final String INTCODI_USUARIS        = IntegracioCodiEnum.USUARIS.name();
 	public static final String INTCODI_UNITATS        = IntegracioCodiEnum.ORGANISMES.name();
 	public static final String INTCODI_CIUTADA        = IntegracioCodiEnum.CIUTADA.name();
@@ -195,9 +203,9 @@ public class IntegracioHelper {
 			Throwable throwable) {
 		IntegracioResourceEntity entity = buildEntity(integracioCodi, descripcio, endpoint, parametres, tipus, tempsResposta, IntegracioAccioEstatEnumDto.ERROR);
 		if (entity != null) {
-			entity.setErrorDescripcio(errorDescripcio);
+			entity.setErrorDescripcio(Utils.leftBytes(errorDescripcio, LONGITUD_ERROR, MAX_BYTES_VARCHAR));
 			if (throwable != null) {
-				entity.setExcepcioMessage(ExceptionUtils.getMessage(throwable));
+				entity.setExcepcioMessage(Utils.leftBytes(ExceptionUtils.getMessage(throwable), LONGITUD_ERROR, MAX_BYTES_VARCHAR));
 				entity.setExcepcioStacktrace(ExceptionUtils.getStackTrace(throwable));
 			}
 			integracioResourceRepository.save(entity);
@@ -248,8 +256,8 @@ public class IntegracioHelper {
 		IntegracioResourceEntity entity = new IntegracioResourceEntity();
 		entity.setData(new Date());
 		entity.setCodi(codi);
-		entity.setDescripcio(descripcio);
-		entity.setEndpoint(endpoint);
+		entity.setDescripcio(Utils.leftBytes(descripcio, LONGITUD_DESCRIPCIO, MAX_BYTES_VARCHAR));
+		entity.setEndpoint(Utils.leftBytes(endpoint, LONGITUD_ENDPOINT, MAX_BYTES_VARCHAR));
 		entity.setParametres(afegirParametreUsuari(parametres));
 		entity.setTipus(tipus);
 		entity.setTempsResposta(tempsResposta);

@@ -24,8 +24,10 @@ import es.caib.ripea.persistence.repository.ViaFirmaUsuariRepository;
 import es.caib.ripea.plugin.viafirma.ViaFirmaDocument;
 import es.caib.ripea.service.helper.AlertaHelper;
 import es.caib.ripea.service.helper.CacheHelper;
+import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ContingutHelper;
 import es.caib.ripea.service.helper.ContingutLogHelper;
+import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.helper.DocumentHelper;
 import es.caib.ripea.service.helper.EmailHelper;
 import es.caib.ripea.service.helper.IntegracioHelper;
@@ -37,6 +39,7 @@ import es.caib.ripea.service.intf.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ViaFirmaCallbackEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ViaFirmaDispositiuDto;
@@ -60,6 +63,7 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 	@Autowired private EmailHelper emailHelper;
 	@Autowired private OrganGestorHelper organGestorHelper;
 	@Autowired private ContingutHelper contingutHelper;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
 
 	public void viaFirmaEnviar(Long entitatId, Long documentId, ViaFirmaEnviarDto viaFirmaEnviarDto) throws SistemaExternException {
 			
@@ -168,21 +172,19 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 	public Exception viaFirmaProcessar(
 			DocumentViaFirmaEntity documentViaFirma) {
 		DocumentEntity document = documentViaFirma.getDocument();
+		EntitatDto entitat = conversioTipusHelper.convertir(document.getEntitat(), EntitatDto.class);
+		ConfigHelper.setEntitat(entitat);
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(document.getId()));
 		DocumentEstatEnumDto documentEstatAnterior = document.getEstat();
 		ViaFirmaCallbackEstatEnumDto callbackEstat = documentViaFirma.getCallbackEstat();
 		if (ViaFirmaCallbackEstatEnumDto.RESPONSED.equals(callbackEstat)) {
 			cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient().getId());
-			if (documentViaFirma.isFirmaParcial())
-				document.updateEstat(DocumentEstatEnumDto.FIRMA_PARCIAL);
-			else
-				document.updateEstat(DocumentEstatEnumDto.FIRMAT);
-			logFirmat(document);
 
 			ViaFirmaDocument viaFirmaDocument = null;
-			// Descarrega el document firmat del portafirmes
 			try {
 				viaFirmaDocument = pluginHelper.viaFirmaDownload(documentViaFirma);
+				if (viaFirmaDocument == null)
+					throw new RuntimeException("Viafirma no ha retornat el document firmat");
 			} catch (Exception ex) {
 				logger.error("Error al descarregar document de Viafirma (id=" + documentViaFirma.getId() + ")", ex);
 				cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedient());
@@ -194,20 +196,20 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 				return null;
 			}
 			try {
-				// Actualitza la informació de firma a l'arxiu.
-				if (viaFirmaDocument != null) {
-					byte [] contingut = IOUtils.toByteArray((new URL(viaFirmaDocument.getLink())).openStream());
-					documentViaFirma.updateProcessat(true, new Date());
-					List<ArxiuFirmaDto> firmes = pluginHelper.validaSignaturaObtenirFirmes(viaFirmaDocument.getNomFitxer(), contingut, null, "application/pdf", true);
-					document.updateDocumentFirmaTipus(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
-					ArxiuEstatEnumDto arxiuEstat =  documentViaFirma.isFirmaParcial() ? ArxiuEstatEnumDto.ESBORRANY : documentHelper.getArxiuEstat(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA, null, false);
-					contingutHelper.arxiuPropagarModificacio(
-							document,
-							firmes.get(0).getFitxer(),
-							arxiuEstat == ArxiuEstatEnumDto.ESBORRANY ? DocumentFirmaTipusEnumDto.SENSE_FIRMA : DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA,
-							firmes,
-							arxiuEstat);
-				}
+				byte [] contingut = IOUtils.toByteArray((new URL(viaFirmaDocument.getLink())).openStream());
+				List<ArxiuFirmaDto> firmes = pluginHelper.validaSignaturaObtenirFirmes(viaFirmaDocument.getNomFitxer(), contingut, null, "application/pdf", true);
+				// arxiuPropagarModificacio depèn de l'estat FIRMA_PARCIAL
+				document.updateEstat(documentViaFirma.isFirmaParcial() ? DocumentEstatEnumDto.FIRMA_PARCIAL : DocumentEstatEnumDto.FIRMAT);
+				document.updateDocumentFirmaTipus(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
+				ArxiuEstatEnumDto arxiuEstat =  documentViaFirma.isFirmaParcial() ? ArxiuEstatEnumDto.ESBORRANY : documentHelper.getArxiuEstat(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA, null, false);
+				contingutHelper.arxiuPropagarModificacio(
+						document,
+						firmes.get(0).getFitxer(),
+						arxiuEstat == ArxiuEstatEnumDto.ESBORRANY ? DocumentFirmaTipusEnumDto.SENSE_FIRMA : DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA,
+						firmes,
+						arxiuEstat);
+				documentViaFirma.updateProcessat(true, new Date());
+				logFirmat(document);
 			} catch (Exception ex) {
 				logger.error("Error al custodiar document de Viafirma (id=" + documentViaFirma.getId() + ")", ex);
 				cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedient());

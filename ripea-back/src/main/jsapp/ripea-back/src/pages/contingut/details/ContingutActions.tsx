@@ -287,7 +287,8 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             icon: "delete",
             showInMenu: true,
             onClick: eliminar,
-            hidden: (row:any) => !(entity?.potModificarContingut || entity?.potModificar) || !isDocument(row) || (row?.arxiuEstat == 'DEFINITIU' && !user?.sessionScope?.permesEsborrarFinals)
+            // Els documents d'una anotació no es poden esborrar, igual que al JSP (documentDeAnotacio ve de la perspectiva RESUM)
+            hidden: (row:any) => !(entity?.potModificarContingut || entity?.potModificar) || !isDocument(row) || row?.documentDeAnotacio || (row?.arxiuEstat == 'DEFINITIU' && !user?.sessionScope?.permesEsborrarFinals)
         },
         {
             label: <Divider sx={{width: '100%'}} color={"none"}/>,
