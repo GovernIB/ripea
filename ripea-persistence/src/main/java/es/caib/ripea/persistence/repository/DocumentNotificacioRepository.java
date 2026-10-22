@@ -93,31 +93,54 @@ public interface DocumentNotificacioRepository extends JpaRepository<DocumentNot
 			"	dn " +
 			"from " +
 			"    DocumentNotificacioEntity dn " +
-			"    left join dn.documentEnviamentInteressats envInt " +
 			"where " +
 			"    (dn.document.entitat = :entitat) " +
-			"and (:rolActual = 'IPA_ADMIN' or (:esNullMetaExpedientPermesos = true or dn.expedient.metaExpedient.id in (:idMetaExpedientPermesos))) " +
+			// Un enviament es veu si es veu el seu expedient (mateixos permisos que el llistat d'expedients JSP)
+			"and (dn.expedient.esborrat = 0) " +
+			"and (:aplicaPermisos = false or dn.expedient.id in (" + ExpedientRepository.SUBCONSULTA_EXPEDIENTS_PERMESOS + ")) " +
 			"and (:esNullExpedientId = true or dn.expedient.id = :expedientId) " +
 			"and (:esNullDocumentNom = true or lower(dn.document.nom) like lower('%'||:documentNom||'%'))" +
 			"and (:esNullDataEnviamentInici = true or dn.createdDate >= :dataEnviamentInici) " +
 			"and (:esNullDataEnviamentFinal = true or dn.createdDate <= :dataEnviamentFinal) " +
 			"and (:esNullEstatNotificacio = true or dn.notificacioEstat = :estatNotificacio) " +
-			"and (:esNullEstatEnviament = true or envInt.enviamentDatatEstat = :estatEnviament) " +
 			"and (:esNullEnviamentTipus = true or dn.tipus = :enviamentTipus) " +
 			"and (:esNullConcepte = true or lower(dn.assumpte) like lower('%'||:concepte||'%'))" +
-			"and (:esNullInteressat = true " +
-			"		or  envInt.interessat.esRepresentant = false " +
-			"				and (lower(envInt.interessat.documentNum||' '||envInt.interessat.nom||' '||envInt.interessat.llinatge1||' '||envInt.interessat.llinatge2) like lower('%'||:interessat||'%')" +
-			"					or lower(envInt.interessat.raoSocial) like lower('%'||:interessat||'%')" +
-			"					or lower(envInt.interessat.organNom) like lower('%'||:interessat||'%'))) " +
+			// Estat de l'enviament i interessat es comproven sobre la mateixa fila d'enviament-interessat. Amb exists, i no amb
+			// un join, una notificacio amb diversos interessats no surt repetida i les que no en tenen no queden excloses.
+			"and ((:esNullEstatEnviament = true and :esNullInteressat = true) " +
+			"		or exists (select envInt.id from DocumentEnviamentInteressatEntity envInt join envInt.interessat inter " +
+			"			where envInt.notificacio = dn " +
+			"			and (:esNullEstatEnviament = true or envInt.enviamentDatatEstat = :estatEnviament) " +
+			"			and (:esNullInteressat = true " +
+			"				or inter.esRepresentant = false " +
+			"					and (lower(inter.documentNum||' '||inter.nom||' '||inter.llinatge1||' '||inter.llinatge2) like lower('%'||:interessat||'%')" +
+			"						or lower(inter.raoSocial) like lower('%'||:interessat||'%')" +
+			"						or lower(inter.organNom) like lower('%'||:interessat||'%'))))) " +
 			"and (:esNullOrganId = true or dn.expedient.organGestor.id = :organId) " +
 			"and (:esNullProcedimentId = true or dn.expedient.metaExpedient.id = :procedimentId) " +
 			"and (:nomesAmbError = false or dn.error = true) ")
 	public Page<DocumentNotificacioEntity> findAmbFiltrePaginat(
 			@Param("entitat") EntitatEntity entitat,
-			@Param("rolActual") String rolActual,
-			@Param("esNullMetaExpedientPermesos") boolean esNullMetaExpedientPermesos,
-			@Param("idMetaExpedientPermesos") List<Long> idMetaExpedientPermesos,
+			@Param("aplicaPermisos") boolean aplicaPermisos,
+			@Param("esNullIdsMetaExpedientsPermesos") boolean esNullIdsMetaExpedientsPermesos,
+			@Param("idsMetaExpedientsPermesos0") List<Long> idsMetaExpedientsPermesos0,
+			@Param("idsMetaExpedientsPermesos1") List<Long> idsMetaExpedientsPermesos1,
+			@Param("idsMetaExpedientsPermesos2") List<Long> idsMetaExpedientsPermesos2,
+			@Param("idsMetaExpedientsPermesos3") List<Long> idsMetaExpedientsPermesos3,
+			@Param("esNullIdsOrgansPermesos") boolean esNullIdsOrgansPermesos,
+			@Param("idsOrgansPermesos0") List<Long> idsOrgansPermesos0,
+			@Param("idsOrgansPermesos1") List<Long> idsOrgansPermesos1,
+			@Param("idsOrgansPermesos2") List<Long> idsOrgansPermesos2,
+			@Param("idsOrgansPermesos3") List<Long> idsOrgansPermesos3,
+			@Param("esNullIdsMetaExpedientOrganPairsPermesos") boolean esNullIdsMetaExpedientOrganPairsPermesos,
+			@Param("idsMetaExpedientOrganPairsPermesos") List<Long> idsMetaExpedientOrganPairsPermesos,
+			@Param("esNullIdsOrgansAmbProcedimentsComunsPermesos") boolean esNullIdsOrgansAmbProcedimentsComunsPermesos,
+			@Param("idsOrgansAmbProcedimentsComunsPermesos") List<Long> idsOrgansAmbProcedimentsComunsPermesos,
+			@Param("idsProcedimentsComuns") List<Long> idsProcedimentsComuns,
+			@Param("esNullIdsGrupsPermesos") boolean esNullIdsGrupsPermesos,
+			@Param("idsGrupsPermesos") List<Long> idsGrupsPermesos,
+			@Param("isAdmin") boolean isAdmin,
+			@Param("noFiltreGrups") boolean noFiltreGrups,
 			@Param("esNullExpedientId") boolean esNullExpedientId,
 			@Param("expedientId") Long expedientId,
 			@Param("esNullDocumentNom") boolean esNullDocumentNom,
@@ -148,26 +171,53 @@ public interface DocumentNotificacioRepository extends JpaRepository<DocumentNot
 			"	dn.id " +
 			"from " +
 			"    DocumentNotificacioEntity dn " +
-			"    left join dn.documentEnviamentInteressats envInt " +
 			"where " +
 			"    (dn.document.entitat = :entitat) " +
+			// Un enviament es veu si es veu el seu expedient (mateixos permisos que el llistat d'expedients JSP)
+			"and (dn.expedient.esborrat = 0) " +
+			"and (:aplicaPermisos = false or dn.expedient.id in (" + ExpedientRepository.SUBCONSULTA_EXPEDIENTS_PERMESOS + ")) " +
 			"and (:esNullExpedientId = true or dn.expedient.id = :expedientId) " +
 			"and (:esNullDocumentNom = true or lower(dn.document.nom) like lower('%'||:documentNom||'%'))" +
 			"and (:esNullDataEnviamentInici = true or dn.createdDate >= :dataEnviamentInici) " +
 			"and (:esNullDataEnviamentFinal = true or dn.createdDate <= :dataEnviamentFinal) " +
 			"and (:esNullEstatNotificacio = true or dn.notificacioEstat = :estatNotificacio) " +
-			"and (:esNullEstatEnviament = true or envInt.enviamentDatatEstat = :estatEnviament) " +
 			"and (:esNullEnviamentTipus = true or dn.tipus = :enviamentTipus) " +
 			"and (:esNullConcepte = true or lower(dn.assumpte) like lower('%'||:concepte||'%'))" +
-			"and (:esNullInteressat = true " +
-			"		or  envInt.interessat.esRepresentant = false " +
-			"				and (lower(envInt.interessat.documentNum||' '||envInt.interessat.nom||' '||envInt.interessat.llinatge1||' '||envInt.interessat.llinatge2) like lower('%'||:interessat||'%')" +
-			"					or lower(envInt.interessat.raoSocial) like lower('%'||:interessat||'%')" +
-			"					or lower(envInt.interessat.organNom) like lower('%'||:interessat||'%'))) " +
+			// Estat de l'enviament i interessat es comproven sobre la mateixa fila d'enviament-interessat. Amb exists, i no amb
+			// un join, una notificacio amb diversos interessats no surt repetida i les que no en tenen no queden excloses.
+			"and ((:esNullEstatEnviament = true and :esNullInteressat = true) " +
+			"		or exists (select envInt.id from DocumentEnviamentInteressatEntity envInt join envInt.interessat inter " +
+			"			where envInt.notificacio = dn " +
+			"			and (:esNullEstatEnviament = true or envInt.enviamentDatatEstat = :estatEnviament) " +
+			"			and (:esNullInteressat = true " +
+			"				or inter.esRepresentant = false " +
+			"					and (lower(inter.documentNum||' '||inter.nom||' '||inter.llinatge1||' '||inter.llinatge2) like lower('%'||:interessat||'%')" +
+			"						or lower(inter.raoSocial) like lower('%'||:interessat||'%')" +
+			"						or lower(inter.organNom) like lower('%'||:interessat||'%'))))) " +
 			"and (:esNullOrganId = true or dn.expedient.organGestor.id = :organId) " +
 			"and (:esNullProcedimentId = true or dn.expedient.metaExpedient.id = :procedimentId) ")
 	public List<Long> findIdsAmbFiltrePaginat(
 			@Param("entitat") EntitatEntity entitat,
+			@Param("aplicaPermisos") boolean aplicaPermisos,
+			@Param("esNullIdsMetaExpedientsPermesos") boolean esNullIdsMetaExpedientsPermesos,
+			@Param("idsMetaExpedientsPermesos0") List<Long> idsMetaExpedientsPermesos0,
+			@Param("idsMetaExpedientsPermesos1") List<Long> idsMetaExpedientsPermesos1,
+			@Param("idsMetaExpedientsPermesos2") List<Long> idsMetaExpedientsPermesos2,
+			@Param("idsMetaExpedientsPermesos3") List<Long> idsMetaExpedientsPermesos3,
+			@Param("esNullIdsOrgansPermesos") boolean esNullIdsOrgansPermesos,
+			@Param("idsOrgansPermesos0") List<Long> idsOrgansPermesos0,
+			@Param("idsOrgansPermesos1") List<Long> idsOrgansPermesos1,
+			@Param("idsOrgansPermesos2") List<Long> idsOrgansPermesos2,
+			@Param("idsOrgansPermesos3") List<Long> idsOrgansPermesos3,
+			@Param("esNullIdsMetaExpedientOrganPairsPermesos") boolean esNullIdsMetaExpedientOrganPairsPermesos,
+			@Param("idsMetaExpedientOrganPairsPermesos") List<Long> idsMetaExpedientOrganPairsPermesos,
+			@Param("esNullIdsOrgansAmbProcedimentsComunsPermesos") boolean esNullIdsOrgansAmbProcedimentsComunsPermesos,
+			@Param("idsOrgansAmbProcedimentsComunsPermesos") List<Long> idsOrgansAmbProcedimentsComunsPermesos,
+			@Param("idsProcedimentsComuns") List<Long> idsProcedimentsComuns,
+			@Param("esNullIdsGrupsPermesos") boolean esNullIdsGrupsPermesos,
+			@Param("idsGrupsPermesos") List<Long> idsGrupsPermesos,
+			@Param("isAdmin") boolean isAdmin,
+			@Param("noFiltreGrups") boolean noFiltreGrups,
 			@Param("esNullExpedientId") boolean esNullExpedientId,
 			@Param("expedientId") Long expedientId,
 			@Param("esNullDocumentNom") boolean esNullDocumentNom,

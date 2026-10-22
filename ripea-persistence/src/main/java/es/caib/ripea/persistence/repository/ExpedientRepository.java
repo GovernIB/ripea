@@ -29,6 +29,50 @@ import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
 @Component
 public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long> {
 
+	/**
+	 * Subconsulta JPQL amb els ids dels expedients no esborrats de l'entitat que l'usuari pot veure: són els
+	 * mateixos predicats de permisos (5 vies + restriccions A, B i C) que findByEntitatAndPermesosAndFiltre
+	 * (llistat d'expedients JSP), i s'han de mantenir iguals. La fan servir els llistats JSP que pengen d'un
+	 * expedient (seguiment d'enviaments a Portafirmes i NOTIB): un element es veu si es veu el seu expedient.
+	 *
+	 * Paràmetres: entitat, les llistes de PermisosPerExpedientsDto amb els mateixos noms que al llistat
+	 * (idsMetaExpedientsPermesos0..3, idsOrgansPermesos0..3, idsMetaExpedientOrganPairsPermesos,
+	 * idsOrgansAmbProcedimentsComunsPermesos, idsProcedimentsComuns, idsGrupsPermesos i els seus esNull*),
+	 * isAdmin (no aplica la restricció de permís directe) i noFiltreGrups (no aplica la restricció de grups).
+	 */
+	String SUBCONSULTA_EXPEDIENTS_PERMESOS =
+			"select e.id " +
+			"from " +
+			"    ExpedientEntity e " +
+			"    left join e.metaexpedientOrganGestorPares meogp " +
+			"where	e.esborrat = 0 " +
+			"and	e.entitat = :entitat " +
+			"and (" +
+			"     (:esNullIdsMetaExpedientsPermesos = false and (e.metaExpedient.id in (:idsMetaExpedientsPermesos0)" +
+			"			or e.metaExpedient.id in (:idsMetaExpedientsPermesos1)" +
+			"			or e.metaExpedient.id in (:idsMetaExpedientsPermesos2)" +
+			"			or e.metaExpedient.id in (:idsMetaExpedientsPermesos3))) " +
+			"     or (:esNullIdsOrgansPermesos = false and (meogp.organGestor.id in (:idsOrgansPermesos0)" +
+			"			or meogp.organGestor.id in (:idsOrgansPermesos1)" +
+			"			or meogp.organGestor.id in (:idsOrgansPermesos2)" +
+			"			or meogp.organGestor.id in (:idsOrgansPermesos3))) " +
+			"     or (:esNullIdsMetaExpedientOrganPairsPermesos = false and meogp.id in (:idsMetaExpedientOrganPairsPermesos)) " +
+			"     or (:esNullIdsOrgansAmbProcedimentsComunsPermesos = false and meogp.organGestor.id in (:idsOrgansAmbProcedimentsComunsPermesos) and e.metaExpedient.id in (:idsProcedimentsComuns)) " +
+			"     or (:esNullIdsGrupsPermesos = false and e.grup.id in (:idsGrupsPermesos) and e.metaExpedient.permisDirecte = false)) " +
+			"and (:isAdmin = true or e.metaExpedient.permisDirecte = false " +
+			"	or (:esNullIdsMetaExpedientsPermesos = false and ("+
+			"				e.metaExpedient.id in (:idsMetaExpedientsPermesos0)" +
+			"			or	e.metaExpedient.id in (:idsMetaExpedientsPermesos1)" +
+			"			or	e.metaExpedient.id in (:idsMetaExpedientsPermesos2)" +
+			"			or	e.metaExpedient.id in (:idsMetaExpedientsPermesos3)))" +
+			"	or (:esNullIdsMetaExpedientOrganPairsPermesos = false and meogp.id in (:idsMetaExpedientOrganPairsPermesos))) " +
+			"and (:esNullIdsOrgansPermesos = true " +
+			"			or e.organGestor.id in (:idsOrgansPermesos0)" +
+			"			or e.organGestor.id in (:idsOrgansPermesos1)" +
+			"			or e.organGestor.id in (:idsOrgansPermesos2)" +
+			"			or e.organGestor.id in (:idsOrgansPermesos3)) " +
+			"and (:noFiltreGrups = true or (e.grup is null or (:esNullIdsGrupsPermesos = false and e.grup.id in (:idsGrupsPermesos)))) ";
+
 	ExpedientEntity findByMetaExpedientAndPareAndNomAndEsborrat(
 			MetaExpedientEntity metaExpedient,
 			ContingutEntity pare,

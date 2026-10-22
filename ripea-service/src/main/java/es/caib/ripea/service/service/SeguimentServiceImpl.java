@@ -37,6 +37,7 @@ import es.caib.ripea.persistence.repository.MetaExpedientTascaRepository;
 import es.caib.ripea.persistence.repository.command.ExpedientRepositoryCommnand;
 import es.caib.ripea.service.helper.DateHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
+import es.caib.ripea.service.helper.ExpedientHelper;
 import es.caib.ripea.service.helper.ExpedientPeticioHelper;
 import es.caib.ripea.service.helper.MetaExpedientHelper;
 import es.caib.ripea.service.helper.PaginacioHelper;
@@ -49,6 +50,7 @@ import es.caib.ripea.service.intf.dto.ExpedientPeticioFiltreDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioListDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
+import es.caib.ripea.service.intf.dto.PermisosPerExpedientsDto;
 import es.caib.ripea.service.intf.dto.ResultDto;
 import es.caib.ripea.service.intf.dto.ResultEnumDto;
 import es.caib.ripea.service.intf.dto.SeguimentArxiuPendentsDto;
@@ -61,6 +63,7 @@ import es.caib.ripea.service.intf.dto.SeguimentNotificacionsFiltreDto;
 import es.caib.ripea.service.intf.service.SeguimentService;
 import es.caib.ripea.service.intf.utils.DateUtil;
 import es.caib.ripea.service.intf.utils.Utils;
+import es.caib.ripea.service.resourcehelper.ExpedientPermisosFiltreHelper;
 
 @Service
 public class SeguimentServiceImpl implements SeguimentService {
@@ -77,6 +80,8 @@ public class SeguimentServiceImpl implements SeguimentService {
 	@Autowired private InteressatRepository interessatRepository;
 	@Autowired private MetaExpedientHelper metaExpedientHelper;
 	@Autowired private ExpedientPeticioHelper expedientPeticioHelper;
+	@Autowired private ExpedientHelper expedientHelper;
+	@Autowired private ExpedientPermisosFiltreHelper expedientPermisosFiltreHelper;
 	@Autowired private ConsultaPinbalRepository consultaPinbalRepository;
 	@Autowired private MetaExpedientRepository metaExpedientRepository;
     @Autowired private ExpedientRepositoryCommnand expedientRepositoryCommnand;
@@ -89,15 +94,11 @@ public class SeguimentServiceImpl implements SeguimentService {
 			PaginacioParamsDto paginacioParams,
 			String rolActual) {
 		
-		EntitatEntity entitat = null;
-		List<Long> idMetaExpedientPermesos = null;
-
-		if ("tothom".equals(rolActual)) {
-			idMetaExpedientPermesos = metaExpedientHelper.getIdsReadPermesos(entitatId);
-			entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false, false);
-	 	} else {
-			entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
-	 	}
+		// Un enviament es veu si es veu el seu expedient: mateixa comprovació d'entitat i mateixes llistes de permisos
+		// que el llistat d'expedients JSP (ExpedientRepository.SUBCONSULTA_EXPEDIENTS_PERMESOS). Les pantalles de
+		// seguiment només són per a l'administrador d'entitat i l'usuari, que no treballen amb òrgan actual.
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
+		PermisosPerExpedientsDto permisos = expedientHelper.findPermisosPerExpedients(entitatId, rolActual, null);
 		
 		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 		ordenacioMap.put("expedientNom", new String[] { "expedient.nom" });
@@ -110,9 +111,26 @@ public class SeguimentServiceImpl implements SeguimentService {
 
 		Page<DocumentPortafirmesEntity> docsEnvs = documentPortafirmesRepository.findAmbFiltrePaginat(
 				entitat,
-				rolActual,
-				idMetaExpedientPermesos == null || idMetaExpedientPermesos.isEmpty(),
-				idMetaExpedientPermesos,
+				expedientPermisosFiltreHelper.isAplicaVies(rolActual),
+				permisos.getIdsMetaExpedientsPermesos() == null,
+				permisos.getIdsMetaExpedientsPermesos(0),
+				permisos.getIdsMetaExpedientsPermesos(1),
+				permisos.getIdsMetaExpedientsPermesos(2),
+				permisos.getIdsMetaExpedientsPermesos(3),
+				permisos.getIdsOrgansPermesos() == null,
+				permisos.getIdsOrgansPermesos(0),
+				permisos.getIdsOrgansPermesos(1),
+				permisos.getIdsOrgansPermesos(2),
+				permisos.getIdsOrgansPermesos(3),
+				permisos.getIdsMetaExpedientOrganPairsPermesos() == null,
+				permisos.getIdsMetaExpedientOrganPairsPermesos(),
+				permisos.getIdsOrgansAmbProcedimentsComunsPermesos() == null,
+				permisos.getIdsOrgansAmbProcedimentsComunsPermesos(),
+				permisos.getIdsProcedimentsComuns(),
+				permisos.getIdsGrupsPermesos() == null,
+				permisos.getIdsGrupsPermesos(),
+				!expedientPermisosFiltreHelper.isAplicaRestriccioPermisDirecte(rolActual), //isAdmin: no aplica la restricció de permís directe
+				!expedientPermisosFiltreHelper.isAplicaRestriccioGrups(rolActual), //noFiltreGrups
 				filtre.getExpedientNom() == null || filtre.getExpedientNom().isEmpty(),
 				filtre.getExpedientNom() != null ? filtre.getExpedientNom().trim() : "",
 				filtre.getDocumentNom() == null || filtre.getDocumentNom().isEmpty(),
@@ -170,15 +188,11 @@ public class SeguimentServiceImpl implements SeguimentService {
 			ResultEnumDto resultEnum,
 			String rolActual) {
 		
-		EntitatEntity entitat = null;
-		List<Long> idMetaExpedientPermesos = null;
-
-		if ("tothom".equals(rolActual)) {
-			idMetaExpedientPermesos = metaExpedientHelper.getIdsReadPermesos(entitatId);
-			entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false, false);
-	 	} else {
-			entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
-	 	}
+		// Un enviament es veu si es veu el seu expedient: mateixa comprovació d'entitat i mateixes llistes de permisos
+		// que el llistat d'expedients JSP (ExpedientRepository.SUBCONSULTA_EXPEDIENTS_PERMESOS). Les pantalles de
+		// seguiment només són per a l'administrador d'entitat i l'usuari, que no treballen amb òrgan actual.
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
+		PermisosPerExpedientsDto permisos = expedientHelper.findPermisosPerExpedients(entitatId, rolActual, null);
 		
 		ResultDto<SeguimentDto> result = new ResultDto<SeguimentDto>();
 		
@@ -238,9 +252,26 @@ public class SeguimentServiceImpl implements SeguimentService {
 			// ================================  RETURNS PAGE (DATATABLE) ==========================================
 			Page<DocumentNotificacioEntity> docsEnvs = documentNotificacioRepository.findAmbFiltrePaginat(
 					entitat,
-					rolActual,
-					idMetaExpedientPermesos == null || idMetaExpedientPermesos.isEmpty(),
-					idMetaExpedientPermesos,
+					expedientPermisosFiltreHelper.isAplicaVies(rolActual),
+					permisos.getIdsMetaExpedientsPermesos() == null,
+					permisos.getIdsMetaExpedientsPermesos(0),
+					permisos.getIdsMetaExpedientsPermesos(1),
+					permisos.getIdsMetaExpedientsPermesos(2),
+					permisos.getIdsMetaExpedientsPermesos(3),
+					permisos.getIdsOrgansPermesos() == null,
+					permisos.getIdsOrgansPermesos(0),
+					permisos.getIdsOrgansPermesos(1),
+					permisos.getIdsOrgansPermesos(2),
+					permisos.getIdsOrgansPermesos(3),
+					permisos.getIdsMetaExpedientOrganPairsPermesos() == null,
+					permisos.getIdsMetaExpedientOrganPairsPermesos(),
+					permisos.getIdsOrgansAmbProcedimentsComunsPermesos() == null,
+					permisos.getIdsOrgansAmbProcedimentsComunsPermesos(),
+					permisos.getIdsProcedimentsComuns(),
+					permisos.getIdsGrupsPermesos() == null,
+					permisos.getIdsGrupsPermesos(),
+					!expedientPermisosFiltreHelper.isAplicaRestriccioPermisDirecte(rolActual), //isAdmin: no aplica la restricció de permís directe
+					!expedientPermisosFiltreHelper.isAplicaRestriccioGrups(rolActual), //noFiltreGrups
 					filtre.getExpedientId() == null,
 					filtre.getExpedientId(),
 					Utils.isEmpty(filtre.getDocumentNom()),
@@ -276,6 +307,26 @@ public class SeguimentServiceImpl implements SeguimentService {
 			// ==================================  RETURNS IDS (SELECCIONAR TOTS) ============================================
 			List<Long> idsDocsEnvs = documentNotificacioRepository.findIdsAmbFiltrePaginat(
 					entitat,
+					expedientPermisosFiltreHelper.isAplicaVies(rolActual),
+					permisos.getIdsMetaExpedientsPermesos() == null,
+					permisos.getIdsMetaExpedientsPermesos(0),
+					permisos.getIdsMetaExpedientsPermesos(1),
+					permisos.getIdsMetaExpedientsPermesos(2),
+					permisos.getIdsMetaExpedientsPermesos(3),
+					permisos.getIdsOrgansPermesos() == null,
+					permisos.getIdsOrgansPermesos(0),
+					permisos.getIdsOrgansPermesos(1),
+					permisos.getIdsOrgansPermesos(2),
+					permisos.getIdsOrgansPermesos(3),
+					permisos.getIdsMetaExpedientOrganPairsPermesos() == null,
+					permisos.getIdsMetaExpedientOrganPairsPermesos(),
+					permisos.getIdsOrgansAmbProcedimentsComunsPermesos() == null,
+					permisos.getIdsOrgansAmbProcedimentsComunsPermesos(),
+					permisos.getIdsProcedimentsComuns(),
+					permisos.getIdsGrupsPermesos() == null,
+					permisos.getIdsGrupsPermesos(),
+					!expedientPermisosFiltreHelper.isAplicaRestriccioPermisDirecte(rolActual), //isAdmin: no aplica la restricció de permís directe
+					!expedientPermisosFiltreHelper.isAplicaRestriccioGrups(rolActual), //noFiltreGrups
 					filtre.getExpedientId() == null,
 					filtre.getExpedientId(),
 					Utils.isEmpty(filtre.getDocumentNom()),

@@ -9,8 +9,6 @@ import javax.annotation.PostConstruct;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import com.turkraft.springfilter.FilterBuilder;
-import com.turkraft.springfilter.parser.Filter;
 
 import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
@@ -23,19 +21,14 @@ import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.DocumentHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
-import es.caib.ripea.service.helper.MetaExpedientHelper;
+import es.caib.ripea.service.resourcehelper.EnviamentPermisosFiltreHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.dto.PortafirmesDocumentTipusDto;
-import es.caib.ripea.service.intf.model.ContingutResource;
-import es.caib.ripea.service.intf.model.DocumentEnviamentResource;
 import es.caib.ripea.service.intf.model.DocumentPortafirmesResource;
-import es.caib.ripea.service.intf.model.EntitatResource;
-import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.resourceservice.DocumentPortafirmesResourceService;
-import es.caib.ripea.service.intf.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -51,7 +44,7 @@ public class DocumentPortafirmesResourceServiceImpl extends BaseMutableResourceS
 	private final ConfigHelper configHelper;
 	private final EntityComprovarHelper entityComprovarHelper;
 	private final DocumentFirmaPortafirmesHelper firmaPortafirmesHelper;
-	private final MetaExpedientHelper metaExpedientHelper;
+	private final EnviamentPermisosFiltreHelper enviamentPermisosFiltreHelper;
 	
     @PostConstruct
     public void init() {
@@ -61,39 +54,8 @@ public class DocumentPortafirmesResourceServiceImpl extends BaseMutableResourceS
     
     @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
-    	
-    	String entitatActualCodi = configHelper.getEntitatActualCodi();
-    	String rolActual		 = configHelper.getRolActual();
-    	
-    	// L'administrador de lectura veu, com l'administrador, els enviaments de tots els expedients de l'entitat
-    	// (mateix criteri que el llistat d'expedients a ExpedientHelper.findPermisosPerExpedients)
-    	boolean isAdmin = "IPA_ADMIN".equals(rolActual) || "IPA_ADMIN_LECTURA".equals(rolActual);
-    	
-        Filter filtreBase = FilterBuilder.and(
-                (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
-                FilterBuilder.equal(DocumentEnviamentResource.Fields.document + "." + ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
-                		entitatActualCodi != null?entitatActualCodi:"................................................................................"),
-                FilterBuilder.equal(DocumentEnviamentResource.Fields.document + "." + ContingutResource.Fields.esborrat, 0)
-        );
-        
-        Filter filtrePermisos = null;
-        if (!isAdmin) {
-        	EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, true, false, false, false ,false);
-	        List<Long> idMetaExpedientPermesos = metaExpedientHelper.getIdsReadPermesos(entitat.getId());
-	        List<String> permesosClausulesIn = Utils.getIdsEnGruposMil(idMetaExpedientPermesos);
-	        if (permesosClausulesIn!=null) {
-	        	String campProcedimentId = DocumentEnviamentResource.Fields.expedient + "." + ExpedientResource.Fields.metaExpedient +".id";
-		        for (String aux: permesosClausulesIn) {
-			        if (aux != null && !aux.isEmpty()) {
-			        	filtrePermisos = FilterBuilder.or(filtrePermisos, Filter.parse(campProcedimentId+" IN (" + aux + ")"));
-			        }
-		        }
-	        }
-        }
-        
-        Filter filtreResultat = FilterBuilder.and(filtreBase, filtrePermisos);
-        
-        return filtreResultat.generate();
+    	// Un enviament es veu si i només si es veu el seu expedient (mateixos permisos que el llistat d'expedients)
+    	return enviamentPermisosFiltreHelper.generarFiltre(currentSpringFilter, true);
     }
     
     private class PortafibDetallPerspectiveApplicator implements PerspectiveApplicator<DocumentPortafirmesResourceEntity, DocumentPortafirmesResource> {

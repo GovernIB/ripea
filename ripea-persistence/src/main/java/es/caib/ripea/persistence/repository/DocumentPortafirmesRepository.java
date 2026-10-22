@@ -85,7 +85,9 @@ public interface DocumentPortafirmesRepository extends JpaRepository<DocumentPor
 			"    DocumentPortafirmesEntity dp " +
 			"where " +
 			"    (dp.document.entitat = :entitat) " +
-			"and (:rolActual = 'IPA_ADMIN' or (:esNullMetaExpedientPermesos = true or dp.expedient.metaExpedient.id in (:idMetaExpedientPermesos))) " +
+			// Un enviament es veu si es veu el seu expedient (mateixos permisos que el llistat d'expedients JSP)
+			"and (dp.expedient.esborrat = 0) " +
+			"and (:aplicaPermisos = false or dp.expedient.id in (" + ExpedientRepository.SUBCONSULTA_EXPEDIENTS_PERMESOS + ")) " +
 			"and (:esNullExpedientNom = true or lower(dp.expedient.nom) like lower('%'||:expedientNom||'%')) " +
 			"and (:esNullDocumentNom = true or lower(dp.document.nom) like lower('%'||:documentNom||'%'))" +
 			"and (:esNullDataEnviamentInici = true or dp.enviatData >= :dataEnviamentInici) " +
@@ -94,9 +96,26 @@ public interface DocumentPortafirmesRepository extends JpaRepository<DocumentPor
 			"and (dp.document.esborrat=0)")
 	public Page<DocumentPortafirmesEntity> findAmbFiltrePaginat(
 			@Param("entitat") EntitatEntity entitat,
-			@Param("rolActual") String rolActual,
-			@Param("esNullMetaExpedientPermesos") boolean esNullMetaExpedientPermesos,
-			@Param("idMetaExpedientPermesos") List<Long> idMetaExpedientPermesos,
+			@Param("aplicaPermisos") boolean aplicaPermisos,
+			@Param("esNullIdsMetaExpedientsPermesos") boolean esNullIdsMetaExpedientsPermesos,
+			@Param("idsMetaExpedientsPermesos0") List<Long> idsMetaExpedientsPermesos0,
+			@Param("idsMetaExpedientsPermesos1") List<Long> idsMetaExpedientsPermesos1,
+			@Param("idsMetaExpedientsPermesos2") List<Long> idsMetaExpedientsPermesos2,
+			@Param("idsMetaExpedientsPermesos3") List<Long> idsMetaExpedientsPermesos3,
+			@Param("esNullIdsOrgansPermesos") boolean esNullIdsOrgansPermesos,
+			@Param("idsOrgansPermesos0") List<Long> idsOrgansPermesos0,
+			@Param("idsOrgansPermesos1") List<Long> idsOrgansPermesos1,
+			@Param("idsOrgansPermesos2") List<Long> idsOrgansPermesos2,
+			@Param("idsOrgansPermesos3") List<Long> idsOrgansPermesos3,
+			@Param("esNullIdsMetaExpedientOrganPairsPermesos") boolean esNullIdsMetaExpedientOrganPairsPermesos,
+			@Param("idsMetaExpedientOrganPairsPermesos") List<Long> idsMetaExpedientOrganPairsPermesos,
+			@Param("esNullIdsOrgansAmbProcedimentsComunsPermesos") boolean esNullIdsOrgansAmbProcedimentsComunsPermesos,
+			@Param("idsOrgansAmbProcedimentsComunsPermesos") List<Long> idsOrgansAmbProcedimentsComunsPermesos,
+			@Param("idsProcedimentsComuns") List<Long> idsProcedimentsComuns,
+			@Param("esNullIdsGrupsPermesos") boolean esNullIdsGrupsPermesos,
+			@Param("idsGrupsPermesos") List<Long> idsGrupsPermesos,
+			@Param("isAdmin") boolean isAdmin,
+			@Param("noFiltreGrups") boolean noFiltreGrups,
 			@Param("esNullExpedientNom") boolean esNullExpedientNom,
 			@Param("expedientNom") String expedientNom,
 			@Param("esNullDocumentNom") boolean esNullDocumentNom,

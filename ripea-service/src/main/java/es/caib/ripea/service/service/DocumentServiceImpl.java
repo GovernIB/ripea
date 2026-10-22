@@ -1470,6 +1470,15 @@ public class DocumentServiceImpl implements DocumentService {
 	@Transactional
 	public RespostaJustificantEnviamentNotibDto notificacioDescarregarJustificantEnviamentNotib(Long notificacioId) {
 		DocumentNotificacioEntity documentNotificacioEntity = documentNotificacioRepository.getOne(notificacioId);
+		//Abans de demanar el justificant a NOTIB s'ha de comprovar el permís de lectura sobre l'expedient de la notificació
+		entityComprovarHelper.comprovarExpedient(
+				documentNotificacioEntity.getExpedient().getId(),
+				false,
+				true,
+				false,
+				false,
+				false,
+				null);
 		RespostaJustificantEnviamentNotib resposta = pluginHelper.notificacioDescarregarJustificantEnviamentNotib(documentNotificacioEntity.getNotificacioIdentificador());
 		return conversioTipusHelper.convertir(resposta, RespostaJustificantEnviamentNotibDto.class);
 	}

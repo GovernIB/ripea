@@ -11,8 +11,6 @@ import javax.annotation.PostConstruct;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
-import com.turkraft.springfilter.FilterBuilder;
-import com.turkraft.springfilter.parser.Filter;
 
 import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.EntitatEntity;
@@ -27,12 +25,13 @@ import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
 import es.caib.ripea.service.helper.ExecucioMassivaHelper;
 import es.caib.ripea.service.helper.MessageHelper;
-import es.caib.ripea.service.helper.MetaExpedientHelper;
+import es.caib.ripea.service.resourcehelper.EnviamentPermisosFiltreHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
+import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotDeletedException;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.ReportFileType;
@@ -42,12 +41,8 @@ import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
-import es.caib.ripea.service.intf.model.ContingutResource;
-import es.caib.ripea.service.intf.model.DocumentEnviamentResource;
 import es.caib.ripea.service.intf.model.DocumentNotificacioResource;
 import es.caib.ripea.service.intf.model.DocumentNotificacioResource.MassiveAction;
-import es.caib.ripea.service.intf.model.EntitatResource;
-import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.resourceservice.DocumentNotificacioResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
@@ -72,7 +67,7 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
 	private final DocumentNotificacioHelper documentNotificacioHelper;
 	private final ExecucioMassivaHelper execucioMassivaHelper;
 	private final MessageHelper messageHelper;
-	private final MetaExpedientHelper metaExpedientHelper;
+	private final EnviamentPermisosFiltreHelper enviamentPermisosFiltreHelper;
 
 	private final DocumentNotificacioResourceRepository documentNotificacioResourceRepository;
 	
@@ -85,39 +80,8 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
 
     @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
-    	
-    	String entitatActualCodi = configHelper.getEntitatActualCodi();
-    	String rolActual		 = configHelper.getRolActual();
-    	
-    	// L'administrador de lectura veu, com l'administrador, els enviaments de tots els expedients de l'entitat
-    	// (mateix criteri que el llistat d'expedients a ExpedientHelper.findPermisosPerExpedients)
-    	boolean isAdmin = "IPA_ADMIN".equals(rolActual) || "IPA_ADMIN_LECTURA".equals(rolActual);
-    	
-        Filter filtreBase = FilterBuilder.and(
-                (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
-                FilterBuilder.equal(DocumentEnviamentResource.Fields.document + "." + ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi,
-                		entitatActualCodi != null?entitatActualCodi:"................................................................................")
-//              ,Filter.parse("exists(documentInteressats.id is not null)")
-        );
-        
-        Filter filtrePermisos = null;
-        if (!isAdmin) {
-        	EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, true, false, false, false ,false);
-	        List<Long> idMetaExpedientPermesos = metaExpedientHelper.getIdsReadPermesos(entitat.getId());
-	        List<String> permesosClausulesIn = Utils.getIdsEnGruposMil(idMetaExpedientPermesos);
-	        if (permesosClausulesIn!=null) {
-	        	String campProcedimentId = DocumentEnviamentResource.Fields.expedient + "." + ExpedientResource.Fields.metaExpedient +".id";
-		        for (String aux: permesosClausulesIn) {
-			        if (aux != null && !aux.isEmpty()) {
-			        	filtrePermisos = FilterBuilder.or(filtrePermisos, Filter.parse(campProcedimentId+" IN (" + aux + ")"));
-			        }
-		        }
-	        }
-        }
-        
-        Filter filtreResultat = FilterBuilder.and(filtreBase, filtrePermisos);
-        
-        return filtreResultat.generate();
+    	// Un enviament es veu si i només si es veu el seu expedient (mateixos permisos que el llistat d'expedients)
+    	return enviamentPermisosFiltreHelper.generarFiltre(currentSpringFilter, false);
     }    
     
     @Override
@@ -151,6 +115,17 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
     	}
     }
     
+    /**
+     * Notificació per id amb el mateix filtre de permisos que el llistat (additionalSpringFilter): les accions i informes
+     * que reben els ids al cos de la petició no passen per la càrrega amb filtre de base-boot. Si l'usuari no veu
+     * l'expedient de la notificació llança ResourceNotFoundException.
+     * Nota: comprovarDocumentDinsExpedientAccessible no comprova els permisos de lectura/escriptura quan el contingut
+     * és un document (només quan és l'expedient), per això no basta per a aquestes comprovacions.
+     */
+    private DocumentNotificacioResourceEntity getNotificacioAccessible(Long id) throws ResourceNotFoundException {
+        return getEntity(id);
+    }
+
     private class ActualitzarEstatActionExecutor implements ActionExecutor<DocumentNotificacioResourceEntity, MassiveAction, Serializable> {
 
         @Override
@@ -162,7 +137,7 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
 
         			//Comprovam l'accés a totes les notificacions seleccionades abans d'executar res
         			for (Long docId: params.getIds()) {
-        				DocumentNotificacioResourceEntity notificacio = documentNotificacioResourceRepository.findById(docId).get();
+        				DocumentNotificacioResourceEntity notificacio = getNotificacioAccessible(docId);
                     	DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
                     			entitatEntity.getId(),
                     			notificacio.getDocument().getId(),
@@ -223,7 +198,14 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
                 //La generació massiva de justificants de notificacions no esta implementat. No pareix probable que la demanin. Pero ho deixam obert a implementació.
 				throw new ReportGenerationException(getResourceClass(), documentNotificacioId, code, "documentNotificacio.justificant.massive.reject");
 			} else {
-				DocumentNotificacioResourceEntity documentNotificacioResourceEntity = documentNotificacioResourceRepository.findById(documentNotificacioId).get();
+				//L'id de la notificació arriba al cos de la petició (informe sense id): abans de demanar el justificant a NOTIB
+				//s'ha de comprovar que l'usuari veu la notificació (és a dir, el seu expedient).
+				DocumentNotificacioResourceEntity documentNotificacioResourceEntity;
+				try {
+					documentNotificacioResourceEntity = getNotificacioAccessible(documentNotificacioId);
+				} catch (ResourceNotFoundException ex) {
+					throw new ReportGenerationException(getResourceClass(), documentNotificacioId, code, messageHelper.getMessage("documentNotificacio.justificant.reject", new Object[]{ex.getMessage()}));
+				}
 				RespostaJustificantEnviamentNotib resposta = pluginHelper.notificacioDescarregarJustificantEnviamentNotib(documentNotificacioResourceEntity.getNotificacioIdentificador());
 				if (resposta.isError()) {
 					throw new ReportGenerationException(getResourceClass(), documentNotificacioId, code, messageHelper.getMessage("documentNotificacio.justificant.reject", new Object[]{resposta.getErrorDescripcio()}));
@@ -263,7 +245,7 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
 			Long documentNotificacioId = data.get(0)!=null?(Long)data.get(0):null;
 			try {
 				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
-				DocumentNotificacioResourceEntity documentNotificacioResourceEntity = documentNotificacioResourceRepository.findById(documentNotificacioId).get();
+				DocumentNotificacioResourceEntity documentNotificacioResourceEntity = getNotificacioAccessible(documentNotificacioId);
 	        	DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
 	        			entitatEntity.getId(),
 	        			documentNotificacioResourceEntity.getDocument().getId(),

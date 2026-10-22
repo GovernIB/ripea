@@ -8,6 +8,7 @@ import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
 
 import es.caib.ripea.service.intf.dto.PermisosPerExpedientsDto;
+import es.caib.ripea.service.intf.model.DocumentEnviamentResource;
 import es.caib.ripea.service.intf.model.ExpedientResource;
 import es.caib.ripea.service.intf.model.MetaExpedientOrganGestorResource;
 import es.caib.ripea.service.intf.model.MetaExpedientResource;
@@ -24,10 +25,56 @@ import es.caib.ripea.service.intf.utils.Utils;
  * Mapa complet de vies i restriccions: les llistes les calcula ExpedientHelper.findPermisosPerExpedients;
  * una llista null desactiva la seva via (el fragment retorna null).
  *
+ * Cada fragment admet un prefix de camí (p. ex. "expedient.") per aplicar els mateixos permisos des d'un
+ * recurs que penja d'un expedient (enviaments a Portafirmes i NOTIB): l'element es veu si i només si es
+ * veu el seu expedient. Sense prefix el filtre generat és el del llistat d'expedients.
+ *
  * @author Límit Tecnologies
  */
 @Component
 public class ExpedientPermisosFiltreHelper {
+
+	/** Prefix de camí per filtrar recursos que pengen d'un expedient pel camp "expedient". */
+	public static final String PREFIX_EXPEDIENT = DocumentEnviamentResource.Fields.expedient + ".";
+
+	/**
+	 * Sense cap permís per cap via (i el rol n'aplica): el llistat no ha de retornar res. Els cridadors
+	 * ho resolen amb un filtre "id = 0".
+	 */
+	public boolean isCapPermis(PermisosPerExpedientsDto permisosPerExpedients, String rolActual) {
+		return isAplicaVies(rolActual) && permisosPerExpedients.capPermis();
+	}
+
+	/**
+	 * Filtre complet de permisos sobre l'expedient (vies + restriccions A, B i C segons el rol), el mateix que
+	 * aplica el llistat d'expedients REACT. No inclou el filtre d'entitat ni el d'expedients esborrats, ni el
+	 * cas sense cap permís ({@link #isCapPermis}), que resol cada cridador.
+	 *
+	 * @param prefix camí fins a l'expedient des de l'arrel de la consulta ("" per al llistat d'expedients).
+	 */
+	public Filter filtrePermisos(PermisosPerExpedientsDto permisosPerExpedients, String rolActual, String prefix) {
+		Filter filtreVies = null;
+		Filter filtreRestriccioPermisDirecte = null;
+		Filter filtreRestriccioGrups = null;
+		if (isAplicaVies(rolActual)) {
+			filtreVies = filtreVies(permisosPerExpedients, prefix);
+			//RESTRICCIO A: permis directe a procediments (issue #1633)
+			if (isAplicaRestriccioPermisDirecte(rolActual)) {
+				filtreRestriccioPermisDirecte = filtreRestriccioPermisDirecte(permisosPerExpedients, prefix);
+			}
+			//RESTRICCIO C: grups
+			if (isAplicaRestriccioGrups(rolActual)) {
+				filtreRestriccioGrups = filtreRestriccioGrups(permisosPerExpedients, prefix);
+			}
+		}
+		//RESTRICCIO B: organs permesos (nomes si la llista no es null: admin d'organ i dissenyador)
+		Filter filtreRestriccioOrgans = filtreRestriccioOrgans(permisosPerExpedients, prefix);
+		return FilterBuilder.and(
+				filtreVies,
+				filtreRestriccioPermisDirecte,
+				filtreRestriccioOrgans,
+				filtreRestriccioGrups);
+	}
 
 	/** Els administradors d'entitat (i de lectura) veuen tots els expedients de l'entitat: no s'aplica cap via. */
 	public boolean isAplicaVies(String rolActual) {
@@ -46,6 +93,10 @@ public class ExpedientPermisosFiltreHelper {
 
 	/** OR de les 5 vies. */
 	public Filter filtreVies(PermisosPerExpedientsDto permisosPerExpedients) {
+		return filtreVies(permisosPerExpedients, "");
+	}
+
+	public Filter filtreVies(PermisosPerExpedientsDto permisosPerExpedients, String prefix) {
 
 		/**
 	 	"and (" +
@@ -57,18 +108,22 @@ public class ExpedientPermisosFiltreHelper {
 		 */
 
 		return FilterBuilder.or(
-				filtreVia1Procediments(permisosPerExpedients),
-				filtreVia2Organs(permisosPerExpedients),
-				filtreVia3ParellesProcedimentOrgan(permisosPerExpedients),
-				filtreVia4ComunsPerOrgan(permisosPerExpedients),
-				filtreVia5Grups(permisosPerExpedients));
+				filtreVia1Procediments(permisosPerExpedients, prefix),
+				filtreVia2Organs(permisosPerExpedients, prefix),
+				filtreVia3ParellesProcedimentOrgan(permisosPerExpedients, prefix),
+				filtreVia4ComunsPerOrgan(permisosPerExpedients, prefix),
+				filtreVia5Grups(permisosPerExpedients, prefix));
 	}
 
 	/** VIA 1: permís sobre el procediment. */
 	public Filter filtreVia1Procediments(PermisosPerExpedientsDto permisosPerExpedients) {
+		return filtreVia1Procediments(permisosPerExpedients, "");
+	}
+
+	public Filter filtreVia1Procediments(PermisosPerExpedientsDto permisosPerExpedients, String prefix) {
 		/** (:esNullIdsMetaExpedientsPermesos = false and (e.metaExpedient.id in (:idsMetaExpedientsPermesos0))) " */
 		Filter filtreMetaExpedientsPermesos = null;
-		String procedimentId = ExpedientResource.Fields.metaExpedient + ".id";
+		String procedimentId = prefix + ExpedientResource.Fields.metaExpedient + ".id";
 		List<String> permesosClausulesIn = Utils.getIdsEnGruposMil(permisosPerExpedients.getIdsMetaExpedientsPermesos());
 		if (permesosClausulesIn!=null) {
 			for (String aux: permesosClausulesIn) {
@@ -86,6 +141,10 @@ public class ExpedientPermisosFiltreHelper {
 	 * (:esNullIdsOrgansPermesos = false and (e.organGestor.id in (:idsOrgansPermesos0)))
 	 */
 	public Filter filtreVia2Organs(PermisosPerExpedientsDto permisosPerExpedients) {
+		return filtreVia2Organs(permisosPerExpedients, "");
+	}
+
+	public Filter filtreVia2Organs(PermisosPerExpedientsDto permisosPerExpedients, String prefix) {
 		//Organs gestors permesos (nomes admin organ/dissenyador): Organ actual capçalera + fills.
 		//idsOrgansPermesos ja ve expandit amb TOTS els descendents (getIdsOrgansFills, recursiu). Com que
 		//organpare(E) = {organ directe + ancestres}, navegar la col·leccio per veure si un ancestre es permes
@@ -93,16 +152,20 @@ public class ExpedientPermisosFiltreHelper {
 		//quan L es downward-closed. Per tant comprovem l'organ directe (to-one sobre l'arrel), evitant el exists()
 		//correlat: pla set-based, usa l'index IPA_EXPEDIENT_ORGAN_FK_I i es immune a organpare buida (organGestor
 		//es NOT NULL, no navega col·leccio ni descarta files germanes de l'OR).
-		return filtreOrganGestor(permisosPerExpedients);
+		return filtreOrganGestor(permisosPerExpedients, prefix);
 	}
 
 	/** VIA 3: permís sobre la parella procediment-òrgan (només usuaris tothom). */
 	public Filter filtreVia3ParellesProcedimentOrgan(PermisosPerExpedientsDto permisosPerExpedients) {
+		return filtreVia3ParellesProcedimentOrgan(permisosPerExpedients, "");
+	}
+
+	public Filter filtreVia3ParellesProcedimentOrgan(PermisosPerExpedientsDto permisosPerExpedients, String prefix) {
 		//MetaExpedientOrganPairsPermesos (nomes usuaris tothom): ExtendedPermission.READ --> MetaExpedientOrganGestorEntity.class
 		//Permisos que s'han donat sobre procediments comuns, a on es pot seleccionar organ gestor.
 		/** (:esNullIdsMetaExpedientOrganPairsPermesos = false and meogp.id in (:idsMetaExpedientOrganPairsPermesos)) */
 		Filter filtreMetaExpedientOrganPairsPermesos = null;
-		String campMetaExpOrganId = ExpedientResource.Fields.metaexpedientOrganGestorPares + ".id";
+		String campMetaExpOrganId = prefix + ExpedientResource.Fields.metaexpedientOrganGestorPares + ".id";
 		List<String> organsMetaExpClausulesIn = Utils.getIdsEnGruposMil(permisosPerExpedients.getIdsMetaExpedientOrganPairsPermesos());
 		if (organsMetaExpClausulesIn!=null) {
 			for (String aux: organsMetaExpClausulesIn) {
@@ -120,6 +183,10 @@ public class ExpedientPermisosFiltreHelper {
 
 	/** VIA 4: procediments comuns per òrgan (COMU + READ sobre l'òrgan; només usuaris tothom). */
 	public Filter filtreVia4ComunsPerOrgan(PermisosPerExpedientsDto permisosPerExpedients) {
+		return filtreVia4ComunsPerOrgan(permisosPerExpedients, "");
+	}
+
+	public Filter filtreVia4ComunsPerOrgan(PermisosPerExpedientsDto permisosPerExpedients, String prefix) {
 		//OrgansAmbProcedimentsComunsPermesos (nomes usuaris tothom): ExtendedPermission.COMU + ExtendedPermission.READ --> OrganGestorEntity.class
 		//Permisos que s'han donat sobre OrganGestor
 		/** (:esNullIdsOrgansAmbProcedimentsComunsPermesos = false and meogp.organGestor.id in (:idsOrgansAmbProcedimentsComunsPermesos)
@@ -133,7 +200,7 @@ public class ExpedientPermisosFiltreHelper {
 		//AmbOrgansObsolets)- la llista expandida perd l'expedient i el JSP no. Verificat en local: extingint un organ
 		//intermedi amb les dues taules congruents, REACT deixava de mostrar l'expedient i JSP el seguia mostrant.
 		Filter filtreOrgansAmbProcedimentsComunsPermesos = null;
-		String campMetaExpOrganComuId = ExpedientResource.Fields.metaexpedientOrganGestorPares + "." + MetaExpedientOrganGestorResource.Fields.organGestor + ".id";
+		String campMetaExpOrganComuId = prefix + ExpedientResource.Fields.metaexpedientOrganGestorPares + "." + MetaExpedientOrganGestorResource.Fields.organGestor + ".id";
 		List<String> organsMetaExpComunsClausulesIn = Utils.getIdsEnGruposMil(permisosPerExpedients.getIdsOrgansAmbProcedimentsComunsPermesos());
 		if (organsMetaExpComunsClausulesIn!=null) {
 			for (String aux: organsMetaExpComunsClausulesIn) {
@@ -145,7 +212,7 @@ public class ExpedientPermisosFiltreHelper {
 			}
 
 			Filter filtreIdsProcedimentsComuns = null;
-			String campMetaExpId = ExpedientResource.Fields.metaExpedient + ".id";
+			String campMetaExpId = prefix + ExpedientResource.Fields.metaExpedient + ".id";
 			List<String> idsProcedimentsComunsClausulesIn = Utils.getIdsEnGruposMil(permisosPerExpedients.getIdsProcedimentsComuns());
 			if (idsProcedimentsComunsClausulesIn!=null) {
 				for (String aux: idsProcedimentsComunsClausulesIn) {
@@ -176,9 +243,13 @@ public class ExpedientPermisosFiltreHelper {
 	 * l'usuari), validada a més per la restricció de permís directe.
 	 */
 	public Filter filtreVia5Grups(PermisosPerExpedientsDto permisosPerExpedients) {
+		return filtreVia5Grups(permisosPerExpedients, "");
+	}
+
+	public Filter filtreVia5Grups(PermisosPerExpedientsDto permisosPerExpedients, String prefix) {
 		/** (:esNullIdsGrupsPermesos = false and e.grup.id in (:idsGrupsPermesos) and e.metaExpedient.permisDirecte = false) */
 		Filter filtreGrupsAccess = null;
-		String grupAccessId = ExpedientResource.Fields.grup + ".id";
+		String grupAccessId = prefix + ExpedientResource.Fields.grup + ".id";
 		List<String> grupsAccessClausulesIn = Utils.getIdsEnGruposMil(permisosPerExpedients.getIdsGrupsPermesos());
 		if (grupsAccessClausulesIn!=null) {
 			for (String aux: grupsAccessClausulesIn) {
@@ -188,7 +259,7 @@ public class ExpedientPermisosFiltreHelper {
 			}
 		}
 		if (filtreGrupsAccess != null) {
-			String campPermisDirecte = ExpedientResource.Fields.metaExpedient + "." + MetaExpedientResource.Fields.permisDirecte;
+			String campPermisDirecte = prefix + ExpedientResource.Fields.metaExpedient + "." + MetaExpedientResource.Fields.permisDirecte;
 			filtreGrupsAccess = FilterBuilder.and(filtreGrupsAccess, Filter.parse(campPermisDirecte + "!true"));
 		}
 		return filtreGrupsAccess;
@@ -205,8 +276,12 @@ public class ExpedientPermisosFiltreHelper {
 	 * NO es desactiva: nomes passen els procediments sense permisDirecte.
 	 */
 	public Filter filtreRestriccioPermisDirecte(PermisosPerExpedientsDto permisosPerExpedients) {
-		String campPermisDir = ExpedientResource.Fields.metaExpedient + "." + MetaExpedientResource.Fields.permisDirecte;
-		String procedimentId = ExpedientResource.Fields.metaExpedient + ".id";
+		return filtreRestriccioPermisDirecte(permisosPerExpedients, "");
+	}
+
+	public Filter filtreRestriccioPermisDirecte(PermisosPerExpedientsDto permisosPerExpedients, String prefix) {
+		String campPermisDir = prefix + ExpedientResource.Fields.metaExpedient + "." + MetaExpedientResource.Fields.permisDirecte;
+		String procedimentId = prefix + ExpedientResource.Fields.metaExpedient + ".id";
 
 		Filter filtreProcedimentPermisDirecte = Filter.parse(campPermisDir + "!true");
 		Filter filtreProcediments = null;
@@ -221,7 +296,7 @@ public class ExpedientPermisosFiltreHelper {
 
 		//Parelles procediment-organ permeses: compten com a permis directe sobre el procediment.
 		//exists(...) correlat, igual que la VIA 3.
-		String campParellaId = ExpedientResource.Fields.metaexpedientOrganGestorPares + ".id";
+		String campParellaId = prefix + ExpedientResource.Fields.metaexpedientOrganGestorPares + ".id";
 		Filter filtreParelles = null;
 		List<String> parellesClausulesIn = Utils.getIdsEnGruposMil(permisosPerExpedients.getIdsMetaExpedientOrganPairsPermesos());
 		if (parellesClausulesIn!=null) {
@@ -242,7 +317,11 @@ public class ExpedientPermisosFiltreHelper {
 	 * d'òrgans permesos no és null (admin d'òrgan i dissenyador); en aquest cas fa la VIA 2 redundant.
 	 */
 	public Filter filtreRestriccioOrgans(PermisosPerExpedientsDto permisosPerExpedients) {
-		return filtreOrganGestor(permisosPerExpedients);
+		return filtreRestriccioOrgans(permisosPerExpedients, "");
+	}
+
+	public Filter filtreRestriccioOrgans(PermisosPerExpedientsDto permisosPerExpedients, String prefix) {
+		return filtreOrganGestor(permisosPerExpedients, prefix);
 	}
 
 	/**
@@ -251,8 +330,13 @@ public class ExpedientPermisosFiltreHelper {
 	 * (:noFiltreGrups = true or (e.grup is null or (:esNullIdsGrupsPermesos = false and e.grup.id in (:idsGrupsPermesos))))
 	 */
 	public Filter filtreRestriccioGrups(PermisosPerExpedientsDto permisosPerExpedients) {
+		return filtreRestriccioGrups(permisosPerExpedients, "");
+	}
+
+	public Filter filtreRestriccioGrups(PermisosPerExpedientsDto permisosPerExpedients, String prefix) {
 		Filter filtreGrupsPermesos = null;
-		String grupId = ExpedientResource.Fields.grup + ".id";
+		String grupNull = prefix + ExpedientResource.Fields.grup + " IS NULL";
+		String grupId = prefix + ExpedientResource.Fields.grup + ".id";
 		List<String> grupsClausulesIn = Utils.getIdsEnGruposMil(permisosPerExpedients.getIdsGrupsPermesos());
 		if (grupsClausulesIn!=null && grupsClausulesIn.size()>0) {
 			for (String aux: grupsClausulesIn) {
@@ -260,17 +344,17 @@ public class ExpedientPermisosFiltreHelper {
 					filtreGrupsPermesos = FilterBuilder.or(filtreGrupsPermesos, Filter.parse(grupId + " IN (" + aux + ")"));
 				}
 			}
-			filtreGrupsPermesos = FilterBuilder.or(Filter.parse(ExpedientResource.Fields.grup + " IS NULL"), filtreGrupsPermesos);
+			filtreGrupsPermesos = FilterBuilder.or(Filter.parse(grupNull), filtreGrupsPermesos);
 		} else {
-			filtreGrupsPermesos = Filter.parse(ExpedientResource.Fields.grup + " IS NULL");
+			filtreGrupsPermesos = Filter.parse(grupNull);
 		}
 		return filtreGrupsPermesos;
 	}
 
 	/** organGestor.id IN (idsOrgansPermesos): compartit per la VIA 2 i la RESTRICCIÓ B. */
-	private Filter filtreOrganGestor(PermisosPerExpedientsDto permisosPerExpedients) {
+	private Filter filtreOrganGestor(PermisosPerExpedientsDto permisosPerExpedients, String prefix) {
 		Filter filtreOrgansPermesos = null;
-		String campOrganId = ExpedientResource.Fields.organGestor + ".id";
+		String campOrganId = prefix + ExpedientResource.Fields.organGestor + ".id";
 		List<String> organsClausulesIn = Utils.getIdsEnGruposMil(permisosPerExpedients.getIdsOrgansPermesos());
 		if (organsClausulesIn!=null) {
 			for (String aux: organsClausulesIn) {

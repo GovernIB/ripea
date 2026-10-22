@@ -508,50 +508,25 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         		}
         	}
     		
-			Filter filtrePermisosVaris = null;
-			Filter filtreProcedimentsDirectes = null;
-			Filter filtreGrupsPermesos = null;
-			Filter filtreOrgansPermesos = null;
-           
             OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitatEntity.getId(), organActualCodi);
-			
+
     		PermisosPerExpedientsDto permisosPerExpedients = expedientHelper.findPermisosPerExpedients(
     				entitatEntity.getId(),
     				rolActual,
     				ogEntity!=null?ogEntity.getId():null);
-			
-			if (expedientPermisosFiltreHelper.isAplicaVies(rolActual)) {
 
-	    		//Si no es té permis per cap banda, no retornam resultats
-	    		if (permisosPerExpedients.capPermis()) {
-	    			return FilterBuilder.equal("id", 0).generate();
-	    		}
+    		//Si no es té permis per cap banda, no retornam resultats
+    		if (expedientPermisosFiltreHelper.isCapPermis(permisosPerExpedients, rolActual)) {
+    			return FilterBuilder.equal("id", 0).generate();
+    		}
 
-				//Les vies (OR que concedeixen) i les restriccions (AND que retallen) es defineixen a
-				//ExpedientPermisosFiltreHelper, compartit amb el simulador de permisos del superusuari.
-				filtrePermisosVaris = expedientPermisosFiltreHelper.filtreVies(permisosPerExpedients);
-
-				//RESTRICCIO A: permis directe a procediments (issue #1633)
-				if (expedientPermisosFiltreHelper.isAplicaRestriccioPermisDirecte(rolActual)) {
-					filtreProcedimentsDirectes = expedientPermisosFiltreHelper.filtreRestriccioPermisDirecte(permisosPerExpedients);
-				}
-
-				//RESTRICCIO C: grups
-				if (expedientPermisosFiltreHelper.isAplicaRestriccioGrups(rolActual)) {
-					filtreGrupsPermesos = expedientPermisosFiltreHelper.filtreRestriccioGrups(permisosPerExpedients);
-				}
-			}
-
-			//RESTRICCIO B: organs permesos (nomes si la llista no es null: admin d'organ i dissenyador)
-			filtreOrgansPermesos = expedientPermisosFiltreHelper.filtreRestriccioOrgans(permisosPerExpedients);
-
+			//Les vies (OR que concedeixen) i les restriccions (AND que retallen) es defineixen a
+			//ExpedientPermisosFiltreHelper, compartit amb el simulador de permisos del superusuari i
+			//amb els llistats d'enviaments (Portafirmes i NOTIB), que el reutilitzen amb prefix "expedient.".
 			Filter filtreResultat = FilterBuilder.and(
 					filtreFrontAndEntitat,
 					filtreNoEliminats,
-					filtrePermisosVaris,
-					filtreProcedimentsDirectes,
-					filtreOrgansPermesos,
-					filtreGrupsPermesos);
+					expedientPermisosFiltreHelper.filtrePermisos(permisosPerExpedients, rolActual, ""));
 			
 			return filtreResultat.generate();
         
