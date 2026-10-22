@@ -33,6 +33,9 @@ public class ExcepcioLogHelper {
 	private static final int LONGITUD_URI = 1024;
 	private static final int LONGITUD_PARAM = 512;
 	private static final int LONGITUD_MESSAGE = 4000;
+	/** Amb AL32UTF8 un VARCHAR2 no admet més de 4000 bytes encara que la columna sigui de 4000 CHAR:
+	 *  retallar només per caràcters no basta si el missatge té accents (ORA-01461). */
+	private static final int MAX_BYTES_VARCHAR = 4000;
 
 	private final ExcepcioLogResourceRepository excepcioLogResourceRepository;
 
@@ -72,7 +75,7 @@ public class ExcepcioLogHelper {
 		ThreadLocal<EntitatDto> entitatActual = ConfigHelper.getEntitat();
 		newExcepcioLog.setEntitatId((entitatActual!=null && entitatActual.get()!=null)?entitatActual.get().getId():null);
 		newExcepcioLog.setTipus(Utils.left(exception.getClass().getName(), LONGITUD_TIPUS));
-		newExcepcioLog.setMessage(Utils.left(exception.getMessage(), LONGITUD_MESSAGE));
+		newExcepcioLog.setMessage(Utils.leftBytes(exception.getMessage(), LONGITUD_MESSAGE, MAX_BYTES_VARCHAR));
 		newExcepcioLog.setStacktrace(ExceptionUtils.getStackTrace(exception));
 		if (param1 != null) newExcepcioLog.setParam1(Utils.left(param1, LONGITUD_PARAM));
 		if (param2 != null) newExcepcioLog.setParam2(Utils.left(param2, LONGITUD_PARAM));

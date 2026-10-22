@@ -1423,6 +1423,15 @@ public class ContingutHelper {
 					"Aquest contingut ja està esborrat");
 		}
 
+		// Els documents provinents d'una anotació no es poden esborrar (el JSP ja no ofereix l'acció):
+		// si n'hi ha cap d'esborrat, el tancament de l'expedient falla a deleteDocumentsNotSelectedDB.
+		if (contingut instanceof DocumentEntity && ((DocumentEntity) contingut).getAnnexAnotacioId() != null) {
+			throw new ValidationException(
+					contingut.getId(),
+					ContingutEntity.class,
+					"No es pot esborrar un document provinent d'una anotació");
+		}
+
 		// Actualitza camp registres importats per no deixar informació inconsistent durant la cerca per número de registre
 		ExpedientEntity expedientPare = contingut.getExpedientPare();
 		if (contingut.getNumeroRegistre() != null && expedientPare != null && expedientPare.getRegistresImportats() != null) { // Importat

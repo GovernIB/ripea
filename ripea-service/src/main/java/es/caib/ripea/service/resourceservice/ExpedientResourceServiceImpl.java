@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.Hibernate;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -119,6 +120,7 @@ import es.caib.ripea.service.intf.dto.ResultatConsultaDto;
 import es.caib.ripea.service.intf.dto.SiNoEnumDto;
 import es.caib.ripea.service.intf.dto.TipusRegistreEnumDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.exception.FirmaServidorException;
 import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
@@ -1483,7 +1485,15 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 				// El missatge es calcula abans de res: qualsevol fallada registrant l'excepció no ha de
 				// substituir l'error original, o l'usuari es queda sense cap informació del que ha passat.
 				String ids = Utils.getIdsSeparatsComa(params.getIds());
-				String missatge = messageHelper.getMessage("expedient.tancar.reject", new Object[]{e.getMessage()});
+				String missatge;
+				int indexFirmaServidor = ExceptionUtils.indexOfThrowable(e, FirmaServidorException.class);
+				if (indexFirmaServidor >= 0) {
+					//Mateix missatge que el JSP: document que no s'ha pogut firmar en servidor i la causa
+					FirmaServidorException fe = (FirmaServidorException) ExceptionUtils.getThrowableList(e).get(indexFirmaServidor);
+					missatge = messageHelper.getMessage("expedient.controller.tancar.error", new Object[]{fe.getDocumentNom(), fe.getErrorMsg()});
+				} else {
+					missatge = messageHelper.getMessage("expedient.tancar.reject", new Object[]{e.getMessage()});
+				}
 				try {
 					excepcioLogHelper.addExcepcio(
 							"/expedient/TancarActionExecutor", e,

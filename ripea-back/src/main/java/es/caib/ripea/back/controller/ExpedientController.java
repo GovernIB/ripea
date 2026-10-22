@@ -1418,7 +1418,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 						request,
 						"redirect:../../contingut/" + expedientId,
 						"expedient.controller.tancar.error",
-						new Object[] {fe.getDocumentNom()},
+						new Object[] {fe.getDocumentNom(), fe.getErrorMsg()},
 						ex);
 			} else if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex,	ValidationException.class)) {
 				omplirModelTancarExpedient(expedientId, request, model);

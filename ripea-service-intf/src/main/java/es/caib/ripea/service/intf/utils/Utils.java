@@ -90,7 +90,39 @@ public class Utils {
 	public static String left(String value, int maxLength) {
 		return StringUtils.left(value, maxLength);
 	}
-	
+
+	/**
+	 * <p>Retalla un string als primers <code>maxLength</code> caràcters i, a més, perquè no superi
+	 * <code>maxBytes</code> bytes en UTF-8, sense partir cap caràcter.</p>
+	 *
+	 * <p>Cal fer-lo servir per desar a columnes VARCHAR2 d'Oracle: amb AL32UTF8 una columna
+	 * VARCHAR2(n CHAR) no admet mai més de 4000 bytes, i els caràcters accentuats n'ocupen 2.
+	 * Retallar només per caràcters dona ORA-12899 o ORA-01461.</p>
+	 *
+	 * @param value  the String to truncate, may be null
+	 * @param maxLength  the maximum length of the result in characters
+	 * @param maxBytes  the maximum length of the result in UTF-8 bytes
+	 * @return the leftmost characters, <code>null</code> if null input
+	 */
+	public static String leftBytes(String value, int maxLength, int maxBytes) {
+		String retallat = StringUtils.left(value, maxLength);
+		if (retallat == null || retallat.getBytes(StandardCharsets.UTF_8).length <= maxBytes) {
+			return retallat;
+		}
+		int bytes = 0;
+		int index = 0;
+		while (index < retallat.length()) {
+			int codePoint = retallat.codePointAt(index);
+			int bytesCodePoint = new String(Character.toChars(codePoint)).getBytes(StandardCharsets.UTF_8).length;
+			if (bytes + bytesCodePoint > maxBytes) {
+				break;
+			}
+			bytes += bytesCodePoint;
+			index += Character.charCount(codePoint);
+		}
+		return retallat.substring(0, index);
+	}
+
 	public static boolean isNotNullAndEquals(String object1, String object2) {
 		return object1 != null && object2 != null && object1.equals(object2);
 	}

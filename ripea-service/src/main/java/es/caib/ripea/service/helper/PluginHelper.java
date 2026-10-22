@@ -4935,8 +4935,11 @@ public class PluginHelper {
 						System.currentTimeMillis() - t0);				
 				applicationHelper.stopTimer(sample, "METRICS@Integracions.validaFirma", "resultado", "exito", "endpoint", Utils.hasValue(validaSignaturaPlugin.getEndpoint())?validaSignaturaPlugin.getEndpoint():"N/A");
 				return new SignatureInfoDto(false, false, null);
-			} else if (throwable.getMessage().contains("InvalidNotSignerCertificate") && isFitxerSignedSenseExcepcio(documentContingut, firmaContentType)) {
+			} else if ((throwable.getMessage().contains("(VALIDATION)") || throwable.getMessage().contains("InvalidNotSignerCertificate"))
+					&& isFitxerSignedSenseExcepcio(documentContingut, firmaContentType)) {
 				//Hi ha validadors que retornen la firma invàlida com a excepció en lloc de com a status SIGNATURE_INVALID (-2).
+				//@firma marca amb "(VALIDATION)" els errors en validar un diccionari de firma concret (p.ex. InvalidNotSignerCertificate
+				//o "error accediendo a la revisión del diccionario [SignatureN]"); PortaFIB fallaria igual en firmar sense eliminar-les.
 				//Només es tracta com a firma invàlida si el fitxer realment conté firmes, igual que el cas del status.
 				integracioHelper.addAccioOk(
 						IntegracioHelper.INTCODI_VALIDASIG,
