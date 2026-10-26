@@ -261,6 +261,7 @@ public class PropertyConfig {
 	public static final String CONVERSIO_DEFINITIU	 								= "es.caib.ripea.conversio.definitiu";
 	public static final String CONVERSIO_DEFINITIU_PROPAGAR_ARXIU					= "es.caib.ripea.conversio.definitiu.propagar.arxiu";
 	public static final String PROPAGAR_RELACIO_EXPEDIENTS							= "es.caib.ripea.propagar.relacio.expedients";
+	public static final String RELACIONAR_EXPEDIENTS_TANCATS						= "es.caib.ripea.relacionar.expedients.tancats";
 	public static final String GUARDAR_CERTIFICACIO_EXPEDIENT						= "es.caib.ripea.notificacio.guardar.certificacio.expedient";
 	public static final String CARPETES_PER_DEFECTE									= "es.caib.ripea.carpetes.defecte";
 	public static final String INCORPORAR_JUSTIFICANT								= "es.caib.ripea.incorporar.justificant";

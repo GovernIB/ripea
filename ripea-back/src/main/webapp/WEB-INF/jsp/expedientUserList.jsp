@@ -732,6 +732,7 @@ function removeCookie(cname) {
 				</c:if>
 				<th data-col-name="rolActualAdminEntitatOAdminOrgan" data-visible="false"></th>
 				<th data-col-name="potModificar" data-visible="false"></th>
+				<th data-col-name="potRelacionar" data-visible="false"></th>
 				<th data-col-name="rolActualPermisPerModificarExpedient" data-visible="false"></th>
 				<th data-col-name="expedientAgafatPerUsuariActual" data-visible="false"></th>
 				<th data-col-name="potTancar" data-visible="false"></th>
@@ -857,8 +858,12 @@ function removeCookie(cname) {
 								 	{{if estat == 'OBERT'}}
 										<li><a href="<c:url value="/expedient/{{:id}}/canviarEstat"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.canviarEstat"/>...</a></li>
 									{{/if}}
+								{{/if}}
+								{{if potRelacionar}}
 									<%---- Relacionar... ----%>
 									<li><a href="<c:url value="/expedient/{{:id}}/relacionarList"/>" data-toggle="modal" data-refresh-pagina="true" data-maximized="true"><span class="fa fa-link"></span>&nbsp;<spring:message code="comu.boto.relacionar"/>...</a></li>
+								{{/if}}
+								{{if potModificar}}
 								 	<%---- Tancar... ----%>
 									{{if estat == 'OBERT'}}
 										{{if potTancar}}

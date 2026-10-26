@@ -652,6 +652,8 @@ public class ContingutHelper {
 		dto.setDataDarrerEnviament(cacheHelper.getDataDarrerEnviament(expedient));
 		dto.setRolActualAdminEntitatOAdminOrgan(entityComprovarHelper.comprovarRolActualAdminEntitatOAdminOrganDelExpedient(expedient, rolActual));
 		dto.setPotModificar(entityComprovarHelper.comprovarSiEsPotModificarExpedient(expedient));
+		boolean potRelacionarTancat = entityComprovarHelper.comprovarSiEsPotRelacionarExpedientTancat(expedient);
+		dto.setPotRelacionar(dto.isPotModificar() || potRelacionarTancat);
 		dto.setExpedientAgafatPerUsuariActual(entityComprovarHelper.comprovarSiExpedientAgafatPerUsuariActual(expedient));
 		dto.setRolActualPermisPerModificarExpedient(entityComprovarHelper.comprovarSiRolTePermisPerModificarExpedient(expedient, rolActual));
 		dto.setPotReobrir(entityComprovarHelper.comprovarSiEsPotReobrirExpedient(expedient));

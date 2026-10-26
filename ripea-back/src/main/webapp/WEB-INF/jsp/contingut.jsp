@@ -44,6 +44,9 @@ pageContext.setAttribute("isRolActualAdministradorLectura", es.caib.ripea.back.h
 		<c:otherwise>false</c:otherwise>
 	</c:choose>
 </c:set>
+<c:set var="usuariPotGestionar" value="${(expedientAgafatPerUsuariActual and permissionWrite) or contingut.admin}"/>
+<c:set var="potRelacionarTancat" value="${expedientTancat and isRelacionarTancatsActiu and usuariPotGestionar and !isRolActualAdministradorLectura and !isExpedientPendentExecucioMassiva}"/>
+<c:set var="potRelacionar" scope="request" value="${potModificar or potRelacionarTancat}"/>
 
 
 <c:set var="htmlIconaCarpeta6em"><span class="fa-stack" style="font-size:.6em"><i class="fa fa-folder fa-stack-2x"></i><i class="fa fa-clock-o fa-stack-1x fa-inverse"></i></span></c:set>

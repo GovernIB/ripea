@@ -51,7 +51,7 @@ const ExpedientsRelacionats = (props:any) => {
                             <Link sx={{ fontSize: "0.9rem", color: (theme) => (theme.palette.mode === 'dark' ? 'primary.light' : 'primary.main') }} href={`./${relacionat?.id}`}>{relacionat?.nom}</Link>
                         </Grid>
                         <Grid size={1}>
-                            {expedient?.potModificar &&
+                            {expedient?.potRelacionar &&
                                 <IconButton
                                     onClick={()=>eliminarRelacio(expedient?.id, expedient, relacionat?.id)}
                                     title={t('page.expedient.action.eliminarRelacio.label')}

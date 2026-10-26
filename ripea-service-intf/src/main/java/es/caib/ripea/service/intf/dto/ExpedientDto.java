@@ -64,6 +64,7 @@ public class ExpedientDto extends NodeDto {
 	private boolean rolActualAdminEntitatOAdminOrgan;
 	private boolean rolActualPermisPerModificarExpedient;
 	private boolean potModificar;
+	private boolean potRelacionar;
 	private boolean expedientAgafatPerUsuariActual;
 	private boolean potReobrir;
 	private PrioritatEnumDto prioritat;

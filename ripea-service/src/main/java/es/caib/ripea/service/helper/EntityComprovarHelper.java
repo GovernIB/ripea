@@ -835,6 +835,20 @@ public class EntityComprovarHelper {
 
 	
 	public boolean comprovarSiEsPotModificarExpedient(ExpedientEntity expedient) {
+		boolean expedientObert = ExpedientEstatEnumDto.OBERT.equals(expedient.getEstat());
+		return comprovarSiEsPotModificarExpedient(expedient, expedientObert);
+	}
+
+	public boolean comprovarSiEsPotRelacionarExpedientTancat(ExpedientEntity expedient) {
+		boolean expedientTancat = ExpedientEstatEnumDto.TANCAT.equals(expedient.getEstat());
+		boolean isRelacionarTancatsActiu = configHelper.getAsBoolean(PropertyConfig.RELACIONAR_EXPEDIENTS_TANCATS);
+		if (!expedientTancat || !isRelacionarTancatsActiu) {
+			return false;
+		}
+		return comprovarSiEsPotModificarExpedient(expedient, true);
+	}
+
+	private boolean comprovarSiEsPotModificarExpedient(ExpedientEntity expedient, boolean estatPermes) {
 
 		boolean expedientAgafatPerUsuariActual = comprovarSiExpedientAgafatPerUsuariActual(expedient);
 
@@ -852,7 +866,7 @@ public class EntityComprovarHelper {
 		//((expedientAgafatPerUsuariActual and permissionWrite) or isTascaObert or contingut.admin) and expedientObert and !isRolActualAdministradorLectura and !isExpedientPendentExecucioMassiva
 		
 		if (((expedientAgafatPerUsuariActual && usuariActualWrite) || permisosAdminEntitatOAdminOrgan) 
-				&& ExpedientEstatEnumDto.OBERT.equals(expedient.getEstat()) && !"IPA_ADMIN_LECTURA".equals(rolActual) &&  !isExpedientPendentExecucioMassiva) {
+				&& estatPermes && !"IPA_ADMIN_LECTURA".equals(rolActual) &&  !isExpedientPendentExecucioMassiva) {
 			return true;
 		} else {
 			return false;

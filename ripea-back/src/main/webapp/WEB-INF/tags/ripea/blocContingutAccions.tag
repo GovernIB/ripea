@@ -350,6 +350,10 @@
 					</li>
 				</c:if>
 			</c:if>
+			<c:if test="${(potModificar || potRelacionar) && contingut.expedient && !isTasca}">
+				<%---- Relacionar... ----%>
+				<li><a href="<c:url value="/expedient/${contingut.id}/relacionarList"/>" data-toggle="modal" data-refresh-pagina="true" data-maximized="true"><span class="fa fa-link"></span>&nbsp;<spring:message code="comu.boto.relacionar"/>...</a></li>
+			</c:if>
 			<c:if test="${potModificar || (contingut.carpeta && isCreacioCarpetesActiva)}">
 				<c:if test="${contingut.expedient and !isTasca}">
 					<%---- Canviar prioritat... ----%>
@@ -358,8 +362,6 @@
 					<c:if test="${contingut.estat == 'OBERT'}">
 						<li><a href="<c:url value="/expedient/${contingut.id}/canviarEstat"/>" data-toggle="modal" data-refresh-pagina="true" data-maximized="true"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.canviarEstat"/>...</a></li>
 					</c:if>
-					<%---- Relacionar... ----%>
-					<li><a href="<c:url value="/expedient/${contingut.id}/relacionarList"/>" data-toggle="modal" data-refresh-pagina="true" data-maximized="true"><span class="fa fa-link"></span>&nbsp;<spring:message code="comu.boto.relacionar"/>...</a></li>
 					<%---- Tancar... ----%>
 					<c:if test="${contingut.estat == 'OBERT'}">
 							<c:choose>

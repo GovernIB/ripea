@@ -485,6 +485,10 @@ public class ExpedientHelper {
 				false,
 				false,
 				rolActual);
+		boolean relacioPermesa = isRelacioPermesa(expedient.getEstat());
+		if (!relacioPermesa) {
+			throw new ValidationException(id, ExpedientEntity.class, "No es permet relacionar expedients tancats");
+		}
 		ExpedientEntity toRelate = entityComprovarHelper.comprovarExpedient(
 				relacionatId,
 				false,
@@ -509,11 +513,17 @@ public class ExpedientHelper {
 		logRelacionarExpedients(expedient, relacionatId, LogTipusEnumDto.CREACIO);
 
 		boolean isPropagarRelacioActiva = configHelper.getAsBoolean(PropertyConfig.PROPAGAR_RELACIO_EXPEDIENTS);
-		if (isPropagarRelacioActiva && toRelate.getTancatData() == null) {
+		if (isPropagarRelacioActiva) {
 			pluginHelper.arxiuExpedientEnllacar(
 					expedient,
 					toRelate);
 		}
+	}
+
+	public boolean isRelacioPermesa(ExpedientEstatEnumDto estat) {
+		boolean expedientTancat = ExpedientEstatEnumDto.TANCAT.equals(estat);
+		boolean isRelacionarTancatsActiu = configHelper.getAsBoolean(PropertyConfig.RELACIONAR_EXPEDIENTS_TANCATS);
+		return !expedientTancat || isRelacionarTancatsActiu;
 	}
 
 	public boolean relacioDelete(Long entitatId, final Long id, final Long relacionatId, String rolActual) {
@@ -554,9 +564,14 @@ public class ExpedientHelper {
 			} catch (Exception e) {
 				logger.debug(e.getMessage());
 				//provar desenllaçar fill del pare des del fill
-				pluginHelper.arxiuExpedientDesenllacar(
-						relacionat,
-						expedient);
+				try {
+					pluginHelper.arxiuExpedientDesenllacar(
+							relacionat,
+							expedient);
+				} catch (Exception ex) {
+					// La relació pot no existir a l'arxiu (p.ex. creada sense propagar)
+					logger.warn("No s'ha pogut desenllaçar a l'arxiu els expedients " + expedient.getId() + " i " + relacionat.getId() + ": " + ex.getMessage());
+				}
 			}
 		}
 		return trobat;

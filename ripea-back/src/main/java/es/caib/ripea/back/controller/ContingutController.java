@@ -222,6 +222,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			model.addAttribute("convertirDefinitiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.CONVERSIO_DEFINITIU)));
 			model.addAttribute("imprimibleNoFirmats", Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.IMPRIMIBLE_NO_FIRMAT_ACTIU)));
 			model.addAttribute("isReobrirPermes", aplicacioService.propertyBooleanFindByKey(PropertyConfig.REOBRIR_EXPEDIENT_TANCAT, true));
+			model.addAttribute("isRelacionarTancatsActiu", aplicacioService.propertyBooleanFindByKey(PropertyConfig.RELACIONAR_EXPEDIENTS_TANCATS, false));
 			model.addAttribute("isRolActualAdministrador", RolHelper.isRolActualAdministrador(request));
 			model.addAttribute("isOrdenacioPermesa", aplicacioService.propertyBooleanFindByKey(PropertyConfig.ORDENACIO_CONTINGUT_ACTIU, false));
 			model.addAttribute("isPermesModificarCustodiats", aplicacioService.propertyBooleanFindByKey(PropertyConfig.MODIFICAR_DOCUMENTS_CUSTODIATS, false));

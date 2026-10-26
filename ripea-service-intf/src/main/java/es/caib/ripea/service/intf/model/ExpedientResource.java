@@ -430,6 +430,7 @@ public class ExpedientResource extends NodeResource implements Serializable {
     @Transient private ArxiuDetallDto arxiu;
     @Transient private Date dataDarrerEnviament;
     @Transient private boolean potModificar;
+    @Transient private boolean potRelacionar;
     @Transient private boolean potModificarContingut;
     @Transient private List<ResourceReference<ExpedientResource, Long>> relacionatsPer;
     @Transient private List<ResourceReference<ExpedientResource, Long>> relacionatsAmb;

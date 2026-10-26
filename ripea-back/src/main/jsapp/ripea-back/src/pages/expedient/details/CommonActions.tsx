@@ -344,7 +344,7 @@ export const useCommonActions = (refresh?: () => void) => {
             icon: "link",
             showInMenu: true,
             onClick: hanldeRelacionar,
-            hidden: (row:any) => !row?.potModificar,
+            hidden: (row:any) => !row?.potRelacionar,
         },
         {
             label: t('page.expedient.action.close.label'),

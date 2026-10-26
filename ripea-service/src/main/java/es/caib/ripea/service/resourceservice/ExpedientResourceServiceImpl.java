@@ -115,7 +115,6 @@ import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.FileNameOption;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.ImportacioRegistreParamsDto;
-import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import es.caib.ripea.service.intf.dto.PermisosPerExpedientsDto;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
@@ -780,6 +779,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
 			resource.setDataDarrerEnviament(cacheHelper.getDataDarrerEnviament(expedientEntity));
 			resource.setPotModificar(entityComprovarHelper.comprovarSiEsPotModificarExpedient(expedientEntity));
+			boolean potRelacionarTancat = entityComprovarHelper.comprovarSiEsPotRelacionarExpedientTancat(expedientEntity);
+			resource.setPotRelacionar(resource.isPotModificar() || potRelacionarTancat);
 			resource.setHasEsborranys(hasEsborranys);
 			resource.setPendentExecucioMassiva(pendentExecucioMassiva);
 
@@ -1019,14 +1020,19 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         @Override
         public Serializable exec(String code, ExpedientResourceEntity entity, ExpedientResource.RelacionarAction params) throws ActionExecutionException {
             List<ExpedientResourceEntity> expedientResourceEntityList = expedientResourceRepository.findAllById(params.getIds());
+            Long entitatId = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi()).getId();
+            String rolActual = configHelper.getRolActual();
             if (ExpedientResource.RelacionarAction.Action.ADD.equals(params.getAction())) {
+                boolean relacioPermesa = expedientHelper.isRelacioPermesa(entity.getEstat());
+                if (!relacioPermesa) {
+                    throw new ActionExecutionException(getResourceClass(), entity.getId(), code, "No es permet relacionar expedients tancats");
+                }
+                List<ExpedientResourceEntity> toAdd = new ArrayList<>();
                 for (ExpedientResourceEntity expedientResourceEntity : expedientResourceEntityList) {
                     if (!entity.getRelacionatsAmb().contains(expedientResourceEntity)) {
-                        entity.getRelacionatsAmb().add(expedientResourceEntity);
-                        expedientHelper.logRelacionarExpedients(entity.getId(), expedientResourceEntity.getId(), LogTipusEnumDto.CREACIO);                       
+                        toAdd.add(expedientResourceEntity);
                     }
                 }
-
                 // REMOVE IF UNSELECT
                 List<ExpedientResourceEntity> toRemove = new ArrayList<>();
                 for (ExpedientResourceEntity expedientResourceEntity : entity.getRelacionatsAmb()) {
@@ -1034,19 +1040,18 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                         toRemove.add(expedientResourceEntity);
                     }
                 }
+                for (ExpedientResourceEntity expedientResourceEntity : toAdd) {
+                    expedientHelper.relacioCreate(entitatId, entity.getId(), expedientResourceEntity.getId(), rolActual);
+                }
                 for (ExpedientResourceEntity expedientResourceEntity : toRemove) {
-                    entity.getRelacionatsAmb().remove(expedientResourceEntity);
-                    expedientHelper.logRelacionarExpedients(entity.getId(), expedientResourceEntity.getId(), LogTipusEnumDto.ELIMINACIO);
+                    expedientHelper.relacioDelete(entitatId, entity.getId(), expedientResourceEntity.getId(), rolActual);
                 }
             } else {
                 for (ExpedientResourceEntity expedientResourceEntity : expedientResourceEntityList) {
-                    if (entity.getRelacionatsAmb().contains(expedientResourceEntity)) {
-                        entity.getRelacionatsAmb().remove(expedientResourceEntity);
-                        expedientHelper.logRelacionarExpedients(entity.getId(), expedientResourceEntity.getId(), LogTipusEnumDto.ELIMINACIO);
-                    }
-                    if (entity.getRelacionatsPer().contains(expedientResourceEntity)) {
-                        entity.getRelacionatsPer().remove(expedientResourceEntity);
-                        expedientHelper.logRelacionarExpedients(entity.getId(), expedientResourceEntity.getId(), LogTipusEnumDto.ELIMINACIO);
+                    boolean relacionat = entity.getRelacionatsAmb().contains(expedientResourceEntity)
+                            || entity.getRelacionatsPer().contains(expedientResourceEntity);
+                    if (relacionat) {
+                        expedientHelper.relacioDelete(entitatId, entity.getId(), expedientResourceEntity.getId(), rolActual);
                     }
                 }
             }
