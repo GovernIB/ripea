@@ -127,3 +127,19 @@ databaseChangeLog:
             splitStatements: false
             stripComments: true
             relativeToChangelogFile: true
+  - changeSet:
+      id: RIPEA_1.0.9_COMPROVAR_CIE_NOTIB_1859
+      author: limit
+      changes:
+        - sqlFile:
+            dbms: oracle
+            path: ../scripts/oracle/1.0.9/Versio_1.0.9_DML_1859.sql
+            splitStatements: false
+            stripComments: true
+            relativeToChangelogFile: true
+        - sqlFile:
+            dbms: postgresql
+            path: ../scripts/postgres/1.0.9/Versio_1.0.9_DML_1859.sql
+            splitStatements: false
+            stripComments: true
+            relativeToChangelogFile: true

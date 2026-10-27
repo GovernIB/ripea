@@ -568,6 +568,9 @@ public class DocumentResource extends NodeResource {
 
         @Transient
         private boolean permetreEnviamentPostal;
+        // Entrega postal per CIE activa a NOTIB per al procediment i l'òrgan de l'expedient (null = no verificat)
+        @Transient
+        private Boolean entregaPostalCie;
         @Transient
         private List<ResourceReference<InteressatResource, Long>> interessatsAmbAvis = new ArrayList<>();
         @Transient 

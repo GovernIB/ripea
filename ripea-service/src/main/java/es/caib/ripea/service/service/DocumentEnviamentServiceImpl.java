@@ -68,6 +68,17 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 		return documentNotificacioHelper.checkIfAnyInteressatIsAdministracio(interessatsIds);
 	}
 	
+	@Transactional(readOnly = true)
+	@Override
+	public Boolean isEntregaPostalCieActiva(Long entitatId, Long documentId) {
+		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
+				entitatId,
+				documentId,
+				false,
+				false);
+		return pluginHelper.notificacioIsEntregaCieActiva(document.getExpedient());
+	}
+
 	@Transactional
 	@Override
 	public boolean checkIfDocumentIsZip(Long documentId) {

@@ -98,7 +98,24 @@ public interface DocumentEnviamentService {
 			Long notificacioId) throws NotFoundException;
 
 	public List<RespostaAmpliarPlazo> ampliarPlazoEnviament(AmpliarPlazoForm documentNotificacioDto);
-	
+
+	/**
+	 * Consulta a NOTIB si el procediment (codi SIA) i l'òrgan gestor de l'expedient
+	 * del document tenen l'entrega postal per CIE activa.
+	 *
+	 * @param entitatId
+	 *            Atribut id de l'entitat.
+	 * @param documentId
+	 *            Atribut id del document a notificar.
+	 * @return true o false segons NOTIB, o null si no s'ha pogut verificar
+	 *         (procediment sense codi SIA o error en la consulta).
+	 *         Si la comprovació del CIE està desactivada per configuració, retorna true
+	 *         sense consultar NOTIB.
+	 */
+	public Boolean isEntregaPostalCieActiva(
+			Long entitatId,
+			Long documentId);
+
 	/**
 	 * Crea una publicació d'un document de l'expedient a un butlletí oficial.
 	 * 

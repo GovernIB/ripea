@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import es.caib.ripea.service.intf.dto.*;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -116,7 +115,6 @@ import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.ExpedientPeticioRepository;
 import es.caib.ripea.persistence.repository.FluxFirmaUsuariRepository;
 import es.caib.ripea.persistence.repository.MetaDocumentFluxPortafibRepository;
-import es.caib.ripea.persistence.repository.MetaDocumentRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.plugin.PropertiesHelper;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
@@ -179,10 +177,75 @@ import es.caib.ripea.plugin.viafirma.ViaFirmaPlugin;
 import es.caib.ripea.plugin.viafirma.ViaFirmaResponse;
 import es.caib.ripea.plugin.viafirma.ViaFirmaTipusDestinatari;
 import es.caib.ripea.service.intf.config.PropertyConfig;
-import es.caib.ripea.service.intf.model.sse.NotificacioEstatCanviatEvent;
+import es.caib.ripea.service.intf.dto.AmpliarPlazoForm;
+import es.caib.ripea.service.intf.dto.ArbreDto;
+import es.caib.ripea.service.intf.dto.ArbreNodeDto;
+import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
+import es.caib.ripea.service.intf.dto.ArxiuFirmaDetallDto;
+import es.caib.ripea.service.intf.dto.ArxiuFirmaDto;
+import es.caib.ripea.service.intf.dto.ArxiuFirmaPerfilEnumDto;
+import es.caib.ripea.service.intf.dto.ArxiuFirmaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.ArxiuOperacioEnumDto;
+import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DiagnosticFiltreDto;
+import es.caib.ripea.service.intf.dto.DigitalitzacioEstatDto;
+import es.caib.ripea.service.intf.dto.DigitalitzacioPerfilDto;
+import es.caib.ripea.service.intf.dto.DigitalitzacioResultatDto;
+import es.caib.ripea.service.intf.dto.DigitalitzacioTransaccioRespostaDto;
+import es.caib.ripea.service.intf.dto.DocumentDto;
+import es.caib.ripea.service.intf.dto.DocumentEnviamentInteressatDto;
+import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioDto;
+import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentNtiTipoFirmaEnumDto;
+import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
+import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.EntregaPostalTipusEnum;
+import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
+import es.caib.ripea.service.intf.dto.FirmaResultatDto;
+import es.caib.ripea.service.intf.dto.FitxerDto;
+import es.caib.ripea.service.intf.dto.GenericDto;
+import es.caib.ripea.service.intf.dto.ImportacioRegistreParamsDto;
+import es.caib.ripea.service.intf.dto.IntegracioAccioDto;
+import es.caib.ripea.service.intf.dto.IntegracioAccioTipusEnumDto;
+import es.caib.ripea.service.intf.dto.InteressatTipusEnumDto;
+import es.caib.ripea.service.intf.dto.LogObjecteTipusEnumDto;
+import es.caib.ripea.service.intf.dto.LogTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
+import es.caib.ripea.service.intf.dto.MetaDocumentPerDefecteEnumDto;
+import es.caib.ripea.service.intf.dto.MunicipiDto;
+import es.caib.ripea.service.intf.dto.NivellAdministracioDto;
+import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
+import es.caib.ripea.service.intf.dto.PaisDto;
+import es.caib.ripea.service.intf.dto.PortafirmesCarrecDto;
+import es.caib.ripea.service.intf.dto.PortafirmesDocumentTipusDto;
+import es.caib.ripea.service.intf.dto.PortafirmesFluxEstatDto;
+import es.caib.ripea.service.intf.dto.PortafirmesFluxInfoDto;
+import es.caib.ripea.service.intf.dto.PortafirmesFluxRespostaDto;
+import es.caib.ripea.service.intf.dto.PortafirmesFluxReviserDto;
+import es.caib.ripea.service.intf.dto.PortafirmesFluxSignerDto;
+import es.caib.ripea.service.intf.dto.PortafirmesIniciFluxRespostaDto;
+import es.caib.ripea.service.intf.dto.ProcedimentDto;
+import es.caib.ripea.service.intf.dto.ProvinciaDto;
+import es.caib.ripea.service.intf.dto.RespostaAmpliarPlazo;
+import es.caib.ripea.service.intf.dto.Resum;
+import es.caib.ripea.service.intf.dto.SignatureInfoDto;
+import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
+import es.caib.ripea.service.intf.dto.TipusClassificacioEnumDto;
+import es.caib.ripea.service.intf.dto.TipusDocumentalDto;
+import es.caib.ripea.service.intf.dto.TipusImportEnumDto;
+import es.caib.ripea.service.intf.dto.TipusViaDto;
+import es.caib.ripea.service.intf.dto.UnitatOrganitzativaDto;
+import es.caib.ripea.service.intf.dto.UsuariAnotacioDto;
+import es.caib.ripea.service.intf.dto.UsuariDto;
+import es.caib.ripea.service.intf.dto.ValidacioErrorDto;
+import es.caib.ripea.service.intf.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.service.intf.dto.config.ConfigDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
+import es.caib.ripea.service.intf.model.sse.NotificacioEstatCanviatEvent;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.utils.DateUtil;
 import es.caib.ripea.service.intf.utils.Utils;
@@ -234,7 +297,6 @@ public class PluginHelper {
 	@Autowired private CacheHelper cacheHelper;
 	@Autowired private EventHelper eventHelper;
 	@Autowired private ContingutLogHelper contingutLogHelper;
-	@Autowired private MetaDocumentRepository metaDocumentRepository;
 	@Autowired private MetaDocumentHelper metaDocumentHelper;
 	@Autowired private EmailHelper emailHelper;
 	@Autowired private ContingutHelper contingutHelper;
@@ -5136,6 +5198,82 @@ public class PluginHelper {
 
 		return resultat;
 	}
+	
+	/**
+	 * Consulta a NOTIB si el procediment (codi SIA) i l'òrgan gestor de l'expedient tenen
+	 * l'entrega postal per CIE activa. S'empren els mateixos codis que en fer l'enviament.
+	 *
+	 * @return true o false segons respongui NOTIB, o null si no s'ha pogut verificar
+	 *         (procediment sense codi SIA o error en la consulta).
+	 *         Si la comprovació està desactivada ({@link PropertyConfig#NOTIB_ENTREGA_POSTAL_COMPROVAR_CIE})
+	 *         no es consulta NOTIB i es retorna true, de manera que l'entrega postal només depèn
+	 *         del permís de l'entitat.
+	 */
+	public Boolean notificacioIsEntregaCieActiva(ExpedientEntity expedientEntity) {
+		if (!getPropertyNotificacioComprovarCie()) {
+			return true;
+		}
+		MetaExpedientEntity metaExpedient = expedientEntity.getMetaExpedient();
+		if (metaExpedient.getTipusClassificacio() != TipusClassificacioEnumDto.SIA || !Utils.hasValue(metaExpedient.getClassificacio())) {
+			return null;
+		}
+		String codiProcediment = metaExpedient.getClassificacio();
+		String codiEntitat = getNotificacioEntitatCodi(expedientEntity);
+		String codiOrgan = getNotificacioOrganCodi(expedientEntity, codiEntitat);
+
+		String accioDescripcio = "Consulta de l'entrega postal per CIE activa";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("expedientId", expedientEntity.getId().toString());
+		accioParams.put("codiProcediment", codiProcediment);
+		accioParams.put("codiEntitat", codiEntitat);
+		accioParams.put("codiOrgan", codiOrgan);
+
+		Timer.Sample sample = Timer.start(aplicacioService.getMeterRegistry());
+		long t0 = System.currentTimeMillis();
+		String endpoint = null;
+		try {
+			organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedientEntity.getId()));
+			NotificacioPlugin notificacioPlugin = getNotificacioPlugin();
+			endpoint = notificacioPlugin.getEndpointURL();
+			Boolean entregaCieActiva = notificacioPlugin.isProcedimentEntregaCieActiva(
+					codiProcediment,
+					codiEntitat,
+					codiOrgan);
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_NOTIFICACIO,
+					accioDescripcio,
+					endpoint,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+			return entregaCieActiva;
+		} catch (Exception ex) {
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_NOTIFICACIO,
+					accioDescripcio,
+					endpoint,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					"Error en el plugin de notificacions: " + ex.getMessage(),
+					ex);
+			applicationHelper.stopTimer(sample, "METRICS@Integracions.notib", "resultado", "error", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
+			return null;
+		}
+	}
+
+	/** Codi DIR3 de l'entitat que s'informa a NOTIB. */
+	private String getNotificacioEntitatCodi(ExpedientEntity expedientEntity) {
+		String forsarEntitat = getPropertyNotificacioForsarEntitat();
+		return forsarEntitat != null ? forsarEntitat : expedientEntity.getEntitat().getUnitatArrel();
+	}
+
+	/** Codi DIR3 de l'òrgan gestor que s'informa a NOTIB: el de l'expedient o, si no en té, el de l'entitat. */
+	private String getNotificacioOrganCodi(ExpedientEntity expedientEntity, String entitatCodi) {
+		OrganGestorEntity organGestor = expedientEntity.getOrganGestor();
+		return organGestor != null ? organGestor.getCodi() : entitatCodi;
+	}
 
 	public RespostaEnviar notificacioEnviar(
 			DocumentNotificacioDto notificacioDto,
@@ -5160,18 +5298,8 @@ public class PluginHelper {
 
 		try {
 			Notificacio notificacio = new Notificacio();
-			String forsarEntitat = getPropertyNotificacioForsarEntitat();
-			if (forsarEntitat != null) {
-				notificacio.setEmisorDir3Codi(forsarEntitat);
-			} else {
-				notificacio.setEmisorDir3Codi(expedientEntity.getEntitat().getUnitatArrel());
-			}
-			OrganGestorEntity organGestor = expedientEntity.getOrganGestor();
-			if (organGestor != null) {
-				notificacio.setOrganGestor(organGestor.getCodi());
-			} else {
-				notificacio.setOrganGestor(notificacio.getEmisorDir3Codi());
-			}
+			notificacio.setEmisorDir3Codi(getNotificacioEntitatCodi(expedientEntity));
+			notificacio.setOrganGestor(getNotificacioOrganCodi(expedientEntity, notificacio.getEmisorDir3Codi()));
 			notificacio.setEnviamentTipus(notificacioDto.getTipus() != null ? EnviamentTipus.valueOf(notificacioDto.getTipus().toString()) : null);
 			notificacio.setConcepte(notificacioDto.getAssumpte());
 			notificacio.setDescripcio(notificacioDto.getObservacions());
@@ -8986,6 +9114,10 @@ public class PluginHelper {
 
 	private String getPropertyNotificacioForsarEntitat() {
 		return configHelper.getConfig(PropertyConfig.NOTIB_PLUGIN_ENTITAT);
+	}
+
+	private boolean getPropertyNotificacioComprovarCie() {
+		return configHelper.getAsBoolean(PropertyConfig.NOTIB_ENTREGA_POSTAL_COMPROVAR_CIE);
 	}
 
 	private boolean getPropertyGuardarCertificacioExpedient() {

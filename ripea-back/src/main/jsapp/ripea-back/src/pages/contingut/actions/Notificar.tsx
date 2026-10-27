@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {Grid, Alert, Typography} from "@mui/material";
+import {Grid, Alert, Box, Tooltip, Typography} from "@mui/material";
 import {useMuiFormDialogApiRef, useBaseAppContext, useFormContext, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import FormActionDialog from "../../../components/FormActionDialog.tsx";
@@ -74,6 +74,14 @@ const NotificarForm = () => {
         builder.eq('esRepresentant', false),
     );
 
+    // entregaPostalCie: true/false segons NOTIB; null si no s'ha pogut verificar (el check queda habilitat)
+    const entregaPostalCieInactiu = data?.entregaPostalCie === false;
+    const entregaPostalTooltip = entregaPostalCieInactiu
+        ? t('page.document.action.notificar.entregaPostal.cieInactiu')
+        : data?.entregaPostalCie == null
+            ? t('page.document.action.notificar.entregaPostal.cieNoVerificat')
+            : '';
+
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         {data?.interessatsAmbAvis?.length > 0 &&
             <Alert severity={"warning"}>
@@ -129,7 +137,12 @@ const NotificarForm = () => {
         <GridFormField size={6} name="duracio" componentProps={{title: t('page.contingut.detalle.duracio')}}/>
         <GridFormField size={6} name="dataCaducitat" type={"date"} componentProps={{title: t('page.contingut.detalle.dataCaducitat')}}/>
         <GridFormField name="retard" componentProps={{title: t('page.contingut.detalle.retard')}}/>
-        <GridFormField name="entregaPostal" hidden={!data?.permetreEnviamentPostal}/>
+        {/* El Tooltip va sobre un Box perquè GridFormField no reenvia ref ni events al seu Grid */}
+        <Tooltip title={entregaPostalTooltip} describeChild>
+            <Box sx={{width: '100%'}} hidden={!data?.permetreEnviamentPostal}>
+                <GridFormField name="entregaPostal" disabled={entregaPostalCieInactiu}/>
+            </Box>
+        </Tooltip>
 
         <Grid size={12}>
             {/* Gatear per longitud: un array buit [] és truthy i faria renderitzar

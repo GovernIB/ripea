@@ -57,8 +57,6 @@
 		        $('#nom1', $('#panellInfo')).val(organ.nom);
 		        $('#cif', $('#panellInfo')).val(organ.cif);
 		        $('#utilitzarCifPinbal', $('#panellInfo')).prop( "checked", organ.utilitzarCifPinbal );
-		        $('#permetreEnviamentPostal', $('#panellInfo')).prop( "checked", organ.permetreEnviamentPostal );
-		        $('#permetreEnviamentPostalDescendents', $('#panellInfo')).prop( "checked", organ.permetreEnviamentPostalDescendents );
 
 		        $('#pareId1', $('#panellInfo')).append ('<option value="' + organ.pareId + '">' + organ.pareCodiNom + '</option>')
 		        $('#pareId1', $('#panellInfo')).val(organ.pareId);
@@ -90,30 +88,12 @@
         $(".datatable-dades-carregant").css("display", "none");
 	};
 
-    var hideEnvPostalDesc = function (val){
-        if (val) {
-            $('.hideByPostal').show();
-            $('#permetreEnviamentPostalDescendents').show();
-        } else {
-            $('.hideByPostal').hide();
-            $('#permetreEnviamentPostalDescendents').hide();
-            $('#permetreEnviamentPostalDescendents').prop( "checked", false );
-        }
-    }
-
 	$(document).ready(function() {
 		$("input:visible:enabled:not([readonly]),textarea:visible:enabled:not([readonly]),select:visible:enabled:not([readonly])").first().focus();
 
 		if ($('#codi').val() || $('#nom').val() || $('#pareId').val()) {
 			$('#arbreOrgans').jstree('open_all');
 		}
-
-        $('#permetreEnviamentPostal').change(function(){
-            var val = $('#permetreEnviamentPostal').is(":checked");
-            hideEnvPostalDesc(val)
-        });
-
-        hideEnvPostalDesc(${organGestorCommand.permetreEnviamentPostal});
 	});
 
 
@@ -211,8 +191,6 @@
 								
 						<rip:inputText name="cif" textKey="entitat.list.columna.cif" labelSize="2" readonly="true"/>
 						<rip:inputCheckbox name="utilitzarCifPinbal" textKey="organgestor.form.camp.utilitzar.cif.pinbal" labelSize="2" />
-                        <rip:inputCheckbox name="permetreEnviamentPostal" textKey="notificacio.form.entregapostal.permes" labelSize="2"/>
-                        <rip:inputCheckbox name="permetreEnviamentPostalDescendents" textKey="notificacio.form.entregapostal.permes" labelClass="hideByPostal" labelSize="2"/>
 
 						<!------------------------- PERMISOS ------------------------>
 						<div class="panel panel-default" style="margin-top: 45px;">

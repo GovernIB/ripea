@@ -1084,6 +1084,10 @@ const translationCa = {
                     button: "Notifica",
                     title: "Crear notificació document",
                     ok: "Notificació creada correctament",
+                    entregaPostal: {
+                        cieInactiu: "El procediment no té activa a NOTIB l'entrega postal per CIE (Centre d'Impressió i Ensobrat) per a l'òrgan gestor de l'expedient",
+                        cieNoVerificat: "No s'ha pogut verificar a NOTIB si el procediment té activa l'entrega postal per CIE (Centre d'Impressió i Ensobrat) per a l'òrgan gestor de l'expedient. Si no la té, NOTIB rebutjarà l'enviament postal.",
+                    },
                     alert: {
                         interessatsAmbAvis: {
                             title: "Hi ha notificacions amb destinatari sense NIF/NIE. Aquestes notficacions no es poden enviar a la carpeta ciutadana, degut a que és necessari un NIF o NIE per a accedir-hi.",

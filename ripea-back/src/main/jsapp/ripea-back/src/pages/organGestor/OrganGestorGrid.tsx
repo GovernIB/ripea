@@ -1,6 +1,6 @@
 import {useTranslation} from "react-i18next";
 import {useMemo, useState} from "react";
-import {GridPage, useFormContext, useMuiDataGridApiRef} from "reactlib";
+import {GridPage, useMuiDataGridApiRef} from "reactlib";
 import {CardPage} from "../../components/CardData.tsx";
 import StyledMuiGrid, {ToolbarButton} from "../../components/StyledMuiGrid.tsx";
 import {Grid, Icon, Badge, IconButton} from "@mui/material";
@@ -10,16 +10,15 @@ import {useOrganGestorSyncDialog} from "./actions/OrganGestorSync.tsx";
 import {useSession} from "../../components/SessionStorageContext.tsx";
 import {useOrganGestorPermisDialog} from "../user/configurar/PermisOrganGestorGrid.tsx";
 
+// permetreEnviamentPostal i permetreEnviamentPostalDescendents ja no es mostren: l'enviament
+// postal depèn del permís de l'entitat i del CIE de NOTIB (es consulta en obrir la notificació)
 const OrganGestorForm = () => {
-    const {data} = useFormContext()
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
         <GridFormField name="codi" disabled readOnly/>
         <GridFormField name="nom" disabled readOnly/>
         <GridFormField name="pare" disabled readOnly/>
         <GridFormField name="cif" disabled readOnly/>
         <GridFormField name="utilitzarCifPinbal"/>
-        <GridFormField name="permetreEnviamentPostal"/>
-        <GridFormField name="permetreEnviamentPostalDescendents" hidden={!data?.permetreEnviamentPostal}/>
     </Grid>
 }
 
