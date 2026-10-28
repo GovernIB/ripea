@@ -105,7 +105,7 @@ export default defineConfig({
         // usuari i no es pot canviar el de l'admin mentre corren els seus tests.
         {
             name: 'super',
-            dependencies: ['setup-super'],
+            dependencies: ['setup-super', 'setup-user'],
             use: {
                 ...devices['Desktop Chrome'],
                 channel: 'chrome',
@@ -118,7 +118,7 @@ export default defineConfig({
         },
         {
             name: 'super-jsp',
-            dependencies: ['setup-super'],
+            dependencies: ['setup-super', 'setup-user'],
             use: {
                 ...devices['Desktop Chrome'],
                 channel: 'chrome',

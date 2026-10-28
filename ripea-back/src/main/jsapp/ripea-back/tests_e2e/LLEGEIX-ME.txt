@@ -79,6 +79,15 @@ tests_e2e/
     entitatComu.ts          — Dades i comprovacions compartides (CIF vàlids,
                               imatges de prova, lectura de l'entitat per API).
 
+  avis/
+    avis.super.spec.ts      — Manteniment d'avisos REACT (superusuari): crear,
+                              quins es mostren segons les dates (SSE i recàrrega),
+                              activar/desactivar i esborrar (individual i massiu),
+                              i visibilitat per entitat (amb rip_user, REACT i JSP).
+    avis.super.jsp.spec.ts  — Els mateixos tests sobre la interfície JSP (sense
+                              entitat al formulari).
+    avisComu.ts             — Dates relatives i avisos de "finestra".
+
   fixtures/                 — Fitxers de prova (imatges per als logos d'entitat).
 
   Els tests de superusuari s'executen amb un usuari propi (entrada "super" de
