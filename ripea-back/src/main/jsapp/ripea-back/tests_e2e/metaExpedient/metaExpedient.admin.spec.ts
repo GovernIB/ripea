@@ -10,6 +10,10 @@ import {
     expectSuccessAlert,
     obrirMenuAccions,
     esperarGridCarregat,
+    guardaAmbDelay,
+    triaMuiSelect,
+    checkBoxOcultClick,
+    netejarFiltre,
     waitApiGet,
     waitApiEntityLoad,
     seleccionarOpcioAutocompletament,
@@ -63,35 +67,10 @@ const PRINCIPAL_NOM_TEST = 'ROL_PW_REACT_TEST';
 const getToolbar = (page: Page) =>
     page.locator('.MuiToolbar-root').filter({ hasText: /nou procediment|nuevo procedimiento/i });
 
-const guardaAmbDelay = async (page: Page, locator: Locator) => {
-	await page.waitForTimeout(SYSTEM_DELAY);
-	await locator.click();
-};
-
 const aplicaQuickFilter = async (page: Page, locator: Locator, text: string) => {
 	await page.waitForTimeout(SYSTEM_DELAY);
 	await locator.fill(text);
 	esperarGridCarregat(page);
-};
-
-// Clica un MUI Checkbox ocult (opacity:0) a través del wrapper visible MuiButtonBase-root.
-// `checkbox` és un selector CSS de l'<input> (p.ex. 'input[name="read"]').
-// Assumeix que el checkbox passarà a estat marcat després del clic.
-const checkBoxOcultClick = async (dialog: Locator, checkbox: string) => {
-    const wrapper = dialog.locator(`span.MuiButtonBase-root:has(${checkbox})`);
-    await expect(wrapper).toBeVisible({ timeout: 5_000 });
-    await wrapper.click();
-    await expect(dialog.locator(checkbox)).toBeChecked({ timeout: 3_000 });
-};
-
-
-// Interacciona amb un MUI Select (native input ocult) i selecciona una opció per text/regex
-const triaMuiSelect = async (page: Page, container: Locator, inputName: string, matcher: string | RegExp) => {
-    const muiRoot = container.locator(`.MuiInputBase-root:has(input[name="${inputName}"])`);
-    await muiRoot.locator('[role="combobox"]').click();
-    await page.waitForSelector('[role="listbox"]', { timeout: 5_000 });
-    await page.getByRole('option', { name: matcher }).first().click();
-    await page.waitForSelector('[role="listbox"]', { state: 'detached', timeout: 3_000 }).catch(() => {});
 };
 
 // Selecciona la primera opció no buida d'un MUI Select
@@ -130,7 +109,7 @@ const aplicarFiltreProcediments = async (page: Page, codi: string, permisDirecte
     const dialog = page.locator('.styledFilter');
     await triaMuiSelectFirst(page, dialog, 'actiu', true);
     if (permisDirecte) {
-        await page.getByRole('button').filter({ hasText: /permis directe|permiso directo/i }).click();
+        await page.getByRole('button').filter({ hasText: /perm[ií]s directe|permiso directo/i }).click();
     }
     logDebug('[Filtre] Fent click a Filtrar...');
     await page.getByRole('button', { name: 'Filtra', exact: true }).click();
@@ -386,26 +365,9 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
         await esperarGridCarregat(page);
         logDebug('[beforeEach] Càrrega inicial OK.');
 
-        // 2. Netejar filtres de sessió i esperar que el reset sigui efectiu al DOM.
-        //    NO usem waitApiGet aquí: el GET de Netejar pot arribar tard (mentre el test
-        //    ja ha aplicat el seu propi filtre), sobreescrivint el resultat i causant
-        //    errors. En comptes, verifiquem directament l'estat DOM esperat:
-        //      - camp codi buit  → el formulari s'ha netejat
-        //      - .MuiDataGrid-overlay absent → el grid no està carregant
-        //      - almenys 1 fila visible → la recàrrega sense filtre ha acabat
-        logDebug('[beforeEach] Fent click a Netejar...');
-        // Nom accessible exacte i ancorat: evita col·lisió amb "Neteja la selecció"
-        // (botó de la selecció del DataGrid), que també conté "Neteja".
-        await page.getByRole('button', { name: /^(Neteja|Limpia)$/ }).click();
-        logDebug('[beforeEach] Esperant reset DOM: codi buit + grid carregat amb files...');
-        await page.waitForFunction(() => {
-            const codi = document.querySelector('input[name="codi"]');
-            if (!(codi instanceof HTMLInputElement) || codi.value !== '') return false;
-            const grid = document.querySelector('.MuiDataGrid-root');
-            if (!grid || grid.querySelector('.MuiDataGrid-overlay')) return false;
-            return document.querySelectorAll('.MuiDataGrid-row').length > 0;
-        }, { timeout: 15_000 });
-        logDebug('[beforeEach] Netejar OK. Num files: ' + await getRows(page).count());
+        // 2. Netejar filtres de sessió i esperar que el reset sigui efectiu al DOM
+        //    (veure netejarFiltre a reactHelpers per què no s'espera el GET).
+        await netejarFiltre(page);
     });
 
     // ── Disposició ────────────────────────────────────────────────────────────
@@ -522,6 +484,11 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
             // Seleccionar el primer òrgan gestor disponible via Autocomplete
             await seleccionarOpcioAutocompletament(page, dialog, '[name="organGestor"] input[type="text"]');
+
+            // La classificació (tipus ID) la calcula l'onChange del backend a partir de l'òrgan.
+            // Amb el servidor carregat pot arribar tard: si es desa abans, el backend respon
+            // "Aquest camp és obligatori" a classificació i òrgan encara que es vegin plens.
+            await expect(dialog.locator('input[name="classificacio"]')).not.toHaveValue('', { timeout: 15_000 });
         });
 
         await test.step('enviar el formulari', async () => {
@@ -602,7 +569,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             await page.locator('input[name="codi"]').fill(CODI_TEST);
             await page.locator('input[name="nom"]').fill('modificació');
 			await humanDelay(page);
-			await page.getByRole('button').filter({ hasText: /permis directe|permiso directo/i }).click();
+			await page.getByRole('button').filter({ hasText: /perm[ií]s directe|permiso directo/i }).click();
 			await humanDelay(page);
 			const resp = waitApiGet(page, url => url.includes('/metaExpedient') && !url.includes('/metaExpedient/'));
 			await page.getByRole('button', { name: 'Filtra', exact: true }).click();

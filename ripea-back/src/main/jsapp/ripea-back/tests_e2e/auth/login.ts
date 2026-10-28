@@ -1,4 +1,6 @@
 import { Page } from '@playwright/test';
+import path from 'path';
+import fs from 'fs';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Login adaptatiu segons el proveïdor d'identitat que mostri la baseURL configurada
@@ -51,4 +53,17 @@ export const performLogin = async (page: Page, creds: Credentials): Promise<void
     } else {
         await loginKeycloak(page, creds); // localhost → Keycloak
     }
+};
+
+// Codi d'usuari d'un rol ('admin', 'user'...) del fitxer de credencials (el mateix que
+// fan servir els setups: E2E_CREDENTIALS_FILE o tests_e2e/auth/credentials.json).
+// Per als tests que necessiten un usuari que existeixi a l'entorn (p.ex. per donar-li
+// un permís) sense escriure'l al codi.
+export const codiUsuariCredencials = (rol: string): string => {
+    const fitxer = process.env.E2E_CREDENTIALS_FILE || path.join('tests_e2e', 'auth', 'credentials.json');
+    const creds = JSON.parse(fs.readFileSync(fitxer, 'utf-8'));
+    if (!creds?.[rol]?.usuari) {
+        throw new Error(`Falta l'entrada "${rol}" a ${fitxer}.`);
+    }
+    return creds[rol].usuari;
 };

@@ -31,6 +31,7 @@ import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientResource
 import es.caib.ripea.persistence.entity.resourcerepository.OrganGestorResourceRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseMutableResourceService;
+import es.caib.ripea.service.helper.MessageHelper;
 import es.caib.ripea.service.helper.PermisosHelper;
 import es.caib.ripea.service.helper.UsuariHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
@@ -62,6 +63,7 @@ public class AclSidResourceServiceImpl extends BaseMutableResourceService<AclSid
     private final MetaExpedientResourceRepository metaExpedientResourceRepository;
     private final OrganGestorResourceRepository organGestorResourceRepository;
     private final TransactionTemplate transactionTemplate;
+    private final MessageHelper messageHelper;
 
     @PostConstruct
     public void init() {
@@ -145,6 +147,14 @@ public class AclSidResourceServiceImpl extends BaseMutableResourceService<AclSid
 
             switch (params.getClassType()) {
                 case ENTITY:
+                    // Un permís d'entitat sense cap tipus marcat no dona accés: no es permet desar-lo
+                    if (!params.isAdmin() && !params.isAdminLectura() && !params.isUser()) {
+                        throw new ActionExecutionException(
+                                getResourceClass(),
+                                entity != null ? entity.getId() : null,
+                                code,
+                                messageHelper.getMessage("entitat.permis.form.validacio.cap.permis"));
+                    }
                     permis.setAdministration(params.isAdmin());
                     permis.setAdministrationLectura(params.isAdminLectura());
                     permis.setRead(params.isUser());

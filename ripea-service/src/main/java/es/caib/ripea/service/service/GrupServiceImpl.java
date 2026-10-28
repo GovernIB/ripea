@@ -117,7 +117,9 @@ public class GrupServiceImpl implements GrupService {
 				true);
 
 		GrupEntity grupEntity = grupRepository.getOne(id);
-		
+
+		// Els permisos del grup (ACL) no s'esborren en cascada amb el grup
+		permisosHelper.deleteAcl(id, GrupEntity.class);
 		grupRepository.delete(grupEntity);
 
 		GrupDto dto = conversioTipusHelper.convertir(

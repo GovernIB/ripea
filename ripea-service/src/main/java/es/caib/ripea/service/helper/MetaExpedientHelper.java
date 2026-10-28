@@ -1921,6 +1921,15 @@ public class MetaExpedientHelper {
 			usuari.updateProcediment(null);
 		}
 
+		// Els permisos (ACL) no s'esborren en cascada: ni els del procediment ni els de les
+		// seves relacions procediment-òrgan, que s'esborren en cascada amb el procediment.
+		if (metaExpedient.getMetaExpedientOrganGestors() != null) {
+			for (MetaExpedientOrganGestorEntity metaExpedientOrganGestor: metaExpedient.getMetaExpedientOrganGestors()) {
+				permisosHelper.deleteAcl(metaExpedientOrganGestor.getId(), MetaExpedientOrganGestorEntity.class);
+			}
+		}
+		permisosHelper.deleteAcl(metaExpedient.getId(), MetaNodeEntity.class);
+
 		metaExpedientRepository.delete(metaExpedient);
 
 		return metaExpedient;

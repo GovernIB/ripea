@@ -1483,6 +1483,12 @@ const translationEn = {
                 },
                 delete: {
                     ok: "Group '{{data.codi}}' deleted successfully",
+                    massive: {
+                        check: "Delete groups",
+                        description: "Are you sure you want to delete the {{num}} selected groups?",
+                        ok: "{{num}} groups deleted successfully",
+                        error: "An error occurred while deleting {{num}} groups",
+                    },
                 },
                 link: {
                     label: "Link group...",

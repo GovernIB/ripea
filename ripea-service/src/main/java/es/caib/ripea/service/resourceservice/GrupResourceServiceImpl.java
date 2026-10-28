@@ -190,6 +190,12 @@ public class GrupResourceServiceImpl extends BaseMutableResourceService<GrupReso
         EntitatResourceEntity entitat = entitatResourceRepository.findByCodi(entitatActualCodi);
         entity.setEntitat(entitat);
     }
+
+    @Override
+    protected void beforeDelete(GrupResourceEntity entity, Map<String, AnswerRequiredException.AnswerValue> answers) {
+        // Els permisos del grup (ACL) no s'esborren en cascada amb el grup
+        permisosHelper.deleteAcl(entity.getId(), GrupEntity.class);
+    }
     
     private class CountPermisosPerspectiveApplicator implements PerspectiveApplicator<GrupResourceEntity, GrupResource> {
 		@Override

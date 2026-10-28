@@ -1,7 +1,7 @@
 /**
  * 
  */
-package es.caib.ripea.back.validation;
+package es.caib.ripea.service.intf.resourcevalidation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

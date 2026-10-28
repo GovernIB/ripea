@@ -1485,6 +1485,12 @@ const translationCa = {
                 },
                 delete: {
                     ok: "Grup '{{data.codi}}' esborrat correctament",
+                    massive: {
+                        check: "Esborrar grups",
+                        description: "Esteu segur que voleu esborrar els {{num}} grups seleccionats?",
+                        ok: "S'han esborrat correctament {{num}} grups",
+                        error: "S'ha produït un error en esborrar {{num}} grups",
+                    },
                 },
                 link: {
                     label: "Vincula grup...",

@@ -29,55 +29,29 @@
 	
 		var maxTamanyFitxerUpload = ${maxFileSize};
 	
+		// Cada imatge té un camp ocult que indica si l'entitat la conserva: en seleccionar un fitxer
+		// es posa a true i en netejar el camp ("Netejar") a false, perquè el servidor l'esborri.
+		var imatges = {
+			logoImg: 'logo',
+			menuImg: 'logoMenu',
+			faviconImg: 'logoFavicon',
+			blackLogoImg: 'blackLogo',
+			blackMenuImg: 'blackMenu',
+			blackFaviconImg: 'blackFavicon'
+		};
+
 		$(document).ready(function() {
-		  $('#logoImg').change(function(){
-			    var path = $(this).val();
-			    if (path) {
-			     	$('#logo').val(true);
-				} else {
-					$('#logo').val(false);
-				}
-			    let tamany = $(this)[0].files[0].size;
-			    var pare = $(this).closest('.fileinput').parent();
-				if (tamany>maxTamanyFitxerUpload) {
+			$.each(imatges, function(inputId, campOcult) {
+				$('#' + inputId).change(function() {
+					var fitxer = this.files && this.files.length > 0 ? this.files[0] : null;
+					$('#' + campOcult).val(fitxer != null);
+					var pare = $(this).closest('.fileinput').parent();
 					$(pare).find('div.alert.alert-danger').remove();
-					$(pare).append('<div class="alert alert-danger" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; margin-bottom: 0px;" role="alert"><span><spring:message code="MaxFileUploadSize"/></span></div>');
-				} else {
-					$(pare).find('div.alert.alert-danger').remove();
-				}
-		  });
-		  $('#ripeaImg').change(function(){
-			    var path = $(this).val();
-			    if (path) {
-			     	$('#logoRipea').val(true);
-				} else {
-					$('#logoRipea').val(false);
-				}
-			    let tamany = $(this)[0].files[0].size;
-			    var pare = $(this).closest('.fileinput').parent();
-				if (tamany>maxTamanyFitxerUpload) {
-					$(pare).find('div.alert.alert-danger').remove();
-					$(pare).append('<div class="alert alert-danger" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; margin-bottom: 0px;" role="alert"><span><spring:message code="MaxFileUploadSize"/></span></div>');
-				} else {
-					$(pare).find('div.alert.alert-danger').remove();
-				}
-		  });
-		  $('#menuImg').change(function(){
-			    var path = $(this).val();
-			    if (path) {
-			     	$('#logoMenu').val(true);
-				} else {
-					$('#logoMenu').val(false);
-				}
-			    let tamany = $(this)[0].files[0].size;
-			    var pare = $(this).closest('.fileinput').parent();
-				if (tamany>maxTamanyFitxerUpload) {
-					$(pare).find('div.alert.alert-danger').remove();
-					$(pare).append('<div class="alert alert-danger" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; margin-bottom: 0px;" role="alert"><span><spring:message code="MaxFileUploadSize"/></span></div>');
-				} else {
-					$(pare).find('div.alert.alert-danger').remove();
-				}
-		  });		  
+					if (fitxer != null && fitxer.size > maxTamanyFitxerUpload) {
+						$(pare).append('<div class="alert alert-danger" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; margin-bottom: 0px;" role="alert"><span><spring:message code="MaxFileUploadSize"/></span></div>');
+					}
+				});
+			});
 		});
 	</script>	
 </head>

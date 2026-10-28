@@ -5,7 +5,7 @@ package es.caib.ripea.back.command;
 
 import es.caib.ripea.back.helper.ConversioTipusHelper;
 import es.caib.ripea.back.validation.CodiEntitatNoRepetit;
-import es.caib.ripea.back.validation.DocumentIdentitat;
+import es.caib.ripea.service.intf.resourcevalidation.DocumentIdentitat;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import lombok.Getter;
 import lombok.Setter;

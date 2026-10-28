@@ -3,8 +3,9 @@ import { expect, Page, Locator } from '@playwright/test';
 // ─────────────────────────────────────────────────────────────────────────────
 // Utilitats compartides pels tests E2E de la interfície REACT (Material UI).
 //
-// Conté constants, logging i helpers genèrics (graella MUI DataGrid, esperes
-// d'API, selecció en Autocomplete) i el helper de canvi de rol del menú d'usuari.
+// Conté constants, logging i helpers genèrics (graella MUI DataGrid, diàlegs,
+// formularis i filtres, esperes d'API, selecció en Autocomplete) i el helper de
+// canvi de rol del menú d'usuari.
 // Els helpers específics de cada pàgina (getToolbar, filtres concrets, etc.) es
 // mantenen al seu propi spec.
 // ─────────────────────────────────────────────────────────────────────────────
@@ -35,6 +36,82 @@ export const expectSuccessAlert = (page: Page) =>
 // (l'aria-label varia: "more" / "més" / "más" segons la llengua activa).
 export const obrirMenuAccions = (fila: Locator) =>
     fila.locator('.MuiDataGrid-actionsCell button[aria-haspopup="menu"]').click();
+
+// Clica un botó que obre un diàleg i espera que aparegui. Alguns diàlegs (FormActionDialog)
+// no s'obren si el clic arriba abans que el component estigui llest: es torna a clicar.
+// Retorna el diàleg.
+export const obrirDialegAmbReintent = async (page: Page, boto: Locator, intents: number = 3): Promise<Locator> => {
+    const dialog = page.locator('[role="dialog"]');
+    for (let i = 1; i < intents; i++) {
+        await boto.click();
+        if (await dialog.waitFor({ state: 'visible', timeout: 3_000 }).then(() => true).catch(() => false)) {
+            return dialog;
+        }
+        logDebug(`[Diàleg] No s'ha obert (intent ${i}), es torna a clicar...`);
+    }
+    await boto.click();
+    await expect(dialog).toBeVisible({ timeout: 5_000 });
+    return dialog;
+};
+
+// Accepta el diàleg MUI de confirmació obert (esborrats, etc.).
+export const confirmarDialeg = async (page: Page) => {
+    const dialog = page.locator('[role="dialog"]');
+    await expect(dialog).toBeVisible({ timeout: 5_000 });
+    await dialog.getByRole('button').filter({ hasText: /accepta|acepta|confirma|ok/i }).click();
+};
+
+// ── Formularis i filtres ─────────────────────────────────────────────────────────
+
+// Espera SYSTEM_DELAY abans de clicar (p.ex. el botó Guarda d'un diàleg), perquè els
+// camps acabin de propagar el seu valor al formulari.
+export const guardaAmbDelay = async (page: Page, locator: Locator) => {
+    await page.waitForTimeout(SYSTEM_DELAY);
+    await locator.click();
+};
+
+// Clica un MUI Checkbox ocult (opacity:0) a través del wrapper visible MuiButtonBase-root.
+// `checkbox` és un selector CSS de l'<input> (p.ex. 'input[name="read"]').
+// Assumeix que el checkbox passarà a estat marcat després del clic.
+export const checkBoxOcultClick = async (dialog: Locator, checkbox: string) => {
+    const wrapper = dialog.locator(`span.MuiButtonBase-root:has(${checkbox})`);
+    await expect(wrapper).toBeVisible({ timeout: 5_000 });
+    await wrapper.click();
+    await expect(dialog.locator(checkbox)).toBeChecked({ timeout: 3_000 });
+};
+
+// Interacciona amb un MUI Select (native input ocult) i selecciona una opció per text/regex
+export const triaMuiSelect = async (page: Page, container: Locator, inputName: string, matcher: string | RegExp) => {
+    const muiRoot = container.locator(`.MuiInputBase-root:has(input[name="${inputName}"])`);
+    await muiRoot.locator('[role="combobox"]').click();
+    await page.waitForSelector('[role="listbox"]', { timeout: 5_000 });
+    await page.getByRole('option', { name: matcher }).first().click();
+    await page.waitForSelector('[role="listbox"]', { state: 'detached', timeout: 3_000 }).catch(() => {});
+};
+
+// Clica el botó "Neteja" del filtre de la pàgina i espera que el reset sigui efectiu al DOM.
+//
+// NO usa waitApiGet: el GET de Netejar pot arribar tard (mentre el test ja ha aplicat el
+// seu propi filtre), sobreescrivint el resultat i causant errors. En comptes, verifica
+// directament l'estat DOM esperat:
+//   - camp `campBuit` buit           → el formulari s'ha netejat
+//   - .MuiDataGrid-overlay absent    → el grid no està carregant
+//   - almenys 1 fila visible         → la recàrrega sense filtre ha acabat
+export const netejarFiltre = async (page: Page, campBuit: string = 'codi') => {
+    logDebug('[Filtre] Fent click a Netejar...');
+    // Nom accessible exacte i ancorat: evita col·lisió amb "Neteja la selecció"
+    // (botó de la selecció del DataGrid), que també conté "Neteja".
+    await page.getByRole('button', { name: /^(Neteja|Limpia)$/ }).click();
+    logDebug('[Filtre] Esperant reset DOM: ' + campBuit + ' buit + grid carregat amb files...');
+    await page.waitForFunction((camp: string) => {
+        const input = document.querySelector(`input[name="${camp}"]`);
+        if (!(input instanceof HTMLInputElement) || input.value !== '') return false;
+        const grid = document.querySelector('.MuiDataGrid-root');
+        if (!grid || grid.querySelector('.MuiDataGrid-overlay')) return false;
+        return document.querySelectorAll('.MuiDataGrid-row').length > 0;
+    }, campBuit, { timeout: 15_000 });
+    logDebug('[Filtre] Netejar OK. Num files: ' + await getRows(page).count());
+};
 
 // Espera que el DataGrid estigui completament carregat, hagi o no resultats.
 // Condició "carregat" = .MuiDataGrid-root al DOM  AND  .MuiDataGrid-overlay absent.
@@ -77,6 +154,20 @@ export const waitApiGet = async (page: Page, urlMatcher: string | ((url: string)
     await esperarGridCarregat(page);
 };
 
+// Escriu `text` al filtre ràpid de la barra d'eines de la graella i espera la resposta
+// d'aquest text concret (paràmetre quickFilter). El camp té debounce: esperar només
+// "una" resposta podria agafar la d'un text anterior. Amb text buit, espera la
+// resposta sense quickFilter.
+// esLlistat: predicat de la URL del GET del llistat (p.ex. pathname acabat en '/entitats').
+// IMPORTANT: si el text és el mateix que ja hi ha al camp, no hi ha petició nova.
+export const aplicarFiltreRapid = async (page: Page, text: string, esLlistat: (url: string) => boolean) => {
+    logDebug(`[Filtre ràpid] "${text}"`);
+    const resp = waitApiGet(page, url =>
+        esLlistat(url) && (new URL(url).searchParams.get('quickFilter') ?? '') === text);
+    await page.getByRole('textbox', { name: /filtre r.pid|filtro r.pido/i }).fill(text);
+    await resp;
+};
+
 // Registra un listener per esperar la resposta GET de l'apiGetOne d'una entitat concreta.
 // En els formularis de modificació, Form.tsx crida apiGetOne(id) i, quan respon, executa
 // reset(entityData) que marca isReady=true i renderitza els camps del formulari.
@@ -111,14 +202,19 @@ export const ORDINAL_IDX: Record<OrdinalOpcio, number> = { first: 0, second: 1, 
 //
 // inputSelector: selector CSS de l'<input> del camp (p.ex. '[name="organGestor"] input[type="text"]')
 // ordinal:       'first' | 'second' | 'third' (per defecte: 'first')
+// Retorna el text que mostra el camp després de la selecció.
 export const seleccionarOpcioAutocompletament = async (
     page: Page,
     container: Page | Locator,
     inputSelector: string,
     ordinal: OrdinalOpcio = 'first'
-): Promise<void> => {
+): Promise<string> => {
     logDebug(`[Autocomplete] Obrint "${inputSelector}", seleccionant: ${ordinal}`);
-    await container.locator(inputSelector).click();
+    // En buidar un camp amb valor, MUI obre el desplegable tot sol: si ja és obert, un clic
+    // a l'input el tancaria.
+    if (await container.locator(inputSelector).getAttribute('aria-expanded') !== 'true') {
+        await container.locator(inputSelector).click();
+    }
     await page.waitForFunction(
         (sel: string) => {
             const input = document.querySelector(sel);
@@ -133,6 +229,30 @@ export const seleccionarOpcioAutocompletament = async (
     );
     await page.getByRole('option').nth(ORDINAL_IDX[ordinal]).click();
     await page.waitForSelector('[role="listbox"]', { state: 'detached', timeout: 5_000 }).catch(() => {});
+    return container.locator(inputSelector).inputValue();
+};
+
+// Com seleccionarOpcioAutocompletament, però escrivint `cerca` al camp (el backend filtra
+// les opcions pel quickFilter) i triant l'opció que té exactament el text `textOpcio`.
+// Útil quan cal triar un valor conegut (p.ex. l'òrgan d'un registre creat abans): l'ordre
+// de les opcions pot no ser el mateix en camps diferents (formulari vs filtre).
+// Retorna el text que mostra el camp després de la selecció.
+export const seleccionarOpcioAutocompletamentPerText = async (
+    page: Page,
+    container: Page | Locator,
+    inputSelector: string,
+    cerca: string,
+    textOpcio: string
+): Promise<string> => {
+    logDebug(`[Autocomplete] Cercant "${cerca}" a "${inputSelector}", seleccionant: ${textOpcio}`);
+    const input = container.locator(inputSelector);
+    await input.click();
+    await input.fill(cerca);
+    const opcio = page.getByRole('option', { name: textOpcio, exact: true });
+    await expect(opcio).toBeVisible({ timeout: 15_000 });
+    await opcio.click();
+    await page.waitForSelector('[role="listbox"]', { state: 'detached', timeout: 5_000 }).catch(() => {});
+    return input.inputValue();
 };
 
 // ── Rol (menú d'usuari REACT) ────────────────────────────────────────────────────
@@ -146,6 +266,7 @@ export const seleccionarOpcioAutocompletament = async (
 
 export const ROL_LABEL: Record<string, string> = {
     'IPA_ADMIN': "Administrador d'entitat",
+    'IPA_SUPER': 'Superusuari',
     'tothom':    'Usuari',
 };
 

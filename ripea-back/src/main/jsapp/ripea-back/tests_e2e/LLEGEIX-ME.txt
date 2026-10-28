@@ -59,6 +59,38 @@ tests_e2e/
                             — Tests del llistat de procediments per al
                               rol IPA_ADMIN: càrrega, columnes, botons
                               d'acció, filtre per nom, etc.
+    metaExpedient.admin.jsp.spec.ts
+                            — Els mateixos tests sobre la interfície JSP.
+
+  grup/
+    grup.admin.spec.ts      — Manteniment de grups REACT (IPA_ADMIN): vista,
+                              filtres, crear, modificar, permisos i esborrat
+                              individual i massiu. Crea els seus grups i els
+                              esborra en acabar (NETEJA PREVIA / NETEJA FINAL).
+    grup.admin.jsp.spec.ts  — Els mateixos tests sobre la interfície JSP.
+
+  entitat/
+    entitat.super.spec.ts   — Manteniment d'entitats REACT (superusuari): vista,
+                              crear, modificar (imatges comparades amb l'API),
+                              permisos, activar i esborrar. Crea la seva entitat
+                              i l'esborra en acabar.
+    entitat.super.jsp.spec.ts
+                            — Els mateixos tests sobre la interfície JSP.
+    entitatComu.ts          — Dades i comprovacions compartides (CIF vàlids,
+                              imatges de prova, lectura de l'entitat per API).
+
+  fixtures/                 — Fitxers de prova (imatges per als logos d'entitat).
+
+  Els tests de superusuari s'executen amb un usuari propi (entrada "super" de
+  credentials.json, auth/super.setup.ts, projectes "super" i "super-jsp"): el rol
+  actiu es desa per usuari a la BD i no es pot canviar el de l'admin mentre
+  s'executen els seus tests en paral·lel.
+
+  utils/
+    reactHelpers.ts         — Helpers comuns dels tests REACT (graella MUI,
+                              diàlegs, filtres, Autocomplete, rol).
+    jspHelpers.ts           — Helpers comuns dels tests JSP (datatables,
+                              modals amb iframe, select2, rol).
 
   LLEGEIX-ME.txt            — Aquest fitxer.
 

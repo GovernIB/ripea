@@ -66,6 +66,7 @@ public class EntitatServiceImpl implements EntitatService {
 				.blackFaviconBytes(entitat.getBlackFaviconImgBytes())
 				.blackCapsaleraColorFons(entitat.getBlackCapsaleraColorFons())
 				.blackCapsaleraColorLletra(entitat.getBlackCapsaleraColorLletra())
+				.permetreEnviamentPostal(entitat.isPermetreEnviamentPostal())
 				.build();
 		EntitatEntity savedEntity = entitatRepository.save(entity);
 		configHelper.crearConfigsEntitat(savedEntity.getCodi());

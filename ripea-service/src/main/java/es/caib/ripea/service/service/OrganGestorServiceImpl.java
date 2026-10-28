@@ -153,6 +153,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	public String delete(Long entitatId, Long id) {
 		logger.debug("Esborrant organ gestor (id=" + id + ")");
 		OrganGestorEntity organGestor = entityComprovarHelper.comprovarPermisOrganGestor(entitatId, id, false);
+		// Els permisos de l'òrgan (ACL) no s'esborren en cascada amb l'òrgan
+		permisosHelper.eliminarPermisosOrgan(organGestor);
 		organGestorRepository.delete(organGestor);
 		return organGestor.getNom();
 	}

@@ -13,7 +13,7 @@ import es.caib.ripea.service.intf.base.annotation.ResourceField;
 import es.caib.ripea.service.intf.base.model.BaseAuditableResource;
 import es.caib.ripea.service.intf.base.model.FileReference;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
-import es.caib.ripea.service.intf.resourcevalidation.ValidImageFile;
+import es.caib.ripea.service.intf.resourcevalidation.DocumentIdentitat;
 import es.caib.ripea.service.intf.resourcevalidation.ValidImageFile;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -47,11 +47,13 @@ public class EntitatResource extends BaseAuditableResource<Long> {
 	private String descripcio;
 	@NotNull
 	@Size(max = 9)
+	@DocumentIdentitat
 	private String cif;
 	@NotNull
 	@Size(max = 9)
 	private String unitatArrel;
-	private boolean activa;
+	// Una entitat nova es crea activa (com des de la interfície clàssica); el formulari no té el camp
+	private boolean activa = true;
 	private Date dataSincronitzacio;
 	private Date dataActualitzacio;
 	private boolean permetreEnviamentPostal;

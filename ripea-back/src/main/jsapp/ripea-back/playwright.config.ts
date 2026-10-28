@@ -51,6 +51,15 @@ export default defineConfig({
             // del backend i amb els selectors dels tests.
             use: { locale: 'ca-ES' },
         },
+        {
+            name: 'setup-super',
+            testMatch: /auth[\/\\]super\.setup\.ts/,
+			workers: 1,
+            // Força el català al detector d'idioma de i18next (navigator.language),
+            // perquè la sessió desada quedi en català i coincideixi amb les etiquetes
+            // del frontend i amb els selectors dels tests.
+            use: { locale: 'ca-ES' },
+        },
 
         // ── Tests per rol ──
         {
@@ -91,6 +100,32 @@ export default defineConfig({
                 storageState: 'tests_e2e/.auth/user.json',
             },
             testMatch: '**/*.user.spec.ts',
+        },
+        // Superusuari amb usuari propi (veure auth/super.setup.ts): el rol actiu és per
+        // usuari i no es pot canviar el de l'admin mentre corren els seus tests.
+        {
+            name: 'super',
+            dependencies: ['setup-super'],
+            use: {
+                ...devices['Desktop Chrome'],
+                channel: 'chrome',
+                // Força el català perquè la UI del frontend (i18next) coincideixi amb els
+                // selectors del test; sense això, Chrome arrenca en anglès.
+                locale: 'ca-ES',
+                storageState: 'tests_e2e/.auth/super.json',
+            },
+            testMatch: '**/*.super.spec.ts',
+        },
+        {
+            name: 'super-jsp',
+            dependencies: ['setup-super'],
+            use: {
+                ...devices['Desktop Chrome'],
+                channel: 'chrome',
+                // Reutilitza la mateixa sessió Keycloak que la interfície React
+                storageState: 'tests_e2e/.auth/super.json',
+            },
+            testMatch: '**/*.super.jsp.spec.ts',
         },
     ],
 });

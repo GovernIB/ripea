@@ -1,6 +1,7 @@
 import {useTranslation} from "react-i18next";
 import {useState} from "react";
-import {GridPage} from "reactlib";
+import {GridPage, useBaseAppContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
+import {useConfirmDialogButtons} from "@src/util/buttonsOverride.tsx";
 import {CardPage} from "../../../components/CardData.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {Grid, Icon, Badge} from "@mui/material";
@@ -84,6 +85,41 @@ const perspectives = ["COUNT_PERMISOS"];
 const GrupGrid = () => {
     const {t} = useTranslation();
     const [springFilter, setSpringFilter] = useState<string>();
+    const [seleccio, setSeleccio] = useState<any[]>([]);
+    const gridApiRef = useMuiDataGridApiRef();
+    const {delete: apiDelete} = useResourceApiService('grupResource');
+    const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
+    const confirmDialogButtons = useConfirmDialogButtons().reverse();
+
+    // Esborra els grups seleccionats d'un en un (com l'esborrat massiu del JSP) i
+    // informa de quants s'han esborrat i quants han fallat.
+    const esborrarMassiu = (ids: any[]) => {
+        messageDialogShow(
+            t('page.grup.action.delete.massive.check'),
+            t('page.grup.action.delete.massive.description', {num: ids.length}),
+            confirmDialogButtons,
+            {maxWidth: 'sm', fullWidth: true})
+            .then(async (value: any) => {
+                if (!value) {
+                    return;
+                }
+                const errors: any[] = [];
+                for (const id of ids) {
+                    await apiDelete(id).catch((error: any) => errors.push(error));
+                }
+                const correctes = ids.length - errors.length;
+                setSeleccio([]);
+                gridApiRef?.current?.refresh?.();
+                if (correctes > 0) {
+                    temporalMessageShow(null, t('page.grup.action.delete.massive.ok', {num: correctes}), 'success');
+                }
+                if (errors.length > 0) {
+                    temporalMessageShow(null,
+                        t('page.grup.action.delete.massive.error', {num: errors.length}) + ': ' + (errors[0]?.message ?? ''),
+                        'error');
+                }
+            });
+    }
 
     const actions = [
         {
@@ -104,6 +140,7 @@ const GrupGrid = () => {
             label: t('common.delete'),
             icon: "delete",
             showInMenu: false,
+            onClick: esborrarMassiu,
         },
     ]
 
@@ -112,7 +149,10 @@ const GrupGrid = () => {
             <GrupFilter onSpringFilterChange={setSpringFilter}/>
 
             <StyledMuiGrid
+                apiRef={gridApiRef}
                 resourceName={"grupResource"}
+                rowSelectionModel={seleccio}
+                onRowSelectionModelChange={setSeleccio}
                 popupEditUpdateActive
                 popupEditFormDialogResourceTitle={t('page.grup.title')}
                 popupEditFormContent={<GrupForm/>}

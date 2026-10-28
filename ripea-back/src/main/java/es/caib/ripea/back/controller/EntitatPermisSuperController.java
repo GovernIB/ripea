@@ -107,6 +107,10 @@ public class EntitatPermisSuperController extends BaseController {
 			@Valid PermisCommand command,
 			BindingResult bindingResult,
 			Model model) {
+		// Un permís d'entitat sense cap tipus marcat no dona accés: no es permet desar-lo
+		if (!command.isAdministration() && !command.isAdministrationLectura() && !command.isRead()) {
+			bindingResult.reject("entitat.permis.form.validacio.cap.permis");
+		}
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("entitat", entitatService.findById(entitatId));
 			request.getSession().setAttribute(MissatgesHelper.SESSION_ATTRIBUTE_BINDING_ERRORS, bindingResult.getGlobalErrors());

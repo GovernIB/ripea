@@ -1485,6 +1485,12 @@ const translationEs = {
                 },
                 delete: {
                     ok: "Grupo '{{data.codi}}' eliminado correctamente",
+                    massive: {
+                        check: "Eliminar grupos",
+                        description: "¿Está seguro de que desea eliminar los {{num}} grupos seleccionados?",
+                        ok: "Se han eliminado correctamente {{num}} grupos",
+                        error: "Se ha producido un error al eliminar {{num}} grupos",
+                    },
                 },
                 link: {
                     label: "Vincula grupo...",

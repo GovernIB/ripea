@@ -231,6 +231,10 @@ public class EntitatEntity extends RipeaAuditable<Long> {
 		public Builder blackCapsaleraColorLletra(String capsaleraColorLletra) {
 			built.blackCapsaleraColorLletra = capsaleraColorLletra;
 			return this;
+		}
+		public Builder permetreEnviamentPostal(boolean permetreEnviamentPostal) {
+			built.permetreEnviamentPostal = permetreEnviamentPostal;
+			return this;
 		}		
 	}
 
