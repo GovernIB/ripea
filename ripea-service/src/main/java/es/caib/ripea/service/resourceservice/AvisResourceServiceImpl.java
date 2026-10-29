@@ -62,8 +62,9 @@ public class AvisResourceServiceImpl extends BaseMutableResourceService<AvisReso
             for (AvisResourceEntity avisEntity : avisEntityList) {
                 avisEntity.setActiu(params.getActive());
                 avisResourceRepository.save(avisEntity);
-                eventHelper.notifyAvisosActius();
             }
+            // Una sola notificació per a tot el lot: el missatge només és un avís perquè els clients tornin a llegir els avisos.
+            eventHelper.notifyAvisosActius();
             return null;
         }
     }

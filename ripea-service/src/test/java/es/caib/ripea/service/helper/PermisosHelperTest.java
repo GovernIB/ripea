@@ -510,7 +510,12 @@ class PermisosHelperTest {
 
             verify(cacheHelper, never()).evictEntitatsAccessiblesUsuari(any());
 
+            // A JBoss, afterCommit arriba abans del commit JTA real: encara no s'ha d'evictar.
             TransactionSynchronizationManager.getSynchronizations().forEach(TransactionSynchronization::afterCommit);
+            verify(cacheHelper, never()).evictEntitatsAccessiblesUsuari(any());
+
+            TransactionSynchronizationManager.getSynchronizations().forEach(
+                    s -> s.afterCompletion(TransactionSynchronization.STATUS_COMMITTED));
 
             verify(cacheHelper).evictEntitatsAccessiblesUsuari("usuari1");
         } finally {

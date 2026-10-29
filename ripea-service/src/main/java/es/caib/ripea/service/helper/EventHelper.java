@@ -65,7 +65,7 @@ public class EventHelper {
     	// El missatge d'avisos viatja buit (és només un trigger): la data la re-consulta el consumidor
     	// (handleEventAvisos -> getAvisosActiusPerUsuariCodi) en una transacció nova. Si publiquéssim el
     	// missatge dins la transacció encara oberta del canvi d'avís, el consumidor podria llegir l'estat
-    	// antic (race condition). Per això diferim l'enviament a afterCommit, quan el canvi ja és visible.
+    	// antic (race condition). Per això diferim l'enviament a després del commit (TransactionAfterCommitUtils), quan el canvi ja és visible.
     	TransactionAfterCommitUtils.run(() -> {
         	try {
     	        log.debug("notifyAvisosActius a clients");
@@ -112,7 +112,7 @@ public class EventHelper {
      *
      * A diferència de notifyErrorsValidacio (que viatja amb les dades ja calculades dins la mateixa
      * transacció), aquest event és només un senyal: el client hi reacciona refrescant la graella, és a dir,
-     * tornant a llegir de BBDD. Per això l'enviament es difereix a afterCommit, com a notifyAvisosActius;
+     * tornant a llegir de BBDD. Per això l'enviament es difereix a després del commit, com a notifyAvisosActius;
      * si el publicàssim amb la transacció encara oberta, el refresc podria llegir l'estat anterior.
      */
     public void notifyFirmaEstatCanviat(FirmaEstatCanviatEvent firmaEvent) {
@@ -128,7 +128,7 @@ public class EventHelper {
 
     /**
      * Notifica als clients subscrits a l'expedient que ha canviat l'estat d'una notificació.
-     * Es difereix a afterCommit pel mateix motiu que notifyFirmaEstatCanviat.
+     * Es difereix a després del commit pel mateix motiu que notifyFirmaEstatCanviat.
      */
     public void notifyNotificacioEstatCanviat(NotificacioEstatCanviatEvent notificacioEvent) {
     	TransactionAfterCommitUtils.run(() -> {
