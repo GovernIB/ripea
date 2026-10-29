@@ -230,13 +230,13 @@ databaseChangeLog:
         - sqlFile:
             dbms: oracle
             path: ../scripts/oracle/1.0.8/Versio_1.0.8_DML_1890.sql
-            splitStatements: false
+            splitStatements: true
             stripComments: true
             relativeToChangelogFile: true
         - sqlFile:
             dbms: postgresql
             path: ../scripts/postgres/1.0.8/Versio_1.0.8_DML_1890.sql
-            splitStatements: false
+            splitStatements: true
             stripComments: true
             relativeToChangelogFile: true
   - changeSet:
@@ -246,13 +246,13 @@ databaseChangeLog:
         - sqlFile:
             dbms: oracle
             path: ../scripts/oracle/1.0.8/Versio_1.0.8_DML_7.sql
-            splitStatements: false
+            splitStatements: true
             stripComments: true
             relativeToChangelogFile: true
         - sqlFile:
             dbms: postgresql
             path: ../scripts/postgres/1.0.8/Versio_1.0.8_DML_7.sql
-            splitStatements: false
+            splitStatements: true
             stripComments: true
             relativeToChangelogFile: true
   - changeSet:
@@ -294,13 +294,13 @@ databaseChangeLog:
         - sqlFile:
             dbms: oracle
             path: ../scripts/oracle/1.0.8/Versio_1.0.8_DML_1897.sql
-            splitStatements: false
+            splitStatements: true
             stripComments: true
             relativeToChangelogFile: true
         - sqlFile:
             dbms: postgresql
             path: ../scripts/postgres/1.0.8/Versio_1.0.8_DML_1897.sql
-            splitStatements: false
+            splitStatements: true
             stripComments: true
             relativeToChangelogFile: true
   - changeSet:
@@ -310,13 +310,13 @@ databaseChangeLog:
         - sqlFile:
             dbms: oracle
             path: ../scripts/oracle/1.0.8/Versio_1.0.8_DML_1892.sql
-            splitStatements: false
+            splitStatements: true
             stripComments: true
             relativeToChangelogFile: true
         - sqlFile:
             dbms: postgresql
             path: ../scripts/postgres/1.0.8/Versio_1.0.8_DML_1892.sql
-            splitStatements: false
+            splitStatements: true
             stripComments: true
             relativeToChangelogFile: true
   - changeSet:
@@ -358,13 +358,13 @@ databaseChangeLog:
         - sqlFile:
             dbms: oracle
             path: ../scripts/oracle/1.0.8/Versio_1.0.8_DML_10.sql
-            splitStatements: false
+            splitStatements: true
             stripComments: true
             relativeToChangelogFile: true
         - sqlFile:
             dbms: postgresql
             path: ../scripts/postgres/1.0.8/Versio_1.0.8_DML_10.sql
-            splitStatements: false
+            splitStatements: true
             stripComments: true
             relativeToChangelogFile: true
   - changeSet:
