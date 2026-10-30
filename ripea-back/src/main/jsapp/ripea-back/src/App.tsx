@@ -1,7 +1,6 @@
 import React, {useEffect} from 'react';
 import {BaseApp} from './components/BaseApp';
 import ripea_logo from './assets/Drassana_RIP_DRA_COL.svg';
-import favicon from './assets/favicon.png'
 import governLogo from './assets/govern-logo.png'
 import AppRoutes from './AppRoutes';
 import {useEntitatSession} from "./components/Session.tsx";
@@ -12,15 +11,28 @@ import { useTheme } from '@mui/material';
 import { TemporalMessageBridge } from './components/PreBaseAppProvider.tsx';
 import {useThemeUserContext} from "@src/components/ThemeUserProvider.tsx";
 
-const changeFavicon = (faviconUrl:any) => {
-    const link:any =
-        document.querySelector("link[rel~='icon']") ||
-        document.createElement('link');
+type FaviconLink = { href: string, type?: string, sizes?: string };
 
-    link.rel = 'icon';
-    link.href = faviconUrl;
+// Els mateixos que declara index.html (public/): SVG i PNG per als navegadors sense suport d'SVG
+const defaultFavicons: FaviconLink[] = [
+    { href: `${import.meta.env.BASE_URL}favicon.svg`, type: 'image/svg+xml' },
+    { href: `${import.meta.env.BASE_URL}favicon.png`, type: 'image/png', sizes: '32x32' },
+];
 
-    document.getElementsByTagName('head')[0].appendChild(link);
+// Substitueix tots els <link rel="icon">: si només se'n canviàs un, el navegador podria triar l'altre
+const changeFavicon = (entitatFaviconUrl?: string) => {
+    const head = document.getElementsByTagName('head')[0];
+    head.querySelectorAll("link[rel~='icon']").forEach((link) => link.remove());
+
+    const favicons: FaviconLink[] = entitatFaviconUrl ? [{ href: entitatFaviconUrl }] : defaultFavicons;
+    favicons.forEach(({ href, type, sizes }) => {
+        const link = document.createElement('link');
+        link.rel = 'icon';
+        if (type) link.type = type;
+        if (sizes) link.setAttribute('sizes', sizes);
+        link.href = href;
+        head.appendChild(link);
+    });
 };
 
 export const getImgFromBytes = (img:string) :string | undefined => {
@@ -41,8 +53,8 @@ export const App: React.FC = () => {
     }, [i18n.language]);  // ← se ejecuta en el arranque y cada vez que cambie
 
     useEffect(() => {
-        changeFavicon(getImgFromBytes(entitat?.conf?.favicon) || favicon)
-    }, [entitat?.conf?.favicon, favicon]);
+        changeFavicon(getImgFromBytes(entitat?.conf?.favicon))
+    }, [entitat?.conf?.favicon]);
 
     return (
         <BaseApp

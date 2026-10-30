@@ -57,7 +57,8 @@
     	<link rel="shortcut icon" href="<c:url value="/userajax/getFaviconLogo"/>" type="image/x-icon" />
     </c:when>
     <c:otherwise>
-    	<link rel="shortcut icon" href="<c:url value="/img/favicon.png"/>" type="image/x-icon" />
+    	<link rel="icon" type="image/svg+xml" href="<c:url value="/img/favicon.svg"/>" />
+    	<link rel="icon" type="image/png" sizes="32x32" href="<c:url value="/img/favicon.png"/>" />
     </c:otherwise>
     </c:choose>
     <script src="<c:url value="/webjars/jquery/1.12.4/dist/jquery.min.js"/>"></script>

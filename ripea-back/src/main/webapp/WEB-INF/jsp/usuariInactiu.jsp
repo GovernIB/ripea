@@ -8,7 +8,8 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 	<title><spring:message code="usuari.inactiu.titol"/></title>
-	<link rel="shortcut icon" href="<c:url value="/img/favicon.png"/>" type="image/x-icon"/>
+	<link rel="icon" type="image/svg+xml" href="<c:url value="/img/favicon.svg"/>"/>
+	<link rel="icon" type="image/png" sizes="32x32" href="<c:url value="/img/favicon.png"/>"/>
 	<link href="<c:url value="/webjars/bootstrap/3.3.6/dist/css/bootstrap.min.css"/>" rel="stylesheet"/>
 	<link href="<c:url value="/webjars/font-awesome/4.7.0/css/font-awesome.min.css"/>" rel="stylesheet"/>
 </head>
