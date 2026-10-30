@@ -9,6 +9,14 @@
 	<welcome-file-list>
 		<welcome-file>index.jsp</welcome-file>
 	</welcome-file-list>
+	<!-- Galeta de sessió HttpOnly: cap JS de la UI JSP ni de la REACT no llegeix el JSESSIONID,
+	     i així un XSS no la pot robar. SameSite=Lax queda pendent fins que s'actualitzi el servidor
+	     d'aplicacions: JBoss EAP 7.2 no el permet configurar des del web.xml. -->
+	<session-config>
+		<cookie-config>
+			<http-only>true</http-only>
+		</cookie-config>
+	</session-config>
 	<!-- TEMPORAL: eliminar quan es reprengui l'autenticació real -->
 	<!-- filter>
 		<filter-name>fakeAuthFilter</filter-name>
