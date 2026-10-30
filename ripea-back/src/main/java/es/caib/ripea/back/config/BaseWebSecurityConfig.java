@@ -47,6 +47,10 @@ public abstract class BaseWebSecurityConfig {
 				new AntPathRequestMatcher("/webjars/**/*"),
 				new AntPathRequestMatcher("/modal/document/event/**/*"),
 				new AntPathRequestMatcher("/modal/digitalitzacio/event/**/*"),
+				// Fitxers estàtics de la interfície REACT, públics també al contenidor (veure web.xml)
+				new AntPathRequestMatcher("/reactapp/assets/**"),
+				new AntPathRequestMatcher("/reactapp/favicon.png"),
+				new AntPathRequestMatcher("/reactapp/favicon.svg"),
 		};
 	}
 
