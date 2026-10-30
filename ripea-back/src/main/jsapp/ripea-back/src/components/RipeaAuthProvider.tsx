@@ -1,10 +1,12 @@
 import React from 'react';
 import { AuthContext, useResourceApiContext } from 'reactlib';
 import { useUserSession } from './Session';
+import { PantallaSessioCaducada, useSessioCaducada } from './sessioCaducada';
 
 export const RipeaAuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     const { value: user, remove: clearSession } = useUserSession();
     const { apiUrl } = useResourceApiContext();
+    const sessioCaducada = useSessioCaducada();
     const isAuthenticated = user != null;
 
     const signOut = () => {
@@ -30,5 +32,9 @@ export const RipeaAuthProvider: React.FC<React.PropsWithChildren> = ({ children 
         signIn: undefined,
         signOut,
     };
-    return <AuthContext.Provider value={context}>{children}</AuthContext.Provider>;
+    return (
+        <AuthContext.Provider value={context}>
+            {sessioCaducada ? <PantallaSessioCaducada /> : children}
+        </AuthContext.Provider>
+    );
 };

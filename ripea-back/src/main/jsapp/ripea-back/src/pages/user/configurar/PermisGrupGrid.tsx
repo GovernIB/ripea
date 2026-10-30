@@ -47,8 +47,8 @@ const PermisGrupGrid = ()=> {
     ]
 
     useEffect(() => {
-        setTitlePage(t('page.user.menu.grupPermis'))
-    }, [t]);
+        setTitlePage('page.user.menu.grupPermis')
+    }, []);
 
     return <GridPage autoHeight>
         <CardPage title={t('page.user.menu.grupPermis')}>

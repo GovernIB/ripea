@@ -24,7 +24,7 @@ import {useActions} from "./CommonActions.tsx";
 import useAlerta from "./Alerta.tsx";
 import useErrorValidacio, { getResumErrorsText } from "./ErrorValidacio.tsx";
 import SseExpedient, {useValidacioSession} from "../../../components/SseExpedient.tsx";
-import {setTitlePage} from "../../../TitleHeaderConfigurator.tsx";
+import {setTitlePageText} from "../../../TitleHeaderConfigurator.tsx";
 import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
 import {ErrorPage} from "../../../components/ErrorPage.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
@@ -501,7 +501,7 @@ const Expedient = () => {
     useEffect(() => {
         if (expedient) {
             const title = carpetaNode?.nom ? `${expedient?.nom} — ${carpetaNode.nom}` : expedient?.nom;
-            setTitlePage(title);
+            setTitlePageText(title);
         }
     }, [expedient, carpetaNode]);
 

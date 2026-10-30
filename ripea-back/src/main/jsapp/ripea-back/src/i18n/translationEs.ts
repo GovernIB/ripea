@@ -46,6 +46,10 @@ const translationEs = {
             message: "Mensaje",
         },
         dragdrop: "Reordena el contenido",
+        sessio: {
+            caducada: "La sesión ha caducado",
+            iniciar: "Volver a entrar",
+        },
     },
     calendar: {
         today: "Hoy",

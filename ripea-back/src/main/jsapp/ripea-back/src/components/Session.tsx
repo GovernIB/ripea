@@ -3,6 +3,7 @@ import {useEffect, useMemo} from "react";
 import {useSession, useSessionContext} from "./SessionStorageContext.tsx";
 import {useResourceApiService, useResourceApiContext} from "reactlib";
 import { useTheme } from "@mui/material";
+import { sessioRecuperada } from "./sessioCaducada.tsx";
 
 const userkey :string = 'usuario';
 const entitatKey = 'entitat';
@@ -35,9 +36,11 @@ export const useUserSession = () => {
     const refresh = () => {
         axios.get(apiUrl + 'usuari/actual/securityInfo')
             .then((response) => {
+                sessioRecuperada();
                 save(response.data);
             })
             .catch((error) => {
+                // Un 401 (sense sessió) ja el gestiona l'interceptor de sessioCaducada
                 if (isUsuariInactiu(error)) {
                     window.location.href = apiUrl.replace(/\/api\/?$/, '/') + URL_USUARI_INACTIU;
                     return;

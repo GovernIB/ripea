@@ -116,7 +116,7 @@ export const PropietatsByEntitat: React.FC = () => {
 
     useEffect(() => {
         if (entity) {
-            setTitlePage(`${t('page.user.menu.props')} - ${entity?.nom}`)
+            setTitlePage('page.user.menu.props', undefined, entity?.nom)
         }
     }, [entity]);
 

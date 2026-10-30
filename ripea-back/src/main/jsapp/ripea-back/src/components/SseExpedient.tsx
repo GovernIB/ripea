@@ -1,6 +1,7 @@
 import React, {useEffect, useRef} from 'react';
 import {useSessionContext} from './SessionStorageContext';
 import {useResourceApiContext} from "reactlib";
+import {comprovarSessio} from "./sessioCaducada.tsx";
 
 // Claus dels events SSE de l'expedient.
 // IMPORTANT: són senyals de temps real (transitòries), NO estat persistent. Es guarden en memòria
@@ -162,16 +163,24 @@ export const SseExpedient: React.FC<any> = (props:any) => {
                 eventSource.close();
                 eventSourceRef.current = null;
 
-                // Intentar reconnectar després d'un temps
-                setTimeout(connectToSSE, 5000);
+                // Si ha caigut perquè s'ha perdut la sessió no es reintenta: es recupera la sessió.
+                // Si no, intentar reconnectar després d'un temps
+                comprovarSessio().then((sessioViva) => {
+                    if (sessioViva && actiu) {
+                        setTimeout(connectToSSE, 5000);
+                    }
+                });
             };
         };
+
+        let actiu = true;
 
         // Iniciar la connexió
         connectToSSE();
 
         // Netejar en desmuntar el component
         return () => {
+            actiu = false;
             // console.log('Netejam o desmontam el component');
             if (eventSourceRef.current) {
                 // console.log('Desconnectam SSE');

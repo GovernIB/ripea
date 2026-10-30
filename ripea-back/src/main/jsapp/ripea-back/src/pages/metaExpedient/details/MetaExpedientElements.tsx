@@ -107,7 +107,11 @@ export const MetaExpedientElements = () => {
 
     useEffect(() => {
         if (metaExpedient) {
-            setTitlePage(title)
+            setTitlePage(
+                metaExpedient?.tipusProcedimentServei === 'PROCEDIMENT'
+                    ? 'page.metaExpedient.detall.elementsProc'
+                    : 'page.metaExpedient.detall.elementsServ',
+                {nom: metaExpedient?.nom})
         }
     }, [metaExpedient]);
 

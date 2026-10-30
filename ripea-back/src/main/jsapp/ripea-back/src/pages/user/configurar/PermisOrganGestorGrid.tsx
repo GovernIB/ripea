@@ -161,7 +161,7 @@ const PermisOrganGestorGrid = ()=> {
     const [entity, setEntity] = useState<any>();
 
     useEffect(() => {
-        setTitlePage(t('page.user.menu.organPermis', {nom: entity?.nom}))
+        setTitlePage('page.user.menu.organPermis', {nom: entity?.nom})
     }, [entity]);
 
     return <GridPage autoHeight>

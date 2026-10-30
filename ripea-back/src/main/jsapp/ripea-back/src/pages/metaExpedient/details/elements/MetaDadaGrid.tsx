@@ -226,7 +226,7 @@ const MetaDadaGrid = () => {
 
     useEffect(() => {
         if (metaDocument) {
-            setTitlePage(t('page.user.menu.documentDada', {nom: metaDocument?.nom}))
+            setTitlePage('page.user.menu.documentDada', {nom: metaDocument?.nom})
         }
     }, [metaDocument]);
 
