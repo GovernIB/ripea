@@ -44,7 +44,7 @@ const springFilterBuilder = (data: any) :string => {
         metaExpedient: data?.metaExpedient,
         numero: data?.numero,
         nom: data?.nom,
-        estat: data?.estat,
+        estatCustom: data?.estatCustom,
     }
     return expedientFilterBuilder(processedData);
 }
@@ -58,10 +58,10 @@ const ActionFilterFrom = () => {
     );
 
     return <>
-        <GridFormField size={{xs: 12, sm: 6, md: 2.4}} name="metaExpedient" filter={filterMetaExpedient}/>
-        <GridFormField size={{xs: 12, sm: 6, md: 2.4}} name="numero"/>
-        <GridFormField size={{xs: 12, sm: 6, md: 2.4}} name="nom"/>
-        <GridFormField size={{xs: 12, sm: 6, md: 2.4}} name="estat" requestParams={{metaExpedientId: data?.metaExpedient?.id}}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 2.875}} name="metaExpedient" filter={filterMetaExpedient}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 2.875}} name="numero"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 2.875}} name="nom"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 2.875}} name="estatCustom" requestParams={{metaExpedientId: data?.metaExpedient?.id}}/>
     </>
 }
 
@@ -152,7 +152,7 @@ const useImportarExpedient = (entity:any, refresh?: () => void) => {
             open={open}
             closeCallback={handleClose}
             title={entity?.nom}
-            componentProps={{ fullWidth: true, maxWidth: 'md' }}
+            componentProps={{ fullWidth: true, maxWidth: 'lg' }}
             buttons={[
                 {
                     value: 'close',

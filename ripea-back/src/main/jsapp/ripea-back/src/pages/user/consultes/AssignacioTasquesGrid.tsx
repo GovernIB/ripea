@@ -1,58 +1,84 @@
-import {useTranslation} from "react-i18next";
-import {useState} from "react";
-import {GridPage, useFormContext} from "reactlib";
-import {CardPage} from "../../../components/CardData.tsx";
-import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import {formatDate} from "../../../util/dateUtils.ts";
-import GridFormField from "../../../components/GridFormField.tsx";
-import ContingutLink from "../../../components/ContingutLink.tsx";
-import * as builder from "../../../util/springFilterUtils.ts";
-import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
-import useTascaDetail from "../../tasca/details/TascaDetail.tsx";
+import { useTranslation } from 'react-i18next';
+import { useState } from 'react';
+import { GridPage, useFormContext } from 'reactlib';
+import { ScreenFrame } from '../../../components/ScreenFrame.tsx';
+import { icons } from '../../../util/icons.ts';
+import StyledMuiGrid from '../../../components/StyledMuiGrid.tsx';
+import { formatDate } from '../../../util/dateUtils.ts';
+import GridFormField from '../../../components/GridFormField.tsx';
+import ContingutLink from '../../../components/ContingutLink.tsx';
+import * as builder from '../../../util/springFilterUtils.ts';
+import StyledMuiFilter from '../../../components/StyledMuiFilter.tsx';
+import useTascaDetail from '../../tasca/details/TascaDetail.tsx';
 
 const AssignacioTasquesFilterForm = () => {
-    const {data} = useFormContext();
-    return <>
-        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="expedient"/>
-        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="metaExpedientTasca" namedQueries={[`BY_EXPEDIENT#${data?.expedient?.id ?? 0}`]}/>
-        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="estat"/>
-        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="responsable"/>
-        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="dataInici" type={"date"}/>
-        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="dataFi" type={"date"}/>
-    </>
-}
+    const { data } = useFormContext();
+    return (
+        <>
+            {!data?.advanced && (
+                <>
+                    <GridFormField size={{ xs: 12, sm: 6, md: 3.5 }} name="expedient" />
+                    <GridFormField
+                        size={{ xs: 12, sm: 6, md: 3 }}
+                        name="metaExpedientTasca"
+                        namedQueries={[`BY_EXPEDIENT#${data?.expedient?.id ?? 0}`]}
+                    />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="estat" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="dataInici" type={'date'} />
+                </>
+            )}
+            {data?.advanced && (
+                <>
+                    <GridFormField size={{ xs: 12, sm: 6, md: 4 }} name="expedient" />
+                    <GridFormField
+                        size={{ xs: 12, sm: 6, md: 3 }}
+                        name="metaExpedientTasca"
+                        namedQueries={[`BY_EXPEDIENT#${data?.expedient?.id ?? 0}`]}
+                    />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 3 }} name="responsable" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="estat" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="dataInici" type={'date'} />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="dataFi" type={'date'} />
+                </>
+            )}
+        </>
+    );
+};
 
-const springFilterBuilder = (data:any) => {
+const springFilterBuilder = (data: any) => {
     return builder.and(
         builder.eq('expedient.id', data?.expedient?.id),
         builder.eq('metaExpedientTasca.id', data?.metaExpedientTasca?.id),
         builder.eq('estat', `'${data?.estat}'`),
-        data?.responsable?.id && builder.exists(builder.eq("responsables.codi", `'${data?.responsable?.id}'`)),
-        builder.betweenDates('dataInici', data?.dataInici, data?.dataFi),
+        data?.responsable?.id && builder.exists(builder.eq('responsables.codi', `'${data?.responsable?.id}'`)),
+        builder.betweenDates('dataInici', data?.dataInici, data?.dataFi)
     );
-}
+};
 
 const AssignacioTasquesFilter = (props: any) => {
-    const {onSpringFilterChange} = props;
+    const { onSpringFilterChange } = props;
 
-    return <StyledMuiFilter
-        resourceName={"expedientTascaResource"}
-        code={"TASCA_FILTER"}
-        sessionKey={"ASSIGNACIO_TASCA_FILTER"}
-        springFilterBuilder={springFilterBuilder}
-        onSpringFilterChange={onSpringFilterChange}
-    >
-        <AssignacioTasquesFilterForm/>
-    </StyledMuiFilter>
-}
+    return (
+        <StyledMuiFilter
+            resourceName={'expedientTascaResource'}
+            code={'TASCA_FILTER'}
+            sessionKey={'ASSIGNACIO_TASCA_FILTER'}
+            springFilterBuilder={springFilterBuilder}
+            advancedSearch
+            onSpringFilterChange={onSpringFilterChange}
+        >
+            <AssignacioTasquesFilterForm />
+        </StyledMuiFilter>
+    );
+};
 
 // Grid
-const sortModel: any = [{field: 'dataInici', sort: 'desc'}]
+const sortModel: any = [{ field: 'dataInici', sort: 'desc' }];
 const columns = [
     {
         field: 'expedient',
         flex: 1,
-        renderCell: (params:any) => <ContingutLink id={params?.row?.expedient?.id}>{params?.formattedValue}</ContingutLink>,
+        renderCell: (params: any) => <ContingutLink id={params?.row?.expedient?.id}>{params?.formattedValue}</ContingutLink>,
     },
     {
         field: 'metaExpedientTasca',
@@ -77,11 +103,11 @@ const columns = [
         flex: 0.5,
         valueFormatter: (value: any) => formatDate(value),
     },
-]
+];
 
-const perspectives:any = ['AUDITORIA']
+const perspectives: any = ['AUDITORIA'];
 const AssignacioTasquesGrid = () => {
-    const {t} = useTranslation();
+    const { t } = useTranslation();
     const [springFilter, setSpringFilter] = useState<string>();
 
     const { handleOpen, dialog } = useTascaDetail();
@@ -89,29 +115,31 @@ const AssignacioTasquesGrid = () => {
     const actions = [
         {
             label: t('common.detail'),
-            icon: "info",
+            icon: 'info',
             showInMenu: false,
             onClick: handleOpen,
         },
-    ]
+    ];
 
-    return <GridPage autoHeight>
-        <CardPage title={t('page.user.menu.assignacio')}>
-            <AssignacioTasquesFilter onSpringFilterChange={setSpringFilter}/>
+    return (
+        <GridPage>
+            <ScreenFrame icon={icons.tasca} title={t('page.user.menu.assignacio')}>
+                <AssignacioTasquesFilter onSpringFilterChange={setSpringFilter} />
 
-            <StyledMuiGrid
-                resourceName={"expedientTascaResource"}
-				persistentStateKey={"expedientTascaResource_assignacioTasques"}
-                columns={columns}
-                filter={springFilter}
-                toolbarShowFilterCount
-                perspectives={perspectives}
-                sortModel={sortModel}
-                rowAdditionalActions={actions}
-                readOnly
-            />
-        </CardPage>
-        {dialog}
-    </GridPage>
-}
+                <StyledMuiGrid
+                    resourceName={'expedientTascaResource'}
+                    persistentStateKey={'expedientTascaResource_assignacioTasques'}
+                    columns={columns}
+                    filter={springFilter}
+                    toolbarShowFilterCount
+                    perspectives={perspectives}
+                    sortModel={sortModel}
+                    rowAdditionalActions={actions}
+                    readOnly
+                />
+            </ScreenFrame>
+            {dialog}
+        </GridPage>
+    );
+};
 export default AssignacioTasquesGrid;

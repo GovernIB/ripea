@@ -120,9 +120,11 @@ const aplicarFiltreGrups = async (page: Page, filtre: FiltreGrups) => {
     if (filtre.organ) {
         await seleccionarOpcioAutocompletamentPerText(page, form, SELECTOR_ORGAN, codiOrgan(filtre.organ), filtre.organ);
     }
-    // Els camps de text propaguen el valor amb debounce: sense el retard, el clic pot
-    // arribar abans i el filtre s'aplica sense el text (cap petició nova).
-    await guardaAmbDelay(page, page.getByRole('button', { name: 'Filtra', exact: true }));
+    // El filtre s'aplica sol (no hi ha botó Filtra): els camps de text, 1 s després de l'últim caràcter;
+    // Tab aplica de seguida el canvi pendent (el desplegable d'òrgan ja s'aplica en triar-lo).
+    if (filtre.codi || filtre.descripcio) {
+        await form.locator(`input[name="${filtre.descripcio ? 'descripcio' : 'codi'}"]`).press('Tab');
+    }
     if (!await resp) {
         logDebug('[Filtre] Sense petició nova: la graella ja tenia aquest filtre');
     }
@@ -147,7 +149,7 @@ const crearGrup = async (page: Page, codi: string, descripcio: string, ambOrgan:
     await dialog.locator('input[name="codi"]').fill(codi);
     await dialog.locator('textarea[name="descripcio"]').fill(descripcio);
     const organ = ambOrgan ? await seleccionarOpcioAutocompletament(page, dialog, SELECTOR_ORGAN) : '';
-    await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /guarda/i }));
+    await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /\bdesa\b/i }));
     await expectSuccessAlert(page);
     await expect(dialog).toBeHidden();
     return organ;
@@ -204,7 +206,7 @@ const crearPermis = async (page: Page, principal: RegExp, sid: string) => {
         page.getByRole('button').filter({ hasText: /nou perm|nuevo perm/i }));
     await triaMuiSelect(page, dialog, 'principal', principal);
     await dialog.locator('input[name="sid"]').fill(sid);
-    await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /guarda/i }));
+    await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /\bdesa\b/i }));
     await expectSuccessAlert(page);
     await expect(dialog).toBeHidden();
 };
@@ -427,7 +429,7 @@ test.describe('Gestió de Grups — IPA_ADMIN', () => {
             organM = await seleccionarOpcioAutocompletament(page, dialog, SELECTOR_ORGAN, 'second');
             expect(organM).not.toBe('');
             expect(organM).not.toBe(organAnterior);
-            await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /guarda/i }));
+            await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /\bdesa\b/i }));
             await expectSuccessAlert(page);
             await expect(dialog).toBeHidden();
         });

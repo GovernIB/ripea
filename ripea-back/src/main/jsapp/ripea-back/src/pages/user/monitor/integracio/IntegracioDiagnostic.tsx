@@ -147,12 +147,14 @@ export const IntegracioDiagnosticFilter = ({apiReiniciar}:any) => {
         // onSpringFilterChange={onSpringFilterChange}
         buttons={buttons}
         initOnChangeRequest
+        autoApply={false} // el diagnòstic s'executa amb el botó, no és un filtre de dades
+        buttonGridProps={{size: {xs: 12, sm: 6, md: 2.4}}} // botons amb text: no caben al bloc estret per defecte
     >
         <IntegracioDiagnosticFilterForm apiReiniciar={apiReiniciar}/>
     </StyledMuiFilter>
 }
 
-export const useIntegracioDiagnostic = (integracions:any[]) => {
+export const useIntegracioDiagnostic = (integracions?:any[]) => {
     const { t } = useTranslation();
 
     const [open, setOpen] = useState(false);
@@ -168,7 +170,7 @@ export const useIntegracioDiagnostic = (integracions:any[]) => {
 
     useEffect(() => {
         if (apiIsReady && open && filter != undefined) {
-            apiDiagnosticAll(integracions.map((i:any) => i.codi), filter?.entitat, filter?.organ)
+            apiDiagnosticAll((integracions ?? []).map((i:any) => i.codi), filter?.entitat, filter?.organ)
         }
     }, [open, filter?.entitat, filter?.organ]);
 

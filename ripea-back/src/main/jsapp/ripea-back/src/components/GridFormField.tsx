@@ -3,6 +3,7 @@ import {Box, Button, Grid, Icon, IconButton, useMediaQuery, useTheme} from "@mui
 import {FormField, FormFieldProps, useFormContext} from "reactlib";
 import {FormFieldDataActionType} from "../../lib/components/form/FormContext";
 import Load from "./Load.tsx";
+import {isTypingFieldType, useFilterAutoApply} from "./FilterAutoApplyContext.ts";
 import {useTranslation} from "react-i18next";
 import {useUserSession} from "./Session.tsx";
 import {useCallback, useEffect, useMemo, useState} from "react";
@@ -26,19 +27,25 @@ export const CombinedIcon = (props:any) => {
 export const GRID_FIELD_PADDING_TOP = '3px';
 
 export const GridButton = (props:any) => {
-    const { title, icon, size, children, hidden, sx, iconOnlyBreakpoint = 'md', ...other} = props;
+    const { title, icon, size, children, hidden, sx, iconOnlyBreakpoint = 'md', iconOnlyFrom, iconSx, ...other} = props;
 
     const theme = useTheme();
-    const iconOnly = useMediaQuery(theme.breakpoints.down(iconOnlyBreakpoint));
+    // `iconOnlyFrom`: només icona entre aquest breakpoint i `iconOnlyBreakpoint` (p. ex. a xs el bloc ocupa
+    // tota l'amplada i el text hi cap); sense ell, només icona per sota de `iconOnlyBreakpoint`.
+    const iconOnly = useMediaQuery(
+        iconOnlyFrom
+            ? theme.breakpoints.between(iconOnlyFrom, iconOnlyBreakpoint)
+            : theme.breakpoints.down(iconOnlyBreakpoint)
+    );
 
     const iconNode = typeof icon === 'string'
-        ? <Icon sx={{mr: (!iconOnly && children) ? 0.5 : 0, ...props.iconSx}}>{icon}</Icon>
+        ? <Icon sx={{mr: (!iconOnly && children) ? 0.5 : 0, ...iconSx}}>{icon}</Icon>
         : icon;
 
     return <Grid title={title} size={size} hidden={hidden} sx={{ pt: GRID_FIELD_PADDING_TOP }}>
         <Button
             variant="outlined"
-            sx={{ borderRadius: '4px', width: '100%', height: '100%', ...sx }}
+            sx={[{ borderRadius: '4px', width: '100%', height: '100%', minWidth: 0 }, ...(Array.isArray(sx) ? sx : [sx])]}
             style={{margin: 0}}
             aria-label={(title && (iconOnly || !children)) ? title : undefined}
             {...other}
@@ -50,7 +57,7 @@ export const GridButton = (props:any) => {
 }
 
 export const GridButtonField = (props:any) => {
-    const {name, whitLabel, icon, title, ...other} = props;
+    const {name, whitLabel, icon, title, text, ...other} = props;
     const {data, apiRef, fields} = useFormContext()
 
     const active = !!data?.[name]
@@ -64,7 +71,7 @@ export const GridButtonField = (props:any) => {
         icon={(typeof icon === 'function') ? icon?.(active) :icon}
         {...other}
     >
-        {whitLabel && label}
+        {text != null ? ((typeof text === 'function') ? text(active) : text) : (whitLabel && label)}
     </GridButton></Load>
 }
 
@@ -146,6 +153,7 @@ const GridFormField = (props:GridFormField) => {
         ...componentProps,
     } : componentProps;
     const {fields, dataDispatchAction, validationSetFieldErrors} = useFormContext()
+    const autoApply = useFilterAutoApply();
 
     const [field, setField] = useState<any>();
     useEffect(() => {
@@ -171,6 +179,7 @@ const GridFormField = (props:GridFormField) => {
             name={name}
             disabled={disabled}
             readOnly={disabled}
+            {...(autoApply && isTypingFieldType(field?.type) ? {debounceDisabled: true} : null)}
             {...other}
             componentProps={{
                 className: 'input',

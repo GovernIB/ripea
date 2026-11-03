@@ -28,9 +28,10 @@ const translationEs = {
         },
         import: "Importar",
         export: "Exportar",
-        consult: "Consultar",
+        consult: "Consulta",
         filter: "Filtra",
-        filterCount: "{{num}} filtros aplicados",
+        filterCount_one: "{{num}} filtro aplicado",
+        filterCount_other: "{{num}} filtros aplicados",
         processing: "Procesando...",
         auditoria: {
             create: "Creado el {{createdDate}} por '{{createdBy}}'.",
@@ -38,8 +39,8 @@ const translationEs = {
         },
         nouPermis: "Nuevo permiso",
         advancedSearch: "Búsqueda avanzada",
-        advancedSearchOpen: "Abrir la búsqueda avanzada",
-        advancedSearchClose: "Cerrar la búsqueda avanzada",
+        advancedSearchOpen: "Avanzado",
+        advancedSearchClose: "Básico",
         error: {
             status: "Código de error",
             title: "Título",
@@ -211,6 +212,12 @@ const translationEs = {
             grid: {
                 nom: "Nombre",
                 path: "Ruta del contenido",
+                icona: {
+                    expedient: "Expediente",
+                    carpeta: "Carpeta",
+                    document: "Documento",
+                    intermedies: "Puede haber carpetas intermedias",
+                },
             },
             detalle: {
                 title: "Content details",
@@ -422,7 +429,7 @@ const translationEs = {
                     tipusDocument: "Tipus de document",
                 },
                 afegirJustificant: {
-                    label: "Añadir justificante a expediente",
+                    label: "Añade justificante a expediente",
                     title: "Añadir justificante de registro al expediente",
                     ok: "El justificante de registro se ha añadido correctamente al expediente",
                     info: "No se pudo incorporar el justificante de registro de la anotación al expediente. Selecciona el tipo de documento y vuelve a intentar añadirlo.",
@@ -1868,7 +1875,7 @@ const translationEs = {
                     label: "Permisos",
                 },
                 simulador: {
-                    label: "Simular permisos",
+                    label: "Simula permisos",
                 },
                 baixa: {
                     label: "Dar de baja",
@@ -2349,7 +2356,7 @@ const translationEs = {
                 },
                 diagnostic: {
                     title: "Diagnóstico",
-                    label: "Repetir diagnóstico",
+                    label: "Repite diagnóstico",
                 },
                 diagnosticAll: {
                     title: "Diagnóstico de los sistemas externos",
@@ -2443,7 +2450,7 @@ const translationEs = {
                 perfil: "Mi perfil",
                 manual: "Manual de Usuario",
                 manualAdmin: "Manual de los Administradores",
-                logout: "Desconectar",
+                logout: "Desconecta",
                 noOrgans: "Ningún órgano gestor asignado",
             },
             menu: {
@@ -2460,7 +2467,7 @@ const translationEs = {
                 props: "Propiedades configurables",
                 pinbal: "Servicios PINBAL",
                 segonPla: "Reiniciar tareas en segundo plano...",
-                plugins: "Reiniciar plugins...",
+                plugins: "Reinicia plugins...",
                 avisos: "Avisos",
                 usuaris: "Usuarios",
                 backVersio: "Interfaz clásica",
@@ -2476,7 +2483,7 @@ const translationEs = {
                 tasca: "Tareas",
                 flux: "Flujos de firma",
 
-                consultar: "Consultar",
+                consultar: "Consulta",
                 continguts: "Contenidos",
                 dadesEstadistiques: "Datos estadisticos",
                 portafib: "Documentos enviados a Portafib",
@@ -2496,16 +2503,16 @@ const translationEs = {
             },
             massive: {
                 title: "Acción masiva",
-                portafirmes: "Enviar documentos al portafirmas",
-                firmar: "Firmar documentos desde el navegador",
-                marcar: "Marcar como definitivos",
+                portafirmes: "Envía documentos al portafirmas",
+                firmar: "Firma documentos desde el navegador",
+                marcar: "Marca como definitivos",
                 estat: "Cambio de estado de expedientes",
                 tancar: "Cierre de expedientes",
-                custodiar: "Custodiar elementos pendientes",
-                csv: "Copiar enlace CSV",
-                anexos: "Adjuntar anexos pendientes de anotaciones aceptadas",
-                anotacio: "Actualizar estado de las anotaciones en Distribución",
-                prioritat: "Cambiar prioridad de expedientes",
+                custodiar: "Custodia elementos pendientes",
+                csv: "Copia enlace CSV",
+                anexos: "Adjunta anexos pendientes de anotaciones aceptadas",
+                anotacio: "Actualiza el estado de las anotaciones en Distribución",
+                prioritat: "Cambia la prioridad de expedientes",
                 refresh: "Refrescar dada 10 segundos"
             },
             action: {
@@ -2516,7 +2523,7 @@ const translationEs = {
                     ok: "El documento se ha descargado correctamente",
                     pending: "Este elemento se está procesando actualmente",
                     cancelar: {
-                        label: "Cancelar la ejecución masiva",
+                        label: "Cancela la ejecución masiva",
                         title: "Cancelar la ejecución masiva",
                         confirm: "¿Seguro que desea cancelar esta ejecución masiva? Si está en curso, el elemento que se está procesando terminará y el resto quedarán cancelados.",
                         ok: "La ejecución masiva se ha cancelado",

@@ -1,7 +1,8 @@
 import {useTranslation} from "react-i18next";
 import {useMemo, useState} from "react";
 import {GridPage, useMuiDataGridApiRef} from "reactlib";
-import {CardPage} from "../../components/CardData.tsx";
+import {ScreenFrame} from "../../components/ScreenFrame.tsx";
+import {icons} from "../../util/icons.ts";
 import StyledMuiGrid, {ToolbarButton} from "../../components/StyledMuiGrid.tsx";
 import {Grid, Icon, Badge, IconButton} from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
@@ -91,8 +92,8 @@ const OrganGestorGrid = () => {
     ], [treeView])
 
     return (
-        <GridPage autoHeight>
-            <CardPage title={t('page.user.menu.organs')}>
+        <GridPage>
+            <ScreenFrame icon={icons.organGestor} title={t('page.user.menu.organs')}>
                 <OrganGestorFilter onSpringFilterChange={setSpringFilter} />
 
                 <StyledMuiGrid
@@ -167,7 +168,7 @@ const OrganGestorGrid = () => {
                         updateSuccess: 'page.organGestor.action.update.ok',
                     }}
                 />
-            </CardPage>
+            </ScreenFrame>
             {dialog}
             {permisDialog}
         </GridPage>

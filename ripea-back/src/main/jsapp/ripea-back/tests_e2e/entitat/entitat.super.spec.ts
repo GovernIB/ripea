@@ -275,7 +275,7 @@ test.describe('Gestió d\'Entitats — IPA_SUPER', () => {
                 await adjuntarImatge(page, dialog, camp, DADES_CREAR.imatges[camp]!);
             }
             await omplirColors(dialog, DADES_CREAR.colors);
-            await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /guarda/i }));
+            await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /\bdesa\b/i }));
             await expectSuccessAlert(page);
             await expect(dialog).toBeHidden();
         });
@@ -318,7 +318,7 @@ test.describe('Gestió d\'Entitats — IPA_SUPER', () => {
                 else await esborrarImatge(page, dialog, camp);
             }
             await omplirColors(dialog, DADES_MODIFICAR.colors);
-            await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /guarda/i }));
+            await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /\bdesa\b/i }));
             await expectSuccessAlert(page);
             await expect(dialog).toBeHidden();
         });
@@ -361,7 +361,7 @@ test.describe('Gestió d\'Entitats — IPA_SUPER', () => {
             await triaMuiSelect(page, dialog, 'principal', /^Rol$/i);
             await dialog.locator('input[name="sid"]').fill(SID_ROL_REACT);
             await checkBoxOcultClick(dialog, 'input[name="user"]');
-            await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /guarda/i }));
+            await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /\bdesa\b/i }));
             await expectSuccessAlert(page);
             await expect(getRows(page).filter({ hasText: SID_ROL_REACT })).toHaveCount(1);
         });

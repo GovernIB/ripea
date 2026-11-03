@@ -2,7 +2,8 @@ import {useTranslation} from "react-i18next";
 import {useState} from "react";
 import {GridPage, useBaseAppContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
 import {useConfirmDialogButtons} from "@src/util/buttonsOverride.tsx";
-import {CardPage} from "../../../components/CardData.tsx";
+import {ScreenFrame} from "../../../components/ScreenFrame.tsx";
+import {icons} from "../../../util/icons.ts";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {Grid, Icon, Badge} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
@@ -12,9 +13,9 @@ import LinkIcon from "../../../components/LinkIcon.tsx";
 
 const GrupFilterForm = () => {
     return <>
-        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="codi"/>
-        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="descripcio"/>
-        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="organGestor"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3.5}} name="codi"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 4}} name="descripcio"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 4}} name="organGestor"/>
     </>
 }
 
@@ -144,8 +145,8 @@ const GrupGrid = () => {
         },
     ]
 
-    return <GridPage autoHeight>
-        <CardPage title={t('page.user.menu.grups')}>
+    return <GridPage>
+        <ScreenFrame icon={icons.grup} title={t('page.user.menu.grups')}>
             <GrupFilter onSpringFilterChange={setSpringFilter}/>
 
             <StyledMuiGrid
@@ -170,7 +171,7 @@ const GrupGrid = () => {
                     deleteSuccess: 'page.grup.action.delete.ok',
                 }}
             />
-        </CardPage>
+        </ScreenFrame>
     </GridPage>
 }
 export default GrupGrid;

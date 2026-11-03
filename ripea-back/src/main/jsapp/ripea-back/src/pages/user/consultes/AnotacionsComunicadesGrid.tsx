@@ -1,5 +1,7 @@
 import { GridPage, MuiDialog, useBaseAppContext, useMuiDataGridApiRef, useResourceApiService } from 'reactlib';
-import { CardPage, DetailCard } from '../../../components/CardData';
+import { DetailCard } from '../../../components/CardData.tsx';
+import { ScreenFrame } from '../../../components/ScreenFrame.tsx';
+import { icons } from '../../../util/icons.ts';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import StyledMuiGrid from '../../../components/StyledMuiGrid.tsx';
@@ -80,7 +82,11 @@ const useAnotacionsComunicadesDetail = () => {
                     <FieldData field={'pendentCanviEstatDistribucio'} size={4} sx={{ borderBottom: '1px solid' }}>
                         <Icon>{entity?.pendentCanviEstatDistribucio ? 'check' : 'close'}</Icon>
                     </FieldData>
-                    <FieldData field={'reintentsCanviEstatDistribucio'} size={4} sx={{ borderRight: '1px solid', borderBottom: '1px solid' }} />
+                    <FieldData
+                        field={'reintentsCanviEstatDistribucio'}
+                        size={4}
+                        sx={{ borderRight: '1px solid', borderBottom: '1px solid' }}
+                    />
                 </DetailCard>
             </MuiDetail>
             {entity?.consultaWsErrorDesc && (
@@ -115,10 +121,10 @@ const useAnotacionsComunicadesDetail = () => {
 const AnotacionsComunicadesFilterForm = () => {
     return (
         <>
-            <GridFormField size={{ xs: 12, sm: 6, md: 2.15 }} name="numRegistre" />
-            <GridFormField size={{ xs: 12, sm: 6, md: 2.15 }} name="estat" />
-            <GridFormField size={{ xs: 12, sm: 6, md: 2.15 }} name="dataAltaInici" type={'date'} />
-            <GridFormField size={{ xs: 12, sm: 6, md: 2.15 }} name="dataAltaFi" type={'date'} />
+            <GridFormField size={{ xs: 12, sm: 6, md: 3 }} name="numRegistre" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 2.5 }} name="estat" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 2.5 }} name="dataAltaInici" type={'date'} />
+            <GridFormField size={{ xs: 12, sm: 6, md: 2.5 }} name="dataAltaFi" type={'date'} />
             <GridButtonField size={{ xs: 12, sm: 2, md: 1 }} name={'nomesAmbErrors'} icon={'warning'} />
         </>
     );
@@ -223,8 +229,8 @@ const AnotacionsComunicadesGrid = () => {
     ];
 
     return (
-        <GridPage autoHeight>
-            <CardPage title={t('page.user.menu.comunicades')}>
+        <GridPage>
+            <ScreenFrame icon={icons.anotacio} title={t('page.user.menu.comunicades')}>
                 <AnotacionsComunicadesFilter onSpringFilterChange={setSpringFilter} />
                 <StyledMuiGrid
                     apiRef={apiRef}
@@ -240,7 +246,7 @@ const AnotacionsComunicadesGrid = () => {
                     toolbarHideCreate
                 />
                 {dialogDetail}
-            </CardPage>
+            </ScreenFrame>
         </GridPage>
     );
 };

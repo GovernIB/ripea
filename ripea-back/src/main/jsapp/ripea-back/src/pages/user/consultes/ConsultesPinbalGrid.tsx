@@ -1,132 +1,161 @@
-import {GridPage, useMuiDataGridApiRef} from "reactlib";
-import {CardPage} from "../../../components/CardData.tsx";
-import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import * as builder from "../../../util/springFilterUtils.ts";
-import {useTranslation} from "react-i18next";
-import {useState} from "react";
-import {EstatMessage} from "../../remesa/RemesaGrid.tsx";
-import {formatDate} from "../../../util/dateUtils.ts";
-import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
-import GridFormField from "../../../components/GridFormField.tsx";
-import ContingutLink from "../../../components/ContingutLink.tsx";
-import {icons} from "@src/util/icons.ts";
-import useDocumentDetail from "../../contingut/details/DocumentDetail.tsx";
-import {useActions} from "../../contingut/details/ContingutActions.tsx";
-import useVisualitzar from "../../contingut/actions/Visualitzar.tsx";
-import Load from "../../../components/Load.tsx";
-import {GridSortDirection} from "@mui/x-data-grid-pro";
+import { GridPage, useFormContext, useMuiDataGridApiRef } from 'reactlib';
+import { ScreenFrame } from '../../../components/ScreenFrame.tsx';
+import StyledMuiGrid from '../../../components/StyledMuiGrid.tsx';
+import * as builder from '../../../util/springFilterUtils.ts';
+import { useTranslation } from 'react-i18next';
+import { useState } from 'react';
+import { EstatMessage } from '../../remesa/RemesaGrid.tsx';
+import { formatDate } from '../../../util/dateUtils.ts';
+import StyledMuiFilter from '../../../components/StyledMuiFilter.tsx';
+import GridFormField from '../../../components/GridFormField.tsx';
+import ContingutLink from '../../../components/ContingutLink.tsx';
+import { icons } from '@src/util/icons.ts';
+import useDocumentDetail from '../../contingut/details/DocumentDetail.tsx';
+import { useActions } from '../../contingut/details/ContingutActions.tsx';
+import useVisualitzar from '../../contingut/actions/Visualitzar.tsx';
+import Load from '../../../components/Load.tsx';
+import { GridSortDirection } from '@mui/x-data-grid-pro';
 
 // Action
 const useConsultaPinbalActions = (refresh?: () => void) => {
     const { t } = useTranslation();
 
-    const { apiDownload } = useActions(refresh)
-    const {apiIsReady: isReadyDetall, handleOpen: handleDetallOpen, dialog: dialogDetall} = useDocumentDetail({}, refresh);
-    const {apiIsReady: isReadyVisualitzar, handleOpen: handleVisualitzarOpen, dialog: dialogVisualitzar, isValid} = useVisualitzar();
+    const { apiDownload } = useActions(refresh);
+    const { apiIsReady: isReadyDetall, handleOpen: handleDetallOpen, dialog: dialogDetall } = useDocumentDetail({}, refresh);
+    const { apiIsReady: isReadyVisualitzar, handleOpen: handleVisualitzarOpen, dialog: dialogVisualitzar, isValid } = useVisualitzar();
 
-    const isDigitalOrImportat = (row:any) => {
+    const isDigitalOrImportat = (row: any) => {
         return isInOptions(row.documentTipus, 'DIGITAL', 'IMPORTAT');
     };
-    const isInOptions = (value:string, ...options:string[]) => {
-        return options.includes(value)
-    }
+    const isInOptions = (value: string, ...options: string[]) => {
+        return options.includes(value);
+    };
 
     const actions = [
         {
             label: t('page.document.action.detall.label'),
-            icon: "info",
+            icon: 'info',
             showInMenu: true,
-            onClick: (_id:any, row:any) => handleDetallOpen(row?.documentInfo?.id),
-            hidden: (row:any) => row?.documentInfo == null
+            onClick: (_id: any, row: any) => handleDetallOpen(row?.documentInfo?.id),
+            hidden: (row: any) => row?.documentInfo == null,
         },
         {
             label: t('page.document.action.descarregarOriginal.label'),
-            icon: "download",
+            icon: 'download',
             showInMenu: true,
-            onClick: (_id:any, row:any) => apiDownload(row?.documentInfo?.id, 'adjunt', t('page.document.action.descarregarOriginal.ok')),
-            hidden: (row:any) => row?.documentInfo == null || !isDigitalOrImportat(row?.documentInfo)
+            onClick: (_id: any, row: any) => apiDownload(row?.documentInfo?.id, 'adjunt', t('page.document.action.descarregarOriginal.ok')),
+            hidden: (row: any) => row?.documentInfo == null || !isDigitalOrImportat(row?.documentInfo),
         },
         {
             label: t('page.document.action.view.label'),
             title: t('page.document.alert.view'),
             icon: icons.visualitza,
             showInMenu: true,
-            onClick: (_id:any, row:any) => handleVisualitzarOpen(row?.documentInfo?.id),
-            disabled: (row:any) => !isValid(row?.documentInfo),
-            hidden: (row:any) => row?.documentInfo == null || !isDigitalOrImportat(row?.documentInfo)
+            onClick: (_id: any, row: any) => handleVisualitzarOpen(row?.documentInfo?.id),
+            disabled: (row: any) => !isValid(row?.documentInfo),
+            hidden: (row: any) => row?.documentInfo == null || !isDigitalOrImportat(row?.documentInfo),
         },
-    ]
+    ];
 
-    const components = <>
-        {dialogDetall}
-        {dialogVisualitzar}
-    </>
+    const components = (
+        <>
+            {dialogDetall}
+            {dialogVisualitzar}
+        </>
+    );
 
     return {
         apiIsReady: isReadyDetall && isReadyVisualitzar,
         actions,
         components,
-    }
-}
+    };
+};
 
 // Filter
 const ConsultesPinbalFilterForm = () => {
-    return <>
-        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="metaExpedient"/>
-        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="expedient"/>        
-        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="servei"/>
-        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="createdBy"/>
-        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="createdDateInici" type={"date"}/>
-        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="createdDateFi" type={"date"}/>
-        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="estat"/>
-    </>
-}
+    const { data } = useFormContext();
+    return (
+        <>
+            {!data?.advanced && (
+                <>
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2.25 }} name="metaExpedient" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="expedient" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2.5 }} name="servei" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2.25 }} name="createdBy" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 1.5 }} name="estat" />
+                </>
+            )}
+            {data?.advanced && (
+                <>
+                    <GridFormField size={{ xs: 12, sm: 6, md: 4 }} name="metaExpedient" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 4 }} name="expedient" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 4 }} name="servei" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 3.5 }} name="createdBy" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2.25 }} name="createdDateInici" type={'date'} />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2.25 }} name="createdDateFi" type={'date'} />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2.25 }} name="estat" />
+                </>
+            )}
+        </>
+    );
+};
 
-const springFilterBuilder = (data:any) => {
+const springFilterBuilder = (data: any) => {
     return builder.and(
         builder.eq('expedient.id', data?.expedient?.id),
         builder.eq('metaExpedient.id', data?.metaExpedient?.id),
-        builder.eq('servei.id',  data?.servei?.id),
-        builder.eq('createdBy',  `'${data?.createdBy?.id}'`),
+        builder.eq('servei.id', data?.servei?.id),
+        builder.eq('createdBy', `'${data?.createdBy?.id}'`),
         builder.betweenDates('createdDate', data?.createdDateInici, data?.createdDateFi),
-        builder.eq('estat', `'${data?.estat}'`),
+        builder.eq('estat', `'${data?.estat}'`)
     );
-}
+};
 
 const ConsultesPinbalFilter = (props: any) => {
-    const {onSpringFilterChange} = props;
+    const { onSpringFilterChange } = props;
 
-    return <StyledMuiFilter
-        resourceName={"consultaPinbalResource"}
-        code={"FILTER_CONSULTA_PINBAL"}
-        springFilterBuilder={springFilterBuilder}
-        onSpringFilterChange={onSpringFilterChange}
-    >
-        <ConsultesPinbalFilterForm/>
-    </StyledMuiFilter>
-}
+    return (
+        <StyledMuiFilter
+            resourceName={'consultaPinbalResource'}
+            code={'FILTER_CONSULTA_PINBAL'}
+            springFilterBuilder={springFilterBuilder}
+            advancedSearch
+            onSpringFilterChange={onSpringFilterChange}
+        >
+            <ConsultesPinbalFilterForm />
+        </StyledMuiFilter>
+    );
+};
 
 // Grid
-const StyledEstat = (props:any) => {
+const StyledEstat = (props: any) => {
     const { entity, children } = props;
 
     switch (entity?.estat) {
         case 'TRAMITADA':
-            return <EstatMessage icon={"check"} color='success'>{children}</EstatMessage>
+            return (
+                <EstatMessage icon={'check'} color="success">
+                    {children}
+                </EstatMessage>
+            );
         case 'ERROR':
-            return <EstatMessage icon={"warning"} color={'error'} title={entity?.error}>{children}</EstatMessage>
+            return (
+                <EstatMessage icon={'warning'} color={'error'} title={entity?.error}>
+                    {children}
+                </EstatMessage>
+            );
     }
 
-    return <></>
-}
+    return <></>;
+};
 
-const sortModel: any[] = [{field: 'createdDate', sort: 'desc'}]
-const perspectives: any[] = ['DOCUMENT', 'AUDITORIA']
+const sortModel: any[] = [{ field: 'createdDate', sort: 'desc' }];
+const perspectives: any[] = ['DOCUMENT', 'AUDITORIA'];
 const columns = [
     {
         field: 'expedient',
         flex: 1,
-        renderCell: (params:any) => <ContingutLink id={params?.row?.expedient?.id}>{params?.formattedValue}</ContingutLink>,
+        renderCell: (params: any) => <ContingutLink id={params?.row?.expedient?.id}>{params?.formattedValue}</ContingutLink>,
     },
     {
         field: 'metaExpedient',
@@ -139,7 +168,7 @@ const columns = [
     {
         field: 'createdByFullName',
         flex: 0.5,
-        sortProcessor: (_field: string, sort: GridSortDirection) => [ { field: "createdBy", sort } ]
+        sortProcessor: (_field: string, sort: GridSortDirection) => [{ field: 'createdBy', sort }],
     },
     {
         field: 'createdDate',
@@ -149,44 +178,47 @@ const columns = [
     {
         field: 'estat',
         flex: 0.5,
-        renderCell: (params:any) => <StyledEstat entity={params?.row}>{params.formattedValue}</StyledEstat>
+        renderCell: (params: any) => <StyledEstat entity={params?.row}>{params.formattedValue}</StyledEstat>,
     },
     {
         field: 'document',
         flex: 1,
     },
-]
+];
 
 const ConsultesPinbalGrid = () => {
-    const {t} = useTranslation();
+    const { t } = useTranslation();
     const apiRef = useMuiDataGridApiRef();
     const [springFilter, setSpringFilter] = useState<string>();
 
     const refresh = () => {
         apiRef?.current?.refresh?.();
-    }
+    };
 
-    const {apiIsReady, actions, components} = useConsultaPinbalActions(refresh);
+    const { apiIsReady, actions, components } = useConsultaPinbalActions(refresh);
 
-    return <GridPage autoHeight>
-        <CardPage title={t('page.user.menu.pinbalEnviades')}>
-            <ConsultesPinbalFilter onSpringFilterChange={setSpringFilter}/>
+    return (
+        <GridPage>
+            <ScreenFrame icon={icons.pinbal} title={t('page.user.menu.pinbalEnviades')}>
+                <ConsultesPinbalFilter onSpringFilterChange={setSpringFilter} />
 
-            <Load value={apiIsReady}>
-            <StyledMuiGrid
-                apiRef={apiRef}
-                resourceName={"consultaPinbalResource"}
-				persistentStateKey={"consultaPinbalResource_consulta"}
-                columns={columns}
-                filter={springFilter}
-                toolbarShowFilterCount
-                perspectives={perspectives}
-                sortModel={sortModel}
-                rowAdditionalActions={actions}
-                readOnly
-            /></Load>
-        </CardPage>
-        {components}
-    </GridPage>
-}
+                <Load value={apiIsReady}>
+                    <StyledMuiGrid
+                        apiRef={apiRef}
+                        resourceName={'consultaPinbalResource'}
+                        persistentStateKey={'consultaPinbalResource_consulta'}
+                        columns={columns}
+                        filter={springFilter}
+                        toolbarShowFilterCount
+                        perspectives={perspectives}
+                        sortModel={sortModel}
+                        rowAdditionalActions={actions}
+                        readOnly
+                    />
+                </Load>
+            </ScreenFrame>
+            {components}
+        </GridPage>
+    );
+};
 export default ConsultesPinbalGrid;

@@ -102,6 +102,7 @@ const TancarForm = () => {
             <Grid size={12}>
                 <Load value={selectedModel} noEffect>
                     <StyledMuiGrid
+                        autoHeight
                         resourceName={"documentResource"}
                         persistentStateActive={false}
                         columns={columns}

@@ -1,5 +1,6 @@
 import {GridPage, useResourceApiService} from "reactlib";
-import {CardPage} from "../../../components/CardData.tsx";
+import {ScreenFrame} from "../../../components/ScreenFrame.tsx";
+import {icons} from "../../../util/icons.ts";
 import {useTranslation} from "react-i18next";
 import {useNavigate, useParams} from "react-router-dom";
 import {useEffect, useMemo, useState} from "react";
@@ -114,27 +115,20 @@ export const MetaExpedientElements = () => {
     if (error)
         return <ErrorPage error={error}/>
 
-    return <GridPage autoHeight>
+    return <GridPage>
         <Load value={metaExpedient}>
-            <CardPage title={title}
-                      header={<>
-                          <Button
-                              variant="outlined"
-                              color={"inherit"}
-                              sx={{ borderRadius: '4px', padding: '0px 10px', marginLeft: "auto !important" }}
-                              onClick={()=>navigate('/metaExpedient')}
-                          >
-                              <Icon>arrow_back</Icon>
-                              {t('common.back')}
-                          </Button>
-                      </>}>
+            <ScreenFrame icon={icons.procediment} title={title}
+                      actions={<Button variant="outlined" onClick={()=>navigate('/metaExpedient')}>
+                          <Icon>arrow_back</Icon>
+                          {t('common.back')}
+                      </Button>}>
                 {metaExpedient?.revisioEstat === 'REVISAT' && rol?.isOrganAdmin &&
                     <Alert severity={'info'} sx={{mb: 1}}>
                         {t('page.metaExpedient.action.consultar.revisat')}
                     </Alert>
                 }
                 <TabComponent defaultValue={element} tabs={tabs}/>
-            </CardPage>
+            </ScreenFrame>
         </Load>
     </GridPage>
 }

@@ -94,25 +94,28 @@ const triaMuiSelectFirst = async (page: Page, container: Locator, inputName: str
 
 // Filtra la llista principal per codi intern i espera la resposta de l'API.
 //
-// IMPORTANT: el listener s'ha de registrar ABANS de qualsevol interacció al formulari,
-// no només abans del click a Filtrar. El motiu: el select "actiu" (triaMuiSelectFirst)
-// pot disparar un GET automàtic quan canvia el seu valor (React reactiu). Si el listener
-// es registrés després del select, perdria aquesta resposta i el waitForResponse
-// esperaria en va 15 s perquè el click a Filtrar no envia una nova petició redundant.
-// Registrant-lo primer, es captura el primer GET que arribi (del select o del botó).
+// El filtre s'aplica sol (no hi ha botó Filtra): el select "actiu" i el botó de permís directe
+// l'apliquen de seguida i el text, 1 s després (o amb Tab).
+// IMPORTANT: el listener s'ha de registrar ABANS de qualsevol interacció al formulari: es captura el
+// primer GET que arribi. Pot ser d'un estat parcial del filtre; els tests que venen després
+// comproven el nombre de files amb reintents, així que esperen a l'estat final.
 const aplicarFiltreProcediments = async (page: Page, codi: string, permisDirecte: boolean) => {
     logDebug('[Filtre] Omplint codi="' + codi + '"' + (permisDirecte ? ' + permisDirecte' : ''));
     // Exclou sub-rutes com /metaExpedient/artifacts que es criden en paral·lel.
     const resp = waitApiGet(page, url => url.includes('/metaExpedient') && !url.includes('/metaExpedient/'));
     logDebug('[Filtre] Listener registrat. Omplint formulari...');
+    if (permisDirecte) {
+        // El botó "Permís directe" només és a la cerca avançada (el filtre bàsic és d'una sola fila)
+        await page.locator('.styledFilter').getByRole('button', { name: /avançat|avanzado/i }).click();
+    }
     await page.locator('input[name="codi"]').fill(codi);
     const dialog = page.locator('.styledFilter');
     await triaMuiSelectFirst(page, dialog, 'actiu', true);
     if (permisDirecte) {
         await page.getByRole('button').filter({ hasText: /perm[ií]s directe|permiso directo/i }).click();
     }
-    logDebug('[Filtre] Fent click a Filtrar...');
-    await page.getByRole('button', { name: 'Filtra', exact: true }).click();
+    // Tab aplica de seguida el que hi hagi pendent al camp de text
+    await page.locator('input[name="codi"]').press('Tab');
     await resp;
     logDebug('[Filtre] Filtre aplicat. Num files resultants: ' + await getRows(page).count());
 };
@@ -171,8 +174,8 @@ const crearDocument = async (page: Page, codi: string, nom: string) => {
     await expect(dialog.locator('input[name="codi"]')).toBeVisible({ timeout: 5_000 });
     await dialog.locator('input[name="codi"]').fill(codi);
     await dialog.locator('input[name="nom"]').fill(nom);
-	await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /guarda/i }));
-    //await dialog.getByRole('button').filter({ hasText: /guarda/i }).click();
+	await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /\bdesa\b/i }));
+    //await dialog.getByRole('button').filter({ hasText: /\bdesa\b/i }).click();
     await expectSuccessAlert(page);
 };
 
@@ -199,8 +202,8 @@ const crearMetaDada = async (page: Page, codi: string, nom: string, full = false
         }
 
     }
-	await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /guarda/i }));
-    //await dialog.getByRole('button').filter({ hasText: /guarda/i }).click();
+	await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /\bdesa\b/i }));
+    //await dialog.getByRole('button').filter({ hasText: /\bdesa\b/i }).click();
     await expectSuccessAlert(page);
 };
 
@@ -226,8 +229,8 @@ const crearEstat = async (page: Page, codi: string, nom: string) => {
     await expect(dialog).toBeVisible({ timeout: 5_000 });
     await dialog.locator('input[name="codi"]').fill(codi);
     await dialog.locator('input[name="nom"]').fill(nom);
-	await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /guarda/i }));
-    //await dialog.getByRole('button').filter({ hasText: /guarda/i }).click();
+	await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /\bdesa\b/i }));
+    //await dialog.getByRole('button').filter({ hasText: /\bdesa\b/i }).click();
     await expectSuccessAlert(page);
 };
 
@@ -290,8 +293,8 @@ const crearTasca = async (page: Page, codi: string, nom: string, full = false) =
         await dialog.locator('input[name="duracio"]').fill('5');
         await triaMuiSelect(page, dialog, 'prioritat', /alta/i);
     }
-	await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /guarda/i }));
-    //await dialog.getByRole('button').filter({ hasText: /guarda/i }).click();
+	await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /\bdesa\b/i }));
+    //await dialog.getByRole('button').filter({ hasText: /\bdesa\b/i }).click();
     await expectSuccessAlert(page);
 };
 
@@ -319,7 +322,7 @@ const crearValidacioReact = async (page: Page, tipus: 'DADA' | 'DOCUMENT') => {
     await page.waitForSelector('[role="listbox"]', { timeout: 5_000 });
     await page.getByRole('option').first().click();
     await page.waitForSelector('[role="listbox"]', { state: 'detached', timeout: 3_000 }).catch(() => {});
-    await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /guarda/i }));
+    await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /\bdesa\b/i }));
     await expectSuccessAlert(page);
 };
 
@@ -493,8 +496,8 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
         await test.step('enviar el formulari', async () => {
             logInfo('  -> enviar el formulari');
-			await guardaAmbDelay(page, page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /guarda/i }));
-            //await page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /guarda/i }).click();
+			await guardaAmbDelay(page, page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /\bdesa\b/i }));
+            //await page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /\bdesa\b/i }).click();
         });
 
         await test.step('verificar missatge d\'èxit', async () => {
@@ -550,7 +553,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
         await test.step('guardar la modificació', async () => {
             logInfo('  -> guardar la modificació');
-			await guardaAmbDelay(page, page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /guarda/i }));
+			await guardaAmbDelay(page, page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /\bdesa\b/i }));
         });
 
         await test.step('verificar missatge d\'èxit', async () => {
@@ -566,13 +569,13 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
         await test.step('filtrar per codi, nom parcial i permís directe i verificar resultat', async () => {
             logInfo('  -> filtrar per codi i nom parcial');
+            // El filtre s'aplica sol: el listener es registra abans d'interactuar amb el formulari
+            const resp = waitApiGet(page, url => url.includes('/metaExpedient') && !url.includes('/metaExpedient/'));
             await page.locator('input[name="codi"]').fill(CODI_TEST);
             await page.locator('input[name="nom"]').fill('modificació');
 			await humanDelay(page);
 			await page.getByRole('button').filter({ hasText: /perm[ií]s directe|permiso directo/i }).click();
 			await humanDelay(page);
-			const resp = waitApiGet(page, url => url.includes('/metaExpedient') && !url.includes('/metaExpedient/'));
-			await page.getByRole('button', { name: 'Filtra', exact: true }).click();
 			await resp;
 			await expect(getRows(page)).toHaveCount(1);
         });
@@ -664,7 +667,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
         await test.step('guardar la modificació', async () => {
             logInfo('  -> guardar la modificació');
-            await guardaAmbDelay(page, page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /guarda/i }));
+            await guardaAmbDelay(page, page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /\bdesa\b/i }));
             await expectSuccessAlert(page);
         });
 
@@ -767,8 +770,8 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
         await test.step('guardar la modificació', async () => {
             logInfo('  -> guardar la modificació');
-			await guardaAmbDelay(page, page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /guarda/i }));
-            //await page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /guarda/i }).click();
+			await guardaAmbDelay(page, page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /\bdesa\b/i }));
+            //await page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /\bdesa\b/i }).click();
             await expectSuccessAlert(page);
         });
 
@@ -923,8 +926,8 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
         await test.step('guardar la modificació', async () => {
             logInfo('  -> guardar la modificació');
-			await guardaAmbDelay(page, page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /guarda/i }));
-            //await page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /guarda/i }).click();
+			await guardaAmbDelay(page, page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /\bdesa\b/i }));
+            //await page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /\bdesa\b/i }).click();
             await expectSuccessAlert(page);
         });
 
@@ -1036,7 +1039,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             logInfo('  -> re-seleccionar la meta-dada i guardar');
             const dialog = page.locator('[role="dialog"]');
             await seleccionarOpcioAutocompletament(page, dialog, '[name="metaDada"] input[type="text"]');
-            await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /guarda/i }));
+            await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /\bdesa\b/i }));
             await expectSuccessAlert(page);
         });
 
@@ -1141,8 +1144,8 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
         await test.step('guardar la modificació', async () => {
             logInfo('  -> guardar la modificació');
-			await guardaAmbDelay(page, page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /guarda/i }));
-            //await page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /guarda/i }).click();
+			await guardaAmbDelay(page, page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /\bdesa\b/i }));
+            //await page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /\bdesa\b/i }).click();
             await expectSuccessAlert(page);
         });
 
@@ -1234,8 +1237,8 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 
         await test.step('guardar la modificació', async () => {
             logInfo('  -> guardar la modificació');
-			await guardaAmbDelay(page, page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /guarda/i }));
-            //await page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /guarda/i }).click();
+			await guardaAmbDelay(page, page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /\bdesa\b/i }));
+            //await page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /\bdesa\b/i }).click();
             await expectSuccessAlert(page);
         });
 
@@ -1343,7 +1346,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
             await dialog.locator('input[name="sid"]').fill(PRINCIPAL_NOM_TEST);
             await dialog.locator('span.MuiButtonBase-root:has(input[name="read"])').click();
             await expect(dialog.locator('input[name="read"]')).toBeChecked({ timeout: 3_000 });
-            await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /guarda/i }));
+            await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /\bdesa\b/i }));
             await expectSuccessAlert(page);
         });
 

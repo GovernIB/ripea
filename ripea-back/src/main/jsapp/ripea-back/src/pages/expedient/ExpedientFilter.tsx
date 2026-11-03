@@ -29,20 +29,20 @@ const ExpedientFilterForm = () => {
     return <>
         {(!data?.advanced) && <>
             <GridFormField size={{xs: 12, sm: 6, md: 2}} name="numero"/>
-            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="nom"/>
-            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="metaExpedient" namedQueries={namedQueriesMetaExpedient}/>
-            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="estatCustom" requestParams={requestParamsEstat} />
-            <GridFormField size={{xs: 12, sm: 6, md: 2}} name="dataCreacioInici"/>
+            <GridFormField size={{xs: 12, sm: 6, md: 2.5}} name="nom"/>
+            <GridFormField size={{xs: 12, sm: 6, md: 3}} name="metaExpedient" namedQueries={namedQueriesMetaExpedient}/>
+            <GridFormField size={{xs: 12, sm: 6, md: 1.5}} name="estatCustom" requestParams={requestParamsEstat} />
+            <GridFormField size={{xs: 12, sm: 6, md: 1.5}} name="dataCreacioInici"/>
         </>}
         {(data?.advanced) && <>
-            <GridFormField size={{xs: 12, sm: 6, md: 3}} name="numero"/>
-            <GridFormField size={{xs: 12, sm: 6, md: 3}} name="nom"/>
-            <GridFormField size={{xs: 12, sm: 6, md: 3}} name="estatCustom" requestParams={requestParamsEstat} />
-            <GridFormField size={{xs: 12, sm: 6, md: 3}} name="interessat"/>
-            <GridFormField size={{xs: 12, sm: 6, md: 3}} name="organGestor" />
-            <GridFormField size={{xs: 12, sm: 6, md: 3}} name="metaExpedient" namedQueries={namedQueriesMetaExpedient}/>
-            <GridFormField size={{xs: 12, sm: 6, md: 3}} name="dataCreacioInici"/>
-            <GridFormField size={{xs: 12, sm: 6, md: 3}} name="dataCreacioFinal"/>
+            <GridFormField size={{xs: 12, sm: 6, md: 2.75}} name="numero"/>
+            <GridFormField size={{xs: 12, sm: 6, md: 3.5}} name="nom"/>
+            <GridFormField size={{xs: 12, sm: 6, md: 1.75}} name="estatCustom" requestParams={requestParamsEstat} />
+            <GridFormField size={{xs: 12, sm: 6, md: 4}} name="interessat"/>
+            <GridFormField size={{xs: 12, sm: 6, md: 3.5}} name="organGestor" />
+            <GridFormField size={{xs: 12, sm: 6, md: 3.5}} name="metaExpedient" namedQueries={namedQueriesMetaExpedient}/>
+            <GridFormField size={{xs: 12, sm: 6, md: 2.5}} name="dataCreacioInici"/>
+            <GridFormField size={{xs: 12, sm: 6, md: 2.5}} name="dataCreacioFinal"/>
 
             <GridFormField size={{xs: 12, sm: 6, md: 3}} name="domini" hidden={!user?.sessionScope?.isDominisEnabled}/>
             <GridFormField size={{xs: 12, sm: 6, md: 3}} name="dominiValor"
@@ -51,15 +51,15 @@ const ExpedientFilterForm = () => {
                            reanOnly={!data?.domini}
                            hidden={!user?.sessionScope?.isDominisEnabled}/>
 
-            <GridFormField size={{xs: 12, sm: (12 / (1 + (mostrarGrups ?1: 0) + (!rol?.isUser ?1 :0))), md: 2}} name="numeroRegistre"/>
-            <GridFormField size={{xs: 12, sm: (12 / (1 + (mostrarGrups ?1: 0) + (!rol?.isUser ?1 :0))), md: 2}} name="grup" hidden={!mostrarGrups}/>
-            <GridFormField size={{xs: 12, sm: (12 / (1 + (mostrarGrups ?1: 0) + (!rol?.isUser ?1 :0))), md: 2}} name="agafatPer" hidden={rol?.isUser}/>
+            <GridFormField size={{xs: 12, sm: (12 / (1 + (mostrarGrups ? 1: 0) + (!rol?.isUser ? 1 : 0))), md: 2}} name="numeroRegistre"/>
+            <GridFormField size={{xs: 12, sm: (12 / (1 + (mostrarGrups ? 1: 0) + (!rol?.isUser ? 1 : 0))), md: 2}} name="grup" hidden={!mostrarGrups}/>
+            <GridFormField size={{xs: 12, sm: (12 / (1 + (mostrarGrups ? 1: 0) + (!rol?.isUser ? 1 : 0))), md: 2}} name="agafatPer" hidden={rol?.isUser}/>
                 <Grid size={{xs: 12, sm: 12, md: 2}} hidden={mostrarGrups}/>
                 <Grid size={{xs: 12, sm: 12, md: 2}} hidden={!rol?.isUser}/>
                 <Grid size={{xs: 12, sm: 12, md: 6}} hidden={user?.sessionScope?.isDominisEnabled}/>
 
-            <GridButtonField size={{xs: rol?.isUser ?4 :6, sm: 1.5}} name={'agafat'} icon={'lock'} iconOnlyBreakpoint={FILTER_ADVANCED_ICON_ONLY_BREAKPOINT} whitLabel/>
-            <GridButtonField size={{xs: rol?.isUser ?4 :6, sm: 1.5}} name={'pendentFirmar'} icon={'edit'} iconOnlyBreakpoint={FILTER_ADVANCED_ICON_ONLY_BREAKPOINT} whitLabel/>
+            <GridButtonField size={{xs: rol?.isUser ? 4 : 6, sm: 1.5}} name={'agafat'} icon={'lock'} iconOnlyBreakpoint={FILTER_ADVANCED_ICON_ONLY_BREAKPOINT} whitLabel/>
+            <GridButtonField size={{xs: rol?.isUser ? 4 : 6, sm: 1.5}} name={'pendentFirmar'} icon={'edit'} iconOnlyBreakpoint={FILTER_ADVANCED_ICON_ONLY_BREAKPOINT} whitLabel/>
             <GridButtonField size={{xs: 4, sm: 1.5}} name={'seguit'} icon={'group_add'} iconOnlyBreakpoint={FILTER_ADVANCED_ICON_ONLY_BREAKPOINT} hidden={!rol?.isUser} whitLabel/>
         </>}
     </>
@@ -130,8 +130,6 @@ const ExpedientFilter = (props: any) => {
             springFilterBuilder={(data: any) => springFilterBuilder(data, user, rol)}
             onSpringFilterChange={onSpringFilterChange}
             advancedSearch
-            buttonGridProps={{ size: { xs: 12, sm: 6, md: 2 } }}
-            buttonIconOnlyBreakpoint={FILTER_ADVANCED_ICON_ONLY_BREAKPOINT}
         >
             <ExpedientFilterForm />
         </StyledMuiFilter>

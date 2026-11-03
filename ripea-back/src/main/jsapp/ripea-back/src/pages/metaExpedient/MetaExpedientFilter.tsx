@@ -8,24 +8,43 @@ import { useUserSession } from '../../components/Session.tsx';
 const MetaExpedientFilterForm = ({ user }: any) => {
     const { data } = useFormContext();
 
+    const revisioActiva = !!user?.sessionScope?.isRevisioActiva;
+
     return (
         <>
-            <GridFormField size={{ xs: 12, sm: 6, md: 3, lg: 2 }} name="tipus" />
-            <GridFormField size={{ xs: 12, sm: 6, md: 3, lg: 2 }} name="codi" />
-            <GridFormField size={{ xs: 12, sm: 6, md: 3, lg: 3 }} name="nom" />
-            <GridFormField size={{ xs: 12, sm: 6, md: 3, lg: 3 }} name="classificacio" />
-            <GridFormField size={{ xs: 12, sm: 6, md: 3, lg: 2 }} name="revisioEstat" hidden={!user?.sessionScope?.isRevisioActiva} />
-            <GridFormField size={{ xs: 12, sm: 6, md: 2, lg: 1.5 }} name="actiu" />
-            <GridFormField size={{ xs: 12, sm: 6, md: 3, lg: 2 }} name="ambit" />
-            <GridFormField size={{ xs: 12, sm: 6, md: 4, lg: 3 }} name="organGestor" disabled={data?.ambit == 'COMUNS'} />
-            <GridButtonField
-                size={{ xs: 12, sm: 3, md: 3, lg: 1.5 }}
-                name="permisDirecte"
-                icon={'pan_tool_alt'}
-                whitLabel
-                iconSx={{ transform: 'rotate(180deg)' }}
-            />
-            <GridButtonField size={{ xs: 12, sm: 3, md: 3, lg: 1.5 }} name="gestioAmbGrupsActiva" icon={'groups'} whitLabel />
+            {!data?.advanced && (
+                <>
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="tipus" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="codi" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 3 }} name="nom" />
+                    {revisioActiva ? (
+                        <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="revisioEstat" />
+                    ) : (
+                        <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="organGestor" disabled={data?.ambit == 'COMUNS'} />
+                    )}
+                    <GridFormField size={{ xs: 12, sm: 6, md: 1.5 }} name="actiu" />
+                </>
+            )}
+            {data?.advanced && (
+                <>
+                    <GridFormField size={{ xs: 12, sm: 6, md: 3 }} name="tipus" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 3 }} name="codi" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 3 }} name="nom" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 3 }} name="classificacio" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="ambit" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 3 }} name="organGestor" disabled={data?.ambit == 'COMUNS'} />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 1.5 }} name="revisioEstat" hidden={!revisioActiva} />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 1.5 }} name="actiu" />
+                    <GridButtonField
+                        size={{ xs: 12, sm: 3, md: 1.5 }}
+                        name="permisDirecte"
+                        icon={'pan_tool_alt'}
+                        whitLabel
+                        iconSx={{ transform: 'rotate(180deg)' }}
+                    />
+                    <GridButtonField size={{ xs: 12, sm: 3, md: 1 }} name="gestioAmbGrupsActiva" icon={'groups'} whitLabel />
+                </>
+            )}
         </>
     );
 };
@@ -59,6 +78,7 @@ export const MetaExpedientFilter = (props: any) => {
             code={'FILTER_GESTIO'}
             springFilterBuilder={springFilterBuilder}
             defaultData={defaultData}
+            advancedSearch
             {...props}
         >
             <MetaExpedientFilterForm user={user} />

@@ -1,141 +1,123 @@
-import {useTranslation} from "react-i18next";
-import {useMemo, useState} from "react";
-import {
-    GridPage,
-    MuiDialog,
-    useMuiDataGridApiRef,
-    useFormContext,
-    useResourceApiService,
-    useBaseAppContext,
-    BasePage
-} from "reactlib";
-import {CardPage, DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
-import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import {Grid, Icon} from "@mui/material";
-import GridFormField from "../../../components/GridFormField.tsx";
-import * as builder from "../../../util/springFilterUtils.ts";
-import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
-import {formatDate} from "../../../util/dateUtils.ts";
-import useHistoric from "../../Historic.tsx";
-import Load from "../../../components/Load.tsx";
-import ContingutLink from "../../../components/ContingutLink.tsx";
-import useAssignar from "../../expedient/actions/Assignar.tsx";
-import {useSession} from "../../../components/SessionStorageContext.tsx";
-import Box from "@mui/material/Box";
-import { useConfirmDialogButtons } from "@src/util/buttonsOverride.tsx";
+import { useTranslation } from 'react-i18next';
+import { Fragment, useMemo, useState } from 'react';
+import { GridPage, MuiDialog, useMuiDataGridApiRef, useFormContext, useResourceApiService, useBaseAppContext, BasePage } from 'reactlib';
+import { DetailCard, DetailCardContent } from '../../../components/CardData.tsx';
+import { ScreenFrame } from '../../../components/ScreenFrame.tsx';
+import { icons } from '../../../util/icons.ts';
+import StyledMuiGrid from '../../../components/StyledMuiGrid.tsx';
+import { Grid, Icon, Tooltip } from '@mui/material';
+import GridFormField from '../../../components/GridFormField.tsx';
+import * as builder from '../../../util/springFilterUtils.ts';
+import StyledMuiFilter from '../../../components/StyledMuiFilter.tsx';
+import { formatDate } from '../../../util/dateUtils.ts';
+import useHistoric from '../../Historic.tsx';
+import Load from '../../../components/Load.tsx';
+import ContingutLink from '../../../components/ContingutLink.tsx';
+import useAssignar from '../../expedient/actions/Assignar.tsx';
+import { useSession } from '../../../components/SessionStorageContext.tsx';
+import Box from '@mui/material/Box';
+import { useConfirmDialogButtons } from '@src/util/buttonsOverride.tsx';
 
 const useActions = (refresh?: () => void) => {
-    const {t} = useTranslation();
+    const { t } = useTranslation();
 
-    const {
-        artifactAction: apiAction,
-    } = useResourceApiService('contingutResource');
-    const {messageDialogShow, temporalMessageShow} = useBaseAppContext();
+    const { artifactAction: apiAction } = useResourceApiService('contingutResource');
+    const { messageDialogShow, temporalMessageShow } = useBaseAppContext();
     const confirmDialogButtons = useConfirmDialogButtons().reverse();
-    const confirmDialogComponentProps = {maxWidth: 'sm', fullWidth: true};
+    const confirmDialogComponentProps = { maxWidth: 'sm', fullWidth: true };
 
-    const action = (id:any, code:string, msg:string) => {
-        apiAction(undefined, {code: code, data:{ ids: [id], massivo: false }})
+    const action = (id: any, code: string, msg: string) => {
+        apiAction(undefined, { code: code, data: { ids: [id], massivo: false } })
             .then(() => {
-                refresh?.()
+                refresh?.();
                 temporalMessageShow(null, msg, 'success');
             })
             .catch((error) => {
                 temporalMessageShow(null, error?.message, 'error');
             });
-    }
+    };
 
-    const actionMassive = (ids:any, code:string, msg:string) => {
-        apiAction(undefined, {code: code, data:{ ids, massivo: true }})
+    const actionMassive = (ids: any, code: string, msg: string) => {
+        apiAction(undefined, { code: code, data: { ids, massivo: true } })
             .then(() => {
-                refresh?.()
+                refresh?.();
                 temporalMessageShow(null, msg, 'success');
             })
             .catch((error) => {
                 temporalMessageShow(null, error?.message, 'error');
             });
-    }
+    };
 
-    const recuperar= (id:any): void => action(id, 'RECUPERAR', t('page.contingut.action.replay.ok'));
-    const esborrar= (id:any): void => {
-        messageDialogShow(
-            '',
-            t('page.expedient.results.checkDelete'),
-            confirmDialogButtons,
-            confirmDialogComponentProps)
-            .then((value: any) => {
+    const recuperar = (id: any): void => action(id, 'RECUPERAR', t('page.contingut.action.replay.ok'));
+    const esborrar = (id: any): void => {
+        messageDialogShow('', t('page.expedient.results.checkDelete'), confirmDialogButtons, confirmDialogComponentProps).then(
+            (value: any) => {
                 if (value) {
-                    action(id, 'DELETE', t('page.contingut.action.delete.ok'))
+                    action(id, 'DELETE', t('page.contingut.action.delete.ok'));
                 }
-            });
-    }
+            }
+        );
+    };
 
-    const recuperarMassive= (ids:any[]): void => actionMassive(ids, 'RECUPERAR', t('page.contingut.action.replay.massiveOk'));
-    const esborrarMassive= (ids:any[]): void => {
-        messageDialogShow(
-            '',
-            t('page.expedient.results.checkDelete'),
-            confirmDialogButtons,
-            confirmDialogComponentProps)
-            .then((value: any) => {
+    const recuperarMassive = (ids: any[]): void => actionMassive(ids, 'RECUPERAR', t('page.contingut.action.replay.massiveOk'));
+    const esborrarMassive = (ids: any[]): void => {
+        messageDialogShow('', t('page.expedient.results.checkDelete'), confirmDialogButtons, confirmDialogComponentProps).then(
+            (value: any) => {
                 if (value) {
-                    actionMassive(ids, 'DELETE', t('page.contingut.action.delete.massiveOk'))
+                    actionMassive(ids, 'DELETE', t('page.contingut.action.delete.massiveOk'));
                 }
-            });
-    }
+            }
+        );
+    };
 
     return {
         recuperar,
         recuperarMassive,
         esborrar,
         esborrarMassive,
-    }
-}
+    };
+};
 
 // Detail
 const useDetail = () => {
     const { t } = useTranslation();
 
-    const {
-        isReady: apiIsReady,
-        getOne: apiGetOne,
-        currentFields: fields,
-    } = useResourceApiService('contingutResource');
-    const {temporalMessageShow} = useBaseAppContext();
+    const { isReady: apiIsReady, getOne: apiGetOne, currentFields: fields } = useResourceApiService('contingutResource');
+    const { temporalMessageShow } = useBaseAppContext();
 
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
 
-    const handleOpen = (id:any) => {
-        if(apiIsReady && id){
-            apiGetOne(id, {perspectives})
+    const handleOpen = (id: any) => {
+        if (apiIsReady && id) {
+            apiGetOne(id, { perspectives })
                 .then((app) => setEntity(app))
                 .catch((error) => {
-                    handleClose()
+                    handleClose();
                     temporalMessageShow(null, error?.message, 'error');
                 });
         }
         setOpen(true);
-    }
+    };
 
     const handleClose = (reason?: string) => {
-        if(reason !== 'backdropClick') {
+        if (reason !== 'backdropClick') {
             setEntity(undefined);
             setOpen(false);
         }
     };
 
-    const buttons :any[] = [
+    const buttons: any[] = [
         {
             value: 'close',
             text: t('common.close'),
-            componentProps: { variant: 'outlined' }
+            componentProps: { variant: 'outlined' },
         },
-    ]
-    const getLabelByName = (fields: any, name:string) => {
+    ];
+    const getLabelByName = (fields: any, name: string) => {
         const field = fields?.find((f: { name: string; label: string }) => f.name === name);
         return field?.label ?? field?.name;
-    }
+    };
 
     const dialog = (
         <MuiDialog
@@ -223,9 +205,9 @@ const useDetail = () => {
     return {
         handleOpen,
         handleClose,
-        dialog
-    }
-}
+        dialog,
+    };
+};
 
 // Filter
 const ContingutFilterForm = () => {
@@ -235,59 +217,146 @@ const ContingutFilterForm = () => {
     const isDocument = data?.tipus === 'DOCUMENT';
     const isOther = !isExpedient && !isDocument;
 
-    return <>
-        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="nom"/>
-        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="createdBy"/>
-        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="tipus"/>
-        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="expedient" disabled={isOther}/>
-        {/*<GridFormField size={3} name="metaExpedient" hidden={!isExpedient}/>*/}
-        {/*<GridFormField size={3} name="metaDocument" hidden={!isDocument}/>*/}
-        <GridFormField size={{xs: 12, sm: 6, md: 1.9}} name="dataEsborratInici" type={"date"}/>
-        <GridFormField size={{xs: 12, sm: 6, md: 1.9}} name="dataEsborratFi" type={"date"}/>
-        <GridFormField size={{xs: 12, sm: 6, md: 1.9}} name="dataInici" type={"date"}/>
-        <GridFormField size={{xs: 12, sm: 6, md: 1.9}} name="dataFi" type={"date"}/>
-        <GridFormField size={{xs: 12, sm: 6, md: 2}} name="esborrat" required/>
-    </>
-}
+    return (
+        <>
+            {!data?.advanced && (
+                <>
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2.1 }} name="nom" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2.1 }} name="dataInici" type={'date'} />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2.1 }} name="tipus" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2.1 }} name="expedient" disabled={isOther} />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2.1 }} name="esborrat" required />
+                </>
+            )}
+            {data?.advanced && (
+                <>
+                    <GridFormField size={{ xs: 12, sm: 6, md: 3 }} name="nom" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 3 }} name="createdBy" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 3.25 }} name="expedient" />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2.75 }} name="esborrat" required />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2.5 }} name="tipus" disabled={isOther} />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="dataEsborratInici" type={'date'} />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="dataEsborratFi" type={'date'} />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="dataInici" type={'date'} />
+                    <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="dataFi" type={'date'} />
+                </>
+            )}
+        </>
+    );
+};
 
-const springFilterBuilder = (data:any) => {
+const springFilterBuilder = (data: any) => {
     return builder.and(
         builder.like('nom', data?.nom),
         builder.eq('createdBy', `'${data?.createdBy?.id}'`),
         builder.eq('tipus', `'${data?.tipus}'`),
         builder.betweenDates('esborratData', data?.dataEsborratInici, data?.dataEsborratFi),
-        data?.esborrat != null && data?.esborrat !== 'ESBORRATS_I_NO_ESBORRATS'
-            && builder.equals('esborrat', 1, data?.esborrat == 'NOMES_ESBORRATS'),
+        data?.esborrat != null &&
+            data?.esborrat !== 'ESBORRATS_I_NO_ESBORRATS' &&
+            builder.equals('esborrat', 1, data?.esborrat == 'NOMES_ESBORRATS'),
         data?.tipus === 'EXPEDIENT' && builder.eq('id', data?.expedient?.id),
         data?.tipus === 'DOCUMENT' && builder.eq('expedient.id', data?.expedient?.id),
-        builder.betweenDates('createdDate', data?.dataInici, data?.dataFi),
+        builder.betweenDates('createdDate', data?.dataInici, data?.dataFi)
     );
-}
+};
 
 const ContingutFilter = (props: any) => {
-    return <StyledMuiFilter
-        resourceName={"contingutResource"}
-        code={"FILTER"}
-        springFilterBuilder={springFilterBuilder}
-        {...props}
-    >
-        <ContingutFilterForm/>
-    </StyledMuiFilter>
-}
+    return (
+        <StyledMuiFilter
+            resourceName={'contingutResource'}
+            code={'FILTER'}
+            springFilterBuilder={springFilterBuilder}
+            advancedSearch
+            {...props}
+        >
+            <ContingutFilterForm />
+        </StyledMuiFilter>
+    );
+};
+
+// Ruta del contingut: expedient / carpeta pare / contingut
+const tipusPathIcon: Record<string, { icon: string; tooltip: string }> = {
+    EXPEDIENT: { icon: 'folder_open', tooltip: 'page.contingut.grid.icona.expedient' },
+    CARPETA: { icon: 'folder', tooltip: 'page.contingut.grid.icona.carpeta' },
+    DOCUMENT: { icon: 'description', tooltip: 'page.contingut.grid.icona.document' },
+};
+
+const PathSegment = (props: { tipus: string; nom?: string; id?: string | number }) => {
+    const { tipus, nom, id } = props;
+    const { t } = useTranslation();
+    const info = tipusPathIcon[tipus];
+
+    return (
+        <>
+            {info && (
+                <Tooltip title={t(info.tooltip)}>
+                    <Icon fontSize="small" sx={{ fontSize: '18px', verticalAlign: 'text-bottom', mr: 0.5 }}>
+                        {info.icon}
+                    </Icon>
+                </Tooltip>
+            )}
+            {id != null ? <ContingutLink id={id}>{nom}</ContingutLink> : nom}
+        </>
+    );
+};
+
+/**
+ * Ruta d'un contingut dins l'expedient: expedient (enllaç) / carpeta pare / contingut. Només es coneix
+ * el pare directe (perspectiva AUDITORIA), per això si el pare no és l'expedient es marca amb "…"
+ * que pot haver-hi carpetes intermèdies.
+ */
+const ContingutPathCell = (props: { row: any }) => {
+    const { row } = props;
+    const { t } = useTranslation();
+
+    const esExpedient = row?.tipus === 'EXPEDIENT';
+    const expedient = !esExpedient && row?.expedient?.id != null ? row.expedient : undefined;
+    const pare = row?.pare?.id != null && row.pare.id !== expedient?.id ? row.pare : undefined;
+    const separador = <Box component="span" sx={{ mx: 0.5 }}>/</Box>;
+
+    const segments: React.ReactNode[] = [];
+    if (expedient) {
+        segments.push(<PathSegment key="expedient" tipus="EXPEDIENT" nom={expedient.description} id={expedient.id} />);
+    }
+    if (pare) {
+        if (expedient) {
+            segments.push(
+                <Tooltip key="intermedies" title={t('page.contingut.grid.icona.intermedies')}>
+                    <span>…</span>
+                </Tooltip>
+            );
+        }
+        segments.push(<PathSegment key="pare" tipus="CARPETA" nom={pare.description} />);
+    }
+    segments.push(<PathSegment key="contingut" tipus={row?.tipus} nom={row?.nom} />);
+
+    return (
+        <Box sx={{ whiteSpace: 'normal', lineHeight: 1.4 }}>
+            {segments.map((segment, index) => (
+                <Fragment key={index}>
+                    {index > 0 && separador}
+                    {segment}
+                </Fragment>
+            ))}
+        </Box>
+    );
+};
 
 // Grid
-const perspectives:any = ['AUDITORIA']
-const sortModel: any = [{field: 'createdDate', sort: 'desc'}]
+const perspectives: any = ['AUDITORIA'];
+const sortModel: any = [{ field: 'createdDate', sort: 'desc' }];
 const columns = [
     {
         field: 'nom',
         flex: 0.75,
-        renderCell: (params:any) => <>
-            {params?.row?.tipus == "EXPEDIENT" && <Icon>folder_open</Icon>}
-            {params?.row?.tipus == "CARPETA" && <Icon>folder</Icon>}
-            {params?.row?.tipus == "DOCUMENT" && <Icon>description</Icon>}
-            {params?.formattedValue}
-        </>
+        renderCell: (params: any) => (
+            <>
+                {params?.row?.tipus == 'EXPEDIENT' && <Icon fontSize="small">folder_open</Icon>}
+                {params?.row?.tipus == 'CARPETA' && <Icon fontSize="small">folder</Icon>}
+                {params?.row?.tipus == 'DOCUMENT' && <Icon fontSize="small">description</Icon>}
+                {params?.formattedValue}
+            </>
+        ),
     },
     {
         field: 'numero',
@@ -314,123 +383,123 @@ const columns = [
         flex: 0.6,
         valueFormatter: (value: any) => formatDate(value),
     },
-]
+];
 
 const ContingutGrid = () => {
-    const {t} = useTranslation();
+    const { t } = useTranslation();
     const apiRef = useMuiDataGridApiRef();
     const [springFilter, setSpringFilter] = useState<string>();
 
-    const additionalColumns = useMemo(()=> [
-        ...columns,
-        {
-            field: 'expedient',
-            headerName: t('page.contingut.grid.path'),
-            flex: 1.5,
-            renderCell: (params:any) => <>
-                {!!params?.row?.expedient?.id && <>/<ContingutLink id={params?.row?.expedient?.id} style={{ display: 'flex', alignItems: 'center' }}><Icon>folder_open</Icon>{params?.formattedValue}</ContingutLink></>}
-                {params?.row?.pare?.id != params?.row?.expedient?.id ?<>/.../<Icon>folder</Icon>{params?.row?.pare?.description}</> :"" }
-                {/*{!!params?.row?.fitxerNom && <>/<Icon>description</Icon>{params?.row?.fitxerNom}</>}*/}
-                /
-                {params?.row?.tipus == "EXPEDIENT" && <Icon>folder_open</Icon>}
-                {params?.row?.tipus == "CARPETA" && <Icon>folder</Icon>}
-                {params?.row?.tipus == "DOCUMENT" && <Icon>description</Icon>}
-                {params?.row?.nom}
-            </>,
-        },
-    ], [t])
+    const additionalColumns = useMemo(
+        () => [
+            ...columns,
+            {
+                field: 'expedient',
+                headerName: t('page.contingut.grid.path'),
+                flex: 1.5,
+                renderCell: (params: any) => <ContingutPathCell row={params?.row} />,
+            },
+        ],
+        [t]
+    );
 
-    const sessionKey = "MASSIVE_CONTINGUT_FILTER";
+    const sessionKey = 'MASSIVE_CONTINGUT_FILTER';
     const { value: filterData } = useSession(sessionKey);
     const [esborratFilter, setEsborratFilter] = useState<string | undefined>(() => filterData?.esborrat);
 
     const refresh = () => {
         apiRef?.current?.refresh?.();
-    }
+    };
 
-    const {handleOpen: handleDetail, dialog: dialogDetail} = useDetail();
-    const {handleOpen: handleHistoricOpen, dialog: dialogHistoric} = useHistoric();
-    const {handleShow: hanldeAssignar, content: assignarContent} = useAssignar(refresh);
-    const {recuperar, recuperarMassive, esborrar, esborrarMassive} = useActions(refresh)
+    const { handleOpen: handleDetail, dialog: dialogDetail } = useDetail();
+    const { handleOpen: handleHistoricOpen, dialog: dialogHistoric } = useHistoric();
+    const { handleShow: hanldeAssignar, content: assignarContent } = useAssignar(refresh);
+    const { recuperar, recuperarMassive, esborrar, esborrarMassive } = useActions(refresh);
 
     const actions = [
         {
             label: t('common.detail'),
-            icon: "info",
+            icon: 'info',
             showInMenu: true,
             onClick: handleDetail,
         },
         {
             label: t('page.contingut.action.history.label'),
-            icon: "list",
+            icon: 'list',
             showInMenu: true,
             onClick: handleHistoricOpen,
         },
         {
             label: t('page.contingut.action.replay.label'),
-            icon: "replay",
+            icon: 'replay',
             showInMenu: true,
             onClick: recuperar,
-            hidden: (row:any) => row?.esborrat == 0,
+            hidden: (row: any) => row?.esborrat == 0,
         },
         {
             label: t('common.delete'),
-            icon: "delete",
+            icon: 'delete',
             showInMenu: true,
             onClick: esborrar,
-            hidden: (row:any) => row?.esborrat == 1,
+            hidden: (row: any) => row?.esborrat == 1,
         },
         {
             label: t('page.expedient.action.assignar.label'),
-            icon: "person",
+            icon: 'person',
             showInMenu: true,
             onClick: hanldeAssignar,
-            disabled: (row:any) => row?.esborrat == 1,
-            hidden: (row:any) => row?.tipus !== 'EXPEDIENT',
+            disabled: (row: any) => row?.esborrat == 1,
+            hidden: (row: any) => row?.tipus !== 'EXPEDIENT',
         },
-    ]
-    const massiveActions = useMemo(() => [
-        {
-            label: t('page.contingut.action.replay.label'),
-            icon: "replay",
-            showInMenu: true,
-            onClick: recuperarMassive,
-            hidden: esborratFilter === 'NOMES_NO_ESBORRATS',
-        },
-        {
-            label: t('common.delete'),
-            icon: "delete",
-            showInMenu: true,
-            onClick: esborrarMassive,
-            hidden: esborratFilter === 'NOMES_ESBORRATS',
-        },
-    ], [esborratFilter, t, recuperarMassive, esborrarMassive])
+    ];
+    const massiveActions = useMemo(
+        () => [
+            {
+                label: t('page.contingut.action.replay.label'),
+                icon: 'replay',
+                showInMenu: true,
+                onClick: recuperarMassive,
+                hidden: esborratFilter === 'NOMES_NO_ESBORRATS',
+            },
+            {
+                label: t('common.delete'),
+                icon: 'delete',
+                showInMenu: true,
+                onClick: esborrarMassive,
+                hidden: esborratFilter === 'NOMES_ESBORRATS',
+            },
+        ],
+        [esborratFilter, t, recuperarMassive, esborrarMassive]
+    );
 
-    return <GridPage autoHeight>
-        <CardPage title={t('page.user.menu.continguts')}>
-            <ContingutFilter
-                sessionKey={sessionKey}
-                onSpringFilterChange={setSpringFilter}
-                onDataChange={(data: any) => setEsborratFilter(data?.esborrat)}/>
+    return (
+        <GridPage>
+            <ScreenFrame icon={icons.contingut} title={t('page.user.menu.continguts')}>
+                <ContingutFilter
+                    sessionKey={sessionKey}
+                    onSpringFilterChange={setSpringFilter}
+                    onDataChange={(data: any) => setEsborratFilter(data?.esborrat)}
+                />
 
-            <StyledMuiGrid
-                apiRef={apiRef}
-                resourceName={"contingutResource"}
-				persistentStateKey={"contingutResource_consulta"}
-                columns={additionalColumns}
-                filter={springFilter}
-                toolbarShowFilterCount
-                sortModel={sortModel}
-                perspectives={perspectives}
-                rowAdditionalActions={actions}
-                toolbarMassiveActions={massiveActions}
-                onRowClick={(params: any) => handleDetail(params?.row?.id)}
-                toolbarHideCreate
-            />
-        </CardPage>
-        {dialogHistoric}
-        {dialogDetail}
-        {assignarContent}
-    </GridPage>
-}
+                <StyledMuiGrid
+                    apiRef={apiRef}
+                    resourceName={'contingutResource'}
+                    persistentStateKey={'contingutResource_consulta'}
+                    columns={additionalColumns}
+                    filter={springFilter}
+                    toolbarShowFilterCount
+                    sortModel={sortModel}
+                    perspectives={perspectives}
+                    rowAdditionalActions={actions}
+                    toolbarMassiveActions={massiveActions}
+                    onRowClick={(params: any) => handleDetail(params?.row?.id)}
+                    toolbarHideCreate
+                />
+            </ScreenFrame>
+            {dialogHistoric}
+            {dialogDetail}
+            {assignarContent}
+        </GridPage>
+    );
+};
 export default ContingutGrid;

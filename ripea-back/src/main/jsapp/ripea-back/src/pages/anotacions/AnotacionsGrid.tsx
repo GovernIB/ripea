@@ -3,7 +3,8 @@ import {useTranslation} from "react-i18next";
 import useAnotacioActions from "./details/AnotacioActions.tsx";
 import {formatDate} from "../../util/dateUtils.ts";
 import StyledMuiGrid from '../../components/StyledMuiGrid.tsx';
-import {CardPage} from "../../components/CardData.tsx";
+import {ScreenFrame} from "../../components/ScreenFrame.tsx";
+import {icons} from "../../util/icons.ts";
 import AnotacioFilter from "./AnotacioFilter.tsx";
 import Load from "../../components/Load.tsx";
 import {useMemo, useState} from "react";
@@ -112,8 +113,8 @@ const AnotacionsGrid = () => {
     const {actions, components} = useAnotacioActions(refresh);
     const {handleOpen, dialog} = useAnotacioDetail();
 
-    return <GridPage autoHeight>
-        <CardPage title={t('page.anotacio.filter.title')}>
+    return <GridPage>
+        <ScreenFrame icon={icons.anotacio} title={t('page.anotacio.filter.title')}>
             <AnotacioFilter onSpringFilterChange={(value:any)=>{
                 setSpringFilter(value)
                 setLoad(true)
@@ -145,7 +146,7 @@ const AnotacionsGrid = () => {
             </Load>
             {components}
             {dialog}
-        </CardPage>
+        </ScreenFrame>
     </GridPage>
 }
 

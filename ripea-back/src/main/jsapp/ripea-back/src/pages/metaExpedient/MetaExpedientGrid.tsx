@@ -1,7 +1,8 @@
 import {useTranslation} from "react-i18next";
 import {useCallback, useMemo, useState} from "react";
 import {GridPage, useBaseAppContext, useFilterApiRef, useFormContext, useMuiDataGridApiRef} from "reactlib";
-import {CardPage} from "../../components/CardData.tsx";
+import {ScreenFrame} from "../../components/ScreenFrame.tsx";
+import {icons} from "../../util/icons.ts";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 import {Alert, Badge, Chip, Grid, Icon, IconButton, MenuItem} from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
@@ -306,8 +307,8 @@ const MetaExpedientGrid = () => {
     const [load, setLoad] = useState<boolean>(true);
     const {value: revisioEstatMssg, save: setRevisioEstatMssg} = useSessionContext('revisioEstatMssg')
 
-    return <GridPage autoHeight>
-        <CardPage title={ rol?.isRevisor ? t('page.user.menu.revisar') : t('page.user.menu.procedimentsTitle')}>
+    return <GridPage>
+        <ScreenFrame icon={rol?.isRevisor ? icons.revisio : icons.procediment} title={ rol?.isRevisor ? t('page.user.menu.revisar') : t('page.user.menu.procedimentsTitle')}>
 
             { rol?.isAdmin && user?.sessionScope?.numProcsPendentsRevisio > 0 && !revisioEstatMssg &&
                 <Alert severity={'info'} sx={{mb:1}}>
@@ -362,7 +363,7 @@ const MetaExpedientGrid = () => {
             {contentImportFitxer}
             {contentActualitzar}
             {components}
-        </CardPage>
+        </ScreenFrame>
     </GridPage>
 }
 export default MetaExpedientGrid;

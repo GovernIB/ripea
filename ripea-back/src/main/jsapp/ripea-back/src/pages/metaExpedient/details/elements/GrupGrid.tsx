@@ -87,6 +87,7 @@ export const GrupGrid = ({ entity, refresh: refreshEntity, onRowCountChange, rea
 
     return <Load value={apiIsReady && procIsReady}>
         <StyledMuiGrid
+            autoHeight
             apiRef={apiRef}
             resourceName={'grupResource'}
 			persistentStateKey={"grupResource_procedimentTab"}

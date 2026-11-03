@@ -1,4 +1,5 @@
-import { CardPage } from '../../components/CardData.tsx';
+import { ScreenFrame } from '../../components/ScreenFrame.tsx';
+import { icons } from '../../util/icons.ts';
 import StyledMuiGrid from '../../components/StyledMuiGrid.tsx';
 import { GridPage, useMuiDataGridApiRef } from 'reactlib';
 import { useTranslation } from 'react-i18next';
@@ -63,8 +64,8 @@ export const AvisGrid = () => {
     const { actions, massiveActions, components } = useAvisActions(refresh);
 
     return (
-        <GridPage autoHeight>
-            <CardPage title={t('navigate.avis')}>
+        <GridPage>
+            <ScreenFrame icon={icons.avis} title={t('navigate.avis')}>
                 <StyledMuiGrid
                     apiRef={apiRef}
                     resourceName={'avisResource'}
@@ -85,7 +86,7 @@ export const AvisGrid = () => {
                     }}
                 />
                 {components}
-            </CardPage>
+            </ScreenFrame>
         </GridPage>
     );
 };

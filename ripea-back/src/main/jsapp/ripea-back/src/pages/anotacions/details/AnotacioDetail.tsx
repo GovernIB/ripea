@@ -378,13 +378,13 @@ const useAnotacioDetail = () => {
         {
             value: "interessats",
             label: t('page.anotacio.tabs.interessats'),
-            content: <Interessats entity={entity?.registreInfo} onRowCountChange={setNumInteressats}/>,
+            content: <Interessats entity={entity?.registreInfo} onRowCountChange={setNumInteressats} autoHeight/>,
             badge: numInteressats,
         },
         {
             value: "annexos",
             label: t('page.anotacio.tabs.annexos'),
-            content: <Annexos entity={entity?.registreInfo} onRowCountChange={setNumAnnexos}/>,
+            content: <Annexos entity={entity?.registreInfo} onRowCountChange={setNumAnnexos} autoHeight/>,
             badge: numAnnexos,
         },
         {

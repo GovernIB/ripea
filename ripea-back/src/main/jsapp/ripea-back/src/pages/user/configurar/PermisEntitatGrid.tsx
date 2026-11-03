@@ -3,7 +3,8 @@ import {
     GridPage,
     useMuiDataGridApiRef,
 } from "reactlib";
-import {CardPage} from "../../../components/CardData.tsx";
+import {ScreenFrame} from "../../../components/ScreenFrame.tsx";
+import {icons} from "../../../util/icons.ts";
 import StyledMuiGrid, {ToolbarButton} from "../../../components/StyledMuiGrid.tsx";
 import {Button, Icon} from "@mui/material";
 import {usePermisEntitatCreate, usePermisEntitatModify, usePermisActions} from "../actions/ModifyPermis.tsx";
@@ -78,20 +79,12 @@ const PermisEntitatGrid = ()=> {
         },
     ]
 
-    return <GridPage autoHeight>
-        <CardPage
-            title={t('page.user.menu.permisos')}
-            header={ id &&
-                <Button
-                    variant="outlined"
-                    color={"inherit"}
-                    sx={{ borderRadius: '4px', padding: '0px 10px', marginLeft: "auto !important" }}
-                    onClick={()=>navigate('/entitat')}
-                >
-                    <Icon>arrow_back</Icon>
-                    {t('common.back')}
-                </Button>
-            }
+    return <GridPage>
+        <ScreenFrame icon={icons.permis} title={t('page.user.menu.permisos')}
+            actions={id ? <Button variant="outlined" onClick={()=>navigate('/entitat')}>
+                <Icon>arrow_back</Icon>
+                {t('common.back')}
+            </Button> : undefined}
         >
             <StyledMuiGrid
                 apiRef={gridApiRef}
@@ -115,7 +108,7 @@ const PermisEntitatGrid = ()=> {
                 ]}
                 toolbarHideCreate
             />
-        </CardPage>
+        </ScreenFrame>
         {contentCreate}
         {contentModify}
     </GridPage>

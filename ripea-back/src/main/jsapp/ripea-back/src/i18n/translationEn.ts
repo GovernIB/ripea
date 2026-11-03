@@ -30,7 +30,8 @@ const translationEn = {
         export: "Export",
         consult: "Consult",
         filter: "Filter",
-        filterCount: "{{num}} filters applied",
+        filterCount_one: "{{num}} filter applied",
+        filterCount_other: "{{num}} filters applied",
         processing: "Processing...",
         auditoria: {
             create: "Created on {{createdDate}} by '{{createdBy}}'.",
@@ -38,8 +39,8 @@ const translationEn = {
         },
         nouPermis: "New permission",
         advancedSearch: "Advanced search",
-        advancedSearchOpen: "Open advanced search",
-        advancedSearchClose: "Close advanced search",
+        advancedSearchOpen: "Advanced",
+        advancedSearchClose: "Basic",
         error: {
             status: "Error code",
             title: "Title",
@@ -210,6 +211,12 @@ const translationEn = {
             grid: {
                 nom: "Name",
                 path: "Content path",
+                icona: {
+                    expedient: "Expedient",
+                    carpeta: "Folder",
+                    document: "Document",
+                    intermedies: "There may be intermediate folders",
+                },
             },
             detalle: {
                 title: "Detalles del contenido",

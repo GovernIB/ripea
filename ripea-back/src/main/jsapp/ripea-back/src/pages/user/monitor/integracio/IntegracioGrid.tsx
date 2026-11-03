@@ -1,6 +1,8 @@
 import { useTranslation } from 'react-i18next';
+import { Button, Icon } from '@mui/material';
 import { GridPage } from 'reactlib';
-import { CardPage } from '../../../../components/CardData.tsx';
+import { ScreenFrame } from '../../../../components/ScreenFrame.tsx';
+import { icons } from '../../../../util/icons.ts';
 import { useMemo, useState } from 'react';
 import StyledMuiGrid from '../../../../components/StyledMuiGrid.tsx';
 import { formatDate } from '../../../../util/dateUtils.ts';
@@ -8,6 +10,7 @@ import Load from '../../../../components/Load.tsx';
 import { IntegracioFilter } from './IntegracioFilter.tsx';
 import { useIntegracioTab } from './IntegracioTab.tsx';
 import { useIntegracioDetail } from './IntegracioDetail.tsx';
+import { useIntegracioDiagnostic } from './IntegracioDiagnostic.tsx';
 import { EstatMessage } from '../../../remesa/RemesaGrid.tsx';
 
 export const StyledEstat = (props: any) => {
@@ -73,6 +76,7 @@ export const IntegracioGrid = () => {
     const { value, integracions, tabElement } = useIntegracioTab();
 
     const { apiIsReady, handleOpen, dialog } = useIntegracioDetail();
+    const { handleOpen: handleDiagnosticOpen, dialog: dialogDiagnostic } = useIntegracioDiagnostic(integracions);
     const actions = useMemo(
         () => [
             {
@@ -85,9 +89,18 @@ export const IntegracioGrid = () => {
     );
 
     return (
-        <GridPage autoHeight>
-            <CardPage title={t('navigate.integracio')}>
-                <IntegracioFilter integracions={integracions} onSpringFilterChange={setSpringFilter} />
+        <GridPage>
+            <ScreenFrame
+                icon={icons.integracio}
+                title={t('navigate.integracio')}
+                actions={
+                    <Button variant="outlined" size="small" sx={{ borderRadius: '4px' }} onClick={handleDiagnosticOpen}>
+                        <Icon>monitor_heart</Icon>
+                        {t('page.integracio.action.diagnosticAll.label')}
+                    </Button>
+                }
+            >
+                <IntegracioFilter onSpringFilterChange={setSpringFilter} />
 
                 {tabElement}
 
@@ -108,7 +121,8 @@ export const IntegracioGrid = () => {
                     />
                 </Load>
                 {dialog}
-            </CardPage>
+                {dialogDiagnostic}
+            </ScreenFrame>
         </GridPage>
     );
 };

@@ -1,6 +1,7 @@
 import React, {MutableRefObject, useMemo} from "react";
 import { useBaseAppContext, useMuiActionReportLogic, DialogButton } from "reactlib";
 import {useTranslation} from "react-i18next";
+import {icons} from "../util/icons.ts";
 
 type CommonProps = {
     title?: string | ((data:any) => string),
@@ -29,7 +30,7 @@ const FormActionDialog = (props:FormActionDialogProp) => {
     const { t } = useTranslation();
     const {temporalMessageShow} = useBaseAppContext();
     const buttons = useMemo(() => [
-        {icon: 'save', text: t('common.save'), componentProps: { variant: 'contained' }, value: true },
+        {icon: icons.desa, text: t('common.save'), componentProps: { variant: 'contained' }, value: true },
         {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
     ], [t])
     const {

@@ -11,7 +11,8 @@ import {FollowersDialog} from "../FollowersDialog.tsx";
 import ExpedientFilter from "./ExpedientFilter.tsx";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 import useMassiveActions from "./details/ExpedientMassiveActions.tsx";
-import {CardPage} from "../../components/CardData.tsx";
+import {ScreenFrame} from "../../components/ScreenFrame.tsx";
+import {icons} from "../../util/icons.ts";
 import Load from "../../components/Load.tsx";
 import {useUserSession} from "../../components/Session.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
@@ -277,8 +278,8 @@ const ExpedientGrid = () => {
         .filter((col:any)=>!col?.hidden), [user]);
 
     return (
-        <GridPage autoHeight>
-            <CardPage title={t('page.expedient.filter.title')}>
+        <GridPage>
+            <ScreenFrame icon={icons.expedient} title={t('page.expedient.filter.title')}>
                 <ExpedientFilter
                     onSpringFilterChange={(value: any) => {
                         setSpringFilter(value);
@@ -332,7 +333,7 @@ const ExpedientGrid = () => {
                 {massiveComponents}
                 {dialogAlert}
                 {dialogErrorValidacio}
-            </CardPage>
+            </ScreenFrame>
         </GridPage>
     );
 }

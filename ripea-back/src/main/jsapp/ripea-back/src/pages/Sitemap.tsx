@@ -1,61 +1,62 @@
-import React, {useMemo} from 'react';
+import React, { useMemo } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { Typography, List, ListItem, ListItemText, Link, Divider, Icon } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import {GridPage, MenuEntry} from "reactlib";
-import {useCombinedMenu} from "@src/hooks/useCombinedMenu.ts";
-import {CardPage} from "@src/components/CardData.tsx";
+import { GridPage, MenuEntry } from 'reactlib';
+import { useCombinedMenu } from '@src/hooks/useCombinedMenu.ts';
+import { ScreenFrame } from '@src/components/ScreenFrame.tsx';
+import { icons } from '@src/util/icons.ts';
 
-const SitemapItem = ({id, icon, title, to, children}: MenuEntry) => {
-    return <>
-        {to && <ListItem key={id} disablePadding>
-            <ListItemText
-                primary={
-                    <Link component={RouterLink} to={to} display={'flex'} alignItems={'center'} underline="hover">
-                        {icon && <Icon sx={{mr: 1}}>{icon}</Icon>}
-                        {title}
-                    </Link>
-                }
-            />
-        </ListItem>}
-        {children?.map?.((item:MenuEntry) => (
-            <SitemapItem key={item.id} {...item}/>
-        ))}
-    </>
-}
+const SitemapItem = ({ id, icon, title, to, children }: MenuEntry) => {
+    return (
+        <>
+            {to && (
+                <ListItem key={id} disablePadding>
+                    <ListItemText
+                        primary={
+                            <Link component={RouterLink} to={to} display={'flex'} alignItems={'center'} underline="hover">
+                                {icon && <Icon sx={{ mr: 1 }}>{icon}</Icon>}
+                                {title}
+                            </Link>
+                        }
+                    />
+                </ListItem>
+            )}
+            {children?.map?.((item: MenuEntry) => (
+                <SitemapItem key={item.id} {...item} />
+            ))}
+        </>
+    );
+};
 
 const Sitemap: React.FC = () => {
     const { t } = useTranslation();
 
     const { sideMenuEntries: menuEntries } = useCombinedMenu();
 
-    const sitemap: MenuEntry[] = useMemo(()=> {
+    const sitemap: MenuEntry[] = useMemo(() => {
         return [
             ...menuEntries,
             // additional
-            { id: 'accessibilitat', title: t('navigate.accessibilitat'), icon: 'info', to: '/accessibilitat' }
-        ]
-    },[t, menuEntries])
+            { id: 'accessibilitat', title: t('navigate.accessibilitat'), icon: icons.accessibilitat, to: '/accessibilitat' },
+        ];
+    }, [t, menuEntries]);
 
     return (
-        <GridPage autoHeight>
-            <CardPage>
-                <Typography variant="h4" component="h1" gutterBottom>
-                    {t('page.sitemap.title')}
-                </Typography>
-
-                <Typography variant="body1" color="text.secondary" gutterBottom>
+        <GridPage>
+            <ScreenFrame icon={icons.mapaWeb} title={t('page.sitemap.title')}>
+                <Typography variant="body1" color="text.secondary">
                     {t('page.sitemap.subtitle')}
                 </Typography>
 
-                <Divider sx={{ my: 1 }} />
+                <Divider />
 
                 <List>
-                    {sitemap.map((site:MenuEntry) => (
-                        <SitemapItem key={site.id} {...site}/>
+                    {sitemap.map((site: MenuEntry) => (
+                        <SitemapItem key={site.id} {...site} />
                     ))}
                 </List>
-            </CardPage>
+            </ScreenFrame>
         </GridPage>
     );
 };

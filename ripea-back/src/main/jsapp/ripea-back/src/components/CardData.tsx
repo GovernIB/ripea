@@ -1,5 +1,6 @@
-import {Box, Card, CardContent, CardHeader, Grid, Typography, Icon, IconButton, Collapse, darken} from "@mui/material";
+import {Box, Card, CardContent, CardHeader, Grid, Typography, Icon, IconButton, Collapse} from "@mui/material";
 import React, {useState} from "react";
+import {accentColor} from "../theme";
 
 const iconButton = { p: 0.5, borderRadius: '5px', maxWidth: 'max-content', border: '1px solid grey' }
 
@@ -93,7 +94,7 @@ export const DetailCard = (props: DetailCardProps) => {
                 {(title || header) && (
                     <CardHead icon={icon} action={actionHeader} className={'detail'} sx={{ py: 0, px: 2, ...headerProps }}>
                         {title && (
-                            <Typography mt={0.5} variant={variant}>
+                            <Typography mt={0.5} variant={variant} sx={{ fontWeight: 600, color: accentColor }}>
                                 {title}
                             </Typography>
                         )}
@@ -131,7 +132,7 @@ export const DetailExpandCard = (props: DetailCardProps) => {
                     <CardHead icon={icon} className={'detail'} sx={{ py: 0, px: 2, ...headerProps }}
                               componentProps={{width: '100%', display: 'flex', justifyContent: 'space-between'}} onClick={handleExpandClick}>
                         {title && (<>
-                            <Typography mt={0.5} variant={variant}>
+                            <Typography mt={0.5} variant={variant} sx={{ fontWeight: 600, color: accentColor }}>
                                 {title}
                             </Typography>
 
@@ -182,7 +183,7 @@ export const DetailCardContent = (props:DetailCardContentProps) => {
             <Grid size={titleSize}>
                 <Typography
                     variant={'body1'}
-                    sx={{ color: (theme) => (theme.palette.mode === 'dark' ? 'primary.light' : 'primary.main'), ...componentTitleProps }}
+                    sx={{ color: accentColor, ...componentTitleProps }}
                 >
                     {title}
                 </Typography>
@@ -232,33 +233,6 @@ export const CardData = (props:CardDataProps) => {
     );
 }
 
-export const CardPage = (props:CardPageProps) => {
-    const {icon, title, header, headerProps, children, ...other} = props;
-    return <Card sx={{
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column'
-    }}>
-        {(title || header) &&
-            <CardHead icon={icon} sx={(theme: any) => ({
-                // Banner de cabecera de pantalla (solo afecta a CardPage, que lleva el h1)
-                // bgcolor: theme.palette.primary.main,
-                borderBottom: 'none',
-                '& h1': { color: theme.palette.primary.contrastText, fontWeight: 600 },
-                backgroundColor: theme.palette.mode === 'dark' ? darken(theme.palette.primary.main, 0.3) : theme.palette.primary.main,
-                ...headerProps,
-            })} {...other}>
-                {title && <Typography mt={0.5} variant={"h4"} component={"h1"}>{title}</Typography>}
-                {header}
-            </CardHead>
-        }
-
-        <CardContent sx={{height: '100%', display: 'flex', flexDirection: 'column'}}>
-            {children}
-        </CardContent>
-    </Card>
-}
-
 export const ContenidoData = (props:ContenidoDataProps) => {
     const {title, children, size = 12, titleSize = 4, textSize = 8, componentTitleProps, componentTextProps, hidden, hiddenIfEmpty, ...other} = props;
 
@@ -269,7 +243,7 @@ export const ContenidoData = (props:ContenidoDataProps) => {
     return (
         <Grid container direction={'row'} columnSpacing={1} size={size} {...other}>
             <Grid size={titleSize}>
-                <Typography variant={'body1'} color={'primary.contrastText'} sx={componentTitleProps}>
+                <Typography variant={'body1'} color={'text.primary'} sx={componentTitleProps}>
                     {title}
                 </Typography>
             </Grid>

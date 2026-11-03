@@ -46,8 +46,8 @@ vi.mock('@src/util/dateUtils', () => ({
     formatDate: () => '01/01/2024',
 }));
 
-vi.mock('@src/components/CardData', () => ({
-    CardPage: ({ children }: any) => <div data-testid="card-page">{children}</div>,
+vi.mock('@src/components/ScreenFrame', () => ({
+    ScreenFrame: ({ children }: any) => <div data-testid="screen-frame">{children}</div>,
 }));
 
 vi.mock('@src/components/StyledMuiGrid', () => ({
@@ -188,6 +188,6 @@ describe('MetaExpedientGrid', () => {
         } as any);
         const { default: MetaExpedientGrid } = await import('@src/pages/metaExpedient/MetaExpedientGrid');
         render(<MetaExpedientGrid />);
-        expect(screen.getByTestId('card-page')).toBeInTheDocument();
+        expect(screen.getByTestId('screen-frame')).toBeInTheDocument();
     });
 });

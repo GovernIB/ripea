@@ -7,7 +7,7 @@ const translationCa = {
         copyToClipboard: "Copiat al portapapers",
         update: "Modifica",
         actualize: "Actualitza",
-        save: "Guarda",
+        save: "Desa",
         delete: "Esborra",
         accepta: "Accepta",
         rebutja: "Rebutja",
@@ -30,7 +30,8 @@ const translationCa = {
         export: "Exporta",
         consult: "Consulta",
         filter: "Filtra",
-        filterCount: "{{num}} filtres aplicats",
+        filterCount_one: "{{num}} filtre aplicat",
+        filterCount_other: "{{num}} filtres aplicats",
         processing: "Processant...",
         auditoria: {
             create: "Creat el {{createdDate}} per '{{createdBy}}'.",
@@ -38,8 +39,8 @@ const translationCa = {
         },
         nouPermis: "Nou permís",
         advancedSearch: 'Cerca avançada',
-        advancedSearchOpen: 'Obre la cerca avançada',
-        advancedSearchClose: 'Tanca la cerca avançada',
+        advancedSearchOpen: 'Avançat',
+        advancedSearchClose: 'Bàsic',
         error: {
             status: "Codi d'error",
             title: "Títol",
@@ -211,6 +212,12 @@ const translationCa = {
             grid: {
                 nom: "Nom",
                 path: "Ruta contingut",
+                icona: {
+                    expedient: "Expedient",
+                    carpeta: "Carpeta",
+                    document: "Document",
+                    intermedies: "Pot haver-hi carpetes intermèdies",
+                },
             },
             detalle: {
                 title: "Detalls del contingut",
@@ -422,7 +429,7 @@ const translationCa = {
                     tipusDocument: "Tipus de document",
                 },
                 afegirJustificant: {
-                    label: "Afegir justificant a l'expedient",
+                    label: "Afegeix justificant a l'expedient",
                     title: "Afegir justificant de registre a l'expedient",
                     ok: "El justificant de registre s'ha afegit correctament a l'expedient",
                     info: "No es va poder incorporar el justificant de registre de l'anotació a l'expedient. Selecciona el tipus de document i torna a intentar afegir-lo.",
@@ -1868,7 +1875,7 @@ const translationCa = {
                     label: "Permisos",
                 },
                 simulador: {
-                    label: "Simular permisos",
+                    label: "Simula permisos",
                 },
                 baixa: {
                     label: "Dona de baixa",
@@ -2349,7 +2356,7 @@ const translationCa = {
                 },
                 diagnostic: {
                     title: "Diagnòstic",
-                    label: "Repetir diagnòstic",
+                    label: "Repeteix diagnòstic",
                 },
                 diagnosticAll: {
                     title: "Diagnòstic dels sistemes externs",
@@ -2443,7 +2450,7 @@ const translationCa = {
                 perfil: "El meu perfil",
                 manual: "Manual d'usuari",
                 manualAdmin: "Manual dels administradors",
-                logout: "Desconnectar",
+                logout: "Desconnecta",
                 noOrgans: "Cap organ gestor assignat"
             },
             menu: {
@@ -2460,7 +2467,7 @@ const translationCa = {
                 props: "Propietats configurables",
                 pinbal: "Serveis PINBAL",
                 segonPla: "Reiniciar tasques en segon pla...",
-                plugins: "Reiniciar plugins...",
+                plugins: "Reinicia plugins...",
                 avisos: "Avisos",
                 usuaris: "Usuaris",
                 backVersio: "Interfície clàssica",
@@ -2476,7 +2483,7 @@ const translationCa = {
                 tasca: "Tasques",
                 flux: "Fluxos de firma",
 
-                consultar: "Consultar",
+                consultar: "Consulta",
                 continguts: "Continguts",
                 dadesEstadistiques: "Dades estadístiques",
                 portafib: "Documents enviats a Portafib",
@@ -2496,16 +2503,16 @@ const translationCa = {
             },
             massive: {
                 title: "Acció massiva",
-                portafirmes: "Enviar documents al portafirmes",
-                firmar: "Firmar documents des del navegador",
-                marcar: "Marcar com a definitius",
+                portafirmes: "Envia documents al portafirmes",
+                firmar: "Signa documents des del navegador",
+                marcar: "Marca com a definitius",
                 estat: "Canvi d'estat d'expedients",
                 tancar: "Tancament d'expedients",
-                custodiar: "Custodiar elements pendents",
-                csv: "Copiar enllaç CSV",
-                anexos: "Adjuntar annexos pendents d'anotacions acceptades",
-                anotacio: "Actualitzar estat de les anotacions a Distribució",
-                prioritat: "Canviar prioritat d'expedients",
+                custodiar: "Custodia elements pendents",
+                csv: "Copia l'enllaç CSV",
+                anexos: "Adjunta annexos pendents d'anotacions acceptades",
+                anotacio: "Actualitza l'estat de les anotacions a Distribució",
+                prioritat: "Canvia la prioritat d'expedients",
                 refresh: "Refrescar dada 10 segons"
             },
             action: {
@@ -2516,7 +2523,7 @@ const translationCa = {
                     ok: "El document s'ha baixat correctament",
                     pending: "Aquest element s'està processant actualment",
                     cancelar: {
-                        label: "Cancel·lar l'execució massiva",
+                        label: "Cancel·la l'execució massiva",
                         title: "Cancel·lar l'execució massiva",
                         confirm: "Segur que voleu cancel·lar aquesta execució massiva? Si està en curs, l'element que s'està processant acabarà i la resta quedaran cancel·lats.",
                         ok: "L'execució massiva s'ha cancel·lat",

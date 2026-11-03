@@ -4,7 +4,8 @@ import {
     MuiDialog,
     useMuiDataGridApiRef, useResourceApiService,
 } from "reactlib";
-import {CardPage} from "../../../components/CardData.tsx";
+import {ScreenFrame} from "../../../components/ScreenFrame.tsx";
+import {icons} from "../../../util/icons.ts";
 import StyledMuiGrid, {ToolbarButton} from "../../../components/StyledMuiGrid.tsx";
 import {Button, Icon} from "@mui/material";
 import {useEffect, useState} from "react";
@@ -164,21 +165,14 @@ const PermisOrganGestorGrid = ()=> {
         setTitlePage(t('page.user.menu.organPermis', {nom: entity?.nom}))
     }, [entity]);
 
-    return <GridPage autoHeight>
-        <CardPage title={t('page.user.menu.organPermis', {nom: entity?.nom})}
-                  header={<>
-                      <Button
-                          variant="outlined"
-                          color={"inherit"}
-                          sx={{ borderRadius: '4px', padding: '0px 10px', marginLeft: "auto !important" }}
-                          onClick={()=>navigate('/organgestor')}
-                      >
+    return <GridPage>
+        <ScreenFrame icon={icons.permis} title={t('page.user.menu.organPermis', {nom: entity?.nom})}
+                      actions={<Button variant="outlined" onClick={()=>navigate('/organgestor')}>
                           <Icon>arrow_back</Icon>
                           {t('common.back')}
-                      </Button>
-                  </>}>
+                      </Button>}>
             {id && <PermisOrganGestorContent id={id} onEntityChange={setEntity}/>}
-        </CardPage>
+        </ScreenFrame>
     </GridPage>
 }
 export default PermisOrganGestorGrid;

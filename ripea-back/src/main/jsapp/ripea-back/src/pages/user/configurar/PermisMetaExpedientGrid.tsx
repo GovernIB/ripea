@@ -3,7 +3,8 @@ import {
     GridPage,
     useMuiDataGridApiRef, useResourceApiService,
 } from "reactlib";
-import {CardPage} from "../../../components/CardData.tsx";
+import {ScreenFrame} from "../../../components/ScreenFrame.tsx";
+import {icons} from "../../../util/icons.ts";
 import StyledMuiGrid, {ToolbarButton} from "../../../components/StyledMuiGrid.tsx";
 import {Box, Button, Icon, Typography} from "@mui/material";
 import {useEffect, useMemo, useState} from "react";
@@ -105,6 +106,7 @@ const PermisMetaExpedientOrganGrid = (props:any) => {
 
     return <Load value={apiIsReady}>
         <StyledMuiGrid
+            autoHeight
             apiRef={gridApiRef}
             resourceName={"aclObjIdentityResource"}
             columns={columnsOrgan}
@@ -246,6 +248,7 @@ const PermisMetaExpedientNodeGrid = (props:any) => {
 
     return <>
         <StyledMuiGrid
+            autoHeight
             apiRef={gridApiRef}
             resourceName={"aclSidResource"}
             persistentStateActive={false}
@@ -309,20 +312,13 @@ const PermisMetaExpedientGrid = ()=> {
         setTitlePage(t('page.user.menu.procedimentPermis', {nom: entity?.nom}))
     }, [entity]);
 
-    return <GridPage autoHeight>
+    return <GridPage>
         <Load value={entity}>
-            <CardPage title={t('page.user.menu.procedimentPermis', {nom: entity?.nom})}
-                      header={<>
-                          <Button
-                              variant="outlined"
-                              color={"inherit"}
-                              sx={{ borderRadius: '4px', padding: '0px 10px', marginLeft: "auto !important" }}
-                              onClick={()=>navigate('/metaExpedient')}
-                          >
-                              <Icon>arrow_back</Icon>
-                              {t('common.back')}
-                          </Button>
-                      </>}>
+            <ScreenFrame icon={icons.permis} title={t('page.user.menu.procedimentPermis', {nom: entity?.nom})}
+                      actions={<Button variant="outlined" onClick={()=>navigate('/metaExpedient')}>
+                          <Icon>arrow_back</Icon>
+                          {t('common.back')}
+                      </Button>}>
                 {(entity?.procedimentComu || entity?.errorPermisos) &&
                     <PermisMetaExpedientOrganGrid id={id} esErronea={!entity?.procedimentComu && entity?.errorPermisos}/>
                 }
@@ -331,7 +327,7 @@ const PermisMetaExpedientGrid = ()=> {
                         <PermisMetaExpedientNodeGrid id={id} esErronea={entity?.procedimentComu && entity?.errorPermisos}/>
                     </Box>
                 }
-            </CardPage>
+            </ScreenFrame>
         </Load>
     </GridPage>
 }

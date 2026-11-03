@@ -17,7 +17,8 @@ import {COLOR_PRIORITAT, StyledEstat, StyledPrioritat} from "../ExpedientGrid.ts
 import {ExpedientComment} from "../../CommentDialog.tsx";
 import RemesaGrid from "../../remesa/RemesaGrid.tsx";
 import PublicacioGrid from "../../publicacio/PublicacioGrid.tsx";
-import {CardPage, DetailCard} from "../../../components/CardData.tsx";
+import {DetailCard} from "../../../components/CardData.tsx";
+import {ScreenFrame} from "../../../components/ScreenFrame.tsx";
 import Load from "../../../components/Load.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import {useActions} from "./CommonActions.tsx";
@@ -28,8 +29,9 @@ import {setTitlePage} from "../../../TitleHeaderConfigurator.tsx";
 import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
 import {ErrorPage} from "../../../components/ErrorPage.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
+import { accentColor } from "../../../theme";
 import { getReadableTextColor } from '@src/components/StyledLabel.tsx';
-import { icons as iconsAppMenu } from '@src/util/icons';
+import { icons } from '@src/util/icons';
 import {useSession} from "@src/components/SessionStorageContext.tsx";
 
 const border= { border: '1px solid #e3e3e3', borderRadius: '4px' };
@@ -48,14 +50,14 @@ const ExpedientsRelacionats = (props:any) => {
                             <Icon sx={{ fontSize: "1.3rem", paddingTop: "4px" }}>drive_file_move</Icon>
                         </Grid>
                         <Grid size={10}>
-                            <Link sx={{ fontSize: "0.9rem", color: (theme) => (theme.palette.mode === 'dark' ? 'primary.light' : 'primary.main') }} href={`./${relacionat?.id}`}>{relacionat?.nom}</Link>
+                            <Link sx={{ fontSize: "0.9rem", color: accentColor }} href={`./${relacionat?.id}`}>{relacionat?.nom}</Link>
                         </Grid>
                         <Grid size={1}>
                             {expedient?.potRelacionar &&
                                 <IconButton
                                     onClick={()=>eliminarRelacio(expedient?.id, expedient, relacionat?.id)}
                                     title={t('page.expedient.action.eliminarRelacio.label')}
-                                    sx={{ color: (theme) => (theme.palette.mode === 'dark' ? 'primary.contrastText' : 'text.primary')}}>
+                                    sx={{ color: 'text.primary' }}>
                                     <Icon sx={{ fontSize: "1.3rem" }}>link_off</Icon>
                                 </IconButton>
                             }
@@ -148,7 +150,7 @@ const ExpedientInfoContret = (props:any) => {
 };
 
 const ExpedientInfoExpandit = (props:any) => {
-    const {title, entity: expedient, fields, xs, readOnly, onCollapse, relacionats, eliminarRelacio} = props;
+    const {title, entity: expedient, fields, xs, readOnly, onCollapse, relacionats, eliminarRelacio, hideNom} = props;
     const { t } = useTranslation();
 
     const buttonExpand = (
@@ -171,7 +173,7 @@ const ExpedientInfoExpandit = (props:any) => {
             <DetailCard title={title ?? t('page.expedient.detall.title')} size={xs} actionHeader={buttonExpand}>
                 <FieldData size={8} field={'numero'} />
                 <FieldData size={4} field={'ntiClasificacionSia'} sx={{ borderRight: '1px solid' }} />
-                <FieldData field={'nom'} />
+                {!hideNom && <FieldData field={'nom'} />}
                 <FieldData field={'metaExpedient'} />
                 <FieldData field={'organGestor'} />
                 <FieldData field={'ntiFechaApertura'}>{formatDate(expedient?.ntiFechaApertura)}</FieldData>
@@ -202,7 +204,8 @@ const ExpedientInfoExpandit = (props:any) => {
 }
 
 export const ExpedientInfo = (props: any) => {
-    const { expanded, entity: expedient, fields, setExpanded } = props;
+    // hideNom: la pantalla ja mostra el nom de l'expedient com a títol (ScreenFrame)
+    const { expanded, entity: expedient, fields, setExpanded, hideNom } = props;
     const {
         isReady: apiIsReady,
         find: apiFind,
@@ -237,7 +240,7 @@ export const ExpedientInfo = (props: any) => {
 
 
     return expanded ? (
-        <ExpedientInfoExpandit entity={expedient} fields={fields} onCollapse={() => setExpanded(false)} relacionats={relacionats} eliminarRelacio={eliminarRelacio}/>
+        <ExpedientInfoExpandit entity={expedient} fields={fields} onCollapse={() => setExpanded(false)} hideNom={hideNom} relacionats={relacionats} eliminarRelacio={eliminarRelacio}/>
     ) : (
         <ExpedientInfoContret entity={expedient} fields={fields} onExpand={() => setExpanded(true)} relacionats={relacionats}/>
     );
@@ -327,10 +330,9 @@ const ExpedientAlert = (props:any) => {
 }
 
 const HeaderMain = (props: any) => {
-    const { expedient, fields, isCarpetaUrl, alliberar, user, carpetaNode, expanded } = props;
-    const { t } = useTranslation();
+    const { expedient, fields, isCarpetaUrl, carpetaNode, expanded } = props;
     const theme = useTheme();
-    const headerTextColor = theme.palette.primary.contrastText;
+    const headerTextColor = theme.palette.text.primary;
 
     const campsExpedientContret = [
         { name: 'numero', value: expedient?.numero },
@@ -341,62 +343,20 @@ const HeaderMain = (props: any) => {
     ];
 
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', columnGap: 1, rowGap: 0.5, width: '100%' }}>
-                    <Icon sx={{ fontSize: '2rem', color: 'primary.contrastText' }}>{iconsAppMenu.expedient}</Icon>
-                    <Typography variant="h4" component="h1" sx={{ lineHeight: 1.2, flexShrink: 0, color: 'primary.contrastText' }}>
-                        {isCarpetaUrl && expedient?.id != null ? (
-                            <Link
-                                component={RrLink}
-                                to={`/contingut/${expedient.id}`}
-                                underline="hover"
-                                color="inherit"
-                                sx={{ fontWeight: 'inherit', fontSize: 'inherit', lineHeight: 'inherit' }}
-                            >
-                                {expedient.nom}
-                            </Link>
-                        ) : (
-                            expedient?.nom
-                        )}
-                    </Typography>
-                    {isCarpetaUrl && (
-                        <Icon sx={{ fontSize: '1.5rem', color: 'text.secondary', flexShrink: 0 }} aria-hidden>
-                            chevron_right
-                        </Icon>
-                    )}
-                    <ContingutBreadcrumb expedient={expedient} carpetaNode={isCarpetaUrl ? carpetaNode : null} />
+        <>
+            {isCarpetaUrl && expedient?.id != null && (
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', columnGap: 0.5, rowGap: 0.5 }}>
+                    <Link component={RrLink} to={`/contingut/${expedient.id}`} underline="hover" color="inherit" variant="body2">
+                        {expedient.nom}
+                    </Link>
+                    <Icon sx={{ fontSize: '1.1rem', color: 'text.secondary', flexShrink: 0 }} aria-hidden>
+                        chevron_right
+                    </Icon>
+                    <ContingutBreadcrumb expedient={expedient} carpetaNode={carpetaNode} />
                 </Box>
-                <Box>
-                    <Typography
-                        variant={'subtitle1'}
-                        component="p"
-                        sx={{
-                            border,
-                            flexShrink: 0,
-                            whiteSpace: 'nowrap',
-                            bgcolor: (theme) => alpha(theme.palette.common.white, 0.9),
-                            color: (theme) => theme.palette.getContrastText(theme.palette.common.white),
-                        }}
-                        px={2}
-                        hidden={!expedient?.agafatPer}
-                    >
-                        {t('page.expedient.title')} {t('page.expedient.detall.agafatPer')}: {expedient?.agafatPer?.description}
-                        {expedient?.agafatPer?.id == user?.codi && (
-                            <IconButton
-                                aria-label="lock_open"
-                                color={'inherit'}
-                                onClick={() => alliberar(expedient?.id, expedient)}
-                                title={t('page.expedient.action.lliberar.label')}
-                            >
-                                <Icon>lock_open</Icon>
-                            </IconButton>
-                        )}
-                    </Typography>
-                </Box>
-            </Box>
+            )}
             {!expanded && (
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 1 }}>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 2 }}>
                     {campsExpedientContret.map((camp, index) => (
                         <React.Fragment key={camp.name}>
                             {index > 0 && <Divider orientation="vertical" flexItem sx={{ borderColor: headerTextColor, opacity: 0.5 }} />}
@@ -410,7 +370,40 @@ const HeaderMain = (props: any) => {
                     ))}
                 </Box>
             )}
-        </Box>
+        </>
+    );
+};
+
+// Qui té agafat l'expedient: va a la dreta de la barra de títol del ScreenFrame
+const AgafatPer = (props: any) => {
+    const { expedient, alliberar, user } = props;
+    const { t } = useTranslation();
+    if (!expedient?.agafatPer) return null;
+    return (
+        <Typography
+            variant={'subtitle1'}
+            component="p"
+            sx={{
+                border,
+                flexShrink: 0,
+                whiteSpace: 'nowrap',
+                bgcolor: (theme) => alpha(theme.palette.common.white, 0.9),
+                color: (theme) => theme.palette.getContrastText(theme.palette.common.white),
+            }}
+            px={2}
+        >
+            {t('page.expedient.title')} {t('page.expedient.detall.agafatPer')}: {expedient?.agafatPer?.description}
+            {expedient?.agafatPer?.id == user?.codi && (
+                <IconButton
+                    aria-label="lock_open"
+                    color={'inherit'}
+                    onClick={() => alliberar(expedient?.id, expedient)}
+                    title={t('page.expedient.action.lliberar.label')}
+                >
+                    <Icon>lock_open</Icon>
+                </IconButton>
+            )}
+        </Typography>
     );
 };
 
@@ -608,26 +601,25 @@ const Expedient = () => {
     ];
 
     return (
-        <GridPage autoHeight>
+        <GridPage>
             {expedient?.id != null && <SseExpedient id={expedient.id} />}
+            <ScreenFrame
+                icon={icons.expedient}
+                title={expedient?.nom ?? ''}
+                actions={<AgafatPer expedient={expedient} alliberar={alliberar} user={user} />}
+            >
             <Load value={expedient} noEffect>
-                <CardPage
-                    header={
-                        <HeaderMain
-                            expedient={expedient}
-                            isCarpetaUrl={isCarpetaUrl}
-                            alliberar={alliberar}
-                            user={user}
-                            carpetaNode={carpetaNode}
-                            fields={fields}
-                            expanded={expanded}
-                        />
-                    }
-                    componentProps={{ justifyContent: 'space-between' }}
-                >
+                <>
+                    <HeaderMain
+                        expedient={expedient}
+                        isCarpetaUrl={isCarpetaUrl}
+                        carpetaNode={carpetaNode}
+                        fields={fields}
+                        expanded={expanded}
+                    />
                     <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
                         <Box sx={{ width: expanded ? 444 : 72, flexShrink: 0 }}>
-                            <ExpedientInfo entity={expedient} fields={fields} expanded={expanded} setExpanded={handleToggle} />
+                            <ExpedientInfo entity={expedient} fields={fields} expanded={expanded} setExpanded={handleToggle} hideNom />
                         </Box>
                         <Box sx={{ flex: 1, minWidth: 0 }}>
                             <ExpedientAlert entity={expedient} />
@@ -640,8 +632,9 @@ const Expedient = () => {
                             </Box>
                         </Box>
                     </Box>
-                </CardPage>
+                </>
             </Load>
+            </ScreenFrame>
         </GridPage>
     );
 }

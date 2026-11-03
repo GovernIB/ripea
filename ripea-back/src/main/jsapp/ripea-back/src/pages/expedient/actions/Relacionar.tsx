@@ -57,7 +57,7 @@ const springFilterBuilder = (data: any) :string => {
         metaExpedient: data?.metaExpedient,
         numero: data?.numero,
         nom: data?.nom,
-        estat: data?.estat,
+        estatCustom: data?.estatCustom,
     }
     return expedientFilterBuilder(processedData);
 }
@@ -71,10 +71,10 @@ const ActionFilterFrom = () => {
     );
 
     return <>
-        <GridFormField size={{xs: 12, sm: 6, md: 3}} name="metaExpedient" filter={filterMetaExpedient}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3.75}} name="metaExpedient" filter={filterMetaExpedient}/>
         <GridFormField size={{xs: 12, sm: 6, md: 2}} name="numero"/>
-        <GridFormField size={{xs: 12, sm: 6, md: 2}} name="nom"/>
-        <GridFormField size={{xs: 12, sm: 6, md: 2}} name="estat" requestParams={{metaExpedientId: data?.metaExpedient?.id}}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 3.75}} name="nom"/>
+        <GridFormField size={{xs: 12, sm: 6, md: 2}} name="estatCustom" requestParams={{metaExpedientId: data?.metaExpedient?.id}}/>
     </>
 }
 

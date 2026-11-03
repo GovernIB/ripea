@@ -1,6 +1,7 @@
 import {useTranslation} from "react-i18next";
 import {GridPage, useBaseAppContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
-import {CardPage} from "../../../components/CardData.tsx";
+import {ScreenFrame} from "../../../components/ScreenFrame.tsx";
+import {icons} from "../../../util/icons.ts";
 import StyledMuiGrid, {ToolbarButton} from "../../../components/StyledMuiGrid.tsx";
 import { Grid } from "@mui/material";
 import GridFormField, {PasswordFormField} from "../../../components/GridFormField.tsx";
@@ -90,8 +91,8 @@ const DominiGrid = () => {
         },
     ]
 
-    return <GridPage autoHeight>
-        <CardPage title={t('page.user.menu.dominis')}>
+    return <GridPage>
+        <ScreenFrame icon={icons.domini} title={t('page.user.menu.dominis')}>
             <StyledMuiGrid
                 apiRef={apiRef}
                 resourceName={"dominiResource"}
@@ -122,7 +123,7 @@ const DominiGrid = () => {
                     deleteSuccess: 'page.domini.action.delete.ok',
                 }}
             />
-        </CardPage>
+        </ScreenFrame>
     </GridPage>
 }
 export default DominiGrid;

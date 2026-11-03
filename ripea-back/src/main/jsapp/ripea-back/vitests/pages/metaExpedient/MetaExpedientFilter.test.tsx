@@ -52,7 +52,25 @@ describe('MetaExpedientFilter', () => {
         expect(screen.getByTestId('styled-filter')).toHaveAttribute('data-resource', 'metaExpedientResource');
     });
 
-    it('renderitza tots els camps del filtre', () => {
+    it('el filtre bàsic només té els camps d\'una fila', () => {
+        render(<MetaExpedientFilter onSpringFilterChange={vi.fn()} />);
+        ['tipus', 'codi', 'nom', 'organGestor', 'actiu'].forEach((name) => {
+            expect(screen.getByTestId(`field-${name}`)).toBeInTheDocument();
+        });
+        expect(screen.queryByTestId('field-classificacio')).not.toBeInTheDocument();
+    });
+
+    it('el filtre bàsic substitueix organGestor per revisioEstat quan la revisió és activa', () => {
+        vi.mocked(useUserSession).mockReturnValue({
+            value: { sessionScope: { isRevisioActiva: true } },
+        } as any);
+        render(<MetaExpedientFilter onSpringFilterChange={vi.fn()} />);
+        expect(screen.getByTestId('field-revisioEstat')).toBeInTheDocument();
+        expect(screen.queryByTestId('field-organGestor')).not.toBeInTheDocument();
+    });
+
+    it('renderitza tots els camps del filtre avançat', () => {
+        vi.mocked(useFormContext).mockReturnValue({ data: { advanced: true }, fields: [] } as any);
         render(<MetaExpedientFilter onSpringFilterChange={vi.fn()} />);
         expect(screen.getByTestId('field-tipus')).toBeInTheDocument();
         expect(screen.getByTestId('field-codi')).toBeInTheDocument();
@@ -64,7 +82,8 @@ describe('MetaExpedientFilter', () => {
         expect(screen.getByTestId('button-field-permisDirecte')).toBeInTheDocument();
     });
 
-    it('amaga el camp revisioEstat quan isRevisioActiva és false (usuari null)', () => {
+    it('amaga el camp revisioEstat del filtre avançat quan isRevisioActiva és false (usuari null)', () => {
+        vi.mocked(useFormContext).mockReturnValue({ data: { advanced: true }, fields: [] } as any);
         vi.mocked(useUserSession).mockReturnValue({ value: null } as any);
         render(<MetaExpedientFilter onSpringFilterChange={vi.fn()} />);
         expect(screen.getByTestId('field-revisioEstat')).toHaveAttribute('data-hidden', 'true');

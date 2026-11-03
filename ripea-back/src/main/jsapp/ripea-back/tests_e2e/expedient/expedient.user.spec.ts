@@ -52,18 +52,18 @@ const esGetLlistat = (url: string) => url.includes('/api/expedients') && !url.in
 // els expedients acabats de crear (oberts) sempre hi apareixen.
 const filtrarPerTitol = async (page: Page, titol: string) => {
     logDebug('[Filtre] Filtrant per títol="' + titol + '"');
-    // Omplir el camp ABANS de registrar el listener i clicar Filtra: així ens assegurem
-    // que el valor ja està compromès al formulari i que el GET que esperem és el del
-    // botó Filtra (no pas el de la càrrega inicial en muntar-se el filtre).
+    // El filtre s'aplica sol (no hi ha botó Filtra): el text s'aplica 1 s després de l'últim caràcter, o de
+    // seguida amb Tab. El listener es registra ABANS d'omplir el camp, perquè el GET que esperem és el
+    // d'aquest canvi (no pas el de la càrrega inicial en muntar-se el filtre).
     // Esperar que s'hagi tancat qualsevol diàleg (p.ex. el de creació just després de guardar):
     // si s'omple el filtre durant la transició de tancament, el valor queda al DOM però no a
-    // l'estat del formulari, i Filtra no llança cap petició nova.
+    // l'estat del formulari, i no es llança cap petició nova.
     await expect(page.locator('[role="dialog"]')).toHaveCount(0, { timeout: 10_000 });
-    // Acotat al filtre: evita coincidir amb el camp "nom" d'un diàleg de l'expedient.
-    await page.locator('.styledFilter input[name="nom"]').fill(titol);
-    await humanDelay(page);
     const resp = waitApiGet(page, esGetLlistat);
-    await page.locator('.styledFilter').getByRole('button', { name: 'Filtra', exact: true }).click();
+    // Acotat al filtre: evita coincidir amb el camp "nom" d'un diàleg de l'expedient.
+    const camp = page.locator('.styledFilter input[name="nom"]');
+    await camp.fill(titol);
+    await camp.press('Tab');
     await resp;
     logDebug('[Filtre] Filtre aplicat. Num files resultants: ' + await getRows(page).count());
 };
@@ -142,7 +142,8 @@ test.describe('Gestió d\'Expedients — usuari base', () => {
             logInfo('  -> formulari de filtre visible');
             await expect(page.locator('input[name="numero"]')).toBeVisible();
             await expect(page.locator('input[name="nom"]')).toBeVisible();
-            await expect(page.locator('.styledFilter').getByRole('button', { name: 'Filtra', exact: true })).toBeVisible();
+            // El filtre s'aplica sol: no hi ha botó Filtra, només Neteja (només icona, amb nom accessible)
+            await expect(page.locator('.styledFilter').getByRole('button', { name: 'Neteja', exact: true })).toBeVisible();
         });
 
     });
@@ -203,7 +204,7 @@ test.describe('Gestió d\'Expedients — usuari base', () => {
         await test.step('enviar el formulari', async () => {
             logInfo('  -> enviar el formulari');
             await page.waitForTimeout(SYSTEM_DELAY);
-            await page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /guarda/i }).click();
+            await page.locator('[role="dialog"]').getByRole('button').filter({ hasText: /\bdesa\b/i }).click();
         });
 
         await test.step('verificar missatge d\'èxit', async () => {

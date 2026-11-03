@@ -1,5 +1,6 @@
 import {GridPage} from "reactlib";
-import {CardPage} from "../../../components/CardData.tsx";
+import {ScreenFrame} from "../../../components/ScreenFrame.tsx";
+import {icons} from "../../../util/icons.ts";
 import {useTranslation} from "react-i18next";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {Grid} from "@mui/material";
@@ -58,8 +59,8 @@ export const UrlInstruccioGrid = () => {
         },
     ]
 
-    return <GridPage autoHeight>
-        <CardPage title={t('page.user.menu.url')}>
+    return <GridPage>
+        <ScreenFrame icon={icons.urlInstruccio} title={t('page.user.menu.url')}>
             <StyledMuiGrid
                 resourceName={"uRLInstruccioResource"}
                 popupEditUpdateActive
@@ -79,6 +80,6 @@ export const UrlInstruccioGrid = () => {
                     deleteSuccess: 'page.urlInstruccio.action.delete.ok',
                 }}
             />
-        </CardPage>
+        </ScreenFrame>
     </GridPage>
 }

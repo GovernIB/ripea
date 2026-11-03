@@ -128,6 +128,7 @@ export const MetaDocumentGrid = ({ entity, onRowCountChange, readOnly } :any) =>
     }
 
     return <><StyledMuiGrid
+        autoHeight
         apiRef={apiRef}
         resourceName={"metaDocumentResource"}
 		persistentStateKey={"metaDocumentResource_procedimentTab"}

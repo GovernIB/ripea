@@ -57,6 +57,7 @@ const SubsanarAnnexosForm = () => {
     return <>
         <Alert severity="info" sx={{mb: 1}}>{t('page.anotacio.action.subsanarAnnexos.info')}</Alert>
         <StyledMuiGrid
+            autoHeight
             resourceName={'registreAnnexResource'}
             persistentStateActive={false}
             filter={filter}

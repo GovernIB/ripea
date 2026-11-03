@@ -1,6 +1,7 @@
 import {useTranslation} from "react-i18next";
 import {GridPage, useBaseAppContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
-import {CardPage} from "../../../components/CardData.tsx";
+import {ScreenFrame} from "../../../components/ScreenFrame.tsx";
+import {icons} from "../../../util/icons.ts";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import {Grid, Icon} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
@@ -81,8 +82,8 @@ const TipusDocumentalGrid = () => {
         },
     ]
 
-    return <GridPage autoHeight>
-        <CardPage title={t('page.user.menu.nti')}>
+    return <GridPage>
+        <ScreenFrame icon={icons.tipusDocumental} title={t('page.user.menu.nti')}>
             <StyledMuiGrid
                 apiRef={apiRef}
                 resourceName={"tipusDocumentalResource"}
@@ -100,7 +101,7 @@ const TipusDocumentalGrid = () => {
                     deleteSuccess: 'page.tipusDocumental.action.delete.ok',
                 }}
             />
-        </CardPage>
+        </ScreenFrame>
     </GridPage>
 }
 export default TipusDocumentalGrid;

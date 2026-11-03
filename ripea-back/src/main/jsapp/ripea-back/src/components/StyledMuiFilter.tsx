@@ -3,9 +3,28 @@ import {MuiFilter, useFilterApiRef} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {useSession} from "./SessionStorageContext.tsx";
 import {useEffect, useMemo, useRef} from "react";
-import {CombinedIcon, GridButton, GridButtonField} from "./GridFormField.tsx";
+import {GridButton, GridButtonField} from "./GridFormField.tsx";
+import FilterAutoApply from "./FilterAutoApply.tsx";
+import {FilterAutoApplyContext, normalizeFilterData} from "./FilterAutoApplyContext.ts";
+import {icons} from "../util/icons.ts";
+import {outlinedControlBorderSx} from "./titleBarControlsSx.ts";
 
 const filterStyle = { className: "styledFilter" };
+
+/**
+ * Columnes (de 12) que ocupa el bloc de botons del filtre, per punt de ruptura. És l'única font de
+ * les mides del bloc: es pot ajustar tot des d'aquí.
+ *
+ * El bloc simple només duu el botó "Neteja" (amb icona): amb `md: 0.5` a ~900px d'amplada són uns
+ * 17px i la icona hi queda justa (cal que el botó no tingui padding). Amb la cerca avançada (`advancedSearch`)
+ * n'hi ha dos: el commutador (fletxa de desplegar/contreure + text "Avançat"/"Bàsic") i "Neteja" (només icona).
+ *
+ * Els camps de cada filtre han de sumar `12 - FILTER_BUTTONS_COLUMNS.md` a `md` (o
+ * `12 - FILTER_BUTTONS_COLUMNS_ADVANCED.md` amb cerca avançada) a l'última fila perquè el bloc càpiga
+ * a la mateixa fila.
+ */
+export const FILTER_BUTTONS_COLUMNS = { xs: 12, sm: 2, md: 0.5 } as const;
+export const FILTER_BUTTONS_COLUMNS_ADVANCED = { xs: 12, sm: 3, md: 1.5 } as const;
 
 // Width (px) below which the advanced-filter action buttons collapse to
 // icon-only, so their text never gets clipped in the narrow button container.
@@ -23,6 +42,8 @@ export const filterSessionKey = (resourceName?: string, code?: string) =>
 export type FilterButtonProps = {
     value: string;
     text?: string;
+    /** Només es mostra la icona (el text queda com a títol/tooltip). */
+    iconOnly?: boolean;
     icon?: string;
     componentProps?: any;
 };
@@ -42,17 +63,10 @@ const StyledMuiFilter = (props:any) => {
         {
             value: 'clear',
             text: t('common.clear'),
-            icon: 'auto_fix_normal',
+            icon: icons.neteja,
+            iconOnly: true,
         },
-        {
-            value: 'search',
-            text: t('common.filter'),
-            icon: 'filter_alt',
-            componentProps: {
-                variant: "contained",
-            },
-        },
-    ], [filterRef]);
+    ], [t]);
 
     const {
         buttons = defaultButtons,
@@ -74,12 +88,19 @@ const StyledMuiFilter = (props:any) => {
         sessionKey = code != null ? filterSessionKey(props.resourceName, code) : undefined,
         advancedSearch = false,
         buttonIconOnlyBreakpoint = 'lg',
+        // Aplica el filtre sol en canviar-ne els camps (veure FilterAutoApply). Només s'ha de desactivar als
+        // filtres que s'executen amb un botó propi perquè la cerca té efectes (p. ex. el d'InteressatsGridForm).
+        autoApply = true,
         ...other
     } = props
 
     // Marca que la propera notificació de dades prové d'un "netejar", per re-aplicar
     // el filtre buit només quan el formulari no té camps per defecte (vegeu onDataChange).
     const netejarPendingRef = useRef(false);
+    // Dades (normalitzades) de l'últim filtre aplicat i cancel·lació de l'aplicació automàtica pendent
+    // (veure FilterAutoApply, que els fa servir per no repetir cerques).
+    const lastAppliedRef = useRef<string | undefined>(undefined);
+    const autoApplyCancelRef = useRef<(() => void) | undefined>(undefined);
 
     const cercar = ()=> {
         apiRef?.current?.filter?.()
@@ -89,6 +110,7 @@ const StyledMuiFilter = (props:any) => {
             saveFilterData(null)
         }
         netejarPendingRef.current = true;
+        autoApplyCancelRef.current?.();
         apiRef?.current?.clear?.()
     }
 
@@ -106,6 +128,7 @@ const StyledMuiFilter = (props:any) => {
     // sense passar per cercar()) i l'auto-cerca inicial. Així Intro i botó persisteixen
     // igual. clear() amb buttonControlled no crida filter(), per tant no re-desa.
     const handleSpringFilterChange = (springFilter:any) => {
+        lastAppliedRef.current = normalizeFilterData(apiRef?.current?.getData?.());
         if (sessionKey) {
             saveFilterData(apiRef?.current?.getData?.())
         }
@@ -114,11 +137,15 @@ const StyledMuiFilter = (props:any) => {
 
     useEffect(() => {
         if (!!sessionKey && filterData && onSpringFilterChange && springFilterBuilder) {
+            lastAppliedRef.current = normalizeFilterData(filterData);
             onSpringFilterChange(springFilterBuilder(filterData));
         }
     }, []);
 
-    const buttonSize = 12 / (buttons.length + (advancedSearch ?1 :0))
+    // Amb cerca avançada el commutador duu icona (fletxa) + text i ocupa la major part del bloc;
+    // la resta de botons (només icona) es reparteixen el que queda.
+    const advancedButtonSize = buttons.length > 0 ? 8 : 12;
+    const otherButtonSize = advancedSearch ? 4 / Math.max(buttons.length, 1) : 12 / buttons.length;
 
     return <MuiFilter
         code={code}
@@ -147,34 +174,44 @@ const StyledMuiFilter = (props:any) => {
         }}
         {...other}
     >
-        <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-            {children}
+        <FilterAutoApplyContext.Provider value={autoApply}>
+            <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
+                {children}
+                {autoApply && <FilterAutoApply lastAppliedRef={lastAppliedRef} cancelRef={autoApplyCancelRef} />}
 
-            <Grid container direction={"row"} columnSpacing={1} rowSpacing={1} size={{xs: 12, sm: 6, md: 2.4}} sx={{ display: 'flex', justifyContent: 'end', marginLeft: 'auto' }} {...buttonGridProps}>
-                {advancedSearch && <GridButtonField
-                    size={buttonSize}
-                    name={"advanced"}
-                    title={(active:boolean) => active
-                        ?t('common.advancedSearchClose')
-                        :t('common.advancedSearchOpen')}
-                    icon={(active:boolean) => active
-                        ?<CombinedIcon base={"zoom_out"} badge={"expand_less"}/>
-                        :<CombinedIcon base={"zoom_in"} badge={"expand_more"}/>}
-                />}
-                {
-                    buttons?.map((button:FilterButtonProps)=>
-                        <GridButton size={buttonSize}
-                                    key={button.value}
-                                    title={button.text}
-                                    icon={button.icon}
-                                    iconOnlyBreakpoint={buttonIconOnlyBreakpoint}
-                                    onClick={() => callback(button.value)}
-                                    {...button?.componentProps}>
-                            <Typography sx={{paddingLeft: '5px', marginTop: '1px', maxWidth: 'max-content'}}>{button.text}</Typography>
-                        </GridButton>)
-                }
+                <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}
+                      size={advancedSearch ? FILTER_BUTTONS_COLUMNS_ADVANCED : FILTER_BUTTONS_COLUMNS}
+                      sx={{ display: 'flex', justifyContent: 'end', marginLeft: 'auto' }} {...buttonGridProps}>
+                    {advancedSearch && <GridButtonField
+                        size={advancedButtonSize}
+                        name={"advanced"}
+                        title={(active:boolean) => active
+                            ?t('common.advancedSearchClose')
+                            :t('common.advancedSearchOpen')}
+                        text={(active:boolean) => active
+                            ?t('common.advancedSearchClose')
+                            :t('common.advancedSearchOpen')}
+                        icon={(active:boolean) => active ?icons.plega :icons.desplega}
+                        iconOnlyFrom="sm"
+                        iconOnlyBreakpoint={buttonIconOnlyBreakpoint}
+                        sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}
+                    />}
+                    {
+                        buttons?.map((button:FilterButtonProps)=>
+                            <GridButton size={otherButtonSize}
+                                        key={button.value}
+                                        title={button.text}
+                                        icon={button.icon}
+                                        iconOnlyBreakpoint={buttonIconOnlyBreakpoint}
+                                        sx={[button.iconOnly ? {minWidth: 0, px: 0} : {}, outlinedControlBorderSx]}
+                                        onClick={() => callback(button.value)}
+                                        {...button?.componentProps}>
+                                {!button.iconOnly && <Typography sx={{paddingLeft: '5px', marginTop: '1px', maxWidth: 'max-content'}}>{button.text}</Typography>}
+                            </GridButton>)
+                    }
+                </Grid>
             </Grid>
-        </Grid>
+        </FilterAutoApplyContext.Provider>
     </MuiFilter>
 }
 export default StyledMuiFilter;

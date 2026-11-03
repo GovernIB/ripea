@@ -1,72 +1,72 @@
-import {useTranslation} from "react-i18next";
-import {GridPage, useMuiDataGridApiRef} from "reactlib";
-import {useState} from "react";
-import { CardPage } from "../../../components/CardData.tsx";
-import {CanviEstatFilter, CanviEstatMuiGrid} from "./CanviEstatGrid.tsx";
-import useTancar, {useTancarMassive} from "../../expedient/actions/Tancar.tsx";
-import {useExecucioMassivaContingut} from "../actions/ExecucioMassivaGrid.tsx";
-import {Box} from "@mui/material";
+import { useTranslation } from 'react-i18next';
+import { GridPage, useMuiDataGridApiRef } from 'reactlib';
+import { useState } from 'react';
+import { ScreenFrame } from '../../../components/ScreenFrame.tsx';
+import { icons } from '../../../util/icons.ts';
+import { CanviEstatFilter, CanviEstatMuiGrid } from './CanviEstatGrid.tsx';
+import useTancar, { useTancarMassive } from '../../expedient/actions/Tancar.tsx';
+import { useExecucioMassivaContingut } from '../actions/ExecucioMassivaGrid.tsx';
+import { Box } from '@mui/material';
 
-const namedQueries: string[] = ['MASSIVE_ACTION_QUERY', 'MASSIVE_ACTION_TANCAR']
-const perspectives:any = ['ESTAT','AUDITORIA', 'EN_PROCES_TANCAMENT'];
+const namedQueries: string[] = ['MASSIVE_ACTION_QUERY', 'MASSIVE_ACTION_TANCAR'];
+const perspectives: any = ['ESTAT', 'AUDITORIA', 'EN_PROCES_TANCAMENT'];
 const TancarGrid = () => {
-    const {t} = useTranslation();
+    const { t } = useTranslation();
     const apiRef = useMuiDataGridApiRef();
     const [springFilter, setSpringFilter] = useState<string>();
 
     const refresh = () => {
         apiRef?.current?.refresh?.();
-    }
+    };
 
-    const {handleShow: handleTancar, content: contentTancar} = useTancar(refresh)
-    const {handleShow: handleTancarMassive, content: contentTancarMassive} = useTancarMassive(refresh)
-    const {handleOpen: handleContingutOpen, dialog: dialogContingut} = useExecucioMassivaContingut();
+    const { handleShow: handleTancar, content: contentTancar } = useTancar(refresh);
+    const { handleShow: handleTancarMassive, content: contentTancarMassive } = useTancarMassive(refresh);
+    const { handleOpen: handleContingutOpen, dialog: dialogContingut } = useExecucioMassivaContingut();
 
-    const actions:any[] = [
+    const actions: any[] = [
         {
             label: t('page.expedient.action.close.label'),
-            icon: "check",
+            icon: 'check',
             showInMenu: false,
             onClick: handleTancar,
-            hidden: (row:any) => row?.execucioMassivaTancamentId,
+            hidden: (row: any) => row?.execucioMassivaTancamentId,
         },
         {
             label: t('page.user.action.massives.pending'),
             icon: <Box sx={{ color: 'warning.main' }}>schedule</Box>,
             showInMenu: false,
-            onClick: (_id:any, row:any) => handleContingutOpen(row?.execucioMassivaTancamentId),
-            hidden: (row:any) => !row?.execucioMassivaTancamentId,
+            onClick: (_id: any, row: any) => handleContingutOpen(row?.execucioMassivaTancamentId),
+            hidden: (row: any) => !row?.execucioMassivaTancamentId,
         },
-    ]
+    ];
     const massiveActions = [
         {
             label: t('page.expedient.action.close.label'),
-            icon: "check",
+            icon: 'check',
             showInMenu: false,
             onClick: handleTancarMassive,
         },
-    ]
+    ];
 
-    return <GridPage autoHeight>
-        <CardPage title={t('navigate.massiu.tancament')}>
-            <CanviEstatFilter
-                sessionKey={"MASSIVE_TANCAR_FILTER"}
-                onSpringFilterChange={setSpringFilter}
-                findExpedientByName/>
+    return (
+        <GridPage>
+            <ScreenFrame icon={icons.massiva} title={t('navigate.massiu.tancament')}>
+                <CanviEstatFilter sessionKey={'MASSIVE_TANCAR_FILTER'} onSpringFilterChange={setSpringFilter} findExpedientByName />
 
-            <CanviEstatMuiGrid
-                apiRef={apiRef}
-                filter={springFilter}
-                perspectives={perspectives}
-                namedQueries={namedQueries}
-                rowAdditionalActions={actions}
-                toolbarMassiveActions={massiveActions}
-                isRowSelectable={(params:any) => !params?.row?.execucioMassivaTancamentId}
-            />
-        </CardPage>
-        {contentTancar}
-        {contentTancarMassive}
-        {dialogContingut}
-    </GridPage>
-}
+                <CanviEstatMuiGrid
+                    apiRef={apiRef}
+                    filter={springFilter}
+                    perspectives={perspectives}
+                    namedQueries={namedQueries}
+                    rowAdditionalActions={actions}
+                    toolbarMassiveActions={massiveActions}
+                    isRowSelectable={(params: any) => !params?.row?.execucioMassivaTancamentId}
+                />
+            </ScreenFrame>
+            {contentTancar}
+            {contentTancarMassive}
+            {dialogContingut}
+        </GridPage>
+    );
+};
 export default TancarGrid;

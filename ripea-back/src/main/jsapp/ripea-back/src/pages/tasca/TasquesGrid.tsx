@@ -3,14 +3,19 @@ import {useTranslation} from "react-i18next";
 import { formatDate } from "../../util/dateUtils.ts";
 import {StyledPrioritat} from "../expedient/ExpedientGrid.tsx";
 import {TascaComment} from "../CommentDialog.tsx";
-import StyledMuiGrid, {FilterCountChip} from '../../components/StyledMuiGrid.tsx';
+import StyledMuiGrid from '../../components/StyledMuiGrid.tsx';
+import {FilterCountChip} from '../../components/FilterCountChip.tsx';
 import ViewSelector from '../../components/ViewSelector.tsx';
 import TasquesFilter, {TASCA_FILTER_SESSION_KEY} from "./TasquesFilter.tsx";
 import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import Load from "../../components/Load.tsx";
-import { CardPage } from "../../components/CardData.tsx";
+import { ScreenFrame } from "../../components/ScreenFrame.tsx";
+import { useScreenFrame } from "../../components/ScreenFrameContext.ts";
+import { createPortal } from "react-dom";
+import { icons } from "../../util/icons.ts";
 import {useUserSession} from "../../components/Session.tsx";
-import {Grid, Icon, Typography} from "@mui/material";
+import {Icon, Typography} from "@mui/material";
+import {lighten, type Theme} from "@mui/material/styles";
 import useTascaActions from "./details/TascaActions.tsx";
 import ContingutLink from "../../components/ContingutLink.tsx";
 import useTascaDetail from "./details/TascaDetail.tsx";
@@ -27,7 +32,11 @@ export const StyledDate = (props: any) => {
         :entity?.shouldNotifyAboutDeadline
             ?'warning'
             :'default'
-    return <Typography variant={"inherit"} color={color}>
+    // Als temes foscos el vermell/taronja del tema no arriba al 4,5:1 sobre les files (Dracula: 3,93:1),
+    // així que s'aclareix, com fa tonal.ts.
+    const sx = (theme: Theme) =>
+        color !== 'default' && theme.palette.mode === 'dark' ? {color: lighten(theme.palette[color].main, 0.4)} : {};
+    return <Typography variant={"inherit"} color={color} sx={sx}>
         {children}
         {(entity?.dataLimitExpirada || entity?.shouldNotifyAboutDeadline) && <Icon>alarm</Icon>}
     </Typography>
@@ -78,6 +87,11 @@ export const useTascaView = (sessionKey: string) => {
 // El filtre spring sempre inclou la condició fixa "expedient.esborrat = 0" (veure
 // TasquesFilter), que no és un filtre triat per l'usuari i no s'ha de comptar.
 const filterCount = (num: number) => num - 1;
+
+const FilterCountInFrame = (props: { filter?: string, filterCount?: (num: number) => number }) => {
+    const frame = useScreenFrame();
+    return frame?.infoSlot ? createPortal(<FilterCountChip filter={props.filter} filterCount={props.filterCount}/>, frame.infoSlot) : null;
+};
 
 /** Període (dies enrere) al qual la vista kanban limita la data d'inici. */
 const KANBAN_DIES_DATA_INICI = 30;
@@ -232,8 +246,12 @@ const TasquesGrid = () => {
         }
     }, [vista, filterReady, applyFilterValues]);
 
-    return <GridPage autoHeight>
-        <CardPage title={t('page.user.menu.tasca')}>
+    return <GridPage>
+        <ScreenFrame
+            icon={icons.tasca}
+            title={t('page.user.menu.tasca')}
+            actions={vista != TascaView.table ? <TascaViewSelector value={vista} onChange={setVista}/> : undefined}
+        >
             <TasquesFilter
                 apiRef={filterRef}
                 onDataChange={() => setFilterReady(true)}
@@ -245,10 +263,7 @@ const TasquesGrid = () => {
 
             <Load value={load} noEffect>
                 {vista != TascaView.table && <>
-                    <Grid container display={'flex'} justifyContent={'end'} alignItems={'center'} mb={1}>
-                        <FilterCountChip filter={springFilter} filterCount={filterCount} sx={{mr: 'auto'}}/>
-                        <TascaViewSelector value={vista} onChange={setVista}/>
-                    </Grid>
+                    <FilterCountInFrame filter={springFilter} filterCount={filterCount}/>
                     {vista == TascaView.kanban && <TascaKanban actions={actions} filter={springFilter} namedQueries={namedQueries} perspectives={perspectives} reloadTrigger={reload} onEventClick={handleTascaClick} readOnly />}
                     {vista == TascaView.calendar && <TascaCalendar actions={actions} filter={springFilter} namedQueries={namedQueries} perspectives={perspectives} reloadTrigger={reload} onEventClick={handleTascaClick} />}
                 </>}
@@ -298,7 +313,7 @@ const TasquesGrid = () => {
                 {components}
                 {dialog}
             </Load>
-        </CardPage>
+        </ScreenFrame>
     </GridPage>
 }
 

@@ -63,7 +63,7 @@ export const confirmarDialeg = async (page: Page) => {
 
 // ── Formularis i filtres ─────────────────────────────────────────────────────────
 
-// Espera SYSTEM_DELAY abans de clicar (p.ex. el botó Guarda d'un diàleg), perquè els
+// Espera SYSTEM_DELAY abans de clicar (p.ex. el botó Desa d'un diàleg), perquè els
 // camps acabin de propagar el seu valor al formulari.
 export const guardaAmbDelay = async (page: Page, locator: Locator) => {
     await page.waitForTimeout(SYSTEM_DELAY);

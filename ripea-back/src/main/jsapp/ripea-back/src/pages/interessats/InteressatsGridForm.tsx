@@ -46,6 +46,8 @@ export const InteressatsGridForm = () => {
                     springFilterBuilder={(data:any)=> setValue(data)}
                     onSpringFilterChange={() => {}}
                     buttons={filterButtons}
+                    autoApply={false} // la cerca s'executa amb el botó «Actualitza» (efectes sobre el formulari)
+                    buttonGridProps={{size: {xs: 12, sm: 6, md: 2.4}}} // botó amb text: no cap al bloc estret per defecte
                     disableGridBinding={true} // <-- evitar que la búsqueda actualice el grid
                 >
                     <InteressatsGridFormFilter/>

@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { useMemo, useState } from 'react';
 import { GridPage } from 'reactlib';
-import { CardPage } from '../../../components/CardData.tsx';
+import { ScreenFrame } from '../../../components/ScreenFrame.tsx';
+import { icons } from '../../../util/icons.ts';
 import StyledMuiGrid from '../../../components/StyledMuiGrid.tsx';
 import { formatDate } from '../../../util/dateUtils.ts';
 import { GridSortDirection } from '@mui/x-data-grid-pro';
@@ -13,11 +14,11 @@ import useAnotacioActions from '../../anotacioExpedient/details/AnotacioActions.
 const ExpedientsPendentsFilterForm = () => {
     return (
         <>
-            <GridFormField size={{ xs: 12, sm: 6, md: 4 }} name="numRegistre" />
-            <GridFormField size={{ xs: 12, sm: 6, md: 4 }} name="extracte" />
-            <GridFormField size={{ xs: 12, sm: 6, md: 4 }} name="metaExpedient" />
-            <GridFormField size={{ xs: 12, sm: 6, md: 4 }} name="dataRecepcioInicial" type={'date'} />
-            <GridFormField size={{ xs: 12, sm: 6, md: 4 }} name="dataRecepcioFinal" type={'date'} />
+            <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="numRegistre" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 2.5 }} name="extracte" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 3 }} name="metaExpedient" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="dataRecepcioInicial" type={'date'} />
+            <GridFormField size={{ xs: 12, sm: 6, md: 2 }} name="dataRecepcioFinal" type={'date'} />
         </>
     );
 };
@@ -50,7 +51,7 @@ const ExpedientsPendentsFilter = (props: any) => {
 // Grid
 const sortModel: any = [{ field: 'registreInfo.data', sort: 'desc' }];
 const perspectives = ['REGISTRE'];
-const namedQueries = ['LLISTAT_ANOTACIONS','ESTAT_PENDENT'];
+const namedQueries = ['LLISTAT_ANOTACIONS', 'ESTAT_PENDENT'];
 
 const ExpedientsPendentsGrid = () => {
     const { t } = useTranslation();
@@ -90,8 +91,8 @@ const ExpedientsPendentsGrid = () => {
     const { actions, components } = useAnotacioActions();
 
     return (
-        <GridPage autoHeight>
-            <CardPage title={t('page.user.menu.pendents')}>
+        <GridPage>
+            <ScreenFrame icon={icons.expedient} title={t('page.user.menu.pendents')}>
                 <ExpedientsPendentsFilter onSpringFilterChange={setSpringFilter} />
                 <StyledMuiGrid
                     resourceName={'expedientPeticioResource'}
@@ -105,7 +106,7 @@ const ExpedientsPendentsGrid = () => {
                     rowAdditionalActions={actions}
                     readOnly
                 />
-            </CardPage>
+            </ScreenFrame>
             {components}
         </GridPage>
     );

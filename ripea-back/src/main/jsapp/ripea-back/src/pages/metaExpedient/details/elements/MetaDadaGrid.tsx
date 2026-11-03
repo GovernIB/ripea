@@ -1,6 +1,7 @@
 import {useTranslation} from "react-i18next";
 import {GridPage, useBaseAppContext, useFormContext, useMuiDataGridApiRef, useResourceApiService} from "reactlib";
-import {CardPage} from "@src/components/CardData.tsx";
+import {ScreenFrame} from "@src/components/ScreenFrame.tsx";
+import {icons} from "@src/util/icons.ts";
 import StyledMuiGrid from "@src/components/StyledMuiGrid.tsx";
 import {Alert, Grid, Icon, Divider, Button} from "@mui/material";
 import * as builder from "@src/util/springFilterUtils.ts";
@@ -12,7 +13,6 @@ import {useUserSession} from "@src/components/Session.tsx";
 import {MultiplicitatStyled} from "@src/pages/contingut/details/MetaExpedient.tsx";
 import useMetaDadaDetail from "./details/MetaDadaDetail.tsx";
 import {ErrorPage} from "@src/components/ErrorPage.tsx";
-import {icons} from "@src/util/icons.ts";
 import {esMetaDocumentPerDefecte} from "@src/util/metaDocumentUtils.ts";
 import Load from "@src/components/Load.tsx";
 
@@ -168,6 +168,7 @@ export const MetDadaGrid = ({ id, enviable = false, readOnly, persistentStateKey
     }
 
     return <><StyledMuiGrid
+            autoHeight
         apiRef={apiRef}
         resourceName={"metaDadaResource"}
 		persistentStateKey={persistentStateKey}
@@ -252,20 +253,13 @@ const MetaDadaGrid = () => {
     // del useMemo de les columnes a la llibreria no inclouen les accions). Fins que no
     // arriba el tipus de document no se sap si el procediment està revisat, així que
     // s'espera amb Load, igual que fa la pantalla del procediment.
-    return <GridPage autoHeight>
+    return <GridPage>
         <Load value={metaDocument}>
-            <CardPage title={t('page.user.menu.documentDada', {nom: metaDocument?.nom})}
-                      header={<>
-                          <Button
-                              variant="outlined"
-                              color={"inherit"}
-                              sx={{ borderRadius: '4px', padding: '0px 10px', marginLeft: "auto !important" }}
-                              onClick={()=>navigate(`/metaExpedient/${metaDocument?.metaExpedient?.id}/metaDocument`)}
-                          >
-                              <Icon>arrow_back</Icon>
-                              {t('common.back')}
-                          </Button>
-                      </>}>
+            <ScreenFrame icon={icons.procediment} title={t('page.user.menu.documentDada', {nom: metaDocument?.nom})}
+                      actions={<Button variant="outlined" onClick={()=>navigate(`/metaExpedient/${metaDocument?.metaExpedient?.id}/metaDocument`)}>
+                          <Icon>arrow_back</Icon>
+                          {t('common.back')}
+                      </Button>}>
                 {metaDocument?.metaExpedientRevisioEstat === 'REVISAT' && rol?.isOrganAdmin &&
                     <Alert severity={'info'} sx={{mb: 1}}>
                         {t('page.metaExpedient.action.consultar.revisat')}
@@ -273,7 +267,7 @@ const MetaDadaGrid = () => {
                 }
                 {reservat && <Alert severity={'info'} sx={{mb: 2}}>{t('page.metaDocument.reservat')}</Alert>}
                 <MetDadaGrid id={id} readOnly={readOnly} persistentStateKey={"metaDadaResource_metaDocumentTab"}/>
-            </CardPage>
+            </ScreenFrame>
         </Load>
     </GridPage>
 }

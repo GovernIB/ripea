@@ -1,4 +1,5 @@
 import {Grid} from "@mui/material";
+import {useTheme} from "@mui/material/styles";
 import {StyledLabel} from "../../../components/StyledLabel.tsx";
 
 export const formatMultiplicitat = (raw: string): string => {
@@ -13,8 +14,11 @@ export const formatMultiplicitat = (raw: string): string => {
 
 export const MultiplicitatStyled = (props:any) => {
     const {multiplicitat} = props;
+    const theme = useTheme();
+    // El color `info` canvia segons el tema (a Dracula és un cian molt clar): el text s'ha d'ajustar al fons.
+    const color = theme.palette.getContrastText(theme.palette.info.main);
 
-    return <StyledLabel className={'multiplicitat'} backgroundColor={'info'} color={'white'}>{multiplicitat}</StyledLabel>
+    return <StyledLabel className={'multiplicitat'} backgroundColor={'info'} color={color}>{multiplicitat}</StyledLabel>
 }
 
 const MetaExpedient = (props:any) => {

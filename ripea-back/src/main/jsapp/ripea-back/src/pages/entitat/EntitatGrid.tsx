@@ -1,5 +1,6 @@
 import {GridPage, useFormContext, useMuiDataGridApiRef} from "reactlib";
-import {CardPage} from "../../components/CardData.tsx";
+import {ScreenFrame} from "../../components/ScreenFrame.tsx";
+import {icons} from "../../util/icons.ts";
 import {useTranslation} from "react-i18next";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
 import {Badge, Grid, Icon, Typography} from "@mui/material";
@@ -80,8 +81,8 @@ export const EntitatGrid = () => {
 
     const {actions, components} = useEntitatActions(refresh)
 
-    return <GridPage autoHeight>
-        <CardPage title={t('navigate.entitat')}>
+    return <GridPage>
+        <ScreenFrame icon={icons.entitat} title={t('navigate.entitat')}>
             <StyledMuiGrid
                 apiRef={apiRef}
                 resourceName={"entitatResource"}
@@ -102,6 +103,6 @@ export const EntitatGrid = () => {
                 }}
             />
             {components}
-        </CardPage>
+        </ScreenFrame>
     </GridPage>
 }

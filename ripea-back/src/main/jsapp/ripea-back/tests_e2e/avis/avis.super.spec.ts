@@ -123,7 +123,7 @@ const crearAvis = async (page: Page, dades: DadesAvis) => {
     const dialog = getDialog(page);
     await expect(dialog).toBeVisible();
     await omplirFormulari(page, dialog, dades);
-    await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /guarda/i }));
+    await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /\bdesa\b/i }));
     await expectSuccessAlert(page);
     await expect(dialog).toBeHidden();
 };
@@ -419,7 +419,7 @@ test.describe('Gestió d\'Avisos — IPA_SUPER', () => {
             await aplicarFiltreRapid(page, ASSUMPTE_CREAR, esGetLlistat);
             const dialog = await obrirModificacio(page, ASSUMPTE_CREAR);
             await omplirFormulari(page, dialog, dades);
-            await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /guarda/i }));
+            await guardaAmbDelay(page, dialog.getByRole('button').filter({ hasText: /\bdesa\b/i }));
             await expectSuccessAlert(page);
             await expect(dialog).toBeHidden();
         });

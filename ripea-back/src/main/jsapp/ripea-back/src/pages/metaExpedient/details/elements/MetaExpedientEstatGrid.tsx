@@ -1,44 +1,44 @@
-import {Grid, Icon, Divider} from "@mui/material";
-import GridFormField from "../../../../components/GridFormField.tsx";
-import {StyledBadge} from "../../../../components/StyledBadge.tsx";
-import {useTranslation} from "react-i18next";
-import StyledMuiGrid from "../../../../components/StyledMuiGrid.tsx";
-import * as builder from "../../../../util/springFilterUtils.ts";
-import {useBaseAppContext, useResourceApiService} from "reactlib";
-import {useMemo} from "react";
-import useMetaExpEstatDetail from "./details/MetaExpEstatDetail.tsx";
-import {icons} from "@src/util/icons.ts";
+import { Grid, Icon, Divider } from '@mui/material';
+import GridFormField from '../../../../components/GridFormField.tsx';
+import { StyledBadge } from '../../../../components/StyledBadge.tsx';
+import { useTranslation } from 'react-i18next';
+import StyledMuiGrid from '../../../../components/StyledMuiGrid.tsx';
+import * as builder from '../../../../util/springFilterUtils.ts';
+import { useBaseAppContext, useResourceApiService } from 'reactlib';
+import { useMemo } from 'react';
+import useMetaExpEstatDetail from './details/MetaExpEstatDetail.tsx';
+import { icons } from '@src/util/icons.ts';
 
 const useActions = (refresh?: () => void) => {
-    const {
-        artifactAction: apiAction,
-    } = useResourceApiService('metaExpedientEstatResource');
-    const {temporalMessageShow} = useBaseAppContext();
+    const { artifactAction: apiAction } = useResourceApiService('metaExpedientEstatResource');
+    const { temporalMessageShow } = useBaseAppContext();
 
-    const reordering = (id:any, ordre:number) => {
+    const reordering = (id: any, ordre: number) => {
         apiAction(id, { code: 'REORDENAR', data: ordre })
             .then(() => refresh?.())
             .catch((error) => {
                 temporalMessageShow(null, error?.message, 'error');
             });
-    }
+    };
 
-    return {reordering}
-}
+    return { reordering };
+};
 
 const MetaExpedientEstatForm = () => {
-    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField name="codi"/>
-        <GridFormField name="nom"/>
-        <GridFormField name="color" type={'color'}/>
-        <GridFormField name="inicial"/>
-        <GridFormField name="responsable"/>
-    </Grid>
-}
+    return (
+        <Grid container direction={'row'} columnSpacing={1} rowSpacing={1}>
+            <GridFormField name="codi" />
+            <GridFormField name="nom" />
+            <GridFormField name="color" type={'color'} />
+            <GridFormField name="inicial" />
+            <GridFormField name="responsable" />
+        </Grid>
+    );
+};
 
-const sortModel: any = [{field: 'ordre', sort: 'asc'}]
+const sortModel: any = [{ field: 'ordre', sort: 'asc' }];
 const perspectives: string[] = [];
-const columns:any = [
+const columns: any = [
     {
         field: 'codi',
         flex: 1,
@@ -50,7 +50,7 @@ const columns:any = [
     {
         field: 'inicial',
         flex: 0.5,
-        renderCell: (params:any) => (params?.row?.inicial && <Icon>check</Icon>),
+        renderCell: (params: any) => params?.row?.inicial && <Icon>check</Icon>,
     },
     {
         field: 'responsable',
@@ -59,70 +59,81 @@ const columns:any = [
     {
         field: 'color',
         flex: 0.5,
-        renderCell: (params:any) => (params?.row?.color && <StyledBadge badgecolor={params?.formattedValue} overlap="circular" badgeContent=" "/>)
+        renderCell: (params: any) =>
+            params?.row?.color && <StyledBadge badgecolor={params?.formattedValue} overlap="circular" badgeContent=" " />,
     },
-]
-export const MetaExpedientEstatGrid = ({ entity, onRowCountChange, readOnly } :any) => {
-    const {t} = useTranslation()
+];
+export const MetaExpedientEstatGrid = ({ entity, onRowCountChange, readOnly }: any) => {
+    const { t } = useTranslation();
 
-    const {reordering} = useActions()
-    const {apiIsReady, handleOpen, dialog} = useMetaExpEstatDetail()
-    const actions:any[] = useMemo(() => readOnly ?[
-        {
-            label: t('page.metaExpedient.action.consultar.label'),
-            icon: icons.detall,
-            showInMenu: false,
-            onClick: handleOpen,
-        },
-    ]:[
-        {
-            label: t('common.update'),
-            icon: "edit",
-            showInMenu: true,
-            clickShowUpdateDialog: true,
-        },
-        {
-            label: <Divider sx={{px: 1, width: '100%'}} color={"none"}/>,
-            showInMenu: true,
-            disabled: true,
-        },
-        {
-            label: t('common.delete'),
-            icon: "delete",
-            showInMenu: true,
-            clickTriggerDelete: true,
-        },
-    ], [t, readOnly, apiIsReady]);
+    const { reordering } = useActions();
+    const { apiIsReady, handleOpen, dialog } = useMetaExpEstatDetail();
+    const actions: any[] = useMemo(
+        () =>
+            readOnly
+                ? [
+                      {
+                          label: t('page.metaExpedient.action.consultar.label'),
+                          icon: icons.detall,
+                          showInMenu: false,
+                          onClick: handleOpen,
+                      },
+                  ]
+                : [
+                      {
+                          label: t('common.update'),
+                          icon: 'edit',
+                          showInMenu: true,
+                          clickShowUpdateDialog: true,
+                      },
+                      {
+                          label: <Divider sx={{ px: 1, width: '100%' }} color={'none'} />,
+                          showInMenu: true,
+                          disabled: true,
+                      },
+                      {
+                          label: t('common.delete'),
+                          icon: 'delete',
+                          showInMenu: true,
+                          clickTriggerDelete: true,
+                      },
+                  ],
+        [t, readOnly, apiIsReady]
+    );
 
     const handleDragEnd = (params: any) => {
         if (params.targetIndex != params.oldIndex) {
-            reordering(params.row.id, params.targetIndex)
+            reordering(params.row.id, params.targetIndex);
         }
-    }
+    };
 
-    return <><StyledMuiGrid
-        resourceName={'metaExpedientEstatResource'}
-        popupEditUpdateActive
-        popupEditFormDialogResourceTitle={t('page.expedientEstat.title')}
-        popupEditFormContent={<MetaExpedientEstatForm/>}
-        columns={columns}
-        filter={builder.eq("metaExpedient.id", entity?.id)}
-        formAdditionalData={{ metaExpedient: {id: entity?.id} }}
-        staticSortModel={sortModel}
-        perspectives={perspectives}
-        rowAdditionalActions={actions}
-        onRowCountChange={onRowCountChange}
-
-        rowReordering={!readOnly}
-        onRowOrderChange={handleDragEnd}
-
-        popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'lg' }}
-        toolbarCreateTitle={t('page.expedientEstat.action.new.label')}
-        popupEditFormI18nKeys={{
-            createSuccess: 'page.expedientEstat.action.new.ok',
-            updateSuccess: 'page.expedientEstat.action.update.ok',
-            deleteSuccess: 'page.expedientEstat.action.delete.ok',
-        }}
-        readOnly={readOnly}
-    />{dialog}</>
-}
+    return (
+        <>
+            <StyledMuiGrid
+                autoHeight
+                resourceName={'metaExpedientEstatResource'}
+                popupEditUpdateActive
+                popupEditFormDialogResourceTitle={t('page.expedientEstat.title')}
+                popupEditFormContent={<MetaExpedientEstatForm />}
+                columns={columns}
+                filter={builder.eq('metaExpedient.id', entity?.id)}
+                formAdditionalData={{ metaExpedient: { id: entity?.id } }}
+                staticSortModel={sortModel}
+                perspectives={perspectives}
+                rowAdditionalActions={actions}
+                onRowCountChange={onRowCountChange}
+                rowReordering={!readOnly}
+                onRowOrderChange={handleDragEnd}
+                popupEditFormDialogComponentProps={{ fullWidth: true, maxWidth: 'lg' }}
+                toolbarCreateTitle={t('page.expedientEstat.action.new.label')}
+                popupEditFormI18nKeys={{
+                    createSuccess: 'page.expedientEstat.action.new.ok',
+                    updateSuccess: 'page.expedientEstat.action.update.ok',
+                    deleteSuccess: 'page.expedientEstat.action.delete.ok',
+                }}
+                readOnly={readOnly}
+            />
+            {dialog}
+        </>
+    );
+};

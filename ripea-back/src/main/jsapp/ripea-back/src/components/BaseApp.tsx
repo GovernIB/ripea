@@ -6,6 +6,8 @@ import {
     LinkProps as RouterLinkProps,
 } from 'react-router-dom';
 import i18n from '../i18n/i18n';
+import reactlibCa from '../i18n/reactlibCa';
+import reactlibEs from '../i18n/reactlibEs';
 import { useTranslation } from 'react-i18next';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -19,8 +21,7 @@ import {
     useResourceApiContext,
     useResourceApiService,
 } from 'reactlib';
-import Footer from './Footer';
-import drassana from '../assets/drassana.png';
+import DrassanaFooter from './DrassanaFooter';
 import UserHeadToolbar from "../pages/user/UserHeadToolbar.tsx";
 import {UserMenu} from "../pages/user/UserMenu.tsx";
 import AppFormFieldReference from './AppFormFieldReference';
@@ -29,23 +30,9 @@ import {useAlertesSession} from "./SseClient.tsx";
 import {useUserSession} from "./Session";
 import AlertExpand from "./AlertExpand.tsx";
 import {useSession} from "./SessionStorageContext.tsx";
-import {Box, useTheme} from "@mui/material";
+import {alpha, Box, useTheme} from "@mui/material";
 import {EstilMenuProp} from "@src/components/ThemeUserProvider.tsx";
-
-export const HEIGHT_FOOTER = 36;
-
-/**
- * Amplada del menú lateral plegat. La de reactlib (calc(spacing(7) + 1px) = 57px) deixa
- * els icones 8px a l'esquerra dels del capçal; amb 74px queden alineats, perquè quan el
- * menú està plegat l'icona es centra dins del calaix.
- */
-const MENU_COLLAPSED_WIDTH = 74;
-/**
- * Selector del calaix del menú quan està plegat: en mode compacte reactlib embolcalla la
- * llista dins d'un <div> (el contenidor del panell flotant dels submenús), mentre que
- * desplegat la llista penja directament del paper.
- */
-const MENU_COLLAPSED_DRAWER_SELECTOR = '& nav .MuiDrawer-root:has(.MuiDrawer-paper > div > .MuiList-root)';
+import {FOOTER_HEIGHT, MAIN_GAP, MAIN_PADDING} from "../util/layout.ts";
 
 export type MenuEntryWithResource = MenuEntry & {
     resourceName?: string;
@@ -70,8 +57,17 @@ export type BaseAppProps = React.PropsWithChildren & {
     appbarBackgroundImg?: string;
 };
 
+/**
+ * Enllaç que base-react fa servir a tots els components amb `to` (menú, botons, files de graella).
+ * Les entrades del menú lateral són ListItemButton que la llibreria posa directament dins el <ul> del
+ * menú, sense <li>: una llista mal construïda i "buida" (WCAG 1.3.1, verificació 1.3 de l'OAW). Com
+ * que no es pot tocar la llibreria, quan l'enllaç el pinta un ListItemButton s'embolcalla amb un <li>
+ * (veure també els selectors del menú a theme.ts). Les entrades amb fills (grups) no passen per
+ * aquí: la llibreria les pinta com a <div>, igual que el contenidor del seu submenú.
+ */
 const Link = React.forwardRef<HTMLAnchorElement, RouterLinkProps>((itemProps, ref) => {
-    return <RouterLink ref={ref} {...itemProps} role={undefined} />;
+    const link = <RouterLink ref={ref} {...itemProps} role={undefined} />;
+    return itemProps.className?.includes('MuiListItemButton-root') ? <li>{link}</li> : link;
 });
 
 export const getAlertSeverity = (avisNivell: string) => {
@@ -114,6 +110,12 @@ const useLocationPath = () => {
     return location.pathname;
 }
 
+// Espai de noms on base-react registra les seves traduccions (LIB_I18N_NS a lib/components/
+// BaseApp.tsx, que la llibreria no exporta) i sobreescriptures de l'aplicació per idioma.
+// L'anglès de la llibreria ja és imperatiu, per això no té paquet.
+const REACTLIB_I18N_NS = 'reactlib';
+const REACTLIB_OVERRIDES: Record<string, any> = { ca: reactlibCa, es: reactlibEs };
+
 const useI18n = () => {
     const { value: currentUser } = useUserSession();
     const { isReady: apiIsReady, getOne: apiGetOne } = useResourceApiService('usuariResource');
@@ -130,6 +132,14 @@ const useI18n = () => {
     }
     const i18nAddResourceBundleCallback = (language: string, namespace: string, bundle: any) => {
         i18n.addResourceBundle(language, namespace, bundle);
+        // base-react registra aquí les seves traduccions. Com que no s'hi pot tocar, els seus
+        // textos es corregeixen fusionant-hi a sobre el paquet de sobreescriptures de
+        // l'aplicació (veure i18n/reactlibCa.ts): fusió profunda -- només se substitueixen les
+        // claus declarades -- i amb sobreescriptura, perquè la clau ja existeix.
+        const overrides = namespace === REACTLIB_I18N_NS ? REACTLIB_OVERRIDES[language] : undefined;
+        if (overrides != null) {
+            i18n.addResourceBundle(language, namespace, overrides, true, true);
+        }
     }
     return {
         i18nUseTranslation: useTranslation,
@@ -159,19 +169,12 @@ const CustomLocalizationProvider = ({ children }: React.PropsWithChildren) => {
     </LocalizationProvider>;
 }
 
+// El peu va per flux (no fix a baix): el marc de frameSx fa que ocupi sempre l'última fila.
 const generateFooter = (version?:string) => {
     return (
-        <>
-            {/*<div style={{ height: `${HEIGHT_FOOTER}px`, width: '100%' }} />*/}
-            <Footer
-                title="RIPEA"
-                version={version}
-                logos={[drassana]}
-                backgroundColor="#5F5D5D"
-                // style={{ position: 'fixed', bottom: 0, height: `${HEIGHT_FOOTER}px`, width: '100%', zIndex: 1200 }}
-                style={{ height: `${HEIGHT_FOOTER}px`, width: '100%' }}
-            />
-        </>
+        <div style={{ height: FOOTER_HEIGHT + 'px', overflow: 'hidden' }}>
+            <DrassanaFooter title="RIPEA" version={version} backgroundColor="#5F5D5D" />
+        </div>
     );
 };
 
@@ -194,27 +197,72 @@ const getMenuColorSet = (
     if (appearance !== EstilMenuProp.inverse) {
         return undefined;
     }
+    // L'accent i la selecció surten de la identitat (taronja): `primary.dark` sobre el fons blanc i
+    // `primary.light` sobre el fosc, com `accentColor` a theme.ts.
     if (theme.palette.mode === 'dark') {
         return {
             background: '#FFFFFF',
-            textPrimary: '#1F2937',
-            textSecondary: '#4B5563',
-            divider: '#D1D5DB',
-            accent: '#1976D2',
-            selectedBackground: 'rgba(25, 118, 210, 0.12)',
+            textPrimary: '#1E1E1E',
+            textSecondary: '#666666',
+            divider: '#E0E0E0',
+            accent: theme.palette.primary.dark,
+            selectedBackground: alpha(theme.palette.primary.main, 0.16),
             hoverBackground: 'rgba(0, 0, 0, 0.04)',
         };
     }
     return {
-        background: '#1E293B',
-        textPrimary: '#F8FAFC',
-        textSecondary: '#CBD5E1',
-        divider: '#475569',
-        accent: '#60A5FA',
-        selectedBackground: 'rgba(96, 165, 250, 0.18)',
+        background: '#2E2E2E',
+        textPrimary: '#F6F6F6',
+        textSecondary: '#D0D0D0',
+        divider: '#555555',
+        accent: theme.palette.primary.light,
+        selectedBackground: alpha(theme.palette.primary.main, 0.22),
         hoverBackground: 'rgba(255, 255, 255, 0.08)',
     };
 };
+
+// La geometria del menú lateral (amplada plegada, icones, columna on s'alineen amb el botó de la
+// capçalera, panell flotant dels submenús) s'ajusta al tema, a `MuiDrawer` de theme.ts, amb les mides
+// de util/layout.ts. Aquí només hi queden els colors, que depenen de l'estil de menú del perfil de
+// l'usuari.
+
+/**
+ * Marc de l'aplicació: l'arrel ocupa tota l'alçada de la finestra (capçalera dalt, peu baix) i només
+ * l'àrea de contingut (`<main>`) fa scroll. La llibreria només ho fa amb `100vh` a les pantalles que
+ * l'activen (GridPage), i no fixa cap marge propi quan es desactiven (`marginsDisabled`). Per això:
+ *  - `> div`: arrel del contingut de la llibreria (ContentComponentDefault, lib/components/BaseApp.tsx);
+ *  - `> div > div > main`: l'àrea de contingut. El `gap` és la separació entre els elements apilats
+ *    (la pantalla, els avisos...) i el padding, el marge de l'àrea.
+ * Si la llibreria canvia aquesta estructura, aquest és l'únic lloc a revisar.
+ */
+const frameSx = {
+    height: '100vh',
+    '& > div': { height: '100%' },
+    '& > div > div > main': {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: MAIN_GAP + 'px',
+        padding: MAIN_PADDING + 'px',
+        boxSizing: 'border-box',
+        minHeight: 0,
+        overflowY: 'auto',
+        // GridPage torna a activar el marge de la llibreria (16px 24px, en línia) en desmuntar-se, i les
+        // pantalles que no en duen en tindrien dos: el marge d'`<main>` és sempre aquest padding.
+        margin: '0 !important',
+    },
+    // Pantalla amb ScreenFrame (dins de GridPage, que hi posa `height: 100%`): amb avisos a sobre seria
+    // més alta que `<main>` i faria scroll el conjunt, títol inclòs. Es comporta com a fila flexible: ocupa
+    // l'alçada que deixen els avisos i és el contingut del marc qui fa scroll. Només les pantalles amb ScreenFrame.
+    '& > div > div > main > div:has(> .screen-frame)': { flex: '1 1 0', minHeight: 0 },
+    // Les entrades de submenú (llista dins la llista de l'entrada pare) ja duen la seva pròpia guia
+    // vertical de la llibreria (`:before` de Menu.tsx, 2px a 40px); la vora de 4px de l'entrada
+    // seleccionada (theme.ts i estils de menú d'aquí baix) hi quedaria doblada. Més específic que
+    // les dues, així no depèn de l'ordre. El panell flotant del menú plegat no hi entra: no és
+    // dins cap `.MuiList-root`.
+    '& nav .MuiDrawer-root .MuiList-root .MuiList-root .MuiListItemButton-root.Mui-selected': {
+        boxShadow: 'none',
+    },
+} as const;
 
 export const BaseApp: React.FC<BaseAppProps> = (props) => {
     const {
@@ -254,29 +302,6 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
     const { value } = useAlertesSession();
     const { value: read, save } = useSession('readAlerts');
     const menuColorSet = getMenuColorSet(theme, menuAppearance);
-    const menuLayoutSx = {
-        // Els icones del menú han de quedar alineats verticalment amb el del botó de
-        // plegar/desplegar del capçal. Amb el menú desplegat reactlib posa 24px de padding a
-        // l'enllaç i el contenidor de l'icona hi suma 8px de marge, així que es baixa el
-        // padding a 16px. Només al primer nivell, per no tocar la sagnia dels submenús. El
-        // padding és un style en línia, d'aquí l'!important.
-        '& nav .MuiDrawer-paper > .MuiList-root > .MuiListItemButton-root': {
-            paddingLeft: '16px !important',
-        },
-        // Amb el menú plegat l'icona es centra dins del calaix, per això s'alinea eixamplant-lo
-        // en lloc de tocar el padding.
-        [MENU_COLLAPSED_DRAWER_SELECTOR]: {
-            width: MENU_COLLAPSED_WIDTH,
-            '& .MuiDrawer-paper': { width: MENU_COLLAPSED_WIDTH },
-        },
-        // Panell flotant dels submenús del menú plegat: ha de començar on acaba el calaix i
-        // estendre's fins a baix de la pantalla. Si queda separat o curt, per arribar al
-        // submenú cal sortir del menú i el panell es tanca abans.
-        '& nav .MuiDrawer-paper > div > .MuiBox-root': {
-            bottom: 0,
-            left: MENU_COLLAPSED_WIDTH,
-        },
-    };
     const menuColorSetSx = {
         '& nav .MuiDrawer-root': {
             '& .MuiPaper-root, & .MuiList-root': {
@@ -300,11 +325,21 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
                 color: menuColorSet?.textSecondary,
             },
             '& .MuiListItemButton-root': {
+                // La icona de l'entrada seleccionada pren l'accent del joc de colors del menú (a TEMA
+                // el posa el tema, veure MuiListItemButton a theme.ts).
+                '&.Mui-selected .menu-item-icon': {
+                    color: menuColorSet?.accent,
+                },
                 '&.Mui-selected': {
                     backgroundColor: menuColorSet?.selectedBackground,
+                    boxShadow: `inset 4px 0 0 ${menuColorSet?.accent}`,
                 },
                 '&.Mui-selected:hover': {
                     backgroundColor: menuColorSet?.selectedBackground,
+                },
+                // Guia vertical dels submenús (la dibuixa la llibreria en blau fix)
+                '&.Mui-selected :before': {
+                    background: menuColorSet?.accent,
                 },
                 '&:hover': {
                     backgroundColor: menuColorSet?.hoverBackground,
@@ -313,7 +348,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         },
     };
 
-    return (<Box sx={menuColorSet ? { ...menuLayoutSx, ...menuColorSetSx } : menuLayoutSx}>
+    return (<Box sx={menuColorSet ? { ...frameSx, ...menuColorSetSx } : frameSx}>
         <MuiBaseApp
             code={code}
             headerTitle={title}
@@ -334,7 +369,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
                 </MuiBaseAppContext.Provider>
             }
             footer={generateFooter(version)}
-            // footerHeight={HEIGHT_FOOTER}
+            footerHeight={FOOTER_HEIGHT}
             persistentLanguage
             i18nUseTranslation={i18nUseTranslation}
             i18nCurrentLanguage={i18nCurrentLanguage}
@@ -345,7 +380,8 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
             routerUseLocationPath={useLocationPath}
             routerAnyHistoryEntryExist={anyHistoryEntryExist}
             linkComponent={Link}
-            marginsDisabled={false}
+            // Els marges d'<main> els posa frameSx (la llibreria els deixa a 16px 24px).
+            marginsDisabled
             formFieldComponents={[
                 { type: 'reference', component: AppFormFieldReference },
                 { type: FORM_FIELD_TYPE_TOGGLE_BUTTONS, component: FormFieldToggleButtons },
@@ -353,7 +389,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
             menuEntries={baseAppMenuEntries}
         >
             <CustomLocalizationProvider>
-                <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', gap: '8px' }}>
+                <>
                     {value?.avisosUsuari?.map((avis: any) => {
                         if (!read?.includes?.(avis.id)) {
                             return (
@@ -361,7 +397,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
                                     key={avis.id}
                                     title={avis.assumpte}
                                     severity={getAlertSeverity(avis.avisNivell)}
-                                    sx={{ m: 0 }}
+                                    sx={{ m: 0, flex: '0 0 auto' }}
                                     onClose={() => {
                                         save([...(read ?? []), avis.id]);
                                     }}
@@ -373,7 +409,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
                         }
                     })}
                     {i18nInitialized && children}
-                </div>
+                </>
             </CustomLocalizationProvider>
         </MuiBaseApp>
     </Box>);

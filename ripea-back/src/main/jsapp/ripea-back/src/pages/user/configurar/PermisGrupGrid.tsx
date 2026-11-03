@@ -3,7 +3,8 @@ import {
     GridPage,
     useMuiDataGridApiRef,
 } from "reactlib";
-import {CardPage} from "../../../components/CardData.tsx";
+import {ScreenFrame} from "../../../components/ScreenFrame.tsx";
+import {icons} from "../../../util/icons.ts";
 import StyledMuiGrid, {ToolbarButton} from "../../../components/StyledMuiGrid.tsx";
 import {useEffect} from "react";
 import {useParams} from "react-router-dom";
@@ -50,8 +51,8 @@ const PermisGrupGrid = ()=> {
         setTitlePage(t('page.user.menu.grupPermis'))
     }, [t]);
 
-    return <GridPage autoHeight>
-        <CardPage title={t('page.user.menu.grupPermis')}>
+    return <GridPage>
+        <ScreenFrame icon={icons.permis} title={t('page.user.menu.grupPermis')}>
             <StyledMuiGrid
                 apiRef={gridApiRef}
                 resourceName={"aclSidResource"}
@@ -74,7 +75,7 @@ const PermisGrupGrid = ()=> {
                 ]}
                 toolbarHideCreate
             />
-        </CardPage>
+        </ScreenFrame>
         {contentCreate}
     </GridPage>
 }
