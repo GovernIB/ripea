@@ -43,10 +43,6 @@ const changeFavicon = (entitatFaviconUrl?: string) => {
     });
 };
 
-// Les icones de la capçalera són de 24px ('--toolbar-icon-size', a appbarStyle) i no de 20 com a la
-// llibreria: el botó de menú fa 52px en lloc de 48 i la caixa del logo arrenca 4px més a la dreta.
-const MENU_BUTTON_EXTRA = 4;
-
 export const getImgFromBytes = (img:string) :string | undefined => {
     return img ?`data:image/png;base64,${img}` :undefined;
 }
@@ -79,10 +75,12 @@ export const App: React.FC = () => {
                 // l'alçada de la capçalera. El botó de menú duu un marge esquerre de -12 i un dret de
                 // 16, així que la caixa del logo arrenca a LOGO_BOX_LEFT. Fixant-ne l'amplada (en
                 // comptes de deixar que la mida del logo mani) la vora cau sempre a MENU_WIDTH.
-                width: MENU_WIDTH - LOGO_BOX_LEFT - MENU_BUTTON_EXTRA + 'px',
+                width: MENU_WIDTH - LOGO_BOX_LEFT + 'px',
                 boxSizing: 'border-box',
                 alignSelf: 'stretch',
-                borderRight: `1px solid ${entitat?.conf?.colorLletra ?? theme.palette.divider}`,
+                // Mateix color que la vora dreta del menú lateral (la del Drawer de MUI), perquè les
+                // dues línies facin una sola.
+                borderRight: `1px solid ${theme.palette.divider}`,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'flex-end',
@@ -104,8 +102,7 @@ export const App: React.FC = () => {
                 color: entitat?.conf?.colorFons ? theme.palette.getContrastText(entitat?.conf?.colorFons) : undefined,
                 paddingLeft: APPBAR_PADDING_LEFT + 'px',
                 minHeight: HEADER_HEIGHT + 'px',
-                '--toolbar-icon-size': '1.5rem'} as React.CSSProperties
-            }
+            }}
             version={version}
             appbarBackgroundColor={entitat?.conf?.colorFons}
             menuEntries={menuEntries}
