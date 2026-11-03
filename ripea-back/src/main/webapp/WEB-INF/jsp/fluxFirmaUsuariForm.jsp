@@ -76,8 +76,10 @@ $(document).ready(function() {
 
 function adjustModalPerFlux() {
 	var $iframe = $(window.frameElement);
-	$iframe.css('height', '100%');
-	$iframe.parent().css('height', '600px');
+	var alcada = 600;
+	$iframe.css('height', alcada + 'px');
+	$iframe.css('min-height', alcada + 'px');
+	$iframe.parent().css('height', alcada + 'px');
 	$iframe.closest('div.modal-content').css('height',  'auto');
 	$iframe.closest('div.modal-dialog').css({
 		'height':'auto',
