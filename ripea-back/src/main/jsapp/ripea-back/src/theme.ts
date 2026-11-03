@@ -652,7 +652,10 @@ export const lightTheme = createTheme({
         secondary: { main: LIGHT_SECONDARY_MAIN },
         background: { default: LIGHT_BACKGROUND_DEFAULT, paper: LIGHT_BACKGROUND_PAPER },
         text: { primary: LIGHT_TEXT_PRIMARY, secondary: LIGHT_TEXT_SECONDARY },
-        divider: LIGHT_DIVIDER,
+        // Ha de ser el negre translúcid per defecte de MUI (com a les altres apps de Drassana), no un
+        // gris opac: MUI X en deriva el color de les vores de la graella (separadors de columna,
+        // línies de cel·la) amb `lighten(alpha(divider, 1), 0.88)`, i amb #e0e0e0 queda gairebé blanc.
+        divider: 'rgba(0, 0, 0, 0.12)',
         primarySoft: PRIMARY_SOFT,
         DataGrid: { headerBg: PRIMARY_SOFT },
     },
