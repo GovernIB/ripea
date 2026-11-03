@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWarDeployment;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -30,6 +31,7 @@ import org.springframework.security.core.authority.mapping.SimpleMappableAttribu
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedGrantedAuthoritiesUserDetailsService;
@@ -91,6 +93,14 @@ public class JBossWebSecurityConfig extends BaseWebSecurityConfig {
 //				requestMatchers(adminRequestMatchers()).hasRole(BaseConfig.ROLE_ADMIN).
 //				requestMatchers(procedimentRequestMatchers()).hasAnyRole(BaseConfig.ROLE_ADMIN, BaseConfig.ROLE_ORGAN_ADMIN, BaseConfig.ROLE_REVISIO, BaseConfig.ROLE_DISSENY).
 				.anyRequest().authenticated();
+		// L'API no la protegeix el contenidor (web.xml, "Public areas"): si l'adaptador de Keycloak no
+		// pot renovar el token, la petició arriba sense usuari. Es respon 401 (no el 403 per defecte de
+		// la pre-autenticació) perquè la interfície REACT ho reconegui i recarregui la pàgina per tornar
+		// a passar pel login. El 403 USUARI_INACTIU del SessioInterceptor és d'un usuari autenticat i no
+		// passa per aquí.
+		http.exceptionHandling(eh -> eh.defaultAuthenticationEntryPointFor(
+				new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
+				new AntPathRequestMatcher(BaseConfig.API_PATH + "/**")));
 		http.headers().frameOptions().sameOrigin();
 		http.csrf().disable();
 		http.cors();

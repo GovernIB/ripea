@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import {useSessionList} from './SessionStorageContext';
 import {useUserSession} from "./Session.tsx";
 import {useResourceApiContext} from "reactlib";
+import {comprovarSessio} from "./sessioCaducada.tsx";
 
 // Keys for session storage
 const sseClientKey = 'sseClient';
@@ -131,10 +132,17 @@ export const SseClient: React.FC = () => {
                 eventSource.close();
                 eventSourceRef.current = null;
 
-                // Intentar reconnectar després d'un temps
-                setTimeout(connectToSSE, 5000);
+                // Si ha caigut perquè s'ha perdut la sessió no es reintenta: es recupera la sessió.
+                // Si no, intentar reconnectar després d'un temps
+                comprovarSessio().then((sessioViva) => {
+                    if (sessioViva && actiu) {
+                        setTimeout(connectToSSE, 5000);
+                    }
+                });
             };
         };
+
+        let actiu = true;
 
         // Reconnectar quan l'usuari torna a la pestanya (cobreix reinicis de servidor)
         const handleVisibilityChange = () => {
@@ -150,6 +158,7 @@ export const SseClient: React.FC = () => {
 
         // Netejar en desmuntar el component
         return () => {
+            actiu = false;
             document.removeEventListener('visibilitychange', handleVisibilityChange);
             console.log('Netejam o desmontam el component');
             if (eventSourceRef.current) {

@@ -47,6 +47,10 @@ const translationCa = {
             message: "Missatge",
         },
         dragdrop: "Reordena el contingut",
+        sessio: {
+            caducada: "La sessió ha caducat",
+            iniciar: "Torna a entrar",
+        },
     },
     calendar: {
         today: "Avui",

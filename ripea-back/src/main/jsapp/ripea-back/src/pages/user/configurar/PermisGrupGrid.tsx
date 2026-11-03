@@ -48,8 +48,8 @@ const PermisGrupGrid = ()=> {
     ]
 
     useEffect(() => {
-        setTitlePage(t('page.user.menu.grupPermis'))
-    }, [t]);
+        setTitlePage('page.user.menu.grupPermis')
+    }, []);
 
     return <GridPage>
         <ScreenFrame icon={icons.permis} title={t('page.user.menu.grupPermis')}>

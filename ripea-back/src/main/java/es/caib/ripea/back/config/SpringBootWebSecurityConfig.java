@@ -82,6 +82,10 @@ public class SpringBootWebSecurityConfig extends BaseWebSecurityConfig {
 				new AntPathRequestMatcher("/webjars/**/*"),
 				new AntPathRequestMatcher("/modal/document/event/**/*"),
 				new AntPathRequestMatcher("/modal/digitalitzacio/event/**/*"),
+				// Fitxers estàtics de la interfície REACT (veure web.xml)
+				new AntPathRequestMatcher("/reactapp/assets/**"),
+				new AntPathRequestMatcher("/reactapp/favicon.png"),
+				new AntPathRequestMatcher("/reactapp/favicon.svg"),
 		};
 	}
 

@@ -309,7 +309,7 @@ const PermisMetaExpedientGrid = ()=> {
     }, [apiIsReady, id]);
 
     useEffect(() => {
-        setTitlePage(t('page.user.menu.procedimentPermis', {nom: entity?.nom}))
+        setTitlePage('page.user.menu.procedimentPermis', {nom: entity?.nom})
     }, [entity]);
 
     return <GridPage>

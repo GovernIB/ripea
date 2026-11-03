@@ -44,7 +44,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Ripea - <decorator:title default="Benvinguts" /></title>
+    <title>RIPEA - <decorator:title default="Benvinguts" /></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="description" content=""/>
     <meta name="author" content=""/>
@@ -57,7 +57,8 @@
     	<link rel="shortcut icon" href="<c:url value="/userajax/getFaviconLogo"/>" type="image/x-icon" />
     </c:when>
     <c:otherwise>
-    	<link rel="shortcut icon" href="<c:url value="/img/favicon.png"/>" type="image/x-icon" />
+    	<link rel="icon" type="image/svg+xml" href="<c:url value="/img/favicon.svg"/>" />
+    	<link rel="icon" type="image/png" sizes="32x32" href="<c:url value="/img/favicon.png"/>" />
     </c:otherwise>
     </c:choose>
     <script src="<c:url value="/webjars/jquery/1.12.4/dist/jquery.min.js"/>"></script>

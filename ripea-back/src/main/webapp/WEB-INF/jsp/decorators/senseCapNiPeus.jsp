@@ -19,7 +19,8 @@
 	<link href="<c:url value="/webjars/bootstrap/3.3.6/dist/css/bootstrap.min.css"/>" rel="stylesheet"/>
 	<link href="<c:url value="/webjars/font-awesome/4.7.0/css/font-awesome.min.css"/>" rel="stylesheet"/>
 	<link href="<c:url value="/css/estils.css"/>" rel="stylesheet">
-	<link rel="shortcut icon" href="<c:url value="/img/favicon.png"/>" type="image/x-icon" />
+	<link rel="icon" type="image/svg+xml" href="<c:url value="/img/favicon.svg"/>" />
+	<link rel="icon" type="image/png" sizes="32x32" href="<c:url value="/img/favicon.png"/>" />
 	<script src="<c:url value="/webjars/jquery/1.12.4/dist/jquery.min.js"/>"></script>
 	<!-- Llibreria per a compatibilitat amb HTML5 -->
 	<!--[if lt IE 9]>

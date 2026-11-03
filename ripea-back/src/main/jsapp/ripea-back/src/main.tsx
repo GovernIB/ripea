@@ -14,6 +14,7 @@ import {RipeaAuthProvider} from "./components/RipeaAuthProvider.tsx";
 import SseProvider from "./components/SseClient.tsx";
 import {ThemeUserProvider} from "./components/ThemeUserProvider.tsx";
 import { PreBaseAppProvider } from './components/PreBaseAppProvider.tsx';
+import { instalarDeteccioSenseSessio } from './components/sessioCaducada.tsx';
 
 dayjs.extend(duration);
 
@@ -55,10 +56,14 @@ const getEnvApiUrl = () => {
     }
 }
 
+const apiUrl = getEnvApiUrl();
+// Abans de la primera crida a l'API: un 401 vol dir que s'ha perdut la sessió del servidor
+instalarDeteccioSenseSessio(apiUrl);
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
         {/*<AuthProvider config={getAuthConfig()} mandatory everetAuthPatch>*/}
-        <ResourceApiProvider apiUrl={getEnvApiUrl()} userSessionActive>
+        <ResourceApiProvider apiUrl={apiUrl} userSessionActive>
             <SessionStorageProvider>
                 <RipeaAuthProvider>
                     <PreBaseAppProvider>

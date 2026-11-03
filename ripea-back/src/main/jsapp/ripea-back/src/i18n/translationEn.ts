@@ -47,6 +47,10 @@ const translationEn = {
             message: "Message",
         },
         dragdrop: "Reorder content",
+        sessio: {
+            caducada: "Your session has expired",
+            iniciar: "Sign in again",
+        },
     },
     calendar: {
         today: "Today",

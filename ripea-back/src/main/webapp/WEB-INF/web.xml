@@ -9,6 +9,14 @@
 	<welcome-file-list>
 		<welcome-file>index.jsp</welcome-file>
 	</welcome-file-list>
+	<!-- Galeta de sessió HttpOnly: cap JS de la UI JSP ni de la REACT no llegeix el JSESSIONID,
+	     i així un XSS no la pot robar. SameSite=Lax queda pendent fins que s'actualitzi el servidor
+	     d'aplicacions: JBoss EAP 7.2 no el permet configurar des del web.xml. -->
+	<session-config>
+		<cookie-config>
+			<http-only>true</http-only>
+		</cookie-config>
+	</session-config>
 	<!-- TEMPORAL: eliminar quan es reprengui l'autenticació real -->
 	<!-- filter>
 		<filter-name>fakeAuthFilter</filter-name>
@@ -70,6 +78,18 @@
 			<url-pattern>/rest/notib</url-pattern>
 			<url-pattern>/rest/notib/notificaCanvi</url-pattern>
 			<url-pattern>/rest/portafib/v1/event</url-pattern>
+		</web-resource-collection>
+		<!-- Fitxers estàtics de la interfície REACT (JS/CSS compilats, imatges i icona de la pestanya):
+		     no contenen dades. Si els protegís el contenidor, amb la sessió caducada cadascun rebria una
+		     redirecció al login i sobreescriuria la galeta d'estat OAuth_Token_Request_State (path "/")
+		     mentre la pàgina torna de Keycloak: l'estat no quadra i l'adaptador respon 400 Bad Request
+		     (reproduït el 30/10/2026 amb el favicon). La pàgina (/reactapp/ i index.html) continua
+		     protegida i és l'única que fa el login. -->
+		<web-resource-collection>
+			<web-resource-name>Fitxers estàtics REACT</web-resource-name>
+			<url-pattern>/reactapp/assets/*</url-pattern>
+			<url-pattern>/reactapp/favicon.png</url-pattern>
+			<url-pattern>/reactapp/favicon.svg</url-pattern>
 		</web-resource-collection>
 	</security-constraint>
 	<jsp-config>
