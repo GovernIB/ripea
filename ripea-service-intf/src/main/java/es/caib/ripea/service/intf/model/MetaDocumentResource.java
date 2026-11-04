@@ -6,6 +6,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Sort;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
@@ -33,6 +34,8 @@ import lombok.experimental.FieldNameConstants;
 @ResourceConfig(
 		quickFilterFields = { "codi", "nom" },
 		descriptionField = "nom",
+		// Ordre dels desplegables de tipus de document (els camps de referència no envien l'ordenació)
+		defaultSortFields = { @ResourceConfig.ResourceSort(field = "nom", direction = Sort.Direction.ASC) },
 		artifacts = {
 				@ResourceArtifact(
                         type = ResourceArtifactType.PERSPECTIVE,

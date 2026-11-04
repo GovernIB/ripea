@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -12,7 +14,9 @@ import javax.validation.constraints.Size;
 
 import org.springframework.data.annotation.Transient;
 
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import es.caib.ripea.service.intf.base.annotation.ResourceArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
@@ -44,13 +48,9 @@ import es.caib.ripea.service.intf.dto.PinbalConsentimentEnumDto;
 import es.caib.ripea.service.intf.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.service.intf.dto.PortafirmesPrioritatEnumDto;
 import es.caib.ripea.service.intf.dto.ServeiTipusEnumDto;
-import es.caib.ripea.service.intf.dto.SexeEnumDto;
-import es.caib.ripea.service.intf.dto.SiNoEnumDto;
-import es.caib.ripea.service.intf.dto.TipusPassaportEnumDto;
 import es.caib.ripea.service.intf.dto.VersioDocumentEnum;
 import es.caib.ripea.service.intf.dto.ViaFirmaTipusDestinatariEnum;
 import es.caib.ripea.service.intf.resourcevalidation.AdjuntValid;
-import es.caib.ripea.service.intf.resourcevalidation.DocPinbalValid;
 import es.caib.ripea.service.intf.resourcevalidation.EnviarPortafirmesValid;
 import es.caib.ripea.service.intf.resourcevalidation.ViaFirmaValid;
 import es.caib.ripea.service.intf.utils.Utils;
@@ -167,6 +167,10 @@ import lombok.experimental.FieldNameConstants;
                         formClass = DocumentResource.DescarregarVersionFormAction.class,
                         requiresId = true),
                 @ResourceArtifact(
+                        type = ResourceArtifactType.REPORT,
+                        code = DocumentResource.REPORT_PINBAL_FORMULARI,
+                        formClass = DocumentResource.PinbalFormulariForm.class),
+                @ResourceArtifact(
                         type = ResourceArtifactType.FILTER,
                         code = DocumentResource.MASSIVE_PORTAFIRMES_FILTER_CODE,
                         formClass = DocumentResource.MassivePortafirmesFilter.class),
@@ -204,6 +208,8 @@ public class DocumentResource extends NodeResource {
     public static final String ACTION_MASSIVE_NOTIFICAR_CODE = "MASSIVE_NOTIFICAR";
     public static final String ACTION_MASSIVE_CANVI_TIPUS_CODE = "MASSIVE_CANVI_TIPUS";
     public static final String REPORT_DESCARREGAR_VERSIO_CODE = "DESCARREGAR_VERSIO";
+    /** Formulari de dades específiques del servei PINBAL d'un tipus de document (modal de nova consulta PINBAL). */
+    public static final String REPORT_PINBAL_FORMULARI = "PINBAL_FORMULARI";
 
 	@NotNull
 	private DocumentTipusEnumDto documentTipus = DocumentTipusEnumDto.DIGITAL;
@@ -435,11 +441,20 @@ public class DocumentResource extends NodeResource {
     	private Boolean rebreCorreu = false;
     }
     
+    /**
+     * Formulari del modal de nova consulta PINBAL. Les dades específiques del servei no són camps d'aquesta classe:
+     * el modal les pinta a partir del formulari del servei (report {@link #REPORT_PINBAL_FORMULARI}) i les envia com
+     * a propietats amb el prefix {@link #DADA_ESPECIFICA_PREFIX} seguit del path de la dada a PINBAL, que es recullen
+     * a {@link #getDadesEspecifiques()}.
+     */
     @Getter
     @Setter
     @FieldNameConstants
-    @DocPinbalValid
     public static class NewDocPinbalForm implements Serializable {
+
+        /** Prefix de les propietats amb les dades específiques del servei (el mateix que fa servir DocPinbal.tsx). */
+        public static final String DADA_ESPECIFICA_PREFIX = "dadaEspecifica:";
+
         @NotNull
         private ResourceReference<ExpedientResource, Long> expedient;
         // Carpeta de l'expedient on es desarà el document generat. Si no s'informa es desa a l'arrel de l'expedient.
@@ -457,46 +472,33 @@ public class DocumentResource extends NodeResource {
     	@NotNull
     	private String codiServeiPinbal;
 
-    	@ResourceField(enumType = true)
-        private String comunitatAutonoma = "04";
-    	@ResourceField(enumType = true)
-        private String provincia = "07";
+        /**
+         * No es mostra: el modal en copia la definició (l'enllaç a les opcions) per als camps de llista de les dades
+         * específiques (ENUM, PAIS, PROVINCIA, MUNICIPI_3 i MUNICIPI_5), i hi afegeix el servei, el camp, el tipus de
+         * llista i el filtre com a paràmetres de la petició d'opcions.
+         */
         @ResourceField(enumType = true)
-        private String municipi;
-        private Date dataConsulta;
-        private Date dataNaixement;
-        private Date dataCaducidad;
-        private Date dataExpedicion;
-        private SiNoEnumDto consentimentTipusDiscapacitat = SiNoEnumDto.SI;
-        private String numeroTitol;
-        @ResourceField(enumType = true)
-        private String nacionalitat = "724";
-        @ResourceField(enumType = true)
-        private String paisNaixament = "724";
-        private boolean ausenciaSegundoApellido;
-        private SexeEnumDto sexe;
-        @ResourceField(enumType = true)
-        private String provinciaNaixament = "07";
-        private String poblacioNaixament;
-        @ResourceField(enumType = true)
-        private String municipiNaixament;
-        private String nomPare;
-        private String nomMare;
-        private String telefon;
-        private String email;
-        private Integer nombreAnysHistoric;
-        private Integer exercici;
-        private String numeroSoporte;
-        private TipusPassaportEnumDto tipusPassaport;
+        private String opcioDadaEspecifica;
 
-        private String registreCivil;
-        private String tom;
-        private String pagina;
-        private Date dataRegistre;
-        @ResourceField(enumType = true)
-        private String municipiRegistre;
+        /** Valors de les dades específiques, per path de la dada a PINBAL, tal com els envia el formulari. */
+        @JsonIgnore
+        private Map<String, Object> dadesEspecifiques = new HashMap<>();
 
-        private Integer curs;
+        @JsonAnySetter
+        public void setDadaEspecifica(String propietat, Object valor) {
+            if (propietat != null && propietat.startsWith(DADA_ESPECIFICA_PREFIX)) {
+                dadesEspecifiques.put(propietat.substring(DADA_ESPECIFICA_PREFIX.length()), valor);
+            }
+        }
+    }
+
+    /** Paràmetres del report {@link #REPORT_PINBAL_FORMULARI}. */
+    @Getter
+    @Setter
+    @FieldNameConstants
+    public static class PinbalFormulariForm implements Serializable {
+        @NotNull
+        private ResourceReference<MetaDocumentResource, Long> tipusDocument;
     }
     
     @Getter

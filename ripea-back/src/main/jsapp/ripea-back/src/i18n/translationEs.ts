@@ -935,10 +935,6 @@ const translationEs = {
                 dataBasic: "Datos básicos",
                 dataInteressat: "Datos interesado",
                 dataEspecific: "Datos específicos",
-                dadesRegistrals: "Datos registrales",
-                fetRegistral: "Hecho registral",
-                naixement: "Nacimiento",
-                dadesAdicionals: "Datos adicionales",
                 dataOther: "Otros datos",
                 senseTipus: "Sin tipo asignado",
                 extensio: "Extensión",
@@ -965,6 +961,10 @@ const translationEs = {
                     button: "Consulta",
                     title: "Nueva consulta PINBAL",
                     ok: "Se ha creado el documento a partir de la consulta pinbal '{{codiServeiPinbal}}'",
+                    formulari: {
+                        carregant: "Cargando los datos específicos del servicio PINBAL...",
+                        error: "No se han podido obtener los datos específicos del servicio PINBAL",
+                    },
                 },
 				import: {
 					close: {

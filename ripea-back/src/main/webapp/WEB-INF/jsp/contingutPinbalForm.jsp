@@ -28,19 +28,26 @@
 		metaDocumentFinalitat[${metaDocument.id}] = "<spring:escapeBody javaScriptEscape='true'>${metaDocument.pinbalFinalitat}</spring:escapeBody>";
 		metaDocumentActiu[${metaDocument.id}] = "${metaDocument.pinbalServei.actiu}";
 		</c:forEach>
+		// Serveis amb camps propis en aquest formulari: la resta només es poden consultar des de la Interfície Moderna
+		const serveisFormulariJsp = [<c:forEach var="serveiFormulariJsp" items="${serveisFormulariJsp}" varStatus="status">"${serveiFormulariJsp}"<c:if test="${not status.last}">, </c:if></c:forEach>];
 		$(document).ready(function() {
-		
+
 			$('#metaDocumentId').on('change', function() {
 
 				let serveiActiu = metaDocumentActiu[$(this).val()];
-		
+
 				if(serveiActiu!="true") {
 					$("#alertaServeiInactiu").show();
 				} else {
 					$("#alertaServeiInactiu").hide();
 				}
-				
+
 				let serveiNom = metaDocumentServeiScsp[$(this).val()];
+				if (serveiNom && !serveisFormulariJsp.includes(serveiNom)) {
+					$("#alertaServeiInterficieModerna").show();
+				} else {
+					$("#alertaServeiInterficieModerna").hide();
+				}
 				showHideDatosEspecificos('#div' + serveiNom);
 		
 				if ('${interessatCreat}'=='')
@@ -134,6 +141,9 @@
 		<div id="alertaServeiInactiu" class="alert alert-warning">
 			<button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button>
 			<spring:message code="metaexpedient.serveiPinbal.inactiu"/>
+		</div>
+		<div id="alertaServeiInterficieModerna" class="alert alert-warning" role="alert" style="display: none;">
+			<spring:message code="contingut.pinbal.form.servei.interficie.moderna"/>
 		</div>
 	</div>
 	<c:set var="formAction"><rip:modalUrl value="/contingut/${pinbalConsultaCommand.pareId}/pinbal/new"/></c:set>

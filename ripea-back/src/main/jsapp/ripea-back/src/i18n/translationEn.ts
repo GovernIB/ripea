@@ -933,10 +933,6 @@ const translationEn = {
                 dataBasic: "Basic data",
                 dataInteressat: "Interested party data",
                 dataEspecific: "Specific data",
-                dadesRegistrals: "Registry data",
-                fetRegistral: "Registry fact",
-                naixement: "Birth",
-                dadesAdicionals: "Additional data",
                 dataOther: "Other data",
                 senseTipus: "No type assigned",
                 extensio: "Extension",
@@ -963,6 +959,10 @@ const translationEn = {
                     button: "PINBAL query",
                     title: "New PINBAL query",
                     ok: "Document created from PINBAL query '{{codiServeiPinbal}}'",
+                    formulari: {
+                        carregant: "Loading the PINBAL service specific data...",
+                        error: "The PINBAL service specific data could not be retrieved",
+                    },
                 },
 				import: {
 					close: {

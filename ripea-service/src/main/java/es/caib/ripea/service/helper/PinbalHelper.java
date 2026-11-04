@@ -9,9 +9,22 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
 
 import es.caib.pinbal.client.recobriment.ClientRecobriment;
+import es.caib.pinbal.client.recobriment.v2.DadaEspecifica;
+import es.caib.pinbal.client.recobriment.v2.DadesComunes;
+import es.caib.pinbal.client.recobriment.v2.DadesComunes.Consentiment;
+import es.caib.pinbal.client.recobriment.v2.EstatEnum;
+import es.caib.pinbal.client.recobriment.v2.Funcionari;
+import es.caib.pinbal.client.recobriment.v2.GrupDadesEspecifiques;
+import es.caib.pinbal.client.recobriment.v2.PeticioRespostaSincrona;
+import es.caib.pinbal.client.recobriment.v2.PeticioSincrona;
+import es.caib.pinbal.client.recobriment.v2.SolicitudSimple;
+import es.caib.pinbal.client.recobriment.v2.Titular;
+import es.caib.pinbal.client.recobriment.v2.ValorEnum;
 import es.caib.pinbal.client.recobriment.legacy.ecot103.ClientEcot103;
 import es.caib.pinbal.client.recobriment.legacy.ecot103.ClientEcot103.SolicitudEcot103;
 import es.caib.pinbal.client.recobriment.model.ScspFuncionario;
@@ -91,6 +104,7 @@ import es.caib.ripea.service.intf.dto.MetaNodeDto;
 import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
 import es.caib.ripea.service.intf.dto.PinbalConsentimentEnumDto;
 import es.caib.ripea.service.intf.dto.PinbalConsultaDto;
+import es.caib.ripea.service.intf.dto.PinbalFormulariDto;
 import es.caib.ripea.service.intf.dto.PinbalServeiDocPermesEnumDto;
 import es.caib.ripea.service.intf.dto.SiNoEnumDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
@@ -103,6 +117,21 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class PinbalHelper {
 
+	/** Caches de l'API v2 de recobriment (caducitat per defecte de CacheConfig: 12 hores). */
+	private static final String CACHE_DADES_ESPECIFIQUES = "pinbalDadesEspecifiques";
+	private static final String CACHE_GRUPS = "pinbalGrupsDadesEspecifiques";
+	private static final String CACHE_VALORS_ENUM = "pinbalValorsEnum";
+
+	/** Timeouts del client de l'API v2: consultes de dades (formulari, llistes, serveis) i peticions. */
+	private static final int TIMEOUT_CONNEXIO_MS = 10 * 1000;
+	private static final int TIMEOUT_LECTURA_CONSULTA_MS = 30 * 1000;
+	private static final int TIMEOUT_LECTURA_PETICIO_MS = 5 * 60 * 1000;
+
+	/** Longituds màximes de l'API v2: departament (validació de PINBAL) i expedient (també als clients antics). */
+	private static final int LONGITUD_DEPARTAMENT_V2 = 250;
+	private static final int LONGITUD_EXPEDIENT = 25;
+
+	@Autowired private CacheManager cacheManager;
 	@Autowired private UsuariHelper usuariHelper;
 	@Autowired private IntegracioHelper integracioHelper;
 	@Autowired private ApplicationHelper applicationHelper;
@@ -117,12 +146,82 @@ public class PinbalHelper {
 	@Autowired private DocumentRepository documentRepository;
 	@Autowired private ConsultaPinbalRepository consultaPinbalRepository;
 
+	/**
+	 * Consulta PINBAL des del formulari de la interfície JSP: només els serveis amb camps propis al formulari
+	 * ({@link PinbalConsultaDto#SERVEIS_FORMULARI_JSP}), amb els clients antics de PINBAL (un per servei).
+	 *
+	 * @return null si la consulta i el document s'han creat, o l'excepció de la consulta (que queda registrada a les
+	 *         consultes PINBAL amb estat ERROR).
+	 */
 	public Exception pinbalNovaConsulta(
 			Long entitatId,
 			Long pareId,
 			Long metaDocumentId,
-			PinbalConsultaDto consulta, 
+			PinbalConsultaDto consulta,
 			String rolActual) {
+		return ferConsulta(
+				entitatId,
+				pareId,
+				metaDocumentId,
+				consulta.getInteressatId(),
+				rolActual,
+				(expedient, metaDocument, interessat) -> novaPeticioFormulariJsp(expedient, metaDocument, interessat, consulta));
+	}
+
+	/**
+	 * Consulta PINBAL des del formulari dinàmic de la interfície REACT, per a qualsevol servei, amb la petició
+	 * síncrona de l'API v2 de recobriment.
+	 *
+	 * @param dadesEspecifiques
+	 *            valors del formulari per path de la dada específica a PINBAL.
+	 * @return null si la consulta i el document s'han creat, o l'excepció de la consulta (que queda registrada a les
+	 *         consultes PINBAL amb estat ERROR).
+	 */
+	public Exception pinbalNovaConsultaDinamica(
+			Long entitatId,
+			Long pareId,
+			Long metaDocumentId,
+			Long interessatId,
+			String finalitat,
+			PinbalConsentimentEnumDto consentiment,
+			Map<String, Object> dadesEspecifiques,
+			String rolActual) {
+		return ferConsulta(
+				entitatId,
+				pareId,
+				metaDocumentId,
+				interessatId,
+				rolActual,
+				(expedient, metaDocument, interessat) -> novaPeticioDinamica(
+						expedient,
+						metaDocument,
+						interessat,
+						finalitat,
+						consentiment,
+						dadesEspecifiques));
+	}
+
+	/** Petició a PINBAL d'una consulta. */
+	@FunctionalInterface
+	private interface PeticioPinbal {
+		/** @return l'identificador de la petició a PINBAL. */
+		String executar(
+				ExpedientEntity expedient,
+				MetaDocumentEntity metaDocument,
+				InteressatEntity interessat) throws Exception;
+	}
+
+	/**
+	 * Comprova l'expedient, el tipus de document i l'interessat, fa la petició i, si va bé, crea el document amb el
+	 * justificant. La consulta queda registrada amb estat TRAMITADA o ERROR.
+	 */
+	private Exception ferConsulta(
+			Long entitatId,
+			Long pareId,
+			Long metaDocumentId,
+			Long interessatId,
+			String rolActual,
+			PeticioPinbal peticio) {
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(pareId));
 		ContingutEntity pare = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
@@ -155,9 +254,9 @@ public class PinbalHelper {
 					DocumentEntity.class,
 					"No es pot fer una petició PINBAL sense un meta-document amb la integració PINBAL activa o el servei PINBAL actiu");
 		}
-		InteressatEntity interessat = interessatRepository.findByExpedientAndId(expedient, consulta.getInteressatId());
+		InteressatEntity interessat = interessatRepository.findByExpedientAndId(expedient, interessatId);
 		if (interessat == null) {
-			throw new NotFoundException(consulta.getInteressatId(), InteressatEntity.class);
+			throw new NotFoundException(interessatId, InteressatEntity.class);
 		} else if (interessat instanceof InteressatAdministracioEntity) {
 			throw new ValidationException(
 					"<creacio>",
@@ -167,130 +266,8 @@ public class PinbalHelper {
 
 		ConsultaPinbalEntity.ConsultaPinbalEntityBuilder consultaPinbalBuilder = ConsultaPinbalEntity.builder();
 		try {
-			String idPeticion = null;
-			if ("SVDDGPCIWS02".equals(metaDocument.getPinbalServei().getCodi())) {
-				idPeticion = novaPeticioSvddgpciws02(
-						expedient,
-						metaDocument,
-						interessat,
-						consulta.getFinalitat(),
-						consulta.getConsentiment());
-			} else if ("SVDDGPVIWS02".equals(metaDocument.getPinbalServei().getCodi())) {
-				idPeticion = novaPeticioSvddgpviws02(
-						expedient,
-						metaDocument,
-						interessat,
-						consulta.getFinalitat(),
-						consulta.getConsentiment());
-			} else if ("SVDCCAACPASWS01".equals(metaDocument.getPinbalServei().getCodi())) {
-				idPeticion = novaPeticioSvdccaacpasws01(
-						expedient,
-						metaDocument,
-						interessat,
-						consulta.getFinalitat(),
-						consulta.getConsentiment(),
-						consulta.getComunitatAutonomaCodi(),
-						consulta.getProvinciaCodi());
-			} else if ("SVDSCDDWS01".equals(metaDocument.getPinbalServei().getCodi())) {
-				idPeticion = novaPeticioSvdscddws01(
-						expedient,
-						metaDocument,
-						interessat,
-						consulta.getFinalitat(),
-						consulta.getConsentiment(),
-						consulta.getComunitatAutonomaCodi(),
-						consulta.getProvinciaCodi(),
-						consulta.getDataConsulta(),
-						consulta.getDataNaixement(),
-						consulta.getConsentimentTipusDiscapacitat());
-			} else if ("SCDCPAJU".equals(metaDocument.getPinbalServei().getCodi())) {
-				idPeticion = novaPeticioScdcpaju(
-						expedient,
-						metaDocument,
-						interessat,
-						consulta.getFinalitat(),
-						consulta.getConsentiment(),
-						consulta.getProvinciaCodi(),
-						consulta.getMunicipiCodi());
-			} else if ("SVDSCTFNWS01".equals(metaDocument.getPinbalServei().getCodi())) {
-				idPeticion = novaPeticioSvdsctfnws01(
-						expedient,
-						metaDocument,
-						interessat,
-						consulta);
-			} else if ("SVDCCAACPCWS01".equals(metaDocument.getPinbalServei().getCodi())) {
-				idPeticion = novaPeticioSvdccaacpcws01(
-						expedient,
-						metaDocument,
-						interessat,
-						consulta);
-			} else if ("Q2827003ATGSS001".equals(metaDocument.getPinbalServei().getCodi())) {
-				idPeticion = novaPeticioQ2827003atgss001(
-						expedient,
-						metaDocument,
-						interessat,
-						consulta);
-			} else if ("SVDDELSEXWS01".equals(metaDocument.getPinbalServei().getCodi())) {
-				idPeticion = novaPeticioSvddelsexws01(
-						expedient,
-						metaDocument,
-						interessat,
-						consulta);
-			} else if ("SCDHPAJU".equals(metaDocument.getPinbalServei().getCodi())) {
-				idPeticion = novaPeticioScdhpaju(
-						expedient,
-						metaDocument,
-						interessat,
-						consulta);
-			} else if ("NIVRENTI".equals(metaDocument.getPinbalServei().getCodi())) {
-				idPeticion = novaPeticioNivrenti(
-						expedient,
-						metaDocument,
-						interessat,
-						consulta);
-			} else if ("ECOT103".equals(metaDocument.getPinbalServei().getCodi())) {
-				idPeticion = novaPeticioEcot103(
-						expedient,
-						metaDocument,
-						interessat,
-						consulta);
-			} else if ("SVDDGPRESIDENCIALEGALDOCWS01".equals(metaDocument.getPinbalServei().getCodi())) {
-				idPeticion = novaPeticioSvddgpresidencialegaldocws01(
-						expedient,
-						metaDocument,
-						interessat,
-						consulta);
-			} else if ("SVDRRCCNACIMIENTOWS01".equals(metaDocument.getPinbalServei().getCodi())) {
-				idPeticion = novaPeticioSvdrrccnacimientows01(
-						expedient,
-						metaDocument,
-						interessat,
-						consulta);
-			} else if ("SVDRRCCMATRIMONIOWS01".equals(metaDocument.getPinbalServei().getCodi())) {
-				idPeticion = novaPeticioSvdrrccmatrimoniows01(
-						expedient,
-						metaDocument,
-						interessat,
-						consulta);
-			} else if ("SVDRRCCDEFUNCIONWS01".equals(metaDocument.getPinbalServei().getCodi())) {
-				idPeticion = novaPeticioSvdrrccdefuncionws01(
-						expedient,
-						metaDocument,
-						interessat,
-						consulta);
-			} else if ("SVDBECAWS01".equals(metaDocument.getPinbalServei().getCodi())) {
-				idPeticion = novaPeticioSvdbecaws01(
-						expedient,
-						metaDocument,
-						interessat,
-						consulta);
-			} else {
-				throw new ValidationException(
-						"<creacio>",
-						DocumentEntity.class,
-						"S'ha especificat un servei PINBAL no suportat: " + metaDocument.getPinbalServei());
-			}
-			
+			String idPeticion = peticio.executar(expedient, metaDocument, interessat);
+
 			FitxerDto justificant = getJustificante(idPeticion);
 			DocumentDto document = new DocumentDto();
 			document.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
@@ -367,6 +344,323 @@ public class PinbalHelper {
 		}
 	}
 	
+	/** Petició amb el client antic del servei, a partir dels camps propis del formulari JSP. */
+	private String novaPeticioFormulariJsp(
+			ExpedientEntity expedient,
+			MetaDocumentEntity metaDocument,
+			InteressatEntity interessat,
+			PinbalConsultaDto consulta) throws PinbalException {
+		String serveiCodi = metaDocument.getPinbalServei().getCodi();
+		if ("SVDDGPCIWS02".equals(serveiCodi)) {
+			return novaPeticioSvddgpciws02(
+					expedient,
+					metaDocument,
+					interessat,
+					consulta.getFinalitat(),
+					consulta.getConsentiment());
+		} else if ("SVDDGPVIWS02".equals(serveiCodi)) {
+			return novaPeticioSvddgpviws02(
+					expedient,
+					metaDocument,
+					interessat,
+					consulta.getFinalitat(),
+					consulta.getConsentiment());
+		} else if ("SVDCCAACPASWS01".equals(serveiCodi)) {
+			return novaPeticioSvdccaacpasws01(
+					expedient,
+					metaDocument,
+					interessat,
+					consulta.getFinalitat(),
+					consulta.getConsentiment(),
+					consulta.getComunitatAutonomaCodi(),
+					consulta.getProvinciaCodi());
+		} else if ("SVDSCDDWS01".equals(serveiCodi)) {
+			return novaPeticioSvdscddws01(
+					expedient,
+					metaDocument,
+					interessat,
+					consulta.getFinalitat(),
+					consulta.getConsentiment(),
+					consulta.getComunitatAutonomaCodi(),
+					consulta.getProvinciaCodi(),
+					consulta.getDataConsulta(),
+					consulta.getDataNaixement(),
+					consulta.getConsentimentTipusDiscapacitat());
+		} else if ("SCDCPAJU".equals(serveiCodi)) {
+			return novaPeticioScdcpaju(
+					expedient,
+					metaDocument,
+					interessat,
+					consulta.getFinalitat(),
+					consulta.getConsentiment(),
+					consulta.getProvinciaCodi(),
+					consulta.getMunicipiCodi());
+		} else if ("SVDSCTFNWS01".equals(serveiCodi)) {
+			return novaPeticioSvdsctfnws01(expedient, metaDocument, interessat, consulta);
+		} else if ("SVDCCAACPCWS01".equals(serveiCodi)) {
+			return novaPeticioSvdccaacpcws01(expedient, metaDocument, interessat, consulta);
+		} else if ("Q2827003ATGSS001".equals(serveiCodi)) {
+			return novaPeticioQ2827003atgss001(expedient, metaDocument, interessat, consulta);
+		} else if ("SVDDELSEXWS01".equals(serveiCodi)) {
+			return novaPeticioSvddelsexws01(expedient, metaDocument, interessat, consulta);
+		} else if ("SCDHPAJU".equals(serveiCodi)) {
+			return novaPeticioScdhpaju(expedient, metaDocument, interessat, consulta);
+		} else if ("NIVRENTI".equals(serveiCodi)) {
+			return novaPeticioNivrenti(expedient, metaDocument, interessat, consulta);
+		} else if ("ECOT103".equals(serveiCodi)) {
+			return novaPeticioEcot103(expedient, metaDocument, interessat, consulta);
+		} else if ("SVDDGPRESIDENCIALEGALDOCWS01".equals(serveiCodi)) {
+			return novaPeticioSvddgpresidencialegaldocws01(expedient, metaDocument, interessat, consulta);
+		} else if ("SVDRRCCNACIMIENTOWS01".equals(serveiCodi)) {
+			return novaPeticioSvdrrccnacimientows01(expedient, metaDocument, interessat, consulta);
+		} else if ("SVDRRCCMATRIMONIOWS01".equals(serveiCodi)) {
+			return novaPeticioSvdrrccmatrimoniows01(expedient, metaDocument, interessat, consulta);
+		} else if ("SVDRRCCDEFUNCIONWS01".equals(serveiCodi)) {
+			return novaPeticioSvdrrccdefuncionws01(expedient, metaDocument, interessat, consulta);
+		} else if ("SVDBECAWS01".equals(serveiCodi)) {
+			return novaPeticioSvdbecaws01(expedient, metaDocument, interessat, consulta);
+		} else {
+			// Els serveis d'aquesta llista han de coincidir amb PinbalConsultaDto.SERVEIS_FORMULARI_JSP
+			throw new ValidationException(
+					"<creacio>",
+					DocumentEntity.class,
+					"S'ha especificat un servei PINBAL no suportat: " + serveiCodi);
+		}
+	}
+
+	/**
+	 * Petició síncrona de l'API v2 de recobriment amb les dades específiques del formulari dinàmic. Les dades
+	 * comunes (sol·licitant, procediment, funcionari, titular...) són les mateixes que les dels clients antics.
+	 */
+	private String novaPeticioDinamica(
+			ExpedientEntity expedient,
+			MetaDocumentEntity metaDocument,
+			InteressatEntity interessat,
+			String finalitat,
+			PinbalConsentimentEnumDto consentiment,
+			Map<String, Object> valorsFormulari) throws PinbalException {
+		long t0 = System.currentTimeMillis();
+		String serveiCodi = metaDocument.getPinbalServei().getCodi();
+		List<DadaEspecifica> dades = getDadesEspecifiques(serveiCodi);
+		DadesSolicitant solicitant = getDadesSolicitant(expedient, metaDocument);
+		ScspFuncionario funcionari = getFuncionariActual();
+		ScspTitular titular = getTitularFromInteressat(interessat, false, metaDocument.getPinbalServei());
+		PeticioSincrona peticio = PeticioSincrona.builder()
+				.dadesComunes(DadesComunes.builder()
+						.entitatCif(solicitant.getIdentificador())
+						.procedimentCodi(getCodiProcediment(metaDocument.getMetaExpedient()))
+						.serveiCodi(serveiCodi)
+						.funcionari(Funcionari.builder()
+								.nom(funcionari.getNombreCompletoFuncionario())
+								.nif(funcionari.getNifFuncionario())
+								.build())
+						.departament(Utils.left(expedient.getOrganGestor().getNom(), LONGITUD_DEPARTAMENT_V2))
+						.consentiment(PinbalConsentimentEnumDto.LLEI.equals(consentiment) ? Consentiment.Ley : Consentiment.Si)
+						.finalitat(netejarFinalitat(finalitat))
+						.build())
+				.solicitud(SolicitudSimple.builder()
+						.titular(Titular.builder()
+								.documentTipus(titular.getTipoDocumentacion() != null
+										? Titular.DocumentTipus.valueOf(titular.getTipoDocumentacion().name())
+										: null)
+								.documentNumero(titular.getDocumentacion())
+								.nom(titular.getNombre())
+								.llinatge1(titular.getApellido1())
+								.llinatge2(titular.getApellido2())
+								.nomComplet(titular.getNombreCompleto())
+								.build())
+						.expedient(Utils.left(expedient.getNumero(), LONGITUD_EXPEDIENT))
+						.dadesEspecifiques(PinbalFormulariUtils.construirDadesEspecifiques(dades, valorsFormulari))
+						.build())
+				.build();
+		String accioDescripcio = "Petició síncrona (API v2)";
+		Map<String, String> accioParams = getAccioParams(peticio, solicitant);
+		PeticioRespostaSincrona resposta;
+		try {
+			resposta = getClientRecobriment(TIMEOUT_LECTURA_PETICIO_MS).peticioSincrona(serveiCodi, peticio);
+		} catch (Exception ex) {
+			String errorDescripcio = "Excepció en la petició a PINBAL: " + ex.getMessage();
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_PINBAL,
+					accioDescripcio,
+					getPinbalEndpointName(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			registrarMetrica(false, t0);
+			throw new PinbalException(ex.getMessage(), ex, "peticioSincrona");
+		}
+		String idPeticio = resposta != null && resposta.getDadesComunes() != null ? resposta.getDadesComunes().getIdPeticio() : null;
+		if (resposta == null || resposta.isError() || !EstatEnum.TRAMITADA.equals(resposta.getEstat()) || idPeticio == null) {
+			String errorDescripcio = PinbalFormulariUtils.descripcioError(resposta, dades);
+			if (idPeticio != null) {
+				accioParams.put("idPeticion", idPeticio);
+			}
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_PINBAL,
+					accioDescripcio,
+					getPinbalEndpointName(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					null);
+			registrarMetrica(false, t0);
+			throw new PinbalException(errorDescripcio);
+		}
+		accioParams.put("idPeticion", idPeticio);
+		integracioHelper.addAccioOk(
+				IntegracioHelper.INTCODI_PINBAL,
+				accioDescripcio,
+				getPinbalEndpointName(),
+				accioParams,
+				IntegracioAccioTipusEnumDto.ENVIAMENT,
+				System.currentTimeMillis() - t0);
+		registrarMetrica(true, t0);
+		return idPeticio;
+	}
+
+	/**
+	 * Formulari de dades específiques d'un servei per al modal de nova consulta PINBAL de la interfície REACT.
+	 *
+	 * @param serveiCodi
+	 *            codi del servei a PINBAL (columna CODI de IPA_PINBAL_SERVEI).
+	 */
+	public PinbalFormulariDto getFormulari(String serveiCodi) throws PinbalException {
+		return PinbalFormulariUtils.construirFormulari(
+				serveiCodi,
+				getDadesEspecifiques(serveiCodi),
+				getGrups(serveiCodi));
+	}
+
+	/**
+	 * Dades específiques d'un servei (API v2 de recobriment). Es guarden a la cache (12 hores) perquè els
+	 * formularis dels serveis canvien poc.
+	 *
+	 * @return les dades específiques, o null si el servei no en té.
+	 */
+	public List<DadaEspecifica> getDadesEspecifiques(String serveiCodi) throws PinbalException {
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("serveiCodi", serveiCodi);
+		return llegirCache(
+				CACHE_DADES_ESPECIFIQUES,
+				clauCache(serveiCodi),
+				"Consulta de les dades específiques d'un servei",
+				accioParams,
+				() -> getClientRecobriment(TIMEOUT_LECTURA_CONSULTA_MS).getDadesEspecifiques(serveiCodi));
+	}
+
+	/**
+	 * Arbre de grups de les dades específiques d'un servei (API v2 de recobriment), amb cache de 12 hores.
+	 *
+	 * @return els grups de primer nivell, amb els seus subgrups, o null si el servei no en té.
+	 */
+	public List<GrupDadesEspecifiques> getGrups(String serveiCodi) throws PinbalException {
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("serveiCodi", serveiCodi);
+		return llegirCache(
+				CACHE_GRUPS,
+				clauCache(serveiCodi),
+				"Consulta dels grups de dades específiques d'un servei",
+				accioParams,
+				() -> getClientRecobriment(TIMEOUT_LECTURA_CONSULTA_MS).getGrups(serveiCodi));
+	}
+
+	/**
+	 * Valors d'un camp de llista de les dades específiques d'un servei (API v2 de recobriment), amb cache de 12
+	 * hores.
+	 *
+	 * @param campCodi
+	 *            path de la dada específica.
+	 * @param enumTipus
+	 *            tipus de llista (ENUM, PAIS, PROVINCIA, MUNICIPI_3 o MUNICIPI_5).
+	 * @param filtre
+	 *            per a països i províncies, l'idioma (CA o ES); per als municipis, el codi de la província; per a
+	 *            la resta, un text que han de contenir les descripcions (o null).
+	 * @return els valors, o null si no n'hi ha cap.
+	 */
+	public List<ValorEnum> getValorsEnum(
+			String serveiCodi,
+			String campCodi,
+			String enumTipus,
+			String filtre) throws PinbalException {
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("serveiCodi", serveiCodi);
+		accioParams.put("campCodi", campCodi);
+		accioParams.put("enumTipus", enumTipus);
+		accioParams.put("filtre", filtre);
+		return llegirCache(
+				CACHE_VALORS_ENUM,
+				clauCache(serveiCodi, campCodi, enumTipus, filtre),
+				"Consulta dels valors d'un camp de llista",
+				accioParams,
+				() -> getClientRecobriment(TIMEOUT_LECTURA_CONSULTA_MS).getValorsEnum(serveiCodi, campCodi, enumTipus, filtre));
+	}
+
+	/** Consulta a PINBAL que pot llançar qualsevol excepció. */
+	@FunctionalInterface
+	private interface ConsultaPinbal<T> {
+		T consultar() throws Exception;
+	}
+
+	/**
+	 * Valor de la cache o, si no hi és, el de la consulta a PINBAL, que es guarda a la cache (també si és null: un
+	 * servei sense dades específiques no es torna a consultar fins que caduqui). Els errors no es guarden. Només
+	 * les consultes a PINBAL queden al monitor d'integracions.
+	 */
+	@SuppressWarnings("unchecked")
+	private <T> T llegirCache(
+			String cacheNom,
+			String clau,
+			String accioDescripcio,
+			Map<String, String> accioParams,
+			ConsultaPinbal<T> consulta) throws PinbalException {
+		Cache cache = cacheManager.getCache(cacheNom);
+		Cache.ValueWrapper valorCache = cache != null ? cache.get(clau) : null;
+		if (valorCache != null) {
+			return (T)valorCache.get();
+		}
+		long t0 = System.currentTimeMillis();
+		try {
+			T valor = consulta.consultar();
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_PINBAL,
+					accioDescripcio,
+					getPinbalEndpointName(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			registrarMetrica(true, t0);
+			if (cache != null) {
+				cache.put(clau, valor);
+			}
+			return valor;
+		} catch (Exception ex) {
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_PINBAL,
+					accioDescripcio,
+					getPinbalEndpointName(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					"Excepció en la consulta a PINBAL: " + ex.getMessage(),
+					ex);
+			registrarMetrica(false, t0);
+			throw new PinbalException(ex, accioDescripcio);
+		}
+	}
+
+	/** Clau de cache: les parts precedides de la URL de PINBAL (que pot dependre de l'entitat actual). */
+	private String clauCache(String... parts) {
+		StringBuilder clau = new StringBuilder(String.valueOf(getPinbalBaseUrl()));
+		for (String part: parts) {
+			clau.append('|').append(part);
+		}
+		return clau.toString();
+	}
+
 	/** SVDDGPCIWS02 - Consulta de datos de identidad */
 	private String novaPeticioSvddgpciws02(
 			ExpedientEntity expedient,
@@ -1002,7 +1296,7 @@ public class PinbalHelper {
 		String accioDescripcio = "Consulta de les entitats";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		try {
-			List<Entitat> entitats = getClientRecobriment().getEntitats();
+			List<Entitat> entitats = getClientRecobriment(TIMEOUT_LECTURA_CONSULTA_MS).getEntitats();
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_PINBAL,
 					accioDescripcio,
@@ -1042,7 +1336,7 @@ public class PinbalHelper {
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("entitatCodi", entitatCodi);
 		try {
-			List<ServeiBasic> serveis = getClientRecobriment().getServeisPerEntitat(entitatCodi, true);
+			List<ServeiBasic> serveis = getClientRecobriment(TIMEOUT_LECTURA_CONSULTA_MS).getServeisPerEntitat(entitatCodi, true);
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_PINBAL,
 					accioDescripcio,
@@ -1087,44 +1381,14 @@ public class PinbalHelper {
 			InteressatEntity interessat,
 			String finalitat,
 			PinbalConsentimentEnumDto consentiment) {
-		EntitatEntity entitat = metaDocument.getEntitat();
-		MetaExpedientEntity metaExpedient = metaDocument.getMetaExpedient();
-		String codiSia = getPinbalDefaultSia();
-		
-		String identificadorSolicitante;
-		String nombreSolicitante;
-		OrganGestorEntity organGestorCIF = null;
-		if (metaDocument.isPinbalUtilitzarCifOrgan()) {
-			List<OrganGestorEntity> organsAmbPares = organGestorHelper.findPares(expedient.getOrganGestor(), true);
-			
-			for (OrganGestorEntity organ : organsAmbPares) {
-				if (organ.isUtilitzarCifPinbal() && Utils.isNotEmpty(organ.getCif())) {
-					organGestorCIF = organ;
-					break;
-				}
-			}
-		}
-		
-		//Per proves en local cap a SE, utilitzar: S0711001H - Govern de les Illes Balears
-		if (organGestorCIF != null) {
-			identificadorSolicitante = organGestorCIF.getCif();
-			nombreSolicitante = organGestorCIF.getNom();
-		} else {
-			identificadorSolicitante = entitat.getCif();
-			nombreSolicitante = entitat.getNom();
-		}
-		
-		solicitud.setIdentificadorSolicitante(identificadorSolicitante);
-		solicitud.setNombreSolicitante(nombreSolicitante);
-		
-		solicitud.setCodigoProcedimiento((codiSia != null && !codiSia.trim().isEmpty()) ? codiSia : metaExpedient.getClassificacio());
+		DadesSolicitant solicitant = getDadesSolicitant(expedient, metaDocument);
+		solicitud.setIdentificadorSolicitante(solicitant.getIdentificador());
+		solicitud.setNombreSolicitante(solicitant.getNom());
+
+		solicitud.setCodigoProcedimiento(getCodiProcediment(metaDocument.getMetaExpedient()));
 		solicitud.setUnidadTramitadora(expedient.getOrganGestor().getNom());
-		
-		// If there is character: ’ in finalitat field, some of the services (for example: SVDCCAACPASWS01, SVDCCAACPCWS01) return an error:
-		// [0227] S'ha produït un error al intentar generar la resposta a la consulta: Error processant petició síncrona: SoapFault: System Error.|||El servidor ha devuelto un mensaje SOAP Fault. Error al generar la respuesta. BackofficeException: Error processant petició síncrona: SoapFault: System Error
-		// if ’ (UNICODE: U+2019) is replaced by ' (UNICODE: U+0027) the problem doesn't happen
-		finalitat = finalitat.replace("’", "'"); // 
-		solicitud.setFinalidad(finalitat);
+
+		solicitud.setFinalidad(netejarFinalitat(finalitat));
 		switch (consentiment) {
 		case LLEI:
 			solicitud.setConsentimiento(ScspConsentimiento.Ley);
@@ -1136,6 +1400,53 @@ public class PinbalHelper {
 		solicitud.setIdExpediente(Utils.left(expedient.getNumero(), 25));
 		solicitud.setFuncionario(getFuncionariActual());
 		solicitud.setTitular(getTitularFromInteressat(interessat, false, metaDocument.getPinbalServei()));
+	}
+
+	/** Sol·licitant de la petició: identificador (CIF) i nom. */
+	private static final class DadesSolicitant {
+		private final String identificador;
+		private final String nom;
+		private DadesSolicitant(String identificador, String nom) {
+			this.identificador = identificador;
+			this.nom = nom;
+		}
+		private String getIdentificador() {
+			return identificador;
+		}
+		private String getNom() {
+			return nom;
+		}
+	}
+
+	/**
+	 * Sol·licitant de la petició: el primer òrgan de la jerarquia de l'òrgan de l'expedient que fa servir el seu CIF
+	 * per a PINBAL, si el tipus de document ho indica, o l'entitat.
+	 */
+	private DadesSolicitant getDadesSolicitant(ExpedientEntity expedient, MetaDocumentEntity metaDocument) {
+		if (metaDocument.isPinbalUtilitzarCifOrgan()) {
+			List<OrganGestorEntity> organsAmbPares = organGestorHelper.findPares(expedient.getOrganGestor(), true);
+			for (OrganGestorEntity organ : organsAmbPares) {
+				if (organ.isUtilitzarCifPinbal() && Utils.isNotEmpty(organ.getCif())) {
+					return new DadesSolicitant(organ.getCif(), organ.getNom());
+				}
+			}
+		}
+		//Per proves en local cap a SE, utilitzar: S0711001H - Govern de les Illes Balears
+		EntitatEntity entitat = metaDocument.getEntitat();
+		return new DadesSolicitant(entitat.getCif(), entitat.getNom());
+	}
+
+	/** Codi del procediment a PINBAL: el codi SIA configurat per a les peticions o la classificació del procediment. */
+	private String getCodiProcediment(MetaExpedientEntity metaExpedient) {
+		String codiSia = getPinbalDefaultSia();
+		return (codiSia != null && !codiSia.trim().isEmpty()) ? codiSia : metaExpedient.getClassificacio();
+	}
+
+	private static String netejarFinalitat(String finalitat) {
+		// If there is character: ’ in finalitat field, some of the services (for example: SVDCCAACPASWS01, SVDCCAACPCWS01) return an error:
+		// [0227] S'ha produït un error al intentar generar la resposta a la consulta: Error processant petició síncrona: SoapFault: System Error.|||El servidor ha devuelto un mensaje SOAP Fault. Error al generar la respuesta. BackofficeException: Error processant petició síncrona: SoapFault: System Error
+		// if ’ (UNICODE: U+2019) is replaced by ' (UNICODE: U+0027) the problem doesn't happen
+		return finalitat != null ? finalitat.replace("’", "'") : null;
 	}
 
 	private ScspFuncionario getFuncionariActual() {
@@ -1330,6 +1641,43 @@ public class PinbalHelper {
 						"titular.nombreCompleto",
 						solicitud.getTitular().getNombreCompleto());
 			}
+		}
+		return accioParams;
+	}
+
+	/**
+	 * Paràmetres del monitor d'integracions d'una petició de l'API v2: els mateixos que els dels clients antics i,
+	 * de les dades específiques, només els paths (els valors poden ser dades personals).
+	 */
+	private Map<String, String> getAccioParams(PeticioSincrona peticio, DadesSolicitant solicitant) {
+		Map<String, String> accioParams = new HashMap<String, String>();
+		DadesComunes dadesComunes = peticio.getDadesComunes();
+		SolicitudSimple solicitud = peticio.getSolicitud();
+		accioParams.put("serveiScsp", dadesComunes.getServeiCodi());
+		accioParams.put("identificadorSolicitante", dadesComunes.getEntitatCif());
+		accioParams.put("nombreSolicitante", solicitant.getNom());
+		accioParams.put("codigoProcedimiento", dadesComunes.getProcedimentCodi());
+		accioParams.put("unidadTramitadora", dadesComunes.getDepartament());
+		accioParams.put("idExpediente", solicitud.getExpedient());
+		if (dadesComunes.getFuncionari() != null) {
+			accioParams.put("funcionario.nif", dadesComunes.getFuncionari().getNif());
+			accioParams.put("funcionario.nombre", dadesComunes.getFuncionari().getNom());
+		}
+		Titular titular = solicitud.getTitular();
+		if (titular != null) {
+			if (titular.getDocumentTipus() != null) {
+				accioParams.put("titular.tipoDocumentacion", titular.getDocumentTipus().name());
+			}
+			accioParams.put("titular.documentacion", titular.getDocumentNumero());
+			accioParams.put("titular.nombre", titular.getNom());
+			accioParams.put("titular.apellido1", titular.getLlinatge1());
+			accioParams.put("titular.apellido2", titular.getLlinatge2());
+			if (titular.getNomComplet() != null) {
+				accioParams.put("titular.nombreCompleto", titular.getNomComplet());
+			}
+		}
+		if (solicitud.getDadesEspecifiques() != null && !solicitud.getDadesEspecifiques().isEmpty()) {
+			accioParams.put("dadesEspecifiques", String.join(", ", solicitud.getDadesEspecifiques().keySet()));
 		}
 		return accioParams;
 	}
@@ -1557,12 +1905,18 @@ public class PinbalHelper {
 	/**
 	 * Client de l'API v2 de recobriment. Sempre s'autentica amb HTTP basic (el client no permet triar-ho),
 	 * a diferència dels clients de consulta, que segueixen la propietat {@link PropertyConfig#PINBAL_BASIC_AUTH}.
+	 *
+	 * @param timeoutLecturaMs
+	 *            temps màxim d'espera de la resposta. Per a les peticions ha de ser llarg: si s'esgota abans que
+	 *            PINBAL respongui, RIPEA registraria com a error una consulta que PINBAL sí ha fet.
 	 */
-	private ClientRecobriment getClientRecobriment() {
+	private ClientRecobriment getClientRecobriment(int timeoutLecturaMs) {
 		return new ClientRecobriment(
 				getPinbalBaseUrl(),
 				getPinbalUser(),
-				getPinbalPassword());
+				getPinbalPassword(),
+				TIMEOUT_CONNEXIO_MS,
+				timeoutLecturaMs);
 	}
 	
 	private String getPinbalBaseUrl() {

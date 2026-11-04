@@ -60,12 +60,24 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 		PinbalConsultaCommand command = new PinbalConsultaCommand();
 		command.setEntitatId(entitatActual.getId());
 		command.setPareId(pareId);
-		omplirModelFormulari(
+		omplirModelFormulariPinbal(
 				request,
 				pareId,
 				model);
 		model.addAttribute(command);
 		return "contingutPinbalForm";
+	}
+
+	/**
+	 * Model del formulari de consulta, amb els serveis que hi tenen camps propis: la resta només es poden consultar
+	 * des de la interfície REACT (Interfície Moderna).
+	 */
+	private void omplirModelFormulariPinbal(
+			HttpServletRequest request,
+			Long pareId,
+			Model model) {
+		omplirModelFormulari(request, pareId, model);
+		model.addAttribute("serveisFormulariJsp", PinbalConsultaDto.SERVEIS_FORMULARI_JSP);
 	}
 
 	@RequestMapping(value = "/{pareId}/pinbal/guardaFormSessio", method = RequestMethod.POST)
@@ -89,8 +101,10 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		MetaDocumentDto metaDocument = metaDocumentService.findById(command.getMetaDocumentId());
-	
-		if ("SVDDELSEXWS01".equals(metaDocument.getPinbalServei().getCodi())) {
+
+		if (!PinbalConsultaDto.SERVEIS_FORMULARI_JSP.contains(metaDocument.getPinbalServei().getCodi())) {
+			bindingResult.rejectValue("metaDocumentId", "contingut.pinbal.form.servei.interficie.moderna");
+		} else if ("SVDDELSEXWS01".equals(metaDocument.getPinbalServei().getCodi())) {
 			if (StringUtils.isEmpty(command.getDataNaixement())) {
 				bindingResult.rejectValue("dataNaixement", "NotEmpty");
 			}
@@ -137,7 +151,7 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 		}
 			
 		if (bindingResult.hasErrors()) {
-			omplirModelFormulari(request, pareId, model);
+			omplirModelFormulariPinbal(request, pareId, model);
 			return "contingutPinbalForm";
 		}
 

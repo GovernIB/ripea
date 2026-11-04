@@ -27,12 +27,14 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleStartTransactionRequest;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
 
+import es.caib.pinbal.client.recobriment.v2.ValorEnum;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.ripea.persistence.entity.ContingutEntity;
 import es.caib.ripea.persistence.entity.DocumentEntity;
@@ -118,9 +120,7 @@ import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.InteressatDocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
 import es.caib.ripea.service.intf.dto.MetaDocumentFirmaFluxTipusEnumDto;
-import es.caib.ripea.service.intf.dto.MunicipiDto;
-import es.caib.ripea.service.intf.dto.PaisDto;
-import es.caib.ripea.service.intf.dto.PinbalConsultaDto;
+import es.caib.ripea.service.intf.dto.PinbalFormulariDto;
 import es.caib.ripea.service.intf.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.service.intf.dto.PortafirmesIniciFluxRespostaDto;
 import es.caib.ripea.service.intf.dto.Resum;
@@ -238,6 +238,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         register(DocumentResource.ACTION_NEW_DOC_PINBAL, new NouDocumentPinbalActionExecutor());
         register(DocumentResource.ACTION_VIA_FIRMA, new ViaFirmaActionExecutor());
         register(DocumentResource.REPORT_DESCARREGAR_VERSIO_CODE, new DescarregarVersionReportGenerator());
+        register(DocumentResource.REPORT_PINBAL_FORMULARI, new PinbalFormulariReportGenerator());
         //Dades externes
         register(DocumentResource.Fields.digitalitzacioPerfil, new PerfilsDigitalitzacioOptionsProvider());
         register(DocumentResource.Fields.digitalitzacioPerfil, new DigitalitzacioPerfilOnchangeLogicProcessor());
@@ -1360,38 +1361,56 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
     private class NouDocumentPinbalActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.NewDocPinbalForm, Serializable> {
 
+        /**
+         * Opcions dels camps de llista de les dades específiques (camp opcioDadaEspecifica): els valors del camp a
+         * PINBAL. Paràmetres: serveiCodi, campCodi, enumTipus i, per als municipis, filtre (codi de la província).
+         * Per a països i províncies el filtre és l'idioma de l'usuari.
+         */
         @Override
         public List<FieldOption> getOptions(String fieldName, Map<String, String[]> requestParameterMap) {
             List<FieldOption> resultat = new ArrayList<FieldOption>();
-            switch (fieldName) {
-                case NewDocPinbalForm.Fields.provincia:
-                case NewDocPinbalForm.Fields.provinciaNaixament:
-                    resultat.add(new FieldOption("07", "Illes Balears"));
+            if (!NewDocPinbalForm.Fields.opcioDadaEspecifica.equals(fieldName)) {
+                return resultat;
+            }
+            String serveiCodi = parametre(requestParameterMap, "serveiCodi");
+            String campCodi = parametre(requestParameterMap, "campCodi");
+            String enumTipus = parametre(requestParameterMap, "enumTipus");
+            if (serveiCodi == null || campCodi == null || enumTipus == null) {
+                return resultat;
+            }
+            String filtre;
+            switch (enumTipus) {
+                case "PAIS":
+                case "PROVINCIA":
+                    filtre = "es".equals(LocaleContextHolder.getLocale().getLanguage()) ? "ES" : "CA";
                     break;
-                case NewDocPinbalForm.Fields.comunitatAutonoma:
-                    resultat.add(new FieldOption("04", "Illes Balears"));
-                    break;
-                case NewDocPinbalForm.Fields.nacionalitat:
-                case NewDocPinbalForm.Fields.paisNaixament:
-                    List<PaisDto> paisos = cacheHelper.findPaisos();
-                    if (paisos!=null) {
-                        for (PaisDto dsp: paisos) {
-                            resultat.add(new FieldOption(dsp.getCodi(), dsp.getNom()));
-                        }
+                case "MUNICIPI_3":
+                case "MUNICIPI_5":
+                    filtre = parametre(requestParameterMap, "filtre");
+                    if (filtre == null) {
+                        // Sense província no hi ha municipis
+                        return resultat;
                     }
                     break;
-                case NewDocPinbalForm.Fields.municipi:
-                case NewDocPinbalForm.Fields.municipiNaixament:
-                case NewDocPinbalForm.Fields.municipiRegistre:
-                    List<MunicipiDto> munis = cacheHelper.findMunicipisPerProvinciaPinbal("07");
-                    if (munis!=null) {
-                        for (MunicipiDto dsp: munis) {
-                            resultat.add(new FieldOption(dsp.getCodi(), dsp.getNom()));
-                        }
+                default:
+                    filtre = null;
+            }
+            try {
+                List<ValorEnum> valors = pinbalHelper.getValorsEnum(serveiCodi, campCodi, enumTipus, filtre);
+                if (valors != null) {
+                    for (ValorEnum valor: valors) {
+                        resultat.add(new FieldOption(valor.getCodi(), valor.getValor()));
                     }
-                    break;
+                }
+            } catch (Exception ex) {
+                log.error("No s'han pogut obtenir els valors del camp " + campCodi + " del servei PINBAL " + serveiCodi, ex);
             }
             return resultat;
+        }
+
+        private String parametre(Map<String, String[]> requestParameterMap, String nom) {
+            String[] valors = requestParameterMap != null ? requestParameterMap.get(nom) : null;
+            return valors != null && valors.length > 0 && Utils.isNotEmpty(valors[0]) ? valors[0].trim() : null;
         }
 
 		@Override
@@ -1422,60 +1441,14 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 				//La entitat ja es comprova a pinbalHelper
 				EntitatEntity entitatEntity = entitatRepository.findByCodi(configHelper.getEntitatActualCodi());
 
-				PinbalConsultaDto consulta = new PinbalConsultaDto();
-				consulta.setInteressatId(params.getTitular().getId());
-				consulta.setFinalitat(params.getFinalitat());
-				consulta.setConsentiment(params.getConsentiment());
-	            consulta.setComunitatAutonomaCodi(params.getComunitatAutonoma());
-	            consulta.setProvinciaCodi(params.getProvincia());
-	            consulta.setMunicipiCodi(params.getMunicipi());
-	            consulta.setDataConsulta(String.valueOf(params.getDataConsulta()));
-	            consulta.setDataNaixement(String.valueOf(params.getDataNaixement()));
-	            consulta.setConsentimentTipusDiscapacitat(params.getConsentimentTipusDiscapacitat());
-	            consulta.setNumeroTitol(params.getNumeroTitol());
-	            consulta.setCodiNacionalitat(params.getNacionalitat());
-	            consulta.setPaisNaixament(params.getPaisNaixament());
-	            consulta.setProvinciaNaixament(params.getProvinciaNaixament());
-	            consulta.setPoblacioNaixament(params.getPoblacioNaixament());
-	            consulta.setCodiPoblacioNaixament(params.getPoblacioNaixament());
-	            consulta.setSexe(params.getSexe());
-	            consulta.setNomPare(params.getNomPare());
-	            consulta.setNomMare(params.getNomMare());
-	            consulta.setTelefon(params.getTelefon());
-	            consulta.setEmail(params.getEmail());
-	            consulta.setNombreAnysHistoric(params.getNombreAnysHistoric());
-	            consulta.setExercici(params.getExercici());
-	            consulta.setTipusPassaport(params.getTipusPassaport());
-	            consulta.setDataCaducidad(params.getDataCaducidad());
-	            consulta.setDataExpedicion(params.getDataExpedicion());
-	            consulta.setNumeroSoporte(params.getNumeroSoporte());
-	            consulta.setRegistreCivil(params.getRegistreCivil());
-	            consulta.setTom(params.getTom());
-	            consulta.setPagina(params.getPagina());
-	            consulta.setAusenciaSegundoApellido(params.isAusenciaSegundoApellido());
-	            consulta.setCurs(params.getCurs());
-
-	            if ("SVDRRCCDEFUNCIONWS01".equals(params.getCodiServeiPinbal())){
-	                consulta.setMunicipiRegistreSVDRRCCDEFUNCIONWS01(params.getMunicipiRegistre());
-	                consulta.setMunicipiNaixamentSVDRRCCDEFUNCIONWS01(params.getMunicipiNaixament());
-	            }
-	            if ("SVDRRCCMATRIMONIOWS01".equals(params.getCodiServeiPinbal())){
-	                consulta.setMunicipiRegistreSVDRRCCMATRIMONIOWS01(params.getMunicipiRegistre());
-	                consulta.setMunicipiNaixamentSVDRRCCMATRIMONIOWS01(params.getMunicipiNaixament());
-	            }
-	            if ("SVDRRCCNACIMIENTOWS01".equals(params.getCodiServeiPinbal())){
-	                consulta.setMunicipiRegistreSVDRRCCNACIMIENTOWS01(params.getMunicipiRegistre());
-	                consulta.setMunicipiNaixamentSVDRRCCNACIMIENTOWS01(params.getMunicipiNaixament());
-	            }
-	            if ("SVDDELSEXWS01".equals(params.getCodiServeiPinbal())){
-	                consulta.setMunicipiNaixamentSVDDELSEXWS01(params.getMunicipiNaixament());
-	            }
-
-	            Exception resultatConsulta = pinbalHelper.pinbalNovaConsulta(
+	            Exception resultatConsulta = pinbalHelper.pinbalNovaConsultaDinamica(
 						entitatEntity.getId(),
                         getPareIdDocumentPinbal(params),
                         params.getTipusDocument().getId(),
-						consulta,
+						params.getTitular().getId(),
+						params.getFinalitat(),
+						params.getConsentiment(),
+						params.getDadesEspecifiques(),
 						configHelper.getRolActual());
 
 	            if (resultatConsulta==null) {
@@ -1509,6 +1482,47 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 			}
 			return carpeta.getId();
 		}
+    }
+
+    /**
+     * Formulari de dades específiques del servei PINBAL d'un tipus de document, per al modal de nova consulta
+     * PINBAL. Torna una llista amb un sol element.
+     */
+    private class PinbalFormulariReportGenerator implements ReportGenerator<DocumentResourceEntity, DocumentResource.PinbalFormulariForm, PinbalFormulariDto> {
+
+        @Override
+        public List<PinbalFormulariDto> generateData(
+                String code,
+                DocumentResourceEntity entity,
+                DocumentResource.PinbalFormulariForm params) throws ReportGenerationException {
+            MetaDocumentResourceEntity metaDocument = params != null && params.getTipusDocument() != null
+                    ? metaDocumentResourceRepository.findById(params.getTipusDocument().getId()).orElse(null)
+                    : null;
+            if (metaDocument == null || !metaDocument.isPinbalActiu() || metaDocument.getPinbalServei() == null) {
+                throw new ActionExecutionException(
+                        getResourceClass(),
+                        null,
+                        code,
+                        messageHelper.getMessage("document.nouDocumentPinbal.formulari.senseServei"));
+            }
+            String serveiCodi = metaDocument.getPinbalServei().getCodi();
+            try {
+                PinbalFormulariDto formulari = pinbalHelper.getFormulari(serveiCodi);
+                String serveiNom = metaDocument.getPinbalServei().getNom();
+                formulari.setServeiNom(serveiNom != null && !serveiNom.isBlank() ? serveiNom : serveiCodi);
+                return List.of(formulari);
+            } catch (Exception ex) {
+                excepcioLogHelper.addExcepcio("/document/PinbalFormulariReportGenerator", ex);
+                throw new ActionExecutionException(
+                        getResourceClass(),
+                        null,
+                        code,
+                        messageHelper.getMessage("document.nouDocumentPinbal.formulari.error", new Object[]{serveiCodi, ex.getMessage()}));
+            }
+        }
+
+        @Override
+        public void onChange(Serializable id, DocumentResource.PinbalFormulariForm previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, DocumentResource.PinbalFormulariForm target) {}
     }
 
     private class IniciarFirmaWebActionExecutor implements ActionExecutor<DocumentResourceEntity, DocumentResource.IniciarFirmaNavegador, Serializable> {

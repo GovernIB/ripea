@@ -167,7 +167,11 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
                     break;
                 case "PINBAL_DOC":
                     expedientEntity = expedientRepository.findById(Long.parseLong(split[1])).get();
-                    idsMetaDocsPermesos = metaDocumentHelper.findMetaDocumentsPinbalDisponiblesPerCreacio(expedientEntity);
+                    // Al modal de nova consulta PINBAL només els tipus amb un servei actiu (el servidor rebutja la
+                    // petició amb un servei inactiu)
+                    idsMetaDocsPermesos = metaDocumentHelper.findMetaDocumentsPinbalDisponiblesPerCreacio(expedientEntity).stream()
+                            .filter(metaDocument -> metaDocument.getPinbalServei() != null && metaDocument.getPinbalServei().isActiu())
+                            .collect(Collectors.toList());
                     break;
             }
 
@@ -179,6 +183,11 @@ public class MetaDocumentResourceServiceImpl extends BaseMutableResourceService<
                         filtreTipusDocsPermesos = FilterBuilder.or(filtreTipusDocsPermesos, Filter.parse("id" + " IN (" + aux + ")"));
                     }
                 }
+            }
+            if (filtreTipusDocsPermesos == null && "PINBAL_DOC".equals(split[0])) {
+                // Sense cap tipus de document PINBAL disponible no s'ha de mostrar cap tipus (sense filtre es
+                // mostrarien tots)
+                filtreTipusDocsPermesos = Filter.parse("id IN (-1)");
             }
 
             if (filtreTipusDocsPermesos!=null) {
