@@ -112,15 +112,11 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<!-- pinbal-client 2.x usa el RESTEasy de JBoss EAP 7.2 (scope provided), que a l'EAR ja hi és per
+		     pluginsib-userinformation-keycloak. Ja no depèn de Jersey, per això no cal excloure jsr311-api. -->
 		<dependency>
 			<groupId>es.caib.pinbal</groupId>
 			<artifactId>pinbal-client</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>javax.ws.rs</groupId>
-					<artifactId>jsr311-api</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>es.caib.portafib</groupId>

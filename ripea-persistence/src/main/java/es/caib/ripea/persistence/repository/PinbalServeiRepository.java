@@ -22,7 +22,13 @@ public interface PinbalServeiRepository extends JpaRepository<PinbalServeiEntity
 	List<PinbalServeiEntity> findActiusOrderByNom();
 	
 	PinbalServeiEntity findByCodi(String codi);
-	
+
+	/** Codis dels serveis ja donats d'alta (per no oferir-los de nou en donar d'alta un servei des de PINBAL). */
+	@Query("select ps.codi from PinbalServeiEntity ps")
+	List<String> findAllCodis();
+
+	boolean existsByCodiIgnoreCase(String codi);
+
 	@Modifying
  	@Query(value = "UPDATE IPA_PINBAL_SERVEI " +
  			"SET CREATEDBY_CODI = CASE WHEN CREATEDBY_CODI = :codiAntic THEN :codiNou ELSE CREATEDBY_CODI END, " +

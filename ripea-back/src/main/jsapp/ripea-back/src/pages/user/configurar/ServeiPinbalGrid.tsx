@@ -1,5 +1,6 @@
+import {useMemo} from "react";
 import {GridPage, useFormContext} from "reactlib";
-import {Grid, Icon} from "@mui/material";
+import {Alert, Grid, Icon} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {useTranslation} from "react-i18next";
 import {CardPage} from "../../../components/CardData.tsx";
@@ -7,8 +8,22 @@ import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 
 const ServeiPinbalGridForm = () => {
     const {data} = useFormContext()
+    const alta = data?.id == null
+
+    // Memoritzat perquè el desplegable recarrega les opcions cada vegada que canvia la identitat de l'objecte.
+    const serveiRequestParams = useMemo(() => ({
+        unitatOrganitzativa: data?.unitatOrganitzativa,
+    }), [data?.unitatOrganitzativa]);
+
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField name={'codi'} disabled={data?.id}/>
+        {/* En l'alta el servei es tria entre els de PINBAL: el codi, el nom, els documents i l'actiu s'emplenen sols */}
+        {alta && data?.avisPinbal &&
+            <Grid size={12}>
+                <Alert severity="warning">{data.avisPinbal}</Alert>
+            </Grid>}
+        {alta && <GridFormField name={'unitatOrganitzativa'} required/>}
+        {alta && <GridFormField name={'serveiPinbal'} requestParams={serveiRequestParams} disabled={!data?.unitatOrganitzativa} required/>}
+        <GridFormField name={'codi'} disabled/>
         <GridFormField name={'nom'} type={'textarea'}/>
         <GridFormField name={'pinbalServeiDocPermesEnum'} multiple/>
         <GridFormField name={'actiu'}/>
@@ -61,9 +76,9 @@ export const ServeiPinbalGrid = () => {
                 popupEditFormContent={<ServeiPinbalGridForm/>}
                 rowAdditionalActions={actions}
                 toolbarShowQuickFilter
-                toolbarHideCreate
                 popupEditFormI18nKeys={{
-                    updateSuccess: 'page.entitat.action.update.ok',
+                    createSuccess: 'page.pinbalServei.action.new.ok',
+                    updateSuccess: 'page.pinbalServei.action.update.ok',
                 }}
             />
         </CardPage>

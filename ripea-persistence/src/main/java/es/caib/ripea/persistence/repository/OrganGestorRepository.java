@@ -21,6 +21,9 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 
 	public List<OrganGestorEntity> findByEntitat(EntitatEntity entitat);
 
+	/** Òrgans que fan les consultes a PINBAL amb el seu propi CIF, ordenats per nom. */
+	List<OrganGestorEntity> findByUtilitzarCifPinbalTrueAndCifIsNotNullOrderByNomAsc();
+
 	public OrganGestorEntity findByEntitatAndCodi(EntitatEntity entitat, String codi);
 	public OrganGestorEntity findByEntitatCodiAndCodi(String entitatCodi, String codi);
 	

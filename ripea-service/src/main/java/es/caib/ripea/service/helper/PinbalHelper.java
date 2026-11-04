@@ -11,8 +11,9 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import es.caib.pinbal.client.recobriment.ecot103.ClientEcot103;
-import es.caib.pinbal.client.recobriment.ecot103.ClientEcot103.SolicitudEcot103;
+import es.caib.pinbal.client.recobriment.ClientRecobriment;
+import es.caib.pinbal.client.recobriment.legacy.ecot103.ClientEcot103;
+import es.caib.pinbal.client.recobriment.legacy.ecot103.ClientEcot103.SolicitudEcot103;
 import es.caib.pinbal.client.recobriment.model.ScspFuncionario;
 import es.caib.pinbal.client.recobriment.model.ScspJustificante;
 import es.caib.pinbal.client.recobriment.model.ScspRespuesta;
@@ -24,40 +25,42 @@ import es.caib.pinbal.client.recobriment.model.SolicitudBaseSvdrrcc;
 import es.caib.pinbal.client.recobriment.model.SolicitudBaseSvdrrcc.FetRegistral;
 import es.caib.pinbal.client.recobriment.model.SolicitudBaseSvdrrcc.Lloc;
 import es.caib.pinbal.client.recobriment.model.SolicitudBaseSvdrrcc.TitularDadesAdicionals;
-import es.caib.pinbal.client.recobriment.nivrenti.ClientNivrenti;
-import es.caib.pinbal.client.recobriment.nivrenti.ClientNivrenti.SolicitudNivrenti;
-import es.caib.pinbal.client.recobriment.q2827003atgss001.ClientQ2827003atgss001;
-import es.caib.pinbal.client.recobriment.q2827003atgss001.ClientQ2827003atgss001.SolicitudQ2827003atgss001;
-import es.caib.pinbal.client.recobriment.scdcpaju.ClientScdcpaju;
-import es.caib.pinbal.client.recobriment.scdcpaju.ClientScdcpaju.SolicitudScdcpaju;
-import es.caib.pinbal.client.recobriment.scdhpaju.ClientScdhpaju;
-import es.caib.pinbal.client.recobriment.scdhpaju.ClientScdhpaju.SolicitudScdhpaju;
-import es.caib.pinbal.client.recobriment.svdbecaws01.ClientSvdbecaws01;
-import es.caib.pinbal.client.recobriment.svdbecaws01.ClientSvdbecaws01.SolicitudSvdbecaws01;
-import es.caib.pinbal.client.recobriment.svdccaacpasws01.ClientSvdccaacpasws01;
-import es.caib.pinbal.client.recobriment.svdccaacpasws01.ClientSvdccaacpasws01.SolicitudSvdccaacpasws01;
-import es.caib.pinbal.client.recobriment.svdccaacpcws01.ClientSvdccaacpcws01;
-import es.caib.pinbal.client.recobriment.svdccaacpcws01.ClientSvdccaacpcws01.SolicitudSvdccaacpcws01;
-import es.caib.pinbal.client.recobriment.svddelsexws01.ClientSvddelsexws01;
-import es.caib.pinbal.client.recobriment.svddelsexws01.ClientSvddelsexws01.SolicitudSvddelsexws01;
-import es.caib.pinbal.client.recobriment.svddelsexws01.ClientSvddelsexws01.SolicitudSvddelsexws01.Sexe;
-import es.caib.pinbal.client.recobriment.svddgpciws02.ClientSvddgpciws02;
-import es.caib.pinbal.client.recobriment.svddgpciws02.ClientSvddgpciws02.SolicitudSvddgpciws02;
-import es.caib.pinbal.client.recobriment.svddgpresidencialegaldocws01.ClientSvddgpresidencialegaldocws01;
-import es.caib.pinbal.client.recobriment.svddgpresidencialegaldocws01.ClientSvddgpresidencialegaldocws01.SolicitudSvddgpresidencialegaldocws01;
-import es.caib.pinbal.client.recobriment.svddgpresidencialegaldocws01.ClientSvddgpresidencialegaldocws01.SolicitudSvddgpresidencialegaldocws01.TipusPassaport;
-import es.caib.pinbal.client.recobriment.svddgpviws02.ClientSvddgpviws02;
-import es.caib.pinbal.client.recobriment.svddgpviws02.ClientSvddgpviws02.SolicitudSvddgpviws02;
-import es.caib.pinbal.client.recobriment.svdrrccdefuncionws01.ClientSvdrrccdefuncionws01;
-import es.caib.pinbal.client.recobriment.svdrrccdefuncionws01.ClientSvdrrccdefuncionws01.SolicitudSvdrrccdefuncionws01;
-import es.caib.pinbal.client.recobriment.svdrrccmatrimoniows01.ClientSvdrrccmatrimoniows01;
-import es.caib.pinbal.client.recobriment.svdrrccmatrimoniows01.ClientSvdrrccmatrimoniows01.SolicitudSvdrrccmatrimoniows01;
-import es.caib.pinbal.client.recobriment.svdrrccnacimientows01.ClientSvdrrccnacimientows01;
-import es.caib.pinbal.client.recobriment.svdrrccnacimientows01.ClientSvdrrccnacimientows01.SolicitudSvdrrccnacimientows01;
-import es.caib.pinbal.client.recobriment.svdscddws01.ClientSvdscddws01;
-import es.caib.pinbal.client.recobriment.svdscddws01.ClientSvdscddws01.SolicitudSvdscddws01;
-import es.caib.pinbal.client.recobriment.svdsctfnws01.ClientSvdsctfnws01;
-import es.caib.pinbal.client.recobriment.svdsctfnws01.ClientSvdsctfnws01.SolicitudSvdsctfnws01;
+import es.caib.pinbal.client.recobriment.v2.Entitat;
+import es.caib.pinbal.client.serveis.ServeiBasic;
+import es.caib.pinbal.client.recobriment.legacy.nivrenti.ClientNivrenti;
+import es.caib.pinbal.client.recobriment.legacy.nivrenti.ClientNivrenti.SolicitudNivrenti;
+import es.caib.pinbal.client.recobriment.legacy.q2827003atgss001.ClientQ2827003atgss001;
+import es.caib.pinbal.client.recobriment.legacy.q2827003atgss001.ClientQ2827003atgss001.SolicitudQ2827003atgss001;
+import es.caib.pinbal.client.recobriment.legacy.scdcpaju.ClientScdcpaju;
+import es.caib.pinbal.client.recobriment.legacy.scdcpaju.ClientScdcpaju.SolicitudScdcpaju;
+import es.caib.pinbal.client.recobriment.legacy.scdhpaju.ClientScdhpaju;
+import es.caib.pinbal.client.recobriment.legacy.scdhpaju.ClientScdhpaju.SolicitudScdhpaju;
+import es.caib.pinbal.client.recobriment.legacy.svdbecaws01.ClientSvdbecaws01;
+import es.caib.pinbal.client.recobriment.legacy.svdbecaws01.ClientSvdbecaws01.SolicitudSvdbecaws01;
+import es.caib.pinbal.client.recobriment.legacy.svdccaacpasws01.ClientSvdccaacpasws01;
+import es.caib.pinbal.client.recobriment.legacy.svdccaacpasws01.ClientSvdccaacpasws01.SolicitudSvdccaacpasws01;
+import es.caib.pinbal.client.recobriment.legacy.svdccaacpcws01.ClientSvdccaacpcws01;
+import es.caib.pinbal.client.recobriment.legacy.svdccaacpcws01.ClientSvdccaacpcws01.SolicitudSvdccaacpcws01;
+import es.caib.pinbal.client.recobriment.legacy.svddelsexws01.ClientSvddelsexws01;
+import es.caib.pinbal.client.recobriment.legacy.svddelsexws01.ClientSvddelsexws01.SolicitudSvddelsexws01;
+import es.caib.pinbal.client.recobriment.legacy.svddelsexws01.ClientSvddelsexws01.SolicitudSvddelsexws01.Sexe;
+import es.caib.pinbal.client.recobriment.legacy.svddgpciws02.ClientSvddgpciws02;
+import es.caib.pinbal.client.recobriment.legacy.svddgpciws02.ClientSvddgpciws02.SolicitudSvddgpciws02;
+import es.caib.pinbal.client.recobriment.legacy.svddgpresidencialegaldocws01.ClientSvddgpresidencialegaldocws01;
+import es.caib.pinbal.client.recobriment.legacy.svddgpresidencialegaldocws01.ClientSvddgpresidencialegaldocws01.SolicitudSvddgpresidencialegaldocws01;
+import es.caib.pinbal.client.recobriment.legacy.svddgpresidencialegaldocws01.ClientSvddgpresidencialegaldocws01.SolicitudSvddgpresidencialegaldocws01.TipusPassaport;
+import es.caib.pinbal.client.recobriment.legacy.svddgpviws02.ClientSvddgpviws02;
+import es.caib.pinbal.client.recobriment.legacy.svddgpviws02.ClientSvddgpviws02.SolicitudSvddgpviws02;
+import es.caib.pinbal.client.recobriment.legacy.svdrrccdefuncionws01.ClientSvdrrccdefuncionws01;
+import es.caib.pinbal.client.recobriment.legacy.svdrrccdefuncionws01.ClientSvdrrccdefuncionws01.SolicitudSvdrrccdefuncionws01;
+import es.caib.pinbal.client.recobriment.legacy.svdrrccmatrimoniows01.ClientSvdrrccmatrimoniows01;
+import es.caib.pinbal.client.recobriment.legacy.svdrrccmatrimoniows01.ClientSvdrrccmatrimoniows01.SolicitudSvdrrccmatrimoniows01;
+import es.caib.pinbal.client.recobriment.legacy.svdrrccnacimientows01.ClientSvdrrccnacimientows01;
+import es.caib.pinbal.client.recobriment.legacy.svdrrccnacimientows01.ClientSvdrrccnacimientows01.SolicitudSvdrrccnacimientows01;
+import es.caib.pinbal.client.recobriment.legacy.svdscddws01.ClientSvdscddws01;
+import es.caib.pinbal.client.recobriment.legacy.svdscddws01.ClientSvdscddws01.SolicitudSvdscddws01;
+import es.caib.pinbal.client.recobriment.legacy.svdsctfnws01.ClientSvdsctfnws01;
+import es.caib.pinbal.client.recobriment.legacy.svdsctfnws01.ClientSvdsctfnws01.SolicitudSvdsctfnws01;
 import es.caib.ripea.persistence.entity.ConsultaPinbalEntity;
 import es.caib.ripea.persistence.entity.ContingutEntity;
 import es.caib.ripea.persistence.entity.DocumentEntity;
@@ -988,6 +991,82 @@ public class PinbalHelper {
 		}
 	}
 
+	/**
+	 * Consulta les entitats donades d'alta a PINBAL (API v2 de recobriment).
+	 *
+	 * @return les entitats amb el seu codi de PINBAL, nom i CIF.
+	 * @throws PinbalException si la consulta falla.
+	 */
+	public List<Entitat> getEntitats() throws PinbalException {
+		long t0 = System.currentTimeMillis();
+		String accioDescripcio = "Consulta de les entitats";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		try {
+			List<Entitat> entitats = getClientRecobriment().getEntitats();
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_PINBAL,
+					accioDescripcio,
+					getPinbalEndpointName(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			registrarMetrica(true, t0);
+			return entitats;
+		} catch (Exception ex) {
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_PINBAL,
+					accioDescripcio,
+					getPinbalEndpointName(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					"Excepció en la consulta de les entitats a PINBAL",
+					ex);
+			registrarMetrica(false, t0);
+			throw new PinbalException(ex, "getEntitats");
+		}
+	}
+
+	/**
+	 * Consulta els serveis d'una entitat de PINBAL (API v2 de recobriment), indicant per a cadascun si l'usuari
+	 * de RIPEA hi té permís.
+	 *
+	 * @param entitatCodi
+	 *            codi de l'entitat a PINBAL (no és el codi de l'entitat a RIPEA).
+	 * @return els serveis de l'entitat.
+	 * @throws PinbalException si la consulta falla.
+	 */
+	public List<ServeiBasic> getServeisPerEntitat(String entitatCodi) throws PinbalException {
+		long t0 = System.currentTimeMillis();
+		String accioDescripcio = "Consulta dels serveis d'una entitat";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("entitatCodi", entitatCodi);
+		try {
+			List<ServeiBasic> serveis = getClientRecobriment().getServeisPerEntitat(entitatCodi, true);
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_PINBAL,
+					accioDescripcio,
+					getPinbalEndpointName(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			registrarMetrica(true, t0);
+			return serveis;
+		} catch (Exception ex) {
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_PINBAL,
+					accioDescripcio,
+					getPinbalEndpointName(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					"Excepció en la consulta dels serveis de l'entitat " + entitatCodi + " a PINBAL",
+					ex);
+			registrarMetrica(false, t0);
+			throw new PinbalException(ex, "getServeisPerEntitat");
+		}
+	}
+
 	/** Longituds màximes de ProvinciaSolicitud i MunicipioSolicitud segons l'esquema SCSP de SCDCPAJU i SCDHPAJU */
 	private static final int LONGITUD_PROVINCIA_SOLICITUD = 2;
 	private static final int LONGITUD_MUNICIPI_SOLICITUD = 3;
@@ -1473,6 +1552,17 @@ public class PinbalHelper {
 		if (log.isDebugEnabled())
 			client.enableLogginFilter();
 		return client;
+	}
+
+	/**
+	 * Client de l'API v2 de recobriment. Sempre s'autentica amb HTTP basic (el client no permet triar-ho),
+	 * a diferència dels clients de consulta, que segueixen la propietat {@link PropertyConfig#PINBAL_BASIC_AUTH}.
+	 */
+	private ClientRecobriment getClientRecobriment() {
+		return new ClientRecobriment(
+				getPinbalBaseUrl(),
+				getPinbalUser(),
+				getPinbalPassword());
 	}
 	
 	private String getPinbalBaseUrl() {

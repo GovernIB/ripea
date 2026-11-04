@@ -2275,6 +2275,9 @@ const translationCa = {
         pinbalServei: {
             title: "Servei pinbal",
             action: {
+                new: {
+                    ok: "Servei PINBAL donat d'alta correctament",
+                },
                 update: {
                     ok: "Servei pinbal modificat correctament",
                 },

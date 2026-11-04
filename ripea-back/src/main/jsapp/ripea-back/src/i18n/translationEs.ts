@@ -2275,6 +2275,9 @@ const translationEs = {
         pinbalServei: {
             title: "Servicio Pinbal",
             action: {
+                new: {
+                    ok: "Servicio PINBAL dado de alta correctamente",
+                },
                 update: {
                     ok: "Servicio Pinbal modificado correctamente",
                 },

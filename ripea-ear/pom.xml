@@ -15,6 +15,23 @@
 		<docker.image.context>${project.basedir}/..</docker.image.context>
 		<docker.image.dockerfile>${project.basedir}/../Dockerfile</docker.image.dockerfile>
 	</properties>
+	<dependencyManagement>
+		<dependencies>
+			<!-- La versió 1.19.4 de Jersey 1.x que hi ha a lib/ l'aportava pinbal-client 1.4.x. Des de pinbal-client
+			     2.x ja no la porta i, sense fixar-la, lib/ passaria a la versió d'una altra llibreria (1.19 d'arxiudigital-apirest
+			     o 1.8 d'apisib-jerseycore). Es fixa a nivell d'EAR per no canviar res de lib/ ni dels WAR. -->
+			<dependency>
+				<groupId>com.sun.jersey</groupId>
+				<artifactId>jersey-client</artifactId>
+				<version>1.19.4</version>
+			</dependency>
+			<dependency>
+				<groupId>com.sun.jersey</groupId>
+				<artifactId>jersey-core</artifactId>
+				<version>1.19.4</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>

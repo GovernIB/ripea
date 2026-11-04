@@ -2273,6 +2273,9 @@ const translationEn = {
         pinbalServei: {
             title: "Pinbal service",
             action: {
+                new: {
+                    ok: "PINBAL service successfully created",
+                },
                 update: {
                     ok: "Pinbal service successfully updated",
                 },

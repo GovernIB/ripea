@@ -18,6 +18,9 @@ public interface EntitatRepository extends JpaRepository<EntitatEntity, Long> {
 
 	EntitatEntity findByCodi(String codi);
 
+	/** Entitats amb CIF (el CIF permet trobar l'entitat corresponent a PINBAL), ordenades per nom. */
+	List<EntitatEntity> findByCifIsNotNullOrderByNomAsc();
+
 	EntitatEntity findByUnitatArrel(String unitatArrel);
 
 	List<EntitatEntity> findByActiva(boolean activa);
