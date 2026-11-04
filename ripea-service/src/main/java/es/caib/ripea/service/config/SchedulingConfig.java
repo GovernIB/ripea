@@ -5,6 +5,7 @@ import es.caib.ripea.service.helper.IncorporacioDocumentsSegonPlaHelper;
 import es.caib.ripea.service.helper.IncorporacioDocumentsSegonPlaHelper.ProcessadorElement;
 import es.caib.ripea.service.helper.UsuariHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.service.ExecucioMassivaService;
 import es.caib.ripea.service.intf.service.MonitorTasquesService;
@@ -85,6 +86,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
     private final String codiBuidarCachesDominis = "buidarCachesDominis";
     private final String codiGenerarJsonMetriques = "generarJsonMetriques";
     private final String codiGenerarEstadistiquesDiaries = "generarEstadistiquesDiaries";
+    private final String codiActualitzarDocumentsPermesosPinbal = "actualitzarDocumentsPermesosPinbal";
     private final String codiEsborrarExcepcionsMesAntigues = "esborrarExcepcionsMesAntigues";
     private final String codiEsborrarIntegracionsAntigues = "esborrarIntegracionsAntigues";
     private final String codiIncorporarCertificatsRemeses = "incorporarCertificatsRemeses";
@@ -141,6 +143,9 @@ public class SchedulingConfig implements SchedulingConfigurer {
             }
             if (codiGenerarEstadistiquesDiaries.equals(taskCodi) || "totes".equals(taskCodi)) {
                 rescheduleTask("generarEstadistiquesDiaries", getTrigger(codiGenerarEstadistiquesDiaries));
+            }
+            if (codiActualitzarDocumentsPermesosPinbal.equals(taskCodi) || "totes".equals(taskCodi)) {
+                rescheduleTask(codiActualitzarDocumentsPermesosPinbal, getTrigger(codiActualitzarDocumentsPermesosPinbal));
             }
         }
     }
@@ -482,6 +487,26 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     }
                 },
                 getTrigger(codiGenerarEstadistiquesDiaries)
+        );
+        addTask(
+                codiActualitzarDocumentsPermesosPinbal,
+                new Runnable() {
+                    @SneakyThrows
+                    @Override
+                    public void run() {
+                        monitorTasquesService.inici(codiActualitzarDocumentsPermesosPinbal);
+                        try {
+                            createAuthenticationContext();
+                            segonPlaService.actualitzarDocumentsPermesosPinbal();
+                            monitorTasquesService.fi(codiActualitzarDocumentsPermesosPinbal);
+                        } catch (Throwable th) {
+                            tractarErrorTascaSegonPla(th, codiActualitzarDocumentsPermesosPinbal);
+                        } finally {
+                            SecurityContextHolder.clearContext();
+                        }
+                    }
+                },
+                getTrigger(codiActualitzarDocumentsPermesosPinbal)
         );
         addTask(
                 codiEsborrarExcepcionsMesAntigues,
@@ -841,6 +866,9 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     return nextExecution;
                 }
             };
+        } else if (taskCodi.equals(codiActualitzarDocumentsPermesosPinbal)) {
+            // Si la propietat és buida la tasca no fa res (actualitzarDocumentsPermesosPinbal), però es programa igualment
+            return cronTrigger(codiActualitzarDocumentsPermesosPinbal, PropertyConfig.PINBAL_DOCUMENTS_PERMESOS_CRON, "0 30 3 * * *");
         } else if (taskCodi.equals(codiGenerarEstadistiquesDiaries)) {
             return new Trigger() {
                 @Override
@@ -888,6 +916,26 @@ public class SchedulingConfig implements SchedulingConfigurer {
     }
 
     /** Enregistre l'error als logs i marca la tasca amb error. */
+    /**
+     * Trigger amb el cron d'una propietat de configuració. Si la propietat és buida o el cron no és vàlid, es fa servir
+     * el cron per defecte. Actualitza la propera execució al monitor de tasques.
+     */
+    private Trigger cronTrigger(String codiTasca, String propietatCron, String cronPerDefecte) {
+        return triggerContext -> {
+            String cron = configHelper.getConfig(propietatCron);
+            CronTrigger trigger;
+            try {
+                trigger = new CronTrigger(Utils.isEmpty(cron) ? cronPerDefecte : cron.trim());
+            } catch (IllegalArgumentException ex) {
+                log.error("Cron no vàlid a la propietat " + propietatCron + " (" + cron + "): es fa servir " + cronPerDefecte, ex);
+                trigger = new CronTrigger(cronPerDefecte);
+            }
+            Date nextExecution = trigger.nextExecutionTime(triggerContext);
+            monitorTasquesService.updateProperaExecucio(codiTasca, nextExecution.getTime() - System.currentTimeMillis());
+            return nextExecution;
+        };
+    }
+
 	private void tractarErrorTascaSegonPla(Throwable th, String codiTasca) {
 		String errMsg = th.getClass() + ": " + th.getMessage() + " (" + new Date().getTime() + ")";
 		logger.error("Error no controlat a l'execució de la tasca en segon pla amb codi \"" + codiTasca + "\": " + errMsg, th);

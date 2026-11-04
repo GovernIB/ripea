@@ -43,6 +43,8 @@ public class PropertyConfig {
 	public static final String PINBAL_BASIC_AUTH	= "es.caib.ripea.pinbal.basic.auth";
 	public static final String PINBAL_ENDPOINT_DESC = "es.caib.ripea.pinbal.endpointName";
 	public static final String PINBAL_DEFAULT_SIA	= "es.caib.ripea.pinbal.codi.sia.peticions";
+	/** Cron de la tasca en segon pla que actualitza els tipus de document permesos dels serveis amb els de PINBAL (buida: no s'executa). */
+	public static final String PINBAL_DOCUMENTS_PERMESOS_CRON = "es.caib.ripea.segonpla.pinbal.documents.permesos.cron";
 
 	public static final String ARXIU_MAX_MB = "es.caib.ripea.segonpla.arxiu.maxMb";
 	public static final String SEGON_PLA_TIMEOUT = "es.caib.ripea.segonpla.arxiu.maxTempsExec";

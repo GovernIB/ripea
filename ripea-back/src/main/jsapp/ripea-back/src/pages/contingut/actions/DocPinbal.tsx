@@ -380,6 +380,12 @@ const DocPinbalForm = ({carpetaFixada}: {carpetaFixada?: boolean}) => {
         builder.eq("expedient.id", data?.expedient?.id),
         builder.eq('esRepresentant', false),
     );
+    // Només els interessats amb un tipus de document que admet el servei del tipus de document triat
+    // (InteressatResource.NAMED_QUERY_PINBAL_TITULAR, el mateix criteri que el formulari JSP)
+    const tipusDocumentId = data?.tipusDocument?.id;
+    const titularNamedQueries = useMemo(
+        () => tipusDocumentId != null ? [`PINBAL_TITULAR#${tipusDocumentId}`] : undefined,
+        [tipusDocumentId]);
 
     const carpetaFilter: string = useMemo(() => (
         builder.and(
@@ -393,7 +399,7 @@ const DocPinbalForm = ({carpetaFixada}: {carpetaFixada?: boolean}) => {
                        namedQueries={[`PINBAL_DOC#${data?.expedient?.id}`]}
                        sortModel={sortModelTipusDocument}/>
 
-        <GridFormField size={"grow"} name="titular" filter={titularFilter}/>
+        <GridFormField size={"grow"} name="titular" filter={titularFilter} namedQueries={titularNamedQueries}/>
         <GridButton
             size={"auto"}
             icon={'person_add'}

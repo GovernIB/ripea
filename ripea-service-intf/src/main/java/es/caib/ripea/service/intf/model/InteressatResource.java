@@ -104,6 +104,8 @@ public class InteressatResource extends BaseAuditableResource<Long> {
     public static final String ACTION_DELETE_REPRESENTANT  = "DELETE_REPRESENTANT";
     public static final String ACTION_GESTIONAR_GRUPS  = "GESTIONAR_GRUPS";
     public static final String FILTER_CODE = "UNITAT_ORGANITZATIVA_FILTER";
+    /** Consulta amb nom per als titulars d'una consulta PINBAL: PINBAL_TITULAR#<id del tipus de document>. */
+    public static final String NAMED_QUERY_PINBAL_TITULAR = "PINBAL_TITULAR";
 
 	@NotNull
     @ResourceField(onChangeActive = true)

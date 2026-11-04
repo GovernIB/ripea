@@ -4,7 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
@@ -101,6 +103,57 @@ class PinbalServeiUtilsTest {
 		assertThat(PinbalServeiUtils.retallarNom(llarg)).hasSize(PinbalServeiUtils.NOM_MAX_LENGTH);
 		assertThat(PinbalServeiUtils.retallarNom("  Consulta de datos de identidad  ")).isEqualTo("Consulta de datos de identidad");
 		assertThat(PinbalServeiUtils.retallarNom(null)).isNull();
+	}
+
+	@Test
+	void canvisDocsPermesos_nomesElsServeisQueNoCoincideixenAmbPinbal() {
+		Map<String, List<PinbalServeiDocPermesEnumDto>> ripea = new LinkedHashMap<>();
+		// Sense cap tipus a RIPEA (sense restricció): s'enviava DNI i el servei no l'admet
+		ripea.put("SVDDELSEXWS01", Collections.emptyList());
+		// Diferent de PINBAL
+		ripea.put("NIVRENTI", Collections.singletonList(PinbalServeiDocPermesEnumDto.PASSAPORT));
+		// Els mateixos tipus en un altre ordre
+		ripea.put("SVDVTUWS01", Arrays.asList(PinbalServeiDocPermesEnumDto.NIE, PinbalServeiDocPermesEnumDto.DNI));
+		// No és a PINBAL
+		ripea.put("SCDHPAJU", Collections.emptyList());
+		List<ServeiBasic> pinbal = Arrays.asList(
+				serveiAmbDocs(" svddelsexws01 ", DocumentTipus.NIF, DocumentTipus.NIE, DocumentTipus.Pasaporte),
+				serveiAmbDocs("NIVRENTI", DocumentTipus.NIF, DocumentTipus.NIE),
+				serveiAmbDocs("SVDVTUWS01", DocumentTipus.DNI, DocumentTipus.NIE),
+				serveiAmbDocs("ALTRE", DocumentTipus.DNI));
+
+		Map<String, List<PinbalServeiDocPermesEnumDto>> canvis = PinbalServeiUtils.canvisDocsPermesos(ripea, pinbal);
+
+		assertThat(canvis).containsOnlyKeys("NIVRENTI", "SVDDELSEXWS01");
+		assertThat(canvis.get("SVDDELSEXWS01")).containsExactly(
+				PinbalServeiDocPermesEnumDto.NIF, PinbalServeiDocPermesEnumDto.NIE, PinbalServeiDocPermesEnumDto.PASSAPORT);
+		assertThat(canvis.get("NIVRENTI")).containsExactly(PinbalServeiDocPermesEnumDto.NIF, PinbalServeiDocPermesEnumDto.NIE);
+		// Ordenats per codi
+		assertThat(canvis.keySet()).containsExactly("NIVRENTI", "SVDDELSEXWS01");
+	}
+
+	@Test
+	void canvisDocsPermesos_senseTipusAPinbal_esMantenenElsDeRipea() {
+		Map<String, List<PinbalServeiDocPermesEnumDto>> ripea = new LinkedHashMap<>();
+		ripea.put("BUIT", Collections.singletonList(PinbalServeiDocPermesEnumDto.NIF));
+		ripea.put("NUL", Collections.singletonList(PinbalServeiDocPermesEnumDto.NIF));
+		ripea.put("NOMES_NO_CONTEMPLATS", Collections.singletonList(PinbalServeiDocPermesEnumDto.NIF));
+		ServeiBasic nul = servei("NUL", true, null);
+		nul.setDocumentsTipusPermesos(null);
+		List<ServeiBasic> pinbal = Arrays.asList(
+				serveiAmbDocs("BUIT"),
+				nul,
+				serveiAmbDocs("NOMES_NO_CONTEMPLATS", DocumentTipus.Otros));
+
+		assertThat(PinbalServeiUtils.canvisDocsPermesos(ripea, pinbal)).isEmpty();
+		assertThat(PinbalServeiUtils.canvisDocsPermesos(ripea, null)).isEmpty();
+		assertThat(PinbalServeiUtils.canvisDocsPermesos(null, pinbal)).isEmpty();
+	}
+
+	private static ServeiBasic serveiAmbDocs(String codi, DocumentTipus... docs) {
+		ServeiBasic servei = servei(codi, true, null);
+		servei.setDocumentsTipusPermesos(Arrays.asList(docs));
+		return servei;
 	}
 
 	private static Entitat entitat(String codi, String nom, String cif) {

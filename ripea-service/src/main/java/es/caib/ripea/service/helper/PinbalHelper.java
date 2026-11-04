@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,6 +101,7 @@ import es.caib.ripea.service.intf.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.IntegracioAccioTipusEnumDto;
+import es.caib.ripea.service.intf.dto.InteressatTipusEnumDto;
 import es.caib.ripea.service.intf.dto.MetaNodeDto;
 import es.caib.ripea.service.intf.dto.NtiOrigenEnumDto;
 import es.caib.ripea.service.intf.dto.PinbalConsentimentEnumDto;
@@ -110,6 +112,7 @@ import es.caib.ripea.service.intf.dto.SiNoEnumDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.PinbalException;
 import es.caib.ripea.service.intf.exception.ValidationException;
+import es.caib.ripea.service.intf.utils.PinbalTitularUtils;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -140,7 +143,8 @@ public class PinbalHelper {
 	@Autowired private ContingutHelper contingutHelper;
 	@Autowired private EntityComprovarHelper entityComprovarHelper;
 	@Autowired private DocumentHelper documentHelper;
-	
+	@Autowired private MessageHelper messageHelper;
+
 	@Autowired private EntitatRepository entitatRepository;
 	@Autowired private InteressatRepository interessatRepository;
 	@Autowired private DocumentRepository documentRepository;
@@ -199,6 +203,31 @@ public class PinbalHelper {
 						finalitat,
 						consentiment,
 						dadesEspecifiques));
+	}
+
+	/**
+	 * Comprova que el servei admet el tipus de document del titular (el mateix criteri que el filtre de titulars dels
+	 * formularis). Si no l'admet, PINBAL o l'emissor rebutjarien la petició amb un error d'esquema poc entenedor.
+	 */
+	private void comprovarTitularPermes(InteressatEntity interessat, PinbalServeiEntity pinbalServei) {
+		List<PinbalServeiDocPermesEnumDto> docsPermesos = pinbalServei.getPinbalServeiDocsPermesos();
+		InteressatTipusEnumDto tipus = interessat instanceof InteressatPersonaFisicaEntity
+				? InteressatTipusEnumDto.PERSONA_FISICA
+				: InteressatTipusEnumDto.PERSONA_JURIDICA;
+		if (!PinbalTitularUtils.isTitularPermes(tipus, interessat.getDocumentTipus(), docsPermesos)) {
+			String documentTitular = interessat.getDocumentTipus() != null
+					? messageHelper.getMessage("interessat.document.tipus.enum." + interessat.getDocumentTipus().name())
+					: "-";
+			String documentsAdmesos = docsPermesos.stream()
+					.map(doc -> messageHelper.getMessage("pinbal.servei.doc.permes.enum." + doc.name()))
+					.collect(Collectors.joining(", "));
+			throw new ValidationException(
+					"<creacio>",
+					DocumentEntity.class,
+					messageHelper.getMessage(
+							"pinbal.titular.document.no.permes",
+							new Object[] { pinbalServei.getCodi(), documentTitular, documentsAdmesos }));
+		}
 	}
 
 	/** Petició a PINBAL d'una consulta. */
@@ -263,6 +292,7 @@ public class PinbalHelper {
 					DocumentEntity.class,
 					"S'ha especificat un interessat que no és una persona física o juridica");
 		}
+		comprovarTitularPermes(interessat, metaDocument.getPinbalServei());
 
 		ConsultaPinbalEntity.ConsultaPinbalEntityBuilder consultaPinbalBuilder = ConsultaPinbalEntity.builder();
 		try {
@@ -1359,6 +1389,48 @@ public class PinbalHelper {
 			registrarMetrica(false, t0);
 			throw new PinbalException(ex, "getServeisPerEntitat");
 		}
+	}
+
+	/**
+	 * Consulta tots els serveis de PINBAL (API v2 de recobriment) amb els tipus de document permesos de cadascun. Els
+	 * tipus permesos són de la configuració del servei a PINBAL i no depenen de l'entitat.
+	 *
+	 * @return els serveis de PINBAL.
+	 * @throws PinbalException si la consulta falla.
+	 */
+	public List<ServeiBasic> getServeis() throws PinbalException {
+		long t0 = System.currentTimeMillis();
+		String accioDescripcio = "Consulta dels serveis";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		try {
+			List<ServeiBasic> serveis = getClientRecobriment(TIMEOUT_LECTURA_CONSULTA_MS).getServeis(true);
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_PINBAL,
+					accioDescripcio,
+					getPinbalEndpointName(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			registrarMetrica(true, t0);
+			return serveis;
+		} catch (Exception ex) {
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_PINBAL,
+					accioDescripcio,
+					getPinbalEndpointName(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					"Excepció en la consulta dels serveis a PINBAL",
+					ex);
+			registrarMetrica(false, t0);
+			throw new PinbalException(ex, "getServeis");
+		}
+	}
+
+	/** Si hi ha l'adreça de PINBAL configurada (la de l'entitat actual o, si no n'hi ha, la general). */
+	public boolean isPinbalConfigurat() {
+		return !Utils.isEmpty(getPinbalBaseUrl());
 	}
 
 	/** Longituds màximes de ProvinciaSolicitud i MunicipioSolicitud segons l'esquema SCSP de SCDCPAJU i SCDHPAJU */

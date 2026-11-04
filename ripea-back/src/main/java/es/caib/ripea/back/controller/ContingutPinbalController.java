@@ -11,6 +11,7 @@ import es.caib.ripea.service.intf.exception.PinbalException;
 import es.caib.ripea.service.intf.service.DocumentService;
 import es.caib.ripea.service.intf.service.ExpedientInteressatService;
 import es.caib.ripea.service.intf.service.MetaDocumentService;
+import es.caib.ripea.service.intf.utils.PinbalTitularUtils;
 import es.caib.ripea.service.intf.utils.Utils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -26,7 +27,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -209,53 +209,12 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 				pareId,
 				false);
 
-		if (pinbalServeiDocsPermesos != null && !pinbalServeiDocsPermesos.isEmpty()) {
-			Iterator<InteressatDto> itin = interessats.iterator();
-			while (itin.hasNext()) {
-				InteressatDto interessat = itin.next();
-				if (!isInteressatDocumentOk(interessat, pinbalServeiDocsPermesos)) {
-					itin.remove();
-				} 
-			};
-		}
+		// Mateix criteri que el filtre de titulars del formulari REACT i que la comprovació en fer la consulta
+		interessats.removeIf(interessat -> !PinbalTitularUtils.isTitularPermes(
+				interessat.getTipus(),
+				interessat.getDocumentTipus(),
+				pinbalServeiDocsPermesos));
 		return interessats;
-	}
-	
-	
-	private boolean isInteressatDocumentOk(InteressatDto interessat, List<PinbalServeiDocPermesEnumDto> pinbalServeiDocsPermesos) {
-		
-		if (interessat.getTipus() == InteressatTipusEnumDto.PERSONA_FISICA) {
-			
-			if (interessat.getDocumentTipus() == InteressatDocumentTipusEnumDto.NIF) {
-				if (pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.NIF) || pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.DNI)) {
-					return true;
-				} else {
-					return false;
-				}
-			} else if (interessat.getDocumentTipus() == InteressatDocumentTipusEnumDto.DOCUMENT_IDENTIFICATIU_ESTRANGERS) {
-				if (pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.NIE)) {
-					return true;
-				} else {
-					return false;
-				}
-			} else if (interessat.getDocumentTipus() == InteressatDocumentTipusEnumDto.PASSAPORT) {
-				if (pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.PASSAPORT)) {
-					return true;
-				} else {
-					return false;
-				}
-			} else
-				return false;
-
-		} else if (interessat.getTipus()==InteressatTipusEnumDto.PERSONA_JURIDICA) {
-			if (pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.NIF) || pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.CIF)) {
-				return true;
-			} else {
-				return false;
-			}
-		} else {
-			return false;
-		}
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(ContingutPinbalController.class); 

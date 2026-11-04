@@ -26,6 +26,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import es.caib.comanda.model.server.monitoring.Dimensio;
 import es.caib.comanda.model.server.monitoring.DimensioDesc;
@@ -35,6 +36,7 @@ import es.caib.comanda.model.server.monitoring.Format;
 import es.caib.comanda.model.server.monitoring.IndicadorDesc;
 import es.caib.comanda.model.server.monitoring.RegistreEstadistic;
 import es.caib.comanda.model.server.monitoring.RegistresEstadistics;
+import es.caib.pinbal.client.serveis.ServeiBasic;
 import es.caib.ripea.persistence.entity.ContingutEntity;
 import es.caib.ripea.persistence.entity.DocumentEntity;
 import es.caib.ripea.persistence.entity.EmailPendentEnviarEntity;
@@ -43,6 +45,7 @@ import es.caib.ripea.persistence.entity.ExpedientEntity;
 import es.caib.ripea.persistence.entity.ExplotacioDimensioEntity;
 import es.caib.ripea.persistence.entity.ExplotacioFetsEntity;
 import es.caib.ripea.persistence.entity.ExplotacioTempsEntity;
+import es.caib.ripea.persistence.entity.PinbalServeiEntity;
 import es.caib.ripea.persistence.entity.InteressatEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientComentariEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
@@ -60,6 +63,7 @@ import es.caib.ripea.persistence.repository.InteressatRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientComentariRepository;
 import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
+import es.caib.ripea.persistence.repository.PinbalServeiRepository;
 import es.caib.ripea.persistence.repository.UsuariRepository;
 import es.caib.ripea.service.config.SchedulingConfig;
 import es.caib.ripea.service.helper.AnotacioDistribucioHelper;
@@ -75,11 +79,14 @@ import es.caib.ripea.service.helper.ExpedientInteressatHelper;
 import es.caib.ripea.service.helper.ExpedientPeticioHelper;
 import es.caib.ripea.service.helper.MetaExpedientHelper;
 import es.caib.ripea.service.helper.OrganGestorHelper;
+import es.caib.ripea.service.helper.PinbalHelper;
+import es.caib.ripea.service.helper.PinbalServeiUtils;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.helper.SynchronizationHelper;
 import es.caib.ripea.service.helper.TestHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.PinbalServeiDocPermesEnumDto;
 import es.caib.ripea.service.intf.dto.EventTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientErrorTancamentDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto;
@@ -134,6 +141,9 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	@Autowired private AnotacioDistribucioHelper anotacioDistribucioHelper;
 	@Autowired private ApplicationHelper applicationHelper;
 	@Autowired private PluginHelper pluginHelper;
+	@Autowired private PinbalHelper pinbalHelper;
+	@Autowired private PinbalServeiRepository pinbalServeiRepository;
+	@Autowired private TransactionTemplate transactionTemplate;
 
     /*
 	 * Obtain registres from DISTRIBUCIO for created peticions and save them in DB
@@ -533,7 +543,87 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		
 		if (cacheHelper.mostrarLogsSegonPla())
 			logger.info("Fin de tasca periòdica: Consulta de canvis en l'organigrama :  " + (System.currentTimeMillis() - t1) + " ms");
-	} 
+	}
+
+	/**
+	 * Sense transacció: la consulta a PINBAL es fa fora de la transacció que actualitza els serveis.
+	 * Els tipus de document permesos són de la configuració global de cada servei a PINBAL (no depenen de l'entitat):
+	 * es consulta PINBAL amb la configuració general i, si no n'hi ha, amb la de la primera entitat que en tingui.
+	 */
+	@Override
+	public void actualitzarDocumentsPermesosPinbal() {
+		long t1 = System.currentTimeMillis();
+		if (cacheHelper.mostrarLogsSegonPla())
+			logger.info("Execució tasca periòdica: Actualitzar els tipus de document permesos dels serveis PINBAL");
+
+		if (Utils.isEmpty(configHelper.getConfig(PropertyConfig.PINBAL_DOCUMENTS_PERMESOS_CRON)))	// Tasca en segon pla no configurada
+			return;
+		if (pinbalServeiRepository.count() == 0)	// Cap servei PINBAL a RIPEA
+			return;
+		// El fil pot conservar l'entitat d'una altra tasca: es comença per la configuració general
+		ConfigHelper.setEntitat(null);
+		ConfigHelper.setOrganCodi(null);
+		try {
+			if (!seleccionarConfiguracioPinbal()) {
+				logger.info("No s'actualitzen els tipus de document permesos dels serveis PINBAL: no hi ha cap adreça de PINBAL configurada");
+				return;
+			}
+			List<ServeiBasic> serveisPinbal = pinbalHelper.getServeis();
+			List<String> canvis = transactionTemplate.execute(status -> aplicarDocumentsPermesosPinbal(serveisPinbal));
+			if (canvis == null || canvis.isEmpty()) {
+				logger.info("Tipus de document permesos dels serveis PINBAL: cap canvi");
+			} else {
+				logger.info("Tipus de document permesos dels serveis PINBAL actualitzats ({}): {}", canvis.size(), String.join("; ", canvis));
+			}
+		} finally {
+			ConfigHelper.setEntitat(null);
+		}
+
+		if (cacheHelper.mostrarLogsSegonPla())
+			logger.info("Fin de tasca periòdica: Actualitzar els tipus de document permesos dels serveis PINBAL :  " + (System.currentTimeMillis() - t1) + " ms");
+	}
+
+	/**
+	 * Deixa al fil la configuració de PINBAL amb què es farà la consulta: la general o, si no té l'adreça de PINBAL, la
+	 * de la primera entitat que la tingui.
+	 *
+	 * @return false si no hi ha cap adreça de PINBAL configurada.
+	 */
+	private boolean seleccionarConfiguracioPinbal() {
+		if (pinbalHelper.isPinbalConfigurat()) {
+			return true;
+		}
+		for (EntitatEntity entitat: entitatRepository.findAll()) {
+			ConfigHelper.setEntitat(conversioTipusHelper.convertir(entitat, EntitatDto.class));
+			if (pinbalHelper.isPinbalConfigurat()) {
+				return true;
+			}
+		}
+		ConfigHelper.setEntitat(null);
+		return false;
+	}
+
+	/**
+	 * Actualitza els tipus de document permesos dels serveis de RIPEA que no coincideixen amb els de PINBAL (veure
+	 * {@link PinbalServeiUtils#canvisDocsPermesos}).
+	 *
+	 * @return la descripció dels canvis, un per servei actualitzat.
+	 */
+	private List<String> aplicarDocumentsPermesosPinbal(List<ServeiBasic> serveisPinbal) {
+		List<PinbalServeiEntity> serveis = pinbalServeiRepository.findAll();
+		Map<String, List<PinbalServeiDocPermesEnumDto>> actuals = new LinkedHashMap<>();
+		serveis.forEach(servei -> actuals.putIfAbsent(servei.getCodi(), servei.getPinbalServeiDocsPermesos()));
+		Map<String, List<PinbalServeiDocPermesEnumDto>> nous = PinbalServeiUtils.canvisDocsPermesos(actuals, serveisPinbal);
+		List<String> canvis = new ArrayList<>();
+		for (PinbalServeiEntity servei: serveis) {
+			List<PinbalServeiDocPermesEnumDto> docsNous = nous.get(servei.getCodi());
+			if (docsNous != null) {
+				canvis.add(servei.getCodi() + ": " + servei.getPinbalServeiDocsPermesos() + " -> " + docsNous);
+				servei.update(docsNous);
+			}
+		}
+		return canvis;
+	}
 
 	@Override
 	@Transactional

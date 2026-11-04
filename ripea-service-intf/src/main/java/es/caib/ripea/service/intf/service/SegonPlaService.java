@@ -30,6 +30,12 @@ public interface SegonPlaService {
 	void actualitzarProcediments();
 
 	void consultaCanvisOrganigrama();
+
+	/**
+	 * Actualitza els tipus de document permesos dels serveis PINBAL de RIPEA amb els que tenen configurats a PINBAL.
+	 * Els serveis que PINBAL no torna o pels quals no torna cap tipus permès no es modifiquen.
+	 */
+	void actualitzarDocumentsPermesosPinbal();
 	
 	void reintentarCanviEstatDistribucio();
 

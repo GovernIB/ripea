@@ -39,7 +39,9 @@ import com.turkraft.springfilter.parser.Filter;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.InteressatEntity;
+import es.caib.ripea.persistence.entity.MetaDocumentEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
+import es.caib.ripea.persistence.entity.PinbalServeiEntity;
 import es.caib.ripea.persistence.entity.resourceentity.InteressatGrupResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.InteressatResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.InteressatGrupResourceRepository;
@@ -47,6 +49,7 @@ import es.caib.ripea.persistence.entity.resourcerepository.InteressatResourceRep
 import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.persistence.repository.ExecucioMassivaContingutRepository;
 import es.caib.ripea.persistence.repository.InteressatRepository;
+import es.caib.ripea.persistence.repository.MetaDocumentRepository;
 import es.caib.ripea.plugin.dadesext.Municipi;
 import es.caib.ripea.plugin.dadesext.Pais;
 import es.caib.ripea.plugin.dadesext.Provincia;
@@ -87,6 +90,7 @@ import es.caib.ripea.service.intf.dto.InteressatTipusEnum;
 import es.caib.ripea.service.intf.dto.MunicipiDto;
 import es.caib.ripea.service.intf.dto.NivellAdministracioDto;
 import es.caib.ripea.service.intf.dto.PaisDto;
+import es.caib.ripea.service.intf.dto.PinbalServeiDocPermesEnumDto;
 import es.caib.ripea.service.intf.dto.ProvinciaDto;
 import es.caib.ripea.service.intf.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.service.intf.model.ContingutResource;
@@ -97,6 +101,7 @@ import es.caib.ripea.service.intf.model.InteressatResource;
 import es.caib.ripea.service.intf.model.InteressatResource.UnitatOrganitzativaFormFilter;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.resourceservice.InteressatResourceService;
+import es.caib.ripea.service.intf.utils.PinbalTitularUtils;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.resourcehelper.InteressatResourceHelper;
 import es.caib.ripea.service.resourcehelper.PerspectivesLotHelper;
@@ -126,6 +131,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     private final InteressatRepository interessatRepository;
     private final InteressatResourceRepository interessatResourceRepository;
     private final InteressatGrupResourceRepository interessatGrupResourceRepository;
+    private final MetaDocumentRepository metaDocumentRepository;
     private final SmartValidator validator;
 
     @PostConstruct
@@ -156,6 +162,45 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         register(InteressatResource.FILTER_CODE, new FilterOnchangeLogicProcessor());
     }
 
+    /**
+     * Interessats que poden ser el titular d'una consulta al servei PINBAL del tipus de document: els que tenen un tipus
+     * de document que el servei admet (el mateix criteri que el formulari JSP i que la comprovació en fer la consulta).
+     *
+     * @return el filtre, o null si el servei no restringeix el titular.
+     */
+    private Filter filtreTitularsPinbal(String metaDocumentId) {
+        Long id;
+        try {
+            id = Long.valueOf(metaDocumentId);
+        } catch (NumberFormatException | NullPointerException ex) {
+            return null;
+        }
+        PinbalServeiEntity servei = metaDocumentRepository.findById(id).map(MetaDocumentEntity::getPinbalServei).orElse(null);
+        List<PinbalServeiDocPermesEnumDto> docsPermesos = servei != null ? servei.getPinbalServeiDocsPermesos() : null;
+        if (docsPermesos == null || docsPermesos.isEmpty()) {
+            return null;
+        }
+        Filter filtre = null;
+        Filter documentsPersonaFisica = null;
+        for (InteressatDocumentTipusEnumDto documentTipus: PinbalTitularUtils.documentsPersonaFisicaPermesos(docsPermesos)) {
+            documentsPersonaFisica = FilterBuilder.or(
+                    documentsPersonaFisica,
+                    FilterBuilder.equal(InteressatResource.Fields.documentTipus, documentTipus.name()));
+        }
+        if (documentsPersonaFisica != null) {
+            filtre = FilterBuilder.and(
+                    FilterBuilder.equal(InteressatResource.Fields.tipus, InteressatTipusEnum.InteressatPersonaFisicaEntity.name()),
+                    documentsPersonaFisica);
+        }
+        if (PinbalTitularUtils.isPersonaJuridicaPermesa(docsPermesos)) {
+            filtre = FilterBuilder.or(
+                    filtre,
+                    FilterBuilder.equal(InteressatResource.Fields.tipus, InteressatTipusEnum.InteressatPersonaJuridicaEntity.name()));
+        }
+        // Sense cap combinació admesa no s'ha de mostrar cap interessat
+        return filtre != null ? filtre : Filter.parse("id IN (-1)");
+    }
+
     @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
 
@@ -170,6 +215,12 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
         );
         
         Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
+        // Titulars d'una consulta PINBAL: no és una acció massiva, no necessita els permisos de la resta de consultes
+        if (mapaNamedQueries.containsKey(InteressatResource.NAMED_QUERY_PINBAL_TITULAR)) {
+            filtreBase = FilterBuilder.and(
+                    filtreBase,
+                    filtreTitularsPinbal(mapaNamedQueries.remove(InteressatResource.NAMED_QUERY_PINBAL_TITULAR)));
+        }
     	if (mapaNamedQueries.size()>0) {
     		
     		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitat.getId(), rolActual);
