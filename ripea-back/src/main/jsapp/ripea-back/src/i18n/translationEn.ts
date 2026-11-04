@@ -962,6 +962,30 @@ const translationEn = {
                     formulari: {
                         carregant: "Loading the PINBAL service specific data...",
                         error: "The PINBAL service specific data could not be retrieved",
+                        validacio: {
+                            EXPRESSIO_REGULAR: "The value does not have the format expected by the service.",
+                            NUM_RANG: "Whole number between {{minim}} and {{maxim}}.",
+                            NUM_MINIM: "Whole number equal to or greater than {{minim}}.",
+                            NUM_MAXIM: "Whole number equal to or less than {{maxim}}.",
+                            DATA_COMPARACIO: {
+                                LT: "Must be earlier than “{{camp}}”.",
+                                LTE: "Must be the same as or earlier than “{{camp}}”.",
+                                GT: "Must be later than “{{camp}}”.",
+                                GTE: "Must be the same as or later than “{{camp}}”.",
+                                EQ: "Must be the same as “{{camp}}”.",
+                                NEQ: "Must be different from “{{camp}}”.",
+                            },
+                            DATA_DIFERENCIA: {
+                                LT: "The difference from “{{camp}}” must be less than {{durada}}.",
+                                LTE: "The difference from “{{camp}}” must be at most {{durada}}.",
+                                GT: "The difference from “{{camp}}” must be more than {{durada}}.",
+                                GTE: "The difference from “{{camp}}” must be at least {{durada}}.",
+                                EQ: "The difference from “{{camp}}” must be exactly {{durada}}.",
+                                NEQ: "The difference from “{{camp}}” cannot be {{durada}}.",
+                            },
+                            unitatSingular: {DIES: "{{n}} day", MESOS: "{{n}} month", ANYS: "{{n}} year"},
+                            unitatPlural: {DIES: "{{n}} days", MESOS: "{{n}} months", ANYS: "{{n}} years"},
+                        },
                     },
                 },
 				import: {

@@ -11,6 +11,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -33,6 +34,10 @@ import es.caib.ripea.service.intf.dto.PinbalFormulariDto;
 import es.caib.ripea.service.intf.dto.PinbalFormulariDto.Camp;
 import es.caib.ripea.service.intf.dto.PinbalFormulariDto.CampTipus;
 import es.caib.ripea.service.intf.dto.PinbalFormulariDto.Seccio;
+import es.caib.ripea.service.intf.dto.PinbalFormulariDto.Validacio;
+import es.caib.ripea.service.intf.dto.PinbalFormulariDto.ValidacioOperacio;
+import es.caib.ripea.service.intf.dto.PinbalFormulariDto.ValidacioTipus;
+import es.caib.ripea.service.intf.dto.PinbalFormulariDto.ValidacioUnitat;
 
 /**
  * Funcions sense estat per al formulari dinàmic de consulta PINBAL: construcció del formulari a partir de les dades
@@ -62,6 +67,8 @@ public final class PinbalFormulariUtils {
 	private static final Pattern DATA_ISO = Pattern.compile("^(\\d{4}-\\d{2}-\\d{2})(T.*)?$");
 	/** Clau d'un error de validació de PINBAL sobre una dada específica: ...dadesEspecifiques[path]. */
 	private static final Pattern ERROR_DADA_ESPECIFICA = Pattern.compile("dadesEspecifiques\\[(.+)]$");
+	/** Durada d'una validació DATA_DIFERENCIA tal com la dona l'API de PINBAL: "6 MESOS" (la unitat és opcional). */
+	private static final Pattern DIFERENCIA = Pattern.compile("^\\s*(\\d+)\\s*([a-zA-Z]+)?\\s*$");
 
 	private static final Set<String> BOOLEA_CERT = Set.of("true", "on", "si", "sí", "s", "yes", "1");
 	private static final Set<String> BOOLEA_FALS = Set.of("false", "off", "no", "n", "0");
@@ -348,6 +355,9 @@ public final class PinbalFormulariUtils {
 		camp.setObligatori(dada.isObligatori());
 		camp.setModificable(dada.isModificable());
 		camp.setValorInicial(valorInicial(dada, tipus));
+		if (dada.isModificable()) {
+			camp.setValidacio(validacio(dada, tipus, dadesPerCodi, codisVisibles));
+		}
 		if (tipus == CampTipus.MUNICIPI_3 || tipus == CampTipus.MUNICIPI_5) {
 			String campProvincia = senseBlancs(dada.getCampCondicionant());
 			if (campProvincia != null && codisVisibles.contains(campProvincia)) {
@@ -364,6 +374,96 @@ public final class PinbalFormulariUtils {
 			}
 		}
 		return camp;
+	}
+
+	/**
+	 * Validació del camp per al formulari, a partir de la de PINBAL. No se'n torna cap (PINBAL la seguirà aplicant en
+	 * rebre la petició) si no correspon al tipus del camp, si li falta alguna dada o si el camp amb què es compara una
+	 * data no és al formulari: el formulari no pot fer referència a un camp que l'usuari no veu.
+	 */
+	static Validacio validacio(
+			DadaEspecifica dada,
+			CampTipus tipus,
+			Map<String, DadaEspecifica> dadesPerCodi,
+			Set<String> codisVisibles) {
+		es.caib.pinbal.client.recobriment.v2.Validacio validacioPinbal = dada.getValidacio();
+		if (validacioPinbal == null || validacioPinbal.getTipus() == null) {
+			return null;
+		}
+		// Un tipus o una operació que RIPEA no coneix (d'una versió més nova de PINBAL) no s'han de mostrar
+		ValidacioTipus validacioTipus = valorEnum(ValidacioTipus.class, validacioPinbal.getTipus().name());
+		if (validacioTipus == null) {
+			return null;
+		}
+		Validacio validacio = new Validacio();
+		validacio.setTipus(validacioTipus);
+		switch (validacioTipus) {
+		case EXPRESSIO_REGULAR:
+			// Sense retallar: els espais poden formar part de l'expressió
+			String expressio = validacioPinbal.getRegexp();
+			if (tipus != CampTipus.TEXT || expressio == null || expressio.isEmpty()) {
+				return null;
+			}
+			validacio.setExpressioRegular(expressio);
+			return validacio;
+		case NUM_MINIM:
+		case NUM_MAXIM:
+		case NUM_RANG:
+			boolean ambMinim = validacioTipus != ValidacioTipus.NUM_MAXIM;
+			boolean ambMaxim = validacioTipus != ValidacioTipus.NUM_MINIM;
+			if (tipus != CampTipus.NUMERIC
+					|| (ambMinim && validacioPinbal.getMin() == null)
+					|| (ambMaxim && validacioPinbal.getMax() == null)) {
+				return null;
+			}
+			validacio.setMinim(ambMinim ? validacioPinbal.getMin() : null);
+			validacio.setMaxim(ambMaxim ? validacioPinbal.getMax() : null);
+			return validacio;
+		case DATA_COMPARACIO:
+		case DATA_DIFERENCIA:
+			String campComparacio = senseBlancs(validacioPinbal.getCampComparacio());
+			DadaEspecifica dadaComparacio = campComparacio != null ? dadesPerCodi.get(campComparacio) : null;
+			ValidacioOperacio operacio = validacioPinbal.getOperacio() != null
+					? valorEnum(ValidacioOperacio.class, validacioPinbal.getOperacio().name())
+					: null;
+			if (tipus != CampTipus.DATA
+					|| operacio == null
+					|| dadaComparacio == null
+					|| !codisVisibles.contains(campComparacio)) {
+				return null;
+			}
+			validacio.setOperacio(operacio);
+			validacio.setCampComparacio(campComparacio);
+			validacio.setCampComparacioText(textCamp(dadaComparacio));
+			if (validacioTipus == ValidacioTipus.DATA_DIFERENCIA) {
+				Matcher diferencia = DIFERENCIA.matcher(validacioPinbal.getDiferencia() != null ? validacioPinbal.getDiferencia() : "");
+				if (!diferencia.matches()) {
+					return null;
+				}
+				try {
+					validacio.setDiferencia(Integer.valueOf(diferencia.group(1)));
+					// Sense unitat, PINBAL la considera en dies
+					validacio.setUnitat(diferencia.group(2) != null
+							? ValidacioUnitat.valueOf(diferencia.group(2).toUpperCase(Locale.ROOT))
+							: ValidacioUnitat.DIES);
+				} catch (IllegalArgumentException ex) {
+					// Nombre massa gran o unitat desconeguda
+					return null;
+				}
+			}
+			return validacio;
+		default:
+			return null;
+		}
+	}
+
+	/** Constant de l'enumeració amb aquest nom o null si no n'hi ha cap. */
+	private static <E extends Enum<E>> E valorEnum(Class<E> enumClass, String nom) {
+		try {
+			return Enum.valueOf(enumClass, nom);
+		} catch (IllegalArgumentException ex) {
+			return null;
+		}
 	}
 
 	/** Valor inicial del camp al formulari, en el format del component del formulari. */

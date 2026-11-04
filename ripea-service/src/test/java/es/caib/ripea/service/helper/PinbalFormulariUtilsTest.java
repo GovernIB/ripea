@@ -18,6 +18,9 @@ import es.caib.pinbal.client.recobriment.v2.DadaEspecifica.EnumTipus;
 import es.caib.pinbal.client.recobriment.v2.DadaTipusEnum;
 import es.caib.pinbal.client.recobriment.v2.GrupDadesEspecifiques;
 import es.caib.pinbal.client.recobriment.v2.PeticioRespostaSincrona;
+import es.caib.pinbal.client.recobriment.v2.Validacio;
+import es.caib.pinbal.client.recobriment.v2.Validacio.ValidacioOperacio;
+import es.caib.pinbal.client.recobriment.v2.Validacio.ValidacioTipus;
 import es.caib.ripea.service.intf.dto.PinbalFormulariDto;
 import es.caib.ripea.service.intf.dto.PinbalFormulariDto.Camp;
 import es.caib.ripea.service.intf.dto.PinbalFormulariDto.CampTipus;
@@ -349,6 +352,118 @@ class PinbalFormulariUtilsTest {
 		assertThat(PinbalFormulariUtils.parseData("31/02/2026", null)).isNull();
 		assertThat(PinbalFormulariUtils.parseData("no és una data", null)).isNull();
 		assertThat(PinbalFormulariUtils.parseData(" ", null)).isNull();
+	}
+
+	@Test
+	void construirFormulari_validacionsNumeriques() {
+		DadaEspecifica rang = validat(dada(PATH + "rang", DadaTipusEnum.NUMERIC), Validacio.builder()
+				.tipus(ValidacioTipus.NUM_RANG).min(1).max(99).build());
+		DadaEspecifica minim = validat(dada(PATH + "minim", DadaTipusEnum.NUMERIC), Validacio.builder()
+				.tipus(ValidacioTipus.NUM_MINIM).min(18).build());
+		DadaEspecifica maxim = validat(dada(PATH + "maxim", DadaTipusEnum.NUMERIC), Validacio.builder()
+				.tipus(ValidacioTipus.NUM_MAXIM).max(5).build());
+		DadaEspecifica rangSenseMaxim = validat(dada(PATH + "rangSenseMaxim", DadaTipusEnum.NUMERIC), Validacio.builder()
+				.tipus(ValidacioTipus.NUM_RANG).min(1).build());
+
+		Map<String, Camp> camps = camps(PinbalFormulariUtils.construirFormulari(
+				"SVD", Arrays.asList(rang, minim, maxim, rangSenseMaxim), null));
+
+		assertThat(camps.get(PATH + "rang").getValidacio())
+				.extracting("tipus", "minim", "maxim")
+				.containsExactly(PinbalFormulariDto.ValidacioTipus.NUM_RANG, 1, 99);
+		assertThat(camps.get(PATH + "minim").getValidacio())
+				.extracting("tipus", "minim", "maxim")
+				.containsExactly(PinbalFormulariDto.ValidacioTipus.NUM_MINIM, 18, null);
+		assertThat(camps.get(PATH + "maxim").getValidacio())
+				.extracting("tipus", "minim", "maxim")
+				.containsExactly(PinbalFormulariDto.ValidacioTipus.NUM_MAXIM, null, 5);
+		assertThat(camps.get(PATH + "rangSenseMaxim").getValidacio()).isNull();
+	}
+
+	@Test
+	void construirFormulari_expressioRegularNomesAlsCampsDeText() {
+		DadaEspecifica text = validat(dada(PATH + "text", DadaTipusEnum.TEXT), Validacio.builder()
+				.tipus(ValidacioTipus.EXPRESSIO_REGULAR).regexp("[0-9]{5}").build());
+		DadaEspecifica document = validat(dada(PATH + "document", DadaTipusEnum.DOC_IDENTITAT), Validacio.builder()
+				.tipus(ValidacioTipus.EXPRESSIO_REGULAR).regexp("[0-9]{8}[A-Z]").build());
+
+		Map<String, Camp> camps = camps(PinbalFormulariUtils.construirFormulari("SVD", Arrays.asList(text, document), null));
+
+		assertThat(camps.get(PATH + "text").getValidacio())
+				.extracting("tipus", "expressioRegular")
+				.containsExactly(PinbalFormulariDto.ValidacioTipus.EXPRESSIO_REGULAR, "[0-9]{5}");
+		assertThat(camps.get(PATH + "document").getValidacio()).isNull();
+	}
+
+	@Test
+	void construirFormulari_comparacioDeDatesAmbElTextDelCampDeReferencia() {
+		DadaEspecifica naixement = dada(PATH + "naixement", DadaTipusEnum.DATE);
+		naixement.setEtiqueta("Data de naixement");
+		DadaEspecifica oculta = dada(PATH + "oculta", DadaTipusEnum.DATE);
+		oculta.setVisible(false);
+		DadaEspecifica anterior = validat(dada(PATH + "anterior", DadaTipusEnum.DATE), Validacio.builder()
+				.tipus(ValidacioTipus.DATA_COMPARACIO).operacio(ValidacioOperacio.GT).campComparacio(PATH + "naixement").build());
+		DadaEspecifica ambOculta = validat(dada(PATH + "ambOculta", DadaTipusEnum.DATE), Validacio.builder()
+				.tipus(ValidacioTipus.DATA_COMPARACIO).operacio(ValidacioOperacio.LT).campComparacio(PATH + "oculta").build());
+		DadaEspecifica noModificable = validat(dada(PATH + "noModificable", DadaTipusEnum.DATE), Validacio.builder()
+				.tipus(ValidacioTipus.DATA_COMPARACIO).operacio(ValidacioOperacio.LT).campComparacio(PATH + "naixement").build());
+		noModificable.setModificable(false);
+
+		Map<String, Camp> camps = camps(PinbalFormulariUtils.construirFormulari(
+				"SVD", Arrays.asList(naixement, oculta, anterior, ambOculta, noModificable), null));
+
+		assertThat(camps.get(PATH + "anterior").getValidacio())
+				.extracting("tipus", "operacio", "campComparacio", "campComparacioText")
+				.containsExactly(
+						PinbalFormulariDto.ValidacioTipus.DATA_COMPARACIO,
+						PinbalFormulariDto.ValidacioOperacio.GT,
+						PATH + "naixement",
+						"Data de naixement");
+		// El camp de referència no és al formulari
+		assertThat(camps.get(PATH + "ambOculta").getValidacio()).isNull();
+		// L'usuari no pot canviar el valor
+		assertThat(camps.get(PATH + "noModificable").getValidacio()).isNull();
+	}
+
+	@Test
+	void construirFormulari_diferenciaDeDatesAmbDuradaIUnitat() {
+		DadaEspecifica inici = dada(PATH + "inici", DadaTipusEnum.DATE);
+		DadaEspecifica mesos = validat(dada(PATH + "mesos", DadaTipusEnum.DATE), diferencia("6 MESOS"));
+		DadaEspecifica senseUnitat = validat(dada(PATH + "senseUnitat", DadaTipusEnum.DATE), diferencia("15"));
+		DadaEspecifica unitatDesconeguda = validat(dada(PATH + "unitatDesconeguda", DadaTipusEnum.DATE), diferencia("2 SETMANES"));
+		DadaEspecifica senseDurada = validat(dada(PATH + "senseDurada", DadaTipusEnum.DATE), diferencia(null));
+
+		Map<String, Camp> camps = camps(PinbalFormulariUtils.construirFormulari(
+				"SVD", Arrays.asList(inici, mesos, senseUnitat, unitatDesconeguda, senseDurada), null));
+
+		assertThat(camps.get(PATH + "mesos").getValidacio())
+				.extracting("tipus", "operacio", "campComparacioText", "diferencia", "unitat")
+				.containsExactly(
+						PinbalFormulariDto.ValidacioTipus.DATA_DIFERENCIA,
+						PinbalFormulariDto.ValidacioOperacio.LTE,
+						"inici",
+						6,
+						PinbalFormulariDto.ValidacioUnitat.MESOS);
+		// Sense unitat, PINBAL la considera en dies
+		assertThat(camps.get(PATH + "senseUnitat").getValidacio())
+				.extracting("diferencia", "unitat")
+				.containsExactly(15, PinbalFormulariDto.ValidacioUnitat.DIES);
+		assertThat(camps.get(PATH + "unitatDesconeguda").getValidacio()).isNull();
+		assertThat(camps.get(PATH + "senseDurada").getValidacio()).isNull();
+	}
+
+	private static DadaEspecifica validat(DadaEspecifica dada, Validacio validacio) {
+		dada.setValidacio(validacio);
+		return dada;
+	}
+
+	private static Validacio diferencia(String diferencia) {
+		return Validacio.builder()
+				.tipus(ValidacioTipus.DATA_DIFERENCIA)
+				.operacio(ValidacioOperacio.LTE)
+				.campComparacio(PATH + "inici")
+				.diferencia(diferencia)
+				.build();
 	}
 
 	private static DadaEspecifica dada(String codi, DadaTipusEnum tipus) {

@@ -48,6 +48,39 @@ public class PinbalFormulariDto implements Serializable {
 		ADJUNT
 	}
 
+	/** Tipus de validació d'un camp a PINBAL (Validacio de l'API v2): només n'hi ha per a camps TEXT, NUMERIC i DATA. */
+	public enum ValidacioTipus {
+		/** El valor sencer ha de coincidir amb l'expressió regular (camps TEXT). */
+		EXPRESSIO_REGULAR,
+		/** Nombre enter igual o superior al mínim (camps NUMERIC). */
+		NUM_MINIM,
+		/** Nombre enter igual o inferior al màxim (camps NUMERIC). */
+		NUM_MAXIM,
+		/** Nombre enter entre el mínim i el màxim (camps NUMERIC). */
+		NUM_RANG,
+		/** Comparació de la data amb la d'un altre camp (camps DATA). */
+		DATA_COMPARACIO,
+		/** Comparació de la diferència entre la data i la d'un altre camp amb una durada (camps DATA). */
+		DATA_DIFERENCIA
+	}
+
+	/** Operació de les validacions de dates: aquest camp (o la diferència) respecte de l'altre (o la durada). */
+	public enum ValidacioOperacio {
+		LT,
+		LTE,
+		GT,
+		GTE,
+		EQ,
+		NEQ
+	}
+
+	/** Unitat de la durada de les validacions DATA_DIFERENCIA. */
+	public enum ValidacioUnitat {
+		DIES,
+		MESOS,
+		ANYS
+	}
+
 	@Getter
 	@Setter
 	@NoArgsConstructor
@@ -84,6 +117,35 @@ public class PinbalFormulariDto implements Serializable {
 		private String campProvincia;
 		/** Per als municipis sense camp de província al formulari: la província de la qual s'han de carregar. */
 		private String provincia;
+		/**
+		 * Validació del camp a PINBAL, per mostrar la restricció i comprovar el valor al formulari. Només per als camps
+		 * modificables; PINBAL torna a validar la petició.
+		 */
+		private Validacio validacio;
+	}
+
+	/**
+	 * Validació d'un camp. Només s'informen les propietats del tipus de validació: expressioRegular (EXPRESSIO_REGULAR);
+	 * minim i/o maxim (NUM_*); operacio, campComparacio i campComparacioText (DATA_*); diferencia i unitat
+	 * (DATA_DIFERENCIA).
+	 */
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	public static class Validacio implements Serializable {
+		private static final long serialVersionUID = 1L;
+		private ValidacioTipus tipus;
+		/** Expressió regular de Java que ha de complir el valor sencer. */
+		private String expressioRegular;
+		private Integer minim;
+		private Integer maxim;
+		private ValidacioOperacio operacio;
+		/** Codi (path) del camp amb què es compara la data: sempre és un camp visible del formulari. */
+		private String campComparacio;
+		/** Text del camp amb què es compara la data. */
+		private String campComparacioText;
+		private Integer diferencia;
+		private ValidacioUnitat unitat;
 	}
 
 }

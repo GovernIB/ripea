@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useRef, useState} from "react";
+import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {useMuiFormDialogApiRef, useBaseAppContext, useFormContext, useResourceApiService} from "reactlib";
 import {Alert, Box, CircularProgress, Grid, Typography} from "@mui/material";
 import GridFormField, {GridButton} from "../../../components/GridFormField.tsx";
@@ -34,6 +34,21 @@ type CampPinbal = {
     campProvincia?: string,
     /** Municipis sense camp de província: la província */
     provincia?: string,
+    /** Validació del camp a PINBAL (només camps modificables de text, numèrics i de data) */
+    validacio?: ValidacioPinbal,
+};
+type ValidacioPinbal = {
+    tipus: 'EXPRESSIO_REGULAR' | 'NUM_MINIM' | 'NUM_MAXIM' | 'NUM_RANG' | 'DATA_COMPARACIO' | 'DATA_DIFERENCIA',
+    /** Expressió regular de Java que ha de complir el valor sencer */
+    expressioRegular?: string,
+    minim?: number,
+    maxim?: number,
+    /** Dates: aquest camp (o la diferència amb l'altre) respecte de l'altre camp (o la durada) */
+    operacio?: 'LT' | 'LTE' | 'GT' | 'GTE' | 'EQ' | 'NEQ',
+    campComparacio?: string,
+    campComparacioText?: string,
+    diferencia?: number,
+    unitat?: 'DIES' | 'MESOS' | 'ANYS',
 };
 type SeccioPinbal = {
     codi?: string,
@@ -71,6 +86,98 @@ const teCamps = (seccio?: SeccioPinbal): boolean =>
 const valorInicialCamp = (camp: CampPinbal) =>
     camp.tipus === 'BOOLEA' ? camp.valorInicial === 'true' : (camp.valorInicial ?? null);
 
+const CLAU_VALIDACIO = 'page.document.action.pinbal.formulari.validacio';
+type Traduccio = ReturnType<typeof useTranslation>['t'];
+
+const esBuit = (valor: any) => valor == null || String(valor).trim() === '';
+
+/**
+ * Restricció de la validació de PINBAL que es mostra sota el camp. La de l'expressió regular no es mostra: no diu res
+ * a l'usuari, i el comentari del camp sol explicar el format.
+ */
+const textRestriccio = (validacio: ValidacioPinbal | undefined, t: Traduccio): string | undefined => {
+    switch (validacio?.tipus) {
+        case 'NUM_RANG':
+        case 'NUM_MINIM':
+        case 'NUM_MAXIM':
+            return t(`${CLAU_VALIDACIO}.${validacio.tipus}`, {minim: validacio.minim, maxim: validacio.maxim});
+        case 'DATA_COMPARACIO':
+            return t(`${CLAU_VALIDACIO}.DATA_COMPARACIO.${validacio.operacio}`, {camp: validacio.campComparacioText});
+        case 'DATA_DIFERENCIA': {
+            const unitat = validacio.diferencia === 1 ? 'unitatSingular' : 'unitatPlural';
+            const durada = t(`${CLAU_VALIDACIO}.${unitat}.${validacio.unitat}`, {n: validacio.diferencia});
+            return t(`${CLAU_VALIDACIO}.DATA_DIFERENCIA.${validacio.operacio}`, {camp: validacio.campComparacioText, durada});
+        }
+        default:
+            return undefined;
+    }
+}
+
+/**
+ * Comprovació del valor al formulari, només de l'expressió regular i dels límits numèrics (les de dates depenen d'un
+ * altre camp): torna el missatge d'error o undefined. Un camp buit no es comprova (l'obligatorietat va a part).
+ */
+const crearComprovacio = (validacio: ValidacioPinbal | undefined, t: Traduccio): ((valor: any) => string | undefined) | undefined => {
+    if (validacio?.tipus === 'EXPRESSIO_REGULAR' && validacio.expressioRegular) {
+        let expressio: RegExp;
+        try {
+            // PINBAL exigeix que el valor sencer compleixi l'expressió (matches de Java)
+            expressio = new RegExp(`^(?:${validacio.expressioRegular})$`);
+        } catch {
+            // Expressió de Java que JavaScript no sap interpretar: només la comprova PINBAL
+            return undefined;
+        }
+        const missatge = t(`${CLAU_VALIDACIO}.EXPRESSIO_REGULAR`);
+        return (valor) => esBuit(valor) || expressio.test(String(valor)) ? undefined : missatge;
+    }
+    if (validacio?.tipus === 'NUM_RANG' || validacio?.tipus === 'NUM_MINIM' || validacio?.tipus === 'NUM_MAXIM') {
+        const missatge = textRestriccio(validacio, t);
+        return (valor) => {
+            if (esBuit(valor)) {
+                return undefined;
+            }
+            const text = String(valor).trim();
+            // PINBAL el converteix amb Integer.valueOf: un decimal no és vàlid
+            if (!/^[-+]?\d+$/.test(text)) {
+                return missatge;
+            }
+            const nombre = Number(text);
+            const foraDeLimits = (validacio.minim != null && nombre < validacio.minim)
+                || (validacio.maxim != null && nombre > validacio.maxim);
+            return foraDeLimits ? missatge : undefined;
+        };
+    }
+    return undefined;
+}
+
+/**
+ * Validació de PINBAL al camp: el text d'ajuda (comentari i restricció) i la comprovació del valor quan canvia.
+ * L'error es posa des de l'onChange i no amb la propietat validator de GridFormField, que amb error no desa el valor:
+ * la comprovació del formulari no impedeix enviar-lo (els formularis d'acció no ho fan), perquè qui decideix és PINBAL.
+ */
+const useValidacioCamp = (camp: CampPinbal, name: string) => {
+    const {t} = useTranslation();
+    const {validationSetFieldErrors} = useFormContext();
+    const helperText = useMemo(
+        () => [camp.comentari, textRestriccio(camp.validacio, t)].filter(Boolean).join(' ') || undefined,
+        [camp, t]);
+    const comprovacio = useMemo(() => crearComprovacio(camp.validacio, t), [camp, t]);
+
+    // GridFormField es queda amb el primer onChange: la comprovació i el context es llegeixen de referències
+    const comprovacioRef = useRef(comprovacio);
+    comprovacioRef.current = comprovacio;
+    const setFieldErrorsRef = useRef(validationSetFieldErrors);
+    setFieldErrorsRef.current = validationSetFieldErrors;
+    const onChange = useCallback((valor: any) => {
+        const missatge = comprovacioRef.current?.(valor);
+        setFieldErrorsRef.current?.(name, missatge ? [{field: name, message: missatge}] : undefined);
+    }, [name]);
+    // En canviar de servei el camp desapareix: el seu error no s'ha de quedar al formulari
+    useEffect(() => () => setFieldErrorsRef.current?.(name, undefined), [name]);
+
+    return {helperText, onChange: comprovacio ? onChange : undefined};
+}
+
 const CampEtiquetaPinbal = ({camp}: {camp: CampPinbal}) =>
     <Grid size={12}>
         <Typography variant="body2" sx={{whiteSpace: 'pre-line'}}>{camp.comentari}</Typography>
@@ -79,14 +186,15 @@ const CampEtiquetaPinbal = ({camp}: {camp: CampPinbal}) =>
 const CampSimplePinbal = ({camp}: {camp: CampPinbal}) => {
     const name = nomCamp(camp.codi);
     const type = TIPUS_COMPONENT[camp.tipus] ?? 'text';
+    const {helperText, onChange} = useValidacioCamp(camp, name);
     // Definició del camp, que no existeix al formulari del servidor
     const field = useMemo(() => ({
         name,
         type,
         label: camp.text,
         required: camp.obligatori,
-        helperText: camp.comentari,
-    }), [name, type, camp]);
+        helperText,
+    }), [name, type, camp, helperText]);
 
     return <GridFormField
         name={name}
@@ -95,6 +203,7 @@ const CampSimplePinbal = ({camp}: {camp: CampPinbal}) => {
         field={field}
         required={camp.obligatori}
         disabled={!camp.modificable}
+        onChange={onChange}
     />
 }
 

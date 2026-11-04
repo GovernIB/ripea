@@ -964,6 +964,30 @@ const translationCa = {
                     formulari: {
                         carregant: "Carregant les dades específiques del servei PINBAL...",
                         error: "No s'han pogut obtenir les dades específiques del servei PINBAL",
+                        validacio: {
+                            EXPRESSIO_REGULAR: "El valor no té el format esperat pel servei.",
+                            NUM_RANG: "Nombre enter entre {{minim}} i {{maxim}}.",
+                            NUM_MINIM: "Nombre enter igual o superior a {{minim}}.",
+                            NUM_MAXIM: "Nombre enter igual o inferior a {{maxim}}.",
+                            DATA_COMPARACIO: {
+                                LT: "Ha de ser anterior a «{{camp}}».",
+                                LTE: "Ha de ser igual o anterior a «{{camp}}».",
+                                GT: "Ha de ser posterior a «{{camp}}».",
+                                GTE: "Ha de ser igual o posterior a «{{camp}}».",
+                                EQ: "Ha de coincidir amb «{{camp}}».",
+                                NEQ: "Ha de ser diferent de «{{camp}}».",
+                            },
+                            DATA_DIFERENCIA: {
+                                LT: "La diferència amb «{{camp}}» ha de ser inferior a {{durada}}.",
+                                LTE: "La diferència amb «{{camp}}» ha de ser com a màxim de {{durada}}.",
+                                GT: "La diferència amb «{{camp}}» ha de ser superior a {{durada}}.",
+                                GTE: "La diferència amb «{{camp}}» ha de ser com a mínim de {{durada}}.",
+                                EQ: "La diferència amb «{{camp}}» ha de ser exactament de {{durada}}.",
+                                NEQ: "La diferència amb «{{camp}}» no pot ser de {{durada}}.",
+                            },
+                            unitatSingular: {DIES: "{{n}} dia", MESOS: "{{n}} mes", ANYS: "{{n}} any"},
+                            unitatPlural: {DIES: "{{n}} dies", MESOS: "{{n}} mesos", ANYS: "{{n}} anys"},
+                        },
                     },
                 },
 				import: {

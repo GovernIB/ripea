@@ -964,6 +964,30 @@ const translationEs = {
                     formulari: {
                         carregant: "Cargando los datos específicos del servicio PINBAL...",
                         error: "No se han podido obtener los datos específicos del servicio PINBAL",
+                        validacio: {
+                            EXPRESSIO_REGULAR: "El valor no tiene el formato esperado por el servicio.",
+                            NUM_RANG: "Número entero entre {{minim}} y {{maxim}}.",
+                            NUM_MINIM: "Número entero igual o superior a {{minim}}.",
+                            NUM_MAXIM: "Número entero igual o inferior a {{maxim}}.",
+                            DATA_COMPARACIO: {
+                                LT: "Debe ser anterior a «{{camp}}».",
+                                LTE: "Debe ser igual o anterior a «{{camp}}».",
+                                GT: "Debe ser posterior a «{{camp}}».",
+                                GTE: "Debe ser igual o posterior a «{{camp}}».",
+                                EQ: "Debe coincidir con «{{camp}}».",
+                                NEQ: "Debe ser distinta de «{{camp}}».",
+                            },
+                            DATA_DIFERENCIA: {
+                                LT: "La diferencia con «{{camp}}» debe ser inferior a {{durada}}.",
+                                LTE: "La diferencia con «{{camp}}» debe ser como máximo de {{durada}}.",
+                                GT: "La diferencia con «{{camp}}» debe ser superior a {{durada}}.",
+                                GTE: "La diferencia con «{{camp}}» debe ser como mínimo de {{durada}}.",
+                                EQ: "La diferencia con «{{camp}}» debe ser exactamente de {{durada}}.",
+                                NEQ: "La diferencia con «{{camp}}» no puede ser de {{durada}}.",
+                            },
+                            unitatSingular: {DIES: "{{n}} día", MESOS: "{{n}} mes", ANYS: "{{n}} año"},
+                            unitatPlural: {DIES: "{{n}} días", MESOS: "{{n}} meses", ANYS: "{{n}} años"},
+                        },
                     },
                 },
 				import: {
