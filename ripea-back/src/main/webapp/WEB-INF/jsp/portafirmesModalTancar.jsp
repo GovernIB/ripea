@@ -114,7 +114,8 @@ function adjustModalPerFluxRemove(fluxCreatedNom) {
 	var $iframe = $(window.parent.frameElement);
 	var height = localStorage.getItem('currentIframeHeight');
 
-	$iframe.css('height', (height != 'null') ? height : '50vh');
+	$iframe.css('min-height', '');
+	$iframe.css('height',(height != 'null') ? height : '50vh');
 	$iframe.parent().css('height', 'auto');
 	$iframe.closest('div.modal-content').css('height',  '');
 	$iframe.closest('div.modal-dialog').css({
