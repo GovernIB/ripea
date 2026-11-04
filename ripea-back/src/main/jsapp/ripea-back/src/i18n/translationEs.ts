@@ -38,6 +38,8 @@ const translationEs = {
             update: "Modificado el {{lastModifiedDate}} por '{{lastModifiedBy}}'.",
         },
         nouPermis: "Nuevo permiso",
+        permisos: "Permisos",
+        validacions: "Validaciones",
         advancedSearch: "Búsqueda avanzada",
         advancedSearchOpen: "Avanzado",
         advancedSearchClose: "Básico",
@@ -1580,6 +1582,7 @@ const translationEs = {
                 grups: "Grupos",
                 actiu: "Activo",
                 estat: "Estado",
+                elements: "Elementos",
             },
             detall: {
                 elementsProc: "Gestión del procedimiento: {{nom}}",
@@ -2468,7 +2471,7 @@ const translationEs = {
                 monitor: "Monitor del sistema",
 
                 config: "Configuración",
-                props: "Propiedades configurables",
+                props: "Propiedades de configuración",
                 pinbal: "Servicios PINBAL",
                 segonPla: "Reiniciar tareas en segundo plano...",
                 plugins: "Reinicia plugins...",

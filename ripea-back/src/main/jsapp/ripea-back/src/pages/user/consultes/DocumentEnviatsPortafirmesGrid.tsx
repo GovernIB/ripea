@@ -10,6 +10,7 @@ import * as builder from '../../../util/springFilterUtils.ts';
 import GridFormField from '../../../components/GridFormField.tsx';
 import ContingutLink from '../../../components/ContingutLink.tsx';
 import { SeguimentPortafirmes } from '../../contingut/actions/SeguimentPortafirmes.tsx';
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 // Detail
 const useDetail = () => {
@@ -40,13 +41,7 @@ const useDetail = () => {
         }
     };
 
-    const buttons: any[] = [
-        {
-            value: 'close',
-            text: t('common.close'),
-            componentProps: { variant: 'outlined' },
-        },
-    ];
+    const buttons = useCloseDialogButtons('close');
 
     const dialog = (
         <MuiDialog

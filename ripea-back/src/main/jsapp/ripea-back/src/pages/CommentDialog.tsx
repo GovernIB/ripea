@@ -6,6 +6,7 @@ import { formatDate } from '../util/dateUtils';
 import { useUserSession } from '../components/Session';
 import { useTranslation } from 'react-i18next';
 import {useRef, useState} from 'react';
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const Comments = (props: any) => {
     const { resourceName, id, resourceReference, onRowCountChange, readOnly, i18nKeys } = props;
@@ -105,13 +106,7 @@ export const CommentDialog = (props: any) => {
     const [num, setNum] = useState<number>(entity?.numComentaris ?? 0)
     const [dialogShow, dialogComponent] = useMuiContentDialog();
     const { t } = useBaseAppContext();
-    const closeButtons = [
-        {
-            value: false,
-            text: t('common.close'),
-            componentProps: { variant: 'outlined' },
-        },
-    ];
+    const closeButtons = useCloseDialogButtons();
 
     const handleOpen = (event: any) => {
         event.stopPropagation();
@@ -138,7 +133,7 @@ export const CommentDialog = (props: any) => {
         <>
             <IconButton title={t('page.comment.label')} aria-label="forum" color="inherit" onClick={handleOpen}>
                 <Badge badgeContent={num} color="primary" showZero>
-                    <Icon sx={iconStyle}>forum</Icon>
+                    <Icon className="grid-icon-medium" sx={iconStyle}>forum</Icon>
                 </Badge>
             </IconButton>
             {dialogComponent}

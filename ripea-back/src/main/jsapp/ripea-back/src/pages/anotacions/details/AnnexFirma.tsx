@@ -6,6 +6,7 @@ import {DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
 import Load from "../../../components/Load.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import {useToProgramaAntic} from "../../user/UserHeadToolbar.tsx";
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const iconButtonSx = { p: 0.5, borderRadius: '5px', border: '1px solid grey' };
 
@@ -124,19 +125,14 @@ const useAnnexFirma = () => {
         }
     };
 
+    const closeButtons = useCloseDialogButtons('close');
     const dialog =
         <MuiDialog
             open={open}
             closeCallback={handleClose}
             title={t('page.anotacio.action.firma.title')}
             componentProps={{ fullWidth: true, maxWidth: 'md'}}
-            buttons={[
-                {
-                    value: 'close',
-                    text: t('common.close'),
-                    componentProps: { variant: 'outlined' }
-                },
-            ]}
+            buttons={closeButtons}
             buttonCallback={(value: any): void => {
                 if (value == 'close') {
                     handleClose();

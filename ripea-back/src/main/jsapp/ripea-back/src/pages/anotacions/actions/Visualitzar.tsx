@@ -4,6 +4,7 @@ import {useTranslation} from "react-i18next";
 import Load from "../../../components/Load.tsx";
 import Iframe from "../../../components/Iframe.tsx";
 import {useToProgramaAntic} from "../../user/UserHeadToolbar.tsx";
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const Visualitzar = (props:any) => {
     const {id} = props;
@@ -31,19 +32,14 @@ const useVisualitzar = () => {
         }
     };
 
+    const closeButtons = useCloseDialogButtons('close');
     const dialog =
         <MuiDialog
             open={open}
             closeCallback={handleClose}
             title={t('page.document.action.view.title')}
             componentProps={{ fullWidth: true, maxWidth: 'md'}}
-            buttons={[
-                {
-                    value: 'close',
-                    text: t('common.close'),
-                    componentProps: { variant: 'outlined' }
-                },
-            ]}
+            buttons={closeButtons}
             buttonCallback={(value: any): void => {
                 if (value == 'close') {
                     handleClose();

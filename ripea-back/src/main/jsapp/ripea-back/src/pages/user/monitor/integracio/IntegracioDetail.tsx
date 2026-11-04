@@ -8,6 +8,7 @@ import {FieldData, MuiDetail} from "../../../../components/MuiDetail.tsx";
 import {StyledEstat} from "./IntegracioGrid.tsx";
 import {Grid} from "@mui/material";
 import {ErrorArea} from "../../../../components/ErrorPage.tsx";
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const IntegracioDetail = ({entity, fields}:any) => {
     return <MuiDetail entity={entity} fields={fields}>
@@ -71,14 +72,7 @@ export const useIntegracioDetail = () => {
         }
     };
 
-    const buttons :any[] = [
-        {
-            value: 'close',
-            text: t('common.close'),
-            icon: 'close',
-            componentProps: { variant: 'outlined' }
-        },
-    ]
+    const buttons = useCloseDialogButtons('close');
 
     const dialog =
         <MuiDialog

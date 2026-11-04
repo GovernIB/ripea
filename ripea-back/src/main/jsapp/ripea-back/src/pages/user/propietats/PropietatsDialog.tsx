@@ -7,6 +7,7 @@ import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import GridFormField from "../../../components/GridFormField.tsx";
 import {configTypeValueLabel, getFieldFromItem} from "./PropietatsProps.tsx";
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const PropietatsForm = ({item, itemField}:any) => {
     const {data, fields, apiRef} = useFormContext()
@@ -99,14 +100,7 @@ export const usePropietatsDialog = () => {
         }
     };
 
-    const buttons :any[] = [
-        {
-            value: 'close',
-            text: t('common.close'),
-            icon: 'close',
-            componentProps: { variant: 'outlined' }
-        },
-    ]
+    const buttons = useCloseDialogButtons('close');
 
     const actions = [
         {

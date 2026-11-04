@@ -289,7 +289,6 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         return columns.filter((col:any) => !col?.hidden).map((col:any) => ({
             ...col,
             flex: col.flex ?? 1,
-            //cellClassName: (user?.conf?.numElementsPagina!= null) ? 'multi-line-cell' : undefined,
         }));
     }, [columns])
 
@@ -327,6 +326,14 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             // el crea reactlib i no admet ni props ni estils des de fora.
             '& .MuiToolbar-root .MuiOutlinedInput-root': { height: '32px' },
             '& .MuiToolbar-root .MuiOutlinedInput-input': { pt: 0, pb: 0 },
+            // Les icones de les cel·les (check de booleans, avisos, estats...) són de mida "small" (20px) en lloc
+            // dels 24px per defecte de MUI, i amb 4px de marge dret (com abans del redisseny). Les que ja demanen
+            // `fontSize="inherit"` segueixen la mida del text. Les que porten la classe `grid-icon-medium`
+            // (botons d'icona amb badge: comentaris, seguidors, permisos...) mantenen els 24px de MUI. El marge no
+            // s'aplica a les icones dins d'un botó amb text (startIcon/endIcon), que ja porten el seu.
+            '& .MuiDataGrid-cell .MuiIcon-root:not(.MuiIcon-fontSizeInherit)': { marginRight: '4px' },
+            '& .MuiDataGrid-cell .MuiButton-icon .MuiIcon-root': { marginRight: 0 },
+            '& .MuiDataGrid-cell .MuiIcon-root:not(.MuiIcon-fontSizeInherit):not(.grid-icon-medium)': { fontSize: '1.25rem' },
             // Barra d'eines de la llibreria sobre la barra de títol del ScreenFrame, a la dreta i centrada
             // verticalment (DataToolbar, que no es pot moure per props): amb `position: absolute` s'ancora al
             // `.screen-frame` i conserva l'ordre dels seus elements, el filtre ràpid i l'indicador d'error.

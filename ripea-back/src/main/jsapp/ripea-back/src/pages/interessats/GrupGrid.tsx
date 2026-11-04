@@ -5,6 +5,7 @@ import {BasePage, MuiDialog, useFormContext, useMuiDataGridApiRef} from "reactli
 import {useEffect, useMemo, useState} from "react";
 import GridFormField from "../../components/GridFormField.tsx";
 import {Typography, Grid} from "@mui/material";
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const sortModelInteressat: any = [{ field: 'nomComplet', sort: 'asc' }];
 const columnsInteressat = [
@@ -141,13 +142,7 @@ export const useGrupGridDialog = (entity:any, refresh?: () => void) => {
         }
     };
 
-    const buttons :any[] = [
-        {
-            value: 'close',
-            text: t('common.close'),
-            icon: 'close',
-        },
-    ]
+    const buttons = useCloseDialogButtons('close');
 
     const dialog =
         <MuiDialog

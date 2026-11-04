@@ -5,7 +5,7 @@ import {useSession} from "./SessionStorageContext.tsx";
 import {useEffect, useMemo, useRef} from "react";
 import {GridButton, GridButtonField} from "./GridFormField.tsx";
 import FilterAutoApply from "./FilterAutoApply.tsx";
-import {FilterAutoApplyContext, normalizeFilterData} from "./FilterAutoApplyContext.ts";
+import {FilterAutoApplyContext, normalizeFilterData, withoutAdvancedSearch} from "./FilterAutoApplyContext.ts";
 import {icons} from "../util/icons.ts";
 import {outlinedControlBorderSx} from "./titleBarControlsSx.ts";
 
@@ -120,7 +120,10 @@ const StyledMuiFilter = (props:any) => {
         buttonCallback?.(value)
     };
 
-    const { value: filterData, save: saveFilterData } = useSession(sessionKey);
+    const { value: savedFilterData, save: saveFilterData } = useSession(sessionKey);
+    // El commutador de cerca avançada no es restaura (ni es desa, vegeu handleSpringFilterChange): el
+    // panell avançat comença sempre tancat, també amb dades desades per versions anteriors.
+    const filterData = useMemo(() => withoutAdvancedSearch(savedFilterData), [savedFilterData]);
 
     // El guardat es fa aquí (i no a cercar()) perquè onSpringFilterChange és l'únic
     // punt pel qual passen totes les aplicacions reals del filtre: el botó "Filtrar",
@@ -130,7 +133,7 @@ const StyledMuiFilter = (props:any) => {
     const handleSpringFilterChange = (springFilter:any) => {
         lastAppliedRef.current = normalizeFilterData(apiRef?.current?.getData?.());
         if (sessionKey) {
-            saveFilterData(apiRef?.current?.getData?.())
+            saveFilterData(withoutAdvancedSearch(apiRef?.current?.getData?.()))
         }
         onSpringFilterChange?.(springFilter);
     };

@@ -12,6 +12,7 @@ import IconButton from "@mui/material/IconButton";
 import Load from "../../../components/Load.tsx";
 import {useToProgramaAntic} from "../../user/UserHeadToolbar.tsx";
 import { useEffect } from "react";
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const useConverdedToPDF = () => {
     const { t } = useTranslation();
@@ -32,19 +33,14 @@ const useConverdedToPDF = () => {
         }
     };
 
+    const closeButtons = useCloseDialogButtons('close');
     const dialog =
         <MuiDialog
             open={open}
             closeCallback={handleClose}
             title={t('page.document.action.toPDF.title')}
             componentProps={{ fullWidth: true, maxWidth: 'lg' }}
-            buttons={[
-                {
-                    value: 'close',
-                    text: t('common.close'),
-                    componentProps: { variant: 'outlined' }
-                },
-            ]}
+            buttons={closeButtons}
             buttonCallback={(value :any) :void=>{
                 if (value=='close') {
                     handleClose();
@@ -66,7 +62,7 @@ const useConverdedToPDF = () => {
 // Funció genèrica per tancar transacció
 const tancarTransaccio = (getUrl: (path: string) => string, idTransaccio?: string) => {
     if (!idTransaccio) return;
-    
+
     const url = getUrl(`document/portafirmes/tancarTransaccio/${idTransaccio}`);
 
     if (navigator.sendBeacon) {
@@ -81,7 +77,7 @@ const tancarTransaccio = (getUrl: (path: string) => string, idTransaccio?: strin
 const useCerrarTransaccioOnUnload = (getUrl: (path: string) => string, idTransaccio?: string, openNewFlux?: boolean) => {
     useEffect(() => {
         if (!idTransaccio || !openNewFlux) return;
-        
+
         const handleBeforeUnload = () => {
             tancarTransaccio(getUrl, idTransaccio);
         };
@@ -123,12 +119,12 @@ const EnviarPortafirmesForm = forwardRef((_props, ref) => {
     const handleCloseModal = () => {
         tancarTransaccio(getUrl, data?.idTransaccio);
     };
-    
+
     // Exposar funció perquè es pugui tancar des del component fill
     useImperativeHandle(ref, () => ({
         handleCloseModal
     }));
-    
+
     return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
 
         { !data?.massivo && data?.extension != 'pdf' &&
@@ -164,7 +160,7 @@ const EnviarPortafirmesForm = forwardRef((_props, ref) => {
             <GridFormField name="annexos" multiple filter={filterAnnexos} hidden={data?.massivo}/>
             <GridFormField size={10} name="portafirmesEnviarFluxId"
                            componentProps={{title: t('page.document.detall.flux')}}
-                           requestParams={{additionalOption: 
+                           requestParams={{additionalOption:
                                 {
                                     value: data?.fluxCreat?.fluxId,
                                     description: data?.fluxCreat?.nom +' - '+ data?.fluxCreat?.descripcio,
@@ -211,7 +207,7 @@ const EnviarPortafirmesForm = forwardRef((_props, ref) => {
 const EnviarPortafirmes = (props:any) => {
     const { t } = useTranslation();
     const formRef = useRef<any>(undefined);
-    
+
     return <FormActionDialog
         resourceName={"documentResource"}
         action={"ENVIAR_PORTAFIRMES"}

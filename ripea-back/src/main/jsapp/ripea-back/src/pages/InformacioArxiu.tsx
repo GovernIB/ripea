@@ -6,6 +6,7 @@ import {formatDate} from "../util/dateUtils.ts";
 import TabComponent from "../components/TabComponent.tsx";
 import {DetailCard, DetailCardContent} from "../components/CardData.tsx";
 import Load from "../components/Load.tsx";
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const InformacionArxiu = (props:any) => {
     const { arxiu } = props;
@@ -19,7 +20,7 @@ const InformacionArxiu = (props:any) => {
                     <DetailCardContent title={t('page.arxiu.detall.arxiuUuid')}>{arxiu?.identificador}</DetailCardContent>
                     <DetailCardContent title={t('page.arxiu.detall.fitxerNom')}>{arxiu?.nom}</DetailCardContent>
                     <DetailCardContent title={t('page.arxiu.detall.serie')}>{arxiu?.serieDocumental}</DetailCardContent>
-                    <DetailCardContent title={t('page.arxiu.detall.arxiuEstat')} hiddenIfEmpty>{arxiu?.arxiuEstat}</DetailCardContent>                    
+                    <DetailCardContent title={t('page.arxiu.detall.arxiuEstat')} hiddenIfEmpty>{arxiu?.arxiuEstat}</DetailCardContent>
                     <DetailCardContent title={t('page.arxiu.detall.fitxerContentType')} hidden={!arxiu?.contingutTipusMime}>{arxiu?.contingutTipusMime}</DetailCardContent>
                     <DetailCardContent title={t('page.arxiu.detall.fitxerNom')} hidden={!arxiu?.contingutArxiuNom}>{arxiu?.contingutArxiuNom}</DetailCardContent>
                 </DetailCard>
@@ -166,6 +167,7 @@ const useInformacioArxiu = (resourceName:string, perspective:string) => {
         },
     ]
 
+    const closeButtons = useCloseDialogButtons('close');
     const dialog =
         <MuiDialog
             open={open}
@@ -173,13 +175,7 @@ const useInformacioArxiu = (resourceName:string, perspective:string) => {
             title={t('page.contingut.action.infoArxiu.title')}
             componentProps={{ fullWidth: true, maxWidth: 'md'}}
             dialogContentProps={{ sx: { px: 2, py: 0 } }}
-            buttons={[
-                {
-                    value: 'close',
-                    text: t('common.close'),
-                    componentProps: { variant: 'outlined' }
-                },
-            ]}
+            buttons={closeButtons}
             buttonCallback={(value :any) :void=>{
                 if (value=='close') {
                     handleClose();

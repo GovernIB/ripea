@@ -100,7 +100,7 @@ export const useMassiveActions = (refresh?: () => void) => {
 
     const guardarArxiu = (ids: any[]): void => { massiveAction(ids, 'GUARDAR_ARXIU', t('page.expedient.results.actionBackgroundOk')); }
     const exportar = (ids:any[], entity:any) => {
-        return apiReport(undefined, {code :'EXPORTAR', data:{ ids: ids, massivo: true, expedient: {id: entity?.id, description: entity?.nom,} }, fileType: 'JSON'})
+        return apiReport(undefined, {code :'EXPORTAR', data:{ ids: ids, massivo: true, expedient: {id: entity?.id, description: entity?.nom,} }, fileType: 'JSON' as any})
             .then((result) => {
                 iniciaDescargaJSON(result);
                 temporalMessageShow(null, t('page.interessat.action.exportar.ok'), 'info');

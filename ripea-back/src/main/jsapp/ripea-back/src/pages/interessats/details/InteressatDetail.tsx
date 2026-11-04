@@ -4,6 +4,7 @@ import {MuiDialog, useBaseAppContext, useResourceApiService} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
 import Load from "../../../components/Load.tsx";
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 export const InteressatDetail = (props: any) => {
     const {entity, isShowDireccio = true } = props;
@@ -95,19 +96,14 @@ const useInteressatDetail = () => {
         }
     };
 
+    const closeButtons = useCloseDialogButtons('close');
     const dialog =
         <MuiDialog
             open={open}
             closeCallback={handleClose}
             title={t('page.interessat.action.detail.title')}
             componentProps={{fullWidth: true, maxWidth: 'md'}}
-            buttons={[
-                {
-                    value: 'close',
-                    text: t('common.close'),
-                    componentProps: { variant: 'outlined' }
-                },
-            ]}
+            buttons={closeButtons}
             buttonCallback={(value: any): void => {
                 if (value == 'close') {
                     handleClose();

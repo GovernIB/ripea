@@ -102,7 +102,7 @@ export const useActions = (refresh?: () => void) => {
     }
 
     const exportar = (id:any) => {
-        apiReport(id, { code: 'REPORT_EXPORT_JSON', fileType: "JSON" })
+        apiReport(id, { code: 'REPORT_EXPORT_JSON', fileType: "JSON" as any })
             .then((result) => {
                 iniciaDescargaJSON(result);
                 temporalMessageShow(null, t('page.metaExpedient.action.export.ok'), 'success');

@@ -17,7 +17,6 @@ vi.mock('reactlib', () => ({
     useFilterApiRef: () => ({ current: null }),
     useFormApiRef: () => ({ current: null }),
     useMuiDataGridApiRef: () => ({ current: { refresh: vi.fn() } }),
-    useBaseAppContext: () => ({ messageDialogShow: vi.fn() }),
 }));
 
 vi.mock('react-router-dom', () => ({

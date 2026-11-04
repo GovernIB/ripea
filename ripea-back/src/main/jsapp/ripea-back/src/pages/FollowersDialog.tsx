@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Badge, Box, Icon, IconButton, Typography } from '@mui/material';
 import { useResourceApiService, MuiDialog } from 'reactlib';
 import { useTranslation } from 'react-i18next';
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const followerStyle = {
     borderRadius: 2,
@@ -39,11 +40,13 @@ export const FollowersDialog = (props: any) => {
         }
     };
 
+    const closeButtons = useCloseDialogButtons('close');
+
     return (
         <>
             <IconButton title={t('page.expedient.modal.seguidors.label')} aria-label="forum" color={'inherit'} onClick={handleOpen}>
                 <Badge badgeContent={entity?.numSeguidors} color="primary" showZero>
-                    <Icon>people</Icon>
+                    <Icon className="grid-icon-medium">people</Icon>
                 </Badge>
             </IconButton>
 
@@ -53,13 +56,7 @@ export const FollowersDialog = (props: any) => {
                 title={t('page.expedient.modal.seguidors.title') + ': ' + entity?.nom}
                 key={entity?.id}
                 componentProps={{ fullWidth: true, maxWidth: 'sm' }}
-                buttons={[
-                    {
-                        value: 'close',
-                        text: t('common.close'),
-                        componentProps: { variant: 'outlined' },
-                    },
-                ]}
+                buttons={closeButtons}
                 buttonCallback={(value: any): void => {
                     if (value == 'close') {
                         handleClose();

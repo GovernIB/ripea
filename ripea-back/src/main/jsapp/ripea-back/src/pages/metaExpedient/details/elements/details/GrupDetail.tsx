@@ -6,6 +6,7 @@ import Load from "../../../../../components/Load.tsx";
 import {FieldData, MuiDetail} from "../../../../../components/MuiDetail.tsx";
 import {formatDate} from "../../../../../util/dateUtils.ts";
 import {DetailCard} from "../../../../../components/CardData.tsx";
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const GrupDetail = (props:any) => {
     const {entity, fields} = props;
@@ -59,14 +60,7 @@ const useGrupDetail = () => {
         }
     };
 
-    const buttons :any[] = [
-        {
-            value: 'close',
-            text: t('common.close'),
-            icon: 'close',
-            componentProps: { variant: 'outlined' },
-        },
-    ]
+    const buttons = useCloseDialogButtons('close');
 
     const dialog =
         <MuiDialog

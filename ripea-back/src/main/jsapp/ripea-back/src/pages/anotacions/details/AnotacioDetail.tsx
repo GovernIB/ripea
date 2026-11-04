@@ -15,6 +15,7 @@ import useVisualitzar from "../actions/Visualitzar.tsx";
 import useAnnexFirma from "./AnnexFirma.tsx";
 import { icons as iconsAppMenu } from '@src/util/icons';
 import {icons} from "@src/util/icons.ts";
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const Resum = (props:any) => {
     const { entity, setNumInteressats, setNumAnnexos } = props;
@@ -347,7 +348,7 @@ const useAnotacioDetail = () => {
     //undefined = encara no consultat a l'Arxiu; null = consultat i sense dades
     const [justificant, setJustificant] = useState<any>();
 
-    const handleOpen = (id:any, row:any) => {
+    const handleOpen = (_id:any, row:any) => {
         setEntity(row);
         setJustificant(undefined);
         setOpen(true);
@@ -395,6 +396,7 @@ const useAnotacioDetail = () => {
         },
     ]
 
+    const closeButtons = useCloseDialogButtons('close');
     const dialog =
         <MuiDialog
             open={open}
@@ -402,13 +404,7 @@ const useAnotacioDetail = () => {
             title={t('page.anotacio.detall.title')}
             componentProps={{ fullWidth: true, maxWidth: 'lg' }}
             dialogContentProps={{ sx: { height: '100%', px: 2, py: 0 } }}
-            buttons={[
-                {
-                    value: 'close',
-                    text: t('common.close'),
-                    componentProps: { variant: 'outlined' }
-                },
-            ]}
+            buttons={closeButtons}
             buttonCallback={(value :any) :void=>{
                 if (value=='close') {
                     handleClose();

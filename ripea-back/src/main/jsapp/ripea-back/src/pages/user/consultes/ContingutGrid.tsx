@@ -17,6 +17,7 @@ import useAssignar from '../../expedient/actions/Assignar.tsx';
 import { useSession } from '../../../components/SessionStorageContext.tsx';
 import Box from '@mui/material/Box';
 import { useConfirmDialogButtons } from '@src/util/buttonsOverride.tsx';
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const useActions = (refresh?: () => void) => {
     const { t } = useTranslation();
@@ -107,13 +108,7 @@ const useDetail = () => {
         }
     };
 
-    const buttons: any[] = [
-        {
-            value: 'close',
-            text: t('common.close'),
-            componentProps: { variant: 'outlined' },
-        },
-    ];
+    const buttons = useCloseDialogButtons('close');
     const getLabelByName = (fields: any, name: string) => {
         const field = fields?.find((f: { name: string; label: string }) => f.name === name);
         return field?.label ?? field?.name;

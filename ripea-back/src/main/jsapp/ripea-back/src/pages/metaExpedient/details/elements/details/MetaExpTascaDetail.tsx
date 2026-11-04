@@ -8,6 +8,7 @@ import {formatDate} from "../../../../../util/dateUtils.ts";
 import {StyledBadge} from "../../../../../components/StyledBadge.tsx";
 import {StyledPrioritat} from "../../../../expedient/ExpedientGrid.tsx";
 import {DetailCard} from "../../../../../components/CardData.tsx";
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const MetaExpTascaDetail = (props:any) => {
     const {entity, fields} = props;
@@ -66,14 +67,7 @@ const useMetaExpTascaDetail = () => {
         }
     };
 
-    const buttons :any[] = [
-        {
-            value: 'close',
-            text: t('common.close'),
-            icon: 'close',
-            componentProps: { variant: 'outlined' },
-        },
-    ]
+    const buttons = useCloseDialogButtons('close');
 
     const dialog =
         <MuiDialog

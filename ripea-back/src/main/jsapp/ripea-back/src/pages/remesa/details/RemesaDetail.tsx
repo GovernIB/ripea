@@ -8,6 +8,7 @@ import {useActions} from "./RemesaActions.tsx";
 import Load from "../../../components/Load.tsx";
 import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
 import {Box} from "@mui/material";
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const RemesaDetail = (props:any) => {
     const {entity, fields} = props;
@@ -77,19 +78,14 @@ const useRemesaDetail = () => {
         }
     };
 
+    const closeButtons = useCloseDialogButtons('close');
     const dialog =
         <MuiDialog
             open={open}
             closeCallback={handleClose}
             title={t('page.notificacio.detall.title')}
             componentProps={{ fullWidth: true, maxWidth: 'lg'}}
-            buttons={[
-                {
-                    value: 'close',
-                    text: t('common.close'),
-                    componentProps: { variant: 'outlined' }
-                },
-            ]}
+            buttons={closeButtons}
             buttonCallback={(value :any) :void=>{
                 if (value=='close') {
                     handleClose();

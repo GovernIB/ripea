@@ -22,6 +22,7 @@ import {
     Typography,
 } from "@mui/material";
 import {formatDate} from "../../util/dateUtils.ts";
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 // Ordre de les taules dins una entitat (el mateix ordre amb què el backend ordena les files)
 const TIPUS_ORDRE = ['ENTITY', 'GRUP', 'ORGAN', 'MET_EXP_ORG', 'MET_NOD'];
@@ -255,12 +256,13 @@ export const usePermisosUsuariDialog = () => {
             });
     }
 
+    const closeButtons = useCloseDialogButtons('close');
     const dialog = <MuiDialog
         open={!!usuari}
         closeCallback={handleClose}
         title={t('page.usuari.permisos.title', {usuari: usuari?.codiAndNom ?? usuari?.codi ?? ''})}
         componentProps={{fullWidth: true, maxWidth: 'xl'}}
-        buttons={[{value: 'close', text: t('common.close'), componentProps: {variant: 'outlined'}}]}
+        buttons={closeButtons}
         buttonCallback={handleClose}
     >
         {usuari && <>

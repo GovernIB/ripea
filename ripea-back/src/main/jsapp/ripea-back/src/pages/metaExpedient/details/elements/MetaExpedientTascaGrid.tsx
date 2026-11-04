@@ -1,11 +1,11 @@
 import { useTranslation } from 'react-i18next';
-import { Badge, Grid, Icon, Divider } from '@mui/material';
+import { Grid, Icon, Divider } from '@mui/material';
 import StyledMuiGrid from '../../../../components/StyledMuiGrid.tsx';
 import * as builder from '../../../../util/springFilterUtils.ts';
 import { useBaseAppContext, useFormContext, useMuiDataGridApiRef, useResourceApiService } from 'reactlib';
 import GridFormField from '../../../../components/GridFormField.tsx';
 import { StyledPrioritat } from '../../../expedient/ExpedientGrid.tsx';
-import LinkIcon from '../../../../components/LinkIcon.tsx';
+import BadgeIconButton from '../../../../components/BadgeIconButton.tsx';
 import { StyledBadge } from '../../../../components/StyledBadge.tsx';
 import { useMemo } from 'react';
 import useMetaExpTascaDetail from './details/MetaExpTascaDetail.tsx';
@@ -70,6 +70,18 @@ const MetaExpedientTascaForm = () => {
 
 const sortModel: any = [{ field: 'ordre', sort: 'asc' }];
 const perspectives: string[] = ['COUNT_VALIDACIONS'];
+const ValidacionsButton = ({ row }: { row: any }) => {
+    const { t } = useTranslation();
+    return (
+        <BadgeIconButton
+            icon={'checklist'}
+            title={t('common.validacions')}
+            badgeContent={row?.numValidacio}
+            to={`/metaExpedient/${row?.metaExpedient.id}/tasca/${row?.id}/validacio`}
+        />
+    );
+};
+
 const columns = [
     {
         field: 'codi',
@@ -137,18 +149,7 @@ const columns = [
         headerName: '',
         sortable: false,
         flex: 0.25,
-        renderCell: (params: any) => (
-            <LinkIcon
-                aria-label="key"
-                color="inherit"
-                title="Validacions"
-                to={`/metaExpedient/${params?.row?.metaExpedient.id}/tasca/${params?.row?.id}/validacio`}
-            >
-                <Badge badgeContent={params?.row?.numValidacio} color="primary" showZero>
-                    <Icon>checklist</Icon>
-                </Badge>
-            </LinkIcon>
-        ),
+        renderCell: (params: any) => <ValidacionsButton row={params?.row} />,
     },
 ];
 export const MetaExpedientTascaGrid = ({ entity, onRowCountChange, readOnly }: any) => {

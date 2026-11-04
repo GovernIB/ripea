@@ -8,6 +8,7 @@ import StyledMuiGrid from "../components/StyledMuiGrid.tsx";
 import * as builder from "../util/springFilterUtils.ts";
 import {DetailCard, DetailCardContent} from "../components/CardData.tsx";
 import Load from "../components/Load.tsx";
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const columnsAccions = [
     {
@@ -64,7 +65,7 @@ const useAccioDialog = () => {
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
 
-    const handleOpen = (id:any, row:any) => {
+    const handleOpen = (_id:any, row:any) => {
         // console.log(id, row);
         setEntity(row);
         setOpen(true);
@@ -77,19 +78,14 @@ const useAccioDialog = () => {
         }
     };
 
+    const closeButtons = useCloseDialogButtons('close');
     const dialog =
     <MuiDialog
         open={open}
         title={t('page.contingut.action.history.detail')}
         closeCallback={handleClose}
         componentProps={{ fullWidth: true, maxWidth: 'md'}}
-        buttons={[
-            {
-                value: 'close',
-                text: t('common.close'),
-                componentProps: { variant: 'outlined' }
-            },
-        ]}
+        buttons={closeButtons}
         buttonCallback={(value :any) :void=>{
             if (value=='close') {
                 handleClose();
@@ -254,7 +250,7 @@ const useHistoric = (contingutTipus:HistoricContingutTipus = HistoricContingutTi
     const [numAccions, setNumAccions] = useState<number>();
     const [numMoviment, setMoviment] = useState<number>();
 
-    const handleOpen = (id:any, row:any) => {
+    const handleOpen = (_id:any, row:any) => {
         // console.log(id, row);
         setEntity(row);
         setOpen(true);
@@ -290,6 +286,7 @@ const useHistoric = (contingutTipus:HistoricContingutTipus = HistoricContingutTi
         },
     ]
 
+    const closeButtons = useCloseDialogButtons('close');
     const dialog =
         <MuiDialog
             open={open}
@@ -297,13 +294,7 @@ const useHistoric = (contingutTipus:HistoricContingutTipus = HistoricContingutTi
             title={t('page.contingut.action.history.label')}
             componentProps={{ fullWidth: true, maxWidth: 'xl'}}
             dialogContentProps={{ sx: { px: 0, py: 0 } }}
-            buttons={[
-                {
-                    value: 'close',
-                    text: t('common.close'),
-                    componentProps: { variant: 'outlined' }
-                },
-            ]}
+            buttons={closeButtons}
             buttonCallback={(value :any) :void=>{
                 if (value=='close') {
                     handleClose();

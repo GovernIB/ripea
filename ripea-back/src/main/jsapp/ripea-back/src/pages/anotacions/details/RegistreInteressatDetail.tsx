@@ -3,6 +3,7 @@ import {useState} from "react";
 import {Grid} from "@mui/material";
 import { MuiDialog } from "reactlib";
 import {DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const RegistreInteressatDetail = (props:any) => {
     const {entity} = props;
@@ -50,19 +51,14 @@ const useRegistreInteressatDetail = () => {
         }
     };
 
+    const closeButtons = useCloseDialogButtons('close');
     const dialog =
         <MuiDialog
             open={open}
             closeCallback={handleClose}
             title={t('page.interessat.action.detail.title')}
             componentProps={{fullWidth: true, maxWidth: 'sm'}}
-            buttons={[
-                {
-                    value: 'close',
-                    text: t('common.close'),
-                    componentProps: { variant: 'outlined' }
-                },
-            ]}
+            buttons={closeButtons}
             buttonCallback={(value: any): void => {
                 if (value == 'close') {
                     handleClose();

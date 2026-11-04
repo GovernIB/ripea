@@ -304,7 +304,7 @@ const anarAValidacionsTasca = async (page: Page): Promise<void> => {
     await anarASubPagina(page, 'tasca');
     await aplicaQuickFilter(page, page.locator('#simple-tabpanel-tasca .MuiToolbar-root input[type="text"]'), CODI_TASCA1);
     await expect(getTascaRows(page)).toHaveCount(1);
-    await getTascaRows(page).first().locator('[aria-label="key"]').click();
+    await getTascaRows(page).first().locator('button:has(.MuiIcon-root:text-is("checklist"))').click();
     await esperarGridCarregat(page);
     await page.waitForTimeout(SYSTEM_DELAY);
 };
@@ -452,7 +452,7 @@ test.describe('Gestió de Procediments — IPA_ADMIN', () => {
 //            await esperarGridCarregat(page);
 //            await aplicarFiltreProcediments(page, CODI_TEST, false);
 //            await expect(getRows(page)).toHaveCount(0);
-        }     
+        }
     });
 
     // ── Creació ───────────────────────────────────────────────────────────────

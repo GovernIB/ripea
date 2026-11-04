@@ -10,6 +10,7 @@ import { useMemo, useState } from 'react';
 import { FieldData, MuiDetail } from '../../../components/MuiDetail.tsx';
 import { Grid } from '@mui/material';
 import { ErrorArea } from '../../../components/ErrorPage.tsx';
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const ExcepcioDetail = ({ entity, currentFields }: any) => {
     return (
@@ -48,14 +49,7 @@ const useExcepcioDetail = () => {
         }
     };
 
-    const buttons: any[] = [
-        {
-            value: 'close',
-            text: t('common.close'),
-            icon: 'close',
-            componentProps: { variant: 'outlined' },
-        },
-    ];
+    const buttons = useCloseDialogButtons('close');
 
     const dialog = (
         <MuiDialog

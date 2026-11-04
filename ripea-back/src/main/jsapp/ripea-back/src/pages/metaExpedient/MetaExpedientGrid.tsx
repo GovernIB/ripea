@@ -4,10 +4,10 @@ import {GridPage, useBaseAppContext, useFilterApiRef, useFormContext, useMuiData
 import {ScreenFrame} from "../../components/ScreenFrame.tsx";
 import {icons} from "../../util/icons.ts";
 import StyledMuiGrid from "../../components/StyledMuiGrid.tsx";
-import {Alert, Badge, Chip, Grid, Icon, IconButton, MenuItem} from "@mui/material";
+import {Alert, Chip, Grid, Icon, IconButton, MenuItem} from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
 import {MetaExpedientComment} from "../CommentDialog.tsx";
-import LinkIcon from "../../components/LinkIcon.tsx";
+import PermisosButton from "../../components/PermisosButton.tsx";
 import {formatDate} from "../../util/dateUtils.ts";
 import {useMetaExpedientActions} from "./details/MetaExpedientActions.tsx";
 import {MetaExpedientFilter} from "./MetaExpedientFilter.tsx";
@@ -148,116 +148,147 @@ const MetaExpedientGrid = () => {
         return rol.isRevisor || rol.isAdminLectura
     }, [rol])
 
-    const additionalColumns = useMemo(() => [
-        ...columns,
-        {
-            field: 'procedimentComu',
-            headerName: t('page.metaExpedient.columnes.comu'),
-            flex: 0.25,
-            minWidth: 90,
-            renderCell: (params:any) => (params?.row?.procedimentComu && <Icon>check</Icon>),
-        },
-        {
-            field: 'permisDirecte',
-            headerName: t('page.metaExpedient.columnes.directe'),
-            flex: 0.25,
-            minWidth: 90,
-            renderCell: (params:any) => (params?.row?.permisDirecte && <Icon>check</Icon>),
-        },
-        {
-            field: 'gestioAmbGrupsActiva',
-            headerName: t('page.metaExpedient.columnes.grups'),
-            flex: 0.25,
-            minWidth: 90,
-            renderCell: (params:any) => (params?.row?.gestioAmbGrupsActiva && <Icon>check</Icon>),
-        },
-        {
-            field: 'actiu',
-            headerName: t('page.metaExpedient.columnes.actiu'),
-            flex: 0.25,
-            minWidth: 90,
-            renderCell: (params:any) => (params?.row?.actiu && <Icon>check</Icon>),
-        },
-        {
-            field: 'revisioEstat',
-            headerName: t('page.metaExpedient.columnes.estat'),
-            flex: 0.75,
-            renderCell: (params:any) => <StyledEstat entity={params?.row}>{params.formattedValue}</StyledEstat>,
-            hidden: !user?.sessionScope?.isRevisioActiva
-        },
-        {
-            field: 'id',
-            headerName: '',
-            sortable: false,
-            flex: 0.75,
-            renderCell: (params: any) => <MenuButton
-                id={`elements-${params?.id}`}
-                buttonLabel={"Elements"}
-                buttonProps={{color: 'black'}}
-            >
-                <MenuItem onClick={() => navigate(`/metaExpedient/${params?.id}/metaDocument`)}>
-                    <StyledBadge badgeContent={params?.row?.numMetaDocument} showZero sx={{ '& .MuiBadge-badge': {right: -3, top: 10 } }}>
-                        {t('page.metaExpedient.tabs.metaDocument')}
-                    </StyledBadge>
-                </MenuItem>
-                <MenuItem onClick={() => navigate(`/metaExpedient/${params?.id}/metaDada`)}>
-                    <StyledBadge badgeContent={params?.row?.numMetaDada} showZero sx={{ '& .MuiBadge-badge': {right: -3, top: 10 } }}>
-                        {t('page.metaExpedient.tabs.metaDada')}
-                    </StyledBadge>
-                </MenuItem>
-                <MenuItem onClick={() => navigate(`/metaExpedient/${params?.id}/estat`)}>
-                    <StyledBadge badgeContent={params?.row?.numEstat} showZero sx={{ '& .MuiBadge-badge': {right: -3, top: 10 } }}>
-                        {t('page.metaExpedient.tabs.expedientEstat')}
-                    </StyledBadge>
-                </MenuItem>
-                <MenuItem onClick={() => navigate(`/metaExpedient/${params?.id}/tasca`)}>
-                    <StyledBadge badgeContent={params?.row?.numTasca} showZero sx={{ '& .MuiBadge-badge': {right: -3, top: 10 } }}>
-                        {t('page.metaExpedient.tabs.tasca')}
-                    </StyledBadge>
-                </MenuItem>
-                {params?.row?.gestioAmbGrupsActiva && <MenuItem onClick={() => navigate(`/metaExpedient/${params?.id}/grup`)}>
-                    <StyledBadge badgeContent={params?.row?.numGrup} showZero sx={{ '& .MuiBadge-badge': {right: -3, top: 10 } }}>
-                        {t('page.metaExpedient.tabs.grup')}
-                    </StyledBadge>
-                </MenuItem>}
-                {user?.sessionScope?.isCarpetesDefecte && <MenuItem onClick={() => navigate(`/metaExpedient/${params?.id}/carpeta`)}>
-                    <StyledBadge badgeContent={params?.row?.numCarpetes} showZero sx={{ '& .MuiBadge-badge': {right: -3, top: 10 } }}>
-                        {t('page.metaExpedient.tabs.carpeta')}
-                    </StyledBadge>
-                </MenuItem>}
-            </MenuButton>
-        },
-        {
-            field: 'numComentaris',
-            headerName: '',
-            sortable: false,
-            flex: 0.25,
-            minWidth: 55,
-            renderCell: (params: any) => <MetaExpedientComment
-                entity={params?.row}
-                readOnly={params?.row?.usuariActualOnlyObservador}
-                onClose={refresh}
-            />
-        },
-        {
-            field: 'numPermisos',
-            headerName: '',
-            sortable: false,
-            flex: 0.25,
-            minWidth: 55,
-            hidden: !(rol?.isAdmin || rol?.isOrganAdmin),
-            renderCell: (params:any) => <LinkIcon
-                aria-label="key"
-                color="inherit"
-                title={params?.row?.errorPermisos ?t('page.metaExpedient.alert.errorPermisos') :"Permisos"}
-                to={`/metaExpedient/${params?.row?.id}/permis`}
-            >
-                <Badge badgeContent={params?.row?.numPermisos} color={params?.row?.errorPermisos ?"error" :"primary"} showZero>
-                    <Icon>key</Icon>
-                </Badge>
-            </LinkIcon>
-        },
-    ].filter((col:any)=>!col?.hidden), [t, user?.sessionScope?.isRevisioActiva])
+    const additionalColumns = useMemo(
+        () =>
+            [
+                ...columns,
+                {
+                    field: 'procedimentComu',
+                    headerName: t('page.metaExpedient.columnes.comu'),
+                    flex: 0.25,
+                    minWidth: 90,
+                    renderCell: (params: any) => params?.row?.procedimentComu && <Icon>check</Icon>,
+                },
+                {
+                    field: 'permisDirecte',
+                    headerName: t('page.metaExpedient.columnes.directe'),
+                    flex: 0.25,
+                    minWidth: 90,
+                    renderCell: (params: any) => params?.row?.permisDirecte && <Icon>check</Icon>,
+                },
+                {
+                    field: 'gestioAmbGrupsActiva',
+                    headerName: t('page.metaExpedient.columnes.grups'),
+                    flex: 0.25,
+                    minWidth: 90,
+                    renderCell: (params: any) => params?.row?.gestioAmbGrupsActiva && <Icon>check</Icon>,
+                },
+                {
+                    field: 'actiu',
+                    headerName: t('page.metaExpedient.columnes.actiu'),
+                    flex: 0.25,
+                    minWidth: 90,
+                    renderCell: (params: any) => params?.row?.actiu && <Icon>check</Icon>,
+                },
+                {
+                    field: 'revisioEstat',
+                    headerName: t('page.metaExpedient.columnes.estat'),
+                    flex: 0.75,
+                    renderCell: (params: any) => <StyledEstat entity={params?.row}>{params.formattedValue}</StyledEstat>,
+                    hidden: !user?.sessionScope?.isRevisioActiva,
+                },
+                {
+                    field: 'id',
+                    headerName: '',
+                    sortable: false,
+                    flex: 0.75,
+                    minWidth: 100,
+                    renderCell: (params: any) => (
+                        <MenuButton
+                            id={`elements-${params?.id}`}
+                            buttonLabel={t('page.metaExpedient.columnes.elements')}
+                            buttonProps={{ color: 'black' }}
+                        >
+                            <MenuItem onClick={() => navigate(`/metaExpedient/${params?.id}/metaDocument`)}>
+                                <StyledBadge
+                                    badgeContent={params?.row?.numMetaDocument}
+                                    showZero
+                                    sx={{ '& .MuiBadge-badge': { right: -3, top: 10 } }}
+                                >
+                                    {t('page.metaExpedient.tabs.metaDocument')}
+                                </StyledBadge>
+                            </MenuItem>
+                            <MenuItem onClick={() => navigate(`/metaExpedient/${params?.id}/metaDada`)}>
+                                <StyledBadge
+                                    badgeContent={params?.row?.numMetaDada}
+                                    showZero
+                                    sx={{ '& .MuiBadge-badge': { right: -3, top: 10 } }}
+                                >
+                                    {t('page.metaExpedient.tabs.metaDada')}
+                                </StyledBadge>
+                            </MenuItem>
+                            <MenuItem onClick={() => navigate(`/metaExpedient/${params?.id}/estat`)}>
+                                <StyledBadge
+                                    badgeContent={params?.row?.numEstat}
+                                    showZero
+                                    sx={{ '& .MuiBadge-badge': { right: -3, top: 10 } }}
+                                >
+                                    {t('page.metaExpedient.tabs.expedientEstat')}
+                                </StyledBadge>
+                            </MenuItem>
+                            <MenuItem onClick={() => navigate(`/metaExpedient/${params?.id}/tasca`)}>
+                                <StyledBadge
+                                    badgeContent={params?.row?.numTasca}
+                                    showZero
+                                    sx={{ '& .MuiBadge-badge': { right: -3, top: 10 } }}
+                                >
+                                    {t('page.metaExpedient.tabs.tasca')}
+                                </StyledBadge>
+                            </MenuItem>
+                            {params?.row?.gestioAmbGrupsActiva && (
+                                <MenuItem onClick={() => navigate(`/metaExpedient/${params?.id}/grup`)}>
+                                    <StyledBadge
+                                        badgeContent={params?.row?.numGrup}
+                                        showZero
+                                        sx={{ '& .MuiBadge-badge': { right: -3, top: 10 } }}
+                                    >
+                                        {t('page.metaExpedient.tabs.grup')}
+                                    </StyledBadge>
+                                </MenuItem>
+                            )}
+                            {user?.sessionScope?.isCarpetesDefecte && (
+                                <MenuItem onClick={() => navigate(`/metaExpedient/${params?.id}/carpeta`)}>
+                                    <StyledBadge
+                                        badgeContent={params?.row?.numCarpetes}
+                                        showZero
+                                        sx={{ '& .MuiBadge-badge': { right: -3, top: 10 } }}
+                                    >
+                                        {t('page.metaExpedient.tabs.carpeta')}
+                                    </StyledBadge>
+                                </MenuItem>
+                            )}
+                        </MenuButton>
+                    ),
+                },
+                {
+                    field: 'numComentaris',
+                    headerName: '',
+                    sortable: false,
+                    flex: 0.25,
+                    minWidth: 55,
+                    renderCell: (params: any) => (
+                        <MetaExpedientComment entity={params?.row} readOnly={params?.row?.usuariActualOnlyObservador} onClose={refresh} />
+                    ),
+                },
+                {
+                    field: 'numPermisos',
+                    headerName: '',
+                    sortable: false,
+                    flex: 0.25,
+                    minWidth: 55,
+                    hidden: !(rol?.isAdmin || rol?.isOrganAdmin),
+                    renderCell: (params: any) => (
+                        <PermisosButton
+                            numPermisos={params?.row?.numPermisos}
+                            error={params?.row?.errorPermisos}
+                            title={params?.row?.errorPermisos ? t('page.metaExpedient.alert.errorPermisos') : undefined}
+                            to={`/metaExpedient/${params?.row?.id}/permis`}
+                        />
+                    ),
+                },
+            ].filter((col: any) => !col?.hidden),
+        [t, user?.sessionScope?.isRevisioActiva]
+    );
 
     const {handleShow: handleImportRolsac, content: contentImportRolsac} = useImportRolsac(apiRef)
     const {handleShow: handleImportFitxer, content: contentImportFitxer} = useImportFitxer(refresh)

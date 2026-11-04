@@ -9,6 +9,7 @@ import {GridSortDirection} from "@mui/x-data-grid-pro";
 import {formatDate} from "../../../util/dateUtils.ts";
 import {Link} from "@mui/material";
 import {Link as RouterLink} from "react-router-dom";
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const sortModel:any = [{ field: 'createdDate', sort: 'desc' }];
 const perspectives = ["AVISOS", "ESTAT"];
@@ -108,14 +109,7 @@ const useExpedientDialog = () => {
         }
     };
 
-    const buttons :any[] = [
-        {
-            value: 'close',
-            text: t('common.close'),
-            icon: 'close',
-            componentProps: { variant: 'outlined' },
-        },
-    ];
+    const buttons = useCloseDialogButtons('close');
 
     const dialog =
         <MuiDialog

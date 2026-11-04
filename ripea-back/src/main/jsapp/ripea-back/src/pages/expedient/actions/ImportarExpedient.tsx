@@ -10,6 +10,7 @@ import {StyledEstat} from "../ExpedientGrid.tsx";
 import {useActions} from "../details/CommonActions.tsx";
 import {springFilterBuilder as expedientFilterBuilder} from "../ExpedientFilter.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const sortModel:any[] = [{ field: 'createdDate', sort: 'desc' }];
 const perspectives = ['ESTAT']
@@ -134,7 +135,6 @@ const ImportarExpedient = (props:any) => {
 }
 
 const useImportarExpedient = (entity:any, refresh?: () => void) => {
-    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
 
     const handleOpen = () => {
@@ -147,19 +147,14 @@ const useImportarExpedient = (entity:any, refresh?: () => void) => {
         }
     };
 
+    const closeButtons = useCloseDialogButtons('close');
     const dialog =
         <MuiDialog
             open={open}
             closeCallback={handleClose}
             title={entity?.nom}
             componentProps={{ fullWidth: true, maxWidth: 'lg' }}
-            buttons={[
-                {
-                    value: 'close',
-                    text: t('common.close'),
-                    componentProps: { variant: 'outlined' }
-                },
-            ]}
+            buttons={closeButtons}
             buttonCallback={(value :any) :void=>{
                 if (value=='close') {
                     handleClose();

@@ -38,6 +38,8 @@ const translationCa = {
             update: "Modificat el {{lastModifiedDate}} per '{{lastModifiedBy}}'.",
         },
         nouPermis: "Nou permís",
+        permisos: "Permisos",
+        validacions: "Validacions",
         advancedSearch: 'Cerca avançada',
         advancedSearchOpen: 'Avançat',
         advancedSearchClose: 'Bàsic',
@@ -1580,6 +1582,7 @@ const translationCa = {
                 grups: "Grups",
                 actiu: "Actiu",
                 estat: "Estat",
+                elements: "Elements",
             },
             detall: {
                 elementsProc: "Gestió del procediment: {{nom}}",
@@ -2468,7 +2471,7 @@ const translationCa = {
                 monitor: "Monitor de sistema",
 
                 config: "Configurar",
-                props: "Propietats configurables",
+                props: "Propietats de configuració",
                 pinbal: "Serveis PINBAL",
                 segonPla: "Reiniciar tasques en segon pla...",
                 plugins: "Reinicia plugins...",

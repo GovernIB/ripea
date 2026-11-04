@@ -13,6 +13,7 @@ import StyledMuiFilter from '../../../components/StyledMuiFilter.tsx';
 import { useActions, useMassiveActions } from '../../anotacions/details/AnotacioActions.tsx';
 import { FieldData, MuiDetail } from '@src/components/MuiDetail.tsx';
 import { ErrorArea } from '@src/components/ErrorPage.tsx';
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const useAnotacionsComunicadesDetail = () => {
     const { t } = useTranslation();
@@ -47,19 +48,14 @@ const useAnotacionsComunicadesDetail = () => {
         return field?.label ?? field?.name;
     };
 
+    const closeButtons = useCloseDialogButtons('close');
     const dialog = (
         <MuiDialog
             open={open}
             closeCallback={handleClose}
             title={t('page.tasca.detall.title')}
             componentProps={{ fullWidth: true, maxWidth: 'lg' }}
-            buttons={[
-                {
-                    value: 'close',
-                    text: t('common.close'),
-                    componentProps: { variant: 'outlined' },
-                },
-            ]}
+            buttons={closeButtons}
             buttonCallback={(value: any): void => {
                 if (value == 'close') {
                     handleClose();

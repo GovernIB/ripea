@@ -23,6 +23,17 @@ export const isTypingFieldType = (type?: string) => TYPING_FIELD_TYPES.includes(
 const ADVANCED_SEARCH_FIELD = 'advanced';
 
 /**
+ * Dades d'un filtre sense el commutador de cerca avançada. S'usa per no desar-lo a la sessió ni restaurar-lo:
+ * els valors dels camps es recorden, però el panell avançat comença sempre tancat en tornar a la pantalla.
+ */
+export const withoutAdvancedSearch = <T extends Record<string, unknown> | null | undefined>(data: T): T => {
+    if (data == null || !(ADVANCED_SEARCH_FIELD in data)) return data;
+    const rest = { ...data };
+    delete rest[ADVANCED_SEARCH_FIELD];
+    return rest as T;
+};
+
+/**
  * Forma canònica de les dades d'un filtre per comparar-les: sense camps buits (`undefined`, `null`,
  * text buit o llista buida), sense el commutador de cerca avançada i amb els camps ordenats per nom.
  * Un camp esborrat i un camp que no s'ha tocat són el mateix filtre, i commutar entre cerca bàsica i

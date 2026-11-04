@@ -6,6 +6,7 @@ import Load from "../../../components/Load.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import * as builder from "../../../util/springFilterUtils.ts";
 import {useUserSession} from "../../../components/Session.tsx";
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const useActions = (refresh?: () => void) => {
     const { t } = useTranslation();
@@ -110,7 +111,7 @@ const useAlerta = () => {
     const [entity, setEntity] = useState<any>();
     const [count, setCount] = useState<number>();
 
-    const handleOpen = (id:any, row:any) => {
+    const handleOpen = (_id:any, row:any) => {
         setEntity(row);
         setOpen(true);
     }
@@ -128,18 +129,13 @@ const useAlerta = () => {
         }
     }, [count]);
 
+    const closeButtons = useCloseDialogButtons('close');
     const dialog = <MuiDialog
         open={open}
         closeCallback={handleClose}
         title={t('page.alert.action.read.title')}
         componentProps={{ fullWidth: true, maxWidth: 'md'}}
-        buttons={[
-            {
-                value: 'close',
-                text: t('common.close'),
-                componentProps: { variant: 'outlined' }
-            },
-        ]}
+        buttons={closeButtons}
         buttonCallback={(value :any) :void=>{
             if (value=='close') {
                 handleClose();

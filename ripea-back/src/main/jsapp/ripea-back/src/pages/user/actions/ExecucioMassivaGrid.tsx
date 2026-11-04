@@ -10,6 +10,7 @@ import Load from "../../../components/Load.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import * as builder from "../../../util/springFilterUtils.ts";
 import {iniciaDescargaBlob} from "../../expedient/details/CommonActions.tsx";
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const useActions = () => {
     const { t } = useTranslation()
@@ -262,19 +263,14 @@ const useExecucioMassiva = () => {
         }
     };
 
+    const closeButtons = useCloseDialogButtons('close');
     const dialog =
         <MuiDialog
             open={open}
             closeCallback={handleClose}
             title={t('page.user.action.massives.title', {name: user?.nom})}
             componentProps={{fullWidth: true, maxWidth: 'xl'}}
-            buttons={[
-                {
-                    value: 'close',
-                    text: t('common.close'),
-                    componentProps: { variant: 'outlined' }
-                },
-            ]}
+            buttons={closeButtons}
             buttonCallback={(value: any): void => {
                 if (value == 'close') {
                     handleClose();
@@ -400,19 +396,14 @@ export const useExecucioMassivaContingut = () => {
         fields?.find((item: any) => item?.name === "tipus")?.options[entity?.tipus] ?? ''
     , [fields, entity]);
 
+    const closeButtons = useCloseDialogButtons('close');
     const dialog =
         <MuiDialog
             open={open}
             closeCallback={handleClose}
             title={t('page.user.action.massives.detail', {tipus})}
             componentProps={{fullWidth: true, maxWidth: 'lg'}}
-            buttons={[
-                {
-                    value: 'close',
-                    text: t('common.close'),
-                    componentProps: { variant: 'outlined' }
-                },
-            ]}
+            buttons={closeButtons}
             buttonCallback={(value: any): void => {
                 if (value == 'close') {
                     handleClose();

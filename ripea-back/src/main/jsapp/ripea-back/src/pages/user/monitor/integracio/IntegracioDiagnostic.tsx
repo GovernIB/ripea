@@ -11,6 +11,7 @@ import {getAlertSeverity} from "../../../../components/BaseApp.tsx";
 import {MenuActionButton} from "../../../../components/MenuButton.tsx";
 import AlertExpand from "../../../../components/AlertExpand.tsx";
 import {ErrorArea} from "../../../../components/ErrorPage.tsx";
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const INTEGRACIO_RESOURCE = 'integracioResource';
 const FILTER_PLUGIN_CODE = 'FILTER_PLUGIN';
@@ -181,14 +182,7 @@ export const useIntegracioDiagnostic = (integracions?:any[]) => {
         }
     };
 
-    const buttons :any[] = [
-        {
-            value: 'close',
-            text: t('common.close'),
-            icon: 'close',
-            componentProps: { variant: 'outlined' }
-        },
-    ]
+    const buttons = useCloseDialogButtons('close');
 
     const actions = [
         {

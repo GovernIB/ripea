@@ -113,25 +113,25 @@ describe('columns - columna itemId', () => {
 
     it('valueGetter retorna metaDocument quan itemValidacio és DOCUMENT', () => {
         const row = { itemValidacio: 'DOCUMENT', metaDocument: { id: 1, description: 'Doc A' }, metaDada: { id: 2, description: 'Dada B' } };
-        expect(itemIdCol?.valueGetter(undefined, row)).toEqual(row.metaDocument);
+        expect(itemIdCol?.valueGetter!(undefined, row)).toEqual(row.metaDocument);
     });
 
     it('valueGetter retorna metaDada quan itemValidacio és DADA', () => {
         const row = { itemValidacio: 'DADA', metaDocument: { id: 1, description: 'Doc A' }, metaDada: { id: 2, description: 'Dada B' } };
-        expect(itemIdCol?.valueGetter(undefined, row)).toEqual(row.metaDada);
+        expect(itemIdCol?.valueGetter!(undefined, row)).toEqual(row.metaDada);
     });
 
     it('valueGetter retorna metaDada quan itemValidacio no té valor', () => {
         const row = { metaDocument: { id: 1 }, metaDada: { id: 2, description: 'Dada B' } };
-        expect(itemIdCol?.valueGetter(undefined, row)).toEqual(row.metaDada);
+        expect(itemIdCol?.valueGetter!(undefined, row)).toEqual(row.metaDada);
     });
 
     it('valueFormatter retorna la propietat description de l\'objecte', () => {
         const value = { id: 5, description: 'Validació manual' };
-        expect(itemIdCol?.valueFormatter(value)).toBe('Validació manual');
+        expect(itemIdCol?.valueFormatter!(value)).toBe('Validació manual');
     });
 
     it('valueFormatter retorna undefined quan el valor és null', () => {
-        expect(itemIdCol?.valueFormatter(null)).toBeUndefined();
+        expect(itemIdCol?.valueFormatter!(null)).toBeUndefined();
     });
 });

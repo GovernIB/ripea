@@ -9,6 +9,7 @@ import StyledMuiGrid, { ToolbarButton } from '@src/components/StyledMuiGrid.tsx'
 import Iframe from '@src/components/Iframe.tsx';
 import Load from '@src/components/Load.tsx';
 import { useFluxFinalitzatSession } from '@src/components/SseClient.tsx';
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const RESOURCE_NAME = 'fluxFirmaUsuariResource';
 
@@ -122,19 +123,14 @@ const useFluxPortafirmesDialog = (refresh?: () => void) => {
         refresh?.();
     });
 
+    const closeButtons = useCloseDialogButtons('close');
     const dialog = (
         <MuiDialog
             open={open}
             closeCallback={handleClose}
             title={t(edicio ? 'page.fluxFirmaUsuari.action.update.title' : 'page.fluxFirmaUsuari.action.new.title')}
             componentProps={{ fullWidth: true, maxWidth: 'lg' }}
-            buttons={[
-                {
-                    value: 'close',
-                    text: t('common.close'),
-                    componentProps: { variant: 'outlined' },
-                },
-            ]}
+            buttons={closeButtons}
             buttonCallback={(value: any): void => {
                 if (value == 'close') {
                     handleClose();

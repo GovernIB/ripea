@@ -8,6 +8,7 @@ import {formatDate} from "../../../../../util/dateUtils.ts";
 import {DetailCard} from "../../../../../components/CardData.tsx";
 import {useUserSession} from "@src/components/Session.tsx";
 import {esMetaDocumentPerDefecte} from "@src/util/metaDocumentUtils.ts";
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const MetaDocumentDetail = (props:any) => {
     const {entity, fields} = props;
@@ -68,14 +69,7 @@ const useMetaDocumentDetail = () => {
         }
     };
 
-    const buttons :any[] = [
-        {
-            value: 'close',
-            text: t('common.close'),
-            icon: 'close',
-            componentProps: { variant: 'outlined' },
-        },
-    ]
+    const buttons = useCloseDialogButtons('close');
 
     const dialog =
         <MuiDialog

@@ -6,6 +6,7 @@ import TabComponent from "../../../components/TabComponent.tsx";
 import {CardButton, DetailCard, DetailCardContent} from "../../../components/CardData.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import {useActions} from "./NotificacioInteressatActions.tsx";
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const Dades = (props: any) => {
     const { entity } = props;
@@ -147,7 +148,7 @@ const useNotificacioInteressatDetail = () => {
     const [entity, setEntity] = useState<any>();
     const { t } = useTranslation();
 
-    const handleOpen = (id:any, row:any) => {
+    const handleOpen = (_id:any, row:any) => {
         setEntity(row);
         setOpen(true);
     }
@@ -172,6 +173,7 @@ const useNotificacioInteressatDetail = () => {
         },
     ]
 
+    const closeButtons = useCloseDialogButtons('close');
     const dialog =
         <MuiDialog
             open={open}
@@ -179,13 +181,7 @@ const useNotificacioInteressatDetail = () => {
             title={t('page.notificacioInteressat.detall.title')}
             componentProps={{ fullWidth: true, maxWidth: 'md'}}
             dialogContentProps={{ sx: { height: '100%', px: 2, py: 0 }}}
-            buttons={[
-                {
-                    value: 'close',
-                    text: t('common.close'),
-                    componentProps: { variant: 'outlined' }
-                },
-            ]}
+            buttons={closeButtons}
             buttonCallback={(value :any) :void=>{
                 if (value=='close') {
                     handleClose();

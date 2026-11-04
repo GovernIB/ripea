@@ -5,6 +5,7 @@ import {useTranslation} from "react-i18next";
 import * as builder from "../../../util/springFilterUtils.ts";
 import GridFormField from "../../../components/GridFormField.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const DadaForm = () => {
     const { t } = useTranslation()
@@ -109,7 +110,7 @@ const useDataGrid = (contingut:any, refresh?:() => void) => {
     const [open, setOpen] = useState(false);
     const [entity, setEntity] = useState<any>();
 
-    const handleOpen = (id:any, row:any) => {
+    const handleOpen = (_id:any, row:any) => {
         setEntity(row);
         setOpen(true);
     }
@@ -121,19 +122,14 @@ const useDataGrid = (contingut:any, refresh?:() => void) => {
         }
     };
 
+    const closeButtons = useCloseDialogButtons('close');
     const content =
         <MuiDialog
             open={open}
             title={t('page.metaDada.detail.value', {metaDada: entity?.nom})}
             closeCallback={handleClose}
             componentProps={{ fullWidth: true, maxWidth: 'sm' }}
-            buttons={[
-                {
-                    value: 'close',
-                    text: t('common.close'),
-                    componentProps: { variant: 'outlined' }
-                },
-            ]}
+            buttons={closeButtons}
             buttonCallback={(value :any) :void=>{
                 if (value=='close') {
                     handleClose();

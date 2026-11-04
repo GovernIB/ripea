@@ -1,95 +1,93 @@
-import {useTranslation} from "react-i18next";
-import {useMemo, useState} from "react";
-import {GridPage, useMuiDataGridApiRef} from "reactlib";
-import {ScreenFrame} from "../../components/ScreenFrame.tsx";
-import {icons} from "../../util/icons.ts";
-import StyledMuiGrid, {ToolbarButton} from "../../components/StyledMuiGrid.tsx";
-import {Grid, Icon, Badge, IconButton} from "@mui/material";
-import GridFormField from "../../components/GridFormField.tsx";
-import {OrganGestorFilter} from "./OrganGestorFilter.tsx";
-import {useOrganGestorSyncDialog} from "./actions/OrganGestorSync.tsx";
-import {useSession} from "../../components/SessionStorageContext.tsx";
-import {useOrganGestorPermisDialog} from "../user/configurar/PermisOrganGestorGrid.tsx";
+import { useTranslation } from 'react-i18next';
+import { useMemo, useState } from 'react';
+import { GridPage, useMuiDataGridApiRef } from 'reactlib';
+import { ScreenFrame } from '../../components/ScreenFrame.tsx';
+import { icons } from '../../util/icons.ts';
+import StyledMuiGrid, { ToolbarButton } from '../../components/StyledMuiGrid.tsx';
+import { Grid } from '@mui/material';
+import PermisosButton from '../../components/PermisosButton.tsx';
+import GridFormField from '../../components/GridFormField.tsx';
+import { OrganGestorFilter } from './OrganGestorFilter.tsx';
+import { useOrganGestorSyncDialog } from './actions/OrganGestorSync.tsx';
+import { useSession } from '../../components/SessionStorageContext.tsx';
+import { useOrganGestorPermisDialog } from '../user/configurar/PermisOrganGestorGrid.tsx';
 
 // permetreEnviamentPostal i permetreEnviamentPostalDescendents ja no es mostren: l'enviament
 // postal depèn del permís de l'entitat i del CIE de NOTIB (es consulta en obrir la notificació)
 const OrganGestorForm = () => {
-    return <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
-        <GridFormField name="codi" disabled readOnly/>
-        <GridFormField name="nom" disabled readOnly/>
-        <GridFormField name="pare" disabled readOnly/>
-        <GridFormField name="cif" disabled readOnly/>
-        <GridFormField name="utilitzarCifPinbal"/>
-    </Grid>
-}
+    return (
+        <Grid container direction={'row'} columnSpacing={1} rowSpacing={1}>
+            <GridFormField name="codi" disabled readOnly />
+            <GridFormField name="nom" disabled readOnly />
+            <GridFormField name="pare" disabled readOnly />
+            <GridFormField name="cif" disabled readOnly />
+            <GridFormField name="utilitzarCifPinbal" />
+        </Grid>
+    );
+};
 
 const OrganGestorGrid = () => {
-    const {t} = useTranslation();
+    const { t } = useTranslation();
     const [springFilter, setSpringFilter] = useState<string>();
-    const {value: treeViewStored, save: saveTreeView} = useSession('organGestorTreeView');
+    const { value: treeViewStored, save: saveTreeView } = useSession('organGestorTreeView');
     const treeView = !!treeViewStored;
 
     const gridApiRef = useMuiDataGridApiRef();
     const refresh = () => gridApiRef?.current?.refresh?.();
 
-    const {handleOpen, dialog} = useOrganGestorSyncDialog();
-    const {handleShow: handleShowPermis, dialog: permisDialog} = useOrganGestorPermisDialog(refresh);
+    const { handleOpen, dialog } = useOrganGestorSyncDialog();
+    const { handleShow: handleShowPermis, dialog: permisDialog } = useOrganGestorPermisDialog(refresh);
     const actions = [
         {
             label: t('common.update'),
-            icon: "edit",
+            icon: 'edit',
             showInMenu: true,
             clickShowUpdateDialog: true,
         },
-    ]
+    ];
 
     // Es recalcula en canviar de vista perquè, en tornar a la vista taula, es torni a aplicar
     // l'ordenació per nom (en vista arbre no hi ha columna 'nom' i la graella neteja l'ordenació).
-    const sortModel: any = useMemo(() => (!treeView ? [{field: 'nom', sort: 'asc'}] : []), [treeView])
-    const perspectives = useMemo(() => treeView?['PATH','COUNT_PERMISOS']:['COUNT_PERMISOS'], [treeView])
-    const columns:any[] = useMemo(()=>[
-        ...(!treeView ?[
+    const sortModel: any = useMemo(() => (!treeView ? [{ field: 'nom', sort: 'asc' }] : []), [treeView]);
+    const perspectives = useMemo(() => (treeView ? ['PATH', 'COUNT_PERMISOS'] : ['COUNT_PERMISOS']), [treeView]);
+    const columns: any[] = useMemo(
+        () => [
+            ...(!treeView
+                ? [
+                      {
+                          field: 'codi',
+                          flex: 0.4,
+                      },
+                      {
+                          field: 'nom',
+                          flex: 1,
+                      },
+                      {
+                          field: 'pare',
+                          flex: 1,
+                      },
+                  ]
+                : []),
             {
-                field: 'codi',
+                field: 'cif',
                 flex: 0.4,
             },
             {
-                field: 'nom',
-                flex: 1,
+                field: 'estat',
+                flex: 0.5,
             },
             {
-                field: 'pare',
-                flex: 1,
-            }
-        ] :[]),
-        {
-            field: 'cif',
-            flex: 0.4,
-        },
-        {
-            field: 'estat',
-            flex: 0.5,
-        },
-        {
-            field: 'permis',
-            headerName: '',
-            sortable: false,
-            flex: 0.2,
-            renderCell: (params:any) => <IconButton
-                aria-label="key"
-                color="inherit"
-                title="Permisos"
-                onClick={(e) => {
-                    e.stopPropagation();
-                    handleShowPermis(params?.row?.id);
-                }}
-            >
-                <Badge badgeContent={params?.row?.numPermisos} color="primary" showZero>
-                    <Icon>key</Icon>
-                </Badge>
-            </IconButton>
-        }
-    ], [treeView])
+                field: 'permis',
+                headerName: '',
+                sortable: false,
+                flex: 0.2,
+                renderCell: (params: any) => (
+                    <PermisosButton numPermisos={params?.row?.numPermisos} onClick={() => handleShowPermis(params?.row?.id)} />
+                ),
+            },
+        ],
+        [treeView]
+    );
 
     return (
         <GridPage>
@@ -173,5 +171,5 @@ const OrganGestorGrid = () => {
             {permisDialog}
         </GridPage>
     );
-}
+};
 export default OrganGestorGrid;

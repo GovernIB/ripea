@@ -6,6 +6,7 @@ import * as builder from "../../../util/springFilterUtils.ts";
 import useNotificacioInteressatActions from "./NotificacioInteressatActions.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import Load from "../../../components/Load.tsx";
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const columns = [
     {
@@ -38,7 +39,7 @@ const useNotificacioInteressatGrid = (expedient: any, refresh?: () => void) => {
 
     const {actions, components} = useNotificacioInteressatActions(entity, expedient, refresh);
 
-    const handleOpen = (id:any, row:any) => {
+    const handleOpen = (_id:any, row:any) => {
         setEntity(row);
         setOpen(true);
     }
@@ -50,19 +51,14 @@ const useNotificacioInteressatGrid = (expedient: any, refresh?: () => void) => {
         }
     };
 
+    const closeButtons = useCloseDialogButtons('close');
     const dialog =
         <MuiDialog
             open={open}
             title={t('page.notificacio.action.notificacioInteressat.title')}
             closeCallback={handleClose}
             componentProps={{ fullWidth: true, maxWidth: 'lg' }}
-            buttons={[
-                {
-                    value: 'close',
-                    text: t('common.close'),
-                    componentProps: { variant: 'outlined' }
-                },
-            ]}
+            buttons={closeButtons}
             buttonCallback={(value :any) :void=>{
                 if (value=='close') {
                     handleClose();

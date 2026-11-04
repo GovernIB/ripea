@@ -7,6 +7,7 @@ import {FieldData, MuiDetail} from "../../../../../components/MuiDetail.tsx";
 import {formatDate} from "../../../../../util/dateUtils.ts";
 import {StyledBadge} from "../../../../../components/StyledBadge.tsx";
 import { DetailCard } from "../../../../../components/CardData.tsx";
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const MetaExpEstatDetail = (props:any) => {
     const {entity, fields} = props;
@@ -61,14 +62,7 @@ const useMetaExpEstatDetail = () => {
         }
     };
 
-    const buttons :any[] = [
-        {
-            value: 'close',
-            text: t('common.close'),
-            icon: 'close',
-            componentProps: { variant: 'outlined' },
-        },
-    ]
+    const buttons = useCloseDialogButtons('close');
 
     const dialog =
         <MuiDialog

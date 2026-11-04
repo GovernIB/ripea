@@ -7,6 +7,7 @@ import {formatDate} from "../../../util/dateUtils.ts";
 import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
 import {useUserSession} from "../../../components/Session.tsx";
 import {DetailCard} from "../../../components/CardData.tsx";
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const MetaExpedientDetail = (props:any) => {
     const {entity, fields, isOrganAdmin} = props;
@@ -70,14 +71,7 @@ const useMetaExpedientDetail = () => {
         }
     };
 
-    const buttons :any[] = [
-        {
-            value: 'close',
-            text: t('common.close'),
-            icon: 'close',
-            componentProps: { variant: 'outlined' },
-        },
-    ]
+    const buttons = useCloseDialogButtons('close');
 
     const dialog =
         <MuiDialog

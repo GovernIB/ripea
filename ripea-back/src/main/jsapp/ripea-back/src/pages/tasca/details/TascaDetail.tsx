@@ -6,6 +6,7 @@ import {StyledPrioritat} from "../../expedient/ExpedientGrid.tsx";
 import {DetailCard} from "../../../components/CardData.tsx";
 import {StyledDate} from "../TasquesGrid.tsx";
 import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const useTascaDetail = () => {
     const { t } = useTranslation();
@@ -39,19 +40,14 @@ const useTascaDetail = () => {
         }
     };
 
+    const closeButtons = useCloseDialogButtons('close');
     const dialog =
         <MuiDialog
             open={open}
             closeCallback={handleClose}
             title={t('page.tasca.detall.title')}
             // componentProps={{ fullWidth: true, maxWidth: 'xl'}}
-            buttons={[
-                {
-                    value: 'close',
-                    text: t('common.close'),
-                    componentProps: { variant: 'outlined' }
-                },
-            ]}
+            buttons={closeButtons}
             buttonCallback={(value :any) :void=>{
                 if (value=='close') {
                     handleClose();

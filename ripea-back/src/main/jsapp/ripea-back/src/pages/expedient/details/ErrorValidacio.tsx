@@ -4,6 +4,7 @@ import { MuiDialog } from 'reactlib';
 import { useTranslation } from 'react-i18next';
 import Load from '../../../components/Load.tsx';
 import { useValidacioSession } from '../../../components/SseExpedient.tsx';
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 export const getResumErrorsText = (errors: any[], t: any): string => {
     if (!errors || errors.length === 0) return '';
@@ -95,6 +96,7 @@ const useErrorValidacio = (titleDialog?: string) => {
         }
     };
 
+    const closeButtons = useCloseDialogButtons('close');
     const dialog = (
         <MuiDialog
             open={open}
@@ -102,13 +104,7 @@ const useErrorValidacio = (titleDialog?: string) => {
             title={titleDialog ? titleDialog : t('page.alert.titleExpedient')}
             componentProps={{ fullWidth: true, maxWidth: 'sm' }}
             dialogContentProps={{ sx: { px: 2 } }}
-            buttons={[
-                {
-                    value: 'close',
-                    text: t('common.close'),
-                    componentProps: { variant: 'outlined' },
-                },
-            ]}
+            buttons={closeButtons}
             buttonCallback={(value: any): void => {
                 if (value == 'close') {
                     handleClose();

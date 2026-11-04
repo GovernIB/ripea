@@ -5,11 +5,11 @@ import {useConfirmDialogButtons} from "@src/util/buttonsOverride.tsx";
 import {ScreenFrame} from "../../../components/ScreenFrame.tsx";
 import {icons} from "../../../util/icons.ts";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import {Grid, Icon, Badge} from "@mui/material";
+import {Grid} from "@mui/material";
 import GridFormField from "../../../components/GridFormField.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
 import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
-import LinkIcon from "../../../components/LinkIcon.tsx";
+import PermisosButton from "../../../components/PermisosButton.tsx";
 
 const GrupFilterForm = () => {
     return <>
@@ -67,16 +67,10 @@ const columns:any[] = [
         headerName: '',
         sortable: false,
         flex: 0.25,
-        renderCell: (params:any) => <LinkIcon
-            aria-label="key"
-            color="inherit"
-            title="Permisos"
+        renderCell: (params:any) => <PermisosButton
+            numPermisos={params?.row?.numPermisos}
             to={`/grupPermis/${params?.row?.id}/permis`}
-        >
-            <Badge badgeContent={params?.row?.numPermisos} color="primary" showZero>
-                <Icon>key</Icon>
-            </Badge>
-        </LinkIcon>
+        />
     }
 ]
 

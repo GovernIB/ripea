@@ -1,8 +1,8 @@
 import { createTheme, darken, emphasize, ThemeOptions, type Theme } from '@mui/material/styles';
 import { lighten, alpha } from '@mui/material';
-import type {} from '@mui/x-data-grid/themeAugmentation';
-import type {} from '@mui/x-tree-view/themeAugmentation';
-import type {} from '@mui/x-date-pickers/themeAugmentation';
+import type { } from '@mui/x-data-grid/themeAugmentation';
+import type { } from '@mui/x-tree-view/themeAugmentation';
+import type { } from '@mui/x-date-pickers/themeAugmentation';
 import {
     HEADER_HEIGHT,
     ICON_SIZE,
@@ -217,11 +217,6 @@ const massiveSelectorBorders = (rgb: string) => ({
 const baseComponentStyles: ThemeOptions['components'] = {
     MuiCssBaseline: {
         styleOverrides: {
-            '.multi-line-cell': {
-                display: 'flex',
-                alignItems: 'baseline !important',
-                whiteSpace: 'break-spaces !important',
-            },
             // Sense marges ni padding verticals: la separació amb la barra de títol i la graella és el
             // `gap` de 15px (MAIN_GAP) del cos de ScreenFrame.
             '.styledFilter': {
@@ -250,14 +245,9 @@ const baseComponentStyles: ThemeOptions['components'] = {
                 padding: '8px 16px',
                 borderRadius: '8px',
             },
+            // Els colors de .myComment i .otherComment són a cada tema; aquí només la col·locació.
             '.myComment': {
                 alignSelf: 'end',
-                color: 'black',
-                backgroundColor: '#a5d6a7',
-            },
-            '.otherComment': {
-                color: 'black',
-                backgroundColor: '#e0e0e0',
             },
             '.multiplicitat': {
                 border: '1px solid lightgray',
@@ -278,9 +268,6 @@ const baseComponentStyles: ThemeOptions['components'] = {
                 '& .MuiButtonGroup-grouped:last-of-type': {
                     borderTopRightRadius: '4px',
                     borderBottomRightRadius: '4px',
-                },
-                '& .MuiButton': {
-                    color: 'inherit',
                 },
             },
             'input.Mui-disabled': {
@@ -352,7 +339,6 @@ const baseComponentStyles: ThemeOptions['components'] = {
     MuiButton: {
         styleOverrides: {
             root: {
-                borderRadius: '0px',
                 fontSize: '14px',
                 fontWeight: 400,
                 textTransform: 'none',
@@ -375,8 +361,6 @@ const baseComponentStyles: ThemeOptions['components'] = {
             // Menú permanent: la llibreria el plega a 57px i en reserva aquest espai al layout
             docked: { minWidth: `${MENU_WIDTH_COLLAPSED}px` },
             paper: {
-                right: 'auto',
-                left: 0,
                 minWidth: `${MENU_WIDTH_COLLAPSED}px`,
                 // El menú ha de començar sota la capçalera, que és més alta que els 64px de la llibreria
                 '& > .MuiBox-root:first-of-type': { marginTop: `${HEADER_HEIGHT}px` },
@@ -429,11 +413,6 @@ const baseComponentStyles: ThemeOptions['components'] = {
             }),
         },
     },
-    MuiPaper: {
-        styleOverrides: {
-            root: { borderRadius: '0px' },
-        },
-    },
     MuiCardContent: {
         styleOverrides: {
             root: {
@@ -447,6 +426,7 @@ const baseComponentStyles: ThemeOptions['components'] = {
             h5: { fontSize: '1.8rem', lineHeight: 1.2, fontWeight: 400 },
             h4: { fontSize: '1.5rem', lineHeight: 1.2, fontWeight: 400 },
             body1: { fontWeight: 500 },
+
             overline: { fontSize: '1.2rem', letterSpacing: '0em', textTransform: 'none' },
         },
     },
@@ -560,7 +540,7 @@ const baseComponentStyles: ThemeOptions['components'] = {
                 // El títol és una barra acolorida: el seu padding no separa el contingut.
                 // lib/Dialog força pt:0 i el botó de tancar queda entre títol i contingut ('~', no '+').
                 '.MuiDialogTitle-root ~ &': {
-                    paddingTop: '8px',
+                    paddingTop: '20px',
                 },
             },
         },
@@ -581,12 +561,6 @@ const baseComponentStyles: ThemeOptions['components'] = {
                 paddingRight: '16px',
             },
         },
-    },
-    // Evita que Chrome pinti de groc els camps autocompletats (autofill).
-    // El color de fons que substitueix el groc es defineix a cada tema,
-    // perquè ha de coincidir amb `background.paper` de la palette.
-    MuiOutlinedInput: {
-        styleOverrides: {},
     },
     MuiBadge: {
         styleOverrides: {
@@ -677,7 +651,6 @@ export const lightTheme = createTheme({
                     color: LIGHT_TEXT_PRIMARY,
                 },
                 '.otherComment': {
-                    ...((baseComponentStyles.MuiCssBaseline?.styleOverrides as any)['.otherComment']),
                     color: LIGHT_SECONDARY_MAIN,
                     backgroundColor: LIGHT_DIVIDER,
                 },
@@ -855,7 +828,6 @@ export const darkTheme = createTheme({
                     color: DARK_PRIMARY_CONTRAST_TEXT,
                 },
                 '.otherComment': {
-                    ...((baseComponentStyles.MuiCssBaseline?.styleOverrides as any)['.otherComment']),
                     color: DARK_PRIMARY_CONTRAST_TEXT,
                     backgroundColor: DARK_BACKGROUND_PAPER,
                 },
@@ -1075,7 +1047,6 @@ export const draculaTheme = createTheme({
                     color: DRACULA_PRIMARY_CONTRAST_TEXT,
                 },
                 '.otherComment': {
-                    ...((baseComponentStyles.MuiCssBaseline?.styleOverrides as any)['.otherComment']),
                     color: DRACULA_PRIMARY_CONTRAST_TEXT,
                     backgroundColor: DRACULA_BACKGROUND_PAPER,
                 },
@@ -1145,10 +1116,10 @@ export const draculaTheme = createTheme({
         },
         MuiAlert: {
             styleOverrides: {
-                standardWarning: { backgroundColor: darken(DRACULA_WARNING_MAIN,0.6) },
-                standardError: { backgroundColor: darken(DRACULA_ERROR_MAIN,0.7) },
-                standardInfo: { backgroundColor: darken(DRACULA_INFO_MAIN,0.7) },
-                standardSuccess: { backgroundColor: darken(DRACULA_SUCCESS_MAIN,0.75) },
+                standardWarning: { backgroundColor: darken(DRACULA_WARNING_MAIN, 0.6) },
+                standardError: { backgroundColor: darken(DRACULA_ERROR_MAIN, 0.7) },
+                standardInfo: { backgroundColor: darken(DRACULA_INFO_MAIN, 0.7) },
+                standardSuccess: { backgroundColor: darken(DRACULA_SUCCESS_MAIN, 0.75) },
             },
         },
         MuiDataGrid: {
@@ -1194,7 +1165,7 @@ export const draculaTheme = createTheme({
                         },
                     ],
                     '.MuiDialog-paper &.MuiButton-outlinedPrimary': {
-                         borderColor: DRACULA_SECONDARY_MAIN,
+                        borderColor: DRACULA_SECONDARY_MAIN,
                     },
                 },
             },

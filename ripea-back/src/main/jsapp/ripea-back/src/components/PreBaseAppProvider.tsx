@@ -16,7 +16,7 @@ export const TemporalMessageBridge = () => {
  * Context "pre-app" que exposa certes funcionalitats de BaseAppContext
  * abans que aquest estigui disponible a l'arbre de components.
  *
- * Algunes opcions del menú (menuEntries) fan servir hooks (com useSistemAction) que necessiten cridar 
+ * Algunes opcions del menú (menuEntries) fan servir hooks (com useSistemAction) que necessiten cridar
  * `temporalMessageShow` però s'inicialitzen ABANS que el BaseAppContext (de reactlib) existeixi.
  *
  * Aquest provider exposa una funció ESTABLE (temporalMessageShow) des del principi.
@@ -32,7 +32,7 @@ export const PreBaseAppProvider = ({ children }: { children: React.ReactNode }) 
      * Ref mutable que apunta a la implementació activa de temporalMessageShow.
      */
     const temporalMessageShowRef = React.useRef<(title: any, message: any, severity?: string) => void>(
-        (title, message) => console.error(message)
+        (_title, message) => console.error(message)
     );
 
     /** Funció ESTABLE exposada als consumidors d'aquest context. */

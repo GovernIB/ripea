@@ -14,15 +14,17 @@ export const HEADER_HEIGHT = 74;
 /** Alçada del peu (px). Es passa a la llibreria com a `footerHeight`: el menú hi reserva l'espai. */
 export const FOOTER_HEIGHT = 36;
 
-/** Alçada dels logos de la capçalera (px). */
+/** Alçada dels logos de la capçalera (px). Marca el logo de l'aplicació; el del Govern s'hi adapta (`contain`). */
 export const LOGO_HEIGHT = 59;
 
 /**
  * Espai (px) entre la línia separadora de la capçalera i cada un dels dos logos, a banda i banda
  * d'aquesta: el del Govern a l'esquerra i el de l'aplicació a la dreta. El separador cau sempre a la
- * vora dreta del menú obert i no es mou en plegar-lo.
+ * vora dreta del menú obert i no es mou en plegar-lo. Amb el menú obert, 16 fa que el logo de
+ * l'aplicació comenci just on la vora taronja del ScreenFrame: els 15px de padding de `<main>` més
+ * 1px de vora de la targeta.
  */
-export const LOGO_SEPARATOR_GAP = 12;
+export const LOGO_SEPARATOR_GAP = 16;
 
 /**
  * Marge (px) de l'àrea de contingut (`<main>`) i separació entre els elements que hi ha apilats: la

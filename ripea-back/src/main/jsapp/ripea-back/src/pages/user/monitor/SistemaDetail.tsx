@@ -7,6 +7,7 @@ import {ContenidoData, DetailCard, DetailCardContent} from "../../../components/
 import {Grid, Box, Typography} from "@mui/material";
 import TonalLinearProgress from "../../../components/TonalLinearProgress.tsx";
 import { usePreBaseAppContext } from "@src/components/PreBaseAppProvider.tsx";
+import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const useSistemAction = () => {
     const {
@@ -249,14 +250,7 @@ export const useSistemaDetail = () => {
         }
     };
 
-    const buttons :any[] = [
-        {
-            value: 'close',
-            text: t('common.close'),
-            icon: 'close',
-            componentProps: { variant: 'outlined' }
-        },
-    ]
+    const buttons = useCloseDialogButtons('close');
 
     const tabs = [
         {

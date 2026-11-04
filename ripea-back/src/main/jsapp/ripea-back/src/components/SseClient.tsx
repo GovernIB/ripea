@@ -62,12 +62,12 @@ export const useFluxFinalitzatSession = () => useTempSession(flux_finalitzatKey)
  * Rep esdeveniments en temps real i actualitza la sessió
  */
 export const SseClient: React.FC = () => {
-    
+
     const eventSourceRef = useRef<EventSource | null>(null);
-    const { get, save: saveSession, removeAll } = useSseClientSession();
+    const { save: saveSession, removeAll } = useSseClientSession();
     const { value: user } = useUserSession();
     const { apiUrl } = useResourceApiContext();
-    
+
     const addEventListener = (eventSource: EventSource, key: string) => {
         eventSource.addEventListener(key, (event) => {
             try {
