@@ -31,6 +31,7 @@ import es.caib.pinbal.client.recobriment.v2.DadaTipusEnum;
 import es.caib.pinbal.client.recobriment.v2.GrupDadesEspecifiques;
 import es.caib.pinbal.client.recobriment.v2.PeticioRespostaSincrona;
 import es.caib.ripea.service.intf.dto.PinbalFormulariDto;
+import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.dto.PinbalFormulariDto.Camp;
 import es.caib.ripea.service.intf.dto.PinbalFormulariDto.CampTipus;
 import es.caib.ripea.service.intf.dto.PinbalFormulariDto.Seccio;
@@ -68,7 +69,14 @@ public final class PinbalFormulariUtils {
 	/** Clau d'un error de validació de PINBAL sobre una dada específica: ...dadesEspecifiques[path]. */
 	private static final Pattern ERROR_DADA_ESPECIFICA = Pattern.compile("dadesEspecifiques\\[(.+)]$");
 	/** Durada d'una validació DATA_DIFERENCIA tal com la dona l'API de PINBAL: "6 MESOS" (la unitat és opcional). */
-	private static final Pattern DIFERENCIA = Pattern.compile("^\\s*(\\d+)\\s*([a-zA-Z]+)?\\s*$");
+	/**
+	 * Error de l'esquema XSD (Xerces): "cvc-codi: detall", fins al final del missatge, sense la frase final "It must
+	 * be..." ni els parèntesis de tancament.
+	 */
+	private static final Pattern ERROR_ESQUEMA = Pattern.compile(
+			"cvc-[\\w.-]+:\\s*(.*?)(?:\\s*It must be .*)?\\)*\\s*$",
+			Pattern.DOTALL);
+	private static final Pattern DIFERENCIA =Pattern.compile("^\\s*(\\d+)\\s*([a-zA-Z]+)?\\s*$");
 
 	private static final Set<String> BOOLEA_CERT = Set.of("true", "on", "si", "sí", "s", "yes", "1");
 	private static final Set<String> BOOLEA_FALS = Set.of("false", "off", "no", "n", "0");
@@ -230,6 +238,20 @@ public final class PinbalFormulariUtils {
 	 * camp en lloc del path quan l'error és d'una dada específica.
 	 */
 	public static String descripcioError(PeticioRespostaSincrona resposta, List<DadaEspecifica> dades) {
+		return descripcioError(resposta, dades, false);
+	}
+
+	/**
+	 * Descripció de l'error d'una petició.
+	 *
+	 * @param senseErrorsAmbCamp
+	 *            true per deixar fora els errors de validació que corresponen a un camp del formulari
+	 *            ({@link #errorsCampsFormulari}), que el formulari ja mostra sota el camp.
+	 */
+	public static String descripcioError(
+			PeticioRespostaSincrona resposta,
+			List<DadaEspecifica> dades,
+			boolean senseErrorsAmbCamp) {
 		if (resposta == null) {
 			return "PINBAL no ha retornat cap resposta";
 		}
@@ -243,7 +265,11 @@ public final class PinbalFormulariUtils {
 			if (dades != null) {
 				dades.stream().filter(Objects::nonNull).forEach(d -> textsPerCodi.putIfAbsent(d.getCodi(), textCamp(d)));
 			}
+			Set<String> codisFormulari = senseErrorsAmbCamp ? codisCampsFormulari(dades) : null;
 			resposta.getErrorsValidacio().forEach((camp, errors) -> {
+				if (codisFormulari != null && campFormulariError(camp, errors, codisFormulari) != null) {
+					return;
+				}
 				String nomCamp = camp;
 				Matcher matcher = camp != null ? ERROR_DADA_ESPECIFICA.matcher(camp) : null;
 				if (matcher != null && matcher.find()) {
@@ -256,6 +282,126 @@ public final class PinbalFormulariUtils {
 			return "Estat de la petició: " + resposta.getEstat();
 		}
 		return String.join("; ", parts);
+	}
+
+	/** Prefixos de les claus dels errors de validació de PINBAL que corresponen al titular. */
+	private static final String[] ERRORS_TITULAR = { "solicitud.titular", "dadesComunes.titular" };
+
+	/**
+	 * Errors de validació de PINBAL que corresponen a camps del formulari REACT de nova consulta
+	 * (DocumentResource.NewDocPinbalForm): les dades específiques que es mostren al formulari, el titular, la finalitat
+	 * i el consentiment. La resta (procediment, funcionari, dades específiques que no es mostren...) no tenen camp i
+	 * només surten a la descripció de l'error.
+	 *
+	 * @return els missatges d'error per nom del camp del formulari (buit si no n'hi ha cap).
+	 */
+	public static Map<String, List<String>> errorsCampsFormulari(PeticioRespostaSincrona resposta, List<DadaEspecifica> dades) {
+		Map<String, List<String>> resultat = new LinkedHashMap<>();
+		if (resposta == null || resposta.getErrorsValidacio() == null) {
+			return resultat;
+		}
+		Set<String> codisFormulari = codisCampsFormulari(dades);
+		resposta.getErrorsValidacio().forEach((clau, errors) -> {
+			String camp = campFormulariError(clau, errors, codisFormulari);
+			if (camp != null) {
+				resultat.computeIfAbsent(camp, c -> new ArrayList<>()).addAll(errors);
+			}
+		});
+		return resultat;
+	}
+
+	/**
+	 * Camp del formulari d'un error de validació de PINBAL. Les claus són les de PINBAL: solicitud.dadesEspecifiques[path],
+	 * solicitud.titular.*, dadesComunes.finalitat...
+	 *
+	 * @return el nom del camp, o null si l'error no té missatge o no correspon a cap camp del formulari.
+	 */
+	private static String campFormulariError(String clau, List<String> errors, Set<String> codisFormulari) {
+		if (clau == null || errors == null || errors.isEmpty()) {
+			return null;
+		}
+		Matcher matcher = ERROR_DADA_ESPECIFICA.matcher(clau);
+		if (matcher.find()) {
+			return codisFormulari.contains(matcher.group(1))
+					? DocumentResource.NewDocPinbalForm.DADA_ESPECIFICA_PREFIX + matcher.group(1)
+					: null;
+		}
+		for (String prefix: ERRORS_TITULAR) {
+			if (clau.equals(prefix) || clau.startsWith(prefix + ".")) {
+				return DocumentResource.NewDocPinbalForm.Fields.titular;
+			}
+		}
+		if ("dadesComunes.finalitat".equals(clau)) {
+			return DocumentResource.NewDocPinbalForm.Fields.finalitat;
+		}
+		if ("dadesComunes.consentiment".equals(clau)) {
+			return DocumentResource.NewDocPinbalForm.Fields.consentiment;
+		}
+		return null;
+	}
+
+	/** Codis de les dades específiques que són camps del formulari: les que es mostren i no són etiquetes. */
+	private static Set<String> codisCampsFormulari(List<DadaEspecifica> dades) {
+		if (dades == null) {
+			return Set.of();
+		}
+		return dades.stream()
+				.filter(Objects::nonNull)
+				.filter(PinbalFormulariUtils::esMostra)
+				.filter(d -> tipusCamp(d) != CampTipus.ETIQUETA)
+				.map(DadaEspecifica::getCodi)
+				.collect(Collectors.toSet());
+	}
+
+	/**
+	 * Codis de l'estat de les dades específiques de la resposta que indiquen que l'emissor ha tramitat la consulta. No
+	 * són estàndard: 0003 als serveis que segueixen els codis SCSP i 0 als de la DGT i de Justícia (SVDRRCC*).
+	 */
+	private static final Set<String> CODIS_ESTAT_EMISSOR_OK = Set.of("0003", "0");
+	/** Rutes de l'estat de l'emissor a les dades específiques de la resposta (la primera és la més habitual). */
+	private static final String[] RUTES_ESTAT_EMISSOR = { "DatosEspecificos/Retorno/Estado/", "DatosEspecificos/Estado/" };
+
+	/**
+	 * Error de l'emissor dins les dades específiques de la resposta. PINBAL només mira l'estat general de la transmissió:
+	 * si l'emissor rebutja la consulta dins les dades específiques (p.ex. Justícia amb CodigoEstado=400 i el motiu a
+	 * LiteralError), PINBAL la dona per tramitada.
+	 *
+	 * @return el codi d'estat i el text de l'error (o null si l'emissor no n'ha donat cap), o null si les dades
+	 *         específiques no tenen estat o el codi és d'una consulta tramitada.
+	 */
+	public static String[] errorEstatEmissor(Map<String, String> dadesEspecifiquesResposta) {
+		if (dadesEspecifiquesResposta == null) {
+			return null;
+		}
+		for (String ruta: RUTES_ESTAT_EMISSOR) {
+			String codi = senseBlancs(dadesEspecifiquesResposta.get(ruta + "CodigoEstado"));
+			if (codi != null) {
+				return CODIS_ESTAT_EMISSOR_OK.contains(codi)
+						? null
+						: new String[] { codi, senseBlancs(dadesEspecifiquesResposta.get(ruta + "LiteralError")) };
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Detall d'un error de validació de l'esquema de la petició (l'emissor o PINBAL validen l'XML amb l'XSD del servei),
+	 * que és el que diu què falla. Per exemple, de "...Error durante la validacion del esquema
+	 * '/schemas/SVDBECAWS01v3/peticion.xsd'. cvc-enumeration-valid: Value 'DNI' is not facet-valid with respect to
+	 * enumeration '[NIF, NIE]'. It must be a value from the enumeration.)" torna "Value 'DNI' is not facet-valid with
+	 * respect to enumeration '[NIF, NIE]'.".
+	 *
+	 * @return el detall del primer error d'esquema, o null si el missatge no en conté cap.
+	 */
+	public static String detallErrorEsquema(String missatge) {
+		if (missatge == null) {
+			return null;
+		}
+		Matcher matcher = ERROR_ESQUEMA.matcher(missatge);
+		if (!matcher.find()) {
+			return null;
+		}
+		return senseBlancs(matcher.group(1));
 	}
 
 	/**

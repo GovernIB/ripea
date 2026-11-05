@@ -79,6 +79,7 @@ import es.caib.ripea.service.helper.ExecucioMassivaHelper;
 import es.caib.ripea.service.helper.ExpedientHelper;
 import es.caib.ripea.service.helper.MessageHelper;
 import es.caib.ripea.service.helper.MetaExpedientHelper;
+import es.caib.ripea.service.helper.PinbalFormulariUtils;
 import es.caib.ripea.service.helper.PinbalHelper;
 import es.caib.ripea.service.helper.PluginHelper;
 import es.caib.ripea.service.helper.RolHelper;
@@ -129,6 +130,8 @@ import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.dto.VersioDocumentEnum;
 import es.caib.ripea.service.intf.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.service.intf.dto.ViaFirmaEnviarDto;
+import es.caib.ripea.service.intf.exception.AccioValidacioException;
+import es.caib.ripea.service.intf.exception.PinbalValidacioException;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.DocumentResource;
@@ -1454,12 +1457,39 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 	            if (resultatConsulta==null) {
 	            	return params;
 	            } else {
-	            	throw new ActionExecutionException(getResourceClass(), null, code, messageHelper.getMessage("document.nouDocumentPinbal.reject", new Object[]{resultatConsulta.getMessage()}));
+	            	excepcioLogHelper.addExcepcio("/document/NouDocumentPinbalActionExecutor", resultatConsulta);
+	            	throw rebuig(code, resultatConsulta);
 	            }
+			} catch (ActionExecutionException e) {
+				// Ja és el rebuig: no s'ha de tornar a embolcallar (el missatge duria el prefix dues vegades)
+				throw e;
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/document/NouDocumentPinbalActionExecutor", e);
-				throw new ActionExecutionException(getResourceClass(), null, code, messageHelper.getMessage("document.nouDocumentPinbal.reject", new Object[]{e.getMessage()}));
+				throw rebuig(code, e);
 			}
+		}
+
+		/**
+		 * Rebuig de la consulta amb el missatge de l'error. base-boot retalla el missatge a 250 caràcters: si l'error és
+		 * de l'esquema de la petició (cvc-...), es mostra només el detall de l'esquema, que és el que diu què falla. El
+		 * missatge sencer queda al monitor d'integracions.
+		 */
+		private ActionExecutionException rebuig(String code, Exception error) {
+			if (error instanceof PinbalValidacioException) {
+				// Errors de camps del formulari: es retornen com a errors de validació (422) perquè es marquin els camps
+				PinbalValidacioException errorValidacio = (PinbalValidacioException)error;
+				return new AccioValidacioException(
+						getResourceClass(),
+						null,
+						code,
+						messageHelper.getMessage("document.nouDocumentPinbal.reject", new Object[]{errorValidacio.getMissatgeGeneral()}),
+						errorValidacio.getErrorsCamps());
+			}
+			String detallEsquema = PinbalFormulariUtils.detallErrorEsquema(error.getMessage());
+			String missatge = detallEsquema != null
+					? messageHelper.getMessage("document.nouDocumentPinbal.error.esquema", new Object[]{detallEsquema})
+					: error.getMessage();
+			return new ActionExecutionException(getResourceClass(), null, code, messageHelper.getMessage("document.nouDocumentPinbal.reject", new Object[]{missatge}));
 		}
 
 		/**

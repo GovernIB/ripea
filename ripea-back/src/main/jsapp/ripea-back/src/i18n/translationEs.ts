@@ -965,7 +965,7 @@ const translationEs = {
                         carregant: "Cargando los datos específicos del servicio PINBAL...",
                         error: "No se han podido obtener los datos específicos del servicio PINBAL",
                         validacio: {
-                            EXPRESSIO_REGULAR: "El valor no tiene el formato esperado por el servicio.",
+                            EXPRESSIO_REGULAR: "Los caracteres que pueden usarse en este campo están limitados: {{expressio}}",
                             NUM_RANG: "Número entero entre {{minim}} y {{maxim}}.",
                             NUM_MINIM: "Número entero igual o superior a {{minim}}.",
                             NUM_MAXIM: "Número entero igual o inferior a {{maxim}}.",

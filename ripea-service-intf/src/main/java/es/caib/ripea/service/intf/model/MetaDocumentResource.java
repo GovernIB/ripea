@@ -32,7 +32,7 @@ import lombok.experimental.FieldNameConstants;
 @FieldNameConstants
 @MetaDocumentValid
 @ResourceConfig(
-		quickFilterFields = { "codi", "nom" },
+		quickFilterFields = { "codi", "nom", "pinbalServei.codi" },
 		descriptionField = "nom",
 		// Ordre dels desplegables de tipus de document (els camps de referència no envien l'ordenació)
 		defaultSortFields = { @ResourceConfig.ResourceSort(field = "nom", direction = Sort.Direction.ASC) },

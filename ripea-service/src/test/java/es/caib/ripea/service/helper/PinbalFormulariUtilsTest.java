@@ -344,6 +344,43 @@ class PinbalFormulariUtilsTest {
 	}
 
 	@Test
+	void errorsCampsFormulari_assignaElsErrorsAlsCampsDelFormulari() {
+		DadaEspecifica curs = dada(PATH + "Curso", DadaTipusEnum.TEXT);
+		curs.setEtiqueta("Curs");
+		DadaEspecifica oculta = dada(PATH + "Oculta", DadaTipusEnum.TEXT);
+		oculta.setVisible(false);
+		Map<String, List<String>> errors = new HashMap<>();
+		errors.put("solicitud.dadesEspecifiques[" + PATH + "Curso]", Collections.singletonList("Aquest camp és obligatori"));
+		errors.put("solicitud.dadesEspecifiques[" + PATH + "Oculta]", Collections.singletonList("Valor no vàlid"));
+		errors.put("solicitud.titular.documentNumero", Collections.singletonList("No és un NIF vàlid"));
+		errors.put("dadesComunes.titular.documentTipus", Collections.singletonList("No s'ha trobat l'element"));
+		errors.put("dadesComunes.finalitat", Collections.singletonList("Camp massa llarg"));
+		errors.put("dadesComunes.procedimentCodi", Collections.singletonList("No s'ha trobat el procediment"));
+		errors.put("dadesComunes.consentiment", Collections.emptyList());
+		PeticioRespostaSincrona resposta = PeticioRespostaSincrona.builder()
+				.error(true)
+				.missatge("S'han produït errors en la validació de les dades de la petició.")
+				.errorsValidacio(errors)
+				.build();
+		List<DadaEspecifica> dades = Arrays.asList(curs, oculta);
+
+		Map<String, List<String>> errorsCamps = PinbalFormulariUtils.errorsCampsFormulari(resposta, dades);
+
+		assertThat(errorsCamps).containsOnlyKeys("dadaEspecifica:" + PATH + "Curso", "titular", "finalitat");
+		assertThat(errorsCamps.get("dadaEspecifica:" + PATH + "Curso")).containsExactly("Aquest camp és obligatori");
+		assertThat(errorsCamps.get("titular")).containsExactlyInAnyOrder("No és un NIF vàlid", "No s'ha trobat l'element");
+		// Sense els errors que ja es mostren als camps
+		assertThat(PinbalFormulariUtils.descripcioError(resposta, dades, true))
+				.startsWith("S'han produït errors en la validació de les dades de la petició.")
+				.contains("dadesComunes.procedimentCodi: No s'ha trobat el procediment")
+				.contains("Oculta: Valor no vàlid")
+				.contains("dadesComunes.consentiment: ")
+				.doesNotContain("Curs", "NIF", "massa llarg");
+		assertThat(PinbalFormulariUtils.errorsCampsFormulari(null, dades)).isEmpty();
+		assertThat(PinbalFormulariUtils.errorsCampsFormulari(PeticioRespostaSincrona.builder().build(), null)).isEmpty();
+	}
+
+	@Test
 	void parseData_formatsAcceptatsIDatesInvalides() {
 		assertThat(PinbalFormulariUtils.parseData("2026-11-03", null)).isEqualTo(LocalDate.of(2026, 11, 3));
 		assertThat(PinbalFormulariUtils.parseData("03/11/2026", null)).isEqualTo(LocalDate.of(2026, 11, 3));
@@ -450,6 +487,54 @@ class PinbalFormulariUtilsTest {
 				.containsExactly(15, PinbalFormulariDto.ValidacioUnitat.DIES);
 		assertThat(camps.get(PATH + "unitatDesconeguda").getValidacio()).isNull();
 		assertThat(camps.get(PATH + "senseDurada").getValidacio()).isNull();
+	}
+
+	@Test
+	void errorEstatEmissor_rebutjaElsCodisQueNoSonDeConsultaTramitada() {
+		// Justícia (SVDRRCCDEFUNCIONWS01): error de validació de l'emissor amb la petició TRAMITADA a PINBAL
+		Map<String, String> justiciaError = new HashMap<>();
+		justiciaError.put("DatosEspecificos/Retorno/Estado/CodigoEstado", "400");
+		justiciaError.put("DatosEspecificos/Retorno/Estado/LiteralError", "El campo apellido2 no viene informado.");
+		assertThat(PinbalFormulariUtils.errorEstatEmissor(justiciaError))
+				.containsExactly("400", "El campo apellido2 no viene informado.");
+
+		// Error sense text, a la ruta sense Retorno (com SCDCPAJU)
+		Map<String, String> senseText = new HashMap<>();
+		senseText.put("DatosEspecificos/Estado/CodigoEstado", "0233");
+		assertThat(PinbalFormulariUtils.errorEstatEmissor(senseText)).containsExactly("0233", null);
+	}
+
+	@Test
+	void errorEstatEmissor_consultesTramitadesISenseEstat() {
+		Map<String, String> justiciaOk = new HashMap<>();
+		justiciaOk.put("DatosEspecificos/Retorno/Estado/CodigoEstado", "0");
+		justiciaOk.put("DatosEspecificos/Retorno/Estado/LiteralError", "Se han encontrado datos del titular");
+		Map<String, String> scspOk = new HashMap<>();
+		scspOk.put("DatosEspecificos/Estado/CodigoEstado", " 0003 ");
+		scspOk.put("DatosEspecificos/Estado/LiteralError", "TRAMITADA");
+		Map<String, String> senseEstat = new HashMap<>();
+		senseEstat.put("DatosEspecificos/Retorno/Resultado", "S");
+
+		assertThat(PinbalFormulariUtils.errorEstatEmissor(justiciaOk)).isNull();
+		assertThat(PinbalFormulariUtils.errorEstatEmissor(scspOk)).isNull();
+		assertThat(PinbalFormulariUtils.errorEstatEmissor(senseEstat)).isNull();
+		assertThat(PinbalFormulariUtils.errorEstatEmissor(null)).isNull();
+	}
+
+	@Test
+	void detallErrorEsquema_nomesElDetallDelPrimerErrorCvc() {
+		String error = "La estructura del fichero recibido no corresponde con el esquema. (La estructura del fichero "
+				+ "recibido no corresponde con el esquema.Error durante la validacion del esquema "
+				+ "'/schemas/SVDBECAWS01v3/peticion.xsd'. cvc-enumeration-valid: Value 'DNI' is not facet-valid with "
+				+ "respect to enumeration '[NIF, NIE]'. It must be a value from the enumeration.)";
+
+		assertThat(PinbalFormulariUtils.detallErrorEsquema(error))
+				.isEqualTo("Value 'DNI' is not facet-valid with respect to enumeration '[NIF, NIE]'.");
+		assertThat(PinbalFormulariUtils.detallErrorEsquema(
+				"Error de l'esquema. cvc-maxLength-valid: Value 'ABCDEFGHIJ' with length = '10' is not facet-valid with respect to maxLength '9' for type 'Curso'.)"))
+				.isEqualTo("Value 'ABCDEFGHIJ' with length = '10' is not facet-valid with respect to maxLength '9' for type 'Curso'.");
+		assertThat(PinbalFormulariUtils.detallErrorEsquema("L'usuari no te permisos per a realitzar aquesta consulta")).isNull();
+		assertThat(PinbalFormulariUtils.detallErrorEsquema(null)).isNull();
 	}
 
 	private static DadaEspecifica validat(DadaEspecifica dada, Validacio validacio) {

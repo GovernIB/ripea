@@ -963,7 +963,7 @@ const translationEn = {
                         carregant: "Loading the PINBAL service specific data...",
                         error: "The PINBAL service specific data could not be retrieved",
                         validacio: {
-                            EXPRESSIO_REGULAR: "The value does not have the format expected by the service.",
+                            EXPRESSIO_REGULAR: "The characters that can be used in this field are limited: {{expressio}}",
                             NUM_RANG: "Whole number between {{minim}} and {{maxim}}.",
                             NUM_MINIM: "Whole number equal to or greater than {{minim}}.",
                             NUM_MAXIM: "Whole number equal to or less than {{maxim}}.",

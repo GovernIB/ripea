@@ -111,6 +111,7 @@ import es.caib.ripea.service.intf.dto.PinbalServeiDocPermesEnumDto;
 import es.caib.ripea.service.intf.dto.SiNoEnumDto;
 import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.PinbalException;
+import es.caib.ripea.service.intf.exception.PinbalValidacioException;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.utils.PinbalTitularUtils;
 import es.caib.ripea.service.intf.utils.Utils;
@@ -538,9 +539,37 @@ public class PinbalHelper {
 					errorDescripcio,
 					null);
 			registrarMetrica(false, t0);
+			// Errors de validació de camps del formulari: la interfície REACT els marca sota cada camp
+			Map<String, List<String>> errorsCamps = PinbalFormulariUtils.errorsCampsFormulari(resposta, dades);
+			if (!errorsCamps.isEmpty()) {
+				throw new PinbalValidacioException(
+						errorDescripcio,
+						PinbalFormulariUtils.descripcioError(resposta, dades, true),
+						errorsCamps);
+			}
 			throw new PinbalException(errorDescripcio);
 		}
 		accioParams.put("idPeticion", idPeticio);
+		// PINBAL dona la petició per bona (TRAMITADA) encara que l'emissor l'hagi rebutjada dins les dades específiques
+		// (p.ex. Justícia: CodigoEstado=400). Mentre PINBAL no ho controli, es comprova aquí.
+		String[] errorEmissor = PinbalFormulariUtils.errorEstatEmissor(
+				resposta.getResposta() != null ? resposta.getResposta().getDadesEspecifiques() : null);
+		if (errorEmissor != null) {
+			String errorDescripcio = messageHelper.getMessage(
+					"pinbal.emissor.rebuig",
+					new Object[] { errorEmissor[0], errorEmissor[1] != null ? errorEmissor[1] : "-" });
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_PINBAL,
+					accioDescripcio,
+					getPinbalEndpointName(),
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					null);
+			registrarMetrica(false, t0);
+			throw new PinbalException(errorDescripcio);
+		}
 		integracioHelper.addAccioOk(
 				IntegracioHelper.INTCODI_PINBAL,
 				accioDescripcio,

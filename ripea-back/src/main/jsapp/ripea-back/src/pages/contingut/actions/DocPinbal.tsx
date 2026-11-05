@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo, useRef, useState} from "react";
+import {ClipboardEvent, KeyboardEvent, useEffect, useMemo, useRef, useState} from "react";
 import {useMuiFormDialogApiRef, useBaseAppContext, useFormContext, useResourceApiService} from "reactlib";
 import {Alert, Box, CircularProgress, Grid, Typography} from "@mui/material";
 import GridFormField, {GridButton} from "../../../components/GridFormField.tsx";
@@ -89,14 +89,16 @@ const valorInicialCamp = (camp: CampPinbal) =>
 const CLAU_VALIDACIO = 'page.document.action.pinbal.formulari.validacio';
 type Traduccio = ReturnType<typeof useTranslation>['t'];
 
-const esBuit = (valor: any) => valor == null || String(valor).trim() === '';
-
 /**
- * Restricció de la validació de PINBAL que es mostra sota el camp. La de l'expressió regular no es mostra: no diu res
- * a l'usuari, i el comentari del camp sol explicar el format.
+ * Restricció de la validació de PINBAL que es mostra sota el camp: la de l'expressió regular amb l'expressió, la dels
+ * números amb els límits i la de les dates amb el camp de referència.
  */
 const textRestriccio = (validacio: ValidacioPinbal | undefined, t: Traduccio): string | undefined => {
     switch (validacio?.tipus) {
+        case 'EXPRESSIO_REGULAR':
+            return validacio.expressioRegular
+                ? t(`${CLAU_VALIDACIO}.EXPRESSIO_REGULAR`, {expressio: validacio.expressioRegular})
+                : undefined;
         case 'NUM_RANG':
         case 'NUM_MINIM':
         case 'NUM_MAXIM':
@@ -114,68 +116,91 @@ const textRestriccio = (validacio: ValidacioPinbal | undefined, t: Traduccio): s
 }
 
 /**
- * Comprovació del valor al formulari, només de l'expressió regular i dels límits numèrics (les de dates depenen d'un
- * altre camp): torna el missatge d'error o undefined. Un camp buit no es comprova (l'obligatorietat va a part).
+ * Expressió regular de caràcters permesos: un sol element (una classe com [a-zA-Z], \d, \w, \s, \p{...} o .) amb un
+ * quantificador opcional, com [a-zA-Z]+ o [0-9]{1,25}. Una expressió amb estructura (com [A-Z]{2}[0-9]{4}) no es pot
+ * aplicar caràcter a caràcter mentre s'escriu: només es mostra i la valida PINBAL.
  */
-const crearComprovacio = (validacio: ValidacioPinbal | undefined, t: Traduccio): ((valor: any) => string | undefined) | undefined => {
-    if (validacio?.tipus === 'EXPRESSIO_REGULAR' && validacio.expressioRegular) {
-        let expressio: RegExp;
-        try {
-            // PINBAL exigeix que el valor sencer compleixi l'expressió (matches de Java)
-            expressio = new RegExp(`^(?:${validacio.expressioRegular})$`);
-        } catch {
-            // Expressió de Java que JavaScript no sap interpretar: només la comprova PINBAL
-            return undefined;
-        }
-        const missatge = t(`${CLAU_VALIDACIO}.EXPRESSIO_REGULAR`);
-        return (valor) => esBuit(valor) || expressio.test(String(valor)) ? undefined : missatge;
+const EXPRESSIO_CARACTERS = /^\^?(\[(?:\\.|[^\]\\])+\]|\\[dwsDWS]|\\p\{[\w=]+\}|\.)(\*|\+|\?|\{(\d+)(?:,(\d*))?\})?\$?$/;
+
+/** Caràcters que admet el camp i longitud màxima (sense límit si no n'hi ha). */
+type FiltreCaracters = { caracter: RegExp, longitudMaxima?: number };
+
+const crearFiltreCaracters = (expressio?: string): FiltreCaracters | undefined => {
+    const parts = expressio ? EXPRESSIO_CARACTERS.exec(expressio) : null;
+    if (!parts) {
+        return undefined;
     }
-    if (validacio?.tipus === 'NUM_RANG' || validacio?.tipus === 'NUM_MINIM' || validacio?.tipus === 'NUM_MAXIM') {
-        const missatge = textRestriccio(validacio, t);
-        return (valor) => {
-            if (esBuit(valor)) {
-                return undefined;
-            }
-            const text = String(valor).trim();
-            // PINBAL el converteix amb Integer.valueOf: un decimal no és vàlid
-            if (!/^[-+]?\d+$/.test(text)) {
-                return missatge;
-            }
-            const nombre = Number(text);
-            const foraDeLimits = (validacio.minim != null && nombre < validacio.minim)
-                || (validacio.maxim != null && nombre > validacio.maxim);
-            return foraDeLimits ? missatge : undefined;
-        };
+    const [, element, quantificador, minim, maxim] = parts;
+    let caracter: RegExp;
+    try {
+        // \p{...} només funciona amb la marca u
+        caracter = new RegExp(`^${element}$`, element.includes('\\p') ? 'u' : '');
+    } catch {
+        // Expressió de Java que JavaScript no sap interpretar: només la comprova PINBAL
+        return undefined;
     }
-    return undefined;
+    let longitudMaxima: number | undefined;
+    if (quantificador == null || quantificador === '?') {
+        longitudMaxima = 1;
+    } else if (minim != null) {
+        // {n}: exactament n; {n,}: sense màxim; {n,m}: com a màxim m
+        longitudMaxima = maxim === undefined ? Number(minim) : maxim === '' ? undefined : Number(maxim);
+    }
+    return {caracter, longitudMaxima};
 }
 
+const textPermes = (filtre: FiltreCaracters, inserit: string, valorNou: string) =>
+    Array.from(inserit).every((c) => filtre.caracter.test(c))
+    && (filtre.longitudMaxima == null || Array.from(valorNou).length <= filtre.longitudMaxima);
+
+/** Valor que tindria el camp si s'hi inserís el text en lloc de la selecció. */
+const valorAmbText = (input: HTMLInputElement, text: string) =>
+    input.value.slice(0, input.selectionStart ?? input.value.length)
+    + text
+    + input.value.slice(input.selectionEnd ?? input.value.length);
+
+/** Propietats del camp que no deixen escriure ni enganxar caràcters que l'expressió no admet. */
+const propsFiltreCaracters = (filtre: FiltreCaracters) => ({
+    onKeyDown: (e: KeyboardEvent<HTMLInputElement>) => {
+        // Només els caràcters: les tecles de control i les dreceres amb Ctrl o Cmd passen (AltGr és Ctrl+Alt a Windows)
+        if (Array.from(e.key).length !== 1 || e.metaKey || (e.ctrlKey && !e.altKey)) {
+            return;
+        }
+        if (!textPermes(filtre, e.key, valorAmbText(e.target as HTMLInputElement, e.key))) {
+            e.preventDefault();
+        }
+    },
+    onPaste: (e: ClipboardEvent<HTMLInputElement>) => {
+        const text = e.clipboardData.getData('text');
+        if (!textPermes(filtre, text, valorAmbText(e.target as HTMLInputElement, text))) {
+            e.preventDefault();
+        }
+    },
+});
+
 /**
- * Validació de PINBAL al camp: el text d'ajuda (comentari i restricció) i la comprovació del valor quan canvia.
- * L'error es posa des de l'onChange i no amb la propietat validator de GridFormField, que amb error no desa el valor:
- * la comprovació del formulari no impedeix enviar-lo (els formularis d'acció no ho fan), perquè qui decideix és PINBAL.
+ * Validació de PINBAL al camp: el text d'ajuda (comentari i restricció) i, mentre s'escriu, el filtre de caràcters de
+ * l'expressió regular i dels números amb límits (només xifres: PINBAL els converteix amb Integer.valueOf).
+ * Mentre s'escriu no es mostra cap error sota el camp: el formulari de base-react esborra els errors dels camps
+ * (validationSetFieldErrors) cada vegada que canvien les dades. Qui decideix és PINBAL en rebre la petició: si la
+ * rebutja, el servidor retorna els errors per camp (422) i el formulari els mostra sota el camp.
  */
-const useValidacioCamp = (camp: CampPinbal, name: string) => {
+const useValidacioCamp = (camp: CampPinbal) => {
     const {t} = useTranslation();
-    const {validationSetFieldErrors} = useFormContext();
     const helperText = useMemo(
         () => [camp.comentari, textRestriccio(camp.validacio, t)].filter(Boolean).join(' ') || undefined,
         [camp, t]);
-    const comprovacio = useMemo(() => crearComprovacio(camp.validacio, t), [camp, t]);
-
-    // GridFormField es queda amb el primer onChange: la comprovació i el context es llegeixen de referències
-    const comprovacioRef = useRef(comprovacio);
-    comprovacioRef.current = comprovacio;
-    const setFieldErrorsRef = useRef(validationSetFieldErrors);
-    setFieldErrorsRef.current = validationSetFieldErrors;
-    const onChange = useCallback((valor: any) => {
-        const missatge = comprovacioRef.current?.(valor);
-        setFieldErrorsRef.current?.(name, missatge ? [{field: name, message: missatge}] : undefined);
-    }, [name]);
-    // En canviar de servei el camp desapareix: el seu error no s'ha de quedar al formulari
-    useEffect(() => () => setFieldErrorsRef.current?.(name, undefined), [name]);
-
-    return {helperText, onChange: comprovacio ? onChange : undefined};
+    const componentProps = useMemo(() => {
+        const filtre = camp.validacio?.tipus === 'EXPRESSIO_REGULAR'
+            ? crearFiltreCaracters(camp.validacio.expressioRegular)
+            : undefined;
+        return filtre ? propsFiltreCaracters(filtre) : undefined;
+    }, [camp]);
+    const validacio = camp.validacio;
+    // Amb un mínim negatiu (o sense mínim) s'ha de poder escriure el signe
+    const digitsOnly = (validacio?.tipus === 'NUM_RANG' || validacio?.tipus === 'NUM_MINIM')
+        && validacio.minim != null && validacio.minim >= 0;
+    return {helperText, componentProps, digitsOnly};
 }
 
 const CampEtiquetaPinbal = ({camp}: {camp: CampPinbal}) =>
@@ -186,7 +211,7 @@ const CampEtiquetaPinbal = ({camp}: {camp: CampPinbal}) =>
 const CampSimplePinbal = ({camp}: {camp: CampPinbal}) => {
     const name = nomCamp(camp.codi);
     const type = TIPUS_COMPONENT[camp.tipus] ?? 'text';
-    const {helperText, onChange} = useValidacioCamp(camp, name);
+    const {helperText, componentProps, digitsOnly} = useValidacioCamp(camp);
     // Definició del camp, que no existeix al formulari del servidor
     const field = useMemo(() => ({
         name,
@@ -203,7 +228,8 @@ const CampSimplePinbal = ({camp}: {camp: CampPinbal}) => {
         field={field}
         required={camp.obligatori}
         disabled={!camp.modificable}
-        onChange={onChange}
+        componentProps={componentProps}
+        digitsOnly={digitsOnly}
     />
 }
 
@@ -307,10 +333,27 @@ const DadesEspecifiquesPinbal = () => {
     const [formulari, setFormulari] = useState<FormulariPinbal>();
     const [carregant, setCarregant] = useState<boolean>(false);
     const [error, setError] = useState<string>();
+    // Camps del servei carregat i el seu tipus de document: en canviar de tipus se n'esborren els valors (les dades
+    // del formulari no esborren els camps que ja no es pinten, i s'enviarien amb els del servei nou)
+    const campsCarregats = useRef<string[]>([]);
+    const tipusCarregat = useRef<any>(undefined);
 
     useEffect(() => {
         setFormulari(undefined);
         setError(undefined);
+        // Només en canviar de tipus de document. Amb el mateix tipus els valors s'han de conservar: mentre s'envia la
+        // consulta, FormDialog (base-react) substitueix el contingut del modal per un spinner i, si hi ha un error,
+        // aquest component es torna a muntar amb les dades del formulari intactes.
+        const netejats = new Set<string>();
+        if (tipusCarregat.current !== tipusDocumentId) {
+            // Amb undefined el camp no s'envia (JSON.stringify l'omet)
+            campsCarregats.current.forEach((codi) => {
+                formApiRef?.current?.setFieldValue(nomCamp(codi), undefined);
+                netejats.add(codi);
+            });
+            campsCarregats.current = [];
+            tipusCarregat.current = undefined;
+        }
         if (!apiIsReady || tipusDocumentId == null) {
             return;
         }
@@ -320,14 +363,22 @@ const DadesEspecifiquesPinbal = () => {
             .then((result: any) => {
                 if (!actual) return;
                 const formulariServei: FormulariPinbal | undefined = result?.[0];
+                const dadesActuals = formApiRef?.current?.getData?.() ?? {};
+                campsCarregats.current = [];
                 if (formulariServei?.arrel) {
-                    // Valors inicials: també reemplacen els d'un servei triat abans amb camps iguals
                     recorrerCamps(formulariServei.arrel, (camp) => {
                         if (camp.tipus !== 'ETIQUETA') {
-                            formApiRef?.current?.setFieldValue(nomCamp(camp.codi), valorInicialCamp(camp));
+                            const nom = nomCamp(camp.codi);
+                            // Valor inicial només als camps sense valor (o que s'acaben d'esborrar per canvi de
+                            // servei): els que ja en tenen són els que ha introduït l'usuari
+                            if (netejats.has(camp.codi) || dadesActuals[nom] === undefined) {
+                                formApiRef?.current?.setFieldValue(nom, valorInicialCamp(camp));
+                            }
+                            campsCarregats.current.push(camp.codi);
                         }
                     });
                 }
+                tipusCarregat.current = tipusDocumentId;
                 setFormulari(formulariServei);
             })
             .catch((e: any) => actual && setError(e?.message || t('page.document.action.pinbal.formulari.error')))

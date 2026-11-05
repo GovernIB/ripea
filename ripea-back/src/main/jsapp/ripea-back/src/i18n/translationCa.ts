@@ -965,7 +965,7 @@ const translationCa = {
                         carregant: "Carregant les dades específiques del servei PINBAL...",
                         error: "No s'han pogut obtenir les dades específiques del servei PINBAL",
                         validacio: {
-                            EXPRESSIO_REGULAR: "El valor no té el format esperat pel servei.",
+                            EXPRESSIO_REGULAR: "Els caràcters que es poden fer servir en aquest camp estan limitats: {{expressio}}",
                             NUM_RANG: "Nombre enter entre {{minim}} i {{maxim}}.",
                             NUM_MINIM: "Nombre enter igual o superior a {{minim}}.",
                             NUM_MAXIM: "Nombre enter igual o inferior a {{maxim}}.",
