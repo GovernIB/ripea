@@ -76,7 +76,7 @@ const useNotificarMassive = (entity:any, refresh?: () => void) => {
         find: apiMetaDocumentFindAll,
     } = useResourceApiService('metaDocumentResource');
 
-    const {handleShow: handleNotificar, content} = useNotificar(refresh)
+    const {handleShow: handleNotificar, content} = useNotificar(entity, refresh)
 
     const documentGenerat = (result:any) :void => {
         refresh?.();

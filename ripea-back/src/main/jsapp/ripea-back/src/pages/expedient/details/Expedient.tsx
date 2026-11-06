@@ -31,6 +31,7 @@ import * as builder from "../../../util/springFilterUtils.ts";
 import { getReadableTextColor } from '@src/components/StyledLabel.tsx';
 import { icons as iconsAppMenu } from '@src/util/icons';
 import {useSession} from "@src/components/SessionStorageContext.tsx";
+import useNumRemeses from "@src/hooks/useNumRemeses.ts";
 
 const border= { border: '1px solid #e3e3e3', borderRadius: '4px' };
 
@@ -516,15 +517,28 @@ const Expedient = () => {
     const [numTasques, setNumTasques] = useState<number>(expedient?.numTasques);
     const [numDades, setNumDades] = useState<number>(expedient?.numDades);
     const [numAnotacions, setNumAnotacions] = useState<number>(expedient?.numAnotacions);
-    const [numRemeses, setNumRemeses] = useState<number>(expedient?.numRemeses);
     const [numPublicacions, setNumPublicacions] = useState<number>(expedient?.numPublicacions);
     const [expanded, setExpanded] = useState<boolean>(!!user?.conf?.informacioExpedientExpandit);
 
-    const {value: numInteressats, save: setNumInteressats, remove: removeNumInteressats} = useSession(`expedient-${id}-numInteressats`)
+    // Comptadors compartits per sessió: les accions que creen interessats o remeses des d'altres pantalles
+    // (diàlegs de notificar, PINBAL...) els actualitzen sense recarregar la pàgina. La clau va amb l'id de
+    // l'expedient, i no amb el de la URL, perquè dins una carpeta la URL porta l'id de la carpeta.
+    const {value: numInteressats, save: setNumInteressats, remove: removeNumInteressats} = useSession(`expedient-${expedient?.id}-numInteressats`)
     useEffect(() => {
         setNumInteressats(expedient?.numInteressats)
         return () => {
             removeNumInteressats()
+        }
+    }, [expedient]);
+
+    const {value: numRemeses, save: setNumRemeses, remove: removeNumRemeses} = useNumRemeses(expedient?.id)
+    useEffect(() => {
+        if (expedient?.id == null) {
+            return;
+        }
+        setNumRemeses(expedient?.numRemeses)
+        return () => {
+            removeNumRemeses()
         }
     }, [expedient]);
 
@@ -578,7 +592,8 @@ const Expedient = () => {
             label: t('page.contingut.tabs.remeses'),
             content: <RemesaGrid entity={expedient} onRowCountChange={setNumRemeses} />,
             badge: numRemeses ?? expedient?.numRemeses,
-            hidden: !expedient?.numRemeses,
+            // Apareix en crear-se la primera remesa; si ja hi era, no s'amaga encara que s'esborrin totes
+            hidden: !expedient?.numRemeses && !numRemeses,
             showZero: true,
         },
         {

@@ -364,7 +364,9 @@ function calculateClassificacioId() {
 	<c:set var="formAction"><rip:modalUrl value="/metaExpedient"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="metaExpedientCommand">
 		<c:set var="mostrarTabRevisio" value="${metaExpedientCommand.revisioEstat!=null && isRevisioActiva && (isRolActualAdministrador || isRolAdminOrgan || isRolActualRevisor)}"/>
-		<c:if test="${isCarpetaDefecte || mostrarTabRevisio}">
+		<%-- Admin d'òrgan amb el procediment REVISAT: només consulta de les dades, sense pestanyes --%>
+		<c:set var="consultaRevisatAdminOrgan" value="${isRolAdminOrgan && not empty bloquejarCamps}"/>
+		<c:if test="${(isCarpetaDefecte || mostrarTabRevisio) && !consultaRevisatAdminOrgan}">
 			<ul class="nav nav-tabs" role="tablist">
 				<li role="presentation" class="active"><a href="#dades" aria-controls="dades" role="tab" data-toggle="tab"><spring:message code="metaexpedient.form.camp.tab.dades"/></a></li>
 <%-- 			<li role="presentation"><a href="#notificacions" aria-controls="notificacions" role="tab" data-toggle="tab"><spring:message code="metaexpedient.form.camp.tab.notificacions"/></a></li> --%>
@@ -375,11 +377,11 @@ function calculateClassificacioId() {
 					<li role="presentation"><a href="#revisioEstatTab" aria-controls="revisioEstatTab" role="tab" data-toggle="tab"><spring:message code="metaexpedient.form.camp.tab.revisioEstat"/></a></li>
 				</c:if>
 			</ul>
+			<br/>
 		</c:if>
 		<form:hidden path="id"/>
 		<form:hidden path="entitatId"/>
 		<form:hidden path="RolAdminOrgan"/>
-		<br/>
 		<div class="tab-content">
 			<div role="tabpanel" class="tab-pane active" id="dades">
 			
