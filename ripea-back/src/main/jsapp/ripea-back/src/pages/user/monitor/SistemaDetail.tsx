@@ -98,6 +98,14 @@ const Sistema = ({system, refresh}:any) => {
     </DetailCard></>
 }
 
+const DIALOG_BODY_HEIGHT = 700;
+// Alçada de la graella dins una pestanya: la del cos del diàleg menys la capçalera de pestanyes i el seu padding.
+// Les graelles sense autoHeight s'estiren (flex: 1) dins un pare flex amb alçada, que el diàleg no dona per si sol.
+const GridTabBody = ({children}: {children: any}) =>
+    <Box sx={{display: 'flex', flexDirection: 'column', height: `${DIALOG_BODY_HEIGHT - 70}px`}}>
+        {children}
+    </Box>
+
 const columnsFils = [
     {
         field: 'threadName',
@@ -261,12 +269,12 @@ export const useSistemaDetail = () => {
         {
             value: "fils",
             label: t('page.sistema.tabs.fils'),
-            content: <Fils/>
+            content: <GridTabBody><Fils/></GridTabBody>
         },
         {
             value: "tasques",
             label: t('page.sistema.tabs.tasques'),
-            content: <Tasques/>
+            content: <GridTabBody><Tasques/></GridTabBody>
         },
     ]
 
@@ -284,7 +292,7 @@ export const useSistemaDetail = () => {
                 }
             }}
         >
-            <Box sx={{ height: '700px', minHeight: 0 }}>
+            <Box sx={{ height: `${DIALOG_BODY_HEIGHT}px`, minHeight: 0 }}>
                 <TabComponent tabs={tabs} />
             </Box>
         </MuiDialog>
