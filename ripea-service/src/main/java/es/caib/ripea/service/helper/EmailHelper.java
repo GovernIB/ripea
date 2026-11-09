@@ -3,9 +3,11 @@ package es.caib.ripea.service.helper;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.slf4j.Logger;
@@ -933,6 +935,63 @@ public class EmailHelper {
 	    }, "avisarAdministradorsErrorTancament errors=" + (errors != null ? errors.size() : 0));
 	}
 
+	/**
+	 * Envia l'informe del procés en segon pla de justificants de registre (InformeJustificantsRegistreHelper) als
+	 * administradors de l'entitat: usuaris amb el rol IPA_ADMIN i permís d'administració sobre l'entitat.
+	 *
+	 * S'envia a l'instant i en còpia oculta, sense tenir en compte les preferències de correu dels usuaris ni la cua de
+	 * correus agrupats, que no admet adjunts. A diferència de la resta d'avisos, un error en enviar-lo es propaga: qui
+	 * el crida conserva l'informe per tornar-lo a enviar.
+	 *
+	 * @param adjunt contingut del fitxer adjunt, o null per no adjuntar-ne cap.
+	 * @return el nombre de destinataris; 0 si l'entitat no té cap administrador amb correu i no s'ha enviat res.
+	 * @throws MessagingException si no s'ha pogut muntar el missatge.
+	 */
+	public int enviarInformeJustificantsRegistre(
+			Long entitatId,
+			String assumpte,
+			String text,
+			String nomAdjunt,
+			byte[] adjunt) throws MessagingException {
+		List<String> emails = new ArrayList<>();
+		List<String> emailsAgrupats = new ArrayList<>();
+		List<DadesUsuari> admins = pluginHelper.dadesUsuariFindAmbGrup("IPA_ADMIN");
+		if (admins != null) {
+			for (DadesUsuari admin : admins) {
+				boolean granted = permisosHelper.isGrantedAll(
+						entitatId,
+						EntitatEntity.class,
+						new Permission[] { ExtendedPermission.ADMINISTRATION },
+						admin.getCodi());
+				if (granted) {
+					addDestinatari(
+							admin.getCodi(),
+							emails,
+							emailsAgrupats,
+							EventTipusEnumDto.INFORME_JUSTIFICANTS_REGISTRE,
+							"Email informe justificants de registre. Permission: Administració de entitat: " + entitatId + ", user: " + admin.getCodi());
+				}
+			}
+		}
+		// L'esdeveniment és immediat: addDestinatari no n'hauria de deixar cap als agrupats
+		emails.addAll(emailsAgrupats);
+		List<String> destinataris = new ArrayList<>(new LinkedHashSet<>(emails));
+		if (destinataris.isEmpty()) {
+			return 0;
+		}
+		MimeMessage message = mailSender.createMimeMessage();
+		MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+		helper.setFrom(getRemitent());
+		helper.setBcc(destinataris.toArray(new String[0]));
+		helper.setSubject(getPrefixRipea() + " " + assumpte);
+		helper.setText(text);
+		if (adjunt != null) {
+			helper.addAttachment(nomAdjunt, new ByteArrayResource(adjunt));
+		}
+		mailSender.send(message);
+		return destinataris.size();
+	}
+
 	private String getEnllacExpedient(Long expedientId) {
 		String baseUrl = configHelper.getConfig(PropertyConfig.BASE_URL);
 		String enllacExpedient = "Pot accedir a l'expedient utilizant el següent enllaç: " + baseUrl + "/contingut/" + expedientId + "\n";
@@ -1370,7 +1429,9 @@ public class EmailHelper {
 		String email = null;
 		UsuariEntity usuari = usuariRepository.findById(codi).orElse(null);
 		
-		boolean emailInmediat = (event!=null && (EventTipusEnumDto.ENVIAR_FICHERO.equals(event) || EventTipusEnumDto.AVIS_ERROR_TANCAMENT_ARXIU.equals(event)));
+		boolean emailInmediat = (event!=null && (EventTipusEnumDto.ENVIAR_FICHERO.equals(event)
+				|| EventTipusEnumDto.AVIS_ERROR_TANCAMENT_ARXIU.equals(event)
+				|| EventTipusEnumDto.INFORME_JUSTIFICANTS_REGISTRE.equals(event)));
 
         if (usuari != null) {
             if (emailInmediat) {

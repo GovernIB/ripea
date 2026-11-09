@@ -20,7 +20,9 @@ import es.caib.ripea.service.intf.exception.PermissionDeniedException;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class ExcepcioLogHelper {
@@ -58,13 +60,17 @@ public class ExcepcioLogHelper {
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void addExcepcio(String uri, Throwable exception) {
-		if (exception == null) return;
-		excepcioLogResourceRepository.save(toEntity(uri, exception, null, null));
+		addExcepcio(uri, exception, null, null);
 	}
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void addExcepcio(String uri, Throwable exception, String param1, String param2) {
 		if (exception == null) return;
+		if (SenseMonitorsUtils.isActiu()) {
+			// Amb l'stacktrace, perquè és un error inesperat: només es vol evitar que ocupi espai a la BD (RIPEA_LOB)
+			log.warn("Excepció no registrada al monitor d'excepcions perquè l'acció s'executa sense monitors (uri={})", uri, exception);
+			return;
+		}
 		excepcioLogResourceRepository.save(toEntity(uri, exception, param1, param2));
 	}
 

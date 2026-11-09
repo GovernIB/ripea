@@ -353,8 +353,8 @@ public interface AplicacioService {
     public List<Long> getExpedientsAmbJustificantRegistre();
 
     /**
-     * Anotacions amb justificant de registre pendent d'incorporar i id inferior a darrerId, de les més recents a les
-     * més antigues.
+     * Anotacions d'expedients oberts amb justificant de registre a l'Arxiu i id inferior a darrerId, de les més
+     * recents a les més antigues: tant les que encara no el tenen incorporat com les que sí (per recol·locar-lo).
      *
      * @param darrerId darrera anotació tractada, o null per obtenir-les totes.
      */

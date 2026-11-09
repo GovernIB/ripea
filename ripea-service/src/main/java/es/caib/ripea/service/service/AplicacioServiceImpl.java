@@ -471,12 +471,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 
 	@Override
 	public List<IntegracioAccioDto> getLastIntegracions(IntegracioEnumDto codiIntegracio, int numElements) {
-		List<IntegracioAccioDto> listaAccions = integracioHelper.findAccionsByIntegracioCodi(codiIntegracio.name(), null);
-		if (listaAccions != null) {
-			return listaAccions.subList(0, Math.min(listaAccions.size(), numElements));
-		} else {
-			return new ArrayList<IntegracioAccioDto>();
-		}
+		// Abans es carregaven totes les accions de la integració (amb els CLOB) per quedar-se'n numElements
+		return integracioHelper.findDarreresAccionsByIntegracioCodi(codiIntegracio.name(), numElements);
 	}
 
 	@Override
@@ -1069,8 +1065,8 @@ public class AplicacioServiceImpl implements AplicacioService {
     }
 
     /**
-     * Obté els identificadors dels expedients oberts que tenen justificants de registre
-     * d'anotacions pendents d'incorporar com a document.
+     * Obté els identificadors de les anotacions d'expedients oberts que tenen justificant de registre a l'Arxiu,
+     * tant si ja s'ha incorporat com si no (si ja hi és, el procés el recol·loca a la carpeta del registre).
      */
     @Override
     @Transactional(readOnly = true)
@@ -1081,8 +1077,7 @@ public class AplicacioServiceImpl implements AplicacioService {
     @Override
     @Transactional(readOnly = true)
     public List<Long> getExpedientsAmbJustificantRegistre(Long darrerId) {
-        return expedientPeticioRepository.findExpedientsObertsAmbJustificantPendent(
-                MetaDocumentPerDefecteEnumDto.REGISTRE_JUSTIFICANT_ENTRADA.getCodi(),
+        return expedientPeticioRepository.findAnotacionsExpedientsObertsAmbJustificant(
                 darrerId != null ? darrerId : Long.MAX_VALUE);
     }
 
@@ -1102,7 +1097,7 @@ public class AplicacioServiceImpl implements AplicacioService {
         	if (peticio != null && peticio.getExpedient() != null) {
         		fixarEntitatElement(peticio.getExpedient().getEntitat());
         	}
-            return registreJustificantHelper.incorporarJustificantsRegistreExpedient(anotacioRegistreId, peticio);
+            return registreJustificantHelper.processarJustificantSegonPla(anotacioRegistreId, peticio);
         } catch (Exception ex) {
         	if (peticio!=null && peticio.getRegistre()!=null) {
         		throw new Exception("Error al afegir el justificant de registre de l'anotació " + peticio.getRegistre().getIdentificador() + ": " + ex.getMessage(), ex);

@@ -2055,20 +2055,8 @@ public class ContingutHelper {
 							+ "contingutDestiId=" + contingutDestiId + ")");
 		}
 		// Realitza el moviment del contingut
-		ContingutMovimentEntity contingutMoviment = ferIEnregistrarMoviment(
-				contingutOrigen,
-				contingutDesti,
-				null);
-		
-		reOrdenaContingut(contingutOrigen, contingutOrigen.getOrdre());
-		
-		contingutLogHelper.log(
-				contingutOrigen,
-				LogTipusEnumDto.MOVIMENT,
-				contingutMoviment,
-				true,
-				true);
-		
+		moureBaseDades(contingutOrigen, contingutDesti);
+
 		if (contingutOrigen instanceof DocumentEntity){
 			arxiuDocumentPropagarMoviment(
 					contingutOrigen.getArxiuUuid(),
@@ -2084,6 +2072,28 @@ public class ContingutHelper {
 					contingutOrigen,
 					expedientDesti.getArxiuUuid());
 		}
+	}
+
+	/**
+	 * Mou el contingut a dins el destí només a la base de dades: canvia el pare, desa el moviment, reordena el destí i
+	 * registra el moviment a l'historial. No comprova permisos ni propaga res a l'Arxiu: ho ha de fer qui el crida
+	 * si cal (veure {@link #move}).
+	 */
+	public ContingutMovimentEntity moureBaseDades(ContingutEntity contingut, ContingutEntity desti) {
+		ContingutMovimentEntity contingutMoviment = ferIEnregistrarMoviment(
+				contingut,
+				desti,
+				null);
+
+		reOrdenaContingut(contingut, contingut.getOrdre());
+
+		contingutLogHelper.log(
+				contingut,
+				LogTipusEnumDto.MOVIMENT,
+				contingutMoviment,
+				true,
+				true);
+		return contingutMoviment;
 	}
 
 	public void arxiuCarpetaLogicaPropagarMoviment(

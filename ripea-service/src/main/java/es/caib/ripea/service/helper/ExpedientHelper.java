@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -86,6 +87,7 @@ import es.caib.ripea.persistence.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.persistence.entity.MetaNodeEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.RegistreAnnexEntity;
+import es.caib.ripea.persistence.entity.RegistreEntity;
 import es.caib.ripea.persistence.entity.RegistreInteressatEntity;
 import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.repository.AlertaRepository;
@@ -116,7 +118,11 @@ import es.caib.ripea.service.auxiliary.ExpedientFiltreCalculat;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
+import es.caib.ripea.service.helper.FilaInformeJustificantRegistre.AccioConsulta;
+import es.caib.ripea.service.helper.FilaInformeJustificantRegistre.AccioMoure;
+import es.caib.ripea.service.helper.FilaInformeJustificantRegistre.AccioRipea;
 import es.caib.ripea.service.intf.dto.CarpetaDto;
+import es.caib.ripea.service.intf.dto.ContingutTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentAmbTipusDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
 import es.caib.ripea.service.intf.dto.DocumentEstatEnumDto;
@@ -1234,12 +1240,19 @@ public class ExpedientHelper {
 		CarpetaEntity carpetaEntity = null;
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
 		expedientEntity = expedientRepository.getOne(expedientId);
-		Document documentDetalls = pluginHelper.arxiuDocumentConsultar(
-				null,
-				justificantArxiuUuid,
-				null,
-				true,
-				false);
+		Document documentDetalls;
+		try {
+			documentDetalls = pluginHelper.arxiuDocumentConsultar(
+					null,
+					justificantArxiuUuid,
+					null,
+					true,
+					false);
+			FilaInformeJustificantRegistre.actualitzar(fila -> fila.setAccioConsulta(AccioConsulta.TROBAT));
+		} catch (RuntimeException ex) {
+			FilaInformeJustificantRegistre.actualitzar(fila -> fila.setErrorConsulta(ex));
+			throw ex;
+		}
 
 		entitat = entitatRepository.findByUnitatArrel(expedientPeticioEntity.getRegistre().getEntitatCodi());
 		logger.debug(
@@ -1248,17 +1261,24 @@ public class ExpedientHelper {
 						", " + "expedientPeticioId=" + expedientPeticioEntity.getId() + ")");
 
 		// CREATE CARPETA IN DB AND IN ARXIU
-		boolean isCarpetaActive = configHelper.getAsBoolean(PropertyConfig.CARPETES_CREACIO_ACTIVA);
-		if (isCarpetaActive) {
-			// create carpeta ind db and arxiu if doesnt already exists
-			Long carpetaId = createCarpetaForDocFromAnnex(
-					expedientEntity,
-					entitat.getId(),
-					"Registre entrada: " + expedientPeticioEntity.getRegistre().getIdentificador(), null);
-			carpetaEntity = carpetaRepository.getOne(carpetaId);
+		// El justificant va sempre a la carpeta del registre, igual que els annexos (crearDocFromAnnex),
+		// independentment de la propietat es.caib.ripea.creacio.carpetes.activa. Es cerca igual que quan el procés
+		// en segon pla recol·loca un justificant que ja hi era (findCarpetaRegistre); si no n'hi ha cap o està
+		// esborrada, se'n crea una de nova.
+		CarpetaEntity carpetaRegistre = findCarpetaRegistre(expedientEntity, expedientPeticioEntity);
+		boolean carpetaNova = carpetaRegistre == null || carpetaRegistre.getEsborrat() != 0;
+		Long carpetaId = !carpetaNova
+				? assegurarCarpetaArxiu(expedientEntity, entitat.getId(), carpetaRegistre)
+				: createCarpetaForDocFromAnnex(
+						expedientEntity,
+						entitat.getId(),
+						getNomCarpetaRegistre(expedientPeticioEntity.getRegistre()),
+						null);
+		carpetaEntity = carpetaRepository.getOne(carpetaId);
+		CarpetaEntity carpetaInforme = carpetaEntity;
+		FilaInformeJustificantRegistre.actualitzar(fila -> fila.setCarpeta(carpetaInforme));
 
-			carpetaEntity.updateNumeroRegistre(expedientPeticioEntity.getIdentificador());
-		}
+		carpetaEntity.updateNumeroRegistre(expedientPeticioEntity.getIdentificador());
 
 		// CREATE DOCUMENT IN DB
 		DocumentDto documentDto = toDocumentDto(documentDetalls, expedientPeticioEntity.getIdentificador());
@@ -1270,7 +1290,7 @@ public class ExpedientHelper {
 			}
 		}
 		contingutHelper.comprovarNomValid(
-				isCarpetaActive ? carpetaEntity : expedientEntity,
+				carpetaEntity,
 				documentDto.getNom(),
 				null,
 				DocumentEntity.class);
@@ -1289,7 +1309,7 @@ public class ExpedientHelper {
 				documentDto.getNtiEstadoElaboracion(),
 				documentDto.getNtiTipoDocumental(),
 				metaDocument,
-				isCarpetaActive ? carpetaEntity : expedientEntity,
+				carpetaEntity,
 				expedientEntity.getEntitat(),
 				expedientEntity,
 				documentDto.getUbicacio(),
@@ -1322,7 +1342,7 @@ public class ExpedientHelper {
 		docEntity.updateArxiu(documentDto.getArxiuUuid());
 		docEntity.updateArxiuEstat(ArxiuEstatEnumDto.DEFINITIU);
 		documentRepository.saveAndFlush(docEntity);
-		if (isCarpetaActive && ! contingutHelper.isCarpetaLogica()) {
+		if (!contingutHelper.isCarpetaLogica()) {
 			Carpeta carpeta = pluginHelper.arxiuCarpetaConsultar(carpetaEntity);
 			boolean documentExistsInArxiu = false;
 			String documentUuid = null;
@@ -1335,10 +1355,13 @@ public class ExpedientHelper {
 					}
 				}
 			}
-			if (documentExistsInArxiu && carpetaEntity.getArxiuUuid() == null) {
-				carpetaEntity.updateArxiu(documentUuid);
+			if (documentExistsInArxiu && documentUuid != null) {
+				// document already in arxiu: update uuid of the document, not of the carpeta
+				docEntity.updateArxiu(documentUuid);
 			}
-			if (!documentExistsInArxiu) {
+			if (documentExistsInArxiu) {
+				FilaInformeJustificantRegistre.actualitzar(fila -> fila.setAccioMoure(AccioMoure.JA_A_L_ARXIU));
+			} else {
 				moureJustificantArxiu(docEntity, carpetaEntity, expedientEntity, justificantArxiuUuid);
 			}
 		} else {
@@ -1358,7 +1381,9 @@ public class ExpedientHelper {
 				// document already in arxiu: update uuid of the document, not of the expedient
 				docEntity.updateArxiu(documentUuid);
 			}
-			if (!documentExistsInArxiu) {
+			if (documentExistsInArxiu) {
+				FilaInformeJustificantRegistre.actualitzar(fila -> fila.setAccioMoure(AccioMoure.JA_A_L_ARXIU));
+			} else {
 				moureJustificantArxiu(docEntity, expedientEntity, expedientEntity, justificantArxiuUuid);
 			}
 		}
@@ -1373,6 +1398,10 @@ public class ExpedientHelper {
 		// El justificant ja és a l'expedient: s'esborra l'error d'un intent anterior, si n'hi havia.
 		expedientPeticioEntity.getRegistre().updateJustificantError(null);
 
+		FilaInformeJustificantRegistre.actualitzar(fila -> {
+			fila.setDocument(docEntity, true);
+			fila.setAccioRipea(carpetaNova ? AccioRipea.CREAT_A_CARPETA_NOVA : AccioRipea.CREAT_A_CARPETA_EXISTENT);
+		});
 		return docEntity;
 	}
 
@@ -1407,7 +1436,9 @@ public class ExpedientHelper {
 			if (uuidDesti != null) {
 				docEntity.updateArxiu(uuidDesti);
 			}
+			FilaInformeJustificantRegistre.actualitzar(fila -> fila.setAccioMoure(AccioMoure.MOGUT));
 		} catch (SistemaExternException ex) {
+			FilaInformeJustificantRegistre.actualitzar(fila -> fila.setErrorMoure(ex, true));
 			docEntity.updateArxiu(justificantArxiuUuid);
 			docEntity.updateJustificantMoureError(true);
 			logger.error(
@@ -3080,17 +3111,39 @@ public class ExpedientHelper {
 	}
 
 	public Long createCarpetaForDocFromAnnex(ExpedientEntity expedientEntity, Long entitatId, String nom, String rolActual) {
-		// check if already exists in db
-		boolean carpetaExistsInDB = false;
-		Long carpetaId = null;
+		// check if already exists in db. Les carpetes esborrades no compten: el que s'hi posés no es veuria a
+		// l'expedient (esborrar una carpeta també esborra tot el seu contingut)
 		CarpetaEntity carpetaEntity = null;
 		for (ContingutEntity contingut : expedientEntity.getFills()) {
-			if (contingut instanceof CarpetaEntity && contingut.getNom().equals(nom)) {
-				carpetaExistsInDB = true;
-				carpetaId = contingut.getId();
+			if (contingut instanceof CarpetaEntity && contingut.getEsborrat() == 0 && contingut.getNom().equals(nom)) {
 				carpetaEntity = (CarpetaEntity)contingut;
 			}
 		}
+		return crearOCompletarCarpeta(expedientEntity, entitatId, nom, carpetaEntity, rolActual);
+	}
+
+	/**
+	 * Garanteix que una carpeta que ja existeix a la base de dades també existeix a l'Arxiu (amb carpetes no lògiques):
+	 * si no hi és, la cerca per nom a l'expedient de l'Arxiu i, si tampoc no la troba, la crea.
+	 *
+	 * @return l'id de la carpeta.
+	 */
+	public Long assegurarCarpetaArxiu(ExpedientEntity expedientEntity, Long entitatId, CarpetaEntity carpetaEntity) {
+		return crearOCompletarCarpeta(expedientEntity, entitatId, carpetaEntity.getNom(), carpetaEntity, null);
+	}
+
+	/**
+	 * Crea la carpeta a la base de dades si no existeix (carpetaEntity null) i, amb carpetes no lògiques, a l'Arxiu si
+	 * no hi és.
+	 */
+	private Long crearOCompletarCarpeta(
+			ExpedientEntity expedientEntity,
+			Long entitatId,
+			String nom,
+			CarpetaEntity carpetaEntity,
+			String rolActual) {
+		boolean carpetaExistsInDB = carpetaEntity != null;
+		Long carpetaId = carpetaExistsInDB ? carpetaEntity.getId() : null;
 		// check if already exists in arxiu
 		String carpetaUuid = null;
 		boolean carpetaExistsInArxiu = false;
@@ -3140,6 +3193,151 @@ public class ExpedientHelper {
 			carpetaId = carpetaDto.getId();
 		}
 		return carpetaId;
+	}
+
+	/** Nom de la carpeta on es desen els annexos i el justificant d'una anotació. */
+	public static String getNomCarpetaRegistre(RegistreEntity registre) {
+		return "Registre entrada: " + registre.getIdentificador();
+	}
+
+	/**
+	 * Carpeta del registre d'una anotació dins el seu expedient, o null si no n'hi ha cap. Pot estar esborrada: qui la
+	 * crida ho ha de comprovar. S'escull, per ordre:
+	 * <ol>
+	 * <li>La carpeta no esborrada amb el nom del registre ({@link #getNomCarpetaRegistre}). Si n'hi ha més d'una, la
+	 * que conté més annexos de l'anotació.</li>
+	 * <li>La carpeta de l'expedient que conté més annexos de l'anotació, esborrada o no: el nom pot no coincidir (p.ex.
+	 * si s'ha canviat). No compten els annexos que són a l'arrel de l'expedient ni a un altre expedient.</li>
+	 * <li>La carpeta esborrada amb el nom del registre.</li>
+	 * </ol>
+	 * Si n'hi ha diverses amb el mateix nombre d'annexos, primer les no esborrades i després la d'id menor.
+	 */
+	public CarpetaEntity findCarpetaRegistre(ExpedientEntity expedient, ExpedientPeticioEntity peticio) {
+		Map<Long, Integer> annexosPerCarpeta = comptarAnnexosPerCarpeta(expedient, peticio.getRegistre());
+		Comparator<CarpetaEntity> preferencia = Comparator
+				.comparingInt((CarpetaEntity c) -> -annexosPerCarpeta.getOrDefault(c.getId(), 0))
+				.thenComparing(c -> c.getEsborrat() != 0)
+				.thenComparing(CarpetaEntity::getId);
+		List<CarpetaEntity> ambNom = new ArrayList<>();
+		for (ContingutEntity contingut : contingutRepository.findByPareAndNomOrderByEsborratAsc(
+				expedient,
+				getNomCarpetaRegistre(peticio.getRegistre()))) {
+			if (contingut.getTipus() == ContingutTipusEnumDto.CARPETA) {
+				ambNom.add((CarpetaEntity) HibernateHelper.deproxy(contingut));
+			}
+		}
+		CarpetaEntity carpeta = ambNom.stream().filter(c -> c.getEsborrat() == 0).min(preferencia).orElse(null);
+		if (carpeta == null && !annexosPerCarpeta.isEmpty()) {
+			carpeta = carpetaRepository.findAllById(annexosPerCarpeta.keySet()).stream().min(preferencia).orElse(null);
+		}
+		if (carpeta == null) {
+			carpeta = ambNom.stream().min(preferencia).orElse(null);
+		}
+		return carpeta;
+	}
+
+	/** Nombre d'annexos de l'anotació (esborrats o no) que hi ha a cada carpeta de l'expedient. */
+	private Map<Long, Integer> comptarAnnexosPerCarpeta(ExpedientEntity expedient, RegistreEntity registre) {
+		Map<Long, Integer> annexosPerCarpeta = new HashMap<>();
+		for (RegistreAnnexEntity annex : registre.getAnnexos()) {
+			DocumentEntity document = annex.getDocument();
+			ContingutEntity pare = document != null ? document.getPare() : null;
+			if (pare != null
+					&& pare.getTipus() == ContingutTipusEnumDto.CARPETA
+					&& document.getExpedient() != null
+					&& document.getExpedient().getId().equals(expedient.getId())) {
+				annexosPerCarpeta.merge(pare.getId(), 1, Integer::sum);
+			}
+		}
+		return annexosPerCarpeta;
+	}
+
+	/**
+	 * Mou el justificant de registre d'una anotació a la carpeta del registre, que es crea si no n'hi ha cap.
+	 *
+	 * Si el justificant està marcat amb justificantMoureError, a l'Arxiu encara és a la sèrie de Distribució: només es
+	 * mou a la base de dades i es manté la marca, i el reintent ("Guardar en arxiu") el mourà a l'Arxiu cap a la
+	 * carpeta, que serà el seu pare. Si no està marcat, ja és a l'expedient de l'Arxiu i amb carpetes no lògiques es
+	 * mou també a l'Arxiu, abans que a la base de dades: si l'Arxiu falla, l'excepció es propaga i no es mou enlloc.
+	 *
+	 * @param justificant justificant de registre de l'anotació, no esborrat.
+	 * @param carpeta carpeta del registre no esborrada ({@link #findCarpetaRegistre}), o null si no n'hi ha cap.
+	 * @param peticio anotació del justificant.
+	 * @return descripció del que s'ha fet, per al log.
+	 * @throws ValidationException si a la carpeta ja hi ha un altre contingut amb el mateix nom.
+	 */
+	public String recolocarJustificantRegistre(
+			DocumentEntity justificant,
+			CarpetaEntity carpeta,
+			ExpedientPeticioEntity peticio) {
+		ExpedientEntity expedient = justificant.getExpedient();
+		Long entitatId = expedient.getEntitat().getId();
+		// Amb l'avís d'una execució anterior, el moviment a l'Arxiu no es reintenta
+		AccioMoure accioMoureSenseArxiu = justificant.isJustificantMoureError() ? AccioMoure.WARN_ANTERIOR : AccioMoure.NO_APLICA;
+		FilaInformeJustificantRegistre.actualitzar(fila -> fila.setAccioMoure(accioMoureSenseArxiu));
+		if (carpeta != null && justificant.getPare() != null && justificant.getPare().getId().equals(carpeta.getId())) {
+			FilaInformeJustificantRegistre.actualitzar(fila -> {
+				fila.setCarpeta(carpeta);
+				fila.setAccioRipea(AccioRipea.JA_A_LA_CARPETA);
+			});
+			return "ja és a la carpeta \"" + carpeta.getNom() + "\"";
+		}
+		String origen = justificant.getPare() == null || justificant.getPare().getId().equals(expedient.getId())
+				? "l'arrel de l'expedient"
+				: "la carpeta \"" + justificant.getPare().getNom() + "\"";
+		boolean carpetaNova = carpeta == null;
+		CarpetaEntity desti = carpetaNova
+				? carpetaRepository.getOne(createCarpetaForDocFromAnnex(
+						expedient,
+						entitatId,
+						getNomCarpetaRegistre(peticio.getRegistre()),
+						null))
+				: carpeta;
+		FilaInformeJustificantRegistre.actualitzar(fila -> fila.setCarpeta(desti));
+		if (contingutRepository.findByPareAndNomAndEsborrat(desti, justificant.getNom(), 0) != null) {
+			throw new ValidationException(
+					justificant.getId(),
+					DocumentEntity.class,
+					"A la carpeta \"" + desti.getNom() + "\" ja hi ha un altre contingut amb el nom \"" + justificant.getNom()
+							+ "\": no es mou el justificant");
+		}
+		if (desti.getNumeroRegistre() == null) {
+			desti.updateNumeroRegistre(peticio.getIdentificador());
+		}
+		boolean moureArxiu = !justificant.isJustificantMoureError()
+				&& justificant.getArxiuUuid() != null
+				&& !contingutHelper.isCarpetaLogica();
+		if (moureArxiu) {
+			if (!carpetaNova) {
+				// La carpeta nova ja la deixa creada a l'Arxiu createCarpetaForDocFromAnnex
+				assegurarCarpetaArxiu(expedient, entitatId, desti);
+			}
+			String uuidDesti;
+			try {
+				uuidDesti = contingutHelper.arxiuDocumentPropagarMoviment(
+						justificant.getArxiuUuid(),
+						desti,
+						expedient.getArxiuUuid());
+			} catch (RuntimeException ex) {
+				FilaInformeJustificantRegistre.actualitzar(fila -> fila.setErrorMoure(ex, false));
+				throw ex;
+			}
+			// Si l'Arxiu n'ha fet una còpia (dispatch), el document passa a ser la còpia
+			if (uuidDesti != null) {
+				justificant.updateArxiu(uuidDesti);
+			}
+		}
+		contingutHelper.moureBaseDades(justificant, desti);
+		FilaInformeJustificantRegistre.actualitzar(fila -> {
+			if (moureArxiu) {
+				fila.setAccioMoure(AccioMoure.MOGUT);
+			}
+			fila.setAccioRipea(carpetaNova ? AccioRipea.MOGUT_A_CARPETA_NOVA : AccioRipea.MOGUT_A_CARPETA_EXISTENT);
+		});
+		return "mogut de " + origen + " a la " + (carpetaNova ? "nova " : "") + "carpeta \"" + desti.getNom() + "\""
+				+ (moureArxiu
+						? ", també a l'Arxiu"
+						: justificant.isJustificantMoureError() ? ", només a RIPEA: a l'Arxiu continua pendent de moure" : "");
 	}
 
 	/**

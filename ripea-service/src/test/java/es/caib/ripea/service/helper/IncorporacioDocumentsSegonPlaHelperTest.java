@@ -2,6 +2,7 @@ package es.caib.ripea.service.helper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertTimeout;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -11,7 +12,9 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
+import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -153,6 +156,23 @@ class IncorporacioDocumentsSegonPlaHelperTest {
 				progres -> {}))
 				.isInstanceOf(IllegalStateException.class)
 				.hasMessageContaining(PROPIETAT_DARRER_ID);
+	}
+
+	@Test
+	void ambEsperaNomesAmbServeisExternsNoEsperaDespresDElementsNomesDeBaseDades() {
+		when(configHelper.getConfig(PROPIETAT_CRON)).thenReturn("0 0 21 * * *");
+		when(configHelper.getConfig(PROPIETAT_DARRER_ID)).thenReturn(null);
+		List<String> progressos = new ArrayList<>();
+
+		// Amb l'espera de 5 s entre elements, tres elements trigarien més de 10 s
+		assertTimeout(Duration.ofSeconds(4), () -> helper.executar("proces", PROPIETAT_CRON, PROPIETAT_DARRER_ID, "element",
+				darrerId -> Arrays.asList(3L, 2L, 1L),
+				id -> "recol·locat només a la base de dades",
+				progressos::add,
+				true));
+
+		verify(configHelper).updateConfigNewTransaction(PROPIETAT_DARRER_ID, "1");
+		assertThat(progressos.get(progressos.size() - 1)).contains("sense cridar cap servei extern: 3");
 	}
 
 	@Test
