@@ -124,6 +124,9 @@ const componentsEn = {
                 false: 'No',
             },
         },
+        onChange: {
+            error: 'Error processing change',
+        },
         dialog: {
             create: 'Create',
             update: 'Update',

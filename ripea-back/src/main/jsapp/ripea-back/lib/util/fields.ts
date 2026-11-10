@@ -1,5 +1,5 @@
 import { dateFormatLocale, timeFormatLocale } from './dateFormat';
-import { parseIsoDuration } from './durationFormat';
+import { durationFormat } from './durationFormat';
 import { numberFormatCurrency, numberFormatField } from './numberFormat';
 
 /*config: {
@@ -59,19 +59,7 @@ export const formattedFieldValue = (value: any, field?: any, config?: any): stri
             ? dateFormatLocale(value, config?.noTime ? false : true, config?.noSeconds)
             : value;
     } else if (processedType === 'duration') {
-        const duration = parseIsoDuration(value);
-        if (duration != null) {
-            const parts: string[] = [];
-            duration.years > 0 && parts.push(duration.years + 'y');
-            duration.months > 0 && parts.push(duration.months + 'm');
-            duration.days > 0 && parts.push(duration.days + 'd');
-            duration.hours > 0 && parts.push(duration.hours + 'h');
-            duration.minutes > 0 && parts.push(duration.minutes + 'm');
-            duration.seconds > 0 && parts.push(duration.seconds + 's');
-            return parts.join(' ');
-        } else {
-            return value;
-        }
+        return durationFormat(value) ?? undefined;
     } else if (processedType === 'number' || processedType === 'decimal') {
         return value === 0 || value
             ? numberFormatField(value, field, config?.currentLanguage)

@@ -17,6 +17,9 @@ import { useAuthContext } from '../AuthContext';
 
 type AuthButtonProps = {
     badgeIcon?: string;
+    onEditClick?: () => void;
+    currentUserCode?: string;
+    currentUserName?: string;
     additionalComponents?: React.ReactElement | React.ReactElement[];
 };
 
@@ -44,18 +47,18 @@ export const useAuthButtonContext = () => {
     return context;
 };
 
-const UserAvatar: React.FC = (props: any) => {
+const UserAvatar: React.FC<any> = (props: any) => {
+    const { currentUserName } = props;
     const { getTokenParsed } = useAuthContext();
     const [tokenParsed, setTokenParsed] = React.useState<any>();
+    const userName = currentUserName ?? tokenParsed?.name;
     React.useEffect(() => {
         setTokenParsed(getTokenParsed());
     }, []);
     if (tokenParsed?.imageUrl) {
-        return (
-            <Avatar alt={tokenParsed?.name} title={tokenParsed?.name} src={tokenParsed.imageUrl} />
-        );
-    } else if (tokenParsed?.name) {
-        return <TextAvatar text={tokenParsed.name} />;
+        return <Avatar alt={userName} title={userName} src={tokenParsed.imageUrl} />;
+    } else if (userName) {
+        return <TextAvatar text={userName} />;
     } else {
         return <Icon {...props}>account_circle</Icon>;
     }
@@ -98,7 +101,8 @@ const LoginButton: React.FC = () => {
 };
 
 const LoggedInUserButton: React.FC<AuthButtonProps> = (props) => {
-    const { badgeIcon, additionalComponents } = props;
+    const { badgeIcon, onEditClick, currentUserCode, currentUserName, additionalComponents } =
+        props;
     const { t } = useBaseAppContext();
     const apiRef = React.useRef<AuthButtonApi>(undefined);
     const buttonRef = React.useRef<HTMLButtonElement>(null);
@@ -118,6 +122,8 @@ const LoggedInUserButton: React.FC<AuthButtonProps> = (props) => {
     apiRef.current = {
         close: handleMenuClose,
     };
+    const userCode = currentUserCode ?? tokenParsed?.preferred_username;
+    const userName = currentUserName ?? tokenParsed?.name;
     return (
         <AuthButtonContext.Provider value={{ apiRef }}>
             <IconBadge icon={badgeIcon}>
@@ -130,7 +136,7 @@ const LoggedInUserButton: React.FC<AuthButtonProps> = (props) => {
                     aria-controls={menuOpened ? id : undefined}
                     aria-haspopup="true"
                     aria-expanded={menuOpened ? 'true' : undefined}>
-                    <UserAvatar />
+                    <UserAvatar currentUserName={currentUserName} />
                 </IconButton>
             </IconBadge>
             <Menu
@@ -150,12 +156,14 @@ const LoggedInUserButton: React.FC<AuthButtonProps> = (props) => {
                         },
                     }}>
                     <ListItemAvatar>
-                        <UserAvatar />
+                        <UserAvatar currentUserName={currentUserName} />
                     </ListItemAvatar>
-                    <ListItemText
-                        primary={tokenParsed?.name}
-                        secondary={tokenParsed?.preferred_username}
-                    />
+                    <ListItemText primary={userName} secondary={userCode} />
+                    {onEditClick && (
+                        <IconButton onClick={onEditClick} size="small" sx={{ ml: 2 }}>
+                            <Icon fontSize="small">edit</Icon>
+                        </IconButton>
+                    )}
                 </MenuItem>
                 <Divider />
                 {additionalComponents}
@@ -172,13 +180,20 @@ const LoggedInUserButton: React.FC<AuthButtonProps> = (props) => {
 };
 
 const AuthButton: React.FC<AuthButtonProps> = (props) => {
-    const { badgeIcon, additionalComponents } = props;
+    const { badgeIcon, onEditClick, currentUserCode, currentUserName, additionalComponents } =
+        props;
     const { isReady, isAuthenticated } = useAuthContext();
     return isReady ? (
         !isAuthenticated ? (
             <LoginButton />
         ) : (
-            <LoggedInUserButton badgeIcon={badgeIcon} additionalComponents={additionalComponents} />
+            <LoggedInUserButton
+                badgeIcon={badgeIcon}
+                onEditClick={onEditClick}
+                currentUserCode={currentUserCode}
+                currentUserName={currentUserName}
+                additionalComponents={additionalComponents}
+            />
         )
     ) : null;
 };

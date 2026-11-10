@@ -56,9 +56,9 @@ export const FormFieldCheckbox: React.FC<FormFieldCheckboxProps> = (props) => {
             {...otherComponentProps}
         />
     );
-    const formControlSx = !inline
-        ? { top: typeSwitch ? '12px' : '4px', ml: typeSwitch ? 2 : 1.4 }
-        : undefined;
+    const isSmall = componentProps?.size === 'small';
+    const sxTopPx = typeSwitch ? (isSmall ? 2 : 8) : isSmall ? 2 : 6;
+    const formControlSx = !inline ? { top: sxTopPx + 'px', ml: 0 } : undefined;
     const formHelperText = helperText ?? componentPropsHelperText;
     return (
         <FormControl error={!!fieldError} sx={formControlSx}>

@@ -123,9 +123,12 @@ const componentsEs = {
                 },
             },
             checkboxSelect: {
-                true: 'Si',
+                true: 'Sí',
                 false: 'No',
             },
+        },
+        onChange: {
+            error: 'Error al procesar el cambio',
         },
         dialog: {
             create: 'Crear',
@@ -136,7 +139,7 @@ const componentsEs = {
             saveErrors: 'Hay errores de validación',
         },
         blocker:
-            'Esta seguro de que desea salir de este formulario? Es posible que se pierdan los cambios que ha hecho.',
+            '¿Está seguro de que desea salir de este formulario? Es posible que se pierdan los cambios que ha hecho.',
     },
     actionreport: {
         action: {

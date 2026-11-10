@@ -5,6 +5,9 @@ import { toAbsolutePath, isCurrentPathMatching } from '../util/url';
 import AuthContext, { AuthConfig } from './AuthContext';
 
 const LOG_PREFIX = '[OAUTH]';
+// Segons de validesa restants per davall dels quals es renova el token quan la pàgina torna a ser visible
+const RENEW_ON_RESUME_THRESHOLD_SECONDS = 60;
+const RENEW_ERRORS_REQUIRING_SIGNIN = ['login_required', 'invalid_grant'];
 
 type AuthProviderProps = React.PropsWithChildren & {
     /** La configuració necessària per a crear la instància del UserManager */
@@ -34,7 +37,9 @@ export const AuthProvider = (props: AuthProviderProps) => {
         response_type: 'code',
         scope: 'openid profile email',
         silent_redirect_uri: toAbsolutePath('oidcSilentRenew', appBaseUrl),
-        automaticSilentRenew: true,
+        // La renovació es gestiona des d'aquest component (renewToken) per a no fer-ne dues alhora amb el
+        // mateix refresh token
+        automaticSilentRenew: false,
     };
     const logConsole = useLogConsole(LOG_PREFIX);
     const hasInitialized = React.useRef(false);
@@ -43,6 +48,9 @@ export const AuthProvider = (props: AuthProviderProps) => {
     const tokenRef = React.useRef<string>(undefined);
     const tokenParsedRef = React.useRef<any>(undefined);
     const userManagerRef = React.useRef<UserManager>(undefined);
+    const renewPromiseRef = React.useRef<Promise<string | undefined>>(undefined);
+    const mandatoryRef = React.useRef(mandatory);
+    mandatoryRef.current = mandatory;
     const isAuthCallback = isCurrentPathMatching(oidcAuthConfig?.redirect_uri, true);
     const isAuthSilentRedirect = oidcAuthConfig?.silent_redirect_uri
         ? isCurrentPathMatching(oidcAuthConfig?.silent_redirect_uri, false)
@@ -56,7 +64,7 @@ export const AuthProvider = (props: AuthProviderProps) => {
         } else {
             tokenRef.current = undefined;
             tokenParsedRef.current = undefined;
-            setIsLoading(true);
+            setIsLoading(!!mandatoryRef.current);
             setIsAuthenticated(false);
         }
     };
@@ -67,7 +75,6 @@ export const AuthProvider = (props: AuthProviderProps) => {
         hasInitialized.current = true;
         const userManager = userManagerNewInstance(oidcAuthConfig);
         userManagerRef.current = userManager;
-        userManager.startSilentRenew();
         const handleAuthFlow = async () => {
             try {
                 if (isAuthSilentRedirect) {
@@ -75,8 +82,9 @@ export const AuthProvider = (props: AuthProviderProps) => {
                     await userManager.signinSilentCallback();
                 } else if (isAuthCallback) {
                     debug && logConsole.debug('Callback des del servidor de recursos');
-                    await userManager.signinRedirectCallback();
+                    const user = await userManager.signinRedirectCallback();
                     window.history.replaceState({}, document.title, '/');
+                    processUser(user);
                 } else {
                     debug && logConsole.debug("Comprovant si l'usuari ja està autenticat");
                     const loadedUser = await userManager.getUser();
@@ -94,8 +102,11 @@ export const AuthProvider = (props: AuthProviderProps) => {
                                 );
                             processUser(user);
                         } catch (error: any) {
-                            const isLoginRequired = error.error === 'login_required';
-                            if (mandatory && isLoginRequired) {
+                            const requiresFreshSignin = [
+                                'login_required',
+                                'invalid_grant',
+                            ].includes(error.error);
+                            if (mandatory && requiresFreshSignin) {
                                 debug &&
                                     logConsole.debug(
                                         'La renovació silenciosa ha fallat amb un codi ' +
@@ -122,39 +133,86 @@ export const AuthProvider = (props: AuthProviderProps) => {
             userManager.stopSilentRenew();
         };
     }, [config, debug, isAuthCallback, isAuthSilentRedirect, mandatory, logConsole]);
+    const renewToken = React.useCallback((): Promise<string | undefined> => {
+        const userManager = userManagerRef.current;
+        if (userManager == null) {
+            return Promise.resolve(undefined);
+        }
+        // Només es fa una renovació alhora: les crides concurrents reben la mateixa promesa
+        if (renewPromiseRef.current != null) {
+            return renewPromiseRef.current;
+        }
+        debug && logConsole.debug('Renovant token');
+        const renewPromise = userManager
+            .signinSilent()
+            .then((user) => {
+                debug && logConsole.debug('Token renovat correctament', user);
+                processUser(user);
+                return user?.access_token;
+            })
+            .catch((error) => {
+                logConsole.error('Error renovant el token', error);
+                if (RENEW_ERRORS_REQUIRING_SIGNIN.includes(error?.error)) {
+                    // La sessió del servidor d'autenticació ha caducat: cal tornar a iniciar sessió
+                    debug && logConsole.debug('Redirigint cap a la pantalla de login');
+                    userManager.removeUser();
+                    processUser(null);
+                    mandatoryRef.current && userManager.signinRedirect();
+                } else {
+                    debug && logConsole.debug('No redirigim cap a la pantalla de login', error?.error);
+                }
+                return undefined;
+            })
+            .finally(() => {
+                renewPromiseRef.current = undefined;
+            });
+        renewPromiseRef.current = renewPromise;
+        return renewPromise;
+    }, [debug, logConsole]);
     React.useEffect(() => {
         const userManager = userManagerRef.current;
         if (userManager) {
             const onAccessTokenExpiring = () => {
-                debug && logConsole.debug("Renovant token a punt d'expirar");
-                userManagerRef.current
-                    ?.signinSilent()
-                    .then((user) => {
-                        debug && logConsole.debug('Token renovat correctament', user);
-                        processUser(user);
-                    })
-                    .catch((error) => {
-                        logConsole.error('Error renovant el token', error);
-                        // Forçam redirecció cap a la pantalla de login si la renovació falla
-                        if (['login_required', 'invalid_grant'].includes(error.error)) {
-                            debug && logConsole.debug('Redirigint cap a la pantalla de login');
-                            userManagerRef.current?.removeUser();
-                            mandatory && userManagerRef.current?.signinRedirect();
-                        } else {
+                debug && logConsole.debug("Token a punt d'expirar");
+                renewToken();
+            };
+            const onAccessTokenExpired = () => {
+                debug && logConsole.debug('Token expirat');
+                renewToken();
+            };
+            // Quan el dispositiu es bloqueja o la pestanya queda en segon pla els temporitzadors s'aturen i el
+            // token pot expirar sense haver-se renovat. Quan la pàgina torna a ser visible es comprova el token
+            // i, si ha expirat o està a punt d'expirar, es renova immediatament.
+            const onPageResume = () => {
+                if (document.visibilityState !== 'visible') {
+                    return;
+                }
+                userManager.getUser().then((user) => {
+                    if (user != null) {
+                        const expiresIn = user.expires_in;
+                        if (expiresIn == null || expiresIn <= RENEW_ON_RESUME_THRESHOLD_SECONDS) {
                             debug &&
                                 logConsole.debug(
-                                    'No redirigim cap a la pantalla de login',
-                                    error.error
+                                    'Pàgina visible amb el token expirat o a punt d\'expirar',
+                                    expiresIn
                                 );
+                            renewToken();
                         }
-                    });
+                    }
+                });
             };
             userManager.events.addAccessTokenExpiring(onAccessTokenExpiring);
+            userManager.events.addAccessTokenExpired(onAccessTokenExpired);
+            document.addEventListener('visibilitychange', onPageResume);
+            window.addEventListener('pageshow', onPageResume);
             return () => {
                 userManager.events.removeAccessTokenExpiring(onAccessTokenExpiring);
+                userManager.events.removeAccessTokenExpired(onAccessTokenExpired);
+                document.removeEventListener('visibilitychange', onPageResume);
+                window.removeEventListener('pageshow', onPageResume);
             };
         }
-    }, [debug, logConsole]);
+    }, [debug, logConsole, renewToken]);
     const signIn = isLoading
         ? undefined
         : () => {
@@ -177,6 +235,7 @@ export const AuthProvider = (props: AuthProviderProps) => {
         getUserEmail: () => tokenParsedRef.current?.['email'],
         signIn,
         signOut,
+        refreshToken: renewToken,
         config,
     };
     const showChildren =

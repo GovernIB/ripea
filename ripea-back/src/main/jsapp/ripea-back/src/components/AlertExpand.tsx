@@ -35,8 +35,9 @@ const AlertExpand = (props: any) => {
             <Alert
                 {...other}
                 sx={{
-                    py: 0.75,
-                    // px: 1.5,
+                    py: 0,
+                    px: 1.5,
+                    alignItems: 'center',
                     fontSize: '0.85rem',
                     minHeight: 'unset',
                     lineHeight: 1.3,
@@ -56,7 +57,7 @@ const AlertExpand = (props: any) => {
                     </>
                 }
             >
-                {title && <AlertTitle sx={{ m: 0 }}>{title}</AlertTitle>}
+                {title && <AlertTitle sx={{ m: 0, lineHeight: 1.4 }}>{title}</AlertTitle>}
                 {label}
                 <Collapse in={verDetalles}>
                     <Box mt={1}>

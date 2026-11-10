@@ -8,7 +8,10 @@ export const isCurrentPathMatching = (path: string, withParams: boolean | undefi
     if (withParams) {
         const currentPath =
             window.location.origin + window.location.pathname + window.location.search;
-        return path === currentPath;
+        // El servidor d'autorització sempre afegeix els seus propis paràmetres (code, state, session_state...) al
+        // final de la query string del redirect_uri indicat, així que mai hi haurà una coincidència exacta amb la
+        // URL original: només podem comprovar que hi comença.
+        return currentPath === path || currentPath.startsWith(path + '&');
     } else {
         const currentPath = window.location.origin + window.location.pathname;
         return path === currentPath;

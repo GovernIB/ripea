@@ -11,7 +11,7 @@ import { useBaseAppContext } from '../../BaseAppContext';
 export type DataToolbarType = 'default' | 'upper' | 'hidden';
 
 type DataToolbarProps = {
-    title?: string;
+    title?: string | React.ReactNode;
     subtitle?: string;
     elementsWithPositions?: ReactElementWithPosition[];
     upperToolbar?: boolean;
@@ -19,7 +19,7 @@ type DataToolbarProps = {
 };
 
 export const useDataToolbar = (
-    title: string,
+    title: string | React.ReactNode,
     titleDisabled: boolean,
     subtitle: string | undefined,
     toolbarType: DataToolbarType,
@@ -126,7 +126,6 @@ const DataToolbar: React.FC<DataToolbarProps> = (props) => {
                 elementsWithPositions={elementsWithPositions}
                 upperToolbar={upperToolbar}
                 error={error}
-                sx={!upperToolbar ? { mt: -1.5 } : undefined}
             />
         </Box>
     );

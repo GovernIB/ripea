@@ -49,6 +49,8 @@ export type FormProps = React.PropsWithChildren & {
     perspectives?: string[];
     /** Camps personalitzats per a inicialitzar el formulari (si s'especifica aquesta propietat no es consultaran els camps a l'API REST) */
     customFields?: any[];
+    /** Permet establir si l'acció de desar està present als enllaços HATEOAS i així ignorar la lògica que deshabilita els camps del formulari si l'enllaç no hi és */
+    saveActionPresent?: true;
     /** Indica si s'ha de fer una petició onChange sense cap camp associat quan es crea el component */
     initOnChangeRequest?: true;
     /** Indica si s'ha d'aturar l'enviament del formulari si hi ha errors del validador (que no siguin errors de validació de l'API REST) */
@@ -87,6 +89,10 @@ export type FormProps = React.PropsWithChildren & {
     onValidationErrorsChange?: (id: any, validationErrors?: FormFieldError[]) => void;
     /** Validador per a les dades del formulari. Es crida en cada canvi i retorna una llista d'errors (o null/undefined si tot es correcte) */
     dataValidator?: (data: any) => FormFieldError[] | undefined;
+    /** Indica que els missatges temporals d'accions finalitzades correctament no s'han de mostrar */
+    temporalSuccessMessagesDisabled?: true;
+    /** Indica que els missatges temporals d'accions finalitzades amb error no s'han de mostrar */
+    temporalErrorMessagesDisabled?: true;
     /** Errors de validació */
     validationErrors?: FormFieldError[];
     /** Mapeig dels tipus de camp */
@@ -137,8 +143,8 @@ const formDataReducer = (state: any, action: FormFieldDataAction): any => {
         case FormFieldDataActionType.FIELD_CHANGE: {
             return {
                 ...state,
-                [payload.fieldName]: payload.value,
                 ...payload.changes,
+                [payload.fieldName]: payload.value,
             };
         }
     }
@@ -215,6 +221,7 @@ export const Form: React.FC<FormProps> = (props) => {
         additionalData: additionalDataProp,
         perspectives,
         customFields,
+        saveActionPresent: saveActionPresentProp,
         initOnChangeRequest,
         avoidSubmitIfAnyValidatorErrors,
         saveOnFieldEnterKeyPressed,
@@ -234,6 +241,8 @@ export const Form: React.FC<FormProps> = (props) => {
         onBeforeSaveSuccess,
         onValidationErrorsChange,
         dataValidator,
+        temporalSuccessMessagesDisabled,
+        temporalErrorMessagesDisabled,
         validationErrors,
         fieldTypeMap,
         inline,
@@ -254,6 +263,17 @@ export const Form: React.FC<FormProps> = (props) => {
     } = useBaseAppContext();
     const locationPath = useLocationPath();
     const divRef = React.useRef<HTMLDivElement>(null);
+    const autoFocusExcludedFieldNamesRef = React.useRef<Set<string>>(new Set());
+    const registerFieldAutoFocusExcluded = React.useCallback(
+        (fieldName: string, excluded: boolean) => {
+            if (excluded) {
+                autoFocusExcludedFieldNamesRef.current.add(fieldName);
+            } else {
+                autoFocusExcludedFieldNamesRef.current.delete(fieldName);
+            }
+        },
+        []
+    );
     const {
         isReady: apiIsReady,
         currentFields: apiCurrentFields,
@@ -283,8 +303,11 @@ export const Form: React.FC<FormProps> = (props) => {
     const { id, setInternalId } = useControlledId(idProp);
     const location = useLocation();
     const additionalData = additionalDataProp ?? location.state?.additionalData;
-    const isSaveActionPresent =
-        resourceType == null ? apiActions?.[id != null ? 'update' : 'create'] != null : true;
+    const isSaveActionPresent = saveActionPresentProp
+        ? saveActionPresentProp
+        : resourceType == null
+          ? apiActions?.[id != null ? 'update' : 'create'] != null
+          : true;
     const isDeleteActionPresent = id && apiActions?.['delete'] != null;
     const isReady = !isLoading;
     const anyModified = modified || externalModified;
@@ -337,7 +360,9 @@ export const Form: React.FC<FormProps> = (props) => {
         formDataReducer,
         {},
         onChangeActionMiddleware,
-        (error: any) => temporalMessageShow(t('form.onChange.error'), error.message, 'error')
+        (error: any) =>
+            !temporalErrorMessagesDisabled &&
+            temporalMessageShow(t('form.onChange.error'), error.message, 'error')
     );
     const getId = () => id;
     const getData = () => data;
@@ -400,18 +425,20 @@ export const Form: React.FC<FormProps> = (props) => {
                 setApiFieldErrors(fieldErrors);
                 onValidationErrorsChange?.(id, fieldErrors);
             } else {
+                !temporalErrorMessagesDisabled &&
+                    temporalMessageShow(
+                        temporalMessageTitle ?? '',
+                        error.description ?? error.message,
+                        'error'
+                    );
+            }
+        } else {
+            !temporalErrorMessagesDisabled &&
                 temporalMessageShow(
                     temporalMessageTitle ?? '',
                     error.description ?? error.message,
                     'error'
                 );
-            }
-        } else {
-            temporalMessageShow(
-                temporalMessageTitle ?? '',
-                error.description ?? error.message,
-                'error'
-            );
         }
         reject?.(error);
     };
@@ -430,7 +457,7 @@ export const Form: React.FC<FormProps> = (props) => {
         setIsLoading(false);
         setModified(false);
         setExternalModified(false);
-        setRevertData(data);
+        setRevertData(joinedData);
         setApiFieldErrors(undefined);
         validateWithValidator(joinedData);
         setIsDataInitialized(isDataInitialized != null ? isDataInitialized : true);
@@ -456,7 +483,7 @@ export const Form: React.FC<FormProps> = (props) => {
             _templates: initialDataTemplates,
             ...realInitialData
         } = data ?? {};
-        id != null && setApiActions(initialDataActions);
+        setApiActions(id != null ? initialDataActions : apiCurrentActions);
         const mergedData = {
             ...additionalData,
             ...realInitialData,
@@ -579,15 +606,16 @@ export const Form: React.FC<FormProps> = (props) => {
                                     : t(i18nKeys?.createSuccess ?? 'form.create.success', {
                                           data: savedData,
                                       });
-                            temporalMessageShow(null, message, 'success');
+                            !temporalSuccessMessagesDisabled &&
+                                temporalMessageShow(null, message, 'success');
                             if (id != null) {
                                 onUpdateSuccess != null
                                     ? onUpdateSuccess(savedData)
-                                    : onSaveSuccess?.(data);
+                                    : onSaveSuccess?.(savedData);
                             } else {
                                 onCreateSuccess != null
                                     ? onCreateSuccess(savedData)
-                                    : onSaveSuccess?.(data);
+                                    : onSaveSuccess?.(savedData);
                             }
                             reset(
                                 savedData,
@@ -621,26 +649,37 @@ export const Form: React.FC<FormProps> = (props) => {
                 apiDelete(id)
                     .then(() => {
                         goBack(goBackLink);
-                        temporalMessageShow(
-                            null,
-                            t(i18nKeys?.deleteSuccess ?? 'form.delete.success'),
-                            'success'
-                        );
+                        !temporalSuccessMessagesDisabled &&
+                            temporalMessageShow(
+                                null,
+                                t(i18nKeys?.deleteSuccess ?? 'form.delete.success'),
+                                'success'
+                            );
                     })
                     .catch((error: ResourceApiError) => {
-                        temporalMessageShow(
-                            t(i18nKeys?.deleteError ?? 'form.delete.error'),
-                            error.message,
-                            'error'
-                        );
+                        !temporalErrorMessagesDisabled &&
+                            temporalMessageShow(
+                                t(i18nKeys?.deleteError ?? 'form.delete.error'),
+                                error.message,
+                                'error'
+                            );
                     });
             }
         });
     };
     const focus = (name?: string) => {
-        const input = divRef.current?.querySelector<HTMLInputElement>(
-            'input' + (name != null ? '[name="' + name + '"]' : '')
-        );
+        let input: HTMLInputElement | null | undefined;
+        if (name != null) {
+            input = divRef.current?.querySelector<HTMLInputElement>('input[name="' + name + '"]');
+        } else {
+            const inputs = divRef.current?.querySelectorAll<HTMLInputElement>('input');
+            input =
+                inputs &&
+                Array.from(inputs).find(
+                    (candidateInput) =>
+                        !autoFocusExcludedFieldNamesRef.current.has(candidateInput.name)
+                );
+        }
         if (input) {
             input.focus();
         }
@@ -716,9 +755,10 @@ export const Form: React.FC<FormProps> = (props) => {
     React.useEffect(() => {
         // Controla l'estat de formulari amb modificacions
         if (isReady) {
-            setModified(!shallowEqual(data, revertData));
-            onDataChange?.(data, !modified);
-            if (modified) {
+            const isModifiedNow = !shallowEqual(data, revertData);
+            setModified(isModifiedNow);
+            onDataChange?.(data, !isModifiedNow);
+            if (isModifiedNow) {
                 validateWithValidator(data);
             }
         }
@@ -794,6 +834,7 @@ export const Form: React.FC<FormProps> = (props) => {
                     ...(errs?.filter((e) => e.field !== fieldName) ?? []),
                     ...(errors ?? []),
                 ]),
+            registerFieldAutoFocusExcluded,
             commonFieldComponentProps,
         }),
         [
@@ -804,6 +845,7 @@ export const Form: React.FC<FormProps> = (props) => {
             data,
             dataDispatchAction,
             setValidatorFieldErrors,
+            registerFieldAutoFocusExcluded,
             commonFieldComponentProps,
         ]
     );

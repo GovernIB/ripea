@@ -390,6 +390,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         >
             <CustomLocalizationProvider>
                 <>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: '0 0 auto' }}>
                     {value?.avisosUsuari?.map((avis: any) => {
                         if (!read?.includes?.(avis.id)) {
                             return (
@@ -408,6 +409,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
                             );
                         }
                     })}
+                    </Box>
                     {i18nInitialized && children}
                 </>
             </CustomLocalizationProvider>

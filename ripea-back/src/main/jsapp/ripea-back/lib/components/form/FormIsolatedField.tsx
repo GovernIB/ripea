@@ -20,7 +20,7 @@ type FormIsolatedFieldProps = FormFieldCommonProps & {
 };
 
 export const FormIsolatedField: React.FC<FormIsolatedFieldProps> = (props) => {
-    const { resourceName, name, field: fieldProp, ...otherProps } = props;
+    const { resourceName, name, label, field: fieldProp, ...otherProps } = props;
     const { getFormFieldComponent } = useBaseAppContext();
     const { isReady: apiIsReady, currentFields: apiCurrentFields } =
         useResourceApiService(resourceName);
@@ -33,6 +33,9 @@ export const FormIsolatedField: React.FC<FormIsolatedFieldProps> = (props) => {
             setFields(apiCurrentFields);
             const field = apiCurrentFields?.find((f: any) => f.name === name);
             setField(field);
+            if (field?.value) {
+                otherProps.onChange(field.value, field.name);
+            }
         }
     }, [apiIsReady, fieldProp]);
     const mockFormApi = {
@@ -73,11 +76,17 @@ export const FormIsolatedField: React.FC<FormIsolatedFieldProps> = (props) => {
         dataGetFieldValue: (_fieldName: string) => null,
         dataDispatchAction: (_action: FormFieldDataAction) => {},
         validationSetFieldErrors: (_fieldName: string, _errors?: FormFieldError[]) => {},
+        registerFieldAutoFocusExcluded: (_fieldName: string, _excluded: boolean) => {},
     };
     return FormFieldComponent != null ? (
         <ResourceApiFormContext.Provider value={formContext}>
             {(fieldProp != null || field != null) && (
-                <FormFieldComponent {...otherProps} name={name} field={fieldProp ?? field} />
+                <FormFieldComponent
+                    {...otherProps}
+                    name={name}
+                    label={label ?? field?.label}
+                    field={fieldProp ?? field}
+                />
             )}
         </ResourceApiFormContext.Provider>
     ) : null;

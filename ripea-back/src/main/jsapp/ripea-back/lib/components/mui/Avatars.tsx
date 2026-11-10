@@ -28,10 +28,11 @@ type IconAvatarProps = {
 export const TextAvatar: React.FC<TextAvatarProps> = (props) => {
     const { text } = props;
     const theme = useTheme();
-    const textSplit = text.split(' ');
-    const avatarText0 = textSplit[0][0].toUpperCase();
-    const avatarText1 =
-        textSplit.length > 1 ? textSplit[1][0].toUpperCase() : textSplit[0][1].toUpperCase();
+    const textSplit = text.trim().split(/\s+/);
+    const avatarText0 = textSplit[0].charAt(0).toUpperCase();
+    const avatarText1 = (
+        textSplit.length > 1 ? textSplit[1].charAt(0) : textSplit[0].charAt(1)
+    ).toUpperCase();
     const bgColor = stringToColor(text);
     const textColor = theme.palette.getContrastText(bgColor);
     return (

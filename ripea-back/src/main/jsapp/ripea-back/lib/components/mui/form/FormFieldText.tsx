@@ -12,6 +12,8 @@ type FormFieldTextProps = FormFieldCustomProps & {
     password?: true;
     /** Indica si s'ha de deshabilitar el debounce amb els valors del camp */
     debounceDisabled?: true;
+    /** Indica si el valor del camp només s'ha de propagar al formulari quan el camp perd el focus */
+    propagateChangesOnBlur?: true;
 };
 
 export const useFormFieldCommon = (
@@ -120,6 +122,7 @@ const InnerFormFieldText: React.FC<
             {...componentProps}
             helperText={helperText ?? componentProps.helperText}
             slotProps={{
+                ...componentProps.slotProps,
                 input: inputProps,
                 htmlInput: htmlInputProps,
             }}
@@ -144,7 +147,7 @@ const useIsUserTypingRef = (delay: number = 250): [React.RefObject<boolean>, () 
 };
 
 const InnerFormFieldTextDebounce: React.FC<FormFieldTextProps> = (props) => {
-    const { value, onChange } = props;
+    const { value, onChange, propagateChangesOnBlur } = props;
     const [localValue, setLocalValue] = React.useState<string | null>(value);
     const changedValue = useDebounce(localValue, undefined, true);
     const [isUserTypingRef, onUserInput] = useIsUserTypingRef();
@@ -154,7 +157,9 @@ const InnerFormFieldTextDebounce: React.FC<FormFieldTextProps> = (props) => {
         }
     }, [value]);
     React.useEffect(() => {
-        onChange?.(changedValue);
+        if (!propagateChangesOnBlur && value !== changedValue) {
+            onChange?.(changedValue);
+        }
     }, [changedValue]);
     return (
         <InnerFormFieldText
@@ -165,13 +170,19 @@ const InnerFormFieldTextDebounce: React.FC<FormFieldTextProps> = (props) => {
                     onUserInput();
                     setLocalValue(e.target.value === '' ? null : e.target.value);
                 },
+                onBlur: (e) => {
+                    if (value !== localValue) {
+                        onChange?.(localValue);
+                    }
+                    props.componentProps?.onBlur?.(e);
+                },
             }}
         />
     );
 };
 
 export const FormFieldText: React.FC<FormFieldTextProps> = (props) => {
-    if (!props.debounceDisabled) {
+    if (!props.debounceDisabled || props.propagateChangesOnBlur) {
         return <InnerFormFieldTextDebounce {...props} />;
     } else {
         return <InnerFormFieldText {...props} />;

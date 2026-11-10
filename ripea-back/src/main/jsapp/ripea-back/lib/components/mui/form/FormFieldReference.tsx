@@ -236,14 +236,14 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
                     const pageArgs = optionsUnpaged
                         ? { page: 'UNPAGED' }
                         : { page: pageNumber, size: optionsPageSize };
-                    const sorts =
+                    const sort =
                         sortModel && sortModel.length
                             ? sortModel.map((sm) => sm.field + ',' + sm.sort)
                             : undefined;
                     const templateData = {
                         quickFilter: q,
                         filter,
-                        sorts,
+                        sort,
                         namedQuery: namedQueries,
                         perspective: perspectives,
                         ...pageArgs,
@@ -264,7 +264,7 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
                 });
             }
         },
-        [optionsRequestProp, filter, sortModel, namedQueries, perspectives]
+        [optionsRequestProp, field, filter, sortModel, namedQueries, perspectives, optionsUnpaged]
     );
     const {
         loading: optionsLoading,
@@ -400,7 +400,7 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
                 options={options}
                 multiple={multiple}
                 readOnly={readOnly}
-                disableCloseOnSelect={multiple}
+                disabled={disabled}
                 open={open}
                 onOpen={() => !disabled && !readOnly && setOpen(true)}
                 onClose={(event: Event, reason) => {
@@ -467,7 +467,6 @@ export const FormFieldReference: React.FC<FormFieldRefProps> = (props) => {
                         {...params}
                         label={!inline ? label : undefined}
                         placeholder={componentProps?.placeholder ?? (inline ? label : undefined)}
-                        disabled={disabled}
                         required={required ?? field.required}
                         error={fieldError != null}
                         title={componentProps?.title ?? title}

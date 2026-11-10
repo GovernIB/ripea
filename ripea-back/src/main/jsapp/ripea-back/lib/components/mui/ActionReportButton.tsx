@@ -8,6 +8,7 @@ import {
     useActionDialogButtons,
     useReportDialogButtons,
     useConfirmDialogButtons,
+    useCloseDialogButtons,
 } from '../AppButtons';
 import { useBaseAppContext, DialogButton } from '../BaseAppContext';
 import { ExportFileType } from '../ResourceApiContext';
@@ -65,6 +66,8 @@ export type ActionReportButtonProps = {
     formDialogTitle?: string;
     /** Component amb el contingut (camps) del formulari */
     formDialogContent?: React.ReactElement;
+    /** Indica que el diàleg amb el formulari no s'ha de mostrar */
+    formDialogDisabled?: true;
     /** Component que mostra que l'acció/informe s'està executant */
     formDialogLoading?: React.ReactElement;
     /** Indica si s'ha de mostrar la icona de tancar al component de diàleg */
@@ -156,6 +159,7 @@ const TextCustomButton: React.FC<TextCustomButtonProps> = (props) => {
  * @param formI18nKeys - Claus de traducció personalitzades pel component Form.
  * @param formInitOnChangeRequest - Indica si el formulari ha de fer una petició onChange inicial.
  * @param formDialogContent - Contingut (camps) pel formulari del diàleg.
+ * @param formDialogDisabled - Indica que el diàleg amb el formulari no s'ha de mostrar.
  * @param formDialogLoading - Component que mostra que l'acció/informe s'està executant.
  * @param formDialogButtons - Botons pel component de diàleg.
  * @param formDialogComponentPropsArg - Propietats pel component del diàleg.
@@ -179,6 +183,7 @@ export const useActionReportLogic = (
     formI18nKeys?: FormI18nKeys,
     formInitOnChangeRequest?: boolean,
     formDialogContent?: React.ReactElement,
+    formDialogDisabled?: boolean,
     formDialogLoading?: React.ReactElement,
     formDialogButtons?: DialogButton[],
     formDialogComponentPropsArg?: any,
@@ -191,9 +196,11 @@ export const useActionReportLogic = (
     dialogAutoSubmit?: boolean
 ): ActionReportLogicResult => {
     const { t, messageDialogShow, temporalMessageShow, saveAs } = useBaseAppContext();
+    const [finished, setFinished] = React.useState<boolean>(false);
     const actionDialogButtons = useActionDialogButtons();
     const reportDialogButtons = useReportDialogButtons();
     const confirmDialogButtons = useConfirmDialogButtons();
+    const closeDialogButtons = useCloseDialogButtons();
     const {
         isReady: apiIsReady,
         artifacts: apiArtifacts,
@@ -208,6 +215,7 @@ export const useActionReportLogic = (
                     code: action,
                     data: { ...formAdditionalDataArg, ...data },
                 };
+                setFinished(false);
                 apiArtifactAction(id, requestArgs)
                     .then((result: any) => {
                         if (onSuccess) {
@@ -216,11 +224,13 @@ export const useActionReportLogic = (
                             temporalMessageShow(null, t('actionreport.action.success'), 'success');
                         }
                         resolve(formDialogResultProcessor?.(result));
+                        setFinished(true);
                     })
                     .catch((error) => {
                         onError?.(error);
                         reject(error);
-                    });
+                    })
+                    .finally(() => setFinished(true));
             } else {
                 console.error("Couldn't exec action without code");
             }
@@ -231,9 +241,10 @@ export const useActionReportLogic = (
                 const requestArgs = {
                     id,
                     code: report,
+                    data: { ...formAdditionalDataArg, ...data },
                     fileType: reportFileType,
-                    data,
                 };
+                setFinished(false);
                 apiArtifactReport(id, requestArgs)
                     .then((result: any) => {
                         saveAs?.(result.blob, result.fileName);
@@ -247,17 +258,21 @@ export const useActionReportLogic = (
                     .catch((error) => {
                         onError?.(error);
                         reject(error);
-                    });
+                    })
+                    .finally(() => setFinished(true));
             } else {
                 console.error("Couldn't generate report without code");
             }
         });
+    const dialogButtons = finished
+        ? closeDialogButtons
+        : (formDialogButtons ??
+          (action ? actionDialogButtons : report ? reportDialogButtons : undefined));
     const [formDialogShow, formDialogComponent, formDialogClose] = useFormDialog(
         resourceName,
         action ? 'ACTION' : report ? 'REPORT' : undefined,
         action ? action : report ? report : undefined,
-        formDialogButtons ??
-            (action ? actionDialogButtons : report ? reportDialogButtons : undefined),
+        dialogButtons,
         action ? execAction : generateReport,
         action ? t('actionreport.action.error') : t('actionreport.report.error'),
         null,
@@ -278,6 +293,7 @@ export const useActionReportLogic = (
         formAdditionalData?: any,
         formDialogComponentProps?: any
     ) => {
+        setFinished(false);
         if (hasForm) {
             const formDialogTitle =
                 apiLink?.title ?? (action != null ? 'Exec ' + action : 'Generate ' + report);
@@ -322,7 +338,7 @@ export const useActionReportLogic = (
     };
     const [artifact, setArtifact] = React.useState<any>();
     const [apiLink, setApiLink] = React.useState<any>();
-    const hasForm = artifact != null && artifact.formClassActive;
+    const hasForm = artifact != null && artifact.formClassActive && !formDialogDisabled;
     React.useEffect(() => {
         if (action == null && report == null) {
             console.error('[ActionReportButton] No action or report prop specified');
@@ -390,6 +406,7 @@ export const ActionReportButton: React.FC<ActionReportButtonProps> = (props) => 
         formInitOnChangeRequest,
         formDialogTitle,
         formDialogContent,
+        formDialogDisabled,
         formDialogLoading,
         formDialogCloseIcon,
         formDialogButtons,
@@ -418,6 +435,7 @@ export const ActionReportButton: React.FC<ActionReportButtonProps> = (props) => 
         formI18nKeys,
         formInitOnChangeRequest,
         formDialogContent,
+        formDialogDisabled,
         formDialogLoading,
         formDialogButtons,
         formDialogComponentProps,

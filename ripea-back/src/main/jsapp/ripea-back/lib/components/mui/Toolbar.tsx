@@ -33,7 +33,7 @@ export const Toolbar: React.FC<ToolbarProps> = (props) => {
     const theme = useTheme();
     const titleElement = subtitle ? (
         <div style={{ minWidth: 0, width: '100%' }}>
-            <Typography variant="h6">{title}</Typography>
+            {typeof title === 'string' ? <Typography variant="h6">{title}</Typography> : title}
             <Typography
                 variant="body2"
                 sx={{
@@ -46,8 +46,10 @@ export const Toolbar: React.FC<ToolbarProps> = (props) => {
                 {subtitle}
             </Typography>
         </div>
-    ) : (
+    ) : typeof title === 'string' ? (
         <Typography variant="h6">{title}</Typography>
+    ) : (
+        (title as React.ReactElement)
     );
     const flexGrow = !noFlexGrow ? <div style={{ flexGrow: 1 }} /> : <></>;
     const upperToolbarBgColor =

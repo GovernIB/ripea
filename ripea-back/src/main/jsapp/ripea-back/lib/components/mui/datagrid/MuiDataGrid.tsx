@@ -13,6 +13,7 @@ import {
     GridPaginationModel,
     GridRowSelectionModel,
     GridRowModesModel,
+    GridRowEditStopReasons,
     GridSlots,
     GridEventListener,
     GridCallbackDetails,
@@ -98,7 +99,7 @@ export type MuiDataGridColDef = GridColDef & {
  */
 export type MuiDataGridProps = {
     /** Títol que es mostrarà a la barra d'eines */
-    title?: string;
+    title?: string | React.ReactNode;
     /** Indica si s'ha de mostrar o no el títol a la barra d'eines */
     titleDisabled?: true;
     /** Subtítol que es mostrarà a la barra d'eines */
@@ -176,11 +177,11 @@ export type MuiDataGridProps = {
     /** Estil minHeight per a la fila addicional */
     toolbarAdditionalRowMinHeight?: string;
     /** Adreça que s'ha de mostrar al fer clic sobre una fila de la graella (només es permet fer clic sobre les files si s'especifica algun valor) */
-    rowLink?: string;
+    rowLink?: string | ((row: any) => string);
     /** Adreça que s'ha de mostrar al fer clic sobre el botó per a mostrar els detalls d'una fila (només en mode només lectura) */
-    rowDetailLink?: string;
+    rowDetailLink?: string | ((row: any) => string);
     /** Adreça que s'ha de mostrar al fer clic sobre el botó de modificar una fila */
-    rowUpdateLink?: string;
+    rowUpdateLink?: string | ((row: any) => string);
     /** Funció que indica si l'enllaç d'una determinada fila està activa */
     isRowLinkActive?: (row: any) => boolean;
     /** Deshabilita el botó d'actualització de cada fila (por ser també una funció que reb la fila i retorna true/false) */
@@ -244,7 +245,7 @@ export type MuiDataGridProps = {
     /** Event que es llença quan es fa clic sobre una fila */
     onRowClick?: GridEventListener<'rowClick'>;
     /** Event que es llença quan es fa clic dret sobre una fila */
-    onRowContextMenu?: (event:any, row: any) => void;
+    onRowContextMenu?: (event: React.MouseEvent, row: any) => void;
     /** Event que es llença quan hi ha canvis en les files que mostra la graella */
     onRowsChange?: (rows: GridRowsProp, pageInfo: any) => void;
     /** Event que es llença quan hi ha canvis en l'ordenació de la graella */
@@ -892,6 +893,55 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
     const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
     const [findArgs, setFindArgs] = React.useState<DataCommonFindArgs>();
     const anyRowInEditMode = Object.keys(rowModesModel).length > 0;
+    // La fila de creació s'elimina quan la graella l'ha treta de rowModesModel (edició
+    // desada o cancel·lada) i no abans: si s'elimina mentre la graella encara processa
+    // l'aturada (p. ex. el desament asíncron en fer clic a fora de la fila, que falla per
+    // errors de validació), la fila roman a rowModesModel en mode edició i el botó
+    // d'afegir queda deshabilitat per sempre.
+    const createRowInEditMode = rowModesModel[CREATE_ROW_ID] != null;
+    const prevCreateRowInEditModeRef = React.useRef(false);
+    React.useEffect(() => {
+        if (prevCreateRowInEditModeRef.current && !createRowInEditMode) {
+            const rowData = datagridApiRef.current?.getRow(CREATE_ROW_ID);
+            if (rowData != null) {
+                datagridApiRef.current?.updateRows([{ id: CREATE_ROW_ID, _action: 'delete' }]);
+                if (rowData._previousRowData != null) {
+                    datagridApiRef.current?.updateRows([rowData._previousRowData]);
+                }
+            }
+        }
+        prevCreateRowInEditModeRef.current = createRowInEditMode;
+    }, [createRowInEditMode]);
+    // La graella només detecta el clic a fora de la fila (rowFocusOut) si el seu estat de
+    // focus apunta a una cel·la editable de la fila. Quan l'edició s'inicia amb un botó
+    // (d'afegir o de modificar) el focus queda al botó o a la columna d'accions, i per això
+    // s'ha de moure explícitament a la primera cel·la editable.
+    const focusFirstEditableCell = (id: any, preferredField?: string) => {
+        // Es té en compte isCellEditable, que pot fer que una columna editable no ho sigui
+        // en una fila concreta
+        const editableFields = datagridApiRef.current
+            ?.getVisibleColumns()
+            .filter((c) => datagridApiRef.current?.getCellParams(id, c.field).isEditable)
+            .map((c) => c.field);
+        const field =
+            preferredField != null && editableFields?.includes(preferredField)
+                ? preferredField
+                : editableFields?.[0];
+        if (field != null) {
+            datagridApiRef.current?.setCellFocus(id, field);
+            // El focus es posa a l'input de la cel·la (i no amb FormApi.focus) perquè el
+            // formulari també conté la barra d'eines de la graella i perquè el nom de la
+            // columna no sempre coincideix amb el nom del camp del formulari
+            setTimeout(() =>
+                datagridApiRef.current
+                    ?.getCellElement(id, field)
+                    ?.querySelector<HTMLElement>(
+                        'input:not([type="hidden"]):not([aria-hidden="true"]), textarea'
+                    )
+                    ?.focus()
+            );
+        }
+    };
     const inlineCreate = () => {
         const sortedRowIds = datagridApiRef.current?.getSortedRowIds();
         const page = datagridApiRef.current?.state.pagination.paginationModel.page ?? 0;
@@ -909,26 +959,18 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         } else {
             datagridApiRef.current?.updateRows([{ id: CREATE_ROW_ID, isNew: true }]);
         }
-        formApiRef.current?.reset();
+        formApiRef.current?.reset(undefined, null);
         datagridApiRef.current?.startRowEditMode({ id: CREATE_ROW_ID });
-        setTimeout(() => formApiRef.current?.focus());
+        focusFirstEditableCell(CREATE_ROW_ID);
     };
     const inlineUpdate = (id: any, row?: any) => {
         formApiRef.current?.reset(row, id);
         datagridApiRef.current?.startRowEditMode({ id });
-        setTimeout(() => formApiRef.current?.focus());
+        focusFirstEditableCell(id);
     };
     const inlineStopRowEditMode = (id: any, ignoreModifications?: boolean) => {
         if (ignoreModifications) {
             datagridApiRef.current?.stopRowEditMode({ id, ignoreModifications });
-            if (id === CREATE_ROW_ID) {
-                const rowData = datagridApiRef.current?.getRow(id);
-                const previousRowData = rowData?._previousRowData;
-                datagridApiRef.current?.updateRows([{ id, _action: 'delete' }]);
-                if (previousRowData != null) {
-                    datagridApiRef.current?.updateRows([previousRowData]);
-                }
-            }
         } else {
             datagridApiRef.current?.stopRowEditMode({ id });
         }
@@ -1229,58 +1271,56 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
             : {
                   disableRowSelectionOnClick: true,
               };
-    const inlineEditingProps: any =
-        inlineEditActive || inlineEditCreateActive
-            ? {
-                  editMode: 'row',
-                  onRowModesModelChange: setRowModesModel,
-                  onRowEditStart: (params: any) => {
-                      formApiRef.current?.reset(params.row, params.id);
-                      setTimeout(() => formApiRef.current?.focus(params.field));
-                  },
-                  onRowEditStop: (params: any) => {
-                      if (params.id === CREATE_ROW_ID) {
-                          const previousRowData = params.row._previousRowData;
-                          datagridApiRef.current?.updateRows([
-                              { id: CREATE_ROW_ID, _action: 'delete' },
-                          ]);
-                          if (previousRowData != null) {
-                              datagridApiRef.current?.updateRows([previousRowData]);
-                          }
+    const inlineEditable = inlineEditActive || inlineEditCreateActive || inlineEditUpdateActive;
+    const inlineEditingProps: any = inlineEditable
+        ? {
+              editMode: 'row',
+              onRowModesModelChange: setRowModesModel,
+              onRowEditStart: (params: any) => {
+                  formApiRef.current?.reset(params.row, params.id);
+                  focusFirstEditableCell(params.id, params.field);
+              },
+              onRowEditStop: (params: any, event: any) => {
+                  // Si es fa clic a fora de la fila que s'està editant es cancel·la
+                  // l'edició en lloc d'intentar desar-la (el comportament per defecte
+                  // de la graella)
+                  if (params.reason === GridRowEditStopReasons.rowFocusOut) {
+                      event.defaultMuiPrevented = true;
+                      inlineStopRowEditMode(params.id, true);
+                  }
+              },
+              processRowUpdate: (newRow: any) =>
+                  new Promise((resolve, reject) => {
+                      formApiRef.current
+                          ?.save()
+                          .then((saved) => {
+                              resolve(
+                                  newRow.id === CREATE_ROW_ID
+                                      ? { ...saved, id: CREATE_ROW_ID }
+                                      : saved
+                              );
+                              if (newRow.id === CREATE_ROW_ID) {
+                                  onRowCreate?.(newRow);
+                              } else {
+                                  onRowUpdate?.(newRow);
+                              }
+                              refresh();
+                          })
+                          .catch(reject);
+                  }),
+              onProcessRowUpdateError: (error: any) => {
+                  if (!error.modificationCanceledError && error.status === 422) {
+                      const errors = error.errors ?? error.validationErrors;
+                      const fieldErrors = errors
+                          ?.filter((e: any) => e.field != null)
+                          .map((e: any) => e.field);
+                      if (fieldErrors?.length) {
+                          setTimeout(() => formApiRef.current?.focus(fieldErrors[0]));
                       }
-                  },
-                  processRowUpdate: (newRow: any) =>
-                      new Promise((resolve, reject) => {
-                          formApiRef.current
-                              ?.save()
-                              .then((saved) => {
-                                  resolve(
-                                      newRow.id === CREATE_ROW_ID
-                                          ? { ...saved, id: CREATE_ROW_ID }
-                                          : saved
-                                  );
-                                  if (newRow.id === CREATE_ROW_ID) {
-                                      onRowCreate?.(newRow);
-                                  } else {
-                                      onRowUpdate?.(newRow);
-                                  }
-                                  refresh();
-                              })
-                              .catch(reject);
-                      }),
-                  onProcessRowUpdateError: (error: any) => {
-                      if (!error.modificationCanceledError && error.status === 422) {
-                          const errors = error.errors ?? error.validationErrors;
-                          const fieldErrors = errors
-                              ?.filter((e: any) => e.field != null)
-                              .map((e: any) => e.field);
-                          if (fieldErrors?.length) {
-                              setTimeout(() => formApiRef.current?.focus(fieldErrors[0]));
-                          }
-                      }
-                  },
-              }
-            : null;
+                  }
+              },
+          }
+        : null;
     const stripedProps: any = striped
         ? {
               getRowClassName: (params: GridRowClassNameParams) =>
@@ -1304,7 +1344,12 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         const requestPending =
             loading === undefined && autoFindDisabled && !isRowsPresentInOtherProps;
         return {
-            row: { linkTo: rowLink, isRowLinkActive, isRowClickActive: onRowClick != null, onContextMenu: onRowContextMenu },
+            row: {
+                linkTo: rowLink,
+                isRowLinkActive,
+                isRowClickActive: onRowClick != null,
+                onContextMenu: onRowContextMenu,
+            },
             footer: {
                 paginationActive,
                 selectionActive,
@@ -1400,7 +1445,6 @@ export const MuiDataGrid: React.FC<MuiDataGridProps> = (props) => {
         selection: rowSelectionModel,
         apiRef,
     };
-    const inlineEditable = inlineEditActive || inlineEditCreateActive || inlineEditUpdateActive;
     return (
         <DataGridContext.Provider value={context}>
             {autoHeight ? (

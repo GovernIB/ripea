@@ -64,6 +64,7 @@ const FormActionDialog = (props:FormActionDialogProp) => {
         undefined,
         initialOnChange,
         children,
+        undefined, // formDialogDisabled
         undefined,
         formDialogButtons,
         formDialogComponentProps,
@@ -122,6 +123,7 @@ export const FormReportDialog = (props:FormReportDialogProp) => {
         undefined,
         initialOnChange,
         children,
+        undefined, // formDialogDisabled
         undefined,
         formDialogButtons,
         formDialogComponentProps,

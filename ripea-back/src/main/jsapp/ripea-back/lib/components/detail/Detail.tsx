@@ -5,10 +5,28 @@ import DetailContext from './DetailContext';
 
 const LOG_PREFIX = 'DETAIL';
 
+export type DetailApi = {
+    refresh: () => void;
+};
+
+export type DetailApiRef = React.RefObject<DetailApi | null>;
+
+/**
+ * Hook per a accedir a l'API de Detail des de fora del context del component.
+ *
+ * @returns referència a l'API del component Detail.
+ */
+export const useDetailApiRef: () => DetailApiRef = () => {
+    const detailApiRef = React.useRef<DetailApi | null>(null);
+    return detailApiRef;
+};
+
 /**
  * Propietats del component Detail.
  */
 export type DetailProps = React.PropsWithChildren & {
+    /** Referència a l'api del component */
+    apiRef?: DetailApiRef;
     /** Títol del detall */
     title?: string;
     /** Nom del recurs de l'API REST d'on es consultarà la informació per a mostrar el detall */
@@ -32,7 +50,7 @@ export type DetailProps = React.PropsWithChildren & {
  * @returns Element JSX dels detalls.
  */
 export const Detail: React.FC<DetailProps> = (props) => {
-    const { resourceName, id, perspectives, fieldTypeMap, debug = false, children } = props;
+    const { apiRef, resourceName, id, perspectives, fieldTypeMap, debug = false, children } = props;
     const logConsole = useLogConsole(LOG_PREFIX);
     const {
         isReady: apiIsReady,
@@ -47,7 +65,7 @@ export const Detail: React.FC<DetailProps> = (props) => {
     const dataGetValue = (callback: (state: any) => any) => callback(data);
     const getInitialData = React.useCallback(
         async (id: any): Promise<any> => {
-            return await apiGetOne(id, { data: { perspectives } });
+            return await apiGetOne(id, { perspectives });
         },
         [apiGetOne, perspectives]
     );
@@ -90,6 +108,9 @@ export const Detail: React.FC<DetailProps> = (props) => {
         }),
         [isLoading, fields, data]
     );
+    if (apiRef) {
+        apiRef.current = { refresh };
+    }
     return (
         <DetailContext.Provider value={context}>{isReady ? children : null}</DetailContext.Provider>
     );

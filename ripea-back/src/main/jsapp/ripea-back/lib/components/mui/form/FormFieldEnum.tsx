@@ -23,6 +23,8 @@ type FormFieldEnumProps = FormFieldCustomProps & {
     autocomplete?: boolean;
     /** La descripció que s'ha de mostrar pel valor buit */
     emptyValueDescription?: string;
+    /** Les opcions disponibles */
+    options?: EnumOption[];
 };
 
 type EnumOption = {
@@ -48,6 +50,7 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
         requestParams,
         autocomplete,
         emptyValueDescription,
+        options,
     } = props;
     const { t } = useBaseAppContext();
     const { requestHref } = useResourceApiContext();
@@ -116,7 +119,13 @@ export const FormFieldEnum: React.FC<FormFieldEnumProps> = (props) => {
         setAutocompleteInputValue(newValue);
     };
     React.useEffect(() => {
-        if (field.options != null) {
+        if (options != null) {
+            setEnumOptions(
+                options.filter((o) =>
+                    hiddenEnumValues != null ? hiddenEnumValues.includes(o.value) : true
+                )
+            );
+        } else if (field.options != null) {
             const optionsObj = { ...field.options };
             hiddenEnumValues?.forEach((v: any) => {
                 delete optionsObj[v];

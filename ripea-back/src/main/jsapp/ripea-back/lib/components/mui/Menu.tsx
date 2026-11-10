@@ -485,7 +485,7 @@ export const Menu: React.FC<MenuProps> = (props) => {
                     onMenuItemClick={handleMenuItemClick}
                 />
             )}
-            {footerHeight && <Box sx={{ mb: footerHeight + 'px' }} />}
+            {footerHeight ? <Box sx={{ mb: footerHeight + 'px' }} /> : undefined}
         </>
     );
     return !smallScreen ? (

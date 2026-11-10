@@ -28,6 +28,8 @@ export type FormFieldCommonProps = {
     disabled?: boolean;
     /** Indica que aquest camp és de nomes lectura */
     readOnly?: boolean;
+    /** Indica que aquest camp s'ha d'ignorar quan el formulari posa el focus automàticament al primer camp (vegeu FormApi.focus) */
+    excludeFromAutoFocus?: boolean;
     /** Event que es llença quan es canvia el valor del camp */
     onChange?: (value: any) => void;
     /** Propietats addicionals del component */
@@ -137,6 +139,7 @@ export const FormField: React.FC<FormFieldProps> = (props) => {
         required,
         disabled,
         readOnly,
+        excludeFromAutoFocus,
         onChange,
         componentProps,
         type,
@@ -154,6 +157,7 @@ export const FormField: React.FC<FormFieldProps> = (props) => {
         dataGetFieldValue,
         dataDispatchAction,
         validationSetFieldErrors,
+        registerFieldAutoFocusExcluded,
         commonFieldComponentProps,
     } = useFormContext();
     const filterContext = useOptionalFilterContext();
@@ -196,6 +200,10 @@ export const FormField: React.FC<FormFieldProps> = (props) => {
     React.useEffect(() => {
         validationSetFieldErrors(name, validator?.(value) ?? undefined);
     }, []);
+    React.useEffect(() => {
+        registerFieldAutoFocusExcluded(name, excludeFromAutoFocus ?? false);
+        return () => registerFieldAutoFocusExcluded(name, false);
+    }, [name, excludeFromAutoFocus, registerFieldAutoFocusExcluded]);
     return isReady ? (
         <Renderer
             name={name}

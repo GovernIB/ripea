@@ -4,6 +4,7 @@ import { Form, FormProps, useFormApiContext } from '../../form/Form';
 import { useBaseAppContext } from '../../BaseAppContext';
 import { useMuiBaseAppContext } from '../MuiBaseAppContext';
 import { useFormContext } from '../../form/FormContext';
+import { useSmallHeader } from '../../../util/useSmallScreen';
 import { ReactElementWithPosition } from '../../../util/reactNodePosition';
 import { toToolbarIcon } from '../ToolbarIcon';
 import { Toolbar } from '../Toolbar';
@@ -46,6 +47,7 @@ const MuiFormContent: React.FC<React.PropsWithChildren | any> = (props) => {
         componentProps,
         children,
     } = props;
+    const smallHeader = useSmallHeader();
     const formApiRef = useFormApiContext();
     const { t, goBack, anyHistoryEntryExist, contentExpandsToAvailableHeight } =
         useBaseAppContext();
@@ -110,7 +112,7 @@ const MuiFormContent: React.FC<React.PropsWithChildren | any> = (props) => {
                     upperToolbar
                     sx={{
                         position: 'sticky',
-                        top: '64px',
+                        top: smallHeader ? '56px' : '64px',
                         zIndex: 10,
                     }}
                 />

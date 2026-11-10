@@ -11,6 +11,12 @@ export type FormApi = {
     validate: () => Promise<void>;
     save: () => Promise<any>;
     delete: () => void;
+    /**
+     * Posa el focus a un camp del formulari.
+     *
+     * @param name el nom del camp a on posar el focus. Si no s'especifica es posa el focus al primer
+     * camp del formulari, ignorant els camps marcats amb excludeFromAutoFocus (vegeu FormFieldCommonProps).
+     */
     focus: (name?: string) => void;
     setFieldValue: (name: string, value: any) => void;
     setModified: (modified: boolean) => void;
@@ -56,6 +62,8 @@ export type FormContextType = {
     dataGetFieldValue: (fieldName: string) => any;
     dataDispatchAction: (action: FormFieldDataAction) => void;
     validationSetFieldErrors: (fieldName: string, errors?: FormFieldError[]) => void;
+    /** Marca (o desmarca) un camp com a exclòs del focus automàtic del formulari (vegeu FormApi.focus) */
+    registerFieldAutoFocusExcluded: (fieldName: string, excluded: boolean) => void;
     commonFieldComponentProps?: any;
 };
 

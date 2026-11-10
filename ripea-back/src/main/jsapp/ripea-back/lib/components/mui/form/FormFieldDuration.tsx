@@ -1,7 +1,7 @@
 import React from 'react';
 import { DateTimeField } from '@mui/x-date-pickers/DateTimeField';
 import { FormFieldCustomProps } from '../../form/FormField';
-import { parseIsoDuration } from '../../../util/durationFormat';
+import { durationParseIso } from '../../../util/durationFormat';
 import { FormFieldNumber } from './FormFieldNumber';
 import { useFormFieldCommon } from './FormFieldText';
 import { useFormFieldDateCommon } from './FormFieldDate';
@@ -25,7 +25,7 @@ const intPadding = (num?: number, digits?: number) => {
 
 const useDurationState = (value: any, onChange: (value: any) => void) => {
     const textIsoDurationToTextIsoDate = (textIsoDuration: string) => {
-        const duration = parseIsoDuration(textIsoDuration);
+        const duration = durationParseIso(textIsoDuration);
         if (textIsoDuration != null && duration != null) {
             const isoDate =
                 intPadding(duration.years, 4) +
@@ -88,7 +88,7 @@ const useDurationState = (value: any, onChange: (value: any) => void) => {
 
 export const FormFieldDurationDays: React.FC<FormFieldCustomProps> = (props) => {
     const { value: valueProp, onChange: onChangeProp, ...otherProps } = props;
-    const duration = valueProp && valueProp.length ? parseIsoDuration(valueProp) : undefined;
+    const duration = valueProp && valueProp.length ? durationParseIso(valueProp) : undefined;
     const value = duration ? duration.days : undefined;
     const handlerNumberFieldChange = (value: any) => {
         onChangeProp('P' + value + 'D');

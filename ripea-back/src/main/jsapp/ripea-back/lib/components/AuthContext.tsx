@@ -21,6 +21,12 @@ export type AuthContextType = {
     getUserEmail: () => any | string;
     signIn: (() => void) | undefined;
     signOut: (() => void) | undefined;
+    /**
+     * Renova el token d'accés i retorna el nou token (o undefined si no s'ha pogut renovar). Si ja hi ha una
+     * renovació en curs retorna la mateixa promesa. És opcional perquè no tots els proveïdors d'autenticació
+     * la implementen.
+     */
+    refreshToken?: () => Promise<string | undefined>;
 };
 
 export const AuthContext = React.createContext<AuthContextType | undefined>(undefined);
