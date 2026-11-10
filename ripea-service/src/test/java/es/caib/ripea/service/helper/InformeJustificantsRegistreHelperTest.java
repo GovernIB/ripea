@@ -43,6 +43,8 @@ import es.caib.ripea.persistence.entity.ExpedientPeticioEntity;
 import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.RegistreEntity;
 import es.caib.ripea.persistence.repository.EntitatRepository;
+import es.caib.ripea.service.helper.FilaInformeJustificantRegistre.AccioConsulta;
+import es.caib.ripea.service.helper.FilaInformeJustificantRegistre.AccioMoure;
 import es.caib.ripea.service.helper.FilaInformeJustificantRegistre.AccioRipea;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
@@ -64,8 +66,11 @@ class InformeJustificantsRegistreHelperTest {
 	@BeforeEach
 	void setUp() {
 		lenient().when(configHelper.getConfig(PropertyConfig.APP_DATA_DIR)).thenReturn(directoriDades.toString());
-		lenient().when(entitatRepository.findByCodi("A")).thenReturn(entitat(1L));
-		lenient().when(entitatRepository.findByCodi("B")).thenReturn(entitat(2L));
+		// Els mocks de les entitats es creen abans: stubejar-los dins el thenReturn deixa l'stubbing a mitges
+		EntitatEntity entitatA = entitat(1L);
+		EntitatEntity entitatB = entitat(2L);
+		lenient().when(entitatRepository.findByCodi("A")).thenReturn(entitatA);
+		lenient().when(entitatRepository.findByCodi("B")).thenReturn(entitatB);
 	}
 
 	@AfterEach
@@ -106,6 +111,35 @@ class InformeJustificantsRegistreHelperTest {
 				.doesNotContain("GOIBE11/2026");
 		assertThat(fitxers(InformeJustificantsRegistreHelper.PENDENTS)).isEmpty();
 		assertThat(fitxers(InformeJustificantsRegistreHelper.ENVIATS)).hasSize(2).allMatch(nom -> nom.endsWith(".zip"));
+	}
+
+	@Test
+	void laLlegendaDelCorreuNomesExplicaElsValorsQueApareixen() throws Exception {
+		when(emailHelper.enviarInformeJustificantsRegistre(anyLong(), anyString(), anyString(), anyString(), any())).thenReturn(1);
+
+		helper.iniciarExecucio();
+		helper.processarElement(10L, () -> {
+			FilaInformeJustificantRegistre.actualitzar(fila -> {
+				fila.setAnotacio(peticio("A", "GOIBE10/2026"));
+				fila.setAccioConsulta(AccioConsulta.TROBAT);
+				fila.setErrorMoure(new SistemaExternException("ARXIU", "permission of Write"), true);
+				fila.setAccioRipea(AccioRipea.CREAT_A_CARPETA_EXISTENT);
+			});
+			return "incorporat";
+		});
+		helper.finalitzarExecucio("resum");
+
+		ArgumentCaptor<String> text = ArgumentCaptor.forClass(String.class);
+		verify(emailHelper).enviarInformeJustificantsRegistre(eq(1L), anyString(), text.capture(), anyString(), any());
+		assertThat(text.getValue())
+				.contains("Llegenda dels valors que apareixen en aquest informe")
+				.contains("TROBAT: " + AccioConsulta.TROBAT.getDescripcio())
+				.contains("ERROR_PERMISOS (WARN): " + AccioMoure.ERROR_PERMISOS_WARN.getDescripcio())
+				.contains("CREAT_A_CARPETA_EXISTENT: " + AccioRipea.CREAT_A_CARPETA_EXISTENT.getDescripcio())
+				.contains("Moviment del justificant a l'expedient de RIPEA a l'Arxiu, columna \"Acció moure\" del CSV:")
+				.doesNotContain(AccioConsulta.NO_CONSULTAT.getDescripcio())
+				.doesNotContain(AccioMoure.WARN_ANTERIOR.getDescripcio())
+				.doesNotContain(AccioRipea.JA_A_LA_CARPETA.getDescripcio());
 	}
 
 	@Test

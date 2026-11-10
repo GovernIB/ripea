@@ -30,58 +30,140 @@ import lombok.Getter;
 @Getter
 public class FilaInformeJustificantRegistre {
 
+	/**
+	 * Valor d'una de les columnes d'acció de l'informe: el text amb què surt al CSV i al recompte del correu, i la
+	 * descripció amb què s'explica a la llegenda del correu.
+	 */
+	public interface ValorAccio {
+		String getText();
+		String getDescripcio();
+	}
+
+	/** Avís que mostra el document quan el justificant no s'ha pogut moure a l'expedient de RIPEA a l'Arxiu. */
+	static final String AVIS_NO_MOGUT = "\"No s'ha pogut moure el justificant de registre a l'expedient documental de RIPEA\"";
+
 	/** Consulta del justificant original a l'Arxiu (sèrie de Distribució). */
-	public enum AccioConsulta {
-		TROBAT,
-		NO_TROBAT,
-		ERROR,
-		/** No s'ha consultat: el document ja existia d'una execució anterior, o no es descarrega. */
-		NO_CONSULTAT
+	public enum AccioConsulta implements ValorAccio {
+		TROBAT("S'ha obtingut de l'Arxiu el justificant original, amb el contingut, per incorporar-lo a l'expedient. Si"
+				+ " després falla un altre pas, l'anotació acaba amb ERROR."),
+		NO_TROBAT("L'Arxiu respon que el justificant no existeix. L'anotació acaba amb ERROR."),
+		ERROR("Error en consultar el justificant a l'Arxiu (per exemple, temps d'espera esgotat o servei no disponible)."
+				+ " L'anotació acaba amb ERROR."),
+		NO_CONSULTAT("No ha calgut consultar l'Arxiu: l'expedient ja tenia el justificant, el justificant o la carpeta del"
+				+ " registre estan esborrats, ja hi ha un document amb el mateix nom de fitxer o l'anotació no s'ha tractat."
+				+ " També surt si l'anotació ha fallat abans de consultar-lo (per exemple, si l'expedient no està guardat a"
+				+ " l'Arxiu).");
+
+		private final String descripcio;
+
+		AccioConsulta(String descripcio) {
+			this.descripcio = descripcio;
+		}
+
+		@Override
+		public String getText() {
+			return name();
+		}
+
+		@Override
+		public String getDescripcio() {
+			return descripcio;
+		}
 	}
 
 	/** Moviment del justificant a l'expedient de RIPEA a l'Arxiu. */
-	public enum AccioMoure {
-		MOGUT("MOGUT"),
-		/** El document ja era a la carpeta de l'Arxiu. */
-		JA_A_L_ARXIU("JA_A_L_ARXIU"),
-		/** No s'ha pogut moure per falta de permisos: el document queda amb l'avís (justificantMoureError). */
-		ERROR_PERMISOS_WARN("ERROR_PERMISOS (WARN)"),
-		/** No s'ha pogut moure per un altre error: el document queda amb l'avís (justificantMoureError). */
-		ERROR_WARN("ERROR (WARN)"),
-		/** Justificant ja incorporat sense l'avís que no s'ha pogut moure a la carpeta de l'Arxiu: no s'ha mogut enlloc. */
-		ERROR_PERMISOS_NO_MOGUT("ERROR_PERMISOS (NO MOGUT)"),
-		ERROR_NO_MOGUT("ERROR (NO MOGUT)"),
-		/** Ja tenia l'avís d'una execució anterior: no es reintenta. */
-		WARN_ANTERIOR("WARN_ANTERIOR"),
-		NO_APLICA("NO_APLICA");
+	public enum AccioMoure implements ValorAccio {
+		MOGUT("MOGUT", "S'ha mogut el justificant a l'Arxiu: si s'ha creat en aquesta execució (CREAT_...), de la sèrie de"
+				+ " Distribució a la carpeta del registre de l'expedient de RIPEA; si ja era a l'expedient (MOGUT_...), de"
+				+ " l'arrel o d'una altra carpeta a la carpeta del registre."),
+		JA_A_L_ARXIU("JA_A_L_ARXIU", "En crear el justificant, al destí de l'Arxiu ja hi havia un document amb el mateix"
+				+ " nom (d'un intent anterior): el justificant passa a ser aquest document i no es mou res."),
+		ERROR_PERMISOS_WARN("ERROR_PERMISOS (WARN)", "En crear el justificant, l'Arxiu no l'ha deixat moure a l'expedient"
+				+ " de RIPEA per falta de permisos. El document s'ha creat igualment, apunta al justificant original de"
+				+ " Distribució i es mostra amb l'avís " + AVIS_NO_MOGUT + ". El moviment es pot tornar a intentar amb"
+				+ " \"Guardar en arxiu\" des del document."),
+		ERROR_WARN("ERROR (WARN)", "En crear el justificant, l'Arxiu no l'ha deixat moure a l'expedient de RIPEA per un"
+				+ " error que no és de permisos. El document s'ha creat igualment, apunta al justificant original de"
+				+ " Distribució i es mostra amb l'avís " + AVIS_NO_MOGUT + ". El moviment es pot tornar a intentar amb"
+				+ " \"Guardar en arxiu\" des del document."),
+		ERROR_PERMISOS_NO_MOGUT("ERROR_PERMISOS (NO MOGUT)", "En canviar de carpeta un justificant que ja era a l'expedient"
+				+ " de RIPEA a l'Arxiu, l'Arxiu no l'ha deixat moure per falta de permisos: no s'ha mogut ni a l'Arxiu ni a"
+				+ " RIPEA, i l'anotació acaba amb ERROR."),
+		ERROR_NO_MOGUT("ERROR (NO MOGUT)", "En canviar de carpeta un justificant que ja era a l'expedient de RIPEA a"
+				+ " l'Arxiu, l'Arxiu no l'ha deixat moure per un error que no és de permisos: no s'ha mogut ni a l'Arxiu ni a"
+				+ " RIPEA, i l'anotació acaba amb ERROR."),
+		WARN_ANTERIOR("WARN_ANTERIOR", "El justificant ja tenia l'avís " + AVIS_NO_MOGUT + " d'un intent anterior: a"
+				+ " l'Arxiu continua a la sèrie de Distribució. El procés no torna a intentar moure'l a l'Arxiu (es pot fer"
+				+ " amb \"Guardar en arxiu\" des del document) i, si calia canviar-lo de carpeta, només ho fa a RIPEA. No"
+				+ " compta entre els justificants no moguts per falta de permisos d'aquesta execució."),
+		NO_APLICA("NO_APLICA", "No s'ha fet ni comprovat res a l'Arxiu: el justificant ja era a la carpeta del registre,"
+				+ " només s'ha mogut a RIPEA, no s'ha incorporat (esborrat, carpeta esborrada, ja incorporat amb un altre"
+				+ " tipus o anotació no tractada) o l'anotació ha fallat abans d'arribar a l'Arxiu.");
 
 		private final String text;
+		private final String descripcio;
 
-		AccioMoure(String text) {
+		AccioMoure(String text, String descripcio) {
 			this.text = text;
+			this.descripcio = descripcio;
 		}
 
+		@Override
 		public String getText() {
 			return text;
+		}
+
+		@Override
+		public String getDescripcio() {
+			return descripcio;
 		}
 	}
 
 	/** Què s'ha fet amb el justificant a RIPEA. */
-	public enum AccioRipea {
-		CREAT_A_CARPETA_EXISTENT,
-		CREAT_A_CARPETA_NOVA,
-		MOGUT_A_CARPETA_EXISTENT,
-		MOGUT_A_CARPETA_NOVA,
-		JA_A_LA_CARPETA,
-		CARPETA_ESBORRADA_JUSTIFICANT_ESBORRAT,
-		CARPETA_ESBORRADA_NO_DESCARREGAT,
-		/** El justificant està esborrat: no es torna a incorporar ni es mou. */
-		JUSTIFICANT_ESBORRAT,
-		/** Ja hi ha un document amb el mateix nom de fitxer, però amb un altre tipus de document o número de registre. */
-		JA_INCORPORAT_AMB_ALTRE_TIPUS,
-		/** El procés no ha fet res amb l'anotació (p.ex. no té expedient): el motiu és al detall. */
-		NO_TRACTAT,
-		ERROR
+	public enum AccioRipea implements ValorAccio {
+		CREAT_A_CARPETA_EXISTENT("L'expedient no tenia el justificant: s'ha descarregat de l'Arxiu i s'ha creat a la"
+				+ " carpeta del registre."),
+		CREAT_A_CARPETA_NOVA("L'expedient no tenia el justificant ni la carpeta del registre: s'ha creat la carpeta"
+				+ " \"Registre entrada: <número de registre>\" i s'hi ha creat el justificant, descarregat de l'Arxiu."),
+		MOGUT_A_CARPETA_EXISTENT("El justificant ja era a l'expedient, però a l'arrel o a una altra carpeta (també la"
+				+ " d'una altra anotació): s'ha mogut a la carpeta del registre. Si també s'ha mogut a l'Arxiu, ho indica la"
+				+ " columna \"Acció moure\"."),
+		MOGUT_A_CARPETA_NOVA("El justificant ja era a l'expedient, però no hi havia carpeta del registre: s'ha creat la"
+				+ " carpeta \"Registre entrada: <número de registre>\" i s'hi ha mogut el justificant. Si també s'ha mogut a"
+				+ " l'Arxiu, ho indica la columna \"Acció moure\"."),
+		JA_A_LA_CARPETA("El justificant ja era a la carpeta del registre: no s'ha fet res."),
+		CARPETA_ESBORRADA_JUSTIFICANT_ESBORRAT("La carpeta del registre està esborrada, però el justificant no: s'ha"
+				+ " esborrat el justificant, només a RIPEA, com la resta del contingut de la carpeta."),
+		CARPETA_ESBORRADA_NO_DESCARREGAT("La carpeta del registre està esborrada i l'expedient no té el justificant: no"
+				+ " s'ha descarregat."),
+		JUSTIFICANT_ESBORRAT("L'expedient només té el justificant esborrat: no es torna a incorporar ni es mou."),
+		JA_INCORPORAT_AMB_ALTRE_TIPUS("L'expedient no té el justificant, però sí un document (esborrat o no) amb el nom de"
+				+ " fitxer que el procés dona al justificant (REGISTRE_JUSTIFICANT_ENTRADA_<id anotació>_<número de"
+				+ " registre>.pdf): es considera que ja s'hi va incorporar amb un altre tipus de document o un altre número"
+				+ " de registre, i no s'ha fet res."),
+		NO_TRACTAT("L'anotació no té justificant a l'Arxiu o no té expedient: no s'ha fet res. El motiu és a la columna"
+				+ " \"Detall\"."),
+		ERROR("L'anotació ha fallat i no s'ha canviat res a l'expedient. El motiu és a la columna \"Detall\" (per exemple,"
+				+ " més d'un justificant actiu, un altre document amb el mateix nom a la carpeta, expedient no guardat a"
+				+ " l'Arxiu o error de l'Arxiu). Si ha fallat en incorporar el justificant, l'error queda a l'anotació i es"
+				+ " pot tornar a intentar amb \"Afegir justificant a l'expedient\". El procés no torna a tractar l'anotació a"
+				+ " les execucions següents, llevat que s'hagi aturat per errors de disponibilitat.");
+
+		private final String descripcio;
+
+		AccioRipea(String descripcio) {
+			this.descripcio = descripcio;
+		}
+
+		@Override
+		public String getText() {
+			return name();
+		}
+
+		@Override
+		public String getDescripcio() {
+			return descripcio;
+		}
 	}
 
 	/** Columnes del CSV, en el mateix ordre que {@link #getCamps()}. */
@@ -266,9 +348,9 @@ public class FilaInformeJustificantRegistre {
 				documentNom,
 				documentFitxerNom,
 				documentUuid,
-				accioConsulta.name(),
+				accioConsulta.getText(),
 				accioMoure.getText(),
-				accioRipea != null ? accioRipea.name() : null,
+				accioRipea != null ? accioRipea.getText() : null,
 				text(carpetaId),
 				carpetaNom,
 				detall

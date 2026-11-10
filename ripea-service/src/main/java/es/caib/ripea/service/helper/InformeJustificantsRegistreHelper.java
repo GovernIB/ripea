@@ -34,6 +34,7 @@ import es.caib.ripea.persistence.repository.EntitatRepository;
 import es.caib.ripea.service.helper.FilaInformeJustificantRegistre.AccioConsulta;
 import es.caib.ripea.service.helper.FilaInformeJustificantRegistre.AccioMoure;
 import es.caib.ripea.service.helper.FilaInformeJustificantRegistre.AccioRipea;
+import es.caib.ripea.service.helper.FilaInformeJustificantRegistre.ValorAccio;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import lombok.extern.slf4j.Slf4j;
 
@@ -70,6 +71,23 @@ public class InformeJustificantsRegistreHelper {
 	private static final DateTimeFormatter FORMAT_TEXT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 	/** justificants_&lt;entitat&gt;_&lt;yyyyMMdd_HHmmss&gt;.csv */
 	private static final Pattern PATRO_FITXER = Pattern.compile("^" + PREFIX_FITXER + "(.+)_(\\d{8}_\\d{6})\\.csv$");
+
+	private static final String TITOL_CONSULTA = "Consulta del justificant original a l'Arxiu (sèrie de Distribució)";
+	private static final String TITOL_MOURE = "Moviment del justificant a l'expedient de RIPEA a l'Arxiu";
+	private static final String TITOL_RIPEA = "Acció a RIPEA";
+	/** Conceptes de la llegenda que fan servir les descripcions dels valors. */
+	private static final String LLEGENDA_CONCEPTES = "Justificant: document de l'expedient de tipus"
+			+ " REGISTRE_JUSTIFICANT_ENTRADA amb el número de registre de l'anotació. No hi compten els annexos de"
+			+ " l'anotació, encara que tinguin aquest tipus.\n"
+			+ "Carpeta del registre: la carpeta \"Registre entrada: <número de registre>\" no esborrada; si no n'hi ha, la"
+			+ " carpeta de l'expedient (esborrada o no) que conté més annexos de l'anotació; si tampoc, la carpeta"
+			+ " esborrada amb aquest nom.\n";
+	private static final String LLEGENDA_DETALL = "Columna \"Detall\" del CSV: resultat o error de cada anotació; si el"
+			+ " moviment a l'Arxiu ha fallat, hi afegeix \"Moure: <error>\".\n";
+	private static final String LLEGENDA_RESUM = "Resum de l'execució: OK i ERROR són les anotacions de totes les"
+			+ " entitats que han acabat bé o amb error; \"sense cridar cap servei extern\", les que no han cridat l'Arxiu"
+			+ " ni cap altre servei extern; \"Darrer id\", el punt on continuarà l'execució següent (les anotacions d'id"
+			+ " inferior).\n";
 
 	@Autowired private ConfigHelper configHelper;
 	@Autowired private EmailHelper emailHelper;
@@ -276,17 +294,17 @@ public class InformeJustificantsRegistreHelper {
 		text.append("Execució: ").append(dataText(execucioFitxer)).append("\n");
 		text.append("Resum de l'execució (totes les entitats): ").append(StringUtils.defaultString(resum, "-")).append("\n\n");
 		text.append("Anotacions d'aquesta entitat tractades: ").append(recompte.total).append("\n");
-		afegirRecompte(text, "Consulta del justificant original a l'Arxiu (sèrie de Distribució)", recompte.consulta);
-		afegirRecompte(text, "Moviment del justificant a l'expedient de RIPEA a l'Arxiu", recompte.moure);
-		afegirRecompte(text, "Acció a RIPEA", recompte.ripea);
+		afegirRecompte(text, TITOL_CONSULTA, recompte.consulta);
+		afegirRecompte(text, TITOL_MOURE, recompte.moure);
+		afegirRecompte(text, TITOL_RIPEA, recompte.ripea);
 		int errorsPermisos = recompte.moure.getOrDefault(AccioMoure.ERROR_PERMISOS_WARN.getText(), 0);
 		text.append("\nJustificants que no s'han pogut moure a l'expedient de RIPEA a l'Arxiu per falta de permisos: ")
 				.append(errorsPermisos).append(".\n");
 		if (errorsPermisos > 0) {
-			text.append("Es mostren amb l'avís \"No s'ha pogut moure el justificant de registre a l'expedient documental"
-					+ " de RIPEA\" i continuen apuntant al justificant original de Distribució. Són les files amb l'acció"
-					+ " moure \"" + AccioMoure.ERROR_PERMISOS_WARN.getText() + "\", amb l'identificador de l'anotació i"
-					+ " l'UUID del justificant.\n");
+			text.append("Es mostren amb l'avís " + FilaInformeJustificantRegistre.AVIS_NO_MOGUT + " i continuen apuntant"
+					+ " al justificant original de Distribució. Són les files amb l'acció moure \""
+					+ AccioMoure.ERROR_PERMISOS_WARN.getText() + "\", amb l'identificador de l'anotació i l'UUID del"
+					+ " justificant.\n");
 		}
 		text.append("\n");
 		if (rutaNoAdjuntat == null) {
@@ -298,7 +316,44 @@ public class InformeJustificantsRegistreHelper {
 					.append(MIDA_MAXIMA_ADJUNT / (1024 * 1024)).append(" MB). Es pot obtenir del servidor, a ")
 					.append(rutaNoAdjuntat).append(".\n");
 		}
+		afegirLlegenda(text, recompte);
 		return text.toString();
+	}
+
+	/**
+	 * Llegenda al final del correu: explica només els valors que apareixen a l'informe (els del recompte), que són
+	 * també els únics que hi ha al CSV adjunt.
+	 */
+	private static void afegirLlegenda(StringBuilder text, Recompte recompte) {
+		text.append("\n----------------------------------------\n");
+		text.append("Llegenda dels valors que apareixen en aquest informe\n\n");
+		text.append(LLEGENDA_CONCEPTES);
+		afegirLlegendaColumna(text, TITOL_CONSULTA, FilaInformeJustificantRegistre.COLUMNA_ACCIO_CONSULTA,
+				AccioConsulta.values(), recompte.consulta);
+		afegirLlegendaColumna(text, TITOL_MOURE, FilaInformeJustificantRegistre.COLUMNA_ACCIO_MOURE,
+				AccioMoure.values(), recompte.moure);
+		afegirLlegendaColumna(text, TITOL_RIPEA, FilaInformeJustificantRegistre.COLUMNA_ACCIO_RIPEA,
+				AccioRipea.values(), recompte.ripea);
+		text.append("\n").append(LLEGENDA_DETALL).append(LLEGENDA_RESUM);
+	}
+
+	private static void afegirLlegendaColumna(
+			StringBuilder text,
+			String titol,
+			int columna,
+			ValorAccio[] valors,
+			Map<String, Integer> recompte) {
+		StringBuilder linies = new StringBuilder();
+		for (ValorAccio valor : valors) {
+			if (recompte.getOrDefault(valor.getText(), 0) > 0) {
+				linies.append("    ").append(valor.getText()).append(": ").append(valor.getDescripcio()).append("\n");
+			}
+		}
+		if (linies.length() > 0) {
+			text.append("\n").append(titol).append(", columna \"")
+					.append(FilaInformeJustificantRegistre.CAPCALERA[columna]).append("\" del CSV:\n")
+					.append(linies);
+		}
 	}
 
 	private static void afegirRecompte(StringBuilder text, String titol, Map<String, Integer> recompte) {
@@ -346,13 +401,13 @@ public class InformeJustificantsRegistreHelper {
 
 		Recompte() {
 			for (AccioConsulta accio : AccioConsulta.values()) {
-				consulta.put(accio.name(), 0);
+				consulta.put(accio.getText(), 0);
 			}
 			for (AccioMoure accio : AccioMoure.values()) {
 				moure.put(accio.getText(), 0);
 			}
 			for (AccioRipea accio : AccioRipea.values()) {
-				ripea.put(accio.name(), 0);
+				ripea.put(accio.getText(), 0);
 			}
 		}
 	}
