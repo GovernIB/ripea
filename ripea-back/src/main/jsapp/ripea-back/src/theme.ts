@@ -449,19 +449,20 @@ const baseComponentStyles: ThemeOptions['components'] = {
     },
     MuiFormLabel: {
         styleOverrides: {
-            root: {
+            root: ({ theme }: { theme: Theme }) => ({
                 fontStyle: 'italic',
                 paddingRight: '2px',
                 fontSize: '14px',
-                fontWeight: 200,
+                fontWeight: 300,
+                ...(theme.palette.mode === 'light' && { color: 'rgba(0, 0, 0, 0.74)' }),
                 '&.Mui-disabled': { fontStyle: 'italic', paddingRight: '2px' },
                 '&.Mui-focused': { fontStyle: 'italic', paddingRight: '2px' },
-            },
+            }),
             filled: {
                 fontStyle: 'italic',
                 paddingRight: '2px',
                 fontSize: '14px',
-                fontWeight: 200,
+                fontWeight: 300,
                 '&.Mui-disabled': { fontStyle: 'italic', paddingRight: '2px', opacity: 1 },
                 '&.Mui-focused': { fontStyle: 'italic', paddingRight: '2px' },
             },
@@ -625,7 +626,7 @@ export const lightTheme = createTheme({
         primary: { main: LIGHT_PRIMARY_MAIN, dark: PRIMARY_DARK, light: PRIMARY_LIGHT, contrastText: LIGHT_PRIMARY_CONTRAST_TEXT },
         secondary: { main: LIGHT_SECONDARY_MAIN },
         background: { default: LIGHT_BACKGROUND_DEFAULT, paper: LIGHT_BACKGROUND_PAPER },
-        text: { primary: LIGHT_TEXT_PRIMARY, secondary: LIGHT_TEXT_SECONDARY },
+        text: { primary: LIGHT_TEXT_PRIMARY, secondary: LIGHT_TEXT_SECONDARY, disabled: '#6e6e6e' },
         // Ha de ser el negre translúcid per defecte de MUI (com a les altres apps de Drassana), no un
         // gris opac: MUI X en deriva el color de les vores de la graella (separadors de columna,
         // línies de cel·la) amb `lighten(alpha(divider, 1), 0.88)`, i amb #e0e0e0 queda gairebé blanc.
@@ -802,7 +803,7 @@ export const darkTheme = createTheme({
         primary: { light: DARK_PRIMARY_LIGHT, main: DARK_PRIMARY_MAIN, dark: PRIMARY_DARK, contrastText: PRIMARY_CONTRAST_TEXT },
         secondary: { main: DARK_SECONDARY_MAIN },
         background: { default: DARK_BACKGROUND_DEFAULT, paper: DARK_BACKGROUND_PAPER },
-        text: { primary: DARK_TEXT_PRIMARY, secondary: DARK_TEXT_SECONDARY },
+        text: { primary: DARK_TEXT_PRIMARY, secondary: DARK_TEXT_SECONDARY, disabled: '#a0a0a0' },
         divider: DARK_DIVIDER,
         error: { main: DARK_ERROR_MAIN },
         info: { main: DARK_INFO_MAIN },
@@ -1020,7 +1021,7 @@ export const draculaTheme = createTheme({
         primary: { light: DRACULA_PRIMARY_LIGHT, main: DRACULA_PRIMARY_MAIN, dark: PRIMARY_DARK, contrastText: PRIMARY_CONTRAST_TEXT },
         secondary: { main: DRACULA_SECONDARY_MAIN },
         background: { default: DRACULA_BACKGROUND_DEFAULT, paper: DRACULA_BACKGROUND_PAPER },
-        text: { primary: DRACULA_TEXT_PRIMARY, secondary: DRACULA_TEXT_SECONDARY },
+        text: { primary: DRACULA_TEXT_PRIMARY, secondary: DRACULA_TEXT_SECONDARY, disabled: '#a8aab8' },
         divider: DRACULA_DIVIDER,
         error: { main: DRACULA_ERROR_MAIN },
         warning: { main: DRACULA_WARNING_MAIN },
