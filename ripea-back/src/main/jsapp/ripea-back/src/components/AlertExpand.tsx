@@ -3,6 +3,7 @@ import { Alert, Collapse, Icon, IconButton } from '@mui/material';
 import Box from '@mui/material/Box';
 import AlertTitle from '@mui/material/AlertTitle';
 import ContingutLink from './ContingutLink';
+import { icons } from '../util/icons';
 
 type LinkAlertExpandProps = {
     id: string;
@@ -25,7 +26,7 @@ export const LinkAlertExpand = (props: LinkAlertExpandProps) => {
 };
 
 const AlertExpand = (props: any) => {
-    const { title, label, sx, children, onClose, action, linkChildren, ...other } = props;
+    const { title, label, sx, children, onClose, action, linkChildren, closeLabel, showDetailLabel, hideDetailLabel, ...other } = props;
     const [verDetalles, setVerDetalles] = useState(false);
 
     const toggleDetalles = () => setVerDetalles((prev) => !prev);
@@ -46,12 +47,17 @@ const AlertExpand = (props: any) => {
                 action={
                     <>
                         {action}
-                        <IconButton aria-label="ver detalles" color="inherit" size="small" onClick={toggleDetalles}>
-                            <Icon sx={{ m: 0 }}>{verDetalles ? 'expand_less' : 'expand_more'}</Icon>
+                        <IconButton
+                            aria-label={(verDetalles ? hideDetailLabel : showDetailLabel) ?? 'ver detalles'}
+                            color="inherit"
+                            size="small"
+                            onClick={toggleDetalles}
+                        >
+                            <Icon sx={{ m: 0 }}>{verDetalles ? icons.plega : icons.desplega}</Icon>
                         </IconButton>
                         {onClose && (
-                            <IconButton color="inherit" size="small" onClick={() => onClose?.()}>
-                                <Icon sx={{ m: 0 }}>close</Icon>
+                            <IconButton aria-label={closeLabel} color="inherit" size="small" onClick={() => onClose?.()}>
+                                <Icon sx={{ m: 0 }}>{icons.cancela}</Icon>
                             </IconButton>
                         )}
                     </>

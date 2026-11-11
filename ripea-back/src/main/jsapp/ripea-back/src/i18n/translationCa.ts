@@ -53,6 +53,19 @@ const translationCa = {
             caducada: "La sessió ha caducat",
             iniciar: "Torna a entrar",
         },
+        avisos: {
+            mostra: "Mostra el detall de l'avís",
+            amaga: "Amaga el detall de l'avís",
+            tanca: "Minimitza l'avís",
+            nivell: {
+                INFO: "Informació",
+                WARNING: "Advertència",
+                ERROR: "Error",
+            },
+            chip: "{{nivell}}: {{count}}",
+            chipRestaura: "Mostra els avisos de nivell «{{nivell}}» que has minimitzat",
+            chipBuit: "Cap avís de nivell «{{nivell}}»",
+        },
     },
     calendar: {
         today: "Avui",

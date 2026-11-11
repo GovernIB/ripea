@@ -3,7 +3,7 @@ import {MenuEntry} from "reactlib";
 import Icon from '@mui/material/Icon';
 import IconButton from '@mui/material/IconButton';
 import SideMenu from "./SideMenu.tsx";
-import {useEntitatSession} from "./Session.tsx";
+import {useCapsaleraColors} from "./Session.tsx";
 import {useTranslation} from "react-i18next";
 
 const menuIcon = 'menu';
@@ -16,7 +16,7 @@ export interface AppMenuProps {
 export const AppMenu: React.FC<AppMenuProps> = ({ menuEntries, logo }) => {
   const {t} = useTranslation()
   const [open, setOpen] = React.useState(false);
-  const { value: entitat } = useEntitatSession()
+  const { lletra } = useCapsaleraColors()
 
   const toggleMenu = () => {
     setOpen(!open);
@@ -30,7 +30,7 @@ export const AppMenu: React.FC<AppMenuProps> = ({ menuEntries, logo }) => {
         onClick={toggleMenu}
         edge="start"
         // sx={{ mr: 2 }}
-        style={{color: entitat?.conf?.colorLletra}}
+        style={{color: lletra ?? 'inherit'}}
       >
         <Icon sx={{ fontSize: '24px', m: 0 }} fontSize={'medium'}>{menuIcon}</Icon>
       </IconButton>

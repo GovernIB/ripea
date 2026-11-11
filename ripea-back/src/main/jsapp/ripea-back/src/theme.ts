@@ -215,6 +215,17 @@ const massiveSelectorBorders = (rgb: string) => ({
 });
 
 const baseComponentStyles: ThemeOptions['components'] = {
+    // Colors per defecte de la capçalera, per a quan l'entitat no n'ha definit per al tema actiu (o no hi
+    // ha entitat, com al superadmin). Sense això MUI pinta la barra amb el color primari, que amaga el logo
+    // de Ripea.
+    MuiAppBar: {
+        styleOverrides: {
+            root: ({ theme }) => ({
+                backgroundColor: theme.palette.background.paper,
+                color: theme.palette.text.primary,
+            }),
+        },
+    },
     MuiCssBaseline: {
         styleOverrides: {
             // Sense marges ni padding verticals: la separació amb la barra de títol i la graella és el

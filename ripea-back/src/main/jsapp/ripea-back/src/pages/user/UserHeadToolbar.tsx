@@ -1,7 +1,7 @@
 import React, {useCallback} from "react";
 import {Grid, Button, Icon} from "@mui/material";
 import {StyledBadge} from "../../components/StyledBadge.tsx";
-import {useEntitatSession} from "../../components/Session.tsx";
+import {useCapsaleraColors} from "../../components/Session.tsx";
 import {useTranslation} from "react-i18next";
 import {useResourceApiContext} from "reactlib";
 import {
@@ -39,7 +39,7 @@ const Link = React.forwardRef<HTMLAnchorElement, RouterLinkProps>((itemProps, re
     return <RouterLink ref={ref} {...itemProps} role={undefined} />;
 });
 
-const generateMenuItems = (appMenuEntries: any[], entitat: any, iconOnly: boolean) => {
+const generateMenuItems = (appMenuEntries: any[], colorLletra: string | undefined, iconOnly: boolean) => {
     /*
 	 iconVariant — valores posibles (Material Icons):
 	  - 'material-icons'          : filled (por defecto)
@@ -55,7 +55,7 @@ const generateMenuItems = (appMenuEntries: any[], entitat: any, iconOnly: boolea
                   className="appMenuItem"
                   title={entry.hover || entry.title}
                   key={entry.id}
-                  style={{ color: entitat?.conf?.colorLletra, minWidth: '3rem', marginLeft: 0, ...entry?.componentProps }}
+                  style={{ color: colorLletra ?? 'inherit', minWidth: '3rem', marginLeft: 0, ...entry?.componentProps }}
                   {...(entry.to ? { component: Link, to: entry.to } : {})}
                   onClick={entry?.onClick}
               >
@@ -72,7 +72,7 @@ const AppMenuBadge = (props: any) => {
 
 const UserHeadToolbar = () => {
     const { t } = useTranslation();
-    const { value: entitat } = useEntitatSession();
+    const { lletra } = useCapsaleraColors();
     const { toProgramaAntic } = useToProgramaAntic();
     const location = useLocation();
 
@@ -103,9 +103,9 @@ const UserHeadToolbar = () => {
     const iconOnly = useMediaQuery(theme.breakpoints.down('md'));
 
     return (
-        <Grid container display={'flex'} rowSpacing={1} flexDirection={'row'} alignContent={'center'} justifyContent={'end'} sx={{ mr: 2 }}>
+        <Grid container display={'flex'} rowSpacing={1} flexDirection={'row'} alignContent={'center'} justifyContent={'end'} sx={{ mr: { xs: 0, sm: 2 } }}>
             <Grid size={11} gap={1.5} display={'flex'} justifyContent={'end'}>
-                {...generateMenuItems(appMenuEntries, entitat, iconOnly)}
+                {...generateMenuItems(appMenuEntries, lletra, iconOnly)}
             </Grid>
         </Grid>
     );

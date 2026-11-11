@@ -94,6 +94,7 @@ export const icons = {
     interficieClassica: 'fast_rewind',
 
     // --- Estats i avisos ---------------------------------------------------------------------
+    informacio: 'info',
     advertencia: 'warning',
     error: 'error',
     problema: 'report_problem',

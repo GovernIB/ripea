@@ -5,7 +5,7 @@ import ripea_logo_blanc from './assets/Drassana_RIP_DRA_COL_blanc.svg';
 import goib_logo_light from './assets/goib_logo_light.svg';
 import goib_logo_dark from './assets/goib_logo_dark.svg';
 import AppRoutes from './AppRoutes';
-import { useEntitatSession } from './components/Session.tsx';
+import { useCapsaleraColors, useEntitatSession } from './components/Session.tsx';
 import TitleHeaderConfigurator from './TitleHeaderConfigurator.tsx';
 import { useTranslation } from 'react-i18next';
 import { useCombinedMenu } from './hooks/useCombinedMenu.ts';
@@ -45,6 +45,7 @@ export const getImgFromBytes = (img: string): string | undefined => {
 export const App: React.FC = () => {
     const version = '1.0.1';
     const { value: entitat } = useEntitatSession();
+    const capsalera = useCapsaleraColors();
     const { i18n } = useTranslation();
     const { sideMenuEntries: menuEntries, additionalContents: additionalContentsMenu } = useCombinedMenu();
     const theme = useTheme();
@@ -97,12 +98,12 @@ export const App: React.FC = () => {
             // columna que les icones del menú lateral. L'alçada mínima substitueix els 64px que la
             // llibreria dona a la barra.
             appbarStyle={{
-                color: entitat?.conf?.colorFons ? theme.palette.getContrastText(entitat?.conf?.colorFons) : undefined,
+                color: capsalera.lletra,
                 paddingLeft: APPBAR_PADDING_LEFT + 'px',
                 minHeight: HEADER_HEIGHT + 'px',
             }}
             version={version}
-            appbarBackgroundColor={entitat?.conf?.colorFons}
+            appbarBackgroundColor={capsalera.fons}
             menuEntries={menuEntries}
             menuAppearance={preview?.estilMenu}
         >

@@ -53,6 +53,19 @@ const translationEs = {
             caducada: "La sesión ha caducado",
             iniciar: "Volver a entrar",
         },
+        avisos: {
+            mostra: "Muestra el detalle del aviso",
+            amaga: "Oculta el detalle del aviso",
+            tanca: "Minimiza el aviso",
+            nivell: {
+                INFO: "Información",
+                WARNING: "Advertencia",
+                ERROR: "Error",
+            },
+            chip: "{{nivell}}: {{count}}",
+            chipRestaura: "Muestra los avisos de nivel «{{nivell}}» que has minimizado",
+            chipBuit: "Ningún aviso de nivel «{{nivell}}»",
+        },
     },
     calendar: {
         today: "Hoy",

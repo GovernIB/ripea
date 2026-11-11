@@ -166,16 +166,37 @@ export const useEntitatSession = () => {
         return !isDark ? value?.menuImgBytes : value?.blackMenuImgBytes
     }, [value?.menuImgBytes, value?.blackMenuImgBytes, isDark]);
 
+    // Colors de la capçalera definits per l'entitat per al tema actiu (clar o obscur). Si l'entitat no
+    // en té, o no hi ha entitat (superadmin), queden undefined i la capçalera usa els del tema.
     const colorFons = useMemo(() => {
-        return (!isDark ? value?.capsaleraColorFons : value?.blackCapsaleraColorFons) || "#FFFFFF"
+        return (!isDark ? value?.capsaleraColorFons : value?.blackCapsaleraColorFons) || undefined
     }, [value?.capsaleraColorFons, value?.blackCapsaleraColorFons, isDark]);
 
     const colorLletra = useMemo(() => {
-        return (!isDark ? value?.capsaleraColorLletra : value?.blackCapsaleraColorLletra) || '#000'
+        return (!isDark ? value?.capsaleraColorLletra : value?.blackCapsaleraColorLletra) || undefined
     }, [value?.capsaleraColorLletra, value?.blackCapsaleraColorLletra, isDark]);
 
     return { value : {...value, conf: {logo, favicon, menuicon, colorFons, colorLletra}}, remove }
 }
+
+/**
+ * Colors de la capçalera de l'aplicació.
+ *
+ * Si l'entitat n'ha definit per al tema actiu, s'apliquen aquests. Si no (o si no hi ha entitat, com
+ * al superadmin), els valors són undefined i la capçalera es queda amb els del tema.
+ *
+ * - `fons`: color de fons definit per l'entitat, o undefined (el del tema).
+ * - `lletra`: color de text definit per l'entitat; si només hi ha fons, el text que hi contrasta; si no
+ *   hi ha res, undefined (el del tema).
+ */
+export const useCapsaleraColors = (): { fons?: string; lletra?: string } => {
+    const { value } = useEntitatSession();
+    const theme = useTheme();
+    const fons: string | undefined = value?.conf?.colorFons;
+    const lletra: string | undefined = value?.conf?.colorLletra || (fons ? theme.palette.getContrastText(fons) : undefined);
+
+    return { fons, lletra };
+};
 
 export const useOrganSession = () => {
     const { value, isInitialized, save, remove } = useSession(organKey)

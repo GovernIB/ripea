@@ -51,6 +51,19 @@ const translationEn = {
             caducada: "Your session has expired",
             iniciar: "Sign in again",
         },
+        avisos: {
+            mostra: "Show notice details",
+            amaga: "Hide notice details",
+            tanca: "Minimize notice",
+            nivell: {
+                INFO: "Information",
+                WARNING: "Warning",
+                ERROR: "Error",
+            },
+            chip: "{{nivell}}: {{count}}",
+            chipRestaura: "Show the “{{nivell}}” notices you have minimized",
+            chipBuit: "No “{{nivell}}” notices",
+        },
     },
     calendar: {
         today: "Today",

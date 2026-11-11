@@ -26,10 +26,10 @@ import UserHeadToolbar from "../pages/user/UserHeadToolbar.tsx";
 import {UserMenu} from "../pages/user/UserMenu.tsx";
 import AppFormFieldReference from './AppFormFieldReference';
 import FormFieldToggleButtons, { FORM_FIELD_TYPE_TOGGLE_BUTTONS } from './FormFieldToggleButtons';
-import {useAlertesSession} from "./SseClient.tsx";
 import {useUserSession} from "./Session";
-import AlertExpand from "./AlertExpand.tsx";
-import {useSession} from "./SessionStorageContext.tsx";
+import AvisosBanner from "./AvisosBanner.tsx";
+import AvisosChips from "./AvisosChips.tsx";
+import { AvisosProvider } from "./AvisosProvider.tsx";
 import {alpha, Box, useTheme} from "@mui/material";
 import {EstilMenuProp} from "@src/components/ThemeUserProvider.tsx";
 import {FOOTER_HEIGHT, MAIN_GAP, MAIN_PADDING} from "../util/layout.ts";
@@ -299,8 +299,6 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
             console.warn('[BACK] Couldn\'t go back, neither fallback specified nor previous entry exists in navigation history');
         }
     }
-    const { value } = useAlertesSession();
-    const { value: read, save } = useSession('readAlerts');
     const menuColorSet = getMenuColorSet(theme, menuAppearance);
     const menuColorSetSx = {
         '& nav .MuiDrawer-root': {
@@ -348,73 +346,61 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
         },
     };
 
-    return (<Box sx={menuColorSet ? { ...frameSx, ...menuColorSetSx } : frameSx}>
-        <MuiBaseApp
-            code={code}
-            headerTitle={title}
-            headerLogo={logo}
-            headerLogoStyle={logoStyle}
-            headerVersion={version}
-            headerAppbarStyle={appbarStyle}
-            headerAppbarBackgroundColor={appbarBackgroundColor}
-            headerAppbarBackgroundImg={appbarBackgroundImg}
-            headerAdditionalComponents={
-                <MuiBaseAppContext.Provider value={{ defaultMuiComponentProps: {} }}>
-                    <UserHeadToolbar />
-                </MuiBaseAppContext.Provider>
-            }
-            headerAdditionalAuthComponents={
-                <MuiBaseAppContext.Provider value={{ defaultMuiComponentProps: {} }}>
-                    <UserMenu />
-                </MuiBaseAppContext.Provider>
-            }
-            footer={generateFooter(version)}
-            footerHeight={FOOTER_HEIGHT}
-            persistentLanguage
-            i18nUseTranslation={i18nUseTranslation}
-            i18nCurrentLanguage={i18nCurrentLanguage}
-            i18nHandleLanguageChange={i18nHandleLanguageChange}
-            i18nAddResourceBundleCallback={i18nAddResourceBundleCallback}
-            routerGoBack={goBack}
-            routerNavigate={navigate}
-            routerUseLocationPath={useLocationPath}
-            routerAnyHistoryEntryExist={anyHistoryEntryExist}
-            linkComponent={Link}
-            // Els marges d'<main> els posa frameSx (la llibreria els deixa a 16px 24px).
-            marginsDisabled
-            formFieldComponents={[
-                { type: 'reference', component: AppFormFieldReference },
-                { type: FORM_FIELD_TYPE_TOGGLE_BUTTONS, component: FormFieldToggleButtons },
-            ]}
-            menuEntries={baseAppMenuEntries}
-        >
-            <CustomLocalizationProvider>
-                <>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: '0 0 auto' }}>
-                    {value?.avisosUsuari?.map((avis: any) => {
-                        if (!read?.includes?.(avis.id)) {
-                            return (
-                                <AlertExpand
-                                    key={avis.id}
-                                    title={avis.assumpte}
-                                    severity={getAlertSeverity(avis.avisNivell)}
-                                    sx={{ m: 0, flex: '0 0 auto' }}
-                                    onClose={() => {
-                                        save([...(read ?? []), avis.id]);
-                                    }}
-                                    linkChildren={avis?.expedients}
-                                >
-                                    {avis.missatge}
-                                </AlertExpand>
-                            );
-                        }
-                    })}
-                    </Box>
-                    {i18nInitialized && children}
-                </>
-            </CustomLocalizationProvider>
-        </MuiBaseApp>
-    </Box>);
+    return (
+        <AvisosProvider>
+            <Box sx={menuColorSet ? { ...frameSx, ...menuColorSetSx } : frameSx}>
+                <MuiBaseApp
+                    code={code}
+                    headerTitle={title}
+                    headerLogo={logo}
+                    headerLogoStyle={logoStyle}
+                    headerVersion={version}
+                    headerAppbarStyle={appbarStyle}
+                    headerAppbarBackgroundColor={appbarBackgroundColor}
+                    headerAppbarBackgroundImg={appbarBackgroundImg}
+                    headerAdditionalComponents={
+                        <>
+                            <MuiBaseAppContext.Provider value={{ defaultMuiComponentProps: {} }}>
+                                <UserHeadToolbar />
+                            </MuiBaseAppContext.Provider>
+                            <AvisosChips />
+                        </>
+                    }
+                    headerAdditionalAuthComponents={
+                        <MuiBaseAppContext.Provider value={{ defaultMuiComponentProps: {} }}>
+                            <UserMenu />
+                        </MuiBaseAppContext.Provider>
+                    }
+                    footer={generateFooter(version)}
+                    footerHeight={FOOTER_HEIGHT}
+                    persistentLanguage
+                    i18nUseTranslation={i18nUseTranslation}
+                    i18nCurrentLanguage={i18nCurrentLanguage}
+                    i18nHandleLanguageChange={i18nHandleLanguageChange}
+                    i18nAddResourceBundleCallback={i18nAddResourceBundleCallback}
+                    routerGoBack={goBack}
+                    routerNavigate={navigate}
+                    routerUseLocationPath={useLocationPath}
+                    routerAnyHistoryEntryExist={anyHistoryEntryExist}
+                    linkComponent={Link}
+                    // Els marges d'<main> els posa frameSx (la llibreria els deixa a 16px 24px).
+                    marginsDisabled
+                    formFieldComponents={[
+                        { type: 'reference', component: AppFormFieldReference },
+                        { type: FORM_FIELD_TYPE_TOGGLE_BUTTONS, component: FormFieldToggleButtons },
+                    ]}
+                    menuEntries={baseAppMenuEntries}
+                >
+                    <CustomLocalizationProvider>
+                        <>
+                            <AvisosBanner />
+                            {i18nInitialized && children}
+                        </>
+                    </CustomLocalizationProvider>
+                </MuiBaseApp>
+            </Box>
+        </AvisosProvider>
+    );
 }
 
 export default BaseApp;
