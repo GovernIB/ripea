@@ -64,7 +64,6 @@ import es.caib.plugins.arxiu.api.ContingutTipus;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.Expedient;
-import es.caib.plugins.arxiu.caib.ArxiuConversioHelper;
 import es.caib.ripea.persistence.entity.CarpetaEntity;
 import es.caib.ripea.persistence.entity.ContingutEntity;
 import es.caib.ripea.persistence.entity.DadaEntity;
@@ -3174,7 +3173,7 @@ public class ExpedientHelper {
 				Expedient expedient = pluginHelper.arxiuExpedientConsultar(expedientEntity);
 				if (expedient.getContinguts() != null) {
 					for (ContingutArxiu contingutArxiu : expedient.getContinguts()) {
-						String replacedNom = ArxiuConversioHelper.revisarContingutNom(nom);
+						String replacedNom = PluginHelper.nomPerArxiu(nom);
 						if (contingutArxiu.getTipus() == ContingutTipus.CARPETA &&
 								contingutArxiu.getNom().equals(replacedNom)) {
 							carpetaExistsInArxiu = true;

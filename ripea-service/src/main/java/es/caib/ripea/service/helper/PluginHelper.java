@@ -1958,7 +1958,7 @@ public class PluginHelper {
 			continguts = arxiuCarpetaConsultarPerUuid(pare.getArxiuUuid()).getContinguts();
 		}
 
-		nomPerComprovar = ArxiuConversioHelper.revisarContingutNom(nomPerComprovar);
+		nomPerComprovar = nomPerArxiu(nomPerComprovar);
 		int ocurrences = 0;
 		if (continguts != null) {
 			List<String> noms = new ArrayList<String>();
@@ -1973,6 +1973,23 @@ public class PluginHelper {
 			return newName;
 		}
 		return nomPerComprovar;
+	}
+
+	/**
+	 * Nom amb el qual es guarda un document o una carpeta a l'Arxiu.
+	 * El plugin (ArxiuConversioHelper.revisarContingutNom) només elimina UN punt final i l'Arxiu
+	 * rebutja els noms que acaben en punt (COD_021 "integrity violations: Invalid property value").
+	 * Per això s'eliminen tots els punts i espais finals. La funció és idempotent i el plugin la
+	 * pot tornar a aplicar sense canviar el resultat.
+	 */
+	public static String nomPerArxiu(String nom) {
+		if (nom == null) {
+			return null;
+		}
+		String revisat = ArxiuConversioHelper.revisarContingutNom(nom);
+		String senseFinals = revisat.replaceAll("[.\\s]+$", "");
+		// Un nom format només per punts quedaria buit: es deixa com el retorna el plugin
+		return senseFinals.isEmpty() ? revisat : senseFinals;
 	}
 
 	public Document arxiuDocumentConsultar(String arxiuUuid) {
@@ -6985,7 +7002,7 @@ public class PluginHelper {
 	private Carpeta toArxiuCarpeta(String identificador, String nom) {
 		Carpeta carpeta = new Carpeta();
 		carpeta.setIdentificador(identificador);
-		carpeta.setNom(nom);
+		carpeta.setNom(nomPerArxiu(nom));
 		return carpeta;
 	}
 
@@ -6999,7 +7016,7 @@ public class PluginHelper {
 			ArxiuEstatEnumDto arxiuEstat) {
 
 		Document documentArxiu = new Document();
-		String documentNomInArxiu = documentEntity.getNom();
+		String documentNomInArxiu = nomPerArxiu(documentEntity.getNom());
 		if (!DocumentTipusEnumDto.IMPORTAT.equals(documentEntity.getDocumentTipus()) && !isComprovacioNomsDesactivada()) {
 			documentNomInArxiu = documentNomInArxiu(documentEntity.getNom(), documentEntity.getPare());
 		}
@@ -7053,7 +7070,7 @@ public class PluginHelper {
 
 		Document documentArxiu = new Document();
 
-		documentArxiu.setNom(nom);
+		documentArxiu.setNom(nomPerArxiu(nom));
 		documentArxiu.setDescripcio(descripcio);
 		documentArxiu.setIdentificador(identificador);
 		documentArxiu.setEstat(DocumentEstat.DEFINITIU);

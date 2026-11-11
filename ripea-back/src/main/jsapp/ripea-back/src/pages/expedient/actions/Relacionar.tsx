@@ -5,7 +5,7 @@ import {
 import {useTranslation} from "react-i18next";
 import GridFormField from "../../../components/GridFormField.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
+import StyledMuiFilter, {filterSessionKey} from "../../../components/StyledMuiFilter.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import * as builder from "../../../util/springFilterUtils.ts";
 import {StyledEstat} from "../ExpedientGrid.tsx";
@@ -57,7 +57,7 @@ const springFilterBuilder = (data: any) :string => {
         metaExpedient: data?.metaExpedient,
         numero: data?.numero,
         nom: data?.nom,
-        estat: data?.estat,
+        estatCustom: data?.estatCustom,
     }
     return expedientFilterBuilder(processedData);
 }
@@ -74,7 +74,7 @@ const ActionFilterFrom = () => {
         <GridFormField size={{xs: 12, sm: 6, md: 3}} name="metaExpedient" filter={filterMetaExpedient}/>
         <GridFormField size={{xs: 12, sm: 6, md: 2}} name="numero"/>
         <GridFormField size={{xs: 12, sm: 6, md: 2}} name="nom"/>
-        <GridFormField size={{xs: 12, sm: 6, md: 2}} name="estat" requestParams={{metaExpedientId: data?.metaExpedient?.id}}/>
+        <GridFormField size={{xs: 12, sm: 6, md: 2}} name="estatCustom" requestParams={{metaExpedientId: data?.metaExpedient?.id}}/>
     </>
 }
 
@@ -84,6 +84,9 @@ const ActionFilter = (props:any) => {
     return <StyledMuiFilter
         resourceName="expedientResource"
         code="EXPEDIENT_FILTER"
+        // Clau pròpia: amb la de per defecte (expedientResource.EXPEDIENT_FILTER) compartiria
+        // el filtre desat amb el llistat d'expedients i s'escriurien l'un a l'altre.
+        sessionKey={filterSessionKey('expedientResource_relacionar', 'EXPEDIENT_FILTER')}
         springFilterBuilder={springFilterBuilder}
         onSpringFilterChange={onSpringFilterChange}
     >

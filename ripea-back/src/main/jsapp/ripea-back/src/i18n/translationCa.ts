@@ -1119,12 +1119,13 @@ const translationCa = {
                 },
                 notificarMasiva: {
                     label: "Notifica o comunica...",
-                    ok: "S'ha generat el document amb els elements seleccionats",
+                    ok: "S'ha generat el document ZIP que conté els elements seleccionats",
                     error: {
                         noFirmats: "No es poden notificar documents sense firmar: {{noms}}",
                     },
                     tipusDoc: {
                         title: "Tipus del document a notificar",
+                        titleZip: "Tipus del document ZIP a notificar",
                         description: "Trieu el tipus de document que s'aplicarà al document generat amb els documents seleccionats.",
                         button: "Genera",
                     },

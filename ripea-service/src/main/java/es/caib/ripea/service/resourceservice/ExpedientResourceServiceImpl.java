@@ -1468,7 +1468,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 						"/expedient/CanviPrioritatActionExecutor", e,
 						ids,
 						"massiu="+params.isMassivo());
-				throw new ActionExecutionException(getResourceClass(), ids, code, messageHelper.getMessage("expedient.tancar.reject", new Object[]{e.getMessage()}));
+				throw new ActionExecutionException(getResourceClass(), ids, code, messageHelper.getMessage("expedient.prioritat.reject", new Object[]{e.getMessage()}));
 			}
 		}
     }
@@ -1502,7 +1502,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 						"/expedient/CanviEstatActionExecutor", e,
 						Utils.getIdsSeparatsComa(params.getIds()),
 						"massiu="+params.isMassivo());
-				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("expedient.tancar.reject", new Object[]{e.getMessage()}));
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("expedient.estat.reject", new Object[]{e.getMessage()}));
 			}
 		}
     }
@@ -2040,7 +2040,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 						getResourceClass(),
 						params.getIds().toString(),
 						code,
-						messageHelper.getMessage("expedient.tancar.reject")+": "+e.getMessage());
+						messageHelper.getMessage("expedient.export.generic.reject", new Object[]{e.getMessage()}));
 			}
     	}
     	

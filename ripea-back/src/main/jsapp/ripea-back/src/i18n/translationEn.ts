@@ -1117,12 +1117,13 @@ const translationEn = {
                 },
                 notificarMasiva: {
                     label: "Notify or communicate...",
-                    ok: "The document with the selected items has been generated",
+                    ok: "The ZIP document containing the selected items has been generated",
                     error: {
                         noFirmats: "Unsigned documents cannot be notified: {{noms}}",
                     },
                     tipusDoc: {
                         title: "Type of the document to notify",
+                        titleZip: "Type of the ZIP document to notify",
                         description: "Choose the document type to apply to the document generated with the selected documents.",
                         button: "Generate",
                     },

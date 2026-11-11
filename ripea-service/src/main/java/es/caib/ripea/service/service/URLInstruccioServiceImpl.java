@@ -171,7 +171,7 @@ public class URLInstruccioServiceImpl implements URLInstruccioService {
 			
 			if (urlInstruccio != null) {
 				String url = urlInstruccio.getUrl();
-		 		if (url.contains("[ENI]") && eni != null && ! eni.isEmpty()) {
+		 		if (url != null && url.contains("[ENI]") && eni != null && ! eni.isEmpty()) {
 		 			urlValor = url.replaceAll("\\[ENI\\]", eni);
 				}
 			}

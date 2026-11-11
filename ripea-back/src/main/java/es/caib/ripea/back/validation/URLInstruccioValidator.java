@@ -13,8 +13,7 @@ import org.springframework.web.servlet.support.RequestContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import es.caib.ripea.service.intf.resourcevalidation.URLInstruccioValidaValidator;
 
 /**
  * Constraint de validació que controla que camp url tingui el format correcte
@@ -55,10 +54,7 @@ public class URLInstruccioValidator implements ConstraintValidator<URLInstruccio
 	}
 
 	public static boolean isValidURL(String url) {
-		String regex = "^(http|https)://.*\\[(ENI)\\]$";
-		Pattern pattern = Pattern.compile(regex);
-		Matcher matcher = pattern.matcher(url);
-		return matcher.matches();
+		return URLInstruccioValidaValidator.isValidURL(url);
 	}
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(URLInstruccioValidator.class);

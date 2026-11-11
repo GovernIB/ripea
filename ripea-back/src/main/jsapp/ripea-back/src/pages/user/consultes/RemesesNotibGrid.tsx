@@ -35,7 +35,9 @@ const springFilterBuilder = (data:any) => {
         builder.eq('tipus', `'${data?.tipusEnviament}'`),
         builder.eq('notificacioEstat', `'${data?.estat}'`),
         builder.like('assumpte', data?.concepte),
-        builder.betweenDates("enviatData", data?.dataEnviamentInici, data?.dataEnviamentFi),
+        // Les notificacions no informen ENVIAT_DATA: la data d'enviament és createdDate
+        // (la que mostra la columna "Data enviament" i la que filtra el JSP).
+        builder.betweenDates("createdDate", data?.dataEnviamentInici, data?.dataEnviamentFi),
         builder.exists(
             builder.or(
                 builder.like("documentInteressats.interessat.documentNum", data.interessat),

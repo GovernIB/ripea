@@ -37,7 +37,11 @@ const NotificarMassive = (props:any) => {
     return <FormActionDialog
         resourceName={"documentResource"}
         action={"MASSIVE_NOTIFICAR"}
-        title={t('page.document.action.notificarMasiva.tipusDoc.title')}
+        // Amb concatenar a true (l'usuari ha triat combinar els PDF) el servidor genera un PDF;
+        // en qualsevol altre cas genera un zip (vegeu generarDocument).
+        title={(data:any) => data?.concatenar === true
+            ? t('page.document.action.notificarMasiva.tipusDoc.title')
+            : t('page.document.action.notificarMasiva.tipusDoc.titleZip')}
         formDialogButtons={[
             {icon: 'send', text: t('page.document.action.notificarMasiva.tipusDoc.button'), componentProps: { variant: 'contained' }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
