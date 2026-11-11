@@ -3,6 +3,8 @@ package es.caib.ripea.service.config;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.IncorporacioDocumentsSegonPlaHelper;
 import es.caib.ripea.service.helper.IncorporacioDocumentsSegonPlaHelper.ProcessadorElement;
+import es.caib.ripea.service.helper.InformeJustificantsRegistreHelper;
+import es.caib.ripea.service.helper.SenseMonitorsUtils;
 import es.caib.ripea.service.helper.UsuariHelper;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.service.AplicacioService;
@@ -39,6 +41,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 @Slf4j
@@ -55,6 +59,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
     @Autowired private es.caib.ripea.service.helper.ExcepcioLogHelper excepcioLogHelper;
     @Autowired private es.caib.ripea.service.helper.IntegracioHelper integracioHelper;
     @Autowired private IncorporacioDocumentsSegonPlaHelper incorporacioDocumentsSegonPlaHelper;
+    @Autowired private InformeJustificantsRegistreHelper informeJustificantsRegistreHelper;
     @Autowired private UsuariHelper usuariHelper;
 
     /** Si ja s'ha comprovat en aquesta arrencada que l'usuari de sistema existeix a la BD. */
@@ -533,7 +538,10 @@ public class SchedulingConfig implements SchedulingConfigurer {
                         PropertyConfig.INCORPORAR_CERTIFICATS_REMESES_DARRER_ID,
                         "enviament",
                         aplicacioService::getExpedientsAmbCertificatRemesa,
-                        aplicacioService::executeCertificatsRemesaExpedient),
+                        aplicacioService::executeCertificatsRemesaExpedient,
+                        false,
+                        null,
+                        null),
                 getTriggerIncorporacioDocuments(codiIncorporarCertificatsRemeses, PropertyConfig.INCORPORAR_CERTIFICATS_REMESES_INICI)
         );
         addTask(
@@ -544,7 +552,17 @@ public class SchedulingConfig implements SchedulingConfigurer {
                         PropertyConfig.INCORPORAR_JUSTIFICANTS_REGISTRE_DARRER_ID,
                         "anotacio",
                         aplicacioService::getExpedientsAmbJustificantRegistre,
-                        aplicacioService::executeJustificantsRegistreExpedient),
+                        // Sense monitors: cada element fa diverses accions amb l'Arxiu, i els errors (p.ex. en moure
+                        // el justificant) omplien RIPEA_LOB i falsejaven l'estat de l'Arxiu a COMANDA. Cada element
+                        // ja queda al log i el resum, al monitor de tasques.
+                        // Cada anotació queda a l'informe que s'envia als administradors de l'entitat en acabar
+                        id -> SenseMonitorsUtils.executar(() -> informeJustificantsRegistreHelper.processarElement(
+                                id,
+                                () -> aplicacioService.executeJustificantsRegistreExpedient(id))),
+                        // Molts elements només recol·loquen el justificant a la base de dades: no cal esperar després d'aquests
+                        true,
+                        informeJustificantsRegistreHelper::iniciarExecucio,
+                        informeJustificantsRegistreHelper::finalitzarExecucio),
                 getTriggerIncorporacioDocuments(codiIncorporarJustificantsRegistre, PropertyConfig.INCORPORAR_JUSTIFICANTS_REGISTRE_INICI)
         );
     } //Fi de configureTasks
@@ -560,13 +578,21 @@ public class SchedulingConfig implements SchedulingConfigurer {
             String propietatDarrerId,
             String tipusElement,
             Function<Long, List<Long>> obtenirElements,
-            ProcessadorElement processador) {
+            ProcessadorElement processador,
+            boolean esperaNomesAmbServeisExterns,
+            Runnable abansExecucio,
+            Consumer<String> despresExecucio) {
         if (!incorporacioDocumentsSegonPlaHelper.isMomentInici(codiTasca, propietatCron)) {
             return;
         }
         monitorTasquesService.inici(codiTasca);
+        // El darrer progrés del bucle és el resum de l'execució
+        AtomicReference<String> resum = new AtomicReference<>();
         try {
             createAuthenticationContext();
+            if (abansExecucio != null) {
+                abansExecucio.run();
+            }
             incorporacioDocumentsSegonPlaHelper.executar(
                     codiTasca,
                     propietatCron,
@@ -574,11 +600,18 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     tipusElement,
                     obtenirElements,
                     processador,
-                    progres -> monitorTasquesService.findByCodi(codiTasca).setObservacions(progres));
+                    progres -> {
+                        resum.set(progres);
+                        monitorTasquesService.findByCodi(codiTasca).setObservacions(progres);
+                    },
+                    esperaNomesAmbServeisExterns);
             monitorTasquesService.fi(codiTasca);
         } catch (Throwable th) {
             tractarErrorTascaSegonPla(th, codiTasca);
         } finally {
+            if (despresExecucio != null) {
+                despresExecucio.accept(resum.get());
+            }
             IncorporacioDocumentsSegonPlaHelper.netejarContextFil();
         }
     }

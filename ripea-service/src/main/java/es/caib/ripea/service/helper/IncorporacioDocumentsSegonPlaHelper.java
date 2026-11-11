@@ -122,7 +122,28 @@ public class IncorporacioDocumentsSegonPlaHelper {
 			Function<Long, List<Long>> obtenirElements,
 			ProcessadorElement processador,
 			Consumer<String> progres) {
+		executar(codiProces, propietatCron, propietatDarrerId, tipusElement, obtenirElements, processador, progres, false);
+	}
+
+	/**
+	 * Com {@link #executar(String, String, String, String, Function, ProcessadorElement, Consumer)}, però amb
+	 * esperaNomesAmbServeisExterns es pot evitar l'espera entre elements quan l'anterior només ha fet canvis a la base
+	 * de dades, sense cridar cap servei extern (cap acció d'integració, veure {@link IntegracioHelper#getNumAccionsFil}).
+	 *
+	 * @param esperaNomesAmbServeisExterns només s'espera després dels elements que han cridat algun servei extern.
+	 */
+	public void executar(
+			String codiProces,
+			String propietatCron,
+			String propietatDarrerId,
+			String tipusElement,
+			Function<Long, List<Long>> obtenirElements,
+			ProcessadorElement processador,
+			Consumer<String> progres,
+			boolean esperaNomesAmbServeisExterns) {
 		long t0 = System.currentTimeMillis();
+		boolean anteriorAmbServeisExterns = false;
+		int nomesBaseDades = 0;
 		LocalDateTime limit = LocalDateTime.now().plusHours(DURADA_MAXIMA_EXECUCIO_HORES);
 		int ok = 0;
 		int ko = 0;
@@ -143,7 +164,7 @@ public class IncorporacioDocumentsSegonPlaHelper {
 			logger.info("[" + codiProces + "] Inici del procés: " + total + " elements pendents" + perSotaDe
 					+ ". S'aturarà com a màxim a les " + limit.format(FORMATTER_LOG));
 			for (Long id : ids) {
-				if (processats > 0) {
+				if (processats > 0 && (!esperaNomesAmbServeisExterns || anteriorAmbServeisExterns)) {
 					Thread.sleep(ESPERA_ENTRE_ELEMENTS_MS);
 				}
 				// Cada element informa la seva entitat: es buida abans perquè no se n'hereti la de l'anterior
@@ -158,6 +179,7 @@ public class IncorporacioDocumentsSegonPlaHelper {
 					break;
 				}
 				processats++;
+				long accionsAbans = IntegracioHelper.getNumAccionsFil();
 				try {
 					String resultat = processador.processar(id);
 					ok++;
@@ -179,6 +201,10 @@ public class IncorporacioDocumentsSegonPlaHelper {
 							+ " entitat=" + getEntitatActualCodi() + " ERROR"
 							+ (errorDisponibilitat ? " de disponibilitat (" + errorsDisponibilitatSeguits + "/" + MAX_ERRORS_DISPONIBILITAT_SEGUITS + ")" : "")
 							+ ": " + ex.getMessage());
+				}
+				anteriorAmbServeisExterns = IntegracioHelper.getNumAccionsFil() != accionsAbans;
+				if (!anteriorAmbServeisExterns) {
+					nomesBaseDades++;
 				}
 				// Fora del try de l'element: si no es pot desar el darrer id, s'atura el procés
 				darrerId = id;
@@ -203,6 +229,7 @@ public class IncorporacioDocumentsSegonPlaHelper {
 			// Les execucions programades mentre s'executava ja no s'han d'executar
 			darreraComprovacio.put(codiProces, new Date());
 			String resum = "Procés " + motiuFi + ": " + processats + " elements processats (OK: " + ok + ", ERROR: " + ko
+					+ (esperaNomesAmbServeisExterns ? ", sense cridar cap servei extern: " + nomesBaseDades : "")
 					+ ") en " + ((System.currentTimeMillis() - t0) / 1000) + " s. Darrer id: " + (darrerId != null ? darrerId : "cap");
 			logger.info("[" + codiProces + "] " + resum);
 			progres.accept(resum);
@@ -247,14 +274,17 @@ public class IncorporacioDocumentsSegonPlaHelper {
 	}
 
 	/**
-	 * Neteja el context que el procés deixa al fil (usuari autenticat i entitat, òrgan i rol actuals). Els fils del
-	 * planificador es reutilitzen: sense netejar-lo, la tasca següent que s'executés en aquest fil l'heretaria.
+	 * Neteja el context que el procés deixa al fil (usuari autenticat, entitat, òrgan i rol actuals, l'execució sense
+	 * monitors i la fila de l'informe de justificants). Els fils del planificador es reutilitzen: sense netejar-lo, la
+	 * tasca següent que s'executés en aquest fil l'heretaria.
 	 */
 	public static void netejarContextFil() {
 		SecurityContextHolder.clearContext();
 		ConfigHelper.setEntitat(null);
 		ConfigHelper.setOrganCodi(null);
 		ConfigHelper.setRol(null);
+		SenseMonitorsUtils.netejar();
+		FilaInformeJustificantRegistre.treure();
 	}
 
 	/** Cron de la propietat, o null si està buida o no és una expressió vàlida. */

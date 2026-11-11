@@ -10,6 +10,7 @@ import java.util.Map;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -129,11 +130,8 @@ public class IntegracioHelper {
 	}
 
 	public List<IntegracioAccioDto> findAccionsByIntegracioCodi(String integracioCodi, IntegracioFiltreDto filtre) {
-		IntegracioCodiEnum codi;
-		try {
-			codi = IntegracioCodiEnum.valueOf(integracioCodi);
-		} catch (IllegalArgumentException e) {
-			log.warn("Codi d'integració desconegut: {}", integracioCodi);
+		IntegracioCodiEnum codi = toIntegracioCodi(integracioCodi);
+		if (codi == null) {
 			return new ArrayList<>();
 		}
 		List<IntegracioResourceEntity> entities = integracioResourceRepository.findByCodiOrderByDataDesc(codi);
@@ -147,6 +145,53 @@ public class IntegracioHelper {
 		return result;
 	}
 
+	/**
+	 * Darreres accions d'una integració, de la més recent a la més antiga. El límit s'aplica a la consulta: una
+	 * integració pot tenir centenars de milers d'accions amb els seus CLOB, i qui la crida només en necessita unes
+	 * poques (p.ex. /salut calcula l'estat de cada integració amb les 10 darreres). La consulta fa servir l'índex
+	 * IPA_INTACC_CODI_DATA_I (Versio_1.0.8_DDL_11); sense aquest índex, cada consulta recorre tota la taula.
+	 */
+	public List<IntegracioAccioDto> findDarreresAccionsByIntegracioCodi(String integracioCodi, int numElements) {
+		IntegracioCodiEnum codi = toIntegracioCodi(integracioCodi);
+		if (codi == null || numElements <= 0) {
+			return new ArrayList<>();
+		}
+		List<IntegracioResourceEntity> entities = integracioResourceRepository.findByCodiOrderByDataDesc(
+				codi,
+				PageRequest.of(0, numElements));
+		List<IntegracioAccioDto> result = new ArrayList<>();
+		for (IntegracioResourceEntity entity : entities) {
+			result.add(toDto(entity));
+		}
+		return result;
+	}
+
+	private IntegracioCodiEnum toIntegracioCodi(String integracioCodi) {
+		try {
+			return IntegracioCodiEnum.valueOf(integracioCodi);
+		} catch (IllegalArgumentException e) {
+			log.warn("Codi d'integració desconegut: {}", integracioCodi);
+			return null;
+		}
+	}
+
+	/**
+	 * Accions d'integració (crides als serveis externs) de cada fil, registrades al monitor o no. Només en
+	 * compta la diferència: p.ex. el procés de justificants en segon pla no espera entre elements si l'anterior no ha
+	 * cridat cap servei extern (veure IncorporacioDocumentsSegonPlaHelper). Les crides del PluginHelper es registren
+	 * amb addAccioOk o addAccioError (comprovat per a les de l'Arxiu que fa aquest procés).
+	 */
+	private static final ThreadLocal<long[]> ACCIONS_FIL = ThreadLocal.withInitial(() -> new long[1]);
+
+	/** Nombre d'accions d'integració fetes pel fil actual des que es va crear. */
+	public static long getNumAccionsFil() {
+		return ACCIONS_FIL.get()[0];
+	}
+
+	private static void comptarAccioFil() {
+		ACCIONS_FIL.get()[0]++;
+	}
+
 	public void addAccioOk(
 			String integracioCodi,
 			String descripcio,
@@ -154,6 +199,10 @@ public class IntegracioHelper {
 			Map<String, String> parametres,
 			IntegracioAccioTipusEnumDto tipus,
 			long tempsResposta) {
+		comptarAccioFil();
+		if (SenseMonitorsUtils.isActiu()) {
+			return;
+		}
 		try {
 			self.guardarAccioOk(integracioCodi, descripcio, endpoint, parametres, tipus, tempsResposta);
 		} catch (Throwable th) {
@@ -170,6 +219,16 @@ public class IntegracioHelper {
 			long tempsResposta,
 			String errorDescripcio,
 			Throwable throwable) {
+		comptarAccioFil();
+		if (SenseMonitorsUtils.isActiu()) {
+			// Una línia sense stacktrace: deixa constància de l'error encara que el codi que l'ha provocat se
+			// l'empassi, sense omplir el log en els processos massius
+			log.warn("Error d'integració no registrat al monitor perquè l'acció s'executa sense monitors (integracioCodi={}, descripcio={}): {}",
+					integracioCodi,
+					descripcio,
+					Utils.left(errorDescripcio, LONGITUD_ERROR));
+			return;
+		}
 		try {
 			self.guardarAccioError(integracioCodi, descripcio, endpoint, parametres, tipus, tempsResposta, errorDescripcio, throwable);
 		} catch (Throwable th) {
