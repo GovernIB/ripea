@@ -1953,9 +1953,11 @@ public class PluginHelper {
 	private String documentNomInArxiu(String nomPerComprovar, ContingutEntity pare) {
 
 		List<ContingutArxiu> continguts = null;
-		if (ContingutTipusEnumDto.EXPEDIENT.equals(pare.getTipus()) || (ContingutTipusEnumDto.CARPETA.equals(pare.getTipus()) && isCarpetaLogica())) {
+		boolean esExpedient = ContingutTipusEnumDto.EXPEDIENT.equals(pare.getTipus());
+		boolean esCarpetaLogica = ContingutTipusEnumDto.CARPETA.equals(pare.getTipus()) && isCarpetaLogica();
+		if (esExpedient || esCarpetaLogica) {
 			//Cerca dins tot l'expedient a Arxiu, si el pare es expedient, o estan activades les carpetes lògiques (carpetes nomes a RIPEA)
-			continguts = arxiuExpedientConsultarPerUuid(pare.getArxiuUuid()).getContinguts();
+			continguts = arxiuExpedientConsultarPerUuid(pare.getExpedientPare().getArxiuUuid()).getContinguts();
 		} else {
 			continguts = arxiuCarpetaConsultarPerUuid(pare.getArxiuUuid()).getContinguts();
 		}
