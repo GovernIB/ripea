@@ -1120,16 +1120,23 @@ public class ExpedientInteressatHelper {
 		if (interessat != null) {
 			interessat.updateArxiuIntent(arxiuPropagat);
 		} else {
-            expedient.updateArxiuIntent(arxiuPropagat);
-            
-            //SI s'ha propagat correctament l'expedient, es que els interessats han quedat propagats també
-            if (arxiuPropagat) {
-            	if (expedient.getInteressatsORepresentants()!=null) {
-            		for (InteressatEntity interessatExp: expedient.getInteressatsORepresentants()) {
-            			interessatExp.updateArxiuIntent(arxiuPropagat);
-            		}
-            	}
-            }
+			expedient.updateArxiuIntent(arxiuPropagat);
+
+			if (expedient.getInteressatsORepresentants() != null) {
+				for (InteressatEntity interessatExp: expedient.getInteressatsORepresentants()) {
+					if (arxiuPropagat) {
+						//SI s'ha propagat correctament l'expedient, es que els interessats han quedat propagats també
+						interessatExp.updateArxiuIntent(true);
+					} else if (!interessatExp.isArxiuPropagat() && interessatExp.getArxiuReintents() > 0) {
+						// Si ha fallat, l'intent també compta per als interessats pendents de guardar a l'Arxiu
+						// (els mateixos que tria el procés en segon pla: no propagats i amb algun intent fallit des
+						// del darrer èxit, veure InteressatEntity.updateArxiuIntent).
+						// El procés en segon pla els selecciona pel seu propi comptador: si només s'incrementàs
+						// el de l'expedient, no arribarien mai al màxim de reintents i es reintentarien sempre.
+						interessatExp.updateArxiuIntent(false);
+					}
+				}
+			}
 		}
 	}
 

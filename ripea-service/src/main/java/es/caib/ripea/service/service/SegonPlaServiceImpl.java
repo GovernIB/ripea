@@ -472,13 +472,22 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		
 		List<InteressatEntity> pendents = interessatRepository.findInteressatsPendentsArxiu(getArxiuMaxReintentsInteressats());
 
+		// guardarInteressatsArxiu desa tots els interessats de l'expedient amb una sola crida a l'Arxiu i, si falla,
+		// suma un reintent a cada interessat pendent de l'expedient. Per això es tracta cada expedient un sol cop
+		// per execució: si es cridàs una vegada per interessat pendent, es repetiria la mateixa crida a l'Arxiu i
+		// cada interessat sumaria tants reintents per execució com interessats pendents tingués l'expedient.
+		Map<Long, ExpedientEntity> expedientsPendents = new LinkedHashMap<>();
 		for (InteressatEntity interessat : pendents) {
-			EntitatDto entitat = conversioTipusHelper.convertir(interessat.getExpedient().getEntitat(), EntitatDto.class);
+			expedientsPendents.putIfAbsent(interessat.getExpedient().getId(), interessat.getExpedient());
+		}
+
+		for (ExpedientEntity expedient : expedientsPendents.values()) {
+			EntitatDto entitat = conversioTipusHelper.convertir(expedient.getEntitat(), EntitatDto.class);
 			ConfigHelper.setEntitat(entitat);
 
-			synchronized (SynchronizationHelper.get0To99Lock(interessat.getExpedient().getId(), SynchronizationHelper.locksExpedients)) {
+			synchronized (SynchronizationHelper.get0To99Lock(expedient.getId(), SynchronizationHelper.locksExpedients)) {
 				try {
-					Exception exception = expedientInteressatHelper.guardarInteressatsArxiu(interessat.getExpedient().getId());
+					Exception exception = expedientInteressatHelper.guardarInteressatsArxiu(expedient.getId());
 					if (exception != null) throw exception;
 				} catch (Exception e) {
 					logger.error("Error al guardar interessat en arxiu, segon pla ", e);

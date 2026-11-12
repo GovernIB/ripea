@@ -75,6 +75,10 @@ public class DocumentCommand extends ContenidorCommand {
 	private String fitxerContentType;
 	private String fitxerNom;
 	private byte[] fitxerContingut;
+	// IPA_DOCUMENT.DESCRIPCIO és VARCHAR2(512 CHAR). El maxlength del textarea no basta: el resum per IA s'hi
+	// escriu amb JS. Els salts de línia es normalitzen a \n al setter perquè la longitud validada coincideixi amb
+	// la del comptador del formulari (el navegador compta cada salt com 1 caràcter però n'envia 2, \r\n).
+	@Size(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class, CreateDigitalZip.class}, max=512)
 	private String descripcio;
 	
 	private boolean onlyFileSubmit = false;
@@ -170,7 +174,7 @@ public class DocumentCommand extends ContenidorCommand {
 		return descripcio;
 	}
 	public void setDescripcio(String descripcio) {
-		this.descripcio = descripcio != null ? descripcio.trim() : null;
+		this.descripcio = descripcio != null ? descripcio.replaceAll("\r\n?", "\n").trim() : null;
 	}
 	/*public Date getDataCaptura() {
 		return dataCaptura;

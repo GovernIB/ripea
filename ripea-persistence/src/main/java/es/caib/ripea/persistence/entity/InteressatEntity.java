@@ -255,9 +255,18 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
 		return null;
 	}
 
+	/**
+	 * Registra un intent de guardar l'interessat a l'Arxiu.
+	 *
+	 * arxiuReintents compta els intents fallits des del darrer èxit (és el que limita el procés en segon pla amb
+	 * el màxim de reintents). Si es guarda bé, es reinicia a 0: abans es sumaven també els èxits i un interessat
+	 * modificat diverses vegades arribava al màxim sense haver fallat mai, i un error posterior ja no es reintentava.
+	 *
+	 * Només s'ha de cridar amb arxiuPropagat = true quan l'Arxiu ha respost correctament.
+	 */
 	public void updateArxiuIntent(boolean arxiuPropagat) {
 		this.arxiuPropagat = arxiuPropagat;
-		this.arxiuReintents++;
+		this.arxiuReintents = arxiuPropagat ? 0 : this.arxiuReintents + 1;
 		this.arxiuIntentData = new Date();
 	}
 

@@ -142,7 +142,8 @@ $(document).ready(function() {
 						alert(response.error);
 					} else {
 						$("#nom").val(response.titol);
-						$("#descripcio").val(response.resum);
+						// trigger('change'): .val() no dispara cap event i el comptador de caràcters quedaria desactualitzat
+						$("#descripcio").val(response.resum).trigger('change');
 					}
 				}
 				$(".nom_btn").html('IA');
@@ -687,7 +688,7 @@ function removeLoading() {
 				 maxlength="250"/>		
 		</c:if>
 		
-		<rip:inputTextarea name="descripcio" textKey="contingut.document.form.camp.descripcio" showsize="true" maxlength="510"/>
+		<rip:inputTextarea name="descripcio" textKey="contingut.document.form.camp.descripcio" showsize="true" maxlength="512"/>
 		<rip:inputDateTime name="dataTime" textKey="contingut.document.form.camp.data" required="true" readonly="${!isPermesPropagarModificacioDefinitius}"/>
 		<rip:inputSelect name="ntiOrigen" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.origen" optionEnum="NtiOrigenEnumDto" required="true"/>
 		<rip:inputSelect name="ntiEstadoElaboracion" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.estela" required="true" optionItems="${ntiEstatElaboracioOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
