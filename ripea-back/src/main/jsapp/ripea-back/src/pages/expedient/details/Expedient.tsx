@@ -499,6 +499,33 @@ const Expedient = () => {
         };
     }, [apiIsReady, apiCarpetaReady, id, navigate, user, user?.sessionScope?.isContingutCarpetaDetallAccesActiva]);
 
+    // Quan canvia la validació de l'expedient (event SSE, que s'envia un cop confirmada la transacció) es torna a
+    // demanar l'expedient. potTancar, tancarDisabledMessage, valid, metaDocumentsFaltants... es calculen al servidor
+    // a partir de la validació: sense tornar-los a demanar, l'avís es refrescava però el menú d'accions mantenia els
+    // valors de la càrrega inicial (p.ex. "Tanca..." deshabilitat després d'informar la dada obligatòria que faltava).
+    // No es fa servir onChange de useValidacioSession: és d'un sol consumidor i l'avís (component fill) el marca com a
+    // processat abans que s'executi aquest efecte. Cada event arriba com a objecte nou, i per això basta la dependència.
+    const { value: validacio } = useValidacioSession();
+    useEffect(() => {
+        const expedientId = expedient?.id;
+        if (validacio == null || expedientId == null || validacio?.expedientId != expedientId) {
+            return;
+        }
+        let cancelled = false;
+        appGetOne(expedientId, { perspectives })
+            .then((app) => {
+                if (!cancelled) {
+                    setExpedient(app);
+                }
+            })
+            .catch(() => {
+                /* Es manté l'expedient carregat: l'avís de validació ja mostra la validació nova */
+            });
+        return () => {
+            cancelled = true;
+        };
+    }, [validacio]);
+
     useEffect(() => {
         if (expedient) {
             const title = carpetaNode?.nom ? `${expedient?.nom} — ${carpetaNode.nom}` : expedient?.nom;
