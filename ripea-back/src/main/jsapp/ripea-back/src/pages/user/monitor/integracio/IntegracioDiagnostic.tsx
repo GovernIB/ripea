@@ -219,7 +219,7 @@ export const useIntegracioDiagnostic = (integracions?: any[]) => {
                     {integracions?.map?.((i) => {
                         const d = diagnostic.get(i.codi);
                         return (
-                            <Grid key={i.codi} container direction={'row'} display={'flex'} columnSpacing={1} sx={{ mb: 1 }}>
+                            <Grid key={i.codi} container direction={'row'} display={'flex'} columnSpacing={1}>
                                 <Grid size={3}>
                                     <Typography variant={'body1'} ml={1}>
                                         {i.nom || i.codi}

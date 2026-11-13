@@ -492,8 +492,9 @@ public class SchedulingConfig implements SchedulingConfigurer {
                         monitorTasquesService.inici(codiEsborrarExcepcionsMesAntigues);
                         try {
                             createAuthenticationContext();
-                            int esborrats = excepcioLogHelper.esborrarExcepcionsMesAntigues3Mesos();
-                            log.info("Esborrades {} excepcions de log amb més de 3 mesos d'antiguitat", esborrats);
+                            int dies = excepcioLogHelper.getRetencioDies();
+                            int esborrats = excepcioLogHelper.esborrarExcepcionsMesAntigues(dies);
+                            log.info("Esborrades {} excepcions de log amb més de {} dies d'antiguitat", esborrats, dies);
                             monitorTasquesService.fi(codiEsborrarExcepcionsMesAntigues);
                         } catch (Throwable th) {
                             tractarErrorTascaSegonPla(th, codiEsborrarExcepcionsMesAntigues);
@@ -863,8 +864,14 @@ public class SchedulingConfig implements SchedulingConfigurer {
             return new Trigger() {
                 @Override
                 public Date nextExecutionTime(TriggerContext triggerContext) {
-                    CronTrigger trigger = new CronTrigger("0 0 3 * * SAT");
-                	//CronTrigger trigger = new CronTrigger("0 */4 * * * *");
+                    CronTrigger trigger;
+                    try {
+                        String cron = configHelper.getConfig(PropertyConfig.EXCEPCIONS_NETEJA_CRON);
+                        trigger = new CronTrigger(cron != null ? cron : "0 0 3 * * SAT");
+                    } catch (Exception e) {
+                        log.error("Cron invàlid a {}, s'utilitza el per defecte", PropertyConfig.EXCEPCIONS_NETEJA_CRON, e);
+                        trigger = new CronTrigger("0 0 3 * * SAT");
+                    }
                     Date nextExecution = trigger.nextExecutionTime(triggerContext);
                     Long longNextExecution = nextExecution.getTime() - System.currentTimeMillis();
                     monitorTasquesService.updateProperaExecucio(codiEsborrarExcepcionsMesAntigues, longNextExecution);

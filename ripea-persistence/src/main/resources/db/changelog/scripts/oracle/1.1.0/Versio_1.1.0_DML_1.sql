@@ -1,0 +1,6 @@
+Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values
+('0','SCHEDULLED','es.caib.ripea.excepcions.retencio.dies','30','Dies que es conserven les excepcions del monitor d''excepcions abans de ser esborrades.',20,'INT','0','0','0','0','0');
+Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values
+('0','SCHEDULLED','es.caib.ripea.excepcions.neteja.cron','0 0 3 * * SAT','Expressió cron per indicar quan executar la tasca que esborra les excepcions antigues del monitor d''excepcions.',21,'CRON','0','0','0','0','0');
+Insert into IPA_CONFIG (JBOSS_PROPERTY,GROUP_CODE,KEY,VALUE,DESCRIPTION,POSITION,TYPE_CODE,CONFIGURABLE_ORGAN,CONFIGURABLE_ENTITAT_ACTIU,CONFIGURABLE_ORGAN_ACTIU,CONFIGURABLE,CONFIGURABLE_ORG_DESCENDENTS) values
+('0','SCHEDULLED','es.caib.ripea.excepcions.dedup.minuts','10','Minuts durant els quals una excepció repetida no es torna a registrar (només s''incrementa el comptador d''ocurrències). 0 per desactivar.',22,'INT','0','0','0','0','0');

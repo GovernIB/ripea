@@ -10,7 +10,7 @@ import { useMemo, useState } from 'react';
 import { FieldData, MuiDetail } from '../../../components/MuiDetail.tsx';
 import { Grid } from '@mui/material';
 import { ErrorArea } from '../../../components/ErrorPage.tsx';
-import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
+import { useCloseDialogButtons } from '@src/util/buttonsOverride.tsx';
 
 const ExcepcioDetail = ({ entity, currentFields }: any) => {
     return (
@@ -20,10 +20,12 @@ const ExcepcioDetail = ({ entity, currentFields }: any) => {
                 <FieldData field={'tipus'} />
                 <FieldData field={'uri'} />
                 <FieldData field={'message'} />
+                <FieldData field={'numOcurrencies'} />
+                <FieldData field={'dataDarrera'}>{formatDate(entity?.dataDarrera)}</FieldData>
             </DetailCard>
 
             <Grid size={12}>
-                <ErrorArea sx={{ maxHeight: '400px' }}>{entity?.stacktrace}</ErrorArea>
+                <ErrorArea sx={{ maxHeight: '290px' }}>{entity?.stacktrace}</ErrorArea>
             </Grid>
         </MuiDetail>
     );
@@ -80,6 +82,7 @@ const columns: any[] = [
     {
         field: 'data',
         flex: 0.5,
+        minWidth: 100,
         valueFormatter: (value: any) => formatDate(value),
     },
     {
@@ -93,6 +96,17 @@ const columns: any[] = [
     {
         field: 'message',
         flex: 1,
+    },
+    {
+        field: 'numOcurrencies',
+        flex: 0.3,
+        minWidth: 100,
+    },
+    {
+        field: 'dataDarrera',
+        flex: 0.5,
+        minWidth: 160,
+        valueFormatter: (value: any) => formatDate(value),
     },
 ];
 const perspectives: any[] = [];

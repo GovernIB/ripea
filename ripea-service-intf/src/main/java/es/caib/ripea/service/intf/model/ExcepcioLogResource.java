@@ -30,6 +30,8 @@ public class ExcepcioLogResource implements Resource<Long> {
 	private String param2;
 	private String message;
 	private String stacktrace;
+	private Integer numOcurrencies;
+	private Date dataDarrera;
 
 	@Override
 	public Long getId() {

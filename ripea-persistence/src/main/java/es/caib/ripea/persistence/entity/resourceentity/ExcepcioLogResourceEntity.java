@@ -48,4 +48,16 @@ public class ExcepcioLogResourceEntity extends BaseAuditableEntity<ExcepcioLogRe
 	@Column(name = "entitat_id")
 	private Long entitatId;
 
+	/** Hash que identifica una excepció "del mateix tipus" per detectar repeticions. */
+	@Column(name = "signatura", length = 64)
+	private String signatura;
+
+	/** Vegades que s'ha produït aquesta excepció dins la finestra de deduplicació. */
+	@Column(name = "num_ocurrencies", nullable = false)
+	private int numOcurrencies = 1;
+
+	/** Data de la darrera ocurrència (a "data" hi ha la primera). */
+	@Column(name = "data_darrera")
+	private Date dataDarrera;
+
 }
