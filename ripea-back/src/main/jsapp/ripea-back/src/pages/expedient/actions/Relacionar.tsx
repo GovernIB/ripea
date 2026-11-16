@@ -5,7 +5,7 @@ import {
 import {useTranslation} from "react-i18next";
 import GridFormField from "../../../components/GridFormField.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
+import StyledMuiFilter, {filterSessionKey} from "../../../components/StyledMuiFilter.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import * as builder from "../../../util/springFilterUtils.ts";
 import {StyledEstat} from "../ExpedientGrid.tsx";
@@ -84,6 +84,9 @@ const ActionFilter = (props:any) => {
     return <StyledMuiFilter
         resourceName="expedientResource"
         code="EXPEDIENT_FILTER"
+        // Clau pròpia: amb la de per defecte (expedientResource.EXPEDIENT_FILTER) compartiria
+        // el filtre desat amb el llistat d'expedients i s'escriurien l'un a l'altre.
+        sessionKey={filterSessionKey('expedientResource_relacionar', 'EXPEDIENT_FILTER')}
         springFilterBuilder={springFilterBuilder}
         onSpringFilterChange={onSpringFilterChange}
     >

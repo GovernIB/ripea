@@ -1,11 +1,15 @@
 package es.caib.ripea.service.helper;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
+import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.slf4j.Logger;
@@ -936,6 +940,110 @@ public class EmailHelper {
 	    }, "avisarAdministradorsErrorTancament errors=" + (errors != null ? errors.size() : 0));
 	}
 
+	/**
+	 * Envia l'informe del procés en segon pla de justificants de registre (InformeJustificantsRegistreHelper) als
+	 * administradors de l'entitat: usuaris amb el rol IPA_ADMIN i permís d'administració sobre l'entitat.
+	 *
+	 * S'envia a l'instant i en còpia oculta, sense tenir en compte les preferències de correu dels usuaris ni la cua de
+	 * correus agrupats, que no admet adjunts. A diferència de la resta d'avisos, un error en enviar-lo es propaga: qui
+	 * el crida conserva l'informe per tornar-lo a enviar.
+	 *
+	 * @param adjunt contingut del fitxer adjunt, o null per no adjuntar-ne cap.
+	 * @return el nombre de destinataris; 0 si l'entitat no té cap administrador amb correu i no s'ha enviat res.
+	 * @throws MessagingException si no s'ha pogut muntar el missatge.
+	 */
+	public int enviarInformeJustificantsRegistre(
+			Long entitatId,
+			String assumpte,
+			String text,
+			String nomAdjunt,
+			byte[] adjunt) throws MessagingException {
+		List<String> emails = new ArrayList<>();
+		List<String> emailsAgrupats = new ArrayList<>();
+		List<DadesUsuari> admins = pluginHelper.dadesUsuariFindAmbGrup("IPA_ADMIN");
+		if (admins != null) {
+			for (DadesUsuari admin : admins) {
+				boolean granted = permisosHelper.isGrantedAll(
+						entitatId,
+						EntitatEntity.class,
+						new Permission[] { ExtendedPermission.ADMINISTRATION },
+						admin.getCodi());
+				if (granted) {
+					addDestinatari(
+							admin.getCodi(),
+							emails,
+							emailsAgrupats,
+							EventTipusEnumDto.INFORME_JUSTIFICANTS_REGISTRE,
+							"Email informe justificants de registre. Permission: Administració de entitat: " + entitatId + ", user: " + admin.getCodi());
+				}
+			}
+		}
+		// L'esdeveniment és immediat: addDestinatari no n'hauria de deixar cap als agrupats
+		emails.addAll(emailsAgrupats);
+		List<String> destinataris = normalitzarAdreces(emails, new ArrayList<>());
+		if (destinataris.isEmpty()) {
+			return 0;
+		}
+		MimeMessage message = mailSender.createMimeMessage();
+		MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+		helper.setFrom(getRemitent());
+		helper.setBcc(destinataris.toArray(new String[0]));
+		helper.setSubject(getPrefixRipea() + " " + assumpte);
+		helper.setText(text);
+		if (adjunt != null) {
+			helper.addAttachment(nomAdjunt, new ByteArrayResource(adjunt));
+		}
+		mailSender.send(message);
+		return destinataris.size();
+	}
+
+	/** Separadors entre adreces quan un camp de correu en conté més d'una. */
+	private static final Pattern SEPARADOR_ADRECES = Pattern.compile("[;,]");
+	/**
+	 * Format d'una adreça: nom@domini.xxx. La part local admet els caràcters de l'RFC 5322 (com la validació de l'email
+	 * alternatiu de l'usuari); el domini ha de tenir almenys un punt i acabar amb un domini de primer nivell de 2 lletres
+	 * o més.
+	 */
+	private static final Pattern FORMAT_ADRECA = Pattern.compile(
+			"^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)*\\.[a-zA-Z]{2,}$");
+
+	/**
+	 * Normalitza els destinataris d'un correu abans d'enviar-lo: separa els camps que contenen diverses adreces (per
+	 * ";" o ","), treu els espais de cada adreça i descarta les buides, les repetides i les que no tenen el format
+	 * nom@domini.xxx. Les incorrectes s'avisen al log i s'afegeixen a adrecesIncorrectes.
+	 *
+	 * P.ex. el correu d'un usuari a LDAP "nom@domini.es, altre@gmail.com" són dues adreces: sense separar-les, JavaMail
+	 * no accepta el missatge i no s'envia a cap destinatari.
+	 *
+	 * @param adreces adreces tal com s'han obtingut (dels usuaris o introduïdes per l'usuari).
+	 * @param adrecesIncorrectes hi afegeix les adreces descartades per format incorrecte.
+	 * @return les adreces vàlides, sense repetir i en l'ordre rebut.
+	 */
+	static List<String> normalitzarAdreces(Collection<String> adreces, List<String> adrecesIncorrectes) {
+		Set<String> valides = new LinkedHashSet<>();
+		if (adreces == null) {
+			return new ArrayList<>(valides);
+		}
+		for (String camp : adreces) {
+			if (camp == null) {
+				continue;
+			}
+			for (String adreca : SEPARADOR_ADRECES.split(camp)) {
+				adreca = adreca.trim();
+				if (adreca.isEmpty()) {
+					continue;
+				}
+				if (FORMAT_ADRECA.matcher(adreca).matches()) {
+					valides.add(adreca);
+				} else {
+					logger.warn("Adreça de correu electrònic incorrecta: no s'hi envia el correu (adreça=\"{}\", camp=\"{}\")", adreca, camp);
+					adrecesIncorrectes.add(adreca);
+				}
+			}
+		}
+		return new ArrayList<>(valides);
+	}
+
 	private String getEnllacExpedient(Long expedientId) {
 		String baseUrl = configHelper.getConfig(PropertyConfig.BASE_URL);
 		String enllacExpedient = "Pot accedir a l'expedient utilizant el següent enllaç: " + baseUrl + "/contingut/" + expedientId + "\n";
@@ -1298,9 +1406,15 @@ public class EmailHelper {
             VersioDocumentEnum versioDocument,
             boolean propagarError) {
 
-		// remove duplicats
-		destinatarisNoAgrupats = new ArrayList<>(new HashSet<>(destinatarisNoAgrupats));
-		destinatarisAgrupats = new ArrayList<>(new HashSet<>(destinatarisAgrupats));
+		// Adreces separades, sense repetir i amb format correcte: una adreça incorrecta no impedeix enviar a la resta
+		List<String> adrecesIncorrectes = new ArrayList<>();
+		destinatarisNoAgrupats = normalitzarAdreces(destinatarisNoAgrupats, adrecesIncorrectes);
+		destinatarisAgrupats = normalitzarAdreces(destinatarisAgrupats, adrecesIncorrectes);
+		if (propagarError && !adrecesIncorrectes.isEmpty()) {
+			// Enviament de primer pla (p.ex. "Enviar document via email"): l'usuari ha de saber quina adreça és incorrecta
+			throw new RuntimeException("No s'ha enviat el correu electrònic perquè hi ha adreces incorrectes: "
+					+ String.join(", ", adrecesIncorrectes) + " (subject=" + subject + ")");
+		}
 
 		String from = getRemitent();
 
@@ -1373,7 +1487,9 @@ public class EmailHelper {
 		String email = null;
 		UsuariEntity usuari = usuariRepository.findById(codi).orElse(null);
 		
-		boolean emailInmediat = (event!=null && (EventTipusEnumDto.ENVIAR_FICHERO.equals(event) || EventTipusEnumDto.AVIS_ERROR_TANCAMENT_ARXIU.equals(event)));
+		boolean emailInmediat = (event!=null && (EventTipusEnumDto.ENVIAR_FICHERO.equals(event)
+				|| EventTipusEnumDto.AVIS_ERROR_TANCAMENT_ARXIU.equals(event)
+				|| EventTipusEnumDto.INFORME_JUSTIFICANTS_REGISTRE.equals(event)));
 
 		// Un usuari donat de baixa no rep cap correu, ni tan sols els immediats
 		if (usuari != null && !usuari.isActiu()) {

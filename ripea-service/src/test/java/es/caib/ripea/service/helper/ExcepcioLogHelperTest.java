@@ -2,13 +2,14 @@ package es.caib.ripea.service.helper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -23,7 +24,8 @@ import es.caib.ripea.persistence.entity.resourcerepository.ExcepcioLogResourceRe
 import es.caib.ripea.service.intf.config.PropertyConfig;
 
 /**
- * Tests unitaris de la deduplicació d'excepcions i de la retenció a ExcepcioLogHelper.
+ * Tests unitaris d'ExcepcioLogHelper: deduplicació d'excepcions, retenció, i que les excepcions de les accions
+ * executades sense monitors no es desen al monitor d'excepcions.
  */
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -32,6 +34,11 @@ class ExcepcioLogHelperTest {
 	@Mock private ExcepcioLogResourceRepository repository;
 	@Mock private ConfigHelper configHelper;
 	@InjectMocks private ExcepcioLogHelper helper;
+
+	@AfterEach
+	void netejar() {
+		SenseMonitorsUtils.netejar();
+	}
 
 	@Test
 	void repetidaDinsFinestra_incrementaComptadorISenseInserir() {
@@ -93,5 +100,22 @@ class ExcepcioLogHelperTest {
 		assertThat(helper.getRetencioDies()).isEqualTo(ExcepcioLogHelper.RETENCIO_DIES_DEFECTE);
 		when(configHelper.getAsInt(eq(PropertyConfig.EXCEPCIONS_RETENCIO_DIES), org.mockito.ArgumentMatchers.anyInt())).thenReturn(30);
 		assertThat(helper.getRetencioDies()).isEqualTo(30);
+	}
+
+	@Test
+	void excepcioEsRegistra() {
+		helper.addExcepcio("/expedient/1", new IllegalStateException("error"));
+		verify(repository).save(any(ExcepcioLogResourceEntity.class));
+	}
+
+	@Test
+	void excepcioSenseMonitorsNoEsRegistra() throws Exception {
+		SenseMonitorsUtils.executar(() -> {
+			helper.addExcepcio("/expedient/1", new IllegalStateException("error"));
+			helper.addExcepcio("/expedient/1", new IllegalStateException("error"), "param1", "param2");
+			return null;
+		});
+		// Ni la consulta de deduplicació ni l'insert: no s'ha de tocar la BD
+		verifyNoInteractions(repository);
 	}
 }

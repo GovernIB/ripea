@@ -25,7 +25,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
 public class ApplicationHelper {
-	
+
+	private static final String PREFIX_METRIQUES_INTEGRACIONS = "METRICS@Integracions.";
+
     @Autowired private ProcessosInicialsRepository processosInicialsRepository;
     @Autowired private MeterRegistry meterRegistry;
 	
@@ -39,12 +41,26 @@ public class ApplicationHelper {
 	}
 	
 	public void stopTimer(Timer.Sample sample, String metricCode, String... tags) {
+		if (isMetricaIgnorada(metricCode)) {
+			return;
+		}
         sample.stop(getTimer(metricCode, tags));
 	}
 
 	/** Equivalent a stopTimer per quan la durada ja s'ha mesurat (per exemple, amb un t0 de System.currentTimeMillis()). */
 	public void recordTimer(long durada, TimeUnit unitat, String metricCode, String... tags) {
+		if (isMetricaIgnorada(metricCode)) {
+			return;
+		}
 		getTimer(metricCode, tags).record(durada, unitat);
+	}
+
+	/**
+	 * Les accions dels processos que s'executen sense monitors no compten a les mètriques d'integracions de
+	 * COMANDA. Les dels subsistemes (p.ex. METRICS@Subsystem_Background) sí que compten.
+	 */
+	private boolean isMetricaIgnorada(String metricCode) {
+		return SenseMonitorsUtils.isActiu() && metricCode != null && metricCode.startsWith(PREFIX_METRIQUES_INTEGRACIONS);
 	}
 
 	private Timer getTimer(String metricCode, String... tags) {

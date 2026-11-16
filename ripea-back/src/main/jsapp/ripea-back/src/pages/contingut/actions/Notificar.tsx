@@ -10,6 +10,7 @@ import * as builder from "../../../util/springFilterUtils.ts";
 import {InteressatDetail} from "../../interessats/details/InteressatDetail.tsx";
 import Load from "../../../components/Load.tsx";
 import {useSession} from "@src/components/SessionStorageContext.tsx";
+import useNumRemeses from "@src/hooks/useNumRemeses.ts";
 
 const perspectives = ['REPRESENTANT', 'ADRESSA']
 const AdditionalInfo = (props:any) => {
@@ -175,10 +176,11 @@ const Notificar = (props:any) => {
     )
 }
 
-const useNotificar = (refresh?: () => void) => {
+const useNotificar = (entity?: any, refresh?: () => void) => {
     const { t } = useTranslation();
     const apiRef = useMuiFormDialogApiRef();
     const {temporalMessageShow} = useBaseAppContext();
+    const {recomptar: recomptarRemeses} = useNumRemeses(entity?.id);
 
     const handleShow = (id:any, row:any) :void => {
         apiRef.current?.show?.(id,{
@@ -186,10 +188,12 @@ const useNotificar = (refresh?: () => void) => {
             expedient: row?.expedient
         })
     }
+    // Sense recarregar la pàgina: es refresca la graella de contingut (estat i icona de notificació del
+    // document) i el comptador de la pestanya "Remeses" (la pestanya mateixa llegeix les remeses en obrir-la).
     const onSuccess = () :void => {
         refresh?.()
+        recomptarRemeses()
         temporalMessageShow(null, t('page.document.action.notificar.ok'), 'success');
-        window.location.reload();
     }
 
     return {

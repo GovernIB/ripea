@@ -18,5 +18,6 @@ public enum EventTipusEnumDto {
 	EXEC_MASSIVA_FINALITZADA,
 	MENCIO_COMENTARI, //Envia correu al usuari mencionat, en el moment en que es crea el comentari
 	FIRMA_PARCIAL_PORTAFIB,
-	AVIS_ERROR_TANCAMENT_ARXIU //Avís als administradors (IPA_ADMIN) d'errors en el tancament d'expedients a l'arxiu; s'envia incondicionalment
+	AVIS_ERROR_TANCAMENT_ARXIU, //Avís als administradors (IPA_ADMIN) d'errors en el tancament d'expedients a l'arxiu; s'envia incondicionalment
+	INFORME_JUSTIFICANTS_REGISTRE //Informe del procés en segon pla de justificants de registre als administradors de l'entitat; s'envia incondicionalment i mai no es desa a la cua de correus agrupats (porta un adjunt)
 }

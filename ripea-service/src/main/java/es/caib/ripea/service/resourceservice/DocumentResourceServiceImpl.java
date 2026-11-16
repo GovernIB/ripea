@@ -1827,8 +1827,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/document/"+entity.getId()+"/notificar", e);
-				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
-				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, message);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, e.getMessage());
 			}
 
         	return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);

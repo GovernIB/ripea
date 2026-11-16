@@ -82,6 +82,11 @@ public class ExcepcioLogHelper {
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void addExcepcio(String uri, Throwable exception, String param1, String param2) {
 		if (exception == null) return;
+		if (SenseMonitorsUtils.isActiu()) {
+			// Amb l'stacktrace, perquè és un error inesperat: només es vol evitar que ocupi espai a la BD (RIPEA_LOB)
+			log.warn("Excepció no registrada al monitor d'excepcions perquè l'acció s'executa sense monitors (uri={})", uri, exception);
+			return;
+		}
 		String signatura = null;
 		try {
 			signatura = calcularSignatura(exception);

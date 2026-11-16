@@ -5,6 +5,8 @@ import { useFormContext } from 'reactlib';
 
 vi.mock('react-i18next', () => ({
     useTranslation: () => ({ t: (key: string) => key }),
+    // src/i18n/i18n.ts (importat via TitleHeaderConfigurator) fa i18next.use(initReactI18next)
+    initReactI18next: { type: '3rdParty', init: () => {} },
 }));
 
 vi.mock('reactlib', () => ({
