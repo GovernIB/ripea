@@ -354,37 +354,6 @@ public final class PinbalFormulariUtils {
 	}
 
 	/**
-	 * Codis de l'estat de les dades específiques de la resposta que indiquen que l'emissor ha tramitat la consulta. No
-	 * són estàndard: 0003 als serveis que segueixen els codis SCSP i 0 als de la DGT i de Justícia (SVDRRCC*).
-	 */
-	private static final Set<String> CODIS_ESTAT_EMISSOR_OK = Set.of("0003", "0");
-	/** Rutes de l'estat de l'emissor a les dades específiques de la resposta (la primera és la més habitual). */
-	private static final String[] RUTES_ESTAT_EMISSOR = { "DatosEspecificos/Retorno/Estado/", "DatosEspecificos/Estado/" };
-
-	/**
-	 * Error de l'emissor dins les dades específiques de la resposta. PINBAL només mira l'estat general de la transmissió:
-	 * si l'emissor rebutja la consulta dins les dades específiques (p.ex. Justícia amb CodigoEstado=400 i el motiu a
-	 * LiteralError), PINBAL la dona per tramitada.
-	 *
-	 * @return el codi d'estat i el text de l'error (o null si l'emissor no n'ha donat cap), o null si les dades
-	 *         específiques no tenen estat o el codi és d'una consulta tramitada.
-	 */
-	public static String[] errorEstatEmissor(Map<String, String> dadesEspecifiquesResposta) {
-		if (dadesEspecifiquesResposta == null) {
-			return null;
-		}
-		for (String ruta: RUTES_ESTAT_EMISSOR) {
-			String codi = senseBlancs(dadesEspecifiquesResposta.get(ruta + "CodigoEstado"));
-			if (codi != null) {
-				return CODIS_ESTAT_EMISSOR_OK.contains(codi)
-						? null
-						: new String[] { codi, senseBlancs(dadesEspecifiquesResposta.get(ruta + "LiteralError")) };
-			}
-		}
-		return null;
-	}
-
-	/**
 	 * Detall d'un error de validació de l'esquema de la petició (l'emissor o PINBAL validen l'XML amb l'XSD del servei),
 	 * que és el que diu què falla. Per exemple, de "...Error durante la validacion del esquema
 	 * '/schemas/SVDBECAWS01v3/peticion.xsd'. cvc-enumeration-valid: Value 'DNI' is not facet-valid with respect to

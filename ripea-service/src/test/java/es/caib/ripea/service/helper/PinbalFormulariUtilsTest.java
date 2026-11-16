@@ -490,38 +490,6 @@ class PinbalFormulariUtilsTest {
 	}
 
 	@Test
-	void errorEstatEmissor_rebutjaElsCodisQueNoSonDeConsultaTramitada() {
-		// Justícia (SVDRRCCDEFUNCIONWS01): error de validació de l'emissor amb la petició TRAMITADA a PINBAL
-		Map<String, String> justiciaError = new HashMap<>();
-		justiciaError.put("DatosEspecificos/Retorno/Estado/CodigoEstado", "400");
-		justiciaError.put("DatosEspecificos/Retorno/Estado/LiteralError", "El campo apellido2 no viene informado.");
-		assertThat(PinbalFormulariUtils.errorEstatEmissor(justiciaError))
-				.containsExactly("400", "El campo apellido2 no viene informado.");
-
-		// Error sense text, a la ruta sense Retorno (com SCDCPAJU)
-		Map<String, String> senseText = new HashMap<>();
-		senseText.put("DatosEspecificos/Estado/CodigoEstado", "0233");
-		assertThat(PinbalFormulariUtils.errorEstatEmissor(senseText)).containsExactly("0233", null);
-	}
-
-	@Test
-	void errorEstatEmissor_consultesTramitadesISenseEstat() {
-		Map<String, String> justiciaOk = new HashMap<>();
-		justiciaOk.put("DatosEspecificos/Retorno/Estado/CodigoEstado", "0");
-		justiciaOk.put("DatosEspecificos/Retorno/Estado/LiteralError", "Se han encontrado datos del titular");
-		Map<String, String> scspOk = new HashMap<>();
-		scspOk.put("DatosEspecificos/Estado/CodigoEstado", " 0003 ");
-		scspOk.put("DatosEspecificos/Estado/LiteralError", "TRAMITADA");
-		Map<String, String> senseEstat = new HashMap<>();
-		senseEstat.put("DatosEspecificos/Retorno/Resultado", "S");
-
-		assertThat(PinbalFormulariUtils.errorEstatEmissor(justiciaOk)).isNull();
-		assertThat(PinbalFormulariUtils.errorEstatEmissor(scspOk)).isNull();
-		assertThat(PinbalFormulariUtils.errorEstatEmissor(senseEstat)).isNull();
-		assertThat(PinbalFormulariUtils.errorEstatEmissor(null)).isNull();
-	}
-
-	@Test
 	void detallErrorEsquema_nomesElDetallDelPrimerErrorCvc() {
 		String error = "La estructura del fichero recibido no corresponde con el esquema. (La estructura del fichero "
 				+ "recibido no corresponde con el esquema.Error durante la validacion del esquema "
