@@ -1,11 +1,13 @@
 package es.caib.ripea.service.helper;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -978,7 +980,7 @@ public class EmailHelper {
 		}
 		// L'esdeveniment és immediat: addDestinatari no n'hauria de deixar cap als agrupats
 		emails.addAll(emailsAgrupats);
-		List<String> destinataris = new ArrayList<>(new LinkedHashSet<>(emails));
+		List<String> destinataris = normalitzarAdreces(emails, new ArrayList<>());
 		if (destinataris.isEmpty()) {
 			return 0;
 		}
@@ -993,6 +995,53 @@ public class EmailHelper {
 		}
 		mailSender.send(message);
 		return destinataris.size();
+	}
+
+	/** Separadors entre adreces quan un camp de correu en conté més d'una. */
+	private static final Pattern SEPARADOR_ADRECES = Pattern.compile("[;,]");
+	/**
+	 * Format d'una adreça: nom@domini.xxx. La part local admet els caràcters de l'RFC 5322 (com la validació de l'email
+	 * alternatiu de l'usuari); el domini ha de tenir almenys un punt i acabar amb un domini de primer nivell de 2 lletres
+	 * o més.
+	 */
+	private static final Pattern FORMAT_ADRECA = Pattern.compile(
+			"^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)*\\.[a-zA-Z]{2,}$");
+
+	/**
+	 * Normalitza els destinataris d'un correu abans d'enviar-lo: separa els camps que contenen diverses adreces (per
+	 * ";" o ","), treu els espais de cada adreça i descarta les buides, les repetides i les que no tenen el format
+	 * nom@domini.xxx. Les incorrectes s'avisen al log i s'afegeixen a adrecesIncorrectes.
+	 *
+	 * P.ex. el correu d'un usuari a LDAP "nom@domini.es, altre@gmail.com" són dues adreces: sense separar-les, JavaMail
+	 * no accepta el missatge i no s'envia a cap destinatari.
+	 *
+	 * @param adreces adreces tal com s'han obtingut (dels usuaris o introduïdes per l'usuari).
+	 * @param adrecesIncorrectes hi afegeix les adreces descartades per format incorrecte.
+	 * @return les adreces vàlides, sense repetir i en l'ordre rebut.
+	 */
+	static List<String> normalitzarAdreces(Collection<String> adreces, List<String> adrecesIncorrectes) {
+		Set<String> valides = new LinkedHashSet<>();
+		if (adreces == null) {
+			return new ArrayList<>(valides);
+		}
+		for (String camp : adreces) {
+			if (camp == null) {
+				continue;
+			}
+			for (String adreca : SEPARADOR_ADRECES.split(camp)) {
+				adreca = adreca.trim();
+				if (adreca.isEmpty()) {
+					continue;
+				}
+				if (FORMAT_ADRECA.matcher(adreca).matches()) {
+					valides.add(adreca);
+				} else {
+					logger.warn("Adreça de correu electrònic incorrecta: no s'hi envia el correu (adreça=\"{}\", camp=\"{}\")", adreca, camp);
+					adrecesIncorrectes.add(adreca);
+				}
+			}
+		}
+		return new ArrayList<>(valides);
 	}
 
 	private String getEnllacExpedient(Long expedientId) {
@@ -1357,9 +1406,15 @@ public class EmailHelper {
             VersioDocumentEnum versioDocument,
             boolean propagarError) {
 
-		// remove duplicats
-		destinatarisNoAgrupats = new ArrayList<>(new HashSet<>(destinatarisNoAgrupats));
-		destinatarisAgrupats = new ArrayList<>(new HashSet<>(destinatarisAgrupats));
+		// Adreces separades, sense repetir i amb format correcte: una adreça incorrecta no impedeix enviar a la resta
+		List<String> adrecesIncorrectes = new ArrayList<>();
+		destinatarisNoAgrupats = normalitzarAdreces(destinatarisNoAgrupats, adrecesIncorrectes);
+		destinatarisAgrupats = normalitzarAdreces(destinatarisAgrupats, adrecesIncorrectes);
+		if (propagarError && !adrecesIncorrectes.isEmpty()) {
+			// Enviament de primer pla (p.ex. "Enviar document via email"): l'usuari ha de saber quina adreça és incorrecta
+			throw new RuntimeException("No s'ha enviat el correu electrònic perquè hi ha adreces incorrectes: "
+					+ String.join(", ", adrecesIncorrectes) + " (subject=" + subject + ")");
+		}
 
 		String from = getRemitent();
 
