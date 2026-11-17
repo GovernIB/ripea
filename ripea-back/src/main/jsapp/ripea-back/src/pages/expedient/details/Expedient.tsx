@@ -1,7 +1,7 @@
 import {useTranslation} from 'react-i18next';
 import {useNavigate, useParams, Link as RrLink} from 'react-router-dom';
 import {GridPage, useBaseAppContext, useResourceApiService} from 'reactlib';
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useRef} from "react";
 import {Typography, Grid, Icon, IconButton, Link, Alert, Button, Box, alpha, Paper, Divider, Tooltip, Badge, useTheme} from '@mui/material';
 import {formatDate} from '../../../util/dateUtils.ts';
 import TabComponent from "../../../components/TabComponent.tsx";
@@ -24,7 +24,8 @@ import {useUserSession} from "../../../components/Session.tsx";
 import {useActions} from "./CommonActions.tsx";
 import useAlerta from "./Alerta.tsx";
 import useErrorValidacio, { getResumErrorsText } from "./ErrorValidacio.tsx";
-import SseExpedient, {useValidacioSession} from "../../../components/SseExpedient.tsx";
+import SseExpedient, {useProcesSegonPlaSession, useValidacioSession} from "../../../components/SseExpedient.tsx";
+import {type ProcesSegonPla, ProcesSegonPlaAlert, useProcesSegonPlaDialog} from "../../../components/ProcesSegonPla.tsx";
 import {setTitlePageText} from "../../../TitleHeaderConfigurator.tsx";
 import {FieldData, MuiDetail} from "../../../components/MuiDetail.tsx";
 import {ErrorPage} from "../../../components/ErrorPage.tsx";
@@ -72,7 +73,7 @@ const ExpedientsRelacionats = (props:any) => {
 }
 
 const ExpedientInfoContret = (props:any) => {
-    const { onExpand, entity: expedient, fields, relacionats, readOnly } = props;
+    const { onExpand, entity: expedient, fields, relacionats, readOnly, onProcesSegonPlaClose } = props;
     const { t } = useTranslation();
 
     const iconButtonStyle = {
@@ -144,14 +145,14 @@ const ExpedientInfoContret = (props:any) => {
                 </Tooltip>}
             <Divider sx={{ width: '30px' }} />
             {!readOnly && (
-                <ExpedientActionButton entity={expedient} variant="icon" iconStyle={iconStyle} iconButtonStyle={iconButtonStyle} />
+                <ExpedientActionButton entity={expedient} variant="icon" iconStyle={iconStyle} iconButtonStyle={iconButtonStyle} onProcesSegonPlaClose={onProcesSegonPlaClose} />
             )}
         </Paper>
     );
 };
 
 const ExpedientInfoExpandit = (props:any) => {
-    const {title, entity: expedient, fields, xs, readOnly, onCollapse, relacionats, eliminarRelacio, hideNom} = props;
+    const {title, entity: expedient, fields, xs, readOnly, onCollapse, relacionats, eliminarRelacio, hideNom, onProcesSegonPlaClose} = props;
     const { t } = useTranslation();
 
     const buttonExpand = (
@@ -196,7 +197,7 @@ const ExpedientInfoExpandit = (props:any) => {
 
                 {!readOnly && (
                     <Grid size={12} display={'flex'} justifyContent={'end'} p={1}>
-                        <ExpedientActionButton entity={expedient} />
+                        <ExpedientActionButton entity={expedient} onProcesSegonPlaClose={onProcesSegonPlaClose} />
                     </Grid>
                 )}
             </DetailCard>
@@ -206,7 +207,8 @@ const ExpedientInfoExpandit = (props:any) => {
 
 export const ExpedientInfo = (props: any) => {
     // hideNom: la pantalla ja mostra el nom de l'expedient com a títol (ScreenFrame)
-    const { expanded, entity: expedient, fields, setExpanded, hideNom } = props;
+    // onProcesSegonPlaClose: actualització de la fitxa en tancar el diàleg de progrés del tancament (veure useTancar)
+    const { expanded, entity: expedient, fields, setExpanded, hideNom, onProcesSegonPlaClose } = props;
     const {
         isReady: apiIsReady,
         find: apiFind,
@@ -241,14 +243,14 @@ export const ExpedientInfo = (props: any) => {
 
 
     return expanded ? (
-        <ExpedientInfoExpandit entity={expedient} fields={fields} onCollapse={() => setExpanded(false)} hideNom={hideNom} relacionats={relacionats} eliminarRelacio={eliminarRelacio}/>
+        <ExpedientInfoExpandit entity={expedient} fields={fields} onCollapse={() => setExpanded(false)} hideNom={hideNom} relacionats={relacionats} eliminarRelacio={eliminarRelacio} onProcesSegonPlaClose={onProcesSegonPlaClose}/>
     ) : (
-        <ExpedientInfoContret entity={expedient} fields={fields} onExpand={() => setExpanded(true)} relacionats={relacionats}/>
+        <ExpedientInfoContret entity={expedient} fields={fields} onExpand={() => setExpanded(true)} relacionats={relacionats} onProcesSegonPlaClose={onProcesSegonPlaClose}/>
     );
 };
 
 const ExpedientAlert = (props:any) => {
-    const {entity: expedient} = props;
+    const {entity: expedient, onProcesSegonPlaClose} = props;
     const { t } = useTranslation();
     const {value: user, rol} = useUserSession();
     const {value: validacio} = useValidacioSession()
@@ -260,9 +262,12 @@ const ExpedientAlert = (props:any) => {
     const {agafar} = useActions(refresh);
     const {handleOpen: handelAlert, dialog: dialogAlert, count} = useAlerta();
     const {handleOpen: hanldeErrorValidacio, dialog: dialogErrorValidacio} = useErrorValidacio();
+    // En tancar el diàleg, la fitxa s'actualitza sense recarregar la pàgina (veure Expedient.actualitzarPerProcesSegonPla)
+    const {show: showProgres, dialog: dialogProgres} = useProcesSegonPlaDialog(onProcesSegonPlaClose);
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1}}>
+            <ProcesSegonPlaAlert proces={expedient?.procesSegonPla} onShowProgress={showProgres}/>
             {expedient?.agafatPer?.id != user?.codi &&
                 expedient?.usuariActualWrite &&
                 !rol?.isAdminLectura &&
@@ -326,6 +331,7 @@ const ExpedientAlert = (props:any) => {
                 })()}
             {dialogAlert}
             {dialogErrorValidacio}
+            {dialogProgres}
         </Box>
     );
 }
@@ -429,12 +435,21 @@ const Expedient = () => {
 
     const [expedient, setExpedient] = useState<any>();
     const [carpetaNode, setCarpetaNode] = useState<any>();
+    // Darrera petició de l'expedient per un procés en segon pla: si n'arriben dues seguides (inici i fi, o l'event SSE i
+    // el tancament del diàleg), només s'aplica la resposta de la darrera.
+    const peticioProcesSegonPla = useRef<number>(0);
+    // Refresc del contingut (pestanya de documents) quan acaba un procés en segon pla, i operacioId de l'últim pel qual
+    // ja s'ha fet (l'event SSE de fi i el tancament del diàleg de progrés el demanarien dues vegades).
+    const [versioContingut, setVersioContingut] = useState<number>(0);
+    const procesContingutRefrescat = useRef<string | null>(null);
 
     useEffect(() => {
         if (!apiIsReady || id == null) {
             return;
         }
         let cancelled = false;
+        // Descarta les peticions de l'expedient anterior que encara no han arribat
+        peticioProcesSegonPla.current++;
         setError(undefined);
 
         const load = async () => {
@@ -519,6 +534,42 @@ const Expedient = () => {
         };
     }, [validacio]);
 
+    /**
+     * Actualitza la fitxa, sense recarregar la pàgina, quan comença o acaba un procés en segon pla sobre l'expedient
+     * (p.ex. el tancament):
+     *  - es torna a demanar l'expedient: el bloqueig (procesSegonPla, potModificar...) i l'estat es calculen al servidor;
+     *  - si el procés ja ha acabat, es refresca també el contingut (el tancament firma documents, els passa a definitius,
+     *    esborra els esborranys...).
+     * S'hi arriba per l'event SSE (també quan el procés el fa un altre usuari) i en tancar el diàleg de progrés, per si
+     * s'ha perdut l'event. proces pot ser undefined si el diàleg es tanca abans de la primera consulta.
+     */
+    const actualitzarPerProcesSegonPla = (proces?: ProcesSegonPla | null) => {
+        const expedientId = expedient?.id;
+        if (expedientId == null || (proces != null && proces.elementId != expedientId)) {
+            return;
+        }
+        const peticio = ++peticioProcesSegonPla.current;
+        appGetOne(expedientId, { perspectives })
+            .then((app) => {
+                if (peticio === peticioProcesSegonPla.current) {
+                    setExpedient(app);
+                }
+            })
+            .catch(() => {
+                /* Es manté l'expedient carregat */
+            });
+        if (proces?.operacioId && proces.estat !== 'EN_CURS' && procesContingutRefrescat.current !== proces.operacioId) {
+            procesContingutRefrescat.current = proces.operacioId;
+            setVersioContingut((versio) => versio + 1);
+        }
+    };
+    const { value: procesSegonPla } = useProcesSegonPlaSession();
+    useEffect(() => {
+        if (procesSegonPla != null) {
+            actualitzarPerProcesSegonPla(procesSegonPla);
+        }
+    }, [procesSegonPla]);
+
     useEffect(() => {
         if (expedient) {
             const title = carpetaNode?.nom ? `${expedient?.nom} — ${carpetaNode.nom}` : expedient?.nom;
@@ -579,9 +630,9 @@ const Expedient = () => {
             label: t('page.contingut.tabs.contingut'),
             content:
                 isCarpetaUrl && id != null ? (
-                    <Carpeta key={`carpeta-${id}`} expedient={expedient} carpetaId={id} onRowCountChange={setNumContingut} />
+                    <Carpeta key={`carpeta-${id}`} expedient={expedient} carpetaId={id} onRowCountChange={setNumContingut} refreshKey={versioContingut} />
                 ) : (
-                    <DocumentsGrid key={`expedient-${expedient?.id}`} entity={expedient} onRowCountChange={setNumContingut} />
+                    <DocumentsGrid key={`expedient-${expedient?.id}`} entity={expedient} onRowCountChange={setNumContingut} refreshKey={versioContingut} />
                 ),
             badge: numContingut ?? expedient?.numContingut,
             showZero: true,
@@ -661,10 +712,10 @@ const Expedient = () => {
                     />
                     <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
                         <Box sx={{ width: expanded ? 444 : 72, flexShrink: 0 }}>
-                            <ExpedientInfo entity={expedient} fields={fields} expanded={expanded} setExpanded={handleToggle} hideNom />
+                            <ExpedientInfo entity={expedient} fields={fields} expanded={expanded} setExpanded={handleToggle} hideNom onProcesSegonPlaClose={actualitzarPerProcesSegonPla} />
                         </Box>
                         <Box sx={{ flex: 1, minWidth: 0 }}>
-                            <ExpedientAlert entity={expedient} />
+                            <ExpedientAlert entity={expedient} onProcesSegonPlaClose={actualitzarPerProcesSegonPla} />
                             <Box>
                                 <TabComponent
                                     tabs={tabs}

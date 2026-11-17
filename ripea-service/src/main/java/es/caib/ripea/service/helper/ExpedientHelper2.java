@@ -3,6 +3,7 @@ package es.caib.ripea.service.helper;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -35,6 +36,7 @@ import es.caib.ripea.service.firma.DocumentFirmaServidorFirma;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentDto;
+import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaEstatDto;
 import es.caib.ripea.service.intf.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
@@ -43,6 +45,7 @@ import es.caib.ripea.service.intf.dto.MetaExpedientTascaValidacioDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ValidacioErrorDto;
+import es.caib.ripea.service.intf.exception.FirmaServidorException;
 import es.caib.ripea.service.intf.exception.SistemaExternException;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.service.AplicacioService;
@@ -69,13 +72,17 @@ public class ExpedientHelper2 {
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private ExpedientTascaRepository expedientTascaRepository;
 	@Autowired private EntityComprovarHelper entityComprovarHelper;
- 
+	@Autowired private ProcesSegonPlaHelper procesSegonPlaHelper;
+
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void checkIfExpedientCanBeClosed(Long entitatId, Long expedientId, Long[] documentsPerFirmar) {
-		
+
 		ExpedientEntity expedient = expedientRepository.getOne(expedientId);
 		expedientHelper.concurrencyCheckExpedientJaTancat(expedient);
-		
+		// Un altre tancament (o un altre procés en segon pla) en curs sobre el mateix expedient. El propi procés de
+		// tancament també passa per aquí, i n'està exempt.
+		procesSegonPlaHelper.comprovarNoBloquejat(ElementTipusEnumDto.EXPEDIENT, expedientId);
+
 		if (anyExecucioMassiva(expedient)) {
 			throw new ValidationException("No es pot tancar un expedient amb execucions massives pendents de finalitzar");
 		}
@@ -172,6 +179,7 @@ public class ExpedientHelper2 {
 			expedient.updateEstatAdditional(null);
 			contingutLogHelper.log(expedient, LogTipusEnumDto.TANCAMENT, null, null, false, false);
 			logger.debug("Tancant expedient a l'arxiu per acció iniciada per usuari...");
+			ProcesSegonPlaContext.fase(TancamentExpedientPassos.FASE_TANCAR_ARXIU, null);
 			pluginHelper.arxiuExpedientTancar(expedient);
 		} else {
 			expedient.updateEstat(ExpedientEstatEnumDto.TANCAT, motiu, getDiesPerTancament());
@@ -208,22 +216,38 @@ public class ExpedientHelper2 {
 	public void actualitzaEstatNotificacionsCaducades(Long expedientId) {
 		ExpedientEntity expedient = expedientRepository.getOne(expedientId);
 		List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(expedient, 0);
+		// Per al registre de progrés: notificacions caducades tractades
+		int numNotificacions = 0;
 		for (DocumentEntity document : documents) {
 	        List<DocumentNotificacioEntity> notificacionsPendents = documentNotificacioRepository.findByDocumentOrderByCreatedDateDesc(document);
 	        if (notificacionsPendents!=null && notificacionsPendents.size()>0) {
 	            if (notificacionsPendents.get(0).isCaducada() && !notificacionsPendents.get(0).isNotificacioFinalitzada()) {
+	            	numNotificacions++;
 	        		if (notificacionsPendents.get(0).getDocumentEnviamentInteressats()!=null) {
 	        			for (DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity: notificacionsPendents.get(0).getDocumentEnviamentInteressats()) {
 	        				try {
 	        					pluginHelper.notificacioConsultarIActualitzarEstat(documentEnviamentInteressatEntity);
 	        				} catch (Exception ex) {
 	        					logger.warn("No s'ha pogut actualitzar l'estat de la notificació "+notificacionsPendents.get(0).getNotificacioIdentificador());
+	        					ProcesSegonPlaContext.avis(
+	        							TancamentExpedientPassos.AVIS_NOTIFICACIO_NO_ACTUALITZADA,
+	        							ProcesSegonPlaContext.params(
+	        									"notificacio", Objects.toString(notificacionsPendents.get(0).getNotificacioIdentificador(), ""),
+	        									"document", document.getNom()),
+	        							Utils.getRootMsg(ex));
 	        				}
 	        			}
 	        		}
 	            }
 	        }
         }
+		if (numNotificacions == 0) {
+			ProcesSegonPlaContext.resultat(TancamentExpedientPassos.RESULTAT_CAP_NOTIFICACIO, null);
+		} else {
+			ProcesSegonPlaContext.resultat(
+					TancamentExpedientPassos.RESULTAT_NOTIFICACIONS_ACTUALITZADES,
+					ProcesSegonPlaContext.params("num", String.valueOf(numNotificacions)));
+		}
 	}
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -263,7 +287,10 @@ public class ExpedientHelper2 {
 		List<Long> documentsClonar = new ArrayList<Long>();
 		ExpedientEntity expedient = expedientRepository.getOne(expedientId);
 		List<RegistreAnnexEntity> annexesReprocessar = registreAnnexRepository.findDocumentsDeAnotacionesNoMogutsASerieFinal(expedient);
-		
+		// Per al registre de progrés: annexos amb error tractats i moguts a l'arxiu
+		int numAnnexos = 0;
+		int numMoguts = 0;
+
 		if(annexesReprocessar!=null) {
 			for (RegistreAnnexEntity ra: annexesReprocessar) {
 				//El registre té errors de processament
@@ -272,28 +299,51 @@ public class ExpedientHelper2 {
 					//La segona condició es perque no volem comprovar documents que ja ham estat clonats. Ja que el error de la anotació el mantenim.
 					//i si es reintenta el tancar expedient, pot ser aquest annex ja estigui tractat i clonat (tendrá GesDocOriginalId)
 					if (ra.getDocument()!=null && ra.getDocument().getGesDocOriginalId()==null) {
+						numAnnexos++;
 						boolean clonarDocument = false;
 						//Ja ens avisa distribució, que la firma no es correcte
 						if (!ra.isValidacioFirmaCorrecte()) {
 							clonarDocument = true;
 						} else {
-							
+
 							//Reintentam mourer annex al Arxiu...
+							ProcesSegonPlaContext.fase(
+									TancamentExpedientPassos.FASE_MOURE_ANNEX,
+									ProcesSegonPlaContext.params("document", ra.getDocument().getNom()));
 							Exception excepcio = expedientHelper.moveAnnexArxiu(ra.getId());
-							
+
 							//Novament ha donat un error al mourer el annex al arxiu.
 							if (excepcio!=null) {
 								clonarDocument = true;
+							} else {
+								numMoguts++;
+								ProcesSegonPlaContext.info(
+										TancamentExpedientPassos.INFO_ANNEX_MOGUT,
+										ProcesSegonPlaContext.params("document", ra.getDocument().getNom()));
 							}
 						}
-						
+
 						if (clonarDocument) {
 							//Afegim al document per clonar en una llista, es farà en una funcio REQUIRES_NEW posterior
 							documentsClonar.add(ra.getDocument().getId());
+							ProcesSegonPlaContext.avis(
+									TancamentExpedientPassos.AVIS_ANNEX_FIRMA_SERVIDOR,
+									ProcesSegonPlaContext.params("document", ra.getDocument().getNom()),
+									ra.getError());
 						}
 					}
 				}
 			}
+		}
+		if (numAnnexos == 0) {
+			ProcesSegonPlaContext.resultat(TancamentExpedientPassos.RESULTAT_CAP_ANNEX, null);
+		} else {
+			ProcesSegonPlaContext.resultat(
+					TancamentExpedientPassos.RESULTAT_ANNEXOS_REPROCESSATS,
+					ProcesSegonPlaContext.params(
+							"num", String.valueOf(numAnnexos),
+							"moguts", String.valueOf(numMoguts),
+							"perFirmar", String.valueOf(documentsClonar.size())));
 		}
 		return documentsClonar;
 	}
@@ -342,13 +392,43 @@ public class ExpedientHelper2 {
 		}
 	}
 	
+	/**
+	 * Firma en servidor els documents seleccionats.
+	 *
+	 * Es firmen tots encara que algun falli (cada firma va en la seva pròpia transacció), perquè l'usuari vegi d'una
+	 * vegada tot el que ha quedat pendent en lloc d'anar-ho descobrint document a document (#1903). Si n'ha fallat
+	 * cap, en acabar es llança l'error i l'expedient no es tanca: si n'ha fallat un, l'excepció original; si n'han
+	 * fallat més, una amb tots els documents i els seus errors.
+	 */
 	public void signDocumentsSelected(String motiu, List<Long> documentsPerFirmar, List<Long> documentsClonar) {
-		// Firmam els documents seleccionats en servidor
+		List<FirmaServidorException> errors = new ArrayList<FirmaServidorException>();
 		for (Long documentPerFirmar : documentsPerFirmar) {
 			if (documentPerFirmar!=null) {
-				documentFirmaServidorFirma.firmar(documentPerFirmar, motiu, documentsClonar);
+				try {
+					ProcesSegonPlaContext.pas(
+							TancamentExpedientPassos.FIRMAR_DOCUMENT,
+							ProcesSegonPlaContext.params("document", getNomDocument(documentPerFirmar)),
+							() -> documentFirmaServidorFirma.firmar(documentPerFirmar, motiu, documentsClonar));
+				} catch (FirmaServidorException ex) {
+					errors.add(ex);
+				}
 			}
 		}
+		if (errors.size() == 1) {
+			throw errors.get(0);
+		} else if (errors.size() > 1) {
+			List<String> noms = new ArrayList<String>();
+			List<String> missatges = new ArrayList<String>();
+			for (FirmaServidorException error: errors) {
+				noms.add(error.getDocumentNom());
+				missatges.add(error.getDocumentNom() + ": " + error.getErrorMsg());
+			}
+			throw new FirmaServidorException(String.join(", ", noms), String.join("; ", missatges));
+		}
+	}
+
+	private String getNomDocument(Long documentId) {
+		return documentRepository.findById(documentId).map(DocumentEntity::getNom).orElse(String.valueOf(documentId));
 	}
 	
 	private boolean isTancamentLogicActiu() {

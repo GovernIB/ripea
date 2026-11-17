@@ -159,7 +159,9 @@ const columns = [
 ];
 
 const DocumentsGrid = (props: any) => {
-    const { entity, onRowCountChange, contingutScopeId } = props;
+    // refreshKey: cada canvi de valor (que no sigui el primer) torna a carregar el contingut sense desmuntar la graella,
+    // p.ex. quan acaba el tancament de l'expedient en segon pla
+    const { entity, onRowCountChange, contingutScopeId, refreshKey } = props;
     const { t } = useTranslation();
     const { value: user, rol } = useUserSession();
     const contingutCarpetaDetallAccesActiva = user?.sessionScope?.isContingutCarpetaDetallAccesActiva === true;
@@ -253,6 +255,12 @@ const DocumentsGrid = (props: any) => {
         }
         apiRef?.current?.refresh?.();
     }, [contingutScopeId, entity?.id]);
+
+    useEffect(() => {
+        if (refreshKey) {
+            refresh();
+        }
+    }, [refreshKey]);
 
     const {handleOpen: handleVisualitzarOpen, handleOpenAmbCerca: handleVisualitzarAmbCercaOpen, dialog: dialogVisualitzar, isValid} = useVisualitzar();
     const { createActions, actions, components } = useContingutActions(entity, apiRef, refresh, contingutScopeId, formCarpetaDestiPerScope?.description);

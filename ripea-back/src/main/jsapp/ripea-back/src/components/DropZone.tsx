@@ -24,13 +24,12 @@ const DropZone = (props:DropZoneProps) => {
             onDropFile(file)
         });
     }, [])
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({ noClick: true, onDrop })
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({ noClick: true, onDrop, disabled })
     const dragDropStyle = { border: '2px dashed ' + (isDragActive ? 'orange' : 'transparent') };
 
-    if (disabled){
-        return children
-    }
-
+    // El contenidor es renderitza sempre, també deshabilitat: si canviés l'arbre (fills sols ↔ dins el div), React
+    // desmuntaria i tornaria a muntar els fills cada vegada que canvia disabled (p.ex. la graella de documents es
+    // tornava a carregar sencera quan l'expedient es bloqueja o es desbloqueja pel tancament en segon pla).
     return <div
         style={{
             display: 'flex',
@@ -38,8 +37,8 @@ const DropZone = (props:DropZoneProps) => {
             height: '100%',
             ...dragDropStyle
         }}
-        {...getRootProps()}>
-        <input {...getInputProps()} aria-label={ariaLabel} />
+        {...(disabled ? {} : getRootProps())}>
+        {!disabled && <input {...getInputProps()} aria-label={ariaLabel} />}
         {children}
     </div>
 }

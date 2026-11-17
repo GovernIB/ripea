@@ -18,9 +18,12 @@ import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.DominiHelper;
 import es.caib.ripea.service.helper.ExcepcioLogHelper;
+import es.caib.ripea.service.helper.ProcesSegonPlaHelper;
 import es.caib.ripea.service.helper.ValidacioPostCommitHelper;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
+import es.caib.ripea.service.intf.base.exception.ResourceNotDeletedException;
 import es.caib.ripea.service.intf.base.model.FieldOption;
+import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ResultatConsultaDto;
 import es.caib.ripea.service.intf.model.DadaResource;
 import es.caib.ripea.service.intf.resourceservice.DadaResourceService;
@@ -41,6 +44,7 @@ public class DadaResourceServiceImpl extends BaseMutableResourceService<DadaReso
 	private final ConfigHelper configHelper;
 	private final ExcepcioLogHelper excepcioLogHelper;
 	private final ValidacioPostCommitHelper validacioPostCommitHelper;
+	private final ProcesSegonPlaHelper procesSegonPlaHelper;
 	private final EntitatRepository entitatRepository;
     private final DadaResourceRepository dadaResourceRepository;
 
@@ -51,6 +55,7 @@ public class DadaResourceServiceImpl extends BaseMutableResourceService<DadaReso
     
     @Override
     protected void beforeCreateSave(DadaResourceEntity entity, DadaResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
+        comprovarNoBloquejat(entity);
         updateOrder(entity, entity.getOrdre());
         beforeSave(entity, resource, answers);
     }
@@ -85,7 +90,24 @@ public class DadaResourceServiceImpl extends BaseMutableResourceService<DadaReso
     
     @Override
     protected void beforeUpdateSave(DadaResourceEntity entity, DadaResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
+        comprovarNoBloquejat(entity);
         beforeSave(entity, resource, answers);
+    }
+
+    @Override
+    protected void beforeDelete(DadaResourceEntity entity, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotDeletedException {
+        comprovarNoBloquejat(entity);
+    }
+
+    /**
+     * Mentre s'executa un procés en segon pla sobre l'expedient de la dada (p.ex. el tancament), no se'n poden
+     * modificar les dades. El node és l'expedient o un document seu.
+     */
+    private void comprovarNoBloquejat(DadaResourceEntity entity) {
+        if (entity.getNode() != null) {
+            Long expedientId = entity.getNode().getExpedient() != null ? entity.getNode().getExpedient().getId() : entity.getNode().getId();
+            procesSegonPlaHelper.comprovarNoBloquejat(ElementTipusEnumDto.EXPEDIENT, expedientId);
+        }
     }
 
     private void beforeSave(DadaResourceEntity entity, DadaResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {

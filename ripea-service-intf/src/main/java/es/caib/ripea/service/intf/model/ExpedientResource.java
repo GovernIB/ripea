@@ -26,6 +26,7 @@ import es.caib.ripea.service.intf.dto.DocumentAmbTipusDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.FileNameOption;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
+import es.caib.ripea.service.intf.dto.ProcesSegonPlaDto;
 import es.caib.ripea.service.intf.dto.TipusImportEnumDto;
 import es.caib.ripea.service.intf.registre.RegistreInteressat;
 import es.caib.ripea.service.intf.resourcevalidation.ExpedientValid;
@@ -245,6 +246,9 @@ import lombok.experimental.FieldNameConstants;
 				@ResourceArtifact(
 						type = ResourceArtifactType.PERSPECTIVE,
 						code = ExpedientResource.PERSPECTIVE_EN_PROCES_CUSTODIAR_CODE),
+				@ResourceArtifact(
+						type = ResourceArtifactType.PERSPECTIVE,
+						code = ExpedientResource.PERSPECTIVE_PROCES_SEGON_PLA_CODE),
 		})
 @ExpedientValid
 public class ExpedientResource extends NodeResource implements Serializable {
@@ -303,6 +307,8 @@ public class ExpedientResource extends NodeResource implements Serializable {
 	public static final String PERSPECTIVE_EN_PROCES_CANVI_ESTAT_CODE = "EN_PROCES_CANVI_ESTAT";
 	public static final String PERSPECTIVE_EN_PROCES_TANCAMENT_CODE = "EN_PROCES_TANCAMENT";
 	public static final String PERSPECTIVE_EN_PROCES_CUSTODIAR_CODE = "EN_PROCES_CUSTODIAR";
+	/** Només procesSegonPla (el BASIC ja l'inclou): per a pantalles que no demanen el BASIC, com la modal de tancar. */
+	public static final String PERSPECTIVE_PROCES_SEGON_PLA_CODE = "PROCES_SEGON_PLA";
 
 
 	public static final String FILTER_CODE = "EXPEDIENT_FILTER";
@@ -430,6 +436,11 @@ public class ExpedientResource extends NodeResource implements Serializable {
     @Transient private ArxiuDetallDto arxiu;
     @Transient private Date dataDarrerEnviament;
     @Transient private boolean potModificar;
+    // potModificar sense tenir en compte el bloqueig per un procés en segon pla en curs (procesSegonPla). Serveix
+    // per saber a qui s'ha de mostrar el motiu del bloqueig: només a qui, sense el procés, podria modificar.
+    @Transient private boolean potModificarSiNoBloquejat;
+    // Procés en segon pla en curs sobre l'expedient (p.ex. el tancament), en format resum. Null si no n'hi ha cap.
+    @Transient private ProcesSegonPlaDto procesSegonPla;
     @Transient private boolean potRelacionar;
     @Transient private boolean potModificarContingut;
     @Transient private List<ResourceReference<ExpedientResource, Long>> relacionatsPer;

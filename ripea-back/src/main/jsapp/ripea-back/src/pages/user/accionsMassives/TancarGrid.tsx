@@ -9,7 +9,8 @@ import { useExecucioMassivaContingut } from '../actions/ExecucioMassivaGrid.tsx'
 import { Box } from '@mui/material';
 
 const namedQueries: string[] = ['MASSIVE_ACTION_QUERY', 'MASSIVE_ACTION_TANCAR'];
-const perspectives: any = ['ESTAT', 'AUDITORIA', 'EN_PROCES_TANCAMENT'];
+// PROCES_SEGON_PLA: tancament individual en curs (des de REACT), que bloqueja l'expedient
+const perspectives: any = ['ESTAT', 'AUDITORIA', 'EN_PROCES_TANCAMENT', 'PROCES_SEGON_PLA'];
 const TancarGrid = () => {
     const { t } = useTranslation();
     const apiRef = useMuiDataGridApiRef();
@@ -60,7 +61,7 @@ const TancarGrid = () => {
                     namedQueries={namedQueries}
                     rowAdditionalActions={actions}
                     toolbarMassiveActions={massiveActions}
-                    isRowSelectable={(params: any) => !params?.row?.execucioMassivaTancamentId}
+                    isRowSelectable={(params: any) => !params?.row?.execucioMassivaTancamentId && !params?.row?.procesSegonPla}
                 />
             </ScreenFrame>
             {contentTancar}

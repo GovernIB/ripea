@@ -14,6 +14,8 @@ import Load from "@src/components/Load.tsx";
 import {formatDate} from "@src/util/dateUtils.ts";
 import * as builder from "@src/util/springFilterUtils.ts";
 import ContingutIcon from "@src/pages/contingut/details/ContingutIcon.tsx";
+import {useUserSession} from "@src/components/Session.tsx";
+import {type ProcesSegonPla, ProcesSegonPlaAlert, useProcesSegonPlaDialog} from "@src/components/ProcesSegonPla.tsx";
 
 const columns: any[] = [
     // {
@@ -35,7 +37,13 @@ const columns: any[] = [
         flex: 0.5,
     },
 ]
-const TancarForm = () => {
+type TancarFormProps = {
+    // Avisa el diàleg que l'expedient té un procés en segon pla en curs (no es pot tancar)
+    setBloquejat?: (bloquejat: boolean) => void,
+    onShowProgress?: (operacioId: string) => void,
+}
+const TancarForm = (props: TancarFormProps) => {
+    const { setBloquejat, onShowProgress } = props;
     const { t } = useTranslation();
     const {data, apiRef: formApiRef} = useFormContext();
     const [selectedRows, setSelectedRows] = useState<any[]>([]);
@@ -66,13 +74,20 @@ const TancarForm = () => {
                     'NOTIFICACIONS_CADUCADES',// conteNotificacionsCaducades
                     'DOCUMENTS_NO_MOGUTS',// conteDocumentsDeAnotacionesNoMogutsASerieFinal
                     'AVISOS',// valid + errors (evita el triangle groc fals a la fila de l'expedient)
-                    'AUDITORIA'
+                    'AUDITORIA',
+                    'PROCES_SEGON_PLA',// procesSegonPla: tancament en curs (es demana ara, la fila pot no estar al dia)
                 ]
             })
                 .then((app) => setEntities(app?.rows))
                 .catch(() => setEntities(undefined))
         }
     }, [apiIsReady]);
+
+    // Tancament (o un altre procés en segon pla) ja en curs sobre l'expedient: només es mostra l'avís
+    const procesEnCurs = !data?.massivo ? entities?.[0]?.procesSegonPla : undefined;
+    useEffect(() => {
+        setBloquejat?.(procesEnCurs != null);
+    }, [procesEnCurs]);
 
     const temp = useMemo(()=>{
         return {
@@ -93,6 +108,10 @@ const TancarForm = () => {
         const selected = Array.from(new Set([...selectedRows, ...selectedModel || []]))
         formApiRef?.current?.setFieldValue('documentsPerFirmar', selected.filter((s) => !data.ids.includes(s)) );
     }, [selectedRows, selectedModel]);
+
+    if (procesEnCurs != null) {
+        return <ProcesSegonPlaAlert proces={procesEnCurs} onShowProgress={onShowProgress}/>;
+    }
 
     return <Load value={entities && temp}>
         <Grid container direction={"row"} columnSpacing={1} rowSpacing={1}>
@@ -171,7 +190,9 @@ const TancarForm = () => {
 }
 
 const Tancar = (props: any) => {
+    const {onShowProgress, ...otherProps} = props;
     const {t} = useTranslation();
+    const [bloquejat, setBloquejat] = useState<boolean>(false);
 
     return <FormActionDialog
         resourceName={"expedientResource"}
@@ -182,33 +203,70 @@ const Tancar = (props: any) => {
                 : t('page.expedient.action.close.title')
         }}
         formDialogButtons={[
-            {icon: 'check', text: t('page.expedient.action.close.button'), componentProps: { variant: 'contained' }, value: true },
+            {icon: 'check', text: t('page.expedient.action.close.button'), componentProps: { variant: 'contained', disabled: bloquejat }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
         ]}
-        {...props}
+        {...otherProps}
     >
-        <TancarForm/>
+        <TancarForm setBloquejat={setBloquejat} onShowProgress={onShowProgress}/>
     </FormActionDialog>
 }
-export const useTancar = (refresh?: () => void) => {
-    const { t } = useTranslation();
-    const apiRef = useMuiFormDialogApiRef();
-    const {temporalMessageShow} = useBaseAppContext();
 
-    const handleShow = (id: any): void => {
+/**
+ * Tancament individual (#1903). L'acció valida i llança el tancament en segon pla; a partir d'aquí l'usuari en segueix
+ * el progrés al diàleg de procés (ProcesSegonPlaDialog), que pot tancar quan vulgui: el tancament continua al servidor.
+ *
+ * Si l'expedient ja té un tancament en curs:
+ *  - de l'usuari actual: s'obre directament el diàleg de progrés;
+ *  - d'un altre usuari: la modal només mostra qui l'està tancant, i no deixa tancar.
+ *
+ * En tancar el diàleg de progrés s'ha de mostrar l'expedient tancat o, si encara és en curs, bloquejat:
+ *  - onProcesClose: per a qui es pot actualitzar sense recarregar la pàgina (la fitxa de l'expedient, que a més rep
+ *    els events SSE d'inici i fi del procés). Rep l'estat del procés en tancar el diàleg.
+ *  - si no n'hi ha, refresh (p.ex. la graella d'expedients).
+ */
+export const useTancar = (refresh?: () => void, onProcesClose?: (proces?: ProcesSegonPla) => void) => {
+    const apiRef = useMuiFormDialogApiRef();
+    const { value: user } = useUserSession();
+
+    const {show: showProgres, dialog: dialogProgres} = useProcesSegonPlaDialog((proces) => {
+        if (onProcesClose) {
+            onProcesClose(proces);
+        } else {
+            refresh?.();
+        }
+    });
+
+    const handleShow = (id: any, row?: any): void => {
+        const procesEnCurs = row?.procesSegonPla;
+        if (procesEnCurs?.operacioId && procesEnCurs?.usuariCodi === user?.codi) {
+            showProgres(procesEnCurs.operacioId);
+            return;
+        }
         apiRef.current?.show?.(undefined, {
             ids: [id],
             massivo: false,
         })
     }
+    const onShowProgress = (operacioId: string) => {
+        apiRef.current?.close?.();
+        showProgres(operacioId);
+    }
+    // El resultat de l'acció és l'estat inicial del procés en segon pla
     const onSuccess = (result: any): void => {
-        refresh?.()
-        temporalMessageShow(null, t('page.expedient.action.close.ok', {expedient: result?.nom}), 'success');
+        if (result?.operacioId) {
+            showProgres(result.operacioId);
+        } else {
+            refresh?.();
+        }
     }
 
     return {
         handleShow,
-        content: <Tancar apiRef={apiRef} onSuccess={onSuccess}/>
+        content: <>
+            <Tancar apiRef={apiRef} onSuccess={onSuccess} onShowProgress={onShowProgress}/>
+            {dialogProgres}
+        </>
     }
 }
 export const useTancarMassive = (refresh?: () => void) => {

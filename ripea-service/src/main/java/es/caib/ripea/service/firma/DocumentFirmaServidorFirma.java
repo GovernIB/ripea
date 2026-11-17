@@ -61,6 +61,7 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 					eliminaFirmes = true;
 				} else {
 					logger.info("Detectant firmes per el document "+documentId);
+					ProcesSegonPlaContext.fase(TancamentExpedientPassos.FASE_COMPROVAR_FIRMES, null);
 					//Si no s'ha detectat previament, ho comprovam ara. En cas de detectar firmes incorrectes, s'eliminarán
 					SignatureInfoDto firmes = pluginHelper.detectSignedAttachedUsingValidateSignaturePlugin(fitxer.getContingut(), fitxer.getContentType());
 					if (firmes!=null && firmes.isSigned() && firmes.isError()) {
@@ -70,6 +71,7 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 				}
 				
 				if (eliminaFirmes || document.getArxiuUuid() == null || esPerClonar) {
+					ProcesSegonPlaContext.fase(TancamentExpedientPassos.FASE_ELIMINAR_FIRMES, null);
 					//Guarda copia del arxiu original
 					if (eliminaFirmes || esPerClonar) {
 						logger.info("Creant còpia per el document "+documentId);
@@ -80,6 +82,7 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 					logger.info("Firmes eliminades per el document "+documentId);
 				}
 				
+				ProcesSegonPlaContext.fase(TancamentExpedientPassos.FASE_FIRMAR_SERVIDOR, null);
 				SignaturaResposta firma = pluginHelper.firmaServidorFirmar(document, fitxer, motiu, "ca");
 				logger.info("El document "+documentId +" s'ha firma en servidor.");
 				
@@ -116,7 +119,8 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 				
 				DocumentFirmaTipusEnumDto documentFirmaTipus = getDocumentFirmaTipus(firma);
 				document.updateDocumentFirmaTipus(documentFirmaTipus);
-				
+				ProcesSegonPlaContext.fase(TancamentExpedientPassos.FASE_DESAR_ARXIU, null);
+
 				if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA) {
 
 					contingutHelper.arxiuPropagarModificacio(

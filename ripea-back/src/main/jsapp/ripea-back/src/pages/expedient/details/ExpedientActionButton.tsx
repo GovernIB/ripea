@@ -4,14 +4,15 @@ import { useCommonActions } from './CommonActions.tsx';
 import { useTranslation } from 'react-i18next';
 
 const ExpedientActionButton = (props: any) => {
-    const { entity, variant = 'button', iconStyle, iconButtonStyle } = props;
+    // onProcesSegonPlaClose: en tancar el diàleg de progrés del tancament, la fitxa s'actualitza sense recarregar
+    const { entity, variant = 'button', iconStyle, iconButtonStyle, onProcesSegonPlaClose } = props;
     const { t } = useTranslation();
 
     const refresh = () => {
         window.location.reload();
     };
 
-    const { actions, components } = useCommonActions(refresh);
+    const { actions, components } = useCommonActions(refresh, onProcesSegonPlaClose);
 
     if (variant === 'icon') {
         return (<>

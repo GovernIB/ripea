@@ -14,6 +14,7 @@ const scanFinalitzatKey = 'scan_finalitzat';
 const validacioChangeKey = 'validacio_change';
 const firmaEstatKey = 'firma_estat';
 const notificacioEstatKey = 'notificacio_estat';
+const procesSegonPlaKey = 'proces_segon_pla';
 const sseConnectedKey = 'exp_connect';
 
 // Bus en memòria amb la mateixa API de llista (get/save/remove/removeAll) que abans donava useSessionList,
@@ -97,6 +98,8 @@ export const useValidacioSession = () => useTempSession(validacioChangeKey);
 // Canvis d'estat asíncrons (callback de portafirmes / NOTIB): els consumeixen les graelles per refrescar-se.
 export const useFirmaEstatSession = () => useSharedTempSession(firmaEstatKey);
 export const useNotificacioEstatSession = () => useSharedTempSession(notificacioEstatKey);
+// Inici o fi d'un procés en segon pla sobre l'expedient (p.ex. el tancament): cal tornar a demanar l'expedient.
+export const useProcesSegonPlaSession = () => useSharedTempSession(procesSegonPlaKey);
 
 /**
  * Component que gestiona la connexió SSE amb el servidor
@@ -153,6 +156,9 @@ export const SseExpedient: React.FC<any> = (props:any) => {
 			// Gestionar els canvis d'estat de firma i de notificació dels documents de l'expedient
 			addEventListener(eventSource, firmaEstatKey)
 			addEventListener(eventSource, notificacioEstatKey)
+
+			// Gestionar l'inici i la fi dels processos en segon pla sobre l'expedient (bloqueig)
+			addEventListener(eventSource, procesSegonPlaKey)
 
             // Gestionar errors
             eventSource.onerror = (error) => {

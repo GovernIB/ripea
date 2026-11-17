@@ -19,6 +19,7 @@ import {useNavigate} from "react-router-dom";
 import useMoureTot from '../actions/MoureTot.tsx';
 import {useExportarExpedient} from "../actions/ExportarExpedientsMassive.tsx";
 import { useConfirmDialogButtons } from '@src/util/buttonsOverride.tsx';
+import type {ProcesSegonPla} from "@src/components/ProcesSegonPla.tsx";
 
 export const iniciaDescarga = (url:string, fileName:string) => {
     const link = document.createElement('a');
@@ -216,7 +217,12 @@ export const useActions = (refresh?: () => void) => {
     }
 }
 
-export const useCommonActions = (refresh?: () => void) => {
+/**
+ * @param refresh refresc després de les accions.
+ * @param onProcesSegonPlaClose en tancar el diàleg de progrés d'un procés en segon pla (tancament), substitueix refresh
+ *        per a qui es pot actualitzar sense recarregar la pàgina (veure useTancar).
+ */
+export const useCommonActions = (refresh?: () => void, onProcesSegonPlaClose?: (proces?: ProcesSegonPla) => void) => {
     const { t } = useTranslation();
     const { value: user, rol, permisos } = useUserSession();
 
@@ -237,7 +243,7 @@ export const useCommonActions = (refresh?: () => void) => {
     const {handleShow: hanldeCambiarPrioridad, content: cambiarPrioridadContent} = useCambiarPrioritat(refresh);
     const {handleShow: hanldeRelacionar, content: cambiarRelacionar} = useRelacionar(refresh);
     const {handleShow: handleExportDoc, content: contentExportDoc} = useExportarDocuments();
-    const {handleShow: handleTancar, content: contentTancar} = useTancar(refresh);
+    const {handleShow: handleTancar, content: contentTancar} = useTancar(refresh, onProcesSegonPlaClose);
     const {handleShow: handleDescargarDocuments, content: contentDescargarDocuments} = useDescargarDocuments();
     const {handleShow: handleExportExp, content: contentExportMass} = useExportarExpedient();
     const {handleShow: handleModifyExpedient, content: contentModifyExpedient} = useModifyExpedient(refresh)
@@ -348,12 +354,15 @@ export const useCommonActions = (refresh?: () => void) => {
         },
         {
             label: t('page.expedient.action.close.label'),
-            title: (row:any) => row?.tancarDisabledMessage,
+            title: (row:any) => row?.procesSegonPla ? undefined : row?.tancarDisabledMessage,
             icon: "check",
             showInMenu: true,
             onClick: handleTancar,
-            disabled: (row:any) => !row?.potTancar,
-            hidden: (row:any) => !row?.potModificar || isTancat(row),
+            // Amb un tancament en curs (procesSegonPla), potModificar és fals per a tothom, però l'acció es manté
+            // visible i activa per a qui podria modificar l'expedient: la modal explica qui l'està tancant, i a qui
+            // l'ha llançat li torna a obrir el progrés.
+            disabled: (row:any) => !row?.potTancar && !row?.procesSegonPla,
+            hidden: (row:any) => isTancat(row) || !(row?.potModificar || (row?.procesSegonPla && row?.potModificarSiNoBloquejat)),
         },
         {
             label: t('page.expedient.action.open.label'),

@@ -103,6 +103,7 @@ import es.caib.ripea.service.intf.dto.DocumentFirmaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentTipusEnumDto;
 import es.caib.ripea.service.intf.dto.DocumentVersioDto;
+import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
 import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.ExpedientDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatDto;
@@ -169,6 +170,7 @@ public class ContingutHelper {
 	@Autowired private DocumentFirmaPortafirmesHelper documentFirmaPortafirmesHelper;
 	@Autowired private CarpetaHelper carpetaHelper;
 	@Autowired private ExecutorService executor;
+	@Autowired private ProcesSegonPlaHelper procesSegonPlaHelper;
 	@Autowired private Environment env;
 
 	private static final int NO_ESBORRAT = 0;
@@ -1233,6 +1235,10 @@ public class ContingutHelper {
 					ContingutEntity.class,
 					"No es pot modificar un contingut que no està associat a un expedient");
 		}
+
+		// Mentre s'executa un procés en segon pla sobre l'expedient (p.ex. el tancament des de REACT), ningú el pot
+		// modificar. El propi procés n'està exempt.
+		procesSegonPlaHelper.comprovarNoBloquejat(ElementTipusEnumDto.EXPEDIENT, expedient.getId());
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 

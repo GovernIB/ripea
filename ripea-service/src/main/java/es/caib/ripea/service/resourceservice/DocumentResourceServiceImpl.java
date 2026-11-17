@@ -29,6 +29,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleStartTransactionRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
@@ -79,10 +80,12 @@ import es.caib.ripea.service.helper.MessageHelper;
 import es.caib.ripea.service.helper.MetaExpedientHelper;
 import es.caib.ripea.service.helper.PinbalHelper;
 import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.helper.ProcesSegonPlaHelper;
 import es.caib.ripea.service.helper.RolHelper;
 import es.caib.ripea.service.helper.UsuariHelper;
 import es.caib.ripea.service.helper.ValidacioPostCommitHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
+import es.caib.ripea.service.intf.base.exception.ArtifactNotFoundException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
@@ -181,6 +184,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 	private final MetaExpedientHelper metaExpedientHelper;
 	private final ExecucioMassivaHelper execucioMassivaHelper;
 	private final ValidacioPostCommitHelper validacioPostCommitHelper;
+	private final ProcesSegonPlaHelper procesSegonPlaHelper;
     private final AplicacioService aplicacioService;
 
     private final UsuariResourceRepository usuariResourceRepository;
@@ -437,6 +441,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     		} else {
     			pare = contingutRepository.findById(resource.getExpedient().getId()).get();
     		}
+    		procesSegonPlaHelper.comprovarNoBloquejat(ElementTipusEnumDto.EXPEDIENT, pare.getExpedientPare().getId());
     		DocumentDto documentCreat = documentHelper.crearDocument(
     				entitatEntity.getId(),
                     resource.toDocumentDto(),
@@ -459,6 +464,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     public void delete(Long id, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
     	try {
     		Long expedientId = documentRepository.findById(id).get().getExpedient().getId();
+    		procesSegonPlaHelper.comprovarNoBloquejat(ElementTipusEnumDto.EXPEDIENT, expedientId);
     		EntitatEntity entitatEntity = entitatRepository.findByCodi(configHelper.getEntitatActualCodi());
     		contingutHelper.deleteReversible(entitatEntity.getId(), id, null, configHelper.getRolActual());
     		afterDbChange(expedientId);
@@ -470,6 +476,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
     @Override
 	public DocumentResource update(Long id, DocumentResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
+    	// Fora del try: el catch d'aquest mètode només registra l'excepció, i el bloqueig ha d'arribar a l'usuari.
+    	procesSegonPlaHelper.comprovarNoBloquejat(ElementTipusEnumDto.EXPEDIENT, getExpedientId(resource.getId()));
     	try {
     		DocumentEntity documentActual = documentRepository.findById(resource.getId()).get();
             EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
@@ -484,6 +492,52 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     		excepcioLogHelper.addExcepcio("/document/"+resource.getId()+"/update", ex);
     	}
     	return resource;
+    }
+
+    /**
+     * Accions que es poden executar sobre un document encara que el seu expedient tingui un procés en segon pla en
+     * curs (veure artifactActionExec): les que no modifiquen l'expedient.
+     */
+    private static final Set<String> ACCIONS_PERMESES_AMB_PROCES_EN_CURS = new HashSet<>(Arrays.asList(
+    		DocumentResource.ACTION_ENVIAR_VIA_EMAIL_CODE,
+    		DocumentResource.ACTION_RESUM_IA,
+    		DocumentResource.ACTION_GET_CSV_LINK));
+
+    /**
+     * Cap acció pot modificar els documents d'un expedient mentre s'hi executa un procés en segon pla (p.ex. el
+     * tancament llançat per un altre usuari). Mateix criteri que ExpedientResourceServiceImpl.artifactActionExec:
+     * es comprova l'element de l'acció (id) o els del formulari si és una acció individual, però no les massives.
+     */
+    @Override
+    @Transactional
+    public <P extends Serializable> Serializable artifactActionExec(Long id, String code, P params) throws ArtifactNotFoundException, ActionExecutionException {
+    	if (!ACCIONS_PERMESES_AMB_PROCES_EN_CURS.contains(code)) {
+    		List<Long> contingutIds = new ArrayList<>();
+    		if (id != null) {
+    			contingutIds.add(id);
+    		} else if (params instanceof MassiveAction && !((MassiveAction)params).isMassivo() && ((MassiveAction)params).getIds() != null) {
+    			contingutIds.addAll(((MassiveAction)params).getIds());
+    		}
+    		for (Long contingutId: contingutIds) {
+    			try {
+    				procesSegonPlaHelper.comprovarNoBloquejat(ElementTipusEnumDto.EXPEDIENT, getExpedientId(contingutId));
+    			} catch (ValidationException ex) {
+    				throw new ActionExecutionException(getResourceClass(), contingutId, code, ex.getMessage());
+    			}
+    		}
+    	}
+    	return super.artifactActionExec(id, code, params);
+    }
+
+    /** Expedient d'un contingut (document, carpeta o el mateix expedient), o null si no existeix. */
+    private Long getExpedientId(Long contingutId) {
+    	if (contingutId == null) {
+    		return null;
+    	}
+    	return contingutRepository.findById(contingutId)
+    			.map(ContingutEntity::getExpedientPare)
+    			.map(ExpedientEntity::getId)
+    			.orElse(null);
     }
 
     /**

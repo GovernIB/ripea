@@ -56,6 +56,7 @@ import es.caib.ripea.persistence.repository.command.GrupRepositoryCommnand;
 import es.caib.ripea.service.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ErrorsValidacioTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.service.intf.dto.PermissionEnumDto;
@@ -98,6 +99,7 @@ public class EntityComprovarHelper {
     @Autowired private OrganGestorCacheHelper organGestorCacheHelper;
     @Autowired private MetaExpedientHelper metaExpedientHelper;
     @Autowired private ExpedientService expedientService;
+    @Autowired private ProcesSegonPlaHelper procesSegonPlaHelper;
 
 	public EntitatEntity comprovarEntitat(String entitatCodi) throws NotFoundException {
 		EntitatEntity entitat = entitatRepository.findByCodi(entitatCodi);
@@ -834,7 +836,20 @@ public class EntityComprovarHelper {
 	
 
 	
+	/**
+	 * Indica si l'usuari actual pot modificar l'expedient. Té en compte el bloqueig per un procés en segon pla en
+	 * curs (p.ex. un tancament llançat des de REACT), que impedeix modificar-lo a tothom fins que acabi.
+	 */
 	public boolean comprovarSiEsPotModificarExpedient(ExpedientEntity expedient) {
+		return comprovarSiEsPotModificarExpedientSiNoBloquejat(expedient)
+				&& !procesSegonPlaHelper.isBloquejatPerAltri(ElementTipusEnumDto.EXPEDIENT, expedient.getId());
+	}
+
+	/**
+	 * Com comprovarSiEsPotModificarExpedient, però sense tenir en compte el bloqueig per un procés en segon pla en
+	 * curs. Serveix per saber a qui s'ha d'explicar el bloqueig: a qui, sense el procés, podria modificar l'expedient.
+	 */
+	public boolean comprovarSiEsPotModificarExpedientSiNoBloquejat(ExpedientEntity expedient) {
 		boolean expedientObert = ExpedientEstatEnumDto.OBERT.equals(expedient.getEstat());
 		return comprovarSiEsPotModificarExpedient(expedient, expedientObert);
 	}

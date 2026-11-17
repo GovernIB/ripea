@@ -26,6 +26,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.DigitalitzacioResultatDto;
+import es.caib.ripea.service.intf.dto.ElementTipusEnumDto;
 import es.caib.ripea.service.intf.dto.FirmaResultatDto;
 import es.caib.ripea.service.intf.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.service.intf.dto.StatusEnumDto;
@@ -38,6 +39,7 @@ import es.caib.ripea.service.intf.model.sse.ErrorsValidacioEvictEvent;
 import es.caib.ripea.service.intf.model.sse.FirmaEstatCanviatEvent;
 import es.caib.ripea.service.intf.model.sse.FirmaFinalitzadaEvent;
 import es.caib.ripea.service.intf.model.sse.NotificacioEstatCanviatEvent;
+import es.caib.ripea.service.intf.model.sse.ProcesSegonPlaEvent;
 import es.caib.ripea.service.intf.model.sse.ScanFinalitzatEvent;
 import es.caib.ripea.service.intf.model.sse.TasquesPendentsEvent;
 import es.caib.ripea.service.intf.service.AplicacioService;
@@ -75,7 +77,7 @@ public class SseResourceController {
     }
 
     private enum ExpedientEventType {
-        EXP_CONNECT, FLUX_CREAT, SCAN_FINALITZAT, VALIDACIO_CHANGE, FIRMA_ESTAT, NOTIFICACIO_ESTAT;
+        EXP_CONNECT, FLUX_CREAT, SCAN_FINALITZAT, VALIDACIO_CHANGE, FIRMA_ESTAT, NOTIFICACIO_ESTAT, PROCES_SEGON_PLA;
         public String getEventName() { return name().toLowerCase(); }
         public static ExpedientEventType fromEventName(String name) { return ExpedientEventType.valueOf(name.toUpperCase()); }
     }
@@ -575,6 +577,21 @@ public class SseResourceController {
     		logger.debug("Actualització de NotificacioEstatCanviatEvent a expedients...");
     		sendToExpedient(notificacioEvent.getExpedientId(),
     				SseEmitter.event().name(ExpedientEventType.NOTIFICACIO_ESTAT.getEventName()).data(notificacioEvent));
+    	}
+    }
+
+    /**
+     * Inici o fi d'un procés en segon pla sobre un expedient (p.ex. el tancament). Senyal perquè els clients que
+     * veuen l'expedient el tornin a demanar i n'actualitzin el bloqueig (avís, accions...). Només s'envia pel canal
+     * d'expedient: el progrés detallat el consulta l'usuari que ha llançat el procés.
+     */
+    @Async
+    @JmsListener(destination = "procesSegonPla")
+    public void handleEventProcesSegonPla(ProcesSegonPlaEvent procesEvent) {
+    	if (procesEvent != null && ElementTipusEnumDto.EXPEDIENT.equals(procesEvent.getElementTipus()) && procesEvent.getElementId() != null) {
+    		logger.debug("Actualització de ProcesSegonPlaEvent a expedients...");
+    		sendToExpedient(procesEvent.getElementId(),
+    				SseEmitter.event().name(ExpedientEventType.PROCES_SEGON_PLA.getEventName()).data(procesEvent));
     	}
     }
 }

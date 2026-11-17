@@ -34,6 +34,7 @@ import es.caib.ripea.service.intf.model.sse.ErrorsValidacioChangedEvent;
 import es.caib.ripea.service.intf.model.sse.FirmaEstatCanviatEvent;
 import es.caib.ripea.service.intf.model.sse.FirmaFinalitzadaEvent;
 import es.caib.ripea.service.intf.model.sse.NotificacioEstatCanviatEvent;
+import es.caib.ripea.service.intf.model.sse.ProcesSegonPlaEvent;
 import es.caib.ripea.service.intf.model.sse.ScanFinalitzatEvent;
 import es.caib.ripea.service.intf.model.sse.TasquesPendentsEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -139,6 +140,20 @@ public class EventHelper {
         		log.error("Error al notifyNotificacioEstatCanviat a expedients suscrits", ex);
         	}
     	});
+    }
+
+    /**
+     * Notifica als clients que veuen l'element que hi ha començat o acabat un procés en segon pla (veure
+     * ProcesSegonPlaHelper). Es publica directament, sense esperar cap commit: el bloqueig és en memòria i ja és
+     * visible, i en acabar el procés no hi ha cap transacció oberta.
+     */
+    public void notifyProcesSegonPla(ProcesSegonPlaEvent procesEvent) {
+    	try {
+    		log.debug("notifyProcesSegonPla a clients suscrits");
+    		jmsTemplate.convertAndSend("procesSegonPla", procesEvent);
+    	} catch (Exception ex) {
+    		log.error("Error al notifyProcesSegonPla a clients suscrits", ex);
+    	}
     }
 
     public List<ValidacioErrorDto> getValidacionsInicialsExpedient(Long expedientId) {

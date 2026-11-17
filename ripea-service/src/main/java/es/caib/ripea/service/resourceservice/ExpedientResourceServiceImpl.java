@@ -32,6 +32,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.turkraft.springfilter.FilterBuilder;
@@ -89,10 +90,12 @@ import es.caib.ripea.service.helper.MessageHelper;
 import es.caib.ripea.service.helper.MetaDocumentHelper;
 import es.caib.ripea.service.helper.MetaExpedientHelper;
 import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.helper.ProcesSegonPlaHelper;
 import es.caib.ripea.service.helper.ZipImportacioHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
+import es.caib.ripea.service.intf.base.exception.ArtifactNotFoundException;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
@@ -118,6 +121,7 @@ import es.caib.ripea.service.intf.dto.ImportacioRegistreParamsDto;
 import es.caib.ripea.service.intf.dto.MultiplicitatEnumDto;
 import es.caib.ripea.service.intf.dto.PermisosPerExpedientsDto;
 import es.caib.ripea.service.intf.dto.PrioritatEnumDto;
+import es.caib.ripea.service.intf.dto.ProcesSegonPlaTipusEnumDto;
 import es.caib.ripea.service.intf.dto.ProgresImportacioSgdDto;
 import es.caib.ripea.service.intf.dto.ProgresProcessamentZipDto;
 import es.caib.ripea.service.intf.dto.ResultatConsultaDto;
@@ -125,6 +129,7 @@ import es.caib.ripea.service.intf.dto.SiNoEnumDto;
 import es.caib.ripea.service.intf.dto.TipusRegistreEnumDto;
 import es.caib.ripea.service.intf.dto.UsuariDto;
 import es.caib.ripea.service.intf.exception.FirmaServidorException;
+import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.DocumentResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
@@ -209,7 +214,21 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private final ZipImportacioHelper zipImportacioHelper;
     private final MessageHelper messageHelper;
     private final AplicacioService aplicacioService;
-    
+    private final ProcesSegonPlaHelper procesSegonPlaHelper;
+
+    /**
+     * Accions que es poden executar sobre un expedient encara que tingui un procés en segon pla en curs (veure
+     * artifactActionExec): les que no el modifiquen.
+     */
+    private static final Set<String> ACCIONS_PERMESES_AMB_PROCES_EN_CURS = new HashSet<>(Arrays.asList(
+    		ExpedientResource.ACTION_MASSIVE_FOLLOW_CODE,
+    		ExpedientResource.ACTION_MASSIVE_UNFOLLOW_CODE,
+    		ExpedientResource.ACTION_CERCA_DOCUMENTS_CODE,
+    		ExpedientResource.ACTION_GET_PROGRES_SGD,
+    		ExpedientResource.ACTION_CANCEL_IMPORT_SGD,
+    		ExpedientResource.ACTION_GET_PROGRES_ZIP,
+    		ExpedientResource.ACTION_CANCEL_IMPORT_ZIP));
+
     @PostConstruct
     public void init() {
         
@@ -273,6 +292,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                 ElementTipusEnumDto.EXPEDIENT, ExecucioMassivaTipusDto.TANCAMENT, ExpedientResource::setExecucioMassivaTancamentId));
         register(ExpedientResource.PERSPECTIVE_EN_PROCES_CUSTODIAR_CODE, perspectivesLotHelper.execucioMassivaEnCurs(
                 ElementTipusEnumDto.EXPEDIENT, ExecucioMassivaTipusDto.CUSTODIAR_ELEMENTS_PENDENTS, ExpedientResource::setExecucioMassivaCustodiarId));
+        register(ExpedientResource.PERSPECTIVE_PROCES_SEGON_PLA_CODE, new ProcesSegonPlaPerspectiveApplicator());
 
         register(ExpedientResource.Fields.metaExpedient, new MetaExpedientOnchangeLogicProcessor());
         register(ExpedientResource.Fields.any, new AnyOnchangeLogicProcessor());
@@ -583,6 +603,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     @Override
 	public ExpedientResource update(Long id, ExpedientResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
     	try {
+    		procesSegonPlaHelper.comprovarNoBloquejat(ElementTipusEnumDto.EXPEDIENT, id);
     		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
     		entityComprovarHelper.comprovarEstatExpedient(entitatEntity.getId(), id, ExpedientEstatEnumDto.OBERT);
     		String rolActual = configHelper.getRolActual();
@@ -604,6 +625,36 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     	}
     }
     
+    /**
+     * Cap acció pot modificar un expedient mentre s'hi executa un procés en segon pla (p.ex. el tancament llançat
+     * per un altre usuari). La comprovació es fa aquí, abans de l'executor, perquè la majoria d'accions no passen per
+     * les comprovacions de contingut modificable del ContingutHelper.
+     *
+     * Es comprova l'expedient de l'acció (id) o, en les accions individuals que el passen com a llista d'un sol
+     * element, els ids del formulari. Les accions massives (massivo=true) no es comproven aquí: en segon pla, cada
+     * element falla per separat en arribar a les comprovacions del helper.
+     */
+    @Override
+    @Transactional
+    public <P extends Serializable> Serializable artifactActionExec(Long id, String code, P params) throws ArtifactNotFoundException, ActionExecutionException {
+    	if (!ACCIONS_PERMESES_AMB_PROCES_EN_CURS.contains(code)) {
+    		List<Long> expedientIds = new ArrayList<>();
+    		if (id != null) {
+    			expedientIds.add(id);
+    		} else if (params instanceof MassiveAction && !((MassiveAction)params).isMassivo() && ((MassiveAction)params).getIds() != null) {
+    			expedientIds.addAll(((MassiveAction)params).getIds());
+    		}
+    		for (Long expedientId: expedientIds) {
+    			try {
+    				procesSegonPlaHelper.comprovarNoBloquejat(ElementTipusEnumDto.EXPEDIENT, expedientId);
+    			} catch (ValidationException ex) {
+    				throw new ActionExecutionException(getResourceClass(), expedientId, code, ex.getMessage());
+    			}
+    		}
+    	}
+    	return super.artifactActionExec(id, code, params);
+    }
+
     private class AmbDocumentsPinbalPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
@@ -778,7 +829,11 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 	        }
 
 			resource.setDataDarrerEnviament(cacheHelper.getDataDarrerEnviament(expedientEntity));
-			resource.setPotModificar(entityComprovarHelper.comprovarSiEsPotModificarExpedient(expedientEntity));
+			// Amb un procés en segon pla en curs (p.ex. el tancament) l'expedient no es pot modificar. És el mateix
+			// criteri que comprovarSiEsPotModificarExpedient, però calculant els permisos una sola vegada.
+			resource.setProcesSegonPla(procesSegonPlaHelper.getEnCurs(ElementTipusEnumDto.EXPEDIENT, entity.getId()));
+			resource.setPotModificarSiNoBloquejat(entityComprovarHelper.comprovarSiEsPotModificarExpedientSiNoBloquejat(expedientEntity));
+			resource.setPotModificar(resource.isPotModificarSiNoBloquejat() && resource.getProcesSegonPla() == null);
 			boolean potRelacionarTancat = entityComprovarHelper.comprovarSiEsPotRelacionarExpedientTancat(expedientEntity);
 			resource.setPotRelacionar(resource.isPotModificar() || potRelacionarTancat);
 			resource.setHasEsborranys(hasEsborranys);
@@ -819,6 +874,14 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
             resource.setTreePath(contingutResourceHelper.getTreePath(entity));
+        }
+    }
+
+    /** Procés en segon pla en curs sobre l'expedient (és en memòria: no fa cap consulta a BD). */
+    private class ProcesSegonPlaPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
+        @Override
+        public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
+            resource.setProcesSegonPla(procesSegonPlaHelper.getEnCurs(ElementTipusEnumDto.EXPEDIENT, entity.getId()));
         }
     }
     
@@ -1366,12 +1429,19 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 			try {
 				EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
 				if (!params.isMassivo()) {
-					expedientHelper.tancar(
-							entitatEntity.getId(),
-							params.getIds().get(0),
-							params.getMotiu(),
-							params.getDocumentsPerFirmar()!=null?params.getDocumentsPerFirmar().toArray(new Long[0]):null,
-							false);
+					Long entitatId = entitatEntity.getId();
+					Long expedientId = params.getIds().get(0);
+					String motiu = params.getMotiu();
+					Long[] documentsPerFirmar = params.getDocumentsPerFirmar()!=null?params.getDocumentsPerFirmar().toArray(new Long[0]):null;
+					// Les comprovacions es fan ara, de manera síncrona, perquè els errors es vegin a la mateixa modal.
+					expedientHelper.comprovarSiEsPotTancar(entitatId, expedientId, documentsPerFirmar);
+					// La resta del tancament (firmes en servidor, Arxiu...) pot tardar molt: s'executa en segon pla,
+					// l'expedient queda bloquejat mentre dura i l'usuari en segueix el progrés amb l'operacioId (#1903).
+					return procesSegonPlaHelper.iniciar(
+							ProcesSegonPlaTipusEnumDto.TANCAMENT_EXPEDIENT,
+							ElementTipusEnumDto.EXPEDIENT,
+							expedientId,
+							() -> expedientHelper.tancar(entitatId, expedientId, motiu, documentsPerFirmar, false));
 				} else {
 					Map<Long, List<Long>> documentsPerExpedient = new HashMap<Long, List<Long>>();
 					if(params.getIds()!=null && params.getIds().size()>0) {

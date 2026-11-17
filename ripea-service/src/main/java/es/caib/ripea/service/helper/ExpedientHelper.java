@@ -1664,26 +1664,50 @@ public class ExpedientHelper {
 		return expedientDto;
 	}
 
+	/**
+	 * Comprovacions prèvies al tancament: les mateixes amb què comença tancar(). REACT les executa de manera
+	 * síncrona abans de llançar el tancament en segon pla, perquè els errors es mostrin a la mateixa modal.
+	 */
+	public void comprovarSiEsPotTancar(Long entitatId, Long expedientId, Long[] documentsPerFirmar) {
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedientId));
+		expedientHelper2.checkIfExpedientCanBeClosed(entitatId, expedientId, documentsPerFirmar);
+	}
+
+	/**
+	 * Tanca l'expedient. Cada pas va en la seva pròpia transacció.
+	 *
+	 * Els passos s'informen a ProcesSegonPlaContext: quan el tancament s'executa com a procés en segon pla (REACT),
+	 * l'usuari en veu el progrés; si no (JSP, accions massives), no té cap efecte.
+	 */
 	public ExpedientEntity tancar(Long entitatId, Long expedientId, String motiu, Long[] documentsPerFirmar, boolean checkPerMassiuAdmin) {
 
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedientId));
 
 		logger.debug("Tancant l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + expedientId + "," + "motiu=" + motiu + ")");
 
-		expedientHelper2.checkIfExpedientCanBeClosed(entitatId, expedientId, documentsPerFirmar);
+		ProcesSegonPlaContext.pas(
+				TancamentExpedientPassos.COMPROVAR,
+				null,
+				() -> expedientHelper2.checkIfExpedientCanBeClosed(entitatId, expedientId, documentsPerFirmar));
 
 		/**
 		 * #1525 Permetre tancar un expedient encara que hi hagi remeses tipus comunicació no finalitzades
 		 */
 		logger.debug("Actualitzant estat de les notificacions caducades abans de tancar...");
-		expedientHelper2.actualitzaEstatNotificacionsCaducades(expedientId);
+		ProcesSegonPlaContext.pas(
+				TancamentExpedientPassos.NOTIFICACIONS_CADUCADES,
+				null,
+				() -> expedientHelper2.actualitzaEstatNotificacionsCaducades(expedientId));
 
 		/**
 		 * #1579 Adaptar tancament d'expedients a annexes d'anotacions no moguts
 		 *
 		 * 1.- Reprocessar annexes amb error.
 		 */
-		List<Long> documentsClonar = expedientHelper2.reprocessarAnnexesAnotacionsAmbError(expedientId);
+		List<Long> documentsClonar = ProcesSegonPlaContext.pas(
+				TancamentExpedientPassos.REPROCESSAR_ANNEXOS,
+				null,
+				() -> expedientHelper2.reprocessarAnnexesAnotacionsAmbError(expedientId));
 
 		//Si el ID del document a clonar, no es troba dins la llista de documents a firmar no es clonara,
 		//perque la funcio signDocumentsSelected nomes actua sobre la llista de documents a firmar.
@@ -1704,16 +1728,30 @@ public class ExpedientHelper {
 
 		/**
 		 * Firmam en servidor els documents sense firma, o els clons dels que tenien error d'anotació.
+		 * Cada document és un pas del registre de progrés.
 		 */
 		expedientHelper2.signDocumentsSelected(motiu, documentsSelectedList, documentsClonar);
 
-		expedientHelper2.deleteDocumentsNotSelectedDB(entitatId, expedientId, documentsSelectedList);
+		final List<Long> documentsSeleccionats = documentsSelectedList;
+		ProcesSegonPlaContext.pas(
+				TancamentExpedientPassos.ESBORRAR_NO_SELECCIONATS,
+				null,
+				() -> expedientHelper2.deleteDocumentsNotSelectedDB(entitatId, expedientId, documentsSeleccionats));
 
-		expedientHelper2.markAllDocumentsEsborranysAsDefinitiusArxiu(expedientId);
+		ProcesSegonPlaContext.pas(
+				TancamentExpedientPassos.MARCAR_DEFINITIUS,
+				null,
+				() -> expedientHelper2.markAllDocumentsEsborranysAsDefinitiusArxiu(expedientId));
 
-		expedientHelper2.deleteDocumentsEsborranysArxiu(expedientId);
+		ProcesSegonPlaContext.pas(
+				TancamentExpedientPassos.ESBORRAR_ESBORRANYS_ARXIU,
+				null,
+				() -> expedientHelper2.deleteDocumentsEsborranysArxiu(expedientId));
 
-		expedientHelper2.closeExpedientDbAndArxiu(expedientId, motiu);
+		ProcesSegonPlaContext.pas(
+				TancamentExpedientPassos.TANCAR_EXPEDIENT,
+				null,
+				() -> expedientHelper2.closeExpedientDbAndArxiu(expedientId, motiu));
 
 		return expedientRepository.findById(expedientId).orElse(null);
 	}

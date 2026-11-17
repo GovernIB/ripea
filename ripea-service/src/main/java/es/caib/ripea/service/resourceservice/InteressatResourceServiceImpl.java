@@ -61,6 +61,7 @@ import es.caib.ripea.service.helper.ExpedientInteressatHelper;
 import es.caib.ripea.service.helper.MessageHelper;
 import es.caib.ripea.service.helper.MetaExpedientHelper;
 import es.caib.ripea.service.helper.PluginHelper;
+import es.caib.ripea.service.helper.ProcesSegonPlaHelper;
 import es.caib.ripea.service.helper.UnitatOrganitzativaHelper;
 import es.caib.ripea.service.helper.ValidacioPostCommitHelper;
 import es.caib.ripea.service.intf.base.exception.ActionExecutionException;
@@ -68,6 +69,7 @@ import es.caib.ripea.service.intf.base.exception.AnswerRequiredException;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.PerspectiveApplicationException;
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
+import es.caib.ripea.service.intf.base.exception.ResourceNotDeletedException;
 import es.caib.ripea.service.intf.base.exception.ResourceNotFoundException;
 import es.caib.ripea.service.intf.base.model.DownloadableFile;
 import es.caib.ripea.service.intf.base.model.FieldOption;
@@ -117,6 +119,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     private final PluginHelper pluginHelper;
     private final CacheHelper cacheHelper;
     private final ValidacioPostCommitHelper validacioPostCommitHelper;
+    private final ProcesSegonPlaHelper procesSegonPlaHelper;
     private final EntityComprovarHelper entityComprovarHelper;
     private final ExecucioMassivaHelper execucioMassivaHelper;
     private final ExecucioMassivaContingutRepository execucioMassivaContingutRepository;
@@ -434,6 +437,7 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     @Override
     public InteressatResource create(InteressatResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) {
     	try {
+    		procesSegonPlaHelper.comprovarNoBloquejat(ElementTipusEnumDto.EXPEDIENT, resource.getExpedient() != null ? resource.getExpedient().getId() : null);
     		InteressatResource ir = interessatResourceHelper.create(resource);
     		afterDbChange(resource.getExpedient().getId());
     		return ir;
@@ -444,6 +448,8 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
     
     @Override
     public InteressatResource update(Long id, InteressatResource resource, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotFoundException {
+    	// Fora del try: el catch d'aquest mètode no propaga l'excepció, i el bloqueig ha d'arribar a l'usuari.
+    	procesSegonPlaHelper.comprovarNoBloquejat(ElementTipusEnumDto.EXPEDIENT, resource.getExpedient() != null ? resource.getExpedient().getId() : null);
     	try {
     		InteressatResource ir = interessatResourceHelper.update(resource);
     		afterDbChange(resource.getExpedient().getId());
@@ -463,6 +469,14 @@ public class InteressatResourceServiceImpl extends BaseMutableResourceService<In
      */
     private void afterDbChange(Long expedientId) {
     	validacioPostCommitHelper.programarRecalculINotificacio(expedientId, false);
+    }
+
+    /** Mentre s'executa un procés en segon pla sobre l'expedient (p.ex. el tancament), no se n'esborren interessats. */
+    @Override
+    protected void beforeDelete(InteressatResourceEntity entity, Map<String, AnswerRequiredException.AnswerValue> answers) throws ResourceNotDeletedException {
+    	if (entity.getExpedient() != null) {
+    		procesSegonPlaHelper.comprovarNoBloquejat(ElementTipusEnumDto.EXPEDIENT, entity.getExpedient().getId());
+    	}
     }
 
     private class RespresentantPerspectiveApplicator implements PerspectiveApplicator<InteressatResourceEntity, InteressatResource> {
