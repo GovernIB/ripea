@@ -150,6 +150,7 @@ import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.DocumentResourceService;
 import es.caib.ripea.service.intf.service.AplicacioService;
+import es.caib.ripea.service.intf.utils.RegistreJustificantUtils;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
 import es.caib.ripea.service.resourcehelper.PerspectivesLotHelper;
@@ -572,6 +573,12 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                 resource.setPendentMoverArxiu(documentsAmbAnnexosAmbError.contains(entity.getId()));
                 //Document provinent d'un annex d'anotació: no es pot esborrar. Equival a DocumentDto.documentDeAnotacio del JSP.
                 resource.setDocumentDeAnotacio(documentsDeAnotacio.contains(entity.getId()));
+                //Justificant de registre: de moment no es pot esborrar. Equival a DocumentDto.justificantRegistre del JSP.
+                resource.setJustificantRegistre(RegistreJustificantUtils.isJustificantRegistre(
+                        entity.isJustificantMoureError(),
+                        entity.getMetaDocument() != null ? entity.getMetaDocument().getCodi() : null,
+                        entity.getNumeroRegistre(),
+                        resource.isDocumentDeAnotacio()));
 
                 if (entity.getMetaDocument() != null) {
                     resource.setMetaDocumentInfo(objectMappingHelper.newInstanceMap(
@@ -1203,7 +1210,12 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 						if (registreAnnexId!=null) {
 							errorGuardant = expedientHelper.moveDocumentArxiuNewTransaction(registreAnnexId);
 						} else if (entity.isJustificantMoureError()) {
-							errorGuardant = expedientHelper.moureJustificantArxiuNewTransaction(entity.getId());
+							// El justificant de registre es queda a la sèrie de Regweb: no es mou a l'expedient de l'Arxiu
+							throw new ActionExecutionException(
+									getResourceClass(),
+									entity.getId(),
+									code,
+									messageHelper.getMessage("document.justificant.registre.no.es.mou"));
 						} else if (!StringUtils.isEmpty(entity.getGesDocFirmatId())) {
 							errorGuardant = firmaPortafirmesHelper.portafirmesReintentar(entitatEntity.getId(), entity.getId());
 						}
@@ -1871,8 +1883,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/document/"+entity.getId()+"/notificar", e);
-				String message = messageHelper.getMessage("message.common.action.error")+": "+e.getMessage();
-				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, message);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, e.getMessage());
 			}
 
         	return objectMappingHelper.newInstanceMap(entity, DocumentResource.class);

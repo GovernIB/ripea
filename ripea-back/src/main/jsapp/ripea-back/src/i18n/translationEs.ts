@@ -1143,12 +1143,13 @@ const translationEs = {
                 },
                 notificarMasiva: {
                     label: "Notifica o comunica...",
-                    ok: "Se ha generado el documento con los elementos seleccionados",
+                    ok: "Se ha generado el documento ZIP que contiene los elementos seleccionados",
                     error: {
                         noFirmats: "No se pueden notificar documentos sin firmar: {{noms}}",
                     },
                     tipusDoc: {
                         title: "Tipo del documento a notificar",
+                        titleZip: "Tipo del documento ZIP a notificar",
                         description: "Elija el tipo de documento que se aplicará al documento generado con los documentos seleccionados.",
                         button: "Genera",
                     },
@@ -1199,7 +1200,7 @@ const translationEs = {
                 original: "Este documento contenía firmas inválidas y se ha clonado y firmado en servidor para poder guardarlo en el Archivo Digital. Se puede descargar el original desde el menú de acciones",
                 custodiar: "Pendiente de custodiar documento firmado de portafrimes",
                 moure: "El documento de la anotación está pendiente de mover a la serie documental del procedimiento",
-                moureJustificant: "No se ha podido mover el justificante de registro al expediente documental de RIPEA.",
+                moureJustificant: "Pendiente de mover el justificante al expediente documental de RIPEA. No afecta a la tramitación.",
                 definitiu: "Documento definitivo",
                 firmaPendent: "Pendiente de firmar",
                 firmaParcial: "Firmado parcialmente",

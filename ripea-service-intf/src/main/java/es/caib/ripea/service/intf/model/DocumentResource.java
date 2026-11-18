@@ -314,7 +314,7 @@ public class DocumentResource extends NodeResource {
 	private String validacioFirmaErrorMsg;
 	private ArxiuEstatEnumDto annexArxiuEstat;
 	private ArxiuEstatEnumDto arxiuEstat;
-	// No s'ha pogut moure el justificant de registre a dins l'expedient de l'arxiu.
+	// Justificant de registre pendent de moure a l'expedient de RIPEA de l'arxiu: es queda a la sèrie de Regweb.
 	private boolean justificantMoureError;
     @NotNull
 	private DocumentFirmaTipusEnumDto documentFirmaTipus;
@@ -339,6 +339,8 @@ public class DocumentResource extends NodeResource {
     @Transient private List<ArxiuFirmaDto> firmes;
     @Transient private int NumMetaDades;
     @Transient private boolean documentDeAnotacio;
+    // Justificant de registre d'una anotació: de moment no es pot esborrar (RegistreJustificantUtils.isJustificantRegistre)
+    @Transient private boolean justificantRegistre;
     @Transient private boolean ambNotificacions;
     @Transient private String estatDarreraNotificacio;
     @Transient private boolean errorDarreraNotificacio;

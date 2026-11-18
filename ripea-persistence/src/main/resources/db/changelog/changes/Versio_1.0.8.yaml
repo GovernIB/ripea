@@ -431,3 +431,35 @@ databaseChangeLog:
             splitStatements: true
             stripComments: true
             relativeToChangelogFile: true
+  - changeSet:
+      id: RIPEA_1.0.8_INDEX_MONITOR_INTEGRACIONS_1
+      author: limit
+      changes:
+        - sqlFile:
+            dbms: oracle
+            path: ../scripts/oracle/1.0.8/Versio_1.0.8_DDL_11.sql
+            splitStatements: true
+            stripComments: true
+            relativeToChangelogFile: true
+        - sqlFile:
+            dbms: postgresql
+            path: ../scripts/postgres/1.0.8/Versio_1.0.8_DDL_11.sql
+            splitStatements: true
+            stripComments: true
+            relativeToChangelogFile: true
+  - changeSet:
+      id: RIPEA_1.0.8_INCORPORACIO_DOCUMENTS_SEGONPLA_3
+      author: limit
+      changes:
+        - sqlFile:
+            dbms: oracle
+            path: ../scripts/oracle/1.0.8/Versio_1.0.8_DML_14.sql
+            splitStatements: true
+            stripComments: true
+            relativeToChangelogFile: true
+        - sqlFile:
+            dbms: postgresql
+            path: ../scripts/postgres/1.0.8/Versio_1.0.8_DML_14.sql
+            splitStatements: true
+            stripComments: true
+            relativeToChangelogFile: true

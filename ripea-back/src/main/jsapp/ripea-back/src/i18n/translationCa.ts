@@ -1143,12 +1143,13 @@ const translationCa = {
                 },
                 notificarMasiva: {
                     label: "Notifica o comunica...",
-                    ok: "S'ha generat el document amb els elements seleccionats",
+                    ok: "S'ha generat el document ZIP que conté els elements seleccionats",
                     error: {
                         noFirmats: "No es poden notificar documents sense firmar: {{noms}}",
                     },
                     tipusDoc: {
                         title: "Tipus del document a notificar",
+                        titleZip: "Tipus del document ZIP a notificar",
                         description: "Trieu el tipus de document que s'aplicarà al document generat amb els documents seleccionats.",
                         button: "Genera",
                     },
@@ -1199,7 +1200,7 @@ const translationCa = {
                 original: "Aquest document contenia signatures invàlides i s'ha clonat i signat en servidor per poder guardar-lo a l'Arxiu Digital. Es pot descarregar l'original des del menú d'accions",
                 custodiar: "Pendent de custodiar document signat de portafirmes",
                 moure: "El document de l'anotació està pendent de moure a la sèrie documental del procediment",
-                moureJustificant: "No s'ha pogut moure el justificant de registre a l'expedient documental de RIPEA.",
+                moureJustificant: "Pendent de moure el justificant a l'expedient documental de RIPEA. No afecta a la tramitació.",
                 definitiu: "Document definitiu",
                 firmaPendent: "Pendent de signar",
                 firmaParcial: "Signat parcialment",

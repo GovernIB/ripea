@@ -12,7 +12,10 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.pinbal.client.recobriment.ClientRecobriment;
 import es.caib.pinbal.client.recobriment.v2.DadaEspecifica;
@@ -92,7 +95,9 @@ import es.caib.ripea.persistence.entity.UsuariEntity;
 import es.caib.ripea.persistence.repository.ConsultaPinbalRepository;
 import es.caib.ripea.persistence.repository.DocumentRepository;
 import es.caib.ripea.persistence.repository.EntitatRepository;
+import es.caib.ripea.persistence.repository.ExpedientRepository;
 import es.caib.ripea.persistence.repository.InteressatRepository;
+import es.caib.ripea.persistence.repository.MetaExpedientRepository;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.ConsultaPinbalEstatEnumDto;
 import es.caib.ripea.service.intf.dto.DiagnosticFiltreDto;
@@ -136,6 +141,7 @@ public class PinbalHelper {
 	private static final int LONGITUD_EXPEDIENT = 25;
 
 	@Autowired private CacheManager cacheManager;
+	@Lazy @Autowired private PinbalHelper self;
 	@Autowired private UsuariHelper usuariHelper;
 	@Autowired private IntegracioHelper integracioHelper;
 	@Autowired private ApplicationHelper applicationHelper;
@@ -147,6 +153,8 @@ public class PinbalHelper {
 	@Autowired private MessageHelper messageHelper;
 
 	@Autowired private EntitatRepository entitatRepository;
+	@Autowired private ExpedientRepository expedientRepository;
+	@Autowired private MetaExpedientRepository metaExpedientRepository;
 	@Autowired private InteressatRepository interessatRepository;
 	@Autowired private DocumentRepository documentRepository;
 	@Autowired private ConsultaPinbalRepository consultaPinbalRepository;
@@ -360,19 +368,44 @@ public class PinbalHelper {
 			return null;
 			
 		} catch (Exception e) {
-			
-			consultaPinbalBuilder
-			.entitat(entitatRepository.getOne(entitatId))
-			.servei(metaDocument.getPinbalServei().getCodi())
-			.estat(ConsultaPinbalEstatEnumDto.ERROR)
-			.error(Utils.abbreviate(Utils.getRootMsg(e), 4000))
-			.expedient(expedient)
-			.metaExpedient(expedient.getMetaExpedient());
-			
-			consultaPinbalRepository.save(consultaPinbalBuilder.build());
-			
+			try {
+				self.guardarConsultaError(
+						entitatId,
+						metaDocument.getPinbalServei().getCodi(),
+						Utils.abbreviate(Utils.getRootMsg(e), 4000),
+						expedient.getId(),
+						expedient.getMetaExpedient().getId());
+			} catch (Throwable th) {
+				// No s'ha d'amagar l'error de la consulta PINBAL per un error en desar-ne el registre
+				log.error("No s'ha pogut desar la consulta PINBAL amb error (expedientId=" + expedient.getId() + ")", th);
+			}
 			return e;
 		}
+	}
+
+	/**
+	 * Desa la consulta amb error en una transacció pròpia perquè es conservi encara que la transacció
+	 * de qui crida acabi en rollback. Passa a REACT, on NouDocumentPinbalActionExecutor llança una
+	 * ActionExecutionException quan la consulta falla; sense això, els indicadors PIN_ENVIAMENTS_ERROR
+	 * que s'envien a COMANDA no comptarien els errors de REACT.
+	 * Rep identificadors i no entitats perquè la nova transacció té un context de persistència propi.
+	 */
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void guardarConsultaError(
+			Long entitatId,
+			String serveiCodi,
+			String error,
+			Long expedientId,
+			Long metaExpedientId) {
+		consultaPinbalRepository.save(
+				ConsultaPinbalEntity.builder()
+				.entitat(entitatRepository.getOne(entitatId))
+				.servei(serveiCodi)
+				.estat(ConsultaPinbalEstatEnumDto.ERROR)
+				.error(error)
+				.expedient(expedientRepository.getOne(expedientId))
+				.metaExpedient(metaExpedientRepository.getOne(metaExpedientId))
+				.build());
 	}
 	
 	/** Petició amb el client antic del servei, a partir dels camps propis del formulari JSP. */

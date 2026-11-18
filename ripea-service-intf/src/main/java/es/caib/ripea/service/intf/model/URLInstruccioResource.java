@@ -8,7 +8,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
-import javax.validation.constraints.NotNull;
+import es.caib.ripea.service.intf.resourcevalidation.URLInstruccioValida;
+
+import javax.validation.constraints.NotEmpty;
 
 @Getter
 @Setter
@@ -19,10 +21,10 @@ public class URLInstruccioResource extends BaseAuditableResource<Long> {
 
 	private static final long serialVersionUID = 1301398896789809114L;
 	
-	@NotNull private String codi;
-	@NotNull private String nom;
+	@NotEmpty private String codi;
+	@NotEmpty private String nom;
 	private String descripcio;
-	private String url;
+	@NotEmpty @URLInstruccioValida private String url;
 	
 	protected ResourceReference<EntitatResource, Long> entitat;
 }

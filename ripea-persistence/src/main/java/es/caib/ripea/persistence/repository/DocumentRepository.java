@@ -761,4 +761,25 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 
     boolean existsByExpedientIdAndFitxerNom(Long expedientId, String fitxerNom);
 
+    DocumentEntity findFirstByExpedientIdAndFitxerNomOrderByIdAsc(Long expedientId, String fitxerNom);
+
+    /**
+     * Documents de l'expedient del tipus indicat amb el número de registre d'una anotació (el justificant de registre
+     * de l'anotació), esborrats inclosos. El número de registre el deixa informat
+     * ExpedientHelper.crearDocFromJustificantRegistreUuid.
+     *
+     * No compten els annexos de les anotacions: també porten el número de registre, i en acceptar l'anotació
+     * l'usuari els pot haver assignat el tipus del justificant (p.ex. un annex "PAGO").
+     */
+    @Query("select d from DocumentEntity d " +
+            "where d.expedient = :expedient " +
+            "and d.metaDocument.codi = :codiTipus " +
+            "and d.numeroRegistre = :numeroRegistre " +
+            "and not exists (select a.id from RegistreAnnexEntity a where a.document = d) " +
+            "order by d.id")
+    List<DocumentEntity> findByExpedientAndMetaDocumentCodiAndNumeroRegistre(
+            @Param("expedient") ExpedientEntity expedient,
+            @Param("codiTipus") String codiTipus,
+            @Param("numeroRegistre") String numeroRegistre);
+
 }

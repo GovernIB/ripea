@@ -127,6 +127,7 @@ import es.caib.ripea.service.intf.exception.NotFoundException;
 import es.caib.ripea.service.intf.exception.PermissionDeniedException;
 import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.registre.RegistreInteressat;
+import es.caib.ripea.service.intf.utils.RegistreJustificantUtils;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
 import lombok.Builder;
@@ -916,6 +917,19 @@ public class ContingutHelper {
 		dto.setArxiuEstatDefinitiu(document.isArxiuEstatDefinitiu());
 		dto.setDocumentFirmaTipus(document.getDocumentFirmaTipus());
 		dto.setJustificantMoureError(document.isJustificantMoureError());
+		dto.setJustificantRegistre(isJustificantRegistre(document));
+	}
+
+	/**
+	 * Indica si el document és el justificant de registre d'una anotació, que de moment no es pot esborrar
+	 * ({@link RegistreJustificantUtils#isJustificantRegistre}).
+	 */
+	public boolean isJustificantRegistre(DocumentEntity document) {
+		return RegistreJustificantUtils.isJustificantRegistre(
+				document.isJustificantMoureError(),
+				document.getMetaDocument() != null ? document.getMetaDocument().getCodi() : null,
+				document.getNumeroRegistre(),
+				CollectionUtils.isNotEmpty(document.getAnnexos()));
 	}
 
 	// CARPETA
@@ -1450,6 +1464,18 @@ public class ContingutHelper {
 					"No es pot esborrar un document provinent d'una anotació");
 		}
 
+		// De moment els justificants de registre no es poden esborrar, ni el contingut que en conté: amb la propietat
+		// es.caib.ripea.document.esborrar.finals activada, esborrar-los els mouria a l'Arxiu (arxiuPropagarEliminacio),
+		// i el justificant pendent de moure és a la sèrie de Regweb.
+		if (conteJustificantsRegistre(contingut)) {
+			throw new ValidationException(
+					contingut.getId(),
+					ContingutEntity.class,
+					contingut instanceof DocumentEntity
+							? "No es pot esborrar un justificant de registre"
+							: "No es pot esborrar un contingut que conté justificants de registre");
+		}
+
 		// Actualitza camp registres importats per no deixar informació inconsistent durant la cerca per número de registre
 		ExpedientEntity expedientPare = contingut.getExpedientPare();
 		if (contingut.getNumeroRegistre() != null && expedientPare != null && expedientPare.getRegistresImportats() != null) { // Importat
@@ -1611,6 +1637,23 @@ public class ContingutHelper {
 			conteDefinitius = CollectionUtils.isNotEmpty(document.getAnnexos());
 		}
 		return conteDefinitius;
+	}
+
+	/**
+	 * Indica si el contingut és un justificant de registre ({@link #isJustificantRegistre}) o en conté algun, sense
+	 * comptar els esborrats.
+	 */
+	public boolean conteJustificantsRegistre(ContingutEntity contingut) {
+		ContingutEntity deproxied = HibernateHelper.deproxy(contingut);
+		if (deproxied instanceof ExpedientEntity || deproxied instanceof CarpetaEntity) {
+			for (ContingutEntity fill : contingut.getFills()) {
+				if (fill.getEsborrat() == 0 && conteJustificantsRegistre(fill)) {
+					return true;
+				}
+			}
+			return false;
+		}
+		return deproxied instanceof DocumentEntity && isJustificantRegistre((DocumentEntity) deproxied);
 	}
 
 	private void fitxerDocumentEsborratGuardarEnTmp(
@@ -1806,6 +1849,13 @@ public class ContingutHelper {
 					contingutOrigenId,
 					contingutOrigen.getClass(),
 					"Només es poden copiar documents");
+		}
+		// De moment el justificant de registre no s'incorpora a l'expedient de l'Arxiu, tampoc copiat (veure deleteReversible)
+		if (isJustificantRegistre((DocumentEntity) contingutOrigen)) {
+			throw new ValidationException(
+					contingutOrigenId,
+					contingutOrigen.getClass(),
+					"No es pot copiar un justificant de registre");
 		}
 		// Es comprova que el procediment orígen i destí son el mateix
 		ExpedientEntity expedientOrigen = getExpedientSuperior(
@@ -2073,25 +2123,16 @@ public class ContingutHelper {
 							+ "contingutDestiId=" + contingutDestiId + ")");
 		}
 		// Realitza el moviment del contingut
-		ContingutMovimentEntity contingutMoviment = ferIEnregistrarMoviment(
-				contingutOrigen,
-				contingutDesti,
-				null);
-		
-		reOrdenaContingut(contingutOrigen, contingutOrigen.getOrdre());
-		
-		contingutLogHelper.log(
-				contingutOrigen,
-				LogTipusEnumDto.MOVIMENT,
-				contingutMoviment,
-				true,
-				true);
-		
+		moureBaseDades(contingutOrigen, contingutDesti);
+
 		if (contingutOrigen instanceof DocumentEntity){
-			arxiuDocumentPropagarMoviment(
-					contingutOrigen.getArxiuUuid(),
-					contingutDesti,
-					expedientDesti.getArxiuUuid());
+			// El justificant pendent de moure és a la sèrie de Regweb i no es mou de l'Arxiu: només es mou a RIPEA
+			if (!((DocumentEntity) contingutOrigen).isJustificantMoureError()) {
+				arxiuDocumentPropagarMoviment(
+						contingutOrigen.getArxiuUuid(),
+						contingutDesti,
+						expedientDesti.getArxiuUuid());
+			}
 		} else if (contingutOrigen instanceof CarpetaEntity && !isCarpetaLogica()) {
 			pluginHelper.arxiuCarpetaMoure(
 					(CarpetaEntity)contingutOrigen,
@@ -2111,13 +2152,36 @@ public class ContingutHelper {
 		}
 	}
 
+	/**
+	 * Mou el contingut a dins el destí només a la base de dades: canvia el pare, desa el moviment, reordena el destí i
+	 * registra el moviment a l'historial. No comprova permisos ni propaga res a l'Arxiu: ho ha de fer qui el crida
+	 * si cal (veure {@link #move}).
+	 */
+	public ContingutMovimentEntity moureBaseDades(ContingutEntity contingut, ContingutEntity desti) {
+		ContingutMovimentEntity contingutMoviment = ferIEnregistrarMoviment(
+				contingut,
+				desti,
+				null);
+
+		reOrdenaContingut(contingut, contingut.getOrdre());
+
+		contingutLogHelper.log(
+				contingut,
+				LogTipusEnumDto.MOVIMENT,
+				contingutMoviment,
+				true,
+				true);
+		return contingutMoviment;
+	}
+
 	public void arxiuCarpetaLogicaPropagarMoviment(
 			ContingutEntity origen,
 			String uuidExpedientDesti) {
 		List<ContingutEntity> fills = contingutRepository.findByPareAndEsborratAndOrdenat(origen, 0);
 		
 		for (ContingutEntity fill : fills) {
-			if (fill instanceof DocumentEntity) {
+			// El justificant pendent de moure és a la sèrie de Regweb i no es mou de l'Arxiu
+			if (fill instanceof DocumentEntity && !((DocumentEntity) fill).isJustificantMoureError()) {
 				 pluginHelper.arxiuDocumentMoure(
 						fill.getArxiuUuid(),
 						null,
@@ -2526,7 +2590,11 @@ public class ContingutHelper {
 						(ExpedientEntity)contingut);
 			} else if (contingut instanceof DocumentEntity) {
 				DocumentEntity document = (DocumentEntity)contingut;
-				if (DocumentTipusEnumDto.IMPORTAT.equals(document.getDocumentTipus())) {
+				if (document.isJustificantMoureError()) {
+					// El justificant pendent de moure és a la sèrie de Regweb: aquest node de l'Arxiu no és de RIPEA
+					logger.warn("No es propaga a l'Arxiu l'eliminació del justificant de registre pendent de moure (documentId="
+							+ document.getId() + ", arxiuUuid=" + document.getArxiuUuid() + ")");
+				} else if (DocumentTipusEnumDto.IMPORTAT.equals(document.getDocumentTipus())) {
 					// #1889
 					if (isPermesEsborrarFinals()) {
 						String nouUuid = pluginHelper.arxiuDocumentMoure(
@@ -3529,6 +3597,13 @@ public class ContingutHelper {
 					contingutOrigenId,
 					contingutOrigen.getClass(),
 					"Només es poden enllaçar documents");
+		}
+		// De moment el justificant de registre no s'incorpora a l'expedient de l'Arxiu, tampoc enllaçat (veure deleteReversible)
+		if (isJustificantRegistre((DocumentEntity) contingutOrigen)) {
+			throw new ValidationException(
+					contingutOrigenId,
+					contingutOrigen.getClass(),
+					"No es pot enllaçar un justificant de registre");
 		}
 		// Mirar què passa amb els documents firmats
 		//if (contingutOrigen instanceof DocumentEntity) {
