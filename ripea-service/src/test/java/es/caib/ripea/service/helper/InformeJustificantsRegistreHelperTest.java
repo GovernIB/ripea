@@ -47,7 +47,6 @@ import es.caib.ripea.service.helper.FilaInformeJustificantRegistre.AccioConsulta
 import es.caib.ripea.service.helper.FilaInformeJustificantRegistre.AccioMoure;
 import es.caib.ripea.service.helper.FilaInformeJustificantRegistre.AccioRipea;
 import es.caib.ripea.service.intf.config.PropertyConfig;
-import es.caib.ripea.service.intf.exception.SistemaExternException;
 
 /**
  * Tests unitaris per a InformeJustificantsRegistreHelper: un CSV per entitat escrit a mesura que es tracten les
@@ -86,7 +85,7 @@ class InformeJustificantsRegistreHelperTest {
 		helper.processarElement(10L, () -> {
 			FilaInformeJustificantRegistre.actualitzar(fila -> {
 				fila.setAnotacio(peticio("A", "GOIBE10/2026"));
-				fila.setErrorMoure(new SistemaExternException("ARXIU", "permission of Write"), true);
+				fila.setAccioMoure(AccioMoure.NO_ES_MOU);
 				fila.setAccioRipea(AccioRipea.CREAT_A_CARPETA_EXISTENT);
 			});
 			return "incorporat";
@@ -104,10 +103,10 @@ class InformeJustificantsRegistreHelperTest {
 		assertThat(text.getValue())
 				.contains("Procés finalitzat: 2 elements processats")
 				.contains("Anotacions d'aquesta entitat tractades: 1")
-				.contains("per falta de permisos: 1");
+				.contains("pendents de moure a l'expedient de RIPEA a l'Arxiu: 1");
 		assertThat(contingutZip(adjunt.getValue()))
 				.contains("\"GOIBE10/2026\"")
-				.contains("\"ERROR_PERMISOS (WARN)\"")
+				.contains("\"NO_ES_MOU\"")
 				.doesNotContain("GOIBE11/2026");
 		assertThat(fitxers(InformeJustificantsRegistreHelper.PENDENTS)).isEmpty();
 		assertThat(fitxers(InformeJustificantsRegistreHelper.ENVIATS)).hasSize(2).allMatch(nom -> nom.endsWith(".zip"));
@@ -122,7 +121,7 @@ class InformeJustificantsRegistreHelperTest {
 			FilaInformeJustificantRegistre.actualitzar(fila -> {
 				fila.setAnotacio(peticio("A", "GOIBE10/2026"));
 				fila.setAccioConsulta(AccioConsulta.TROBAT);
-				fila.setErrorMoure(new SistemaExternException("ARXIU", "permission of Write"), true);
+				fila.setAccioMoure(AccioMoure.NO_ES_MOU);
 				fila.setAccioRipea(AccioRipea.CREAT_A_CARPETA_EXISTENT);
 			});
 			return "incorporat";
@@ -134,7 +133,7 @@ class InformeJustificantsRegistreHelperTest {
 		assertThat(text.getValue())
 				.contains("Llegenda dels valors que apareixen en aquest informe")
 				.contains("TROBAT: " + AccioConsulta.TROBAT.getDescripcio())
-				.contains("ERROR_PERMISOS (WARN): " + AccioMoure.ERROR_PERMISOS_WARN.getDescripcio())
+				.contains("NO_ES_MOU: " + AccioMoure.NO_ES_MOU.getDescripcio())
 				.contains("CREAT_A_CARPETA_EXISTENT: " + AccioRipea.CREAT_A_CARPETA_EXISTENT.getDescripcio())
 				.contains("Moviment del justificant a l'expedient de RIPEA a l'Arxiu, columna \"Acció moure\" del CSV:")
 				.doesNotContain(AccioConsulta.NO_CONSULTAT.getDescripcio())

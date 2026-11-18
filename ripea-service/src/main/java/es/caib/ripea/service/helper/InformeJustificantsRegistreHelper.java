@@ -72,7 +72,7 @@ public class InformeJustificantsRegistreHelper {
 	/** justificants_&lt;entitat&gt;_&lt;yyyyMMdd_HHmmss&gt;.csv */
 	private static final Pattern PATRO_FITXER = Pattern.compile("^" + PREFIX_FITXER + "(.+)_(\\d{8}_\\d{6})\\.csv$");
 
-	private static final String TITOL_CONSULTA = "Consulta del justificant original a l'Arxiu (sèrie de Distribució)";
+	private static final String TITOL_CONSULTA = "Consulta del justificant original a l'Arxiu (sèrie de Regweb)";
 	private static final String TITOL_MOURE = "Moviment del justificant a l'expedient de RIPEA a l'Arxiu";
 	private static final String TITOL_RIPEA = "Acció a RIPEA";
 	/** Conceptes de la llegenda que fan servir les descripcions dels valors. */
@@ -297,14 +297,13 @@ public class InformeJustificantsRegistreHelper {
 		afegirRecompte(text, TITOL_CONSULTA, recompte.consulta);
 		afegirRecompte(text, TITOL_MOURE, recompte.moure);
 		afegirRecompte(text, TITOL_RIPEA, recompte.ripea);
-		int errorsPermisos = recompte.moure.getOrDefault(AccioMoure.ERROR_PERMISOS_WARN.getText(), 0);
-		text.append("\nJustificants que no s'han pogut moure a l'expedient de RIPEA a l'Arxiu per falta de permisos: ")
-				.append(errorsPermisos).append(".\n");
-		if (errorsPermisos > 0) {
-			text.append("Es mostren amb l'avís " + FilaInformeJustificantRegistre.AVIS_NO_MOGUT + " i continuen apuntant"
-					+ " al justificant original de Distribució. Són les files amb l'acció moure \""
-					+ AccioMoure.ERROR_PERMISOS_WARN.getText() + "\", amb l'identificador de l'anotació i l'UUID del"
-					+ " justificant.\n");
+		int noEsMouen = recompte.moure.getOrDefault(AccioMoure.NO_ES_MOU.getText(), 0);
+		text.append("\nJustificants incorporats que es queden a la sèrie de Regweb, pendents de moure a l'expedient de"
+				+ " RIPEA a l'Arxiu: ").append(noEsMouen).append(".\n");
+		if (noEsMouen > 0) {
+			text.append("De moment no es mouen, per decisió de l'equip d'Arxiu. Es mostren amb l'avís "
+					+ FilaInformeJustificantRegistre.AVIS_NO_MOGUT + " i apunten al justificant original. Són les files"
+					+ " amb l'acció moure \"" + AccioMoure.NO_ES_MOU.getText() + "\".\n");
 		}
 		text.append("\n");
 		if (rutaNoAdjuntat == null) {
