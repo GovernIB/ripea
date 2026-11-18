@@ -64,7 +64,7 @@ public class DocumentDto extends NodeDto {
 	private String pinbalIdpeticion;
 	
 	private boolean pendentMoverArxiu;
-	// No s'ha pogut moure el justificant de registre a dins l'expedient de l'arxiu.
+	// Justificant de registre pendent de moure a l'expedient de RIPEA de l'arxiu: es queda a la sèrie de Regweb.
 	private boolean justificantMoureError;
 	private Long annexId;
 
@@ -76,6 +76,8 @@ public class DocumentDto extends NodeDto {
 	
 	private boolean arxiuEstatDefinitiu;
 	private boolean documentDeAnotacio;
+	// Justificant de registre d'una anotació: de moment no es pot esborrar (RegistreJustificantUtils.isJustificantRegistre)
+	private boolean justificantRegistre;
 	private boolean scanned;
 	
 	private Integer resolucion;

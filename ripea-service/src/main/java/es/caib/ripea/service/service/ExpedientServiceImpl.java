@@ -427,15 +427,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Transactional
 	@Override
-	public Exception retryMoureJustificantArxiu(Long documentId) {
-		Long expedientId = documentRepository.getOne(documentId).getExpedient().getId();
-		synchronized (SynchronizationHelper.get0To99Lock(expedientId, SynchronizationHelper.locksExpedients)) {
-			return expedientHelper.moureJustificantArxiuNewTransaction(documentId);
-		}
-	}
-
-	@Transactional
-	@Override
 	public ExpedientDto update(
 			Long entitatId,
 			Long id,

@@ -51,17 +51,17 @@ class FilaInformeJustificantRegistreTest {
 				new RuntimeException("GdibException: The user does not have permission of Write"));
 		FilaInformeJustificantRegistre fila = new FilaInformeJustificantRegistre(7L);
 
-		fila.setErrorMoure(error, true);
+		fila.setErrorMoure(error);
 
-		assertThat(fila.getAccioMoure()).isEqualTo(AccioMoure.ERROR_PERMISOS_WARN);
+		assertThat(fila.getAccioMoure()).isEqualTo(AccioMoure.ERROR_PERMISOS_NO_MOGUT);
 		assertThat(fila.getErrorMoure()).contains("Error moguent el document").contains("permission of Write");
 	}
 
 	@Test
-	void accessDeniedTambeEsErrorDePermisosISenseAvisNoEsMou() {
+	void accessDeniedTambeEsErrorDePermisos() {
 		FilaInformeJustificantRegistre fila = new FilaInformeJustificantRegistre(7L);
 
-		fila.setErrorMoure(new SistemaExternException("ARXIU", "Access Denied"), false);
+		fila.setErrorMoure(new SistemaExternException("ARXIU", "Access Denied"));
 
 		assertThat(fila.getAccioMoure()).isEqualTo(AccioMoure.ERROR_PERMISOS_NO_MOGUT);
 	}
@@ -70,10 +70,18 @@ class FilaInformeJustificantRegistreTest {
 	void unAltreErrorEnMoureNoEsDePermisos() {
 		FilaInformeJustificantRegistre fila = new FilaInformeJustificantRegistre(7L);
 
-		fila.setErrorMoure(new SistemaExternException("ARXIU", "Read timed out"), true);
+		fila.setErrorMoure(new SistemaExternException("ARXIU", "Read timed out"));
 
-		assertThat(fila.getAccioMoure()).isEqualTo(AccioMoure.ERROR_WARN);
-		assertThat(fila.getAccioMoure().getText()).isEqualTo("ERROR (WARN)");
+		assertThat(fila.getAccioMoure()).isEqualTo(AccioMoure.ERROR_NO_MOGUT);
+		assertThat(fila.getAccioMoure().getText()).isEqualTo("ERROR (NO MOGUT)");
+	}
+
+	@Test
+	void elJustificantQueNoEsMouDuElTextDeLAvis() {
+		assertThat(AccioMoure.NO_ES_MOU.getText()).isEqualTo("NO_ES_MOU");
+		assertThat(AccioMoure.NO_ES_MOU.getDescripcio())
+				.contains("sèrie de Regweb")
+				.contains(FilaInformeJustificantRegistre.AVIS_NO_MOGUT);
 	}
 
 	@Test
@@ -114,7 +122,7 @@ class FilaInformeJustificantRegistreTest {
 	@Test
 	void elDetallDUnElementCorrecteEsLErrorEnMoureSiNHiHa() {
 		FilaInformeJustificantRegistre ambErrorMoure = new FilaInformeJustificantRegistre(7L);
-		ambErrorMoure.setErrorMoure(new SistemaExternException("ARXIU", "permission of Write"), true);
+		ambErrorMoure.setErrorMoure(new SistemaExternException("ARXIU", "permission of Write"));
 		ambErrorMoure.finalitzarOk("incorporat");
 		FilaInformeJustificantRegistre senseAccio = new FilaInformeJustificantRegistre(8L);
 		senseAccio.finalitzarOk("l'anotació no té expedient");
@@ -127,7 +135,7 @@ class FilaInformeJustificantRegistreTest {
 	@Test
 	void elsCampsSegueixenLaCapcalera() {
 		FilaInformeJustificantRegistre fila = new FilaInformeJustificantRegistre(7L);
-		fila.setErrorMoure(new SistemaExternException("ARXIU", "permission of Write"), true);
+		fila.setErrorMoure(new SistemaExternException("ARXIU", "permission of Write"));
 		fila.finalitzarOk("incorporat");
 
 		String[] camps = fila.getCamps();
@@ -135,7 +143,7 @@ class FilaInformeJustificantRegistreTest {
 		assertThat(camps).hasSize(FilaInformeJustificantRegistre.CAPCALERA.length);
 		assertThat(camps[1]).isEqualTo("7");
 		assertThat(camps[FilaInformeJustificantRegistre.COLUMNA_ACCIO_CONSULTA]).isEqualTo("NO_CONSULTAT");
-		assertThat(camps[FilaInformeJustificantRegistre.COLUMNA_ACCIO_MOURE]).isEqualTo("ERROR_PERMISOS (WARN)");
+		assertThat(camps[FilaInformeJustificantRegistre.COLUMNA_ACCIO_MOURE]).isEqualTo("ERROR_PERMISOS (NO MOGUT)");
 		assertThat(camps[FilaInformeJustificantRegistre.COLUMNA_ACCIO_RIPEA]).isEqualTo("NO_TRACTAT");
 	}
 

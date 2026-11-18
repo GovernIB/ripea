@@ -1336,56 +1336,23 @@ public class ExpedientHelper {
 		docEntity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
 		docEntity.setNtiTipoFirma(documentDto.getNtiTipoFirma());
 
-		// ############################## MOVE DOCUMENT IN ARXIU
-		// ##########################################
-		// put arxiu uuid of annex
+		// ############################## JUSTIFICANT A L'ARXIU
+		// El justificant no es mou a l'expedient de RIPEA de l'Arxiu: es queda a la sèrie de Regweb (A57) i el document
+		// de RIPEA apunta al justificant original. Ho va decidir l'equip d'Arxiu del GOIB el 18/11/2026, fins que la nova
+		// versió de GDIB defineixi com s'incorporen els assentaments registrals als expedients. La marca
+		// justificantMoureError avisa a la interfície i evita que cap altra operació de RIPEA (moure'l de carpeta,
+		// esborrar-lo) toqui aquest node, que no és de RIPEA.
 		docEntity.updateArxiu(documentDto.getArxiuUuid());
 		docEntity.updateArxiuEstat(ArxiuEstatEnumDto.DEFINITIU);
 		documentRepository.saveAndFlush(docEntity);
-		if (!contingutHelper.isCarpetaLogica()) {
-			Carpeta carpeta = pluginHelper.arxiuCarpetaConsultar(carpetaEntity);
-			boolean documentExistsInArxiu = false;
-			String documentUuid = null;
-			if (carpeta != null && carpeta.getContinguts() != null) {
-				for (ContingutArxiu contingutArxiu : carpeta.getContinguts()) {
-					if (contingutArxiu.getTipus() == ContingutTipus.DOCUMENT &&
-							contingutArxiu.getNom().equals(docEntity.getNom())) {
-						documentExistsInArxiu = true;
-						documentUuid = contingutArxiu.getIdentificador();
-					}
-				}
-			}
-			if (documentExistsInArxiu && documentUuid != null) {
-				// document already in arxiu: update uuid of the document, not of the carpeta
-				docEntity.updateArxiu(documentUuid);
-			}
-			if (documentExistsInArxiu) {
-				FilaInformeJustificantRegistre.actualitzar(fila -> fila.setAccioMoure(AccioMoure.JA_A_L_ARXIU));
-			} else {
-				moureJustificantArxiu(docEntity, carpetaEntity, expedientEntity, justificantArxiuUuid);
-			}
+		String uuidJaALArxiu = findJustificantJaALExpedientArxiu(docEntity, carpetaEntity, expedientEntity);
+		if (uuidJaALArxiu != null) {
+			// Un intent anterior el va moure a l'expedient de RIPEA: el document passa a ser aquell
+			docEntity.updateArxiu(uuidJaALArxiu);
+			FilaInformeJustificantRegistre.actualitzar(fila -> fila.setAccioMoure(AccioMoure.JA_A_L_ARXIU));
 		} else {
-			Expedient expedient = pluginHelper.arxiuExpedientConsultar(expedientEntity);
-			boolean documentExistsInArxiu = false;
-			String documentUuid = null;
-			if (expedient != null && expedient.getContinguts() != null) {
-				for (ContingutArxiu contingutArxiu : expedient.getContinguts()) {
-					if (contingutArxiu.getTipus() == ContingutTipus.DOCUMENT &&
-							contingutArxiu.getNom().equals(docEntity.getNom())) {
-						documentExistsInArxiu = true;
-						documentUuid = contingutArxiu.getIdentificador();
-					}
-				}
-			}
-			if (documentExistsInArxiu && documentUuid != null) {
-				// document already in arxiu: update uuid of the document, not of the expedient
-				docEntity.updateArxiu(documentUuid);
-			}
-			if (documentExistsInArxiu) {
-				FilaInformeJustificantRegistre.actualitzar(fila -> fila.setAccioMoure(AccioMoure.JA_A_L_ARXIU));
-			} else {
-				moureJustificantArxiu(docEntity, expedientEntity, expedientEntity, justificantArxiuUuid);
-			}
+			docEntity.updateJustificantMoureError(true);
+			FilaInformeJustificantRegistre.actualitzar(fila -> fila.setAccioMoure(AccioMoure.NO_ES_MOU));
 		}
 
 		// save nti data generated in arxiu in db
@@ -1406,87 +1373,37 @@ public class ExpedientHelper {
 	}
 
 	/**
-	 * Mou el justificant de registre a dins l'expedient de l'arxiu.
+	 * Cerca a l'expedient de RIPEA de l'Arxiu un document amb el nom del justificant, que hi hauria deixat un intent
+	 * anterior d'incorporar-lo, quan el justificant encara es movia a l'expedient. Amb carpetes lògiques el cerca a
+	 * l'expedient; si no, a la carpeta del registre.
 	 *
-	 * El moviment no es critic per a la incorporacio del justificant: si l'arxiu el rebutja
-	 * (tipicament per politiques del servei extern damunt documentMoure) el document es queda
-	 * incorporat a l'expedient de RIPEA amb l'uuid original que s'ha rebut per parametre, es
-	 * marca amb l'indicador justificantMoureError per poder avisar a la interficie i la
-	 * transaccio pot fer commit igualment. No es reintenta.
-	 *
-	 * Nomes es controla l'error del moviment: les consultes previes a l'arxiu i qualsevol altre
-	 * error segueixen propagant-se i fent rollback.
-	 *
-	 * @param docEntity document ja creat a la base de dades.
-	 * @param desti carpeta o expedient de desti dins l'arxiu.
-	 * @param expedientEntity expedient al qual pertany el document.
-	 * @param justificantArxiuUuid uuid original del justificant a l'arxiu.
+	 * @param docEntity justificant ja creat a la base de dades.
+	 * @param carpetaEntity carpeta del registre on s'ha creat.
+	 * @param expedientEntity expedient del justificant.
+	 * @return l'uuid del document trobat, o null si no n'hi ha cap.
 	 */
-	private void moureJustificantArxiu(
+	private String findJustificantJaALExpedientArxiu(
 			DocumentEntity docEntity,
-			ContingutEntity desti,
-			ExpedientEntity expedientEntity,
-			String justificantArxiuUuid) {
-		try {
-			String uuidDesti = contingutHelper.arxiuDocumentPropagarMoviment(
-					docEntity.getArxiuUuid(),
-					desti,
-					expedientEntity.getArxiuUuid());
-			// if document was dispatched, update uuid to new document
-			if (uuidDesti != null) {
-				docEntity.updateArxiu(uuidDesti);
-			}
-			FilaInformeJustificantRegistre.actualitzar(fila -> fila.setAccioMoure(AccioMoure.MOGUT));
-		} catch (SistemaExternException ex) {
-			FilaInformeJustificantRegistre.actualitzar(fila -> fila.setErrorMoure(ex, true));
-			docEntity.updateArxiu(justificantArxiuUuid);
-			docEntity.updateJustificantMoureError(true);
-			logger.error(
-					"No s'ha pogut moure el justificant de registre a l'expedient de l'arxiu (" +
-							"expedientId=" + expedientEntity.getId() + ", " +
-							"documentId=" + docEntity.getId() + ", " +
-							"justificantArxiuUuid=" + justificantArxiuUuid + ")",
-					ex);
+			CarpetaEntity carpetaEntity,
+			ExpedientEntity expedientEntity) {
+		List<ContingutArxiu> continguts;
+		if (!contingutHelper.isCarpetaLogica()) {
+			Carpeta carpeta = pluginHelper.arxiuCarpetaConsultar(carpetaEntity);
+			continguts = carpeta != null ? carpeta.getContinguts() : null;
+		} else {
+			Expedient expedient = pluginHelper.arxiuExpedientConsultar(expedientEntity);
+			continguts = expedient != null ? expedient.getContinguts() : null;
 		}
-	}
-
-	/**
-	 * Reintenta el moviment del justificant de registre a dins l'expedient de l'arxiu, per als
-	 * documents que han quedat marcats amb justificantMoureError. El reintent el demana l'usuari
-	 * des de l'acció "Guardar en arxiu" del document.
-	 *
-	 * Segueix el mateix patró que moveDocumentArxiuNewTransaction per als annexos: no llança
-	 * l'excepció, la retorna, de manera que si el moviment torna a fallar el document conservi
-	 * l'uuid original i la marca.
-	 *
-	 * @param documentId document del justificant de registre.
-	 * @return l'excepció produïda, o null si el moviment ha anat bé.
-	 */
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public Exception moureJustificantArxiuNewTransaction(Long documentId) {
-		DocumentEntity docEntity = documentRepository.getOne(documentId);
-		ExpedientEntity expedientEntity = docEntity.getExpedient();
-		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedientEntity.getId()));
-		try {
-			String uuidDesti = contingutHelper.arxiuDocumentPropagarMoviment(
-					docEntity.getArxiuUuid(),
-					docEntity.getPare(),
-					expedientEntity.getArxiuUuid());
-			// if document was dispatched, update uuid to new document
-			if (uuidDesti != null) {
-				docEntity.updateArxiu(uuidDesti);
+		String documentUuid = null;
+		if (continguts != null) {
+			for (ContingutArxiu contingutArxiu : continguts) {
+				if (contingutArxiu.getTipus() == ContingutTipus.DOCUMENT &&
+						contingutArxiu.getNom().equals(docEntity.getNom())) {
+					documentUuid = contingutArxiu.getIdentificador();
+				}
 			}
-			docEntity.updateJustificantMoureError(false);
-			return null;
-		} catch (Exception ex) {
-			logger.error(
-					"No s'ha pogut moure el justificant de registre a l'expedient de l'arxiu (" +
-							"expedientId=" + expedientEntity.getId() + ", " +
-							"documentId=" + documentId + ", " +
-							"arxiuUuid=" + docEntity.getArxiuUuid() + ")",
-					ex);
-			return ex;
 		}
+		return documentUuid;
 	}
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -3255,10 +3172,11 @@ public class ExpedientHelper {
 	/**
 	 * Mou el justificant de registre d'una anotació a la carpeta del registre, que es crea si no n'hi ha cap.
 	 *
-	 * Si el justificant està marcat amb justificantMoureError, a l'Arxiu encara és a la sèrie de Distribució: només es
-	 * mou a la base de dades i es manté la marca, i el reintent ("Guardar en arxiu") el mourà a l'Arxiu cap a la
-	 * carpeta, que serà el seu pare. Si no està marcat, ja és a l'expedient de l'Arxiu i amb carpetes no lògiques es
-	 * mou també a l'Arxiu, abans que a la base de dades: si l'Arxiu falla, l'excepció es propaga i no es mou enlloc.
+	 * Si el justificant està marcat amb justificantMoureError, a l'Arxiu és a la sèrie de Regweb i no es mou d'allà
+	 * (veure {@link #crearDocFromJustificantRegistreUuid}): només es mou a la base de dades i es manté la marca. Si no
+	 * està marcat, un intent anterior ja el va moure a l'expedient de l'Arxiu i amb carpetes no lògiques es mou també a
+	 * l'Arxiu, dins el mateix expedient, abans que a la base de dades: si l'Arxiu falla, l'excepció es propaga i no es
+	 * mou enlloc.
 	 *
 	 * @param justificant justificant de registre de l'anotació, no esborrat.
 	 * @param carpeta carpeta del registre no esborrada ({@link #findCarpetaRegistre}), o null si no n'hi ha cap.
@@ -3272,7 +3190,7 @@ public class ExpedientHelper {
 			ExpedientPeticioEntity peticio) {
 		ExpedientEntity expedient = justificant.getExpedient();
 		Long entitatId = expedient.getEntitat().getId();
-		// Amb l'avís d'una execució anterior, el moviment a l'Arxiu no es reintenta
+		// Un justificant amb l'avís no es mou mai a l'Arxiu: es queda a la sèrie de Regweb
 		AccioMoure accioMoureSenseArxiu = justificant.isJustificantMoureError() ? AccioMoure.WARN_ANTERIOR : AccioMoure.NO_APLICA;
 		FilaInformeJustificantRegistre.actualitzar(fila -> fila.setAccioMoure(accioMoureSenseArxiu));
 		if (carpeta != null && justificant.getPare() != null && justificant.getPare().getId().equals(carpeta.getId())) {
@@ -3319,7 +3237,7 @@ public class ExpedientHelper {
 						desti,
 						expedient.getArxiuUuid());
 			} catch (RuntimeException ex) {
-				FilaInformeJustificantRegistre.actualitzar(fila -> fila.setErrorMoure(ex, false));
+				FilaInformeJustificantRegistre.actualitzar(fila -> fila.setErrorMoure(ex));
 				throw ex;
 			}
 			// Si l'Arxiu n'ha fet una còpia (dispatch), el document passa a ser la còpia

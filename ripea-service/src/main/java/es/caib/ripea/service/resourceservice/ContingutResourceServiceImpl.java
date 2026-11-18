@@ -111,7 +111,8 @@ implements ContingutResourceService {
             if (parentIdChanged) {
                 if (ContingutTipusEnumDto.DOCUMENT.equals(entity.getTipus())) {
                     DocumentEntity documentActual = documentRepository.findById(entity.getId()).get();
-                    if (Utils.hasValue(documentActual.getArxiuUuid())) {
+                    // El justificant pendent de moure és a la sèrie de Regweb i no es mou de l'Arxiu: només es mou a RIPEA
+                    if (Utils.hasValue(documentActual.getArxiuUuid()) && !documentActual.isJustificantMoureError()) {
 	                    contingutHelper.arxiuDocumentPropagarMoviment(
 	                            entity.getArxiuUuid(),
 	                            documentActual.getPare(),
