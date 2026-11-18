@@ -152,8 +152,9 @@ public class DocumentEntity extends NodeEntity {
 	@Column(name = "arxiu_estat", length = 16)
 	private ArxiuEstatEnumDto arxiuEstat;
 	
-	// No s'ha pogut moure el justificant de registre a dins l'expedient de l'arxiu.
-	// El document queda a l'expedient de RIPEA amb l'uuid original i no es reintenta.
+	// Justificant de registre pendent de moure a l'expedient de RIPEA de l'arxiu: el document apunta al justificant
+	// original, que es queda a la sèrie de Regweb (decisió de l'equip d'Arxiu, 18/11/2026). RIPEA no mou ni esborra
+	// aquest node de l'arxiu.
 	@Column(name = "just_moure_error")
 	private boolean justificantMoureError;
 	

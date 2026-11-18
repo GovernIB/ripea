@@ -143,7 +143,8 @@ public class DocumentResourceEntity extends NodeResourceEntity<DocumentResource>
 	@Column(name = "arxiu_estat", length = 16)
 	private ArxiuEstatEnumDto arxiuEstat;
 	
-	// No s'ha pogut moure el justificant de registre a dins l'expedient de l'arxiu.
+	// Justificant de registre pendent de moure a l'expedient de RIPEA de l'arxiu: es queda a la sèrie de Regweb
+	// (veure DocumentEntity.justificantMoureError).
 	@Column(name = "just_moure_error")
 	private boolean justificantMoureError;
 	

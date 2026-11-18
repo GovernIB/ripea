@@ -242,7 +242,8 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             showInMenu: true,
             onClick: guardarArxiu,
             disabled: !entity?.arxiuUuid,
-            hidden: (row:any) => (row?.arxiuUuid && !row?.gesDocFirmatId && !row?.justificantMoureError) || !entity?.potModificar,
+            // El justificant de registre pendent de moure (justificantMoureError) no es reintenta: es queda a la sèrie de Regweb
+            hidden: (row:any) => (row?.arxiuUuid && !row?.gesDocFirmatId) || !entity?.potModificar,
         },
         {
             label: t('page.document.action.detall.label'),
@@ -273,22 +274,25 @@ export const useContingutActions = (entity:any, apiRef:MuiDataGridApiRef, refres
             icon: "file_copy",
             showInMenu: true,
             onClick: handleCopiarShow,
-            hidden: !entity?.potModificar || !user?.sessionScope?.isMostrarCopiar,
+            // El justificant de registre no es pot copiar, igual que no es pot esborrar (justificantRegistre ve de la perspectiva RESUM)
+            hidden: (row:any) => !entity?.potModificar || !user?.sessionScope?.isMostrarCopiar || row?.justificantRegistre,
         },
         {
             label: t('page.contingut.action.vincular.label'),
             icon: "link",
             showInMenu: true,
             onClick: handleVincularShow,
-            hidden: !entity?.potModificar || !user?.sessionScope?.isMostrarVincular,
+            // El justificant de registre no es pot vincular, igual que no es pot esborrar
+            hidden: (row:any) => !entity?.potModificar || !user?.sessionScope?.isMostrarVincular || row?.justificantRegistre,
         },
         {
             label: t('page.document.action.delete.label'),
             icon: "delete",
             showInMenu: true,
             onClick: eliminar,
-            // Els documents d'una anotació no es poden esborrar, igual que al JSP (documentDeAnotacio ve de la perspectiva RESUM)
-            hidden: (row:any) => !(entity?.potModificarContingut || entity?.potModificar) || !isDocument(row) || row?.documentDeAnotacio || (row?.arxiuEstat == 'DEFINITIU' && !user?.sessionScope?.permesEsborrarFinals)
+            // Els documents d'una anotació i els justificants de registre no es poden esborrar, igual que al JSP
+            // (documentDeAnotacio i justificantRegistre venen de la perspectiva RESUM)
+            hidden: (row:any) => !(entity?.potModificarContingut || entity?.potModificar) || !isDocument(row) || row?.documentDeAnotacio || row?.justificantRegistre || (row?.arxiuEstat == 'DEFINITIU' && !user?.sessionScope?.permesEsborrarFinals)
         },
         {
             label: <Divider sx={{width: '100%'}} color={"none"}/>,

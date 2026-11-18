@@ -612,8 +612,9 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		
 		DocumentDto document = documentService.findById(entitatActual.getId(), documentId, null);
 		Exception exception = null;
+		boolean justificantNoEsMou = false;
 		if (document.getArxiuUuid() == null) {
-			
+
 			try {
 				exception = documentService.guardarDocumentArxiu(documentId);
 			} catch (ArxiuJaGuardatException e) {
@@ -628,11 +629,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				exception = e;
 			}
 		} else if (document.isJustificantMoureError()) {
-			try {
-				exception = expedientService.retryMoureJustificantArxiu(documentId);
-			} catch (Exception e) {
-				exception = e;
-			}
+			// El justificant de registre es queda a la sèrie de Regweb: no es mou a l'expedient de l'Arxiu
+			justificantNoEsMou = true;
 		} else if (!StringUtils.isEmpty(document.getGesDocFirmatId())) {
 			
 			try {
@@ -656,7 +654,13 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		} else if (origin.equals("seguiment")) {
 			redirect = "redirect:../../../../seguimentArxiuPendents/#documents";
 		}
-		
+
+		if (justificantNoEsMou) {
+			return getModalControllerReturnValueWarning(
+					request,
+					redirect,
+					"document.justificant.registre.no.es.mou");
+		}
 		if (exception == null) {
 			return getModalControllerReturnValueSuccess(
 					request,

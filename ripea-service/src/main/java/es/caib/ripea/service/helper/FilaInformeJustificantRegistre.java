@@ -39,10 +39,11 @@ public class FilaInformeJustificantRegistre {
 		String getDescripcio();
 	}
 
-	/** Avís que mostra el document quan el justificant no s'ha pogut moure a l'expedient de RIPEA a l'Arxiu. */
-	static final String AVIS_NO_MOGUT = "\"No s'ha pogut moure el justificant de registre a l'expedient documental de RIPEA\"";
+	/** Avís que mostra el document quan el justificant no s'ha mogut a l'expedient de RIPEA a l'Arxiu. */
+	static final String AVIS_NO_MOGUT = "\"Pendent de moure el justificant a l'expedient documental de RIPEA. No afecta a la"
+			+ " tramitació.\"";
 
-	/** Consulta del justificant original a l'Arxiu (sèrie de Distribució). */
+	/** Consulta del justificant original a l'Arxiu (sèrie de Regweb). */
 	public enum AccioConsulta implements ValorAccio {
 		TROBAT("S'ha obtingut de l'Arxiu el justificant original, amb el contingut, per incorporar-lo a l'expedient. Si"
 				+ " després falla un altre pas, l'anotació acaba amb ERROR."),
@@ -73,29 +74,22 @@ public class FilaInformeJustificantRegistre {
 
 	/** Moviment del justificant a l'expedient de RIPEA a l'Arxiu. */
 	public enum AccioMoure implements ValorAccio {
-		MOGUT("MOGUT", "S'ha mogut el justificant a l'Arxiu: si s'ha creat en aquesta execució (CREAT_...), de la sèrie de"
-				+ " Distribució a la carpeta del registre de l'expedient de RIPEA; si ja era a l'expedient (MOGUT_...), de"
-				+ " l'arrel o d'una altra carpeta a la carpeta del registre."),
+		MOGUT("MOGUT", "S'ha mogut a l'Arxiu un justificant que ja era a l'expedient de RIPEA (MOGUT_...): de l'arrel o"
+				+ " d'una altra carpeta a la carpeta del registre."),
 		JA_A_L_ARXIU("JA_A_L_ARXIU", "En crear el justificant, al destí de l'Arxiu ja hi havia un document amb el mateix"
 				+ " nom (d'un intent anterior): el justificant passa a ser aquest document i no es mou res."),
-		ERROR_PERMISOS_WARN("ERROR_PERMISOS (WARN)", "En crear el justificant, l'Arxiu no l'ha deixat moure a l'expedient"
-				+ " de RIPEA per falta de permisos. El document s'ha creat igualment, apunta al justificant original de"
-				+ " Distribució i es mostra amb l'avís " + AVIS_NO_MOGUT + ". El moviment es pot tornar a intentar amb"
-				+ " \"Guardar en arxiu\" des del document."),
-		ERROR_WARN("ERROR (WARN)", "En crear el justificant, l'Arxiu no l'ha deixat moure a l'expedient de RIPEA per un"
-				+ " error que no és de permisos. El document s'ha creat igualment, apunta al justificant original de"
-				+ " Distribució i es mostra amb l'avís " + AVIS_NO_MOGUT + ". El moviment es pot tornar a intentar amb"
-				+ " \"Guardar en arxiu\" des del document."),
+		NO_ES_MOU("NO_ES_MOU", "En crear el justificant, no s'ha mogut a l'expedient de RIPEA a l'Arxiu: de moment es queda"
+				+ " a la sèrie de Regweb, per decisió de l'equip d'Arxiu, fins a la migració a la nova versió de GDIB. El"
+				+ " document apunta al justificant original i es mostra amb l'avís " + AVIS_NO_MOGUT + "."),
 		ERROR_PERMISOS_NO_MOGUT("ERROR_PERMISOS (NO MOGUT)", "En canviar de carpeta un justificant que ja era a l'expedient"
 				+ " de RIPEA a l'Arxiu, l'Arxiu no l'ha deixat moure per falta de permisos: no s'ha mogut ni a l'Arxiu ni a"
 				+ " RIPEA, i l'anotació acaba amb ERROR."),
 		ERROR_NO_MOGUT("ERROR (NO MOGUT)", "En canviar de carpeta un justificant que ja era a l'expedient de RIPEA a"
 				+ " l'Arxiu, l'Arxiu no l'ha deixat moure per un error que no és de permisos: no s'ha mogut ni a l'Arxiu ni a"
 				+ " RIPEA, i l'anotació acaba amb ERROR."),
-		WARN_ANTERIOR("WARN_ANTERIOR", "El justificant ja tenia l'avís " + AVIS_NO_MOGUT + " d'un intent anterior: a"
-				+ " l'Arxiu continua a la sèrie de Distribució. El procés no torna a intentar moure'l a l'Arxiu (es pot fer"
-				+ " amb \"Guardar en arxiu\" des del document) i, si calia canviar-lo de carpeta, només ho fa a RIPEA. No"
-				+ " compta entre els justificants no moguts per falta de permisos d'aquesta execució."),
+		WARN_ANTERIOR("WARN_ANTERIOR", "El justificant ja tenia l'avís " + AVIS_NO_MOGUT + " d'una execució anterior: a"
+				+ " l'Arxiu continua a la sèrie de Regweb i no es mou d'allà. Si calia canviar-lo de carpeta, només es fa a"
+				+ " RIPEA."),
 		NO_APLICA("NO_APLICA", "No s'ha fet ni comprovat res a l'Arxiu: el justificant ja era a la carpeta del registre,"
 				+ " només s'ha mogut a RIPEA, no s'ha incorporat (esborrat, carpeta esborrada, ja incorporat amb un altre"
 				+ " tipus o anotació no tractada) o l'anotació ha fallat abans d'arribar a l'Arxiu.");
@@ -171,7 +165,7 @@ public class FilaInformeJustificantRegistre {
 			"Entitat",
 			"ID anotació",
 			"Identificador anotació",
-			"UUID justificant (Distribució)",
+			"UUID justificant (Regweb)",
 			"ID expedient",
 			"Número expedient",
 			"ID procediment",
@@ -290,18 +284,11 @@ public class FilaInformeJustificantRegistre {
 	}
 
 	/**
-	 * El moviment del justificant a l'expedient de RIPEA a l'Arxiu ha fallat.
-	 *
-	 * @param ambAvis el document queda amb l'avís justificantMoureError (en incorporar-lo), o no s'ha mogut enlloc
-	 *                (en recol·locar un justificant que ja era a l'expedient de l'Arxiu).
+	 * Ha fallat el moviment a l'Arxiu, cap a la carpeta del registre, d'un justificant que ja era a l'expedient de
+	 * RIPEA: no s'ha mogut enlloc.
 	 */
-	public void setErrorMoure(Throwable error, boolean ambAvis) {
-		boolean permisos = isErrorPermisos(error);
-		if (ambAvis) {
-			accioMoure = permisos ? AccioMoure.ERROR_PERMISOS_WARN : AccioMoure.ERROR_WARN;
-		} else {
-			accioMoure = permisos ? AccioMoure.ERROR_PERMISOS_NO_MOGUT : AccioMoure.ERROR_NO_MOGUT;
-		}
+	public void setErrorMoure(Throwable error) {
+		accioMoure = isErrorPermisos(error) ? AccioMoure.ERROR_PERMISOS_NO_MOGUT : AccioMoure.ERROR_NO_MOGUT;
 		errorMoure = missatge(error);
 	}
 

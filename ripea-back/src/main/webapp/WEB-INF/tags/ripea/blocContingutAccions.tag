@@ -220,7 +220,7 @@
 			
 			<%---- Guardar en arxiu ----%>
 			<c:choose>
-				<c:when test="${contingut.document && (contingut.arxiuUuid==null || contingut.justificantMoureError)}">
+				<c:when test="${contingut.document && contingut.arxiuUuid==null}">
 					<c:set var="primerGuardarExpedientArxiu"><spring:message code="disabled.button.primerGuardarExpedientArxiu"/></c:set>
 					<li class="disabledMsg" title="${expedient.arxiuUuid == null ? primerGuardarExpedientArxiu : ''}"><a class="${expedient.arxiuUuid == null ? 'disabled' : ''}" href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/guardarDocumentArxiu?origin=docDetail&tascaId=${tascaId}&expedientId=${contingutNavigationId}"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
 				</c:when>
@@ -310,10 +310,10 @@
 				<c:if test="${contingut.document and !isTasca or (contingut.carpeta && isCreacioCarpetesActiva)}">
 					
 					<li class="${(contingut.document && contingut.gesDocAdjuntId!=null) ? 'disabled' : ''}"><a href="<c:url value="/contingut/${contingut.id}/moure"/>" data-height="400px" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-arrows"></span>&nbsp;<spring:message code="comu.boto.moure"/>...</a></li>
-					<c:if test="${isMostrarCopiar and contingut.document}">
+					<c:if test="${isMostrarCopiar and contingut.document and !contingut.justificantRegistre}">
 						<li><a href="<c:url value="/contingut/${contingut.id}/copiar"/>" data-height="400px" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-copy"></span>&nbsp;<spring:message code="comu.boto.copiar"/>...</a></li>
 					</c:if>
-					<c:if test="${contingut.document and !isTasca and isMostrarVincular}">
+					<c:if test="${contingut.document and !isTasca and isMostrarVincular and !contingut.justificantRegistre}">
 						<li><a href="<c:url value="/contingut/${contingut.id}/vincular"/>" data-height="400px" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-link"></span>&nbsp;<spring:message code="comu.boto.vincular"/>...</a></li>
 					</c:if>
 					<c:set var="mostrarSeparador" value="${true}"/>
@@ -413,7 +413,7 @@
 				
 				<c:set var="permDeleteExpedient">${contingut.expedient && !contingut.conteDocumentsDefinitius && expedient.usuariActualDelete}</c:set>
 				<c:set var="permDeleteCarpeta">${contingut.carpeta && isCreacioCarpetesActiva && expedient.usuariActualWrite && potModificar}</c:set>
-				<c:set var="permDeleteDocument">${(contingut.document && !contingut.documentDeAnotacio && (!contingut.arxiuEstatDefinitiu || (contingut.arxiuEstatDefinitiu && isPermesEsborrarFinals))) && (expedient.usuariActualWrite || isTasca)}</c:set>
+				<c:set var="permDeleteDocument">${(contingut.document && !contingut.documentDeAnotacio && !contingut.justificantRegistre && (!contingut.arxiuEstatDefinitiu || (contingut.arxiuEstatDefinitiu && isPermesEsborrarFinals))) && (expedient.usuariActualWrite || isTasca)}</c:set>
 	
 				<c:if test="${(permDeleteExpedient || permDeleteCarpeta  || permDeleteDocument) && expedientObert}">
 					<li><a href="<c:url value="/contingut/${contingut.id}/delete?contingutNavigationId=${contingutNavigationId}&tascaId=${tascaId}"/>" data-confirm="${esborrarConfirmacioMsg}"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
