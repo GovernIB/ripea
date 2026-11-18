@@ -12,6 +12,7 @@ import {
     MENU_ITEM_PADDING_LEFT,
     MENU_WIDTH_COLLAPSED,
 } from './util/layout';
+import { AlertMessage, TextFieldInputLabel } from './components/AccessibilitatTema';
 
 // Estenem les interfícies de MUI per admetre el color atenuat de la identitat
 declare module '@mui/material/styles' {
@@ -388,7 +389,7 @@ const baseComponentStyles: ThemeOptions['components'] = {
                 // embolcalla la llista dins un <div> (contenidor del panell flotant).
                 [`@container (max-width: ${MENU_COLLAPSED_BELOW}px)`]: {
                     '& .MuiListItemText-root': { display: 'none' },
-                    // Les entrades amb enllaç van dins un <li> (Link de BaseApp.tsx); els grups, no
+                    // Les entrades amb enllaç van dins un <li> (Link de BaseApp.tsx); els grups són el <li>
                     '& > div > .MuiList-root > .MuiListItemButton-root > .menu-item-icon, & > div > .MuiList-root > li > .MuiListItemButton-root > .menu-item-icon': {
                         marginLeft: `${-8 + MENU_BORDER_WIDTH}px`,
                     },
@@ -415,6 +416,16 @@ const baseComponentStyles: ThemeOptions['components'] = {
     // ScreenFrame i guia dels submenús al mateix color (la dibuixa la llibreria en blau fix). Als estils
     // de menú amb colors propis la pren de l'accent (veure BaseApp.tsx).
     MuiListItemButton: {
+        // Les entrades de grup del menú lateral (les que tenen fills) la llibreria les pinta amb
+        // ListItemButton sense `component`, és a dir, com a <div> directament dins el <ul> (WCAG 1.3.1,
+        // verificació 1.3 de l'OAW). Per defecte es pinten com a <li>; les entrades amb enllaç passen
+        // `component` i el <li> el posa el Link de BaseApp.tsx. Un ListItemButton fora d'una llista ha
+        // de passar `component="div"`.
+        // Limitació: amb un grup desplegat, la llibreria posa el submenú dins un <Box> (<div>) fill
+        // directe del <ul>, i això només es pot corregir a lib/components/mui/Menu.tsx.
+        defaultProps: {
+            component: 'li' as const,
+        },
         styleOverrides: {
             root: ({ theme }: { theme: Theme }) => ({
                 // `menu-item-icon` és la classe que la llibreria posa al ListItemIcon del menú
@@ -433,12 +444,36 @@ const baseComponentStyles: ThemeOptions['components'] = {
         },
     },
     MuiTypography: {
+        // MUI pinta les variants `subtitle1` i `subtitle2` com a <h6>: un subtítol qualsevol (descripció
+        // d'una tasca, text d'un diàleg...) quedava com a encapçalament, i després del <h1> de ScreenFrame
+        // l'OAW ho dona per salt de nivell (h1 -> h6, verificació 1.2). Es pinten com a paràgraf; un
+        // subtítol que sigui de debò un encapçalament ha de dur `component` (h2, h3...).
+        defaultProps: {
+            variantMapping: {
+                subtitle1: 'p',
+                subtitle2: 'p',
+            },
+        },
         styleOverrides: {
             h5: { fontSize: '1.8rem', lineHeight: 1.2, fontWeight: 400 },
             h4: { fontSize: '1.5rem', lineHeight: 1.2, fontWeight: 400 },
             body1: { fontWeight: 500 },
 
             overline: { fontSize: '1.2rem', letterSpacing: '0em', textTransform: 'none' },
+        },
+    },
+    // Etiqueta dels TextField `select` sense `for` cap al <div> del Select (verificació 1.9 de l'OAW):
+    // veure TextFieldInputLabel. `slots` es fusiona amb el de cada camp, que pot posar-ne un de propi.
+    MuiTextField: {
+        defaultProps: {
+            slots: { inputLabel: TextFieldInputLabel },
+        },
+    },
+    // Missatge dels avisos com a paràgraf quan només és text (verificació 1.5 de l'OAW): veure
+    // AlertMessage. Els temes que redefineixen MuiAlert han de conservar aquests defaultProps.
+    MuiAlert: {
+        defaultProps: {
+            slotProps: { message: { component: AlertMessage } },
         },
     },
     MuiInputBase: {
@@ -909,6 +944,7 @@ export const darkTheme = createTheme({
             },
         },
         MuiAlert: {
+            ...baseComponentStyles.MuiAlert,
             styleOverrides: {
                 standardWarning: { backgroundColor: '#302519' },
                 standardError: { backgroundColor: '#281111' },
@@ -1127,6 +1163,7 @@ export const draculaTheme = createTheme({
             },
         },
         MuiAlert: {
+            ...baseComponentStyles.MuiAlert,
             styleOverrides: {
                 standardWarning: { backgroundColor: darken(DRACULA_WARNING_MAIN, 0.6) },
                 standardError: { backgroundColor: darken(DRACULA_ERROR_MAIN, 0.7) },

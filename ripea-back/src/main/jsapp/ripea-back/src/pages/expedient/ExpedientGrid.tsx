@@ -243,8 +243,10 @@ const ExpedientGrid = () => {
                 }
                 return resum;
             },
+            // <p>: amb uns quants interessats el text passa de 150 caràcters i, dins un <div>, l'OAW
+            // (verificació 1.5) el dona per paràgraf sense marcar.
             renderCell: (params: any)=> (
-                <Box sx={{ whiteSpace: 'pre-line' }} title={params?.formattedValue}>
+                <Box component="p" sx={{ m: 0, whiteSpace: 'pre-line' }} title={params?.formattedValue}>
                     {params?.formattedValue}
                 </Box>
             ),

@@ -225,9 +225,12 @@ export const PropietatsProps: React.FC<{ quickFilter?: string; entitatCodi?: str
                                 resourceName="configResource"
                                 hiddenToolbar
                                 commonFieldComponentProps={{ size: 'small' }}>
+                                {/* `component="div"`: la llista és un Paper (<div>) amb el formulari al mig,
+                                    no un <ul>, i un <li> fora d'una llista és una llista mal construïda
+                                    (verificació 1.3 de l'OAW); el ListItemButton, per defecte <li> (theme.ts). */}
                                 {configs?.map((c) => (
-                                    <ListItem key={c.key} disablePadding>
-                                        <ListItemButton disableRipple>
+                                    <ListItem key={c.key} component="div" disablePadding>
+                                        <ListItemButton component="div" disableRipple>
                                             <PropsListItem item={c} highlight={quickFilter} handleSaveClick={(value:any) => update(c, value)}/>
                                         </ListItemButton>
                                     </ListItem>

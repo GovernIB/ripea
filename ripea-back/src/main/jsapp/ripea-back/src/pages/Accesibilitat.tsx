@@ -21,9 +21,14 @@ const SectionTitle: React.FC<{
 );
 
 const Accesibilitat: React.FC = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const p = 'page.accesibilitat';
     const rdUrl = 'https://www.boe.es/diario_boe/txt.php?id=BOE-A-2018-12699';
+    // Apartats de contingut no accessible: tots els `noAccesible.itemN` consecutius de la traducció.
+    const itemsNoAccesibles: number[] = [];
+    while (i18n.exists(`${p}.noAccesible.item${itemsNoAccesibles.length + 1}.title`)) {
+        itemsNoAccesibles.push(itemsNoAccesibles.length + 1);
+    }
 
     return (
         <GridPage>
@@ -70,7 +75,7 @@ const Accesibilitat: React.FC = () => {
                             {t(`${p}.noAccesible.title`)}
                         </SectionTitle>
                         <Box component="ol">
-                            {([1, 2, 3] as const).map((i) => (
+                            {itemsNoAccesibles.map((i) => (
                                 <Box component="li" key={i} sx={{ mb: 1 }}>
                                     <Typography component="span" sx={{ fontWeight: 600 }}>
                                         {t(`${p}.noAccesible.item${i}.title`)}
@@ -89,10 +94,10 @@ const Accesibilitat: React.FC = () => {
                         </SectionTitle>
                         <Typography component="p">{t(`${p}.preparacio.elaborat`)}</Typography>
                         <Box component="ul">
-                            <Box component="li">{t(`${p}.preparacio.dataPrep`)}</Box>
                             <Box component="li">{t(`${p}.preparacio.darreraRevisio`)}</Box>
                             <Box component="li">{t(`${p}.preparacio.properaRevisio`)}</Box>
                             <Box component="li">{t(`${p}.preparacio.norma`)}</Box>
+                            <Box component="li">{t(`${p}.preparacio.mostra`)}</Box>
                         </Box>
                         <Typography component="p" sx={{ fontWeight: 600, mt: 1 }}>
                             {t(`${p}.preparacio.resultatTitle`)}

@@ -2,7 +2,7 @@ import React, {useEffect, useMemo, useState} from "react";
 import {createPortal} from "react-dom";
 import {Box, Button, Icon, IconButton, Theme, Tooltip, Typography} from "@mui/material";
 import {useGridApiRef as useMuiDatagridApiRef} from "@mui/x-data-grid-pro";
-import {MuiDataGridProps, MuiGrid, useMuiDataGridApiRef} from "reactlib";
+import {MuiDataGridColDef, MuiDataGridProps, MuiGrid, useMuiDataGridApiRef} from "reactlib";
 import {useTranslation} from "react-i18next";
 import {useUserSession} from "./Session.tsx";
 import MassiveActionSelector, {MassiveActionProps} from "./MassiveActionSelector.tsx";
@@ -12,6 +12,28 @@ import {useScreenFrame} from "./ScreenFrameContext.ts";
 import {titleBarControlsSx} from "./titleBarControlsSx.ts";
 import {SCREEN_GRID_MIN_HEIGHT, SCREEN_TITLE_MIN_HEIGHT, SCREEN_TITLE_PADDING_X} from "../util/layout.ts";
 import {icons} from "../util/icons.ts";
+import {LLARGADA_PARAGRAF} from "./AccessibilitatTema.tsx";
+
+/**
+ * Les cel·les de la graella són <div>: un text llarg (extractes, observacions...) hi quedaria com a
+ * paràgraf sense marcar, i l'OAW (verificació 1.5) el dona per error. A les columnes que pinta MUI per
+ * defecte (sense `renderCell` ni tipus propi), els textos de més de LLARGADA_PARAGRAF caràcters es pinten
+ * dins un <p> (amb el mateix `title` que hi posaria MUI); per a la resta es torna `undefined`, i MUI
+ * la pinta com sempre. La llibreria només hi afegeix `valueFormatter`, que continua donant el text
+ * (`formattedValue`).
+ */
+const ambParagrafsLlargs = (col: MuiDataGridColDef): MuiDataGridColDef =>
+    col.renderCell != null || (col.type != null && col.type !== 'string')
+        ? col
+        : {
+              ...col,
+              renderCell: (params) => {
+                  const text = params.formattedValue ?? params.value;
+                  return typeof text === 'string' && text.length > LLARGADA_PARAGRAF ? (
+                      <Box component="p" sx={{ m: 0 }} title={text}>{text}</Box>
+                  ) : undefined;
+              },
+          };
 
 export const ToolbarButton = (props:any) => {
     const { title, icon, hidden, children, ...other } = props;
@@ -284,10 +306,10 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         }).join('\n')
     ), [gridRows]);
 
-    // Applica word wrap a totes les columnes
+    // Applica word wrap a totes les columnes i marca com a paràgraf els textos llargs
     const columnsWithWordWrap = useMemo(()=>{
         return columns.filter((col:any) => !col?.hidden).map((col:any) => ({
-            ...col,
+            ...ambParagrafsLlargs(col),
             flex: col.flex ?? 1,
         }));
     }, [columns])

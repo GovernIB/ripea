@@ -4,6 +4,7 @@ import Box from '@mui/material/Box';
 import AlertTitle from '@mui/material/AlertTitle';
 import ContingutLink from './ContingutLink';
 import { icons } from '../util/icons';
+import { esNomesText } from './AccessibilitatTema';
 
 type LinkAlertExpandProps = {
     id: string;
@@ -66,7 +67,12 @@ const AlertExpand = (props: any) => {
                 {title && <AlertTitle sx={{ m: 0, lineHeight: 1.4 }}>{title}</AlertTitle>}
                 {label}
                 <Collapse in={verDetalles}>
-                    <Box mt={1}>
+                    {/* Els enllaços als expedients o un text pla formen un paràgraf: dins un <div>, l'OAW
+                        (verificació 1.5) els dona per paràgraf sense marcar quan passen de 150 caràcters.
+                        Amb un altre contingut es manté el <div>: dins un <p> no hi pot haver blocs. */}
+                    <Box
+                        component={linkChildren || esNomesText(children) ? 'p' : 'div'}
+                        sx={{ mt: 1, mb: 0 }}>
                         {linkChildren
                             ? linkChildren.map((link: any, index: number) => (
                                   <span key={link.id}>
