@@ -9,13 +9,18 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import javax.mail.Address;
+import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.SendFailedException;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.acls.model.Permission;
@@ -993,8 +998,73 @@ public class EmailHelper {
 		if (adjunt != null) {
 			helper.addAttachment(nomAdjunt, new ByteArrayResource(adjunt));
 		}
-		mailSender.send(message);
-		return destinataris.size();
+		return enviarBcc(message, "informe de justificants de registre de l'entitat " + entitatId).size();
+	}
+
+	/**
+	 * Envia un correu amb els destinataris en BCC. Si el servidor de correu rebutja alguna adreça (p.ex. "550 5.1.1
+	 * User unknown"), JavaMail no envia el missatge a ningú: es torna a enviar una sola vegada a les adreces que el
+	 * servidor no ha rebutjat, perquè un destinatari amb una adreça inexistent no deixi sense correu la resta.
+	 *
+	 * Si el servidor accepta l'adreça i el correu rebota després, el rebot arriba al remitent i no es detecta aquí.
+	 *
+	 * @param message missatge amb els destinataris en BCC (sense TO ni CC).
+	 * @param descripcio descripció del correu per al log.
+	 * @return les adreces a les quals s'ha enviat el correu.
+	 * @throws MailSendException si no s'ha pogut enviar a cap adreça, o si falla el segon enviament.
+	 */
+	List<String> enviarBcc(MimeMessage message, String descripcio) throws MessagingException {
+		try {
+			mailSender.send(message);
+			List<String> enviades = adrecesText(message.getRecipients(Message.RecipientType.BCC));
+			logger.info("Correu enviat (" + descripcio + ") a " + enviades.size() + " destinataris: " + enviades);
+			return enviades;
+		} catch (MailSendException ex) {
+			SendFailedException sendFailed = getSendFailedException(ex);
+			if (sendFailed == null) {
+				throw ex;
+			}
+			List<String> rebutjades = adrecesText(sendFailed.getInvalidAddresses());
+			List<String> enviades = adrecesText(sendFailed.getValidSentAddresses());
+			Address[] pendents = sendFailed.getValidUnsentAddresses();
+			if (pendents == null || pendents.length == 0) {
+				if (enviades.isEmpty()) {
+					throw ex;
+				}
+				// El servidor ja l'ha enviat a les adreces vàlides (enviament parcial activat a la sessió de correu)
+				logger.warn("Correu enviat (" + descripcio + ") a " + enviades.size() + " destinataris: " + enviades
+						+ ". Adreces rebutjades pel servidor de correu: " + rebutjades);
+				return enviades;
+			}
+			logger.warn("El servidor de correu ha rebutjat les adreces " + rebutjades + " (" + descripcio
+					+ "): no s'ha enviat a ningú i es torna a enviar a la resta de destinataris");
+			message.setRecipients(Message.RecipientType.BCC, pendents);
+			mailSender.send(message);
+			enviades.addAll(adrecesText(pendents));
+			logger.info("Correu enviat (" + descripcio + ") a " + enviades.size() + " destinataris: " + enviades
+					+ ". Adreces rebutjades pel servidor de correu: " + rebutjades);
+			return enviades;
+		}
+	}
+
+	/** Excepció de JavaMail amb les adreces rebutjades, acceptades i no enviades, si n'hi ha. */
+	private static SendFailedException getSendFailedException(MailSendException ex) {
+		for (Exception failed : ex.getFailedMessages().values()) {
+			if (failed instanceof SendFailedException) {
+				return (SendFailedException) failed;
+			}
+		}
+		return null;
+	}
+
+	private static List<String> adrecesText(Address[] adreces) {
+		List<String> text = new ArrayList<>();
+		if (adreces != null) {
+			for (Address adreca : adreces) {
+				text.add(adreca instanceof InternetAddress ? ((InternetAddress) adreca).getAddress() : adreca.toString());
+			}
+		}
+		return text;
 	}
 
 	/** Separadors entre adreces quan un camp de correu en conté més d'una. */
@@ -1426,6 +1496,7 @@ public class EmailHelper {
                 MimeMessageHelper helper = new MimeMessageHelper(message, true);
                 helper.setFrom(from);
 
+                boolean bcc;
                 switch (eventTipus) {
                     case CANVI_ESTAT_REVISIO:
                     case PROCEDIMENT_COMENTARI:
@@ -1433,9 +1504,11 @@ public class EmailHelper {
                     case MENCIO_COMENTARI:
                     case AVIS_ERROR_TANCAMENT_ARXIU:
                         helper.setBcc(to);
+                        bcc = true;
                         break;
                     default:
                         helper.setTo(to);
+                        bcc = false;
                         break;
                 }
 
@@ -1453,7 +1526,11 @@ public class EmailHelper {
                         helper.addAttachment(fitxer.getNom(), new ByteArrayResource(fitxer.getContingut()));
                     }
                 }
-                mailSender.send(message);
+                if (bcc) {
+                    enviarBcc(message, "esdeveniment " + eventTipus + ", subject=" + subject);
+                } else {
+                    mailSender.send(message);
+                }
             } catch (Exception e) {
                 logger.error("No s'ha pogut enviar el correu electrònic (subject=" + subject + ")", e);
                 if (propagarError) {
