@@ -13,6 +13,8 @@ import { useTranslation } from 'react-i18next';
 import { useToProgramaAntic } from '@src/pages/user/UserHeadToolbar';
 import { useLocation } from 'react-router-dom';
 import { useUserSession } from '@src/components/Session';
+import { icons } from '@src/util/icons';
+import { RUTA_INICI } from '@src/pages/inici/Inici';
 
 const filterHiddenEntries = (entries: any[]): any[] =>
     entries
@@ -67,6 +69,16 @@ export const useCombinedMenu = () => {
             { condition: rol?.isRevisor, data: revisor },
         ];
 
+        // Pantalla d'inici: primera entrada del menú, comuna a tots els rols.
+        if (!senseEntitat && menus.some(({ condition }) => condition)) {
+            side.push({
+                id: 'inici',
+                title: t('page.user.menu.inici'),
+                icon: icons.inici,
+                to: RUTA_INICI,
+            });
+        }
+
         menus.forEach(({ condition, data }) => {
             // Sense entitat no hi ha cap pantalla accessible (AppRoutes mostra l'avís): no s'ofereix cap menú.
             if (condition && !senseEntitat) {
@@ -78,7 +90,7 @@ export const useCombinedMenu = () => {
         });
 
         return { sideMenuEntries: side, headerActions: header, additionalContents: content };
-    }, [supAdmin, admin, adminLectura, dissenyOrgan, organAdmin, revisor, rol, senseEntitat, usuari, accionesMasivas]);
+    }, [t, supAdmin, admin, adminLectura, dissenyOrgan, organAdmin, revisor, rol, senseEntitat, usuari, accionesMasivas]);
 
     return { sideMenuEntries, headerActions, additionalContents };
 };

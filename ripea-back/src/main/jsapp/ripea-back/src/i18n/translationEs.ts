@@ -252,6 +252,7 @@ const translationEs = {
     navigate: {
         sitemap: "Mapa del sitio web",
         accessibilitat: "Accesibilidad",
+        inici: "Inicio",
         expedient: "Expedientes",
         expedientPeticio: "Anotaciones de registro",
         usuariTasca: "Tareas",
@@ -510,6 +511,11 @@ const translationEs = {
         },
         tasca: {
             title: "Tarea",
+            dataLimitEstat: {
+                expirada: "Fecha límite vencida",
+                propera: "Fecha límite próxima",
+                finalitzadaForaTermini: "Finalizada fuera de plazo",
+            },
             view: {
                 title: "Tipo de vista",
                 table: "Vista de tabla",
@@ -2530,6 +2536,8 @@ const translationEs = {
             menu: {
                 title: "Menú",
 
+                inici: "Inicio",
+                alertes: "Alertas de expedientes",
                 entitat: "Entidades",
                 expedient: "Expedientes",
                 monitoritzar: "Monitorizar",
@@ -2643,6 +2651,45 @@ const translationEs = {
                 metaNode: "Existen documentos sin un tipo de documento asignado",
                 noFinalitzades: "Existen notificaciones con un estado que no es final",
                 interessatObligatori: "Falta informar un interesado",
+            },
+        },
+        alertaExpedient: {
+            estat: {
+                llegida: "Leída",
+                noLlegida: "No leída",
+            },
+            detail: {
+                title: "Detalle de la alerta",
+                obrirExpedient: "Abrir el expediente",
+            },
+        },
+        inici: {
+            title: "Inicio",
+            buit: "Todavía no hay ningún indicador disponible.",
+            error: "No se han podido cargar los indicadores.",
+            indicadors: "Indicadores",
+            noDisponible: "No disponible",
+            deTotal: "de {{total}}",
+            indicador: {
+                EXPEDIENTS_AGAFATS: { titol: "Expedientes cogidos por mí", descripcio: "Expedientes abiertos que tienes cogidos." },
+                EXPEDIENTS_ANTICS: { titol: "Expedientes antiguos", descripcio: "Expedientes abiertos creados hace más de {{dies}} días." },
+                EXPEDIENTS_OBERTS: { titol: "Expedientes abiertos", descripcio: "Expedientes abiertos que puedes consultar." },
+                EXPEDIENTS_TANCATS_RECENTS: { titol: "Expedientes cerrados recientemente", descripcio: "Expedientes cerrados en los últimos {{dies}} días." },
+                ALERTES_NO_LLEGIDES: { titol: "Alertas no leídas", descripcio: "Alertas pendientes de leer de los expedientes que puedes consultar." },
+                ANOTACIONS_PENDENTS: { titol: "Anotaciones pendientes", descripcio: "Anotaciones de registro pendientes de procesar." },
+                TASQUES_EN_CURS: { titol: "Tareas en curso", descripcio: "Tareas iniciadas o cogidas en las que participas (responsable, delegado u observador)." },
+                TASQUES_PENDENTS: { titol: "Tareas pendientes", descripcio: "Tareas por iniciar en las que participas (responsable, delegado u observador)." },
+                TASQUES_VENCIMENT_PROPER: { titol: "Tareas con vencimiento próximo", descripcio: "Tareas pendientes que vencen en los próximos {{dies}} días." },
+                TASQUES_FORA_TERMINI: { titol: "Tareas fuera de plazo", descripcio: "Tareas pendientes con la fecha límite vencida." },
+                TASQUES_SENSE_ACTIVITAT: { titol: "Tareas sin actividad", descripcio: "Tareas pendientes de la entidad sin cambios ni comentarios en los últimos {{dies}} días." },
+                PROCEDIMENTS_PENDENTS_REVISIO: { titol: "Procedimientos pendientes de revisión", descripcio: "Procedimientos enviados a revisar." },
+                PROCEDIMENTS_EN_DISSENY: { titol: "Procedimientos en diseño", descripcio: "Procedimientos que todavía se están diseñando." },
+                PROCEDIMENTS_REBUTJATS: { titol: "Procedimientos rechazados", descripcio: "Procedimientos rechazados pendientes de corregir." },
+                PROCEDIMENTS_REVISATS: { titol: "Procedimientos revisados", descripcio: "Procedimientos revisados y aprobados." },
+                INTEGRACIONS_ERROR: { titol: "Errores de integración (24 h)", descripcio: "Llamadas a sistemas externos con error en las últimas 24 horas." },
+                EXCEPCIONS: { titol: "Excepciones (24 h)", descripcio: "Excepciones registradas con alguna aparición en las últimas 24 horas." },
+                MEMORIA_LLIURE: { titol: "Memoria libre", descripcio: "Memoria libre de la máquina virtual Java del servidor que ha respondido." },
+                DISC_LLIURE: { titol: "Disco libre", descripcio: "Espacio libre del disco principal del servidor que ha respondido." },
             },
         },
         sitemap: {

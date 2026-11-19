@@ -118,7 +118,7 @@ export const Avisos = (props: any) => {
                   onClick={(event:any) => {
                       event.stopPropagation()
                       handelAlert?.(entity?.id, entity)
-                  }}>error</Icon>}
+                  }}>{icons.alertes}</Icon>}
         {entity?.arxiuUuid == null &&
             <Icon color={"error"} title={t('page.contingut.alert.guardarPendent')}>warning</Icon>}
     </>

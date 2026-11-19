@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -18,8 +19,10 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.turkraft.springfilter.FilterBuilder;
 import com.turkraft.springfilter.parser.Filter;
@@ -28,6 +31,7 @@ import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientTascaEntity;
 import es.caib.ripea.persistence.entity.resourceentity.ExpedientTascaResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientTascaResourceEntity;
+import es.caib.ripea.service.resourcehelper.inici.RecomptesRecurs;
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.ExpedientTascaResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientTascaResourceRepository;
@@ -67,7 +71,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceService<ExpedientTascaResource, Long, ExpedientTascaResourceEntity> implements ExpedientTascaResourceService {
+public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceService<ExpedientTascaResource, Long, ExpedientTascaResourceEntity> implements ExpedientTascaResourceService, RecomptesRecurs<ExpedientTascaResourceEntity> {
 
     private final ExpedientTascaResourceRepository expedientTascaResourceRepository;
     private final PerspectivesLotHelper perspectivesLotHelper;
@@ -119,6 +123,13 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
             }
         }
         return Sort.by(orders);
+    }
+
+    /** Recomptes de la pantalla d'inici amb la visibilitat del llistat de tasques (veure RecomptesRecurs). */
+    @Override
+    @Transactional(readOnly = true)
+    public Map<String, Long> comptar(Map<String, Specification<ExpedientTascaResourceEntity>> criteris, String[] namedQueries) {
+        return RecomptesRecurs.comptar(criteris, this.<ExpedientTascaResourceEntity>toFindProcessedSpecification(null, null, namedQueries), entityRepository);
     }
 
     @Override
@@ -239,6 +250,10 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
 	}
 	
 
+    /** Estats d'una tasca que encara s'ha de fer: són les úniques que es marquen vençudes o amb la data límit propera. */
+    private static final List<TascaEstatEnumDto> ESTATS_PENDENTS = Arrays.asList(
+            TascaEstatEnumDto.PENDENT, TascaEstatEnumDto.INICIADA, TascaEstatEnumDto.AGAFADA);
+
     private class ContextUsuariPerspectiveApplicator implements PerspectiveApplicator<ExpedientTascaResourceEntity, ExpedientTascaResource> {
         @Override
         public void applySingle(String code, ExpedientTascaResourceEntity entity, ExpedientTascaResource resource) throws PerspectiveApplicationException {
@@ -255,10 +270,16 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
             resource.setUsuariActualResponsable(usuariActualResponsable);
             resource.setUsuariActualDelegat(resource.getDelegat() != null && usuariActualCodi.equals(resource.getDelegat().getId()));
             if (entity.getDataLimit() != null) {
-                if (entity.getDataLimit().before(Calendar.getInstance().getTime())) {
-                    resource.setDataLimitExpirada(true);
-                } else {
-                    resource.setShouldNotifyAboutDeadline(tascaHelper.shouldNotifyAboutDeadline(entity.getDataLimit()));
+                if (ESTATS_PENDENTS.contains(entity.getEstat())) {
+                    // Vençuda o dins del preavís: només per a les tasques que encara s'han de fer
+                    if (entity.getDataLimit().before(Calendar.getInstance().getTime())) {
+                        resource.setDataLimitExpirada(true);
+                    } else {
+                        resource.setShouldNotifyAboutDeadline(tascaHelper.shouldNotifyAboutDeadline(entity.getDataLimit()));
+                    }
+                } else if (TascaEstatEnumDto.FINALITZADA.equals(entity.getEstat()) && entity.getDataFi() != null) {
+                    // La data límit és un dia sense hora: fora de termini si es va finalitzar un dia posterior
+                    resource.setFinalitzadaForaTermini(DateUtils.truncatedCompareTo(entity.getDataFi(), entity.getDataLimit(), Calendar.DATE) > 0);
                 }
             }
             resource.setUsuariActualOnlyObservador(entity.isUsuariActualOnlyObservador(usuariActualCodi));

@@ -249,6 +249,7 @@ const translationEn = {
     },
     navigate: {
         accessibilitat: "Accessibility",
+        inici: "Home",
         expedient: "Case search",
         expedientPeticio: "Registry entries search",
         usuariTasca: "Tasks",
@@ -506,6 +507,11 @@ const translationEn = {
         },
         tasca: {
             title: "Task",
+            dataLimitEstat: {
+                expirada: "Deadline passed",
+                propera: "Deadline approaching",
+                finalitzadaForaTermini: "Finished after the deadline",
+            },
             view: {
                 title: "View type",
                 table: "Table view",
@@ -2523,6 +2529,8 @@ const translationEn = {
             menu: {
                 title: "Menu",
 
+                inici: "Home",
+                alertes: "Case alerts",
                 entitat: "Entities",
                 expedient: "Cases",
                 monitoritzar: "Monitor",
@@ -2628,6 +2636,45 @@ const translationEn = {
                 metaNode: "There are documents without an assigned document type",
                 noFinalitzades: "There are notifications whose status is not final",
                 interessatObligatori: "A required interested party is missing",
+            },
+        },
+        alertaExpedient: {
+            estat: {
+                llegida: "Read",
+                noLlegida: "Unread",
+            },
+            detail: {
+                title: "Alert details",
+                obrirExpedient: "Open the case",
+            },
+        },
+        inici: {
+            title: "Home",
+            buit: "There are no indicators available yet.",
+            error: "The indicators could not be loaded.",
+            indicadors: "Indicators",
+            noDisponible: "Not available",
+            deTotal: "of {{total}}",
+            indicador: {
+                EXPEDIENTS_AGAFATS: { titol: "Cases taken by me", descripcio: "Open cases you have taken." },
+                EXPEDIENTS_ANTICS: { titol: "Old cases", descripcio: "Open cases created more than {{dies}} days ago." },
+                EXPEDIENTS_OBERTS: { titol: "Open cases", descripcio: "Open cases you can view." },
+                EXPEDIENTS_TANCATS_RECENTS: { titol: "Recently closed cases", descripcio: "Cases closed in the last {{dies}} days." },
+                ALERTES_NO_LLEGIDES: { titol: "Unread alerts", descripcio: "Unread alerts of the cases you can view." },
+                ANOTACIONS_PENDENTS: { titol: "Pending registry entries", descripcio: "Registry entries pending processing." },
+                TASQUES_EN_CURS: { titol: "Tasks in progress", descripcio: "Started or taken tasks you take part in (responsible, delegate or observer)." },
+                TASQUES_PENDENTS: { titol: "Pending tasks", descripcio: "Tasks to start you take part in (responsible, delegate or observer)." },
+                TASQUES_VENCIMENT_PROPER: { titol: "Tasks due soon", descripcio: "Pending tasks due in the next {{dies}} days." },
+                TASQUES_FORA_TERMINI: { titol: "Overdue tasks", descripcio: "Pending tasks past their deadline." },
+                TASQUES_SENSE_ACTIVITAT: { titol: "Inactive tasks", descripcio: "Pending tasks of the entity with no changes or comments in the last {{dies}} days." },
+                PROCEDIMENTS_PENDENTS_REVISIO: { titol: "Procedures pending review", descripcio: "Procedures sent for review." },
+                PROCEDIMENTS_EN_DISSENY: { titol: "Procedures in design", descripcio: "Procedures still being designed." },
+                PROCEDIMENTS_REBUTJATS: { titol: "Rejected procedures", descripcio: "Rejected procedures pending correction." },
+                PROCEDIMENTS_REVISATS: { titol: "Reviewed procedures", descripcio: "Reviewed and approved procedures." },
+                INTEGRACIONS_ERROR: { titol: "Integration errors (24 h)", descripcio: "Calls to external systems with errors in the last 24 hours." },
+                EXCEPCIONS: { titol: "Exceptions (24 h)", descripcio: "Exceptions logged with at least one occurrence in the last 24 hours." },
+                MEMORIA_LLIURE: { titol: "Free memory", descripcio: "Free Java virtual machine memory of the server that responded." },
+                DISC_LLIURE: { titol: "Free disk", descripcio: "Free space on the main disk of the server that responded." },
             },
         },
         accesibilitat: {

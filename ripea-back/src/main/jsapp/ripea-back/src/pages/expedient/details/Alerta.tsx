@@ -8,7 +8,8 @@ import * as builder from "../../../util/springFilterUtils.ts";
 import {useUserSession} from "../../../components/Session.tsx";
 import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
-const useActions = (refresh?: () => void) => {
+/** Accions «Marca com a llegida» (individual i massiva) de les alertes. També les fa servir la consulta d'alertes. */
+export const useAlertaActions = (refresh?: () => void) => {
     const { t } = useTranslation();
     const {temporalMessageShow} = useBaseAppContext();
     const {
@@ -30,7 +31,8 @@ const useActions = (refresh?: () => void) => {
         apiAction(undefined, {code :code, data:{ ids: ids, masivo: true }})
             .then(() => {
                 refresh?.()
-                temporalMessageShow(null, msg, 'info');
+                // L'acció es fa a l'instant (no es programa en segon pla): missatge d'èxit
+                temporalMessageShow(null, msg, 'success');
             })
             .catch((error) => {
                 temporalMessageShow(null, error?.message, 'error');
@@ -68,7 +70,7 @@ const Alerta = (props:any) => {
         apiRef?.current?.refresh?.();
     }
 
-    const {llegit, massiveLlegit} = useActions(refresh);
+    const {llegit, massiveLlegit} = useAlertaActions(refresh);
     const actions = user?.rolActual != "IPA_ADMIN_LECTURA" ?[
         {
             label: t('page.alert.action.read.label'),

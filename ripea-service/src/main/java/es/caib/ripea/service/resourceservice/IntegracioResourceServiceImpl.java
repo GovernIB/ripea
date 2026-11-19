@@ -14,6 +14,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
@@ -37,13 +38,14 @@ import es.caib.ripea.service.intf.model.IntegracioResource;
 import es.caib.ripea.service.intf.model.IntegracioResource.DiagnosticResetForm;
 import es.caib.ripea.service.intf.resourceservice.IntegracioResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
+import es.caib.ripea.service.resourcehelper.inici.RecomptesRecurs;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class IntegracioResourceServiceImpl extends BaseMutableResourceService<IntegracioResource, Long, IntegracioResourceEntity> implements IntegracioResourceService {
+public class IntegracioResourceServiceImpl extends BaseMutableResourceService<IntegracioResource, Long, IntegracioResourceEntity> implements IntegracioResourceService, RecomptesRecurs<IntegracioResourceEntity> {
 
 	private final OrganGestorRepository organGestorRepository;
 	private final EntitatRepository entitatRepository;
@@ -65,6 +67,13 @@ public class IntegracioResourceServiceImpl extends BaseMutableResourceService<In
     protected <P> Specification<P> toFindProcessedSpecification(String quickFilter, String filter, String[] namedQueries) {
     	//Substituir entitat.id (que no existeix al IntegracioResourceEntity), per entitatCodi
         return super.toFindProcessedSpecification(quickFilter, translateEntitatFilter(filter), namedQueries);
+    }
+
+    /** Recomptes de la pantalla d'inici sobre el monitor d'integracions (veure RecomptesRecurs). */
+    @Override
+    @Transactional(readOnly = true)
+    public Map<String, Long> comptar(Map<String, Specification<IntegracioResourceEntity>> criteris, String[] namedQueries) {
+        return RecomptesRecurs.comptar(criteris, this.<IntegracioResourceEntity>toFindProcessedSpecification(null, null, namedQueries), entityRepository);
     }
 
     private String translateEntitatFilter(String filter) {

@@ -7,6 +7,22 @@ import { icons as iconsAppMenu } from '@src/util/icons';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
+/** Entrada «Alertes d'expedients» del submenú Consultar: la tenen tots els rols que veuen el llistat d'expedients. */
+const entradaAlertesExpedient = (t: (key: string) => string) => ({
+    id: 'alertes',
+    title: t('page.user.menu.alertes'),
+    icon: iconsAppMenu.alertes,
+    to: '/alertesExpedient',
+});
+
+/** Submenú Consultar dels rols que no en tenen cap altra consulta (administrador de lectura i d'òrgan). */
+const menuConsultarAlertesExpedient = (t: (key: string) => string) => ({
+    id: 'consultar',
+    title: t('page.user.menu.consultar'),
+    icon: iconsAppMenu.consulta,
+    children: [entradaAlertesExpedient(t)],
+});
+
 export const useMenuSupAdmin = () => {
     const { t } = useTranslation();
     const { handleOpen, dialog } = useSistemaDetail();
@@ -211,6 +227,7 @@ export const useMenuAdmin = () => {
                         icon: iconsAppMenu.contingut,
                         to: '/contingutAdmin',
                     },
+                    entradaAlertesExpedient(t),
                     /*{
                         id: 'dadesEstadistiques',
                         title: t('page.user.menu.dadesEstadistiques'),
@@ -307,6 +324,7 @@ export const useMenuAdminLectura = () => {
                 iconVariant: 'material-icons-outlined',
                 to: '/metaExpedient',
             },
+            menuConsultarAlertesExpedient(t),
         ];
         const content = <></>;
 
@@ -379,6 +397,7 @@ export const useMenuAdminOrgan = () => {
                     },
                 ],
             },
+            menuConsultarAlertesExpedient(t),
         ];
         const content = <></>;
 
@@ -495,8 +514,9 @@ export const useMenuUsuari = () => {
                 id: 'consultar',
                 title: t('page.user.menu.consultar'),
                 icon: iconsAppMenu.consulta,
-                hidden: !(user?.sessionScope?.teAccesEstadistiques || user?.sessionScope?.isMostrarSeguimentEnviamentsUsuariActiu),
+                // Sempre visible: les alertes d'expedients no depenen de cap propietat
                 children: [
+                    entradaAlertesExpedient(t),
                     {
                         id: 'dadesEstadistiques',
                         title: t('page.user.menu.dadesEstadistiques'),

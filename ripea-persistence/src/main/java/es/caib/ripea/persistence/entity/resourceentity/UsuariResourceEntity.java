@@ -92,6 +92,9 @@ public class UsuariResourceEntity implements ResourceEntity<UsuariResource, Stri
     @Enumerated(EnumType.STRING)
     @Column(name = "estil_menu", length = 16, nullable = false, columnDefinition = "VARCHAR(16) DEFAULT 'TEMA'")
     private MenuEstilEnum estilMenu = MenuEstilEnum.TEMA;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "pagina_entrada", length = 16, nullable = false, columnDefinition = "VARCHAR(16) DEFAULT 'ROL'")
+    private PaginaEntradaEnum paginaEntrada = PaginaEntradaEnum.ROL;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(

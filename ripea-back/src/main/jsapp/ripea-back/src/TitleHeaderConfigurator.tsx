@@ -4,6 +4,7 @@ import {useTranslation} from "react-i18next";
 import i18n from './i18n/i18n';
 
 const TITLES: any = {
+    '/inici': "navigate.inici",
     '/expedient': "navigate.expedient",
     '/expedientPeticio': "navigate.expedientPeticio",
     '/usuariTasca': "navigate.usuariTasca",
@@ -38,6 +39,7 @@ const TITLES: any = {
     '/seguimentTasques': "page.user.menu.assignacio",
     '/seguimentExpedientsPendents': "page.user.menu.pendents",
     '/expedientPeticioComunicades': "page.user.menu.comunicades",
+    '/alertesExpedient': "page.user.menu.alertes",
 
     // Configurar
     '/metaExpedient': "page.user.menu.procedimentsTitle",

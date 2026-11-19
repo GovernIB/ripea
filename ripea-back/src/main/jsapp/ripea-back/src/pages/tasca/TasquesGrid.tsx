@@ -25,8 +25,21 @@ import {TascaKanban} from "@src/pages/tasca/TascaKanban.tsx";
 import {useSession} from "@src/components/SessionStorageContext.tsx";
 
 
+/**
+ * Data límit d'una tasca. El backend només marca vençudes o properes les tasques pendents (vermell i taronja,
+ * amb la icona); una finalitzada un dia posterior a la data límit duu la icona però no el color.
+ * La icona té text alternatiu perquè no tots els casos es distingeixen pel color.
+ */
 export const StyledDate = (props: any) => {
     const {entity, children} = props;
+    const { t } = useTranslation();
+    const avisDataLimit = entity?.dataLimitExpirada
+        ? t('page.tasca.dataLimitEstat.expirada')
+        : entity?.shouldNotifyAboutDeadline
+            ? t('page.tasca.dataLimitEstat.propera')
+            : entity?.finalitzadaForaTermini
+                ? t('page.tasca.dataLimitEstat.finalitzadaForaTermini')
+                : undefined;
     const color = entity?.dataLimitExpirada
         ?'error'
         :entity?.shouldNotifyAboutDeadline
@@ -38,7 +51,7 @@ export const StyledDate = (props: any) => {
         color !== 'default' && theme.palette.mode === 'dark' ? {color: lighten(theme.palette[color].main, 0.4)} : {};
     return <Typography variant={"inherit"} color={color} sx={sx}>
         {children}
-        {(entity?.dataLimitExpirada || entity?.shouldNotifyAboutDeadline) && <Icon>alarm</Icon>}
+        {avisDataLimit && <Icon role="img" aria-label={avisDataLimit} title={avisDataLimit}>alarm</Icon>}
     </Typography>
 }
 

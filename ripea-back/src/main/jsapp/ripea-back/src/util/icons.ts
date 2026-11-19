@@ -103,9 +103,24 @@ export const icons = {
     programat: 'schedule',
     senseDades: 'block',
     favorit: 'star',
-    alertes: 'note_stack',
+    // Alertes d'expedient: la mateixa icona que les marca al llistat d'expedients
+    alertes: 'error',
     historial: 'history',
     comentaris: 'forum',
+
+    // --- Indicadors de la pantalla d'inici (conceptes sense icona pròpia a la resta de l'aplicació) ---
+    expedientAgafat: 'lock',
+    expedientTancat: 'inventory_2',
+    tascaEnCurs: 'pending_actions',
+    tascaPendent: 'hourglass_empty',
+    // La mateixa icona que marca la data límit propera al llistat de tasques
+    tascaVencimentProper: 'alarm',
+    tascaForaTermini: 'event_busy',
+    tascaSenseActivitat: 'snooze',
+    procedimentEnDisseny: 'design_services',
+    procedimentRebutjat: 'thumb_down',
+    memoria: 'memory',
+    disc: 'storage',
 
     // --- Objectes i vistes -------------------------------------------------------------------
     correu: 'mail',

@@ -103,6 +103,8 @@ public class UsuariResource extends BaseResource<String> {
 
     private TemaAplicacioEnum temaAplicacio;
     private MenuEstilEnum estilMenu;
+    /** Pantalla on entra l'usuari a la interfície REACT: la del rol (per defecte) o la pantalla d'inici. */
+    private PaginaEntradaEnum paginaEntrada = PaginaEntradaEnum.ROL;
 
     @ResourceField(enumType = true)
 	private Long numElementsPagina;

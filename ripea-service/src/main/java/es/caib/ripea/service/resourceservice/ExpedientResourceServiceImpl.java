@@ -158,6 +158,7 @@ import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.resourcehelper.ExpedientPermisosFiltreHelper;
+import es.caib.ripea.service.resourcehelper.inici.RecomptesRecurs;
 import es.caib.ripea.service.intf.utils.ZipDocumentExtractor;
 import es.caib.ripea.service.permission.ExtendedPermission;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
@@ -169,7 +170,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ExpedientResourceServiceImpl extends BaseMutableResourceService<ExpedientResource, Long, ExpedientResourceEntity> implements ExpedientResourceService {
+public class ExpedientResourceServiceImpl extends BaseMutableResourceService<ExpedientResource, Long, ExpedientResourceEntity> implements ExpedientResourceService, RecomptesRecurs<ExpedientResourceEntity> {
 
 	private final EntitatRepository entitatRepository;
 	private final ExpedientRepository expedientRepository;
@@ -341,6 +342,16 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 		};
 		
 		return distinctSpecification != null ? distinctSpecification : Specification.where(null);
+    }
+
+    /**
+     * Recomptes de la pantalla d'inici amb la visibilitat del llistat d'expedients. Els permisos
+     * (additionalSpringFilter) es calculen un sol cop per a tots els criteris (veure RecomptesRecurs).
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Map<String, Long> comptar(Map<String, Specification<ExpedientResourceEntity>> criteris, String[] namedQueries) {
+        return RecomptesRecurs.comptar(criteris, this.<ExpedientResourceEntity>toFindProcessedSpecification(null, null, namedQueries), entityRepository);
     }
 
     @Override

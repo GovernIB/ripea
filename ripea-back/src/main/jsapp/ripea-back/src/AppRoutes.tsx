@@ -22,6 +22,7 @@ import ConsultesPinbalGrid from "./pages/user/consultes/ConsultesPinbalGrid.tsx"
 import AssignacioTasquesGrid from "./pages/user/consultes/AssignacioTasquesGrid.tsx";
 import ExpedientsPendentsGrid from "./pages/user/consultes/ExpedientsPendentsGrid.tsx";
 import AnotacionsComunicadesGrid from "./pages/user/consultes/AnotacionsComunicadesGrid.tsx";
+import AlertesExpedientGrid from "./pages/user/consultes/AlertesExpedientGrid.tsx";
 import ContingutGrid from "./pages/user/consultes/ContingutGrid.tsx";
 import MetaExpedientGrid from "./pages/metaExpedient/MetaExpedientGrid.tsx";
 import GrupGrid from "./pages/user/configurar/GrupGrid.tsx";
@@ -49,6 +50,7 @@ import Accesibilitat from "./pages/Accesibilitat.tsx";
 import Sitemap from "./pages/Sitemap.tsx";
 import UsuariGrid from "./pages/usuari/UsuariGrid.tsx";
 import Load from "./components/Load.tsx";
+import Inici, {PAGINA_ENTRADA_INICI, RUTA_INICI} from "./pages/inici/Inici.tsx";
 
 const ProtectedRoute = ({ allowedRoles = [], params = [] }: any) => {
     const {value: user, isLoaded} = useUserSession();
@@ -78,6 +80,13 @@ const HomeRedirect = () => {
     // hi aterrarien amb el missatge de no autoritzat en comptes de la seva pantalla d'inici.
     if (!isLoaded) {
         return <Load value={false} />;
+    }
+
+    // Preferència del perfil «Pantalla en entrar a l'aplicació»: la pantalla d'inici (indicadors del rol)
+    // en lloc de la pantalla per defecte del rol. Tots els rols en tenen. També s'aplica en canviar de
+    // rol, perquè el canvi torna a aquesta ruta.
+    if (user?.conf?.paginaEntrada === PAGINA_ENTRADA_INICI) {
+        return <Navigate to={RUTA_INICI} replace />;
     }
 
     // En arribar aquí ja estem dins de la UI React (p.ex. després de canviar de rol,
@@ -111,6 +120,9 @@ const AppRoutes: React.FC = () => {
 
     return <Routes>
         <Route path="/" element={<HomeRedirect />} />
+
+        {/* Pantalla d'inici (indicadors i llistes resum del rol actiu): tots els rols. */}
+        <Route path="inici" element={<Inici />} />
 
         {/* Expedients (llistat i detall): rols operatius i administratius, no els de configuració
             (DISSENY/REVISIO/SUPER), que no estan autoritzats a consultar-los ni pel menú ni per URL. */}
@@ -174,6 +186,10 @@ const AppRoutes: React.FC = () => {
             <Route path="seguimentTasques" element={<AssignacioTasquesGrid />} />
             <Route path="seguimentExpedientsPendents" element={<ExpedientsPendentsGrid />} />
             <Route path="expedientPeticioComunicades" element={<AnotacionsComunicadesGrid/>} />
+        </Route>
+        {/* Alertes d'expedients: rols que veuen el llistat d'expedients (l'administrador de lectura, només consulta). */}
+        <Route element={<ProtectedRoute allowedRoles={[rols.ADMIN, rols.ADMIN_LECTURA, rols.ORGAN_ADMIN, rols.tothom]} />}>
+            <Route path="alertesExpedient" element={<AlertesExpedientGrid />} />
         </Route>
         <Route element={<ProtectedRoute allowedRoles={[rols.ADMIN, rols.tothom]} />}>
             <Route path="seguimentPortafirmes" element={<DocumentEnviatsPortafirmesGrid />} />

@@ -110,8 +110,11 @@ public class ExpedientTascaResource extends BaseAuditableResource<Long> {
     
     @ResourceField(onChangeActive = true)
     private Date dataLimit;
+    // Només per a tasques pendents (PENDENT, INICIADA, AGAFADA): vençuda o dins del preavís
     @Transient private boolean dataLimitExpirada;
     @Transient private boolean shouldNotifyAboutDeadline;
+    /** Tasca finalitzada un dia posterior al de la data límit (es marca sense color, només amb la icona). */
+    @Transient private boolean finalitzadaForaTermini;
     
     private String comentari;
     private long numComentaris;

@@ -143,8 +143,9 @@ const PerfilFrom = () =>{
             <CardData title={t('page.user.perfil.generic')} icon="settings" >
                 <GridFormField name="entitatPerDefecte" size={6} namedQueries={[`BY_USUARI`]} />
                 <GridFormField name="procediment"		size={6} filter={builder.and(builder.eq('entitat.id', data?.entitatPerDefecte?.id))} />
-                <GridFormField name="numElementsPagina" size={6}/>
-                <GridFormField name="interficieUsuari"	size={6} required />
+                <GridFormField name="numElementsPagina" size={4}/>
+                <GridFormField name="interficieUsuari"	size={4} required />
+                <GridFormField name="paginaEntrada"		size={4} required />
             </CardData>
 
             <CardData title={t('page.user.perfil.tema')} icon="palette" >

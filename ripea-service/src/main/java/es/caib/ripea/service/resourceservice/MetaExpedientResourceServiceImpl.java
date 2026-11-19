@@ -14,8 +14,10 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.acls.model.Permission;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -29,6 +31,7 @@ import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.resourceentity.GrupResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
+import es.caib.ripea.service.resourcehelper.inici.RecomptesRecurs;
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.GrupResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaDadaResourceRepository;
@@ -115,7 +118,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService<MetaExpedientResource, Long, MetaExpedientResourceEntity> implements MetaExpedientResourceService {
+public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService<MetaExpedientResource, Long, MetaExpedientResourceEntity> implements MetaExpedientResourceService, RecomptesRecurs<MetaExpedientResourceEntity> {
 
 	private final ConfigHelper configHelper;
 	private final PerspectivesLotHelper perspectivesLotHelper;
@@ -171,6 +174,13 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     	register(MetaExpedientResource.Fields.procedimentComu,		new OnchangeLogicProcessor());
     }
     
+    /** Recomptes de la pantalla d'inici amb la visibilitat del llistat de procediments (veure RecomptesRecurs). */
+    @Override
+    @Transactional(readOnly = true)
+    public Map<String, Long> comptar(Map<String, Specification<MetaExpedientResourceEntity>> criteris, String[] namedQueries) {
+        return RecomptesRecurs.comptar(criteris, this.<MetaExpedientResourceEntity>toFindProcessedSpecification(null, null, namedQueries), entityRepository);
+    }
+
 	@Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
 

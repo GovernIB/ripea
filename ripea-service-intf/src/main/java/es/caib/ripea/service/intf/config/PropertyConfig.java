@@ -342,6 +342,8 @@ public class PropertyConfig {
 	public static final String MOSTRAR_LOGS_INTEGRACIO 				                = "es.caib.ripea.mostrar.logs.integracio";
 
     public static final String CONFIG_DIES_AVIS_EXPEDIENT_ANTIC                     = "es.caib.ripea.dies.avis.expedient.antic";
+    /** Dies sense activitat (sense modificacions ni comentaris) a partir dels quals una tasca pendent es considera inactiva. */
+    public static final String CONFIG_DIES_TASCA_SENSE_ACTIVITAT                    = "es.caib.ripea.dies.tasca.sense.activitat";
 	public static final String AVIS_FIRMA_PARCIAL 				                    = "es.caib.ripea.portafirmes.avis.firma.parcial";
 	public static final String FIRMA_PARCIAL 				                        = "es.caib.ripea.portafirmes.firma.parcial";
 	public static final String FILTRAR_USUARI_DESCRIPCIO 				            = "es.caib.ripea.plugin.portafirmes.flux.filtrar.usuari.descripcio";

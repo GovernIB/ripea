@@ -254,6 +254,7 @@ const translationCa = {
         // exactes, i "Mapa del lloc web" no hi és ("Mapa del lloc" sí; en castellà, "Mapa del sitio web").
         sitemap: "Mapa del lloc",
         accessibilitat: "Accessibilitat",
+        inici: "Inici",
         expedient: "Expedients",
         expedientPeticio: "Anotacions de registre",
         usuariTasca: "Tasques",
@@ -512,6 +513,11 @@ const translationCa = {
         },
         tasca: {
             title: "Tasca",
+            dataLimitEstat: {
+                expirada: "Data límit vençuda",
+                propera: "Data límit propera",
+                finalitzadaForaTermini: "Finalitzada fora de termini",
+            },
             view: {
                 title: "Tipus de vista",
                 table: "Vista de taula",
@@ -2532,6 +2538,8 @@ const translationCa = {
             menu: {
                 title: "Menú",
 
+                inici: "Inici",
+                alertes: "Alertes d'expedients",
                 entitat: "Entitats",
                 expedient: "Expedients",
                 monitoritzar: "Monitoritzar",
@@ -2645,6 +2653,45 @@ const translationCa = {
                 metaNode: "Hi ha documents sense un tipus de document assignat",
                 noFinalitzades: "Hi ha notificacions amb un estat que no és final",
                 interessatObligatori: "Falta informar un interessat",
+            },
+        },
+        alertaExpedient: {
+            estat: {
+                llegida: "Llegida",
+                noLlegida: "No llegida",
+            },
+            detail: {
+                title: "Detall de l'alerta",
+                obrirExpedient: "Obre l'expedient",
+            },
+        },
+        inici: {
+            title: "Inici",
+            buit: "Encara no hi ha cap indicador disponible.",
+            error: "No s'han pogut carregar els indicadors.",
+            indicadors: "Indicadors",
+            noDisponible: "No disponible",
+            deTotal: "de {{total}}",
+            indicador: {
+                EXPEDIENTS_AGAFATS: { titol: "Expedients agafats per mi", descripcio: "Expedients oberts que tens agafats." },
+                EXPEDIENTS_ANTICS: { titol: "Expedients antics", descripcio: "Expedients oberts creats fa més de {{dies}} dies." },
+                EXPEDIENTS_OBERTS: { titol: "Expedients oberts", descripcio: "Expedients oberts que pots consultar." },
+                EXPEDIENTS_TANCATS_RECENTS: { titol: "Expedients tancats recentment", descripcio: "Expedients tancats els darrers {{dies}} dies." },
+                ALERTES_NO_LLEGIDES: { titol: "Alertes no llegides", descripcio: "Alertes pendents de llegir dels expedients que pots consultar." },
+                ANOTACIONS_PENDENTS: { titol: "Anotacions pendents", descripcio: "Anotacions de registre pendents de processar." },
+                TASQUES_EN_CURS: { titol: "Tasques en curs", descripcio: "Tasques iniciades o agafades en què participes (responsable, delegat o observador)." },
+                TASQUES_PENDENTS: { titol: "Tasques pendents", descripcio: "Tasques per iniciar en què participes (responsable, delegat o observador)." },
+                TASQUES_VENCIMENT_PROPER: { titol: "Tasques amb venciment proper", descripcio: "Tasques pendents que vencen els propers {{dies}} dies." },
+                TASQUES_FORA_TERMINI: { titol: "Tasques fora de termini", descripcio: "Tasques pendents amb la data límit vençuda." },
+                TASQUES_SENSE_ACTIVITAT: { titol: "Tasques sense activitat", descripcio: "Tasques pendents de l'entitat sense canvis ni comentaris els darrers {{dies}} dies." },
+                PROCEDIMENTS_PENDENTS_REVISIO: { titol: "Procediments pendents de revisió", descripcio: "Procediments enviats a revisar." },
+                PROCEDIMENTS_EN_DISSENY: { titol: "Procediments en disseny", descripcio: "Procediments que encara s'estan dissenyant." },
+                PROCEDIMENTS_REBUTJATS: { titol: "Procediments rebutjats", descripcio: "Procediments rebutjats pendents de corregir." },
+                PROCEDIMENTS_REVISATS: { titol: "Procediments revisats", descripcio: "Procediments revisats i aprovats." },
+                INTEGRACIONS_ERROR: { titol: "Errors d'integració (24 h)", descripcio: "Crides a sistemes externs amb error les darreres 24 hores." },
+                EXCEPCIONS: { titol: "Excepcions (24 h)", descripcio: "Excepcions registrades amb alguna aparició les darreres 24 hores." },
+                MEMORIA_LLIURE: { titol: "Memòria lliure", descripcio: "Memòria lliure de la màquina virtual Java del servidor que ha respost." },
+                DISC_LLIURE: { titol: "Disc lliure", descripcio: "Espai lliure del disc principal del servidor que ha respost." },
             },
         },
         sitemap: {
