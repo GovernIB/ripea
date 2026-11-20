@@ -29,13 +29,16 @@ class IndicadorIniciTest {
 	@Test
 	void admin() {
 		assertThat(IndicadorInici.targetes(BaseConfig.ROLE_ADMIN, true)).containsExactly(
-				EXPEDIENTS_OBERTS, EXPEDIENTS_TANCATS_RECENTS, ANOTACIONS_PENDENTS, TASQUES_SENSE_ACTIVITAT);
+				EXPEDIENTS_OBERTS, EXPEDIENTS_TANCATS_RECENTS, TASQUES_SENSE_ACTIVITAT, ANOTACIONS_PENDENTS);
 	}
 
 	@Test
-	void adminLecturaNomesExpedients() {
+	void adminLecturaNomesExpedientsIProcediments() {
 		assertThat(IndicadorInici.targetes(BaseConfig.ROLE_ADMIN_LECTURA, true)).containsExactly(
-				EXPEDIENTS_OBERTS, EXPEDIENTS_TANCATS_RECENTS);
+				EXPEDIENTS_OBERTS, EXPEDIENTS_TANCATS_RECENTS, PROCEDIMENTS_ACTIUS, PROCEDIMENTS_INACTIUS);
+		// Les targetes de procediments actius i inactius no depenen de la revisió (només el seu criteri)
+		assertThat(IndicadorInici.targetes(BaseConfig.ROLE_ADMIN_LECTURA, false)).containsExactly(
+				EXPEDIENTS_OBERTS, EXPEDIENTS_TANCATS_RECENTS, PROCEDIMENTS_ACTIUS, PROCEDIMENTS_INACTIUS);
 	}
 
 	@Test

@@ -7,7 +7,7 @@ import { icons as iconsAppMenu } from '@src/util/icons';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-/** Entrada «Alertes d'expedients» del submenú Consultar: la tenen tots els rols que veuen el llistat d'expedients. */
+/** Entrada «Alertes d'expedients» del submenú Consultar: rols que veuen el llistat d'expedients i poden marcar alertes (no l'administrador de lectura). */
 const entradaAlertesExpedient = (t: (key: string) => string) => ({
     id: 'alertes',
     title: t('page.user.menu.alertes'),
@@ -15,7 +15,7 @@ const entradaAlertesExpedient = (t: (key: string) => string) => ({
     to: '/alertesExpedient',
 });
 
-/** Submenú Consultar dels rols que no en tenen cap altra consulta (administrador de lectura i d'òrgan). */
+/** Submenú Consultar dels rols que no en tenen cap altra consulta (administrador d'òrgan). */
 const menuConsultarAlertesExpedient = (t: (key: string) => string) => ({
     id: 'consultar',
     title: t('page.user.menu.consultar'),
@@ -324,7 +324,6 @@ export const useMenuAdminLectura = () => {
                 iconVariant: 'material-icons-outlined',
                 to: '/metaExpedient',
             },
-            menuConsultarAlertesExpedient(t),
         ];
         const content = <></>;
 

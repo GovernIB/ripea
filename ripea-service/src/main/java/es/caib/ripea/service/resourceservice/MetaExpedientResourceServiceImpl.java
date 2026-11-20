@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -31,6 +32,7 @@ import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.resourceentity.GrupResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
+import es.caib.ripea.service.resourcehelper.inici.LlistesRecurs;
 import es.caib.ripea.service.resourcehelper.inici.RecomptesRecurs;
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.GrupResourceRepository;
@@ -118,7 +120,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService<MetaExpedientResource, Long, MetaExpedientResourceEntity> implements MetaExpedientResourceService, RecomptesRecurs<MetaExpedientResourceEntity> {
+public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService<MetaExpedientResource, Long, MetaExpedientResourceEntity> implements MetaExpedientResourceService, RecomptesRecurs<MetaExpedientResourceEntity>, LlistesRecurs<MetaExpedientResourceEntity> {
 
 	private final ConfigHelper configHelper;
 	private final PerspectivesLotHelper perspectivesLotHelper;
@@ -179,6 +181,13 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     @Transactional(readOnly = true)
     public Map<String, Long> comptar(Map<String, Specification<MetaExpedientResourceEntity>> criteris, String[] namedQueries) {
         return RecomptesRecurs.comptar(criteris, this.<MetaExpedientResourceEntity>toFindProcessedSpecification(null, null, namedQueries), entityRepository);
+    }
+
+    /** Llistes de la pantalla d'inici amb la visibilitat del llistat (veure LlistesRecurs). */
+    @Override
+    @Transactional(readOnly = true)
+    public <T> T ambVisibles(String[] namedQueries, Function<Specification<MetaExpedientResourceEntity>, T> consulta) {
+        return consulta.apply(this.<MetaExpedientResourceEntity>toFindProcessedSpecification(null, null, namedQueries));
     }
 
 	@Override

@@ -8,7 +8,6 @@ import es.caib.ripea.service.intf.base.annotation.ResourceArtifact;
 import es.caib.ripea.service.intf.base.annotation.ResourceConfig;
 import es.caib.ripea.service.intf.base.model.BaseResource;
 import es.caib.ripea.service.intf.base.model.ResourceArtifactType;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -67,7 +66,6 @@ public class IniciResource extends BaseResource<Long> {
 	@Getter
 	@Setter
 	@NoArgsConstructor
-	@AllArgsConstructor
 	public static class Llista implements Serializable {
 		/** Codi de la llista: el front en deriva el títol, la descripció, les columnes i els enllaços. */
 		private String codi;
@@ -76,6 +74,13 @@ public class IniciResource extends BaseResource<Long> {
 		 * fila són les columnes de la llista i els identificadors que necessiten els seus enllaços.
 		 */
 		private List<Map<String, Object>> files;
+		/** Dies que fa servir el criteri de la llista (configurables), perquè la descripció els pugui mostrar. */
+		private Integer dies;
+		/**
+		 * Minuts configurables que fa servir la llista, perquè la descripció els pugui mostrar (excepcions: finestra en què
+		 * les repeticions d'una excepció s'agrupen en una fila; null si no s'agrupen).
+		 */
+		private Integer minuts;
 		/** Cert si la consulta ha fallat: la llista es mostra amb un missatge d'error i la resta, normalment. */
 		private boolean error;
 	}

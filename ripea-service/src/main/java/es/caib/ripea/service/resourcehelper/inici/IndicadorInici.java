@@ -9,7 +9,8 @@ import es.caib.ripea.service.intf.config.BaseConfig;
 /**
  * Catàleg de targetes de la pantalla d'inici (issue #1510, versió bàsica: sense configuració per usuari).
  *
- * Cada rol veu sempre les mateixes targetes, en aquest ordre (files de 4). El codi és el que rep el front,
+ * Cada rol veu sempre les mateixes targetes, en aquest ordre (files de 4). Si dos rols comparteixen una targeta,
+ * surt a la mateixa posició en tots dos (p. ex. «Anotacions pendents», sempre la quarta). El codi és el que rep el front,
  * que en deriva la presentació (títol, descripció, icona, color i pantalla de destinació).
  */
 public enum IndicadorInici {
@@ -50,6 +51,12 @@ public enum IndicadorInici {
 	PROCEDIMENTS_REBUTJATS,
 	PROCEDIMENTS_REVISATS,
 
+	// Procediments de l'entitat (llistat de procediments): parteixen el total en dues targetes
+	/** Procediments actius i, amb la revisió activa, revisats: els que es poden fer servir per crear expedients. */
+	PROCEDIMENTS_ACTIUS,
+	/** La resta: inactius o, amb la revisió activa, no revisats (en disseny, pendents de revisió o rebutjats). */
+	PROCEDIMENTS_INACTIUS,
+
 	// Superadministrador (monitor d'integracions, registre d'excepcions i monitor del sistema)
 	/** Crides a integracions amb error les darreres 24 hores. */
 	INTEGRACIONS_ERROR,
@@ -81,11 +88,11 @@ public enum IndicadorInici {
 						EXPEDIENTS_AGAFATS, EXPEDIENTS_ANTICS, ALERTES_NO_LLEGIDES, ANOTACIONS_PENDENTS);
 			case BaseConfig.ROLE_ADMIN:
 				return Arrays.asList(
-						EXPEDIENTS_OBERTS, EXPEDIENTS_TANCATS_RECENTS, ANOTACIONS_PENDENTS, TASQUES_SENSE_ACTIVITAT);
+						EXPEDIENTS_OBERTS, EXPEDIENTS_TANCATS_RECENTS, TASQUES_SENSE_ACTIVITAT, ANOTACIONS_PENDENTS);
 			case BaseConfig.ROLE_ADMIN_LECTURA:
 				// Només el que pot consultar: no té accés a anotacions ni a la consulta de tasques
 				return Arrays.asList(
-						EXPEDIENTS_OBERTS, EXPEDIENTS_TANCATS_RECENTS);
+						EXPEDIENTS_OBERTS, EXPEDIENTS_TANCATS_RECENTS, PROCEDIMENTS_ACTIUS, PROCEDIMENTS_INACTIUS);
 			case BaseConfig.ROLE_SUPER:
 				return Arrays.asList(
 						INTEGRACIONS_ERROR, EXCEPCIONS, MEMORIA_LLIURE, DISC_LLIURE);

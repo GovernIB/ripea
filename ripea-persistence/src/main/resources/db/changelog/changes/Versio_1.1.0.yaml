@@ -63,3 +63,19 @@ databaseChangeLog:
             splitStatements: true
             stripComments: true
             relativeToChangelogFile: true
+  - changeSet:
+      id: RIPEA_1.1.0_INICI_INDEX_INTEGRACIONS
+      author: limit
+      changes:
+        - sqlFile:
+            dbms: oracle
+            path: ../scripts/oracle/1.1.0/Versio_1.1.0_DDL_3.sql
+            splitStatements: true
+            stripComments: true
+            relativeToChangelogFile: true
+        - sqlFile:
+            dbms: postgresql
+            path: ../scripts/postgres/1.1.0/Versio_1.1.0_DDL_3.sql
+            splitStatements: true
+            stripComments: true
+            relativeToChangelogFile: true

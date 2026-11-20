@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.EnumMap;
@@ -12,12 +13,18 @@ import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Root;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,24 +42,36 @@ import es.caib.ripea.persistence.entity.resourceentity.ExpedientResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.ExpedientTascaResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.IniciResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.IntegracioResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientComentariResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
+import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
 import es.caib.ripea.persistence.repository.OrganGestorRepository;
 import es.caib.ripea.service.base.service.BaseReadonlyResourceService;
 import es.caib.ripea.service.helper.ConfigHelper;
+import es.caib.ripea.service.helper.ExcepcioLogHelper;
+import es.caib.ripea.service.helper.IntegracioHelper;
 import es.caib.ripea.service.helper.MetaExpedientHelper;
 import es.caib.ripea.service.intf.base.exception.AnswerRequiredException.AnswerValue;
 import es.caib.ripea.service.intf.base.exception.ArtifactNotFoundException;
 import es.caib.ripea.service.intf.base.exception.ReportGenerationException;
+import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.EntitatDto;
+import es.caib.ripea.service.intf.dto.IntegracioCodiEnum;
 import es.caib.ripea.service.intf.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
 import es.caib.ripea.service.intf.model.AlertaResource;
 import es.caib.ripea.service.intf.model.IniciResource;
 import es.caib.ripea.service.intf.resourceservice.IniciResourceService;
 import es.caib.ripea.service.intf.service.ExpedientPeticioService;
+import es.caib.ripea.service.resourcehelper.PerspectivesLotHelper;
+import es.caib.ripea.service.resourcehelper.inici.ConsultesLlistesInici;
 import es.caib.ripea.service.resourcehelper.inici.CriterisIndicadorsInici;
+import es.caib.ripea.service.resourcehelper.inici.ExpedientsPerTancarRecurs;
+import es.caib.ripea.service.resourcehelper.inici.FilesLlistesInici;
 import es.caib.ripea.service.resourcehelper.inici.IndicadorInici;
+import es.caib.ripea.service.resourcehelper.inici.LlistaInici;
+import es.caib.ripea.service.resourcehelper.inici.LlistesRecurs;
 import es.caib.ripea.service.resourcehelper.inici.RecomptesRecurs;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -73,12 +92,9 @@ import lombok.extern.slf4j.Slf4j;
 public class IniciResourceServiceImpl extends BaseReadonlyResourceService<IniciResource, Long, IniciResourceEntity> implements IniciResourceService {
 
 	private static final int CONFIG_DIES_AVIS_EXPEDIENT_ANTIC_DEFAULT = 90;
-	private static final int CONFIG_DIES_TASCA_SENSE_ACTIVITAT_DEFAULT = 7;
 	private static final int TASCA_PREAVIS_DATA_LIMIT_DEFAULT = 3;
 	private static final int DIES_EXPEDIENTS_TANCATS_RECENTS = 7;
 	private static final int HORES_MONITOR = 24;
-	/** Named query del llistat «Les meves tasques» (ExpedientTascaResourceServiceImpl): responsable, observador o delegat. */
-	private static final String NAMED_QUERY_TASQUES_USUARI = "USUARI_RELACIONAT";
 
 	private final RecomptesRecurs<ExpedientResourceEntity> recomptesExpedients;
 	private final RecomptesRecurs<AlertaResourceEntity> recomptesAlertes;
@@ -86,6 +102,14 @@ public class IniciResourceServiceImpl extends BaseReadonlyResourceService<IniciR
 	private final RecomptesRecurs<MetaExpedientResourceEntity> recomptesProcediments;
 	private final RecomptesRecurs<IntegracioResourceEntity> recomptesIntegracions;
 	private final RecomptesRecurs<ExcepcioLogResourceEntity> recomptesExcepcions;
+	private final LlistesRecurs<ExpedientTascaResourceEntity> llistesTasques;
+	private final LlistesRecurs<MetaExpedientResourceEntity> llistesProcediments;
+	private final LlistesRecurs<IntegracioResourceEntity> llistesIntegracions;
+	private final LlistesRecurs<ExcepcioLogResourceEntity> llistesExcepcions;
+	private final ExpedientsPerTancarRecurs expedientsPerTancar;
+	private final ConsultesLlistesInici consultesLlistes;
+	private final PerspectivesLotHelper perspectivesLotHelper;
+	private final IntegracioHelper integracioHelper;
 	private final ExpedientPeticioService expedientPeticioService;
 	private final OrganGestorRepository organGestorRepository;
 	private final ConfigHelper configHelper;
@@ -152,8 +176,7 @@ public class IniciResourceServiceImpl extends BaseReadonlyResourceService<IniciR
 				String code,
 				IniciResourceEntity entity,
 				Serializable params) throws ReportGenerationException {
-			// Les consultes de les llistes de cada rol s'afegeixen a la fase 3.
-			return new ArrayList<>();
+			return calcularLlistes();
 		}
 
 		@Override
@@ -162,15 +185,18 @@ public class IniciResourceServiceImpl extends BaseReadonlyResourceService<IniciR
 
 	private List<IniciResource.Indicador> calcularIndicadors() {
 		String rol = configHelper.getRolActual();
-		List<IndicadorInici> cataleg = IndicadorInici.targetes(rol, metaExpedientHelper.isRevisioActiva());
+		boolean revisioActiva = metaExpedientHelper.isRevisioActiva();
+		List<IndicadorInici> cataleg = senseEntitat(rol)
+				? new ArrayList<IndicadorInici>()
+				: IndicadorInici.targetes(rol, revisioActiva);
 		if (cataleg.isEmpty()) {
 			return new ArrayList<>();
 		}
 		String usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
 		Date ara = new Date();
 		int diesAntic = configHelper.getAsInt(PropertyConfig.CONFIG_DIES_AVIS_EXPEDIENT_ANTIC, CONFIG_DIES_AVIS_EXPEDIENT_ANTIC_DEFAULT);
-		int diesSenseActivitat = configHelper.getAsInt(PropertyConfig.CONFIG_DIES_TASCA_SENSE_ACTIVITAT, CONFIG_DIES_TASCA_SENSE_ACTIVITAT_DEFAULT);
-		int diesPreavis = configHelper.getAsInt(PropertyConfig.TASCA_PREAVIS_DATA_LIMIT, TASCA_PREAVIS_DATA_LIMIT_DEFAULT);
+		int diesSenseActivitat = diesTascaSenseActivitat();
+		int diesPreavis = diesPreavisDataLimit();
 		Date fa24Hores = new Date(ara.getTime() - TimeUnit.HOURS.toMillis(HORES_MONITOR));
 
 		Recull recull = new Recull(cataleg);
@@ -199,8 +225,7 @@ public class IniciResourceServiceImpl extends BaseReadonlyResourceService<IniciR
 		// «Les meves tasques»: la mateixa named query que el llistat (responsable, observador o delegat). També les
 		// d'expedients tancats, que el llistat no distingeix i marca igual (taronja i vermell).
 		Specification<ExpedientTascaResourceEntity> tasquesUsuari = CriterisIndicadorsInici.tasquesExpedientNoEsborrat();
-		Specification<ExpedientTascaResourceEntity> tasquesUsuariPendents = tasquesUsuari
-				.and(CriterisIndicadorsInici.tasquesEnEstat(CriterisIndicadorsInici.ESTATS_TASCA_PENDENT));
+		Specification<ExpedientTascaResourceEntity> tasquesUsuariPendents = CriterisIndicadorsInici.tasquesPendents();
 		Map<IndicadorInici, Specification<ExpedientTascaResourceEntity>> tasques = new EnumMap<>(IndicadorInici.class);
 		tasques.put(IndicadorInici.TASQUES_EN_CURS, tasquesUsuari
 				.and(CriterisIndicadorsInici.tasquesEnEstat(CriterisIndicadorsInici.ESTATS_TASCA_EN_CURS)));
@@ -213,21 +238,22 @@ public class IniciResourceServiceImpl extends BaseReadonlyResourceService<IniciR
 				.and(CriterisIndicadorsInici.tasquesVencimentProper(dema, toDate(avui.plusDays(diesPreavis + 1L)))));
 		tasques.put(IndicadorInici.TASQUES_FORA_TERMINI, tasquesUsuariPendents
 				.and(CriterisIndicadorsInici.tasquesForaTermini(dema)));
-		recull.comptar(tasques, recomptesTasques, new String[] { NAMED_QUERY_TASQUES_USUARI });
+		recull.comptar(tasques, recomptesTasques, new String[] { CriterisIndicadorsInici.NAMED_QUERY_TASQUES_USUARI });
 
 		// Consulta de tasques assignades de l'entitat (administrador): totes, sigui qui sigui el responsable
 		Map<IndicadorInici, Specification<ExpedientTascaResourceEntity>> tasquesEntitat = new EnumMap<>(IndicadorInici.class);
-		tasquesEntitat.put(IndicadorInici.TASQUES_SENSE_ACTIVITAT, CriterisIndicadorsInici.tasquesExpedientNoEsborrat()
-				.and(CriterisIndicadorsInici.tasquesEnEstat(CriterisIndicadorsInici.ESTATS_TASCA_PENDENT))
-				.and(CriterisIndicadorsInici.tasquesSenseActivitatDesDe(LocalDateTime.now().minusDays(diesSenseActivitat))));
+		tasquesEntitat.put(IndicadorInici.TASQUES_SENSE_ACTIVITAT, CriterisIndicadorsInici.tasquesSenseActivitat(
+				LocalDateTime.now().minusDays(diesSenseActivitat)));
 		recull.comptar(tasquesEntitat, recomptesTasques, null);
 
-		// Llistat de procediments (només hi són al catàleg amb la revisió activa)
+		// Llistat de procediments (els d'estat de revisió només hi són al catàleg amb la revisió activa)
 		Map<IndicadorInici, Specification<MetaExpedientResourceEntity>> procediments = new EnumMap<>(IndicadorInici.class);
 		procediments.put(IndicadorInici.PROCEDIMENTS_PENDENTS_REVISIO, CriterisIndicadorsInici.procedimentsEnEstatRevisio(MetaExpedientRevisioEstatEnumDto.PENDENT));
 		procediments.put(IndicadorInici.PROCEDIMENTS_EN_DISSENY, CriterisIndicadorsInici.procedimentsEnEstatRevisio(MetaExpedientRevisioEstatEnumDto.DISSENY));
 		procediments.put(IndicadorInici.PROCEDIMENTS_REBUTJATS, CriterisIndicadorsInici.procedimentsEnEstatRevisio(MetaExpedientRevisioEstatEnumDto.REBUTJAT));
 		procediments.put(IndicadorInici.PROCEDIMENTS_REVISATS, CriterisIndicadorsInici.procedimentsEnEstatRevisio(MetaExpedientRevisioEstatEnumDto.REVISAT));
+		procediments.put(IndicadorInici.PROCEDIMENTS_ACTIUS, CriterisIndicadorsInici.procedimentsActius(revisioActiva));
+		procediments.put(IndicadorInici.PROCEDIMENTS_INACTIUS, CriterisIndicadorsInici.procedimentsInactius(revisioActiva));
 		recull.comptar(procediments, recomptesProcediments, null);
 
 		// Monitor d'integracions, registre d'excepcions i monitor del sistema (del node que respon)
@@ -253,6 +279,204 @@ public class IniciResourceServiceImpl extends BaseReadonlyResourceService<IniciR
 
 	private static Date toDate(LocalDate dia) {
 		return Date.from(dia.atStartOfDay(ZoneId.systemDefault()).toInstant());
+	}
+
+	/**
+	 * Usuari sense cap entitat accessible (sense entitat actual): els llistats de destinació no li poden mostrar res
+	 * (la majoria fallen), així que la pantalla d'inici no calcula targetes ni llistes. El superusuari no treballa
+	 * amb entitat.
+	 */
+	private boolean senseEntitat(String rol) {
+		return !BaseConfig.ROLE_SUPER.equals(rol) && configHelper.getEntitatActualCodi() == null;
+	}
+
+	private int diesPreavisDataLimit() {
+		return configHelper.getAsInt(PropertyConfig.TASCA_PREAVIS_DATA_LIMIT, TASCA_PREAVIS_DATA_LIMIT_DEFAULT);
+	}
+
+	private int diesTascaSenseActivitat() {
+		return configHelper.getAsInt(PropertyConfig.CONFIG_DIES_TASCA_SENSE_ACTIVITAT, CriterisIndicadorsInici.DIES_TASCA_SENSE_ACTIVITAT_DEFECTE);
+	}
+
+	// --- Llistes resum ---------------------------------------------------------------------------------
+
+	/**
+	 * Llistes del catàleg del rol. Cada una es consulta sobre el servei del seu llistat de destinació, en una
+	 * transacció pròpia i amb les mateixes regles de visibilitat; si falla, només aquella surt amb error.
+	 */
+	private List<IniciResource.Llista> calcularLlistes() {
+		String rol = configHelper.getRolActual();
+		List<LlistaInici> cataleg = senseEntitat(rol)
+				? new ArrayList<LlistaInici>()
+				: LlistaInici.llistes(rol, metaExpedientHelper.isRevisioActiva());
+		List<IniciResource.Llista> resultat = new ArrayList<>();
+		for (LlistaInici codi: cataleg) {
+			IniciResource.Llista llista = new IniciResource.Llista();
+			llista.setCodi(codi.name());
+			try {
+				llista.setFiles(files(codi, llista));
+			} catch (Exception ex) {
+				log.error("Error calculant la llista de la pantalla d'inici " + codi, ex);
+				llista.setFiles(new ArrayList<>());
+				llista.setError(true);
+			}
+			resultat.add(llista);
+		}
+		return resultat;
+	}
+
+	private List<Map<String, Object>> files(LlistaInici codi, IniciResource.Llista llista) {
+		int maxim = LlistaInici.MAXIM_FILES;
+		switch (codi) {
+			case TASQUES_PER_DATA_LIMIT:
+				return tasquesPerDataLimit(maxim);
+			case EXPEDIENTS_LLESTOS_TANCAR:
+				return expedientsPerTancar.mesAnticsPerTancar(maxim, FilesLlistesInici::expedientPerTancar);
+			case TASQUES_SENSE_ACTIVITAT:
+				int diesSenseActivitat = diesTascaSenseActivitat();
+				llista.setDies(diesSenseActivitat);
+				return tasquesSenseActivitat(diesSenseActivitat, maxim);
+			case DARRERES_INTEGRACIONS:
+				// Només per data (sense desempat per id): així les llegeix en ordre de l'índex de DATA (1.1.0_DDL_3)
+				// sense haver d'ordenar tota la taula
+				return llistesIntegracions.ambVisibles(null, visibles -> files(
+						consultesLlistes.primeres(
+								IntegracioResourceEntity.class,
+								visibles,
+								(root, cb) -> Collections.singletonList(cb.desc(root.get("data"))),
+								maxim),
+						integracio -> FilesLlistesInici.integracio(integracio, nomIntegracio(integracio.getCodi()))));
+			case DARRERES_EXCEPCIONS:
+				// Les excepcions repetides s'agrupen en una fila: l'ordre és el de la darrera ocurrència
+				int minutsAgrupacio = configHelper.getAsInt(PropertyConfig.EXCEPCIONS_DEDUP_MINUTS, ExcepcioLogHelper.DEDUP_MINUTS_DEFECTE);
+				llista.setMinuts(minutsAgrupacio > 0 ? minutsAgrupacio : null);
+				return llistesExcepcions.ambVisibles(null, visibles -> files(
+						consultesLlistes.primeres(
+								ExcepcioLogResourceEntity.class,
+								visibles,
+								(root, cb) -> Arrays.asList(
+										cb.desc(cb.coalesce(root.<Date>get("dataDarrera"), root.<Date>get("data"))),
+										cb.desc(root.get("id"))),
+								maxim),
+						FilesLlistesInici::excepcio));
+			case DARRERS_COMENTARIS:
+				return darrersComentaris(maxim);
+			case PROCEDIMENTS_PENDENTS_REVISIO:
+				return procedimentsPendentsRevisio(maxim);
+			case PROCEDIMENTS_REBUTJATS:
+				return procedimentsRebutjats(maxim);
+			default:
+				throw new IllegalStateException("Llista de la pantalla d'inici sense consulta: " + codi);
+		}
+	}
+
+	/**
+	 * Tasques pendents de «Les meves tasques» (la mateixa named query i el mateix criteri que les targetes), de
+	 * la data límit més antiga a la més recent: primer les vençudes; les que no en tenen, al final.
+	 */
+	private List<Map<String, Object>> tasquesPerDataLimit(int maxim) {
+		LocalDate avui = LocalDate.now();
+		Date dema = toDate(avui.plusDays(1));
+		Date fiPreavisExclos = toDate(avui.plusDays(diesPreavisDataLimit() + 1L));
+		return llistesTasques.ambVisibles(
+				new String[] { CriterisIndicadorsInici.NAMED_QUERY_TASQUES_USUARI },
+				visibles -> files(
+						consultesLlistes.primeres(
+								ExpedientTascaResourceEntity.class,
+								visibles.and(CriterisIndicadorsInici.tasquesPendents()),
+								(root, cb) -> Arrays.asList(
+										cb.asc(cb.selectCase().when(cb.isNull(root.get("dataLimit")), 1).otherwise(0)),
+										cb.asc(root.get("dataLimit")),
+										cb.asc(root.get("id"))),
+								maxim,
+								"expedient", "metaExpedientTasca"),
+						tasca -> FilesLlistesInici.tascaPerDataLimit(tasca, dema, fiPreavisExclos)));
+	}
+
+	/**
+	 * Tasques pendents de tota l'entitat sense activitat (el mateix criteri que la targeta), de la que fa més
+	 * temps que no en té a la que menys, amb els responsables.
+	 */
+	private List<Map<String, Object>> tasquesSenseActivitat(int dies, int maxim) {
+		Specification<ExpedientTascaResourceEntity> criteri = CriterisIndicadorsInici.tasquesSenseActivitat(
+				LocalDateTime.now().minusDays(dies));
+		return llistesTasques.ambVisibles(null, visibles -> {
+			Map<Long, LocalDateTime> darreraActivitat = consultesLlistes.tasquesMesInactives(visibles.and(criteri), maxim);
+			Map<Long, ExpedientTascaResourceEntity> tasques = consultesLlistes.tasquesAmbResponsables(darreraActivitat.keySet());
+			List<Map<String, Object>> files = new ArrayList<>();
+			darreraActivitat.forEach((id, activitat) -> {
+				ExpedientTascaResourceEntity tasca = tasques.get(id);
+				if (tasca != null) {
+					files.add(FilesLlistesInici.tascaSenseActivitat(tasca, activitat));
+				}
+			});
+			return files;
+		});
+	}
+
+	/** Darrers comentaris dels procediments que l'usuari veu al llistat de procediments. */
+	private List<Map<String, Object>> darrersComentaris(int maxim) {
+		return llistesProcediments.ambVisibles(null, visibles -> {
+			List<MetaExpedientComentariResourceEntity> comentaris = consultesLlistes.darrersComentaris(visibles, maxim);
+			Map<String, UsuariResourceEntity> autors = perspectivesLotHelper.findUsuaris(comentaris.stream()
+					.map(MetaExpedientComentariResourceEntity::getCreatedBy)
+					.filter(Objects::nonNull)
+					.collect(Collectors.toSet()));
+			return files(comentaris, comentari -> FilesLlistesInici.comentari(comentari, autors.get(comentari.getCreatedBy())));
+		});
+	}
+
+	/** Procediments pendents de revisió, del que fa més temps que espera (darrera modificació) al que menys. */
+	private List<Map<String, Object>> procedimentsPendentsRevisio(int maxim) {
+		return llistesProcediments.ambVisibles(null, visibles -> files(
+				consultesLlistes.primeres(
+						MetaExpedientResourceEntity.class,
+						visibles.and(CriterisIndicadorsInici.procedimentsEnEstatRevisio(MetaExpedientRevisioEstatEnumDto.PENDENT)),
+						(root, cb) -> Arrays.asList(cb.asc(darreraModificacio(root, cb)), cb.asc(root.get("id"))),
+						maxim,
+						"organGestor"),
+				FilesLlistesInici::procedimentPendentRevisio));
+	}
+
+	/** Procediments rebutjats, del rebutjat més recentment (darrera modificació) al més antic, amb el darrer comentari. */
+	private List<Map<String, Object>> procedimentsRebutjats(int maxim) {
+		return llistesProcediments.ambVisibles(null, visibles -> {
+			List<MetaExpedientResourceEntity> procediments = consultesLlistes.primeres(
+					MetaExpedientResourceEntity.class,
+					visibles.and(CriterisIndicadorsInici.procedimentsEnEstatRevisio(MetaExpedientRevisioEstatEnumDto.REBUTJAT)),
+					(root, cb) -> Arrays.asList(cb.desc(darreraModificacio(root, cb)), cb.desc(root.get("id"))),
+					maxim);
+			Map<Long, MetaExpedientComentariResourceEntity> comentaris = consultesLlistes.darrerComentariPerProcediment(
+					PerspectivesLotHelper.ids(procediments));
+			Map<String, UsuariResourceEntity> autors = perspectivesLotHelper.findUsuaris(comentaris.values().stream()
+					.map(MetaExpedientComentariResourceEntity::getCreatedBy)
+					.filter(Objects::nonNull)
+					.collect(Collectors.toSet()));
+			return files(procediments, procediment -> {
+				MetaExpedientComentariResourceEntity comentari = comentaris.get(procediment.getId());
+				return FilesLlistesInici.procedimentRebutjat(
+						procediment,
+						comentari,
+						comentari != null ? autors.get(comentari.getCreatedBy()) : null);
+			});
+		});
+	}
+
+	/** Nom de la integració, el mateix de les pestanyes del monitor d'integracions (sense traducció, el codi). */
+	private String nomIntegracio(IntegracioCodiEnum codi) {
+		if (codi == null) {
+			return null;
+		}
+		String nom = integracioHelper.novaIntegracio(codi.name()).getNom();
+		return nom == null || nom.startsWith("???") ? codi.name() : nom;
+	}
+
+	private static Expression<LocalDateTime> darreraModificacio(Root<MetaExpedientResourceEntity> root, CriteriaBuilder cb) {
+		return cb.coalesce(root.<LocalDateTime>get("lastModifiedDate"), root.<LocalDateTime>get("createdDate"));
+	}
+
+	private static <E> List<Map<String, Object>> files(List<E> elements, Function<E, Map<String, Object>> fila) {
+		return elements.stream().map(fila).collect(Collectors.toList());
 	}
 
 	private Long comptarAnotacionsPendents() {

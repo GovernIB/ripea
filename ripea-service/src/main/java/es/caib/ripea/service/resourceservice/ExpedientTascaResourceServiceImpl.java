@@ -10,9 +10,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
 
@@ -31,6 +33,7 @@ import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientTascaEntity;
 import es.caib.ripea.persistence.entity.resourceentity.ExpedientTascaResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientTascaResourceEntity;
+import es.caib.ripea.service.resourcehelper.inici.LlistesRecurs;
 import es.caib.ripea.service.resourcehelper.inici.RecomptesRecurs;
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.ExpedientTascaResourceRepository;
@@ -71,7 +74,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceService<ExpedientTascaResource, Long, ExpedientTascaResourceEntity> implements ExpedientTascaResourceService, RecomptesRecurs<ExpedientTascaResourceEntity> {
+public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceService<ExpedientTascaResource, Long, ExpedientTascaResourceEntity> implements ExpedientTascaResourceService, RecomptesRecurs<ExpedientTascaResourceEntity>, LlistesRecurs<ExpedientTascaResourceEntity> {
 
     private final ExpedientTascaResourceRepository expedientTascaResourceRepository;
     private final PerspectivesLotHelper perspectivesLotHelper;
@@ -130,6 +133,31 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
     @Transactional(readOnly = true)
     public Map<String, Long> comptar(Map<String, Specification<ExpedientTascaResourceEntity>> criteris, String[] namedQueries) {
         return RecomptesRecurs.comptar(criteris, this.<ExpedientTascaResourceEntity>toFindProcessedSpecification(null, null, namedQueries), entityRepository);
+    }
+
+    /** Llistes de la pantalla d'inici amb la visibilitat del llistat (veure LlistesRecurs). */
+    @Override
+    @Transactional(readOnly = true)
+    public <T> T ambVisibles(String[] namedQueries, Function<Specification<ExpedientTascaResourceEntity>, T> consulta) {
+        return consulta.apply(this.<ExpedientTascaResourceEntity>toFindProcessedSpecification(null, null, namedQueries));
+    }
+
+    /** Filtre de les pantalles que mostren les tasques d'un sol expedient (pestanya de tasques de l'expedient). */
+    private static final Pattern FILTRE_PER_EXPEDIENT = Pattern.compile("\\bexpedient\\.id\\s*:");
+
+    /**
+     * Els llistats de tasques no mostren les dels expedients esborrats («Les meves tasques» amb les seves vistes,
+     * «Seguiment de tasques» i les targetes i llistes de la pantalla d'inici). No s'aplica quan el llistat és el d'un
+     * expedient concret, que el mostra la seva pròpia pantalla, ni en obtenir una tasca pel seu id (no passa per aquí).
+     */
+    @Override
+    protected <P> Specification<P> toFindProcessedSpecification(String quickFilter, String filter, String[] namedQueries) {
+        Specification<P> especificacio = super.toFindProcessedSpecification(quickFilter, filter, namedQueries);
+        if (filter != null && FILTRE_PER_EXPEDIENT.matcher(filter).find()) {
+            return especificacio;
+        }
+        Specification<P> expedientNoEsborrat = (root, query, cb) -> cb.equal(root.get("expedient").get("esborrat"), 0);
+        return especificacio != null ? especificacio.and(expedientNoEsborrat) : expedientNoEsborrat;
     }
 
     @Override

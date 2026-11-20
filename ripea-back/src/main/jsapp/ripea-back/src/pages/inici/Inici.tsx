@@ -5,7 +5,10 @@ import { GridPage, useResourceApiService } from 'reactlib';
 import { ScreenFrame } from '@src/components/ScreenFrame.tsx';
 import { useUserSession } from '@src/components/Session.tsx';
 import { icons } from '@src/util/icons.ts';
+import useTascaDetail from '@src/pages/tasca/details/TascaDetail.tsx';
 import { TargetaIndicador, TargetaIndicadorCarregant } from './TargetaIndicador.tsx';
+import { DetallTascaContext, LlistaResum, LlistaResumCarregant } from './LlistaResum.tsx';
+import { CATALEG_LLISTES } from './catalegLlistes.tsx';
 
 /** Ruta de la pantalla d'inici. */
 export const RUTA_INICI = '/inici';
@@ -34,6 +37,10 @@ export type Indicador = {
 export type Llista = {
     codi: string;
     files?: Record<string, any>[];
+    /** Dies que fa servir el criteri de la llista (configurables), per mostrar-los a la descripció. */
+    dies?: number;
+    /** Minuts configurables del criteri (excepcions: finestra d'agrupació de les repetides; sense valor, no s'agrupen). */
+    minuts?: number;
     error?: boolean;
 };
 
@@ -121,6 +128,45 @@ const Indicadors = ({ dades }: { dades?: Indicador[] }) => {
     );
 };
 
+/** Llistes de dues en dues en pantalla ampla i una per fila en pantalles més estretes. */
+const midaLlista = { xs: 12, lg: 6 };
+
+/** Un sol diàleg de detall de tasca per a totes les llistes que en tenen. */
+const AmbDetallTasca = ({ children }: { children: React.ReactNode }) => {
+    const { handleOpen, dialog } = useTascaDetail();
+    return (
+        <DetallTascaContext.Provider value={handleOpen}>
+            {children}
+            {dialog}
+        </DetallTascaContext.Provider>
+    );
+};
+
+/** Llistes resum del rol, sota les targetes, o esquelets mentre es calculen. */
+const Llistes = ({ dades }: { dades?: Llista[] }) => {
+    if (dades != null && dades.length === 0) {
+        return null;
+    }
+    const graella = (
+        <Grid container spacing={2} aria-busy={dades == null}>
+            {dades == null
+                ? [0, 1].map((i) => (
+                    <Grid key={i} size={midaLlista}>
+                        <LlistaResumCarregant />
+                    </Grid>
+                ))
+                : dades.map((llista) => (
+                    <Grid key={llista.codi} size={midaLlista}>
+                        <LlistaResum llista={llista} />
+                    </Grid>
+                ))}
+        </Grid>
+    );
+    // El diàleg només es munta si alguna llista té tasques: els altres rols no han de consultar el recurs de tasques
+    const ambTasques = dades?.some((llista) => CATALEG_LLISTES[llista.codi]?.detallTasca);
+    return ambTasques ? <AmbDetallTasca>{graella}</AmbDetallTasca> : graella;
+};
+
 const Inici: React.FC = () => {
     const { t } = useTranslation();
     const indicadors = useInformeInici<Indicador>(REPORT_INDICADORS);
@@ -134,8 +180,10 @@ const Inici: React.FC = () => {
         <GridPage>
             <ScreenFrame icon={icons.inici} title={t('page.inici.title')} fitContent>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    {error && <Alert severity="error">{t('page.inici.error')}</Alert>}
+                    {indicadors.error && <Alert severity="error">{t('page.inici.error')}</Alert>}
+                    {llistes.error && <Alert severity="error">{t('page.inici.errorLlistes')}</Alert>}
                     {!indicadors.error && <Indicadors dades={indicadors.dades} />}
+                    {!llistes.error && <Llistes dades={llistes.dades} />}
                     {!error && buit && (
                         <Typography variant="body1" color="text.secondary">
                             {t('page.inici.buit')}

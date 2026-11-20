@@ -34,6 +34,11 @@ public final class CriterisIndicadorsInici {
 	public static final List<TascaEstatEnumDto> ESTATS_TASCA_EN_CURS = Arrays.asList(
 			TascaEstatEnumDto.INICIADA, TascaEstatEnumDto.AGAFADA);
 
+	/** Valor per defecte de la propietat de dies sense activitat (PropertyConfig.CONFIG_DIES_TASCA_SENSE_ACTIVITAT). */
+	public static final int DIES_TASCA_SENSE_ACTIVITAT_DEFECTE = 7;
+	/** Named query del llistat «Les meves tasques» (ExpedientTascaResourceServiceImpl): responsable, observador o delegat. */
+	public static final String NAMED_QUERY_TASQUES_USUARI = "USUARI_RELACIONAT";
+
 	private CriterisIndicadorsInici() {}
 
 	// --- Expedients ------------------------------------------------------------------------------------
@@ -113,10 +118,43 @@ public final class CriterisIndicadorsInici {
 		};
 	}
 
+	/** Tasques pendents (PENDENT, INICIADA o AGAFADA) d'expedients no esborrats: base de les targetes i llistes de tasques. */
+	public static Specification<ExpedientTascaResourceEntity> tasquesPendents() {
+		return tasquesExpedientNoEsborrat().and(tasquesEnEstat(ESTATS_TASCA_PENDENT));
+	}
+
+	/** Targeta i llista «Tasques sense activitat»: el mateix criteri a totes dues. */
+	public static Specification<ExpedientTascaResourceEntity> tasquesSenseActivitat(LocalDateTime des) {
+		return tasquesPendents().and(tasquesSenseActivitatDesDe(des));
+	}
+
 	// --- Procediments ----------------------------------------------------------------------------------
 
 	public static Specification<MetaExpedientResourceEntity> procedimentsEnEstatRevisio(MetaExpedientRevisioEstatEnumDto estat) {
 		return (root, query, cb) -> cb.equal(root.get("revisioEstat"), estat);
+	}
+
+	/**
+	 * Procediments actius: amb el check d'actiu i, si la revisió de procediments està activa, revisats (el mateix criteri
+	 * que el selector de procediments en crear un expedient). Sense revisió, l'estat de revisió no compta.
+	 */
+	public static Specification<MetaExpedientResourceEntity> procedimentsActius(boolean revisioActiva) {
+		return (root, query, cb) -> revisioActiva
+				? cb.and(cb.isTrue(root.get("actiu")), cb.equal(root.get("revisioEstat"), MetaExpedientRevisioEstatEnumDto.REVISAT))
+				: cb.isTrue(root.get("actiu"));
+	}
+
+	/**
+	 * La resta de procediments: inactius o, amb la revisió activa, no revisats. És el complementari exacte de
+	 * {@link #procedimentsActius} (un estat de revisió buit compta com a no revisat), així que les dues targetes sumen el total.
+	 */
+	public static Specification<MetaExpedientResourceEntity> procedimentsInactius(boolean revisioActiva) {
+		return (root, query, cb) -> revisioActiva
+				? cb.or(
+						cb.isFalse(root.get("actiu")),
+						cb.isNull(root.get("revisioEstat")),
+						cb.notEqual(root.get("revisioEstat"), MetaExpedientRevisioEstatEnumDto.REVISAT))
+				: cb.isFalse(root.get("actiu"));
 	}
 
 	// --- Monitor ---------------------------------------------------------------------------------------

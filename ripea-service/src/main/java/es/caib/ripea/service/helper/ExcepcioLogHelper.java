@@ -59,7 +59,7 @@ public class ExcepcioLogHelper {
 	/** Dies de retenció per defecte si la propietat no està definida o no és vàlida. */
 	static final int RETENCIO_DIES_DEFECTE = 30;
 	/** Finestra de deduplicació per defecte (minuts). */
-	static final int DEDUP_MINUTS_DEFECTE = 10;
+	public static final int DEDUP_MINUTS_DEFECTE = 10;
 
 	/** Dies que es conserven les excepcions (propietat {@link PropertyConfig#EXCEPCIONS_RETENCIO_DIES}). */
 	public int getRetencioDies() {

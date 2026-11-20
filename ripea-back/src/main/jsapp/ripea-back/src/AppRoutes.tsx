@@ -187,8 +187,8 @@ const AppRoutes: React.FC = () => {
             <Route path="seguimentExpedientsPendents" element={<ExpedientsPendentsGrid />} />
             <Route path="expedientPeticioComunicades" element={<AnotacionsComunicadesGrid/>} />
         </Route>
-        {/* Alertes d'expedients: rols que veuen el llistat d'expedients (l'administrador de lectura, només consulta). */}
-        <Route element={<ProtectedRoute allowedRoles={[rols.ADMIN, rols.ADMIN_LECTURA, rols.ORGAN_ADMIN, rols.tothom]} />}>
+        {/* Alertes d'expedients: rols que veuen el llistat d'expedients, excepte l'administrador de lectura (decisió 20/11/2026). */}
+        <Route element={<ProtectedRoute allowedRoles={[rols.ADMIN, rols.ORGAN_ADMIN, rols.tothom]} />}>
             <Route path="alertesExpedient" element={<AlertesExpedientGrid />} />
         </Route>
         <Route element={<ProtectedRoute allowedRoles={[rols.ADMIN, rols.tothom]} />}>

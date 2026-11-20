@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -27,6 +28,7 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.Hibernate;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
@@ -158,6 +160,7 @@ import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.resourcehelper.ExpedientPermisosFiltreHelper;
+import es.caib.ripea.service.resourcehelper.inici.ExpedientsPerTancarRecurs;
 import es.caib.ripea.service.resourcehelper.inici.RecomptesRecurs;
 import es.caib.ripea.service.intf.utils.ZipDocumentExtractor;
 import es.caib.ripea.service.permission.ExtendedPermission;
@@ -170,7 +173,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ExpedientResourceServiceImpl extends BaseMutableResourceService<ExpedientResource, Long, ExpedientResourceEntity> implements ExpedientResourceService, RecomptesRecurs<ExpedientResourceEntity> {
+public class ExpedientResourceServiceImpl extends BaseMutableResourceService<ExpedientResource, Long, ExpedientResourceEntity> implements ExpedientResourceService, RecomptesRecurs<ExpedientResourceEntity>, ExpedientsPerTancarRecurs {
 
 	private final EntitatRepository entitatRepository;
 	private final ExpedientRepository expedientRepository;
@@ -354,6 +357,45 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         return RecomptesRecurs.comptar(criteris, this.<ExpedientResourceEntity>toFindProcessedSpecification(null, null, namedQueries), entityRepository);
     }
 
+    /**
+     * Expedients més antics que l'acció massiva de tancament permet tancar: els mateixos que el seu llistat (named
+     * queries MASSIVE_ACTION_QUERY + MASSIVE_ACTION_TANCAR), però la consulta en retorna directament els primers en
+     * lloc de tots els identificadors.
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public <F> List<F> mesAnticsPerTancar(int maxim, Function<ExpedientResourceEntity, F> fila) {
+        String rolActual = configHelper.getRolActual();
+        EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+        List<MetaExpedientEntity> procedimentsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitat.getId(), rolActual);
+        if (procedimentsPermesos == null || procedimentsPermesos.isEmpty()) {
+            return new ArrayList<>();
+        }
+        String codiUsuariActual = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<Long> ids = expedientRepository.findIdsExpedientsPerTancamentMassiuMesAntics(
+                entitat,
+                isNomesAgafatsAccioMassiva(rolActual),
+                usuariRepository.findByCodi(codiUsuariActual),
+                procedimentsPermesos,
+                true, null, //esNullMetaExpedient
+                true, null, //esNullNom
+                true, null, //esNullDataInici
+                true, null, //esNullDataFi
+                PageRequest.of(0, maxim));
+        Map<Long, ExpedientResourceEntity> expedients = new HashMap<>();
+        entityRepository.findAllById(ids).forEach(expedient -> expedients.put(expedient.getId(), expedient));
+        return ids.stream()
+                .map(expedients::get)
+                .filter(Objects::nonNull)
+                .map(fila)
+                .collect(Collectors.toList());
+    }
+
+    /** Amb l'acció massiva, els rols que no són administradors només hi veuen els expedients que tenen agafats. */
+    private static boolean isNomesAgafatsAccioMassiva(String rolActual) {
+        return !"IPA_ADMIN".equals(rolActual) && !"IPA_ORGAN_ADMIN".equals(rolActual);
+    }
+
     @Override
     protected Sort processSort(Sort sort) {
         if (sort == null || sort.isUnsorted()) return sort;
@@ -456,7 +498,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         	if (mapaNamedQueries.containsKey("MASSIVE_ACTION_QUERY")) {
         		
         		String codiUsuariActual = SecurityContextHolder.getContext().getAuthentication().getName();
-        		boolean nomesAgafats = !rolActual.equals("IPA_ADMIN") && !rolActual.equals("IPA_ORGAN_ADMIN");
+        		boolean nomesAgafats = isNomesAgafatsAccioMassiva(rolActual);
         		
         		List<MetaExpedientEntity> procedimentsPermesosAccioMass = metaExpedientHelper.findPermesosAccioMassiva(
         				entitatEntity.getId(),

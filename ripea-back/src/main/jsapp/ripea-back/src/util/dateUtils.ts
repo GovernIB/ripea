@@ -4,6 +4,14 @@ export const formatDate = (date: string, format: string = 'DD/MM/Y HH:mm:ss'): s
     return date ? Moment(date).format(format) : null;
 }
 
+/**
+ * Dates de les llistes de la pantalla d'inici, que arriben en tres formats: data sense hora («2025-08-05»), data i
+ * hora sense zona («2025-06-23T17:21:58.013123») i data i hora amb desplaçament («2026-11-19T13:38:34.410+00:00»).
+ * Moment interpreta els dos primers com a hora local i converteix el tercer a l'hora local. Sense valor, text buit.
+ */
+export const formatDia = (date?: string | null): string => (date ? formatDate(date, 'DD/MM/Y') ?? '' : '');
+export const formatDiaHora = (date?: string | null): string => (date ? formatDate(date, 'DD/MM/Y HH:mm') ?? '' : '');
+
 export const formatIso = (date: string) =>{
     return formatDate(date, "Y-MM-DDTHH:mm:ss")
 }

@@ -43,6 +43,9 @@ export const CATALEG_INDICADORS: Record<string, PresentacioIndicador> = {
     PROCEDIMENTS_EN_DISSENY: { icon: icons.procedimentEnDisseny, color: 'info', to: '/metaExpedient', menu: 'procediments' },
     PROCEDIMENTS_REBUTJATS: { icon: icons.procedimentRebutjat, color: 'error', to: '/metaExpedient', menu: 'procediments' },
     PROCEDIMENTS_REVISATS: { icon: icons.correcte, color: 'success', to: '/metaExpedient', menu: 'procediments' },
+    // Procediments de l'entitat (administrador de lectura): actius + inactius = total
+    PROCEDIMENTS_ACTIUS: { icon: icons.procedimentActiu, color: 'success', to: '/metaExpedient', menu: 'procediments' },
+    PROCEDIMENTS_INACTIUS: { icon: icons.procedimentInactiu, color: 'secondary', to: '/metaExpedient', menu: 'procediments' },
     // Superadministrador
     INTEGRACIONS_ERROR: { icon: icons.integracio, color: 'error', to: '/integracio', menu: 'integracions' },
     EXCEPCIONS: { icon: icons.excepcio, color: 'error', to: '/excepcio', menu: 'excepcions' },

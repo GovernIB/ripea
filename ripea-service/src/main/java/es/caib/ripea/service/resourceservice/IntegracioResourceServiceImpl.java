@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,6 +39,7 @@ import es.caib.ripea.service.intf.model.IntegracioResource;
 import es.caib.ripea.service.intf.model.IntegracioResource.DiagnosticResetForm;
 import es.caib.ripea.service.intf.resourceservice.IntegracioResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
+import es.caib.ripea.service.resourcehelper.inici.LlistesRecurs;
 import es.caib.ripea.service.resourcehelper.inici.RecomptesRecurs;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +47,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class IntegracioResourceServiceImpl extends BaseMutableResourceService<IntegracioResource, Long, IntegracioResourceEntity> implements IntegracioResourceService, RecomptesRecurs<IntegracioResourceEntity> {
+public class IntegracioResourceServiceImpl extends BaseMutableResourceService<IntegracioResource, Long, IntegracioResourceEntity> implements IntegracioResourceService, RecomptesRecurs<IntegracioResourceEntity>, LlistesRecurs<IntegracioResourceEntity> {
 
 	private final OrganGestorRepository organGestorRepository;
 	private final EntitatRepository entitatRepository;
@@ -74,6 +76,13 @@ public class IntegracioResourceServiceImpl extends BaseMutableResourceService<In
     @Transactional(readOnly = true)
     public Map<String, Long> comptar(Map<String, Specification<IntegracioResourceEntity>> criteris, String[] namedQueries) {
         return RecomptesRecurs.comptar(criteris, this.<IntegracioResourceEntity>toFindProcessedSpecification(null, null, namedQueries), entityRepository);
+    }
+
+    /** Llistes de la pantalla d'inici amb la visibilitat del llistat (veure LlistesRecurs). */
+    @Override
+    @Transactional(readOnly = true)
+    public <T> T ambVisibles(String[] namedQueries, Function<Specification<IntegracioResourceEntity>, T> consulta) {
+        return consulta.apply(this.<IntegracioResourceEntity>toFindProcessedSpecification(null, null, namedQueries));
     }
 
     private String translateEntitatFilter(String filter) {

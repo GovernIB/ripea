@@ -119,6 +119,8 @@ export const icons = {
     tascaSenseActivitat: 'snooze',
     procedimentEnDisseny: 'design_services',
     procedimentRebutjat: 'thumb_down',
+    procedimentActiu: 'playlist_add_check',
+    procedimentInactiu: 'playlist_remove',
     memoria: 'memory',
     disc: 'storage',
 
