@@ -1,19 +1,20 @@
-import {useState} from "react";
-import {MuiDialog, useFormContext} from "reactlib";
-import {useTranslation} from "react-i18next";
-import Load from "../../../components/Load.tsx";
-import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
-import * as builder from "../../../util/springFilterUtils.ts";
-import StyledMuiFilter from "../../../components/StyledMuiFilter.tsx";
-import GridFormField from "../../../components/GridFormField.tsx";
-import {StyledEstat} from "../ExpedientGrid.tsx";
-import {useActions} from "../details/CommonActions.tsx";
-import {springFilterBuilder as expedientFilterBuilder} from "../ExpedientFilter.tsx";
-import {formatDate} from "../../../util/dateUtils.ts";
-import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
+import { useState } from 'react';
+import GridDialogBody, { gridDialogProps } from '../../../components/GridDialogBody.tsx';
+import { MuiDialog, useFormContext } from 'reactlib';
+import { useTranslation } from 'react-i18next';
+import Load from '../../../components/Load.tsx';
+import StyledMuiGrid from '../../../components/StyledMuiGrid.tsx';
+import * as builder from '../../../util/springFilterUtils.ts';
+import StyledMuiFilter from '../../../components/StyledMuiFilter.tsx';
+import GridFormField from '../../../components/GridFormField.tsx';
+import { StyledEstat } from '../ExpedientGrid.tsx';
+import { useActions } from '../details/CommonActions.tsx';
+import { springFilterBuilder as expedientFilterBuilder } from '../ExpedientFilter.tsx';
+import { formatDate } from '../../../util/dateUtils.ts';
+import { useCloseDialogButtons } from '@src/util/buttonsOverride.tsx';
 
-const sortModel:any[] = [{ field: 'createdDate', sort: 'desc' }];
-const perspectives = ['ESTAT']
+const sortModel: any[] = [{ field: 'createdDate', sort: 'desc' }];
+const perspectives = ['ESTAT'];
 
 const columns = [
     {
@@ -31,145 +32,150 @@ const columns = [
     {
         field: 'estat',
         flex: 0.5,
-        renderCell: (params: any) => <StyledEstat entity={params?.row}>{params.formattedValue}</StyledEstat>
+        renderCell: (params: any) => <StyledEstat entity={params?.row}>{params.formattedValue}</StyledEstat>,
     },
     {
         field: 'createdDate',
         flex: 0.5,
         valueFormatter: (value: any) => formatDate(value),
     },
-]
+];
 
-const springFilterBuilder = (data: any) :string => {
+const springFilterBuilder = (data: any): string => {
     const processedData = {
         metaExpedient: data?.metaExpedient,
         numero: data?.numero,
         nom: data?.nom,
         estatCustom: data?.estatCustom,
-    }
+    };
     return expedientFilterBuilder(processedData);
-}
+};
 
 const ActionFilterFrom = () => {
-    const {data} = useFormContext()
+    const { data } = useFormContext();
 
-    const filterMetaExpedient = builder.and(
-        builder.eq('actiu', true),
-        builder.eq('revisioEstat', "'REVISAT'"),
+    const filterMetaExpedient = builder.and(builder.eq('actiu', true), builder.eq('revisioEstat', "'REVISAT'"));
+
+    return (
+        <>
+            <GridFormField size={{ xs: 12, sm: 6, md: 2.875 }} name="metaExpedient" filter={filterMetaExpedient} />
+            <GridFormField size={{ xs: 12, sm: 6, md: 2.875 }} name="numero" />
+            <GridFormField size={{ xs: 12, sm: 6, md: 2.875 }} name="nom" />
+            <GridFormField
+                size={{ xs: 12, sm: 6, md: 2.875 }}
+                name="estatCustom"
+                requestParams={{ metaExpedientId: data?.metaExpedient?.id }}
+            />
+        </>
     );
+};
 
-    return <>
-        <GridFormField size={{xs: 12, sm: 6, md: 2.875}} name="metaExpedient" filter={filterMetaExpedient}/>
-        <GridFormField size={{xs: 12, sm: 6, md: 2.875}} name="numero"/>
-        <GridFormField size={{xs: 12, sm: 6, md: 2.875}} name="nom"/>
-        <GridFormField size={{xs: 12, sm: 6, md: 2.875}} name="estatCustom" requestParams={{metaExpedientId: data?.metaExpedient?.id}}/>
-    </>
-}
+const ActionFilter = (props: any) => {
+    const { onSpringFilterChange } = props;
 
-const ActionFilter = (props:any) => {
-    const {onSpringFilterChange} = props;
+    return (
+        <StyledMuiFilter
+            resourceName="expedientResource"
+            code="EXPEDIENT_FILTER"
+            springFilterBuilder={springFilterBuilder}
+            onSpringFilterChange={onSpringFilterChange}
+        >
+            <ActionFilterFrom />
+        </StyledMuiFilter>
+    );
+};
 
-    return <StyledMuiFilter
-        resourceName="expedientResource"
-        code="EXPEDIENT_FILTER"
-        springFilterBuilder={springFilterBuilder}
-        onSpringFilterChange={onSpringFilterChange}
-    >
-        <ActionFilterFrom/>
-    </StyledMuiFilter>
-}
-
-const ImportarExpedient = (props:any) => {
-    const { entity, refresh } = props
-    const { t } = useTranslation()
+const ImportarExpedient = (props: any) => {
+    const { entity, refresh } = props;
+    const { t } = useTranslation();
     const [springFilter, setSpringFilter] = useState<string>();
     const [load, setLoad] = useState<boolean>(false);
 
-    const {importarExpedient} = useActions(refresh)
+    const { importarExpedient } = useActions(refresh);
 
     const actions = [
         {
             label: t('page.expedient.action.importar.label'),
-            icon: "download",
+            icon: 'download',
             showInMenu: false,
-            onClick: (id:any) => importarExpedient(entity?.id, id)
-        }
-    ]
+            onClick: (id: any) => importarExpedient(entity?.id, id),
+        },
+    ];
 
-    return <>
-        <ActionFilter onSpringFilterChange={(value:any)=>{
-            setSpringFilter(value)
-            setLoad(true)
-        }}/>
-        <Load value={load} noEffect>
-            <StyledMuiGrid
-                resourceName={'expedientResource'}
-                persistentStateKey={'expedientResource_importarExpedient'}
-                columns={columns}
-                filter={builder.and(
-                    builder.exists(
-                        builder.eq('relacionatsPer.id', entity?.id),
-                    ),
-                    springFilter
-                )}
-                sortModel={sortModel}
-                perspectives={perspectives}
-                rowAdditionalActions={actions}
-                rowProps={(row: any) => {
-                    const color = row?.estatAdditionalInfo?.color;
-                    return color
-                        ? {
-                            'box-shadow': `${color} -6px 0px 0px`,
-                            'border-left': `6px solid ${color}`,
-                        }
-                        : {
-                            'padding-left': '6px'
-                        }
+    return (
+        <GridDialogBody>
+            <ActionFilter
+                onSpringFilterChange={(value: any) => {
+                    setSpringFilter(value);
+                    setLoad(true);
                 }}
-                toolbarHide
-                autoHeight
-                readOnly
             />
-        </Load>
-    </>
-}
+            <Load value={load} noEffect>
+                <StyledMuiGrid
+                    resourceName={'expedientResource'}
+                    persistentStateKey={'expedientResource_importarExpedient'}
+                    columns={columns}
+                    filter={builder.and(builder.exists(builder.eq('relacionatsPer.id', entity?.id)), springFilter)}
+                    sortModel={sortModel}
+                    perspectives={perspectives}
+                    rowAdditionalActions={actions}
+                    rowProps={(row: any) => {
+                        const color = row?.estatAdditionalInfo?.color;
+                        return color
+                            ? {
+                                  'box-shadow': `${color} -6px 0px 0px`,
+                                  'border-left': `6px solid ${color}`,
+                              }
+                            : {
+                                  'padding-left': '6px',
+                              };
+                    }}
+                    toolbarHide
+                    autoHeight
+                    readOnly
+                />
+            </Load>
+        </GridDialogBody>
+    );
+};
 
-const useImportarExpedient = (entity:any, refresh?: () => void) => {
+const useImportarExpedient = (entity: any, refresh?: () => void) => {
     const [open, setOpen] = useState(false);
 
     const handleOpen = () => {
         setOpen(true);
-    }
+    };
 
     const handleClose = (reason?: string) => {
-        if(reason !== 'backdropClick') {
+        if (reason !== 'backdropClick') {
             setOpen(false);
         }
     };
 
     const closeButtons = useCloseDialogButtons('close');
-    const dialog =
+    const dialog = (
         <MuiDialog
             open={open}
             closeCallback={handleClose}
             title={entity?.nom}
-            componentProps={{ fullWidth: true, maxWidth: 'lg' }}
+            componentProps={gridDialogProps('lg')}
             buttons={closeButtons}
-            buttonCallback={(value :any) :void=>{
-                if (value=='close') {
+            buttonCallback={(value: any): void => {
+                if (value == 'close') {
                     handleClose();
                 }
             }}
         >
             <Load value={entity}>
-                <ImportarExpedient entity={entity} refresh={refresh}/>
+                <ImportarExpedient entity={entity} refresh={refresh} />
             </Load>
         </MuiDialog>
+    );
 
     return {
         handleOpen,
         handleClose,
-        dialog
-    }
-}
+        dialog,
+    };
+};
 export default useImportarExpedient;

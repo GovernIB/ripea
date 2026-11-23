@@ -274,6 +274,7 @@ const translationCa = {
             canviPrioritats: "Acció massiva: Canvi de prioritat d'expedients",
             expedientPeticioCanviEstatDistribucio: "Acció massiva: Actualitzar estat de les anotacions a Distribució",
             procesarAnnexosPendents: "Acció massiva: Adjuntar annexos pendents d'anotacions acceptades",
+            execucions: "Execucions massives",
         },
     },
     page: {
@@ -1308,7 +1309,7 @@ const translationCa = {
 			}
         },
         dada: {
-            title: "valor per a la dada '{{metaDada}}'",
+            title: "valor",
             noRowsText: "No hi ha valors per a aquesta dada",
             grid: {
                 valor: "Valor de la dada",
@@ -2596,13 +2597,17 @@ const translationCa = {
                 csv: "Copia l'enllaç CSV",
                 anexos: "Adjunta annexos pendents d'anotacions acceptades",
                 anotacio: "Actualitza l'estat de les anotacions a Distribució",
-                prioritat: "Canvia la prioritat d'expedients",
-                refresh: "Refrescar dada 10 segons"
+                prioritat: "Canvia la prioritat d'expedients"
             },
             action: {
                 massives: {
                     label: "Consulta accions massives",
-                    title: "Execucions massives de {{name}}",
+                    grid: {
+                        elements: "Elements",
+                        progres: "Progrés",
+                        activaRefresc: "Activa refresc cada 10s",
+                        desactivaRefresc: "Desactiva refresc cada 10s",
+                    },
                     detail: "Detall de l'acció massiva: {{tipus}}",
                     ok: "El document s'ha baixat correctament",
                     pending: "Aquest element s'està processant actualment",

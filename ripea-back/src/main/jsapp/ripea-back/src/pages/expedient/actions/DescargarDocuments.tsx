@@ -8,6 +8,7 @@ import {useTranslation} from "react-i18next";
 import {GridTreeDataGroupingCell} from "@mui/x-data-grid-pro";
 import {iniciaDescargaBlob} from "../details/CommonActions.tsx";
 import Load from "../../../components/Load.tsx";
+import GridDialogBody, {gridDialogProps} from "../../../components/GridDialogBody.tsx";
 import {useExpedientsCarpetes} from "../../contingut/DocumentsGrid.tsx";
 
 const sortModel:any = [{field: 'id', sort: 'desc'}]
@@ -52,6 +53,7 @@ const DescargarDocumentsForm = () => {
     const {isReady, carpetes, expedients, refresh} = useExpedientsCarpetes(commonFilter)
 
     return <Load value={apiRef && carpetes && expedients && isReady}>
+        <GridDialogBody>
         <StyledMuiGrid
             resourceName="documentResource"
             persistentStateActive={false}
@@ -98,6 +100,7 @@ const DescargarDocumentsForm = () => {
             selectionActive
             autoHeight
         />
+        </GridDialogBody>
     </Load>
 }
 
@@ -113,7 +116,7 @@ const DescargarDocuments = (props:any) => {
             {icon: 'description', text: t('page.expedient.action.download.button'), componentProps: { variant: 'contained' }, value: true },
             {text: t('common.cancel'), componentProps: { variant: 'outlined' }, value: false },
         ]}
-        formDialogComponentProps={{fullWidth: true, maxWidth: 'lg'}}
+        formDialogComponentProps={gridDialogProps('lg')}
         {...props}
     >
         <DescargarDocumentsForm/>

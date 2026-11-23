@@ -191,7 +191,7 @@ const ExpedientInfoExpandit = (props:any) => {
                     renderCell={(formattedValue: string) => <StyledPrioritat entity={expedient}>{formattedValue}</StyledPrioritat>}
                 />
 
-                {expedient?.grup && <FieldData field={'grup'} sx={{ borderBottom: '1px solid' }} />}
+                {expedient?.grup && <FieldData field={'grup'} sx={{ borderBottom: '1px solid', borderBottomColor: 'divider' }} />}
 
                 <ExpedientsRelacionats entity={expedient} relacionats={relacionats} eliminarRelacio={eliminarRelacio} />
 

@@ -15,6 +15,7 @@ const TITLES: any = {
     '/config': "page.user.menu.props",
     '/excepcio': "navigate.exception",
     '/integracio': "navigate.integracio",
+    '/monitor': "page.user.menu.monitor",
     '/usuari': "navigate.usuari",
 
     // Accions massives
@@ -28,6 +29,7 @@ const TITLES: any = {
     '/massiu/canviPrioritats': "navigate.massiu.canviPrioritats",
     '/massiu/expedientPeticioCanviEstatDistribucio': "navigate.massiu.expedientPeticioCanviEstatDistribucio",
     '/massiu/procesarAnnexosPendents': "navigate.massiu.procesarAnnexosPendents",
+    '/massiu/execucions': "navigate.massiu.execucions",
 
     // Consultes
     '/contingutAdmin': "page.user.menu.continguts",

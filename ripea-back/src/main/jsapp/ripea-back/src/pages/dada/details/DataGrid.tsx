@@ -62,7 +62,7 @@ const DataGrid = (props:any) => {
 
     return <StyledMuiGrid
         resourceName={"dadaResource"}
-        popupEditFormDialogResourceTitle={t('page.dada.title', {metaDada: entity?.nom})}
+        popupEditFormDialogResourceTitle={t('page.dada.title')}
         filter={
             builder.and(
                 builder.eq('metaDada.id', entity?.id),
@@ -96,6 +96,7 @@ const DataGrid = (props:any) => {
             }
         ] as any[]}
         toolbarHideRefresh
+        toolbarCompact
         toolbarHideCreate={(!contingut?.potModificar || numDades > 0 && !(entity?.multiplicitat == 'M_0_N' || entity?.multiplicitat == 'M_1_N')) ?true :undefined}
         toolbarCreateTitle={t('page.dada.action.new.label')}
         popupEditFormI18nKeys={{

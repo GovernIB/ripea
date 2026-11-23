@@ -1,5 +1,6 @@
 import {useMemo, useState} from "react";
 import {MuiDialog} from "reactlib";
+import GridDialogBody, {gridDialogProps} from "../../../components/GridDialogBody.tsx";
 import {useTranslation} from "react-i18next";
 import Load from "../../../components/Load.tsx";
 import * as builder from "../../../util/springFilterUtils.ts";
@@ -63,7 +64,7 @@ const ExpedientDialog = (props:any) => {
         },
     ], [t]);
 
-    return <>
+    return <GridDialogBody>
         <StyledMuiGrid
             resourceName={'expedientResource'}
             persistentStateKey={'expedientResource_expedientDialog'}
@@ -89,7 +90,7 @@ const ExpedientDialog = (props:any) => {
             paginationModel={paginationModel}
             readOnly
         />
-    </>
+    </GridDialogBody>
 }
 
 const useExpedientDialog = () => {
@@ -116,7 +117,7 @@ const useExpedientDialog = () => {
             open={open}
             closeCallback={handleClose}
             title={t('page.metaExpedient.action.expedient.title', {nom: entity?.nom})}
-            componentProps={{ fullWidth: true, maxWidth: 'lg' }}
+            componentProps={gridDialogProps('lg')}
             buttons={buttons}
             buttonCallback={() :void => {
                 handleClose()

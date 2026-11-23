@@ -1,7 +1,5 @@
 import { useUserSession } from '@src/components/Session';
 import { useNotificacionsSession, useTasquesSession } from '@src/components/SseClient';
-import useExecucioMassiva from '@src/pages/user/actions/ExecucioMassivaGrid';
-import { useSistemaDetail } from '@src/pages/user/monitor/SistemaDetail';
 import { useToProgramaAntic } from '@src/pages/user/UserHeadToolbar';
 import { icons as iconsAppMenu } from '@src/util/icons';
 import { useMemo } from 'react';
@@ -25,7 +23,6 @@ const menuConsultarAlertesExpedient = (t: (key: string) => string) => ({
 
 export const useMenuSupAdmin = () => {
     const { t } = useTranslation();
-    const { handleOpen, dialog } = useSistemaDetail();
 
     return useMemo(() => {
         const appEntries: any[] = [
@@ -89,7 +86,7 @@ export const useMenuSupAdmin = () => {
                         id: 'monitor',
                         title: t('page.user.menu.monitor'),
                         icon: iconsAppMenu.monitorSistema,
-                        onClick: handleOpen,
+                        to: '/monitor',
                     },
                 ],
             },
@@ -113,10 +110,8 @@ export const useMenuSupAdmin = () => {
                 ],
             },
         ];
-        const content = <>{dialog}</>;
-
-        return { appEntries, entries, content };
-    }, [t, handleOpen, dialog]);
+        return { appEntries, entries };
+    }, [t]);
 };
 
 export const useMenuAdmin = () => {
@@ -280,9 +275,7 @@ export const useMenuAdmin = () => {
                 ],
             },
         ];
-        const content = <></>;
-
-        return { appEntries, entries, content };
+        return { appEntries, entries };
     }, [t, numNotif, user]);
 };
 
@@ -325,9 +318,7 @@ export const useMenuAdminLectura = () => {
                 to: '/metaExpedient',
             },
         ];
-        const content = <></>;
-
-        return { appEntries, entries, content };
+        return { appEntries, entries };
     }, [t, user]);
 };
 
@@ -398,9 +389,7 @@ export const useMenuAdminOrgan = () => {
             },
             menuConsultarAlertesExpedient(t),
         ];
-        const content = <></>;
-
-        return { appEntries, entries, content };
+        return { appEntries, entries };
     }, [t, numNotif, user]);
 };
 
@@ -445,9 +434,7 @@ export const useMenuDissenyOrgan = () => {
                 ],
             },
         ];
-        const content = <></>;
-
-        return { appEntries, entries, content };
+        return { appEntries, entries };
     }, [t]);
 };
 
@@ -540,16 +527,13 @@ export const useMenuUsuari = () => {
                 ],
             },
         ];
-        const content = <></>;
-
-        return { appEntries, entries, content };
+        return { appEntries, entries };
     }, [t, numNotif, numTasc, user, toProgramaAntic]);
 };
 
 export const useAccionesMassivas = () => {
     const { value: user, rol } = useUserSession();
     const { t } = useTranslation();
-    const { handleOpen, dialog } = useExecucioMassiva();
 
     return useMemo(() => {
         const appEntries: any[] = [];
@@ -626,15 +610,13 @@ export const useAccionesMassivas = () => {
                         id: 'masives',
                         title: t('page.user.action.massives.label'),
                         icon: iconsAppMenu.massiva,
-                        onClick: handleOpen,
+                        to: '/massiu/execucions',
                     },
                 ],
             },
         ];
-        const content = <>{dialog}</>;
-
-        return { appEntries, entries, content };
-    }, [t, user, rol, handleOpen, dialog]);
+        return { appEntries, entries };
+    }, [t, user, rol]);
 };
 
 export const useMenuRevisor = () => {
@@ -659,8 +641,6 @@ export const useMenuRevisor = () => {
                 to: '/metaExpedient',
             },
         ];
-        const content = <></>;
-
-        return { appEntries, entries, content };
+        return { appEntries, entries };
     }, [t]);
 };

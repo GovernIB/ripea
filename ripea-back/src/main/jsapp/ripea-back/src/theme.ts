@@ -584,6 +584,8 @@ const baseComponentStyles: ThemeOptions['components'] = {
     MuiDialogContent: {
         styleOverrides: {
             root: {
+                // Padding explícit i simètric (X i Y) del contingut de totes les modals.
+                padding: '20px 24px',
                 // El títol és una barra acolorida: el seu padding no separa el contingut.
                 // lib/Dialog força pt:0 i el botó de tancar queda entre títol i contingut ('~', no '+').
                 '.MuiDialogTitle-root ~ &': {

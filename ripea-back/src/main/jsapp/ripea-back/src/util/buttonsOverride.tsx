@@ -36,7 +36,7 @@ export const useConfirmDialogButtons = (): DialogButton[] => {
 };
 
 /**
- * Botó únic "Tanca" dels diàlegs de només consulta: contained i sense icona, igual que a la resta d'aplicacions.
+ * Botó únic "Tanca" dels diàlegs de només consulta: outlined (no és una acció primària, només tanca) i sense icona.
  * @param value valor retornat al callback del diàleg (false per defecte; 'close' per als diàlegs que ho comproven).
  */
 export const useCloseDialogButtons = (value: string | boolean = false): DialogButton[] => {
@@ -45,7 +45,7 @@ export const useCloseDialogButtons = (value: string | boolean = false): DialogBu
         {
             value,
             text: t("buttons.misc.close"),
-            componentProps: { variant: "contained" },
+            componentProps: { variant: "outlined" },
         },
     ];
 };

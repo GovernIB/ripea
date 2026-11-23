@@ -97,6 +97,11 @@ type StyledMuiGridProps = Omit<MuiDataGridProps,
     hiddenMassiveDefSelector?: boolean,
     toolbarShowCreate?: boolean,
     toolbarShowQuickFilter?: boolean,
+    /**
+     * Barra d'eines sense l'alçada mínima de 64px de MUI Toolbar (la dels botons en fa 32): per a graelles
+     * dins un diàleg, on l'espai que sobra sobre el botó de crear és molt visible.
+     */
+    toolbarCompact?: boolean,
     staticSortModel?: any[],
     rowSelectionModel?: any[],
     onRowSelectionModelChange?: (ids:any[], detail:any) => void,
@@ -148,6 +153,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
         hiddenMassiveDefSelector = false,
         toolbarShowCreate = true,
         toolbarShowQuickFilter = false,
+        toolbarCompact = false,
         persistentStateActive = true,
         autoHeight: autoHeightProp,
         ...others
@@ -348,6 +354,7 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
             // el crea reactlib i no admet ni props ni estils des de fora.
             '& .MuiToolbar-root .MuiOutlinedInput-root': { height: '32px' },
             '& .MuiToolbar-root .MuiOutlinedInput-input': { pt: 0, pb: 0 },
+            ...(toolbarCompact && { '& .MuiToolbar-root': { minHeight: 0, pb: 1 } }),
             // Les icones de les cel·les (check de booleans, avisos, estats...) són de mida "small" (20px) en lloc
             // dels 24px per defecte de MUI, i amb 4px de marge dret (com abans del redisseny). Les que ja demanen
             // `fontSize="inherit"` segueixen la mida del text. Les que porten la classe `grid-icon-medium`

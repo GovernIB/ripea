@@ -269,6 +269,7 @@ const translationEn = {
             canviPrioritats: "Mass action: Change case priority",
             expedientPeticioCanviEstatDistribucio: "Mass action: Update the status of records in Distribution",
             procesarAnnexosPendents: "Mass action: Attach pending annexes from accepted entries",
+            execucions: "Mass executions",
         },
     },
     page: {
@@ -1302,7 +1303,7 @@ const translationEn = {
 			}
         },
         dada: {
-            title: "value for data '{{metaDada}}'",
+            title: "value",
             noRowsText: "There are no values for this data",
             grid: {
                 valor: "Data value",
@@ -2587,16 +2588,29 @@ const translationEn = {
                 csv: "Copy CSV link",
                 anexos: "Attach pending annexes from accepted annotations",
                 anotacio: "Update annotation status in Distribution",
-                prioritat: "Change case priority",
-                refresh: "Refresh data every 10 seconds"
+                prioritat: "Change case priority"
             },
             action: {
-                masives: {
+                massives: {
                     label: "View massive actions",
-                    title: "{{name}} mass executions",
+                    grid: {
+                        elements: "Items",
+                        progres: "Progress",
+                        activaRefresc: "Enable refresh every 10s",
+                        desactivaRefresc: "Disable refresh every 10s",
+                    },
                     detail: "Detail of the mass action: {{tipus}}",
                     ok: "The document has been downloaded successfully",
                     pending: "This item is currently being processed",
+                    cancelar: {
+                        label: "Cancel the mass execution",
+                        title: "Cancel the mass execution",
+                        confirm: "Are you sure you want to cancel this mass execution? If it is running, the item being processed will finish and the rest will be cancelled.",
+                        ok: "The mass execution has been cancelled",
+                        sollicitadaOk: "Cancellation requested. The item being processed will finish and the rest will be cancelled.",
+                        sollicitada: "Cancelling…",
+                        noCancelable: "Exports and moves between cases cannot be cancelled: they run in a single step and stopping them halfway would leave inconsistent data.",
+                    },
                 },
             },
             perfil: {

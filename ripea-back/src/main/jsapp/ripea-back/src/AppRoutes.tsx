@@ -16,6 +16,7 @@ import CopiarEnllacCSVGrid from "./pages/user/accionsMassives/CopiarEnllacCSVGri
 import MarcarDefinitiuGrid from "./pages/user/accionsMassives/MarcarDefinitiuGrid.tsx";
 import CanviPrioritatGrid from "./pages/user/accionsMassives/CanviPrioritatGrid.tsx";
 import ActualitzarEstatAnotacioGrid from "./pages/user/accionsMassives/ActualitzarEstatAnotacioGrid.tsx";
+import ExecucioMassivaGrid from "./pages/user/actions/ExecucioMassivaGrid.tsx";
 import DocumentEnviatsPortafirmesGrid from "./pages/user/consultes/DocumentEnviatsPortafirmesGrid.tsx";
 import RemesesNotibGrid from "./pages/user/consultes/RemesesNotibGrid.tsx";
 import ConsultesPinbalGrid from "./pages/user/consultes/ConsultesPinbalGrid.tsx";
@@ -46,6 +47,7 @@ import {ServeiPinbalGrid} from "./pages/user/configurar/ServeiPinbalGrid.tsx";
 import {Propietats, PropietatsByEntitat} from "./pages/user/propietats/Propietats.tsx";
 import {ExcepcioGrid} from "./pages/user/monitor/ExcepcioGrid.tsx";
 import {IntegracioGrid} from "./pages/user/monitor/integracio/IntegracioGrid.tsx";
+import {MonitorSistema} from "./pages/user/monitor/MonitorSistema.tsx";
 import Accesibilitat from "./pages/Accesibilitat.tsx";
 import Sitemap from "./pages/Sitemap.tsx";
 import UsuariGrid from "./pages/usuari/UsuariGrid.tsx";
@@ -157,6 +159,7 @@ const AppRoutes: React.FC = () => {
             <Route path={"config"} element={<Propietats/>} />
             <Route path={"integracio"} element={<IntegracioGrid/>} />
             <Route path={"excepcio"} element={<ExcepcioGrid/>} />
+            <Route path={"monitor"} element={<MonitorSistema/>} />
             <Route path={"usuari"} element={<UsuariGrid/>} />
         </Route>
 
@@ -174,6 +177,7 @@ const AppRoutes: React.FC = () => {
                     <Route path={"expedientPeticioCanviEstatDistribucio"} element={<ActualitzarEstatAnotacioGrid />} />
                 </Route>
                 <Route path={"procesarAnnexosPendents"} element={<AdjuntarAnnexosPendentsGrid />} />
+                <Route path={"execucions"} element={<ExecucioMassivaGrid />} />
             </Route>
             <Route path="seguimentArxiuPendents" element={<CustodiarElementsPendentsGrid />} />
         </Route>

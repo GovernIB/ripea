@@ -61,6 +61,8 @@ export const icons = {
     desactiva: 'close',
     executa: 'bolt',
     refresca: 'refresh',
+    refrescaAutomatic: 'sync',
+    refrescaAturada: 'sync_disabled',
     sincronitza: 'cached',
     copia: 'content_copy',
     descarrega: 'file_download',

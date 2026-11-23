@@ -10,7 +10,6 @@ import TitleHeaderConfigurator from './TitleHeaderConfigurator.tsx';
 import { useTranslation } from 'react-i18next';
 import { useCombinedMenu } from './hooks/useCombinedMenu.ts';
 import { useTheme } from '@mui/material';
-import { TemporalMessageBridge } from './components/PreBaseAppProvider.tsx';
 import { useThemeUserContext } from '@src/components/ThemeUserProvider.tsx';
 import { APPBAR_PADDING_LEFT, HEADER_HEIGHT, LOGO_BOX_LEFT, LOGO_HEIGHT, LOGO_SEPARATOR_GAP, MENU_WIDTH } from './util/layout';
 
@@ -47,7 +46,7 @@ export const App: React.FC = () => {
     const { value: entitat } = useEntitatSession();
     const capsalera = useCapsaleraColors();
     const { i18n } = useTranslation();
-    const { sideMenuEntries: menuEntries, additionalContents: additionalContentsMenu } = useCombinedMenu();
+    const { sideMenuEntries: menuEntries } = useCombinedMenu();
     const theme = useTheme();
     const { preview } = useThemeUserContext();
     const isDark = theme.palette.mode === 'dark';
@@ -109,10 +108,6 @@ export const App: React.FC = () => {
         >
             <TitleHeaderConfigurator />
             <AppRoutes />
-            <TemporalMessageBridge />
-            {additionalContentsMenu.map((content: React.ReactNode, index: number) => (
-                <React.Fragment key={index}>{content}</React.Fragment>
-            ))}
         </BaseApp>
     );
 };

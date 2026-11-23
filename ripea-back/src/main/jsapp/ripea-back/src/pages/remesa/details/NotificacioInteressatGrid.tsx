@@ -6,6 +6,7 @@ import * as builder from "../../../util/springFilterUtils.ts";
 import useNotificacioInteressatActions from "./NotificacioInteressatActions.tsx";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import Load from "../../../components/Load.tsx";
+import GridDialogBody, {gridDialogProps} from "../../../components/GridDialogBody.tsx";
 import { useCloseDialogButtons } from "@src/util/buttonsOverride.tsx";
 
 const columns = [
@@ -57,7 +58,7 @@ const useNotificacioInteressatGrid = (expedient: any, refresh?: () => void) => {
             open={open}
             title={t('page.notificacio.action.notificacioInteressat.title')}
             closeCallback={handleClose}
-            componentProps={{ fullWidth: true, maxWidth: 'lg' }}
+            componentProps={gridDialogProps('lg')}
             buttons={closeButtons}
             buttonCallback={(value :any) :void=>{
                 if (value=='close') {
@@ -66,6 +67,7 @@ const useNotificacioInteressatGrid = (expedient: any, refresh?: () => void) => {
             }}
         >
             <Load value={entity}>
+            <GridDialogBody>
             <StyledMuiGrid
                 resourceName={'documentEnviamentInteressatResource'}
                 perspectives={['DETAIL']}
@@ -78,6 +80,7 @@ const useNotificacioInteressatGrid = (expedient: any, refresh?: () => void) => {
 
                 rowAdditionalActions={actions}
             />
+            </GridDialogBody>
             </Load>
             {components}
         </MuiDialog>

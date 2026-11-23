@@ -81,7 +81,7 @@ const AcceptarTabExpedient = () => {
                         filter={builder.and(
                            builder.eq('metaExpedient.id', data?.metaExpedient?.id),
 						   builder.eq('esborrat', 0),
-                       )}                
+                       )}
                 required/>
                 <GridFormField name="agafarExpedient"/>
             </>
@@ -242,6 +242,9 @@ const AcceptarTabAnnexos = () => {
                 }
             }}
             toolbarHide
+            // Dins un diàleg també hi ha el ScreenFrame de la pantalla de darrere: sense autoHeight la graella
+            // s'estira dins un pare que no és flex i es queda a 2px d'alçada (la pestanya es veu buida).
+            autoHeight
             paginationActive={false}
             readOnly
         />
@@ -352,10 +355,14 @@ const AcceptarForm = () => {
     ]
 
     return (
-        <Box sx={{ height: '650px', minHeight: 0 }}>
+        // Alçada de les pestanyes: la mateixa per a totes (el diàleg no ha de canviar de mida en canviar de pestanya),
+        // 650px com a màxim i, en pantalles baixes, la que hi caben (el diàleg, el títol i els botons ocupen uns 260px).
+        <Box sx={{ height: 'min(650px, calc(100vh - 260px))', minHeight: 0, display: 'flex', flexDirection: 'column' }}>
             {data?.expedientNoTrobatMissatge &&
-                <Alert severity="warning" sx={{ mb: 2 }}>{data.expedientNoTrobatMissatge}</Alert>}
-            <TabComponent tabs={tabs}/>
+                <Alert severity="warning" sx={{ mb: 2, flexShrink: 0 }}>{data.expedientNoTrobatMissatge}</Alert>}
+            <Box sx={{ flex: '1 1 0', minHeight: 0 }}>
+                <TabComponent tabs={tabs}/>
+            </Box>
         </Box>
     )
 }

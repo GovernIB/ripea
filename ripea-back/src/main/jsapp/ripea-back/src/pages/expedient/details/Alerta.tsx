@@ -3,6 +3,7 @@ import {MuiDialog, useBaseAppContext, useMuiDataGridApiRef, useResourceApiServic
 import {useTranslation} from "react-i18next";
 import StyledMuiGrid from "../../../components/StyledMuiGrid.tsx";
 import Load from "../../../components/Load.tsx";
+import GridDialogBody, {gridDialogProps} from "../../../components/GridDialogBody.tsx";
 import {formatDate} from "../../../util/dateUtils.ts";
 import * as builder from "../../../util/springFilterUtils.ts";
 import {useUserSession} from "../../../components/Session.tsx";
@@ -88,7 +89,7 @@ const Alerta = (props:any) => {
         },
     ] :undefined
 
-    return <StyledMuiGrid
+    return <GridDialogBody><StyledMuiGrid
         resourceName={"alertaResource"}
         columns={columns}
         filter={builder.and(
@@ -104,7 +105,7 @@ const Alerta = (props:any) => {
         onRowCountChange={onRowCountChange}
 
         toolbarHideCreate
-    />
+    /></GridDialogBody>
 }
 const useAlerta = () => {
     const { t } = useTranslation();
@@ -136,7 +137,7 @@ const useAlerta = () => {
         open={open}
         closeCallback={handleClose}
         title={t('page.alert.action.read.title')}
-        componentProps={{ fullWidth: true, maxWidth: 'md'}}
+        componentProps={gridDialogProps('md')}
         buttons={closeButtons}
         buttonCallback={(value :any) :void=>{
             if (value=='close') {

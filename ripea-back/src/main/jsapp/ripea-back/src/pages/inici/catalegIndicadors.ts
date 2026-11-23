@@ -15,8 +15,6 @@ export type PresentacioIndicador = {
     color: TonalColor;
     /** Pantalla de destinació, oberta com des del menú (sense filtre: versió bàsica). */
     to?: string;
-    /** La targeta obre el diàleg del monitor del sistema, que no té ruta pròpia. */
-    monitorSistema?: boolean;
     /** Clau de l'entrada del menú de la destinació (page.user.menu.<menu>): el peu de la targeta en mostra el nom. */
     menu: string;
     format?: FormatValor;
@@ -49,8 +47,8 @@ export const CATALEG_INDICADORS: Record<string, PresentacioIndicador> = {
     // Superadministrador
     INTEGRACIONS_ERROR: { icon: icons.integracio, color: 'error', to: '/integracio', menu: 'integracions' },
     EXCEPCIONS: { icon: icons.excepcio, color: 'error', to: '/excepcio', menu: 'excepcions' },
-    MEMORIA_LLIURE: { icon: icons.memoria, color: 'info', monitorSistema: true, menu: 'monitor', format: 'bytes' },
-    DISC_LLIURE: { icon: icons.disc, color: 'info', monitorSistema: true, menu: 'monitor', format: 'bytes' },
+    MEMORIA_LLIURE: { icon: icons.memoria, color: 'info', to: '/monitor', menu: 'monitor', format: 'bytes' },
+    DISC_LLIURE: { icon: icons.disc, color: 'info', to: '/monitor', menu: 'monitor', format: 'bytes' },
 };
 
 const GB = 1024 * 1024 * 1024;

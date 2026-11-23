@@ -37,7 +37,6 @@ export const useCombinedMenu = () => {
     const revisor = useMenuRevisor();
 
     const side: any[] = [];
-    const content: any[] = [];
     const header: any[] = [
         {
             id: 'recargar',
@@ -57,7 +56,7 @@ export const useCombinedMenu = () => {
         },
     ];
 
-    const { sideMenuEntries, headerActions, additionalContents } = useMemo(() => {
+    const { sideMenuEntries, headerActions } = useMemo(() => {
         const menus = [
             { condition: rol?.isSupAdmin, data: supAdmin },
             { condition: rol?.isAdmin, data: admin },
@@ -82,15 +81,14 @@ export const useCombinedMenu = () => {
         menus.forEach(({ condition, data }) => {
             // Sense entitat no hi ha cap pantalla accessible (AppRoutes mostra l'avís): no s'ofereix cap menú.
             if (condition && !senseEntitat) {
-                const { appEntries, entries, content: c } = data;
+                const { appEntries, entries } = data;
                 header.push(...appEntries);
                 side.push(...filterHiddenEntries(entries));
-                if (c) content.push(c);
             }
         });
 
-        return { sideMenuEntries: side, headerActions: header, additionalContents: content };
+        return { sideMenuEntries: side, headerActions: header };
     }, [t, supAdmin, admin, adminLectura, dissenyOrgan, organAdmin, revisor, rol, senseEntitat, usuari, accionesMasivas]);
 
-    return { sideMenuEntries, headerActions, additionalContents };
+    return { sideMenuEntries, headerActions };
 };

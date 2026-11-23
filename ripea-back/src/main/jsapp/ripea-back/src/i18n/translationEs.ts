@@ -272,6 +272,7 @@ const translationEs = {
             canviPrioritats: "Acción masiva: Cambio de prioridad de expedientes",
             expedientPeticioCanviEstatDistribucio: "Acción masiva: Actualizar estado de las anotaciones en Distribución",
             procesarAnnexosPendents: "Acción masiva: Adjuntar anexos pendientes de anotaciones aceptadas",
+            execucions: "Ejecuciones masivas",
         },
     },
     page: {
@@ -1306,7 +1307,7 @@ const translationEs = {
 			}
         },
         dada: {
-            title: "valor para el dato '{{metaDada}}'",
+            title: "valor",
             noRowsText: "No hay valores para este dato",
             grid: {
                 valor: "Valor del dato",
@@ -2594,13 +2595,17 @@ const translationEs = {
                 csv: "Copia enlace CSV",
                 anexos: "Adjunta anexos pendientes de anotaciones aceptadas",
                 anotacio: "Actualiza el estado de las anotaciones en Distribución",
-                prioritat: "Cambia la prioridad de expedientes",
-                refresh: "Refrescar dada 10 segundos"
+                prioritat: "Cambia la prioridad de expedientes"
             },
             action: {
                 massives: {
                     label: "Consulta acciones masivas",
-                    title: "Ejecuciones masivas de {{name}}",
+                    grid: {
+                        elements: "Elementos",
+                        progres: "Progreso",
+                        activaRefresc: "Activa refresco cada 10s",
+                        desactivaRefresc: "Desactiva refresco cada 10s",
+                    },
                     detail: "Detalle de la acción masiva: {{tipus}}",
                     ok: "El documento se ha descargado correctamente",
                     pending: "Este elemento se está procesando actualmente",
