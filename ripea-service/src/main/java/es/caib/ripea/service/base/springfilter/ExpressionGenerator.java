@@ -16,6 +16,8 @@ import com.turkraft.springfilter.parser.operation.InfixOperation;
 import com.turkraft.springfilter.shaded.org.antlr.v4.runtime.tree.ParseTreeProperty;
 import es.caib.ripea.service.intf.base.util.CompositePkUtil;
 import org.hibernate.annotations.JoinColumnsOrFormulas;
+import org.hibernate.annotations.JoinFormula;
+import org.hibernate.annotations.NotFound;
 import org.hibernate.query.criteria.internal.path.PluralAttributePath;
 import org.hibernate.query.criteria.internal.path.SingularAttributePath;
 import org.springframework.core.GenericTypeResolver;
@@ -23,8 +25,14 @@ import org.springframework.core.ResolvableType;
 import org.springframework.data.domain.Persistable;
 import org.springframework.util.ReflectionUtils;
 
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
+import javax.persistence.JoinTable;
+import javax.persistence.MapsId;
 import javax.persistence.criteria.*;
 import javax.persistence.metamodel.Attribute.PersistentAttributeType;
+import javax.persistence.metamodel.IdentifiableType;
+import javax.persistence.metamodel.SingularAttribute;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
@@ -183,6 +191,15 @@ public class ExpressionGenerator extends com.turkraft.springfilter.parser.genera
 				chain += "." + field;
 			}
 			authorize(authorizer, path, payload, chain);
+			if (i == fields.length - 2 && isManyToOneIdShortcut(from, field, path, fields[i + 1])) {
+				// Drecera d'id: per a "relacio.id" es compara la columna de la clau forana de l'entitat
+				// (Hibernate tradueix "alias.relacio.id" a la FK sense fer join) en lloc de fer un LEFT JOIN
+				// i comparar la PK de la taula unida. El resultat és el mateix (la FK apunta a la PK), però
+				// la base de dades pot fer servir l'índex de la FK: amb un OR entre dues relacions, el join
+				// obliga a recórrer la taula sencera.
+				String idField = fields[i + 1];
+				return authorize(authorizer, path.get(idField), payload, chain + "." + idField);
+			}
 			JoinType joinType = path instanceof PluralAttributePath ? JoinType.INNER
 					: (path instanceof SingularAttributePath && ((SingularAttributePath<?>) path).getAttribute().getPersistentAttributeType() != PersistentAttributeType.BASIC
 					? JoinType.LEFT : null);
@@ -292,6 +309,54 @@ public class ExpressionGenerator extends com.turkraft.springfilter.parser.genera
 		} else {
 			return false;
 		}
+	}
+
+	/**
+	 * Indica si el camí "relacio.idField" es pot resoldre amb la columna de la clau forana, sense join:
+	 * la relació ha de ser ManyToOne cap a la PK simple (no composta) de l'entitat destí, i no ha de tenir
+	 * cap mapeig que obligui Hibernate a fer el join igualment (columnes referenciades que no són la PK,
+	 * fórmules, taula intermèdia, @MapsId o @NotFound). En cas de dubte es manté el join.
+	 */
+	private static boolean isManyToOneIdShortcut(
+			From<?, ?> from,
+			String fieldName,
+			Path<?> path,
+			String idFieldName) {
+		if (!(path instanceof SingularAttributePath)) {
+			return false;
+		}
+		SingularAttribute<?, ?> attribute = ((SingularAttributePath<?>) path).getAttribute();
+		if (attribute.getPersistentAttributeType() != PersistentAttributeType.MANY_TO_ONE) {
+			return false;
+		}
+		if (!(attribute.getType() instanceof IdentifiableType)) {
+			return false;
+		}
+		IdentifiableType<?> targetType = (IdentifiableType<?>) attribute.getType();
+		if (!targetType.hasSingleIdAttribute()) {
+			return false;
+		}
+		boolean isSimpleId = targetType.getSingularAttributes().stream().anyMatch(a ->
+				a.isId() &&
+				a.getName().equals(idFieldName) &&
+				a.getPersistentAttributeType() == PersistentAttributeType.BASIC);
+		if (!isSimpleId) {
+			return false;
+		}
+		Field field = ReflectionUtils.findField(from.getJavaType(), fieldName);
+		if (field == null) {
+			return false;
+		}
+		if (field.isAnnotationPresent(JoinColumnsOrFormulas.class) ||
+				field.isAnnotationPresent(JoinFormula.class) ||
+				field.isAnnotationPresent(JoinColumns.class) ||
+				field.isAnnotationPresent(JoinTable.class) ||
+				field.isAnnotationPresent(MapsId.class) ||
+				field.isAnnotationPresent(NotFound.class)) {
+			return false;
+		}
+		JoinColumn joinColumn = field.getAnnotation(JoinColumn.class);
+		return joinColumn == null || joinColumn.referencedColumnName().isEmpty();
 	}
 
 	private static boolean isInputTypeCompositePk(Class<?> inputType) {
