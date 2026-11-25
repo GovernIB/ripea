@@ -20,4 +20,6 @@ public class AvisDto implements Serializable {
 	private Boolean avisAdministrador;
 	private Long entitatId;
     private List<GenericDto> expedients;
+    /** Expedients de l'avís que no s'inclouen a {@link #expedients} (només se n'enllacen els primers). */
+    private Long expedientsRestants;
 }

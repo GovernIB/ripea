@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Alert, Collapse, Icon, IconButton } from '@mui/material';
 import Box from '@mui/material/Box';
 import AlertTitle from '@mui/material/AlertTitle';
+import { useTranslation } from 'react-i18next';
 import ContingutLink from './ContingutLink';
 
 type LinkAlertExpandProps = {
@@ -25,8 +26,11 @@ export const LinkAlertExpand = (props: LinkAlertExpandProps) => {
 };
 
 const AlertExpand = (props: any) => {
-    const { title, label, sx, children, onClose, action, linkChildren, ...other } = props;
+    // linkChildrenRestants: elements que no s'enllacen (el backend només n'envia els primers)
+    const { title, label, sx, children, onClose, action, linkChildren, linkChildrenRestants, ...other } = props;
+    const { t, i18n } = useTranslation();
     const [verDetalles, setVerDetalles] = useState(false);
+    const restants = Number(linkChildrenRestants ?? 0);
 
     const toggleDetalles = () => setVerDetalles((prev) => !prev);
 
@@ -61,12 +65,17 @@ const AlertExpand = (props: any) => {
                 <Collapse in={verDetalles}>
                     <Box mt={1}>
                         {linkChildren
-                            ? linkChildren.map((link: any, index: number) => (
-                                  <span key={link.id}>
-                                      <LinkAlertExpand {...link} />
-                                      {index < linkChildren.length - 1 && ', '}
-                                  </span>
-                              ))
+                            ? <>
+                                  {linkChildren.map((link: any, index: number) => (
+                                      <span key={link.id}>
+                                          <LinkAlertExpand {...link} />
+                                          {index < linkChildren.length - 1 && ', '}
+                                      </span>
+                                  ))}
+                                  {restants > 0 && ' ' + t(
+                                      restants === 1 ? 'common.avisExpedientsRestants_1' : 'common.avisExpedientsRestants_n',
+                                      { num: restants.toLocaleString(i18n.language) })}
+                              </>
                             : children}{' '}
                     </Box>
                 </Collapse>

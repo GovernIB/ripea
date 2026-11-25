@@ -46,6 +46,8 @@ const translationCa = {
             message: "Missatge",
         },
         dragdrop: "Reordena el contingut",
+        avisExpedientsRestants_1: "i 1 expedient més.",
+        avisExpedientsRestants_n: "i {{num}} expedients més.",
     },
     calendar: {
         today: "Avui",

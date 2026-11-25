@@ -942,8 +942,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			)
 	public List<Long> findNotEsborratDarrersMesos(@Param("creacioInici") LocalDateTime creacioInici);
 
-    @Query("select e from ExpedientEntity e " +
-        "where e.agafatPer = :usuari " +
+    /** Expedients oberts agafats per l'usuari, creats abans de la data límit i amb tots els documents obligatoris afegits. */
+    String WHERE_EXPEDIENTS_ANTICS = "where e.agafatPer = :usuari " +
         "and e.entitat.id = :entitatId " +
         "and e.esborrat = 0 " +
         "and e.estat = es.caib.ripea.service.intf.dto.ExpedientEstatEnumDto.OBERT " +
@@ -954,11 +954,21 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
         "     and (metaDocument.multiplicitat = 0 or metaDocument.multiplicitat = 3) " +
         "     and metaDocument.id not in (" +
         "         select doc.metaNode.id from DocumentEntity doc where e.id = doc.expedient.id and doc.esborrat = 0" +
-        "     )) = 0")
-    List<ExpedientEntity> findExpedientsAntics(
+        "     )) = 0 ";
+
+    @Query("select count(e) from ExpedientEntity e " + WHERE_EXPEDIENTS_ANTICS)
+    long countExpedientsAntics(
         @Param("usuari") UsuariEntity usuari,
         @Param("entitatId") Long entitatId,
         @Param("dataLimit") LocalDateTime dataLimit);
+
+    /** Els expedients antics de més antic a més nou; la pàgina limita quants se'n carreguen. */
+    @Query("select e from ExpedientEntity e " + WHERE_EXPEDIENTS_ANTICS + "order by e.createdDate asc, e.id asc")
+    List<ExpedientEntity> findExpedientsAntics(
+        @Param("usuari") UsuariEntity usuari,
+        @Param("entitatId") Long entitatId,
+        @Param("dataLimit") LocalDateTime dataLimit,
+        Pageable pageable);
 
 	/**
 	 * ACTUALITZACIO CODU USUARI

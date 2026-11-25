@@ -46,6 +46,8 @@ const translationEn = {
             message: "Message",
         },
         dragdrop: "Reorder content",
+        avisExpedientsRestants_1: "and 1 more file.",
+        avisExpedientsRestants_n: "and {{num}} more files.",
     },
     calendar: {
         today: "Today",

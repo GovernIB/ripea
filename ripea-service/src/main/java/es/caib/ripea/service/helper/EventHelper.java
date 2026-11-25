@@ -17,6 +17,7 @@ import es.caib.ripea.service.intf.config.PropertyConfig;
 import es.caib.ripea.service.intf.dto.*;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -44,6 +45,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class EventHelper {
 
     private static final int CONFIG_DIES_AVIS_EXPEDIENT_ANTIC_DEFAULT = 90;
+    /** Màxim d'expedients enllaçats al detall de l'avís d'expedients antics. */
+    private static final int MAX_EXPEDIENTS_AVIS_ANTICS = 10;
 
 	@Autowired private JmsTemplate jmsTemplate;
 	@Autowired private AvisRepository avisRepository;
@@ -317,10 +320,17 @@ public class EventHelper {
             int dies = configHelper.getAsInt(PropertyConfig.CONFIG_DIES_AVIS_EXPEDIENT_ANTIC, CONFIG_DIES_AVIS_EXPEDIENT_ANTIC_DEFAULT);
             LocalDateTime dataLimit = LocalDateTime.now().minusDays(dies);
 
-            List<ExpedientEntity> expedientsAntics = expedientRepository.findExpedientsAntics(usuari, entitatId, dataLimit);
-            if (expedientsAntics == null || expedientsAntics.isEmpty()) {
+            // El títol només necessita el nombre d'expedients: es compta a BD sense carregar-los. Al detall només
+            // s'enllacen els MAX_EXPEDIENTS_AVIS_ANTICS més antics (un usuari en pot tenir desenes de milers).
+            long totalAntics = expedientRepository.countExpedientsAntics(usuari, entitatId, dataLimit);
+            if (totalAntics == 0) {
                 return null;
             }
+            List<ExpedientEntity> expedientsAntics = expedientRepository.findExpedientsAntics(
+                    usuari,
+                    entitatId,
+                    dataLimit,
+                    PageRequest.of(0, MAX_EXPEDIENTS_AVIS_ANTICS));
 
             List<GenericDto> expedientsDto = expedientsAntics.stream()
                 .map(expedient -> {
@@ -332,8 +342,9 @@ public class EventHelper {
                 }).collect(Collectors.toList());
 
             AvisDto avis = new AvisDto();
-            avis.setAssumpte(messageHelper.getMessage("avis.expedients.antics.assumpte", new Object[]{expedientsAntics.size(), dies}));
+            avis.setAssumpte(messageHelper.getMessage("avis.expedients.antics.assumpte", new Object[]{totalAntics, dies}));
             avis.setExpedients(expedientsDto);
+            avis.setExpedientsRestants(Math.max(0L, totalAntics - expedientsDto.size()));
             avis.setAvisNivell(AvisNivellEnumDto.WARNING);
             avis.setActiu(true);
             avis.setDataInici(new Date());

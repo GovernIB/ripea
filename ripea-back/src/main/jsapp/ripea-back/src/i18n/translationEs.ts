@@ -46,6 +46,8 @@ const translationEs = {
             message: "Mensaje",
         },
         dragdrop: "Reordena el contenido",
+        avisExpedientsRestants_1: "y 1 expediente más.",
+        avisExpedientsRestants_n: "y {{num}} expedientes más.",
     },
     calendar: {
         today: "Hoy",

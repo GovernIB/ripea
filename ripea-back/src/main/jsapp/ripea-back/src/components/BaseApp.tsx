@@ -366,6 +366,7 @@ export const BaseApp: React.FC<BaseAppProps> = (props) => {
                                         save([...(read ?? []), avis.id]);
                                     }}
                                     linkChildren={avis?.expedients}
+                                    linkChildrenRestants={avis?.expedientsRestants}
                                 >
                                     {avis.missatge}
                                 </AlertExpand>
