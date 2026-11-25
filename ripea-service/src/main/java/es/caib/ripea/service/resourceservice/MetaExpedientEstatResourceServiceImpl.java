@@ -53,7 +53,6 @@ public class MetaExpedientEstatResourceServiceImpl extends BaseMutableResourceSe
         String entitatActualCodi = configHelper.getEntitatActualCodi();
     	
         Filter filtreBase = FilterBuilder.and(
-                (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
                 FilterBuilder.equal(MetaExpedientEstatResource.Fields.metaExpedient + "." + MetaNodeResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
                 		entitatActualCodi != null?entitatActualCodi:"................................................................................")
         );

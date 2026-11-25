@@ -60,7 +60,6 @@ public class MetaExpedientTascaResourceServiceImpl extends BaseMutableResourceSe
         String entitatActualCodi = configHelper.getEntitatActualCodi();
 
         Filter filtreBase = FilterBuilder.and(
-                (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
                 FilterBuilder.equal(MetaExpedientTascaResource.Fields.metaExpedient + "." + MetaNodeResource.Fields.entitat + "." + EntitatResource.Fields.codi,
                 		entitatActualCodi != null?entitatActualCodi:"................................................................................")
         );

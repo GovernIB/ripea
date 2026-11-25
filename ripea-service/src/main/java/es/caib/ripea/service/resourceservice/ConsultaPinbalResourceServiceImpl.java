@@ -44,7 +44,6 @@ public class ConsultaPinbalResourceServiceImpl extends BaseMutableResourceServic
     	String entitatActualCodi = configHelper.getEntitatActualCodi();
 
         Filter filtreBase = FilterBuilder.and(
-                (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
                 FilterBuilder.equal(ConsultaPinbalResource.Fields.expedient + "." + ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
                 		entitatActualCodi != null?entitatActualCodi:"................................................................................")
         );

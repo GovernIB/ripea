@@ -188,7 +188,6 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
 		//Si ja ve un filtre definit per entitat, no aplicarem el filtre de entitat actual.
 		if (currentSpringFilter==null || !currentSpringFilter.contains("entitat.id")) {
 	        filtreBase = FilterBuilder.and(
-	                (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
 	                FilterBuilder.equal(MetaNodeResource.Fields.entitat + "." + EntitatResource.Fields.codi,
 	                		entitatActualCodi != null?entitatActualCodi:"................................................................................")
 	        );

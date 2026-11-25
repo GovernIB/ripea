@@ -33,7 +33,6 @@ public class URLInstruccioResourceServiceImpl extends BaseMutableResourceService
         String entitatActualCodi = configHelper.getEntitatActualCodi();
     	
         Filter filtreBase = FilterBuilder.and(
-                (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
                 FilterBuilder.equal(ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
                 		entitatActualCodi != null?entitatActualCodi:"................................................................................")
 //                ,FilterBuilder.equal(ExpedientResource.Fields.organGestor + ".codi", organActualCodi)

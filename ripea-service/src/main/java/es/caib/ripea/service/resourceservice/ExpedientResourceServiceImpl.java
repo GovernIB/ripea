@@ -350,7 +350,6 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             TempsTraca.anota("organ " + organActualCodi);
 
             Filter filtreFrontAndEntitat = FilterBuilder.and(
-                    (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
                     FilterBuilder.equal(ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi,
                     		entitatActualCodi != null?entitatActualCodi:"................................................................................")
             );

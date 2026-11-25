@@ -58,9 +58,6 @@ public class EntitatResourceServiceImpl extends BaseMutableResourceService<Entit
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
         List<Filter> filters = new ArrayList<>();
 
-        Filter filtreBase = (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null;
-        filters.add(filtreBase);
-
         Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
     	if (!mapaNamedQueries.isEmpty()) {
     		/**

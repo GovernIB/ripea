@@ -82,9 +82,6 @@ public class AclSidResourceServiceImpl extends BaseMutableResourceService<AclSid
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
         List<Filter> filters = new ArrayList<>();
 
-        filters.add(
-                (currentSpringFilter != null && !currentSpringFilter.isEmpty()) ? Filter.parse(currentSpringFilter) : null
-        );
 
         Map<String, String> mapaNamedQueries = Utils.namedQueriesToMap(namedQueries);
         if (!mapaNamedQueries.isEmpty()) {

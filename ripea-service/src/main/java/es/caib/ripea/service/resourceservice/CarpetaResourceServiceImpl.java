@@ -87,7 +87,6 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
     	String entitatActualCodi = configHelper.getEntitatActualCodi();
         Filter filtreResultat = FilterBuilder.and(
-                (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
                 FilterBuilder.equal(ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
                 		entitatActualCodi != null?entitatActualCodi:"................................................................................")
         );

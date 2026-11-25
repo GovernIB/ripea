@@ -72,7 +72,6 @@ public class OrganGestorResourceServiceImpl extends BaseMutableResourceService<O
     @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
         List<Filter> filters = new ArrayList<>();
-        filters.add((currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null);
     	
         String entitatActualCodi = configHelper.getEntitatActualCodi();
         String organActualCodi	 = configHelper.getOrganActualCodi();
@@ -152,19 +151,18 @@ public class OrganGestorResourceServiceImpl extends BaseMutableResourceService<O
     	/**
     	 * Filtres ordinaris
     	 */
-        Filter filtreBase = (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null;
         Filter filtreResultat = null;
-        
+
         if (isSuper) {
         	//No s'aplica ni el filtre per entitat, perque superusuari no treballa amb entitat seleccionada.
-        	return filtreBase!=null ?filtreBase.generate() :null;
+        	return null;
         } else { 
         	
             Filter filtreEntitat = FilterBuilder.equal(
                     OrganGestorResource.Fields.entitat + "." + EntitatResource.Fields.codi,
             		entitatActualCodi != null?entitatActualCodi:"................................................................................");
 
-            filtreResultat = FilterBuilder.and(filtreBase, filtreEntitat);
+            filtreResultat = filtreEntitat;
             
             //Ja s'ha filtrat per entitat actual, al admin no se li aplica cap altre filtre
         	if (!isAdmin) {

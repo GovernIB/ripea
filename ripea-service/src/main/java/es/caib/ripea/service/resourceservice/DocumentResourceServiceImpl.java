@@ -249,9 +249,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         String rolActual		 = configHelper.getRolActual();
     	EntitatEntity entitat = TempsTraca.mesura("entityComprovarHelper.comprovarEntitat", () -> entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false));
 
-    	Filter filtreUsuari = (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null;
         Filter filtreBase = FilterBuilder.and(
-        		filtreUsuari,
                 FilterBuilder.equal(ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi,
                 		entitatActualCodi != null?entitatActualCodi:"................................................................................")
         );
@@ -359,7 +357,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         		}
 		        
 		        Filter resultat = FilterBuilder.and(
-		        		filtreBase, //Entitat i filtre del usuari
+		        		filtreBase, //Entitat (el filtre de l'usuari ja l'aplica la consulta base)
 		        		filtreMetaExpedientsPermesos,
 		        		filtreDocumentsNotArxiuIds,
 		        		filtreEstatDocument,

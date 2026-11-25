@@ -47,13 +47,9 @@ public class ExecucioMassivaResourceServiceImpl extends BaseMutableResourceServi
         String rolActual = configHelper.getRolActual();
 
         if (!"IPA_ADMIN".equals(rolActual)){
-            Filter baseSpringFilter = (currentSpringFilter != null && !currentSpringFilter.isEmpty())? Filter.parse(currentSpringFilter):null;
-            return FilterBuilder.and(
-                    baseSpringFilter,
-                    FilterBuilder.equal(BaseAuditableEntity.Fields.createdBy, SecurityContextHolder.getContext().getAuthentication().getName())
-            ).generate();
+            return FilterBuilder.equal(BaseAuditableEntity.Fields.createdBy, SecurityContextHolder.getContext().getAuthentication().getName()).generate();
         }
-        return currentSpringFilter;
+        return null;
     }
 
     private class DocumentFieldDownloader implements FieldDownloader<ExecucioMassivaResourceEntity> {

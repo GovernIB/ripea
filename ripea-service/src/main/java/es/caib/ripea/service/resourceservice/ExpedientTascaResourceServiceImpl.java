@@ -131,7 +131,6 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
 	        Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
 	
 	        filters.add(FilterBuilder.and(
-	                        (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
 	                FilterBuilder.equal(ExpedientTascaResource.Fields.expedient + "." + ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
 	                		entitatActualCodi != null?entitatActualCodi:"................................................................................")
 	                )

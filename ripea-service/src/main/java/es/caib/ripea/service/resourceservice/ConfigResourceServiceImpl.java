@@ -70,7 +70,6 @@ public class ConfigResourceServiceImpl extends BaseMutableResourceService<Config
     @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
     	
-    	Filter filtreFront = (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null;
     	Filter filtreEspecifiques = null;
     	
         Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
@@ -91,9 +90,7 @@ public class ConfigResourceServiceImpl extends BaseMutableResourceService<Config
     		}
     	}
     	
-    	Filter filtreResultat = FilterBuilder.and(filtreFront, filtreEspecifiques);
-    	
-    	return filtreResultat!=null?filtreResultat.generate():null;
+    	return filtreEspecifiques!=null?filtreEspecifiques.generate():null;
     }
 
     @Override

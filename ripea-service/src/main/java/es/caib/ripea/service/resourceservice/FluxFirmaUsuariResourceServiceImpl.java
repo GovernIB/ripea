@@ -71,7 +71,6 @@ public class FluxFirmaUsuariResourceServiceImpl extends BaseMutableResourceServi
 		String entitatActualCodi = configHelper.getEntitatActualCodi();
 		String usuariActualCodi = getUsuariActualCodi();
 		Filter filtreBase = FilterBuilder.and(
-				(currentSpringFilter != null && !currentSpringFilter.isEmpty()) ? Filter.parse(currentSpringFilter) : null,
 				FilterBuilder.equal(
 						FluxFirmaUsuariResource.Fields.entitat + "." + EntitatResource.Fields.codi,
 						entitatActualCodi != null ? entitatActualCodi : CODI_INEXISTENT),

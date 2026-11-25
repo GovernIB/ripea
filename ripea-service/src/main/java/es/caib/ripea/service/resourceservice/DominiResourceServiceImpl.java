@@ -47,7 +47,6 @@ public class DominiResourceServiceImpl extends BaseMutableResourceService<Domini
     	String entitatActualCodi = configHelper.getEntitatActualCodi();
     	
         Filter filtreBase = FilterBuilder.and(
-                (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
                 FilterBuilder.equal(DominiResource.Fields.entitat + "." + EntitatResource.Fields.codi,
                 		entitatActualCodi != null?entitatActualCodi:"................................................................................")
         );

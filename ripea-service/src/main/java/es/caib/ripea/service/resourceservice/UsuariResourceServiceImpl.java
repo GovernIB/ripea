@@ -62,7 +62,6 @@ public class UsuariResourceServiceImpl extends BaseMutableResourceService<Usuari
 
     @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
-    	Filter filtreBase = (Utils.hasValue(currentSpringFilter))?Filter.parse(currentSpringFilter):null;
 //    	Filter filtreNif = FilterBuilder.isNotNull(UsuariResource.Fields.nif);
     	Filter filtreNom1 = FilterBuilder.not(FilterBuilder.like(UsuariResource.Fields.codi, "%SYSTEM%"));
     	Filter filtreNom2 = FilterBuilder.not(FilterBuilder.like(UsuariResource.Fields.codi, "$%"));
@@ -90,8 +89,7 @@ public class UsuariResourceServiceImpl extends BaseMutableResourceService<Usuari
     	}
     	
     	Filter filtreResultat = FilterBuilder.and(
-    			filtreBase, 
-    			filtreNom1, 
+    			filtreNom1,
     			filtreNom2,
     			filtreCodis);
     	

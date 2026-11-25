@@ -94,7 +94,6 @@ public class DocumentNotificacioResourceServiceImpl extends BaseMutableResourceS
     	boolean isAdmin = "IPA_ADMIN".equals(rolActual) || "IPA_ADMIN_LECTURA".equals(rolActual);
     	
         Filter filtreBase = FilterBuilder.and(
-                (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
                 FilterBuilder.equal(DocumentEnviamentResource.Fields.document + "." + ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi,
                 		entitatActualCodi != null?entitatActualCodi:"................................................................................")
 //              ,Filter.parse("exists(documentInteressats.id is not null)")

@@ -209,7 +209,6 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
     @Override
     protected String additionalSpringFilter(String currentSpringFilter, String[] namedQueries) {
         List<Filter> filters = new ArrayList<>();
-        filters.add((currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null);
 
         String entitatActualCodi = configHelper.getEntitatActualCodi();
         EntitatEntity entitat = TempsTraca.mesura("entityComprovarHelper.comprovarEntitat", () -> entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false));

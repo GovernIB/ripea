@@ -42,9 +42,6 @@ public class TipusDocumentalResourceServiceImpl extends BaseMutableResourceServi
         String entitatActualCodi = configHelper.getEntitatActualCodi();
 
         filters.add(
-                (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null
-        );
-        filters.add(
                 FilterBuilder.equal(TipusDocumentalResource.Fields.entitat + "." + EntitatResource.Fields.codi,
                         entitatActualCodi != null?entitatActualCodi:"................................................................................")
         );

@@ -89,7 +89,6 @@ public class RegistreAnnexResourceServiceImpl extends BaseMutableResourceService
     	
     	Filter filtreIdsPermesos = null;
         Filter filtreBase = FilterBuilder.and(
-                (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
                 FilterBuilder.equal(RegistreAnnexResource.Fields.registre + "." +ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi,
                 		entitatActualCodi != null?entitatActualCodi:"................................................................................")
         );
@@ -132,10 +131,7 @@ public class RegistreAnnexResourceServiceImpl extends BaseMutableResourceService
 			        }
 		    	}
 		    	
-		    	Filter filtreResultat = FilterBuilder.and(
-		    			(currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
-		    			filtreIdsPermesos);
-		    	return filtreResultat.generate();
+		    	return filtreIdsPermesos.generate();
     		}
     	}
     	

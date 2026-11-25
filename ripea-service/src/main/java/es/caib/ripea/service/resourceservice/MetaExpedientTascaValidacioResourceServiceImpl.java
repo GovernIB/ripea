@@ -43,7 +43,6 @@ public class MetaExpedientTascaValidacioResourceServiceImpl extends BaseMutableR
         String entitatActualCodi = configHelper.getEntitatActualCodi();
     	
         Filter filtreBase = FilterBuilder.and(
-                (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
                 FilterBuilder.equal(MetaExpedientTascaValidacioResource.Fields.metaExpedientTasca + "." + MetaExpedientTascaResource.Fields.metaExpedient + "." + MetaNodeResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
                 		entitatActualCodi != null?entitatActualCodi:"................................................................................")
         );

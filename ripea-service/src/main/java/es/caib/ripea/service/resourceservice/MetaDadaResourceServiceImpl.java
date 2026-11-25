@@ -68,7 +68,6 @@ public class MetaDadaResourceServiceImpl extends BaseMutableResourceService<Meta
         String entitatActualCodi = configHelper.getEntitatActualCodi();
     	
         Filter filtreBase = FilterBuilder.and(
-                (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
                 FilterBuilder.equal(MetaDadaResource.Fields.metaNode + "." + MetaNodeResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
                 		entitatActualCodi != null?entitatActualCodi:"................................................................................")
         );
