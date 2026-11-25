@@ -32,6 +32,7 @@ import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.resourceservice.ContingutResourceService;
+import es.caib.ripea.service.intf.utils.TempsTraca;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -76,7 +77,7 @@ implements ContingutResourceService {
                 		entitatActualCodi != null?entitatActualCodi:"................................................................................")
         );
         
-        return filtreBase.generate();
+        return TempsTraca.mesura("Filter.generate", () -> filtreBase.generate());
     }
 
     @Override
@@ -137,13 +138,13 @@ implements ContingutResourceService {
         @Override
         public void applySingle(String code, ContingutResourceEntity<ContingutResource> entity, ContingutResource resource) throws PerspectiveApplicationException {
         	if (entity.getCreatedBy()!=null) {
-        		UsuariResourceEntity usuariResourceEntity = usuariResourceRepository.findById(entity.getCreatedBy()).orElse(null);
+        		UsuariResourceEntity usuariResourceEntity = TempsTraca.mesura("usuariResourceRepository.findById (createdBy)", () -> usuariResourceRepository.findById(entity.getCreatedBy()).orElse(null));
         		if (usuariResourceEntity!=null) {
         			resource.setCreatedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
         		}
         	}
         	if (entity.getLastModifiedBy()!=null) {
-        		UsuariResourceEntity usuariResourceEntity = usuariResourceRepository.findById(entity.getLastModifiedBy()).orElse(null);
+        		UsuariResourceEntity usuariResourceEntity = TempsTraca.mesura("usuariResourceRepository.findById (lastModifiedBy)", () -> usuariResourceRepository.findById(entity.getLastModifiedBy()).orElse(null));
         		resource.setLastModifiedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
         	}
         }

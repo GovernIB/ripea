@@ -147,6 +147,7 @@ import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.DocumentResourceService;
 import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.utils.RegistreJustificantUtils;
+import es.caib.ripea.service.intf.utils.TempsTraca;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
 import lombok.RequiredArgsConstructor;
@@ -246,7 +247,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     	
         String entitatActualCodi = configHelper.getEntitatActualCodi();
         String rolActual		 = configHelper.getRolActual();
-    	EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
+    	EntitatEntity entitat = TempsTraca.mesura("entityComprovarHelper.comprovarEntitat", () -> entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false));
 
     	Filter filtreUsuari = (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null;
         Filter filtreBase = FilterBuilder.and(
@@ -269,7 +270,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
     	if (mapaNamedQueries.size()>0) {
     		
-    		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitat.getId(), rolActual);
+    		List<MetaExpedientEntity> metaExpedientsPermesos = TempsTraca.mesura("metaExpedientHelper.findPermesosAccioMassiva", () -> metaExpedientHelper.findPermesosAccioMassiva(entitat.getId(), rolActual));
     		boolean nomesAgafats = !rolActual.equals("IPA_ADMIN") && !rolActual.equals("IPA_ORGAN_ADMIN");
     		String codiUsuariActual = SecurityContextHolder.getContext().getAuthentication().getName();
     		
@@ -285,7 +286,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 	    			
     			if (mapaNamedQueries.containsKey("MASSIU_PENDENT_ARXIU")) {
         			
-        			List<Long> idsArxiusPendents = documentRepository.findIdsArxiuPendents(
+        			List<Long> idsArxiusPendents = TempsTraca.mesura("documentRepository.findIdsArxiuPendents", () -> documentRepository.findIdsArxiuPendents(
         					entitat,
         					metaExpedientsPermesos,
         					nomesAgafats,
@@ -294,7 +295,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         					true, null,
         					true, null,
         					true, null,
-        					true, null);
+        					true, null));
         			
     		    	List<String> permesosClausulesIn = Utils.getIdsEnGruposMil(idsArxiusPendents);
     		    	if (permesosClausulesIn!=null) {
@@ -369,12 +370,12 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 		        		filtreExpedientObert,
 		        		filtreArxiuPendents);
 		        
-		        return resultat.generate();
+		        return TempsTraca.mesura("Filter.generate", () -> resultat.generate());
 
     		}
     	}
         
-        return filtreBase.generate();
+        return TempsTraca.mesura("Filter.generate", () -> filtreBase.generate());
     }
     
     public class InitialOnChangeDocumentResourceLogicProcessor implements OnChangeLogicProcessor<DocumentResource> {
@@ -495,15 +496,17 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
     @Override
     protected void afterConversion(DocumentResourceEntity entity, DocumentResource resource) {
+        TempsTraca.executa("entity.getMetaNode (lazy)", () -> {
         if (entity.getMetaNode() != null) {
             resource.setMetaDocument(ResourceReference.toResourceReference(entity.getMetaNode().getId(), entity.getMetaNode().getNom()));
         }
-        resource.setAdjunt(new FileReference(
+        });
+        resource.setAdjunt(TempsTraca.mesura("adjunt (getFitxerContingut, LOB)", () -> new FileReference(
                 entity.getFitxerNom(),
                 entity.getFitxerContingut(),
                 entity.getFitxerContentType(),
                 entity.getFitxerTamany()
-        ));
+        )));
         resource.setFirmaAdjunt(new FileReference(
                 entity.getNomFitxerFirmat(),
                 null,
@@ -530,22 +533,22 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
             Set<Long> documentsAmbAnnexosAmbError = new HashSet<>();
             Set<Long> documentsDeAnotacio = new HashSet<>();
             for (List<Long> lot: ListUtils.partition(documentIds, MAX_IDS_CONSULTA)) {
-                for (Object[] fila: documentNotificacioRepository.findDarreraNotificacioByDocumentIds(lot)) {
+                for (Object[] fila: TempsTraca.mesura("documentNotificacioRepository.findDarreraNotificacioByDocumentIds (lot)", () -> documentNotificacioRepository.findDarreraNotificacioByDocumentIds(lot))) {
                     darreresNotificacions.put((Long)fila[0], fila);
                 }
-                for (Object[] fila: documentPortafirmesRepository.findErrorDarrerEnviamentByDocumentIds(lot)) {
+                for (Object[] fila: TempsTraca.mesura("documentPortafirmesRepository.findErrorDarrerEnviamentByDocumentIds (lot)", () -> documentPortafirmesRepository.findErrorDarrerEnviamentByDocumentIds(lot))) {
                     errorsDarrerEnviament.put((Long)fila[0], (Boolean)fila[1]);
                 }
-                documentsAmbAnnexosAmbError.addAll(registreAnnexResourceRepository.findDocumentIdsAmbAnnexosAmbError(lot));
-                documentsDeAnotacio.addAll(registreAnnexResourceRepository.findDocumentIdsAmbAnnexos(lot));
+                documentsAmbAnnexosAmbError.addAll(TempsTraca.mesura("registreAnnexResourceRepository.findDocumentIdsAmbAnnexosAmbError (lot)", () -> registreAnnexResourceRepository.findDocumentIdsAmbAnnexosAmbError(lot)));
+                documentsDeAnotacio.addAll(TempsTraca.mesura("registreAnnexResourceRepository.findDocumentIdsAmbAnnexos (lot)", () -> registreAnnexResourceRepository.findDocumentIdsAmbAnnexos(lot)));
             }
-            Map<String, UsuariResourceEntity> usuaris = findUsuarisAuditoria(entities);
+            Map<String, UsuariResourceEntity> usuaris = TempsTraca.mesura("findUsuarisAuditoria (lots)", () -> findUsuarisAuditoria(entities));
 
             for (int i = 0; i < entities.size(); i++) {
                 DocumentResourceEntity entity = entities.get(i);
                 DocumentResource resource = resources.get(i);
 
-                resource.setErrors(cacheHelper.findErrorsValidacioPerNode(entity.getId()));
+                resource.setErrors(TempsTraca.mesura("cacheHelper.findErrorsValidacioPerNode", () -> cacheHelper.findErrorsValidacioPerNode(entity.getId())));
                 resource.setValid(resource.getErrors().isEmpty());
 
                 Object[] darreraNotificacio = darreresNotificacions.get(entity.getId());
@@ -571,12 +574,14 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                         entity.getNumeroRegistre(),
                         resource.isDocumentDeAnotacio()));
 
+                TempsTraca.executa("mapeig metaDocument (lazy + newInstanceMap)", () -> {
                 if (entity.getMetaDocument() != null) {
                     resource.setMetaDocumentInfo(objectMappingHelper.newInstanceMap(
                             entity.getMetaDocument(),
                             MetaDocumentResource.class,
                             "portafirmesResponsables", "serialVersionUID"));
                 }
+                });
 
                 UsuariResourceEntity createdBy = entity.getCreatedBy() != null ? usuaris.get(entity.getCreatedBy()) : null;
                 if (createdBy != null) {
@@ -614,17 +619,17 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private class PathPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
         @Override
         public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
-            resource.setTreePath(contingutResourceHelper.getTreePath(entity));
+            resource.setTreePath(TempsTraca.mesura("contingutResourceHelper.getTreePath", () -> contingutResourceHelper.getTreePath(entity)));
         }
     }
     
     private class ArxiuDocumentPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
         @Override
         public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
-            Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
+            Document arxiuDocument = TempsTraca.mesura("pluginHelper.arxiuDocumentConsultar (Arxiu)", () -> pluginHelper.arxiuDocumentConsultar(
                     entity.getId(), entity.getNom(), entity.getArxiuUuid(), entity.getEntitat().getCodi(),
-                    null, null, true, false);
-            ArxiuDetallDto arxiu = contingutResourceHelper.getArxiuDocumentDetall(arxiuDocument,entity.getEntitat().getId());
+                    null, null, true, false));
+            ArxiuDetallDto arxiu = TempsTraca.mesura("contingutResourceHelper.getArxiuDocumentDetall", () -> contingutResourceHelper.getArxiuDocumentDetall(arxiuDocument,entity.getEntitat().getId()));
             resource.setArxiu(arxiu);
         }
     }
@@ -632,9 +637,9 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private class ProcedimentPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
 		@Override
 		public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
-			resource.setMetaExpedient(ResourceReference.toResourceReference(
+			resource.setMetaExpedient(TempsTraca.mesura("entity.getExpedient().getMetaExpedient (lazy)", () -> ResourceReference.toResourceReference(
 					entity.getExpedient().getMetaExpedient().getId(),
-					entity.getExpedient().getMetaExpedient().getNom()));
+					entity.getExpedient().getMetaExpedient().getNom())));
 		}
     }
 
@@ -676,8 +681,9 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         	try {
 	        	if (!DocumentFirmaTipusEnumDto.SENSE_FIRMA.equals(entity.getDocumentFirmaTipus())) {
 	        		if (Utils.hasValue(entity.getArxiuUuid())) {
-	        			resource.setFirmes(pluginHelper.validaSignaturaObtenirFirmes(entity.getArxiuUuid(), false));
+	        			resource.setFirmes(TempsTraca.mesura("pluginHelper.validaSignaturaObtenirFirmes (Arxiu)", () -> pluginHelper.validaSignaturaObtenirFirmes(entity.getArxiuUuid(), false)));
 	        		} else if (entity.getGesDocAdjuntId()!=null) {
+	        			try (TempsTraca.Tram tramGesDoc = TempsTraca.inicia("gestio documental + validaSignaturaObtenirFirmes")) {
 	        			ByteArrayOutputStream streamDoc = new ByteArrayOutputStream();
 	        			pluginHelper.gestioDocumentalGet(entity.getGesDocAdjuntId(), PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS, streamDoc);
 	        			
@@ -692,6 +698,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 	        					streamFirma!=null?streamFirma.toByteArray():null, 
 	        					entity.getFitxerContentType(), 
 	        					false));
+	        			}
 	        		}
 	        	}
         	} catch (Exception ex) {
@@ -707,7 +714,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private class ArxiuVersionsPerspectiveApplicator implements PerspectiveApplicator<DocumentResourceEntity, DocumentResource> {
         @Override
         public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
-            List<DocumentVersioDto> versions = contingutResourceHelper.getVersions(entity);
+            List<DocumentVersioDto> versions = TempsTraca.mesura("contingutResourceHelper.getVersions", () -> contingutResourceHelper.getVersions(entity));
             resource.setVersions(versions);
             resource.setCsvLinkUrl(configHelper.getConfig(PropertyConfig.CONCSV_BASE_URL));
         }
@@ -717,8 +724,8 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
         @Override
         public void applySingle(String code, DocumentResourceEntity entity, DocumentResource resource) throws PerspectiveApplicationException {
         	if (entity.getMetaNode() != null)
-        		resource.setNumMetaDades(entity.getMetaNode().getMetaDades().size());
-            resource.setNumMoviments(contingutMovimentRepository.countByContingutId(entity.getId()));
+        		resource.setNumMetaDades(TempsTraca.mesura("entity.getMetaNode().getMetaDades (lazy)", () -> entity.getMetaNode().getMetaDades().size()));
+            resource.setNumMoviments(TempsTraca.mesura("contingutMovimentRepository.countByContingutId", () -> contingutMovimentRepository.countByContingutId(entity.getId())));
         }
     }
 

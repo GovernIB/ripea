@@ -166,6 +166,7 @@ import es.caib.ripea.service.intf.exception.ValidationException;
 import es.caib.ripea.service.intf.service.ExecucioMassivaService;
 import es.caib.ripea.service.intf.service.ExpedientSeguidorService;
 import es.caib.ripea.service.intf.utils.DateUtil;
+import es.caib.ripea.service.intf.utils.TempsTraca;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
 import io.micrometer.core.instrument.Timer;
@@ -2288,7 +2289,7 @@ public class ExpedientHelper {
 			Long organActual) {
 
 		PermisosPerExpedientsDto permisosPerExpedientsDto = new PermisosPerExpedientsDto();
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+		EntitatEntity entitat = TempsTraca.mesura("entityComprovarHelper.comprovarEntitat", () -> entityComprovarHelper.comprovarEntitat(entitatId));
 
 		List<Long> idsMetaExpedientsPermesos = null;
 		List<Long> idsOrgansPermesos = null;
@@ -2300,7 +2301,7 @@ public class ExpedientHelper {
 		if (rolActual.equals(BaseConfig.ROLE_ADMIN) || rolActual.equals(BaseConfig.ROLE_ADMIN_LECTURA)) {
 
 			//Si ets admin veruas els expedients de tots els procediments de la entitat
-			idsMetaExpedientsPermesos = metaExpedientRepository.findAllIdsByEntitat(entitat);
+			idsMetaExpedientsPermesos = TempsTraca.mesura("metaExpedientRepository.findAllIdsByEntitat", () -> metaExpedientRepository.findAllIdsByEntitat(entitat));
 
 		} else if (rolActual.equals("IPA_ORGAN_ADMIN") || rolActual.equals("IPA_DISSENY")) {
 
@@ -2311,33 +2312,29 @@ public class ExpedientHelper {
 
 				//Obtenim els organs permesos, a la select apareixeran els procediments d'aquets organs,
 				//ndependenment de lo que hi hagi a la llista de idsMetaExpedientsPermesos posterior.
-				idsOrgansPermesos = organGestorCacheHelper.getIdsOrgansFills(entitat.getCodi(), organGestorRepository.findById(organActual).get().getCodi());
+				idsOrgansPermesos = TempsTraca.mesura("organGestorCacheHelper.getIdsOrgansFills", () -> organGestorCacheHelper.getIdsOrgansFills(entitat.getCodi(), organGestorRepository.findById(organActual).get().getCodi()));
 
 				//Permisos que s'han donat directament a un procediment
-				idsMetaExpedientsPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
-						MetaNodeEntity.class,
-						ExtendedPermission.READ));
+				idsMetaExpedientsPermesos = TempsTraca.mesura("ACL getObjectsIdsWithPermission(MetaNodeEntity READ)", () -> toListLong(permisosHelper.getObjectsIdsWithPermission(MetaNodeEntity.class, ExtendedPermission.READ)));
 
 				List<Long> aux = new ArrayList<Long>();
 				if (idsMetaExpedientsPermesos!=null && idsMetaExpedientsPermesos.size()>0) {
 					if (idsOrgansPermesos==null) { idsOrgansPermesos = new ArrayList<Long>(); }
 					for (Long metaExpId: idsMetaExpedientsPermesos) {
-						MetaExpedientEntity mEx = metaExpedientRepository.findById(metaExpId).orElse(null);
+						MetaExpedientEntity mEx = TempsTraca.mesura("metaExpedientRepository.findById (per procediment)", () -> metaExpedientRepository.findById(metaExpId).orElse(null));
 						if(mEx!=null && mEx.getOrganGestor()!=null && idsOrgansPermesos.contains(mEx.getOrganGestor().getId())) {
 							aux.add(metaExpId);
 						}
 					}
 				}
 
-				List<Long> meComuns = metaExpedientRepository.findProcedimentsComunsActiveIds(entitat);
+				List<Long> meComuns = TempsTraca.mesura("metaExpedientRepository.findProcedimentsComunsActiveIds", () -> metaExpedientRepository.findProcedimentsComunsActiveIds(entitat));
 				if (meComuns!=null && meComuns.size()>0) {
 					//Permisos que s'han donat a un procediment comú (indicant OG)
-					List<Long> permisMetaOrganGestor = toListLong(permisosHelper.getObjectsIdsWithPermission(
-							MetaExpedientOrganGestorEntity.class,
-							ExtendedPermission.READ));
+					List<Long> permisMetaOrganGestor = TempsTraca.mesura("ACL getObjectsIdsWithPermission(MetaExpedientOrganGestorEntity READ)", () -> toListLong(permisosHelper.getObjectsIdsWithPermission(MetaExpedientOrganGestorEntity.class, ExtendedPermission.READ)));
 
 					for (Long metaExpComId: meComuns) {
-						MetaExpedientEntity mExcom = metaExpedientRepository.findById(metaExpComId).orElse(null);
+						MetaExpedientEntity mExcom = TempsTraca.mesura("metaExpedientRepository.findById (per procediment)", () -> metaExpedientRepository.findById(metaExpComId).orElse(null));
 
 						if (mExcom!=null && !mExcom.isPermisDirecte() || permisMetaExpOrgan(permisMetaOrganGestor, mExcom.getId(), idsOrgansPermesos)) {
 							aux.add(metaExpComId);
@@ -2359,24 +2356,15 @@ public class ExpedientHelper {
 		}else {
 			// Si ets usuari normal, permisos de lectura de varies fonts
 
-			idsMetaExpedientsPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
-					MetaNodeEntity.class,
-					ExtendedPermission.READ));
+			idsMetaExpedientsPermesos = TempsTraca.mesura("ACL getObjectsIdsWithPermission(MetaNodeEntity READ)", () -> toListLong(permisosHelper.getObjectsIdsWithPermission(MetaNodeEntity.class, ExtendedPermission.READ)));
 
-			idsMetaExpedientOrganPairsPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
-					MetaExpedientOrganGestorEntity.class,
-					ExtendedPermission.READ));
+			idsMetaExpedientOrganPairsPermesos = TempsTraca.mesura("ACL getObjectsIdsWithPermission(MetaExpedientOrganGestorEntity READ)", () -> toListLong(permisosHelper.getObjectsIdsWithPermission(MetaExpedientOrganGestorEntity.class, ExtendedPermission.READ)));
 
-			idsOrgansAmbProcedimentsComunsPermesos = toListLong(permisosHelper.getObjectsIdsWithTwoPermissions(
-					OrganGestorEntity.class,
-					ExtendedPermission.COMU,
-					ExtendedPermission.READ));
+			idsOrgansAmbProcedimentsComunsPermesos = TempsTraca.mesura("ACL getObjectsIdsWithTwoPermissions(OrganGestorEntity COMU+READ)", () -> toListLong(permisosHelper.getObjectsIdsWithTwoPermissions(OrganGestorEntity.class, ExtendedPermission.COMU, ExtendedPermission.READ)));
 
-			procedimentsComunsIds = metaExpedientRepository.findProcedimentsComunsActiveIds(entitat);
+			procedimentsComunsIds = TempsTraca.mesura("metaExpedientRepository.findProcedimentsComunsActiveIds", () -> metaExpedientRepository.findProcedimentsComunsActiveIds(entitat));
 
-			idsGrupsPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
-					GrupEntity.class,
-					ExtendedPermission.READ));
+			idsGrupsPermesos = TempsTraca.mesura("ACL getObjectsIdsWithPermission(GrupEntity READ)", () -> toListLong(permisosHelper.getObjectsIdsWithPermission(GrupEntity.class, ExtendedPermission.READ)));
 		}
 
 		permisosPerExpedientsDto.setIdsMetaExpedientsPermesos(idsMetaExpedientsPermesos);

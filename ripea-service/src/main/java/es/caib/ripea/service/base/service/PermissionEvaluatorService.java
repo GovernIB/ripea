@@ -2,6 +2,7 @@ package es.caib.ripea.service.base.service;
 
 import es.caib.ripea.service.base.helper.PermissionHelper;
 import es.caib.ripea.service.intf.base.exception.UnknownPermissionException;
+import es.caib.ripea.service.intf.utils.TempsTraca;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.domain.BasePermission;
@@ -31,11 +32,11 @@ public class PermissionEvaluatorService implements es.caib.ripea.service.intf.ba
 				authentication,
 				domainObject,
 				permission);
-		return permissionHelper.checkResourcePermission(
+		return TempsTraca.mesura("@PreAuthorize hasPermission", () -> permissionHelper.checkResourcePermission(
 				authentication,
 				null,
 				domainObject.getClass().getName(),
-				toBasePermission(permission));
+				toBasePermission(permission)));
 	}
 
 	@Override
@@ -49,11 +50,11 @@ public class PermissionEvaluatorService implements es.caib.ripea.service.intf.ba
 				targetId,
 				targetType,
 				permission);
-		return permissionHelper.checkResourcePermission(
+		return TempsTraca.mesura("@PreAuthorize hasPermission", () -> permissionHelper.checkResourcePermission(
 				authentication,
 				targetId,
 				targetType,
-				toBasePermission(permission));
+				toBasePermission(permission)));
 	}
 
 	private BasePermission toBasePermission(Object objectPermission) {

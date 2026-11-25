@@ -98,6 +98,7 @@ import es.caib.ripea.service.intf.registre.RegistreAnnexNtiEstadoElaboracionEnum
 import es.caib.ripea.service.intf.registre.RegistreAnnexNtiOrigenEnum;
 import es.caib.ripea.service.intf.resourceservice.ExpedientPeticioResourceService;
 import es.caib.ripea.service.intf.utils.RegistreJustificantUtils;
+import es.caib.ripea.service.intf.utils.TempsTraca;
 import es.caib.ripea.service.intf.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -211,7 +212,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
         filters.add((currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null);
 
         String entitatActualCodi = configHelper.getEntitatActualCodi();
-        EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false);
+        EntitatEntity entitat = TempsTraca.mesura("entityComprovarHelper.comprovarEntitat", () -> entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true,false));
 
         Map<String, String> mapaNamedQueries =  Utils.namedQueriesToMap(namedQueries);
 
@@ -233,6 +234,8 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 
     			String organActualCodi	 = configHelper.getOrganActualCodi();
     			String rolActual		 = configHelper.getRolActual();
+    			TempsTraca.anota("rol " + rolActual);
+    			TempsTraca.anota("organ " + organActualCodi);
 
     			boolean isAdmin 		= "IPA_ADMIN".equals(rolActual);
     			boolean isAdminOrgan 	= "IPA_ORGAN_ADMIN".equals(rolActual);
@@ -240,12 +243,12 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
     			//Admin no aplica filtres de permisos
     			if (!isAdmin) {
 
-	    			OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), organActualCodi);
-					PermisosPerAnotacions permisosPerAnotacions = expedientPeticioHelper.findPermisosPerAnotacions(
+	    			OrganGestorEntity ogEntity	= TempsTraca.mesura("organGestorRepository.findByEntitatIdAndCodi", () -> organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), organActualCodi));
+					PermisosPerAnotacions permisosPerAnotacions = TempsTraca.mesura("expedientPeticioHelper.findPermisosPerAnotacions", () -> expedientPeticioHelper.findPermisosPerAnotacions(
 							entitat.getId(),
 							null, //UsuariActual, agafa el autenticat
 							rolActual,
-							ogEntity!=null?ogEntity.getId():null);
+							ogEntity!=null?ogEntity.getId():null));
 
 					//Aplica filtres de permisos per organ
 					if (isAdminOrgan) {
@@ -310,7 +313,9 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
         List<Filter> result = filters.stream()
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
-        return result.isEmpty() ? null : FilterBuilder.and(result).generate();
+        String filtreGenerat = result.isEmpty() ? null : TempsTraca.mesura("Filter.generate", () -> FilterBuilder.and(result).generate());
+        if (filtreGenerat != null) TempsTraca.anota("additionalSpringFilter " + filtreGenerat.length() + " caracters");
+        return filtreGenerat;
     }
 
     @Override
@@ -331,9 +336,10 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
         @Override
         public void applySingle(String code, ExpedientPeticioResourceEntity entity, ExpedientPeticioResource resource) throws PerspectiveApplicationException {
 
-        	RegistreResource rr = objectMappingHelper.newInstanceMap(Hibernate.unproxy(entity.getRegistre()), RegistreResource.class);
+        	RegistreResource rr = TempsTraca.mesura("mapeig registre (getRegistre lazy + newInstanceMap)", () -> objectMappingHelper.newInstanceMap(Hibernate.unproxy(entity.getRegistre()), RegistreResource.class));
         	resource.setRegistreInfo(rr);
 
+        	try (TempsTraca.Tram tram = TempsTraca.inicia("registre.getInteressats (lazy) + mapeig")) {
         	if (entity.getRegistre().getInteressats()!=null) {
 	            resource.getRegistreInfo().setInteressats(
 	                    entity.getRegistre().getInteressats().stream()
@@ -344,12 +350,13 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 	                            .collect(Collectors.toList())
 	            );
         	}
+        	}
 
             //Només s'indica si hi ha justificant per incorporar. Les metadades es carreguen a la perspectiva
             //JUSTIFICANT, que consulta l'Arxiu i per això no es pot aplicar a cada fila d'un llistat.
-            resource.setTeJustificant(teJustificant(resource.getRegistreInfo().getJustificantArxiuUuid()));
+            resource.setTeJustificant(TempsTraca.mesura("teJustificant (configHelper.getConfig)", () -> teJustificant(resource.getRegistreInfo().getJustificantArxiuUuid())));
             //Només una anotació acceptada (amb expedient) pot tenir pendent tornar a incorporar el justificant.
-            resource.setTeJustificantAmbError(entity.getExpedient() != null && entity.getRegistre().getJustificantError() != null);
+            resource.setTeJustificantAmbError(TempsTraca.mesura("getExpedient (lazy) + justificantError", () -> entity.getExpedient() != null && entity.getRegistre().getJustificantError() != null));
         }
     }
 
@@ -375,7 +382,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
                 return;
             }
             resource.setTeJustificant(true);
-            resource.getRegistreInfo().setJustificant(justificantArxiuConsultar(justificantArxiuUuid));
+            resource.getRegistreInfo().setJustificant(TempsTraca.mesura("justificantArxiuConsultar (Arxiu)", () -> justificantArxiuConsultar(justificantArxiuUuid)));
         }
     }
 
@@ -460,10 +467,10 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
     private class EnProcesActualitzarEstatPerspectiveApplicator implements PerspectiveApplicator<ExpedientPeticioResourceEntity, ExpedientPeticioResource> {
         @Override
         public void applySingle(String code, ExpedientPeticioResourceEntity entity, ExpedientPeticioResource resource) throws PerspectiveApplicationException {
-            execucioMassivaContingutRepository
+            TempsTraca.executa("execucioMassivaContingutRepository.findFirst... (ANOTACIO)", () -> execucioMassivaContingutRepository
                     .findFirstByElementIdAndElementTipusAndExecucioMassivaTipusAndExecucioMassivaDataFiNull(
                             entity.getId(), ElementTipusEnumDto.ANOTACIO, ExecucioMassivaTipusDto.ACTUALITZAR_ESTAT_ANOTACIONS)
-                    .ifPresent(contingut -> resource.setExecucioMassivaActualitzarEstatId(contingut.getExecucioMassiva().getId()));
+                    .ifPresent(contingut -> resource.setExecucioMassivaActualitzarEstatId(contingut.getExecucioMassiva().getId())));
         }
     }
 
@@ -472,7 +479,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
         public void applySingle(String code, ExpedientPeticioResourceEntity entity, ExpedientPeticioResource resource) throws PerspectiveApplicationException {
             //Només les anotacions acceptades (amb expedient associat) poden tenir annexos en error pendents de subsanar.
             if (entity.getExpedient() != null && entity.getRegistre() != null) {
-                long annexosAmbError = registreAnnexResourceRepository.countAnnexosAmbErrorByRegistreId(entity.getRegistre().getId());
+                long annexosAmbError = TempsTraca.mesura("registreAnnexResourceRepository.countAnnexosAmbErrorByRegistreId", () -> registreAnnexResourceRepository.countAnnexosAmbErrorByRegistreId(entity.getRegistre().getId()));
                 resource.setTeAnnexosAmbError(annexosAmbError > 0);
             }
         }

@@ -67,6 +67,7 @@ import es.caib.ripea.service.intf.base.model.ResourceReference;
 import es.caib.ripea.service.intf.base.service.ReadonlyResourceService;
 import es.caib.ripea.service.intf.base.util.StringUtil;
 import es.caib.ripea.service.intf.base.util.TypeUtil;
+import es.caib.ripea.service.intf.utils.TempsTraca;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -127,15 +128,17 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			ID id,
 			String[] perspectives) throws ResourceNotFoundException {
 		log.debug("Getting single resource (id={}, perspectives={})", id, perspectives);
-		beforeGetOne(perspectives);
-		E entity = getEntity(id);
-		beforeConversion(entity);
-		R response = entityToResource(entity);
-		afterConversion(entity, response);
-		if (perspectives != null) {
-			applyPerspectives(entity, response, perspectives);
+		try (TempsTraca.Tram tramGetOne = TempsTraca.inicia("getOne [" + getResourceClass().getSimpleName() + "]")) {
+			TempsTraca.executa("beforeGetOne", () -> beforeGetOne(perspectives));
+			E entity = TempsTraca.mesura("getEntity (consulta amb additionalSpringFilter)", () -> getEntity(id));
+			TempsTraca.executa("beforeConversion", () -> beforeConversion(entity));
+			R response = TempsTraca.mesura("entityToResource", () -> entityToResource(entity));
+			TempsTraca.executa("afterConversion", () -> afterConversion(entity, response));
+			if (perspectives != null) {
+				applyPerspectives(entity, response, perspectives);
+			}
+			return response;
 		}
-		return response;
 	}
 
 	@Override
@@ -156,23 +159,25 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 				Arrays.toString(namedQueries),
 				Arrays.toString(perspectives),
 				pageable);
-		beforeFind(
+		try (TempsTraca.Tram tramFindPage = TempsTraca.inicia("findPage [" + getResourceClass().getSimpleName() + "]")) {
+		TempsTraca.executa("beforeFind", () -> beforeFind(
 				quickFilter,
 				filter,
 				namedQueries,
-				pageable);
-		Page<E> resultat = entityRepositoryFindEntities(
+				pageable));
+		Page<E> resultat = TempsTraca.mesura("entityRepositoryFindEntities", () -> entityRepositoryFindEntities(
 				quickFilter,
 				filter,
 				namedQueries,
-				pageable);
+				pageable));
+		TempsTraca.anota("files " + resultat.getNumberOfElements() + " de " + resultat.getTotalElements());
 		long elapsedDatabase = System.currentTimeMillis() - t0;
-		beforeConversion(resultat.getContent());
+		TempsTraca.executa("beforeConversion", () -> beforeConversion(resultat.getContent()));
 		Page<R> response = new PageImpl<>(
-				entitiesToResources(resultat.getContent()),
+				TempsTraca.mesura("entitiesToResources", () -> entitiesToResources(resultat.getContent())),
 				pageable,
 				resultat.getTotalElements());
-		afterConversion(resultat.getContent(), response.getContent());
+		TempsTraca.executa("afterConversion", () -> afterConversion(resultat.getContent(), response.getContent()));
 		if (perspectives != null) {
 			applyPerspectives(
 					resultat.getContent(),
@@ -185,6 +190,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 				elapsedDatabase,
 				elapsedConversion);
 		return response;
+		}
 	}
 
 	@Override
@@ -566,14 +572,18 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		Arrays.stream(perspectives).forEach(p -> {
 			PerspectiveApplicator<E, R> perspectiveApplicator = getPerspectiveApplicator(p);
 			if (perspectiveApplicator != null) {
-				boolean modified = perspectiveApplicator.applyMultiple(p, entities, resources);
-				if (!modified) {
-					IntStream.range(0, entities.size()).forEach(i -> {
-						perspectiveApplicator.applySingle(
-								p,
-								entities.get(i),
-								resources.get(i));
-					});
+				try (TempsTraca.Tram tram = TempsTraca.inicia("perspectiva " + p)) {
+					boolean modified = perspectiveApplicator.applyMultiple(p, entities, resources);
+					if (!modified) {
+						IntStream.range(0, entities.size()).forEach(i -> {
+							try (TempsTraca.Tram tramFila = TempsTraca.inicia("applySingle (per fila)")) {
+								perspectiveApplicator.applySingle(
+										p,
+										entities.get(i),
+										resources.get(i));
+							}
+						});
+					}
 				}
 			} else {
 				throw new ArtifactNotFoundException(getResourceClass(), ResourceArtifactType.PERSPECTIVE, p);
@@ -588,7 +598,7 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 		Arrays.stream(perspectives).forEach(p -> {
 			PerspectiveApplicator<E, R> perspectiveApplicator = getPerspectiveApplicator(p);
 			if (perspectiveApplicator != null) {
-				perspectiveApplicator.applySingle(p, entity, resource);
+				TempsTraca.executa("perspectiva " + p, () -> perspectiveApplicator.applySingle(p, entity, resource));
 			} else {
 				throw new ArtifactNotFoundException(getResourceClass(), ResourceArtifactType.PERSPECTIVE, p);
 			}
@@ -906,8 +916,8 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 	}
 
 	protected Optional<E> entityRepositoryFindOne(ID id) {
-		Specification<E> specification = toGetOneProcessedSpecification(id);
-		return entityRepository.findOne(specification);
+		Specification<E> specification = TempsTraca.mesura("toGetOneProcessedSpecification", () -> toGetOneProcessedSpecification(id));
+		return TempsTraca.mesura("repository.findOne", () -> entityRepository.findOne(specification));
 	}
 
 	protected Page<E> entityRepositoryFindEntities(
@@ -915,33 +925,33 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			String filter,
 			String[] namedQueries,
 			Pageable pageable) {
-		Specification<E> specification = toFindProcessedSpecification(
+		Specification<E> specification = TempsTraca.mesura("toFindProcessedSpecification", () -> toFindProcessedSpecification(
 				quickFilter,
 				filter,
-				namedQueries);
+				namedQueries));
 		log.debug("Consulta amb specification ({})", specification);
-		Sort processedSort = toProcessedSort(pageable.getSort());
+		Sort processedSort = TempsTraca.mesura("toProcessedSort", () -> toProcessedSort(pageable.getSort()));
 		if (pageable.isUnpaged()) {
-			List<E> resultList = entityRepository.findAll(specification, processedSort);
+			List<E> resultList = TempsTraca.mesura("repository.findAll (sense paginar)", () -> entityRepository.findAll(specification, processedSort));
 			return new PageImpl<>(resultList, pageable, resultList.size());
 		} else {
 			Pageable processedPageable = PageRequest.of(
 					pageable.getPageNumber(),
 					pageable.getPageSize(),
 					processedSort);
-			return entityRepository.findAll(specification, processedPageable);
+			return TempsTraca.mesura("repository.findAll (pagina + count)", () -> entityRepository.findAll(specification, processedPageable));
 		}
 	}
 
 	protected Specification<E> toGetOneProcessedSpecification(ID id) {
 		Specification<E> processedSpecification = new PkSpec<>(id);
-		String additionalSpringFilter = additionalSpringFilter(null, null);
+		String additionalSpringFilter = TempsTraca.mesura("additionalSpringFilter", () -> additionalSpringFilter(null, null));
 		processedSpecification = appendSpecificationWithAnd(
 				processedSpecification,
 				getSpringFilterSpecification(additionalSpringFilter));
 		return appendSpecificationWithAnd(
 				processedSpecification,
-				additionalSpecification(null));
+				TempsTraca.mesura("additionalSpecification", () -> additionalSpecification(null)));
 	}
 
 	protected <P> Specification<P> toFindProcessedSpecification(
@@ -949,20 +959,20 @@ public abstract class BaseReadonlyResourceService<R extends Resource<ID>, ID ext
 			String filter,
 			String[] namedQueries) {
 		Specification<P> processedSpecification = getSpringFilterSpecification(
-				buildSpringFilterForQuickFilter(
+				TempsTraca.mesura("buildSpringFilterForQuickFilter", () -> buildSpringFilterForQuickFilter(
 						getResourceClass(),
 						null,
-						quickFilter));
+						quickFilter)));
 		processedSpecification = appendSpecificationWithAnd(
 				processedSpecification,
 				getSpringFilterSpecification(filter));
 		processedSpecification = appendSpecificationWithAnd(
 				processedSpecification,
 				getSpringFilterSpecification(
-						additionalSpringFilter(filter, namedQueries)));
+						TempsTraca.mesura("additionalSpringFilter", () -> additionalSpringFilter(filter, namedQueries))));
 		processedSpecification = appendSpecificationWithAnd(
 				processedSpecification,
-				(Specification<P>)additionalSpecification(namedQueries));
+				(Specification<P>)TempsTraca.mesura("additionalSpecification", () -> additionalSpecification(namedQueries)));
 		if (namedQueries != null) {
 			for (String namedQuery: namedQueries) {
 				Specification<P> namedSpecification;

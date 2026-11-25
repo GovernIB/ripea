@@ -18,6 +18,7 @@ import es.caib.ripea.service.intf.base.service.ReadonlyResourceService;
 import es.caib.ripea.service.intf.base.service.ResourceApiService;
 import es.caib.ripea.service.intf.base.util.*;
 import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.utils.TempsTraca;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.AllArgsConstructor;
@@ -131,23 +132,35 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			@RequestParam(value = "perspective", required = false)
 			final String[] perspectives) {
 		log.debug("Obtenint recurs (id={})", id);
-		R resource = getReadonlyResourceService().getOne(
-				id,
-				perspectives);
-		EntityModel<R> entityModel = toEntityModel(
-				resource,
-				buildSingleResourceLinks(
-						resource.getId(),
-						perspectives,
-						true,
-						null,
-						null,
-						resourceApiService.permissionsCurrentUser(
-								getResourceClass(),
-								id),
-						true,
-						true).toArray(new Link[0]));
-		return ResponseEntity.ok(entityModel);
+		try (TempsTraca.Tram tramControlador = TempsTraca.inicia("controlador.getOne")) {
+			R resource;
+			try (TempsTraca.Tram tram = TempsTraca.inicia("servei.getOne (EJB)")) {
+				resource = getReadonlyResourceService().getOne(
+						id,
+						perspectives);
+			}
+			ResourcePermissions resourcePermissions;
+			try (TempsTraca.Tram tram = TempsTraca.inicia("resourceApiService.permissionsCurrentUser (EJB)")) {
+				resourcePermissions = resourceApiService.permissionsCurrentUser(
+						getResourceClass(),
+						id);
+			}
+			EntityModel<R> entityModel;
+			try (TempsTraca.Tram tram = TempsTraca.inicia("enllacos HAL (buildSingleResourceLinks)")) {
+				entityModel = toEntityModel(
+						resource,
+						buildSingleResourceLinks(
+								resource.getId(),
+								perspectives,
+								true,
+								null,
+								null,
+								resourcePermissions,
+								true,
+								true).toArray(new Link[0]));
+			}
+			return ResponseEntity.ok(entityModel);
+		}
 	}
 
 	@Override
@@ -177,40 +190,57 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 				Arrays.toString(namedQueries),
 				Arrays.toString(perspectives),
 				pageable);
-		ResourcePermissions resourcePermissions = resourceApiService.permissionsCurrentUser(
-				getResourceClass(),
-				null);
+		try (TempsTraca.Tram tramControlador = TempsTraca.inicia("controlador.find")) {
+		ResourcePermissions resourcePermissions;
+		try (TempsTraca.Tram tram = TempsTraca.inicia("resourceApiService.permissionsCurrentUser (EJB)")) {
+			resourcePermissions = resourceApiService.permissionsCurrentUser(
+					getResourceClass(),
+					null);
+		}
 		if (pageable != null) {
 			// Només es fa la consulta de recursos si la petició conté informació de paginació.
 			long t0 = System.currentTimeMillis();
 			long initialTime = t0;
-			String filterWithFieldParams = filterWithFieldParameters(filter, getResourceClass());
-			Page<R> page = getReadonlyResourceService().findPage(
-					quickFilter,
-					filterWithFieldParams,
-					namedQueries,
-					perspectives,
-					pageable);
+			String filterWithFieldParams;
+			try (TempsTraca.Tram tram = TempsTraca.inicia("filterWithFieldParameters")) {
+				filterWithFieldParams = filterWithFieldParameters(filter, getResourceClass());
+			}
+			Page<R> page;
+			try (TempsTraca.Tram tram = TempsTraca.inicia("servei.findPage (EJB)")) {
+				page = getReadonlyResourceService().findPage(
+						quickFilter,
+						filterWithFieldParams,
+						namedQueries,
+						perspectives,
+						pageable);
+			}
 			long queryTime = System.currentTimeMillis() - t0;
 			log.trace("\ttemps de consulta: {}ms", queryTime);
 			t0 = System.currentTimeMillis();
-			PagedModel<EntityModel<R>> pagedModel = toPagedModel(
-					page,
-					perspectives,
-					true,
-					null,
-					resourcePermissions,
-					false,
-					false,
-					buildResourceCollectionLinks(
-							quickFilter,
-							filter,
-							namedQueries,
-							perspectives,
-							pageable,
-							page,
-							null,
-							resourcePermissions).toArray(new Link[0]));
+			Link[] collectionLinks;
+			try (TempsTraca.Tram tram = TempsTraca.inicia("enllacos HAL de la colleccio (buildResourceCollectionLinks)")) {
+				collectionLinks = buildResourceCollectionLinks(
+						quickFilter,
+						filter,
+						namedQueries,
+						perspectives,
+						pageable,
+						page,
+						null,
+						resourcePermissions).toArray(new Link[0]);
+			}
+			PagedModel<EntityModel<R>> pagedModel;
+			try (TempsTraca.Tram tram = TempsTraca.inicia("enllacos HAL per fila (toPagedModel)")) {
+				pagedModel = toPagedModel(
+						page,
+						perspectives,
+						true,
+						null,
+						resourcePermissions,
+						false,
+						false,
+						collectionLinks);
+			}
 			long conversionTime = System.currentTimeMillis() - t0;
 			log.trace("\ttemps de conversió dels resultats: {}ms", conversionTime);
 			long totalTime = System.currentTimeMillis() - initialTime;
@@ -232,6 +262,7 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 									null,
 									null,
 									resourcePermissions)));
+		}
 		}
 	}
 
@@ -906,19 +937,23 @@ public abstract class BaseReadonlyResourceController<R extends Resource<? extend
 			boolean withEditLinksInputAndOutput,
 			boolean withArtifactLinks,
 			Link... links) {
-		List<ResourceArtifact> artifactsAll = getReadonlyResourceService().artifactFindAll(null);
+		List<ResourceArtifact> artifactsAll = TempsTraca.mesura(
+				"servei.artifactFindAll (EJB)",
+				() -> getReadonlyResourceService().artifactFindAll(null));
 		return PagedModel.of(
 				page.getContent().stream().map(resource -> {
-					Link[] resourceLinks = resource != null ? buildSingleResourceLinks(
-							resource.getId(),
-							perspectives,
-							withDownloadLink,
-							singleResourceSelfLink,
-							artifactsAll,
-							resourcePermissions,
-							withEditLinksInputAndOutput,
-							withArtifactLinks).toArray(new Link[0]) : new Link[0];
-					return toEntityModel(resource, resourceLinks);
+					try (TempsTraca.Tram tram = TempsTraca.inicia("buildSingleResourceLinks (per fila)")) {
+						Link[] resourceLinks = resource != null ? buildSingleResourceLinks(
+								resource.getId(),
+								perspectives,
+								withDownloadLink,
+								singleResourceSelfLink,
+								artifactsAll,
+								resourcePermissions,
+								withEditLinksInputAndOutput,
+								withArtifactLinks).toArray(new Link[0]) : new Link[0];
+						return toEntityModel(resource, resourceLinks);
+					}
 				}).collect(Collectors.toList()),
 				new PagedModel.PageMetadata(
 						page.getNumberOfElements(),

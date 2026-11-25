@@ -2,6 +2,8 @@ package es.caib.ripea.service.base.springfilter;
 
 import com.turkraft.springfilter.parser.Filter;
 
+import es.caib.ripea.service.intf.utils.TempsTraca;
+
 import javax.persistence.criteria.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +27,15 @@ public class FilterSpecification<T> extends com.turkraft.springfilter.boot.Filte
 
 	@Override
 	public Predicate toPredicate(
+			Root<T> root,
+			CriteriaQuery<?> query,
+			CriteriaBuilder criteriaBuilder) {
+		try (TempsTraca.Tram tram = TempsTraca.inicia("springfilter.toPredicate (parse + criteria)")) {
+			return toPredicateInternal(root, query, criteriaBuilder);
+		}
+	}
+
+	private Predicate toPredicateInternal(
 			Root<T> root,
 			CriteriaQuery<?> query,
 			CriteriaBuilder criteriaBuilder) {

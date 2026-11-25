@@ -42,6 +42,7 @@ import es.caib.ripea.service.intf.dto.EntitatDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioAccioEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.service.intf.dto.ExpedientPeticioInfoDto;
+import es.caib.ripea.service.intf.utils.TempsTraca;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.permission.ExtendedPermission;
 
@@ -402,12 +403,12 @@ public class ExpedientPeticioHelper {
 		} else if (organActualId!=null && (rolActual.equals("IPA_ORGAN_ADMIN") || rolActual.equals("IPA_DISSENY"))) {
 			EntitatEntity entitat = entitatRepository.getOne(entitatId);
 			OrganGestorEntity organGestor = organGestorRepository.getOne(organActualId);
-			permisosPerAnotacionsDto.setAdminOrganHasPermisAdminComu(organGestorHelper.hasPermisAdminComu(organActualId));
-			permisosPerAnotacionsDto.setAdminOrganCodisOrganAmbDescendents(organGestorCacheHelper.getCodisOrgansFills(entitat.getCodi(), organGestor.getCodi()));
-			permisosPerAnotacionsDto.setProcedimentsPermesos(metaExpedientHelper.findProcedimentsDeOrganIDeDescendentsDeOrgan(organActualId));
+			permisosPerAnotacionsDto.setAdminOrganHasPermisAdminComu(TempsTraca.mesura("organGestorHelper.hasPermisAdminComu", () -> organGestorHelper.hasPermisAdminComu(organActualId)));
+			permisosPerAnotacionsDto.setAdminOrganCodisOrganAmbDescendents(TempsTraca.mesura("organGestorCacheHelper.getCodisOrgansFills", () -> organGestorCacheHelper.getCodisOrgansFills(entitat.getCodi(), organGestor.getCodi())));
+			permisosPerAnotacionsDto.setProcedimentsPermesos(TempsTraca.mesura("metaExpedientHelper.findProcedimentsDeOrganIDeDescendentsDeOrgan", () -> metaExpedientHelper.findProcedimentsDeOrganIDeDescendentsDeOrgan(organActualId)));
 		} else if (rolActual.equals("tothom")) {
-			permisosPerAnotacionsDto.setProcedimentsPermesos(metaExpedientHelper.getCreateWritePermesos(entitatId));
-			List<Long> idsGrupsPermesos = permisosHelper.getObjectsIdsWithPermission(GrupEntity.class, ExtendedPermission.READ, usuariCodi, rolActual);
+			permisosPerAnotacionsDto.setProcedimentsPermesos(TempsTraca.mesura("metaExpedientHelper.getCreateWritePermesos", () -> metaExpedientHelper.getCreateWritePermesos(entitatId)));
+			List<Long> idsGrupsPermesos = TempsTraca.mesura("ACL getObjectsIdsWithPermission(GrupEntity READ)", () -> permisosHelper.getObjectsIdsWithPermission(GrupEntity.class, ExtendedPermission.READ, usuariCodi, rolActual));
 			permisosPerAnotacionsDto.setIdsGrupsPermesos(idsGrupsPermesos);
 		}
 		return permisosPerAnotacionsDto;

@@ -146,6 +146,7 @@ import es.caib.ripea.service.intf.model.NodeResource.MassiveAction;
 import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.ExpedientResourceService;
 import es.caib.ripea.service.intf.service.AplicacioService;
+import es.caib.ripea.service.intf.utils.TempsTraca;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.intf.utils.ZipDocumentExtractor;
 import es.caib.ripea.service.permission.ExtendedPermission;
@@ -271,16 +272,16 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         String[] namedFilters) {
 
 		Specification<P> processedSpecification = getSpringFilterSpecification(
-				buildSpringFilterForQuickFilter(
+				TempsTraca.mesura("buildSpringFilterForQuickFilter", () -> buildSpringFilterForQuickFilter(
 						getResourceClass(),
 						null,
-						quickFilter));
-		
+						quickFilter)));
+
 		processedSpecification = appendSpecificationWithAnd(processedSpecification, getSpringFilterSpecification(filter));
-		processedSpecification = appendSpecificationWithAnd(processedSpecification, 
+		processedSpecification = appendSpecificationWithAnd(processedSpecification,
 				getSpringFilterSpecification(
-						additionalSpringFilter(filter, namedFilters)));
-		
+						TempsTraca.mesura("additionalSpringFilter", () -> additionalSpringFilter(filter, namedFilters))));
+
 		if (namedFilters != null) {
 			for (String namedFilter: namedFilters) {
 				Specification<P> namedSpecification = null;
@@ -345,7 +346,9 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             String entitatActualCodi = configHelper.getEntitatActualCodi();
             String organActualCodi	 = configHelper.getOrganActualCodi();
             String rolActual		 = configHelper.getRolActual();
-        	
+            TempsTraca.anota("rol " + rolActual);
+            TempsTraca.anota("organ " + organActualCodi);
+
             Filter filtreFrontAndEntitat = FilterBuilder.and(
                     (currentSpringFilter != null && !currentSpringFilter.isEmpty())?Filter.parse(currentSpringFilter):null,
                     FilterBuilder.equal(ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi,
@@ -357,7 +360,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
                 return filtreFrontAndEntitat.generate();
         	}
 
-        	EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true, false);
+        	EntitatEntity entitatEntity = TempsTraca.mesura("entityComprovarHelper.comprovarEntitat", () -> entityComprovarHelper.comprovarEntitat(entitatActualCodi, false, false, false, true, false));
         	Filter filtreNoEliminats = FilterBuilder.and(FilterBuilder.equal(ContingutResource.Fields.esborrat, "0"));
         	
         	//Expedients sobre els quals l'usuari pot escriure: mateix criteri de permisos que les accions
@@ -487,13 +490,14 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 			Filter filtreGrupsPermesos = null;
 			Filter filtreOrgansPermesos = null;
            
-            OrganGestorEntity ogEntity	= organGestorRepository.findByEntitatIdAndCodi(entitatEntity.getId(), organActualCodi);
-			
-    		PermisosPerExpedientsDto permisosPerExpedients = expedientHelper.findPermisosPerExpedients(
+            OrganGestorEntity ogEntity	= TempsTraca.mesura("organGestorRepository.findByEntitatIdAndCodi", () -> organGestorRepository.findByEntitatIdAndCodi(entitatEntity.getId(), organActualCodi));
+
+    		PermisosPerExpedientsDto permisosPerExpedients = TempsTraca.mesura("expedientHelper.findPermisosPerExpedients", () -> expedientHelper.findPermisosPerExpedients(
     				entitatEntity.getId(),
     				rolActual,
-    				ogEntity!=null?ogEntity.getId():null);
-			
+    				ogEntity!=null?ogEntity.getId():null));
+
+			try (TempsTraca.Tram tramFiltres = TempsTraca.inicia("construccio dels filtres de permisos (Filter.parse)")) {
 			if (!rolActual.equals("IPA_ADMIN") && !rolActual.equals("IPA_ADMIN_LECTURA")) {
 
 	    		//Si no es té permis per cap banda, no retornam resultats
@@ -570,7 +574,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 					}
 				}
 			}
-			
+			}
+
 			Filter filtreResultat = FilterBuilder.and(
 					filtreFrontAndEntitat,
 					filtreNoEliminats,
@@ -578,8 +583,10 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 					filtreProcedimentsDirectes,
 					filtreOrgansPermesos,
 					filtreGrupsPermesos);
-			
-			return filtreResultat.generate();
+
+			String filtreGenerat = TempsTraca.mesura("Filter.generate", () -> filtreResultat.generate());
+			TempsTraca.anota("additionalSpringFilter " + filtreGenerat.length() + " caracters");
+			return filtreGenerat;
         
     	} catch (Exception e) {
     		applicationHelper.stopTimer(sample, "METRICS@Subsystem_Expedient.list", "resultado", "error");
@@ -798,50 +805,52 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private class AmbDocumentsPinbalPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
-            List<MetaDocumentEntity> metaDocuments = metaDocumentHelper.findMetaDocumentsPinbalDisponiblesPerCreacio(entity.getId());
+            List<MetaDocumentEntity> metaDocuments = TempsTraca.mesura("metaDocumentHelper.findMetaDocumentsPinbalDisponiblesPerCreacio", () -> metaDocumentHelper.findMetaDocumentsPinbalDisponiblesPerCreacio(entity.getId()));
             resource.setAmbDocumentsPinbal(metaDocuments!=null && !metaDocuments.isEmpty());
         }
     }
 
     private void aplicarDocumentsFaltants(ExpedientEntity expedientEntity, ExpedientResource resource) {
-        resource.setMetaDocumentsFaltants(EntityComprovarHelper.getNomsDocumentsFaltants(resource.getErrors()));
-        resource.setPotTancarAmbDocumentsFaltants(entityComprovarHelper.comprovarSiEsPotTancarAmbDocumentsFaltants(expedientEntity, resource.getErrors()));
+        try (TempsTraca.Tram tram = TempsTraca.inicia("aplicarDocumentsFaltants")) {
+        resource.setMetaDocumentsFaltants(TempsTraca.mesura("EntityComprovarHelper.getNomsDocumentsFaltants", () -> EntityComprovarHelper.getNomsDocumentsFaltants(resource.getErrors())));
+        resource.setPotTancarAmbDocumentsFaltants(TempsTraca.mesura("entityComprovarHelper.comprovarSiEsPotTancarAmbDocumentsFaltants", () -> entityComprovarHelper.comprovarSiEsPotTancarAmbDocumentsFaltants(expedientEntity, resource.getErrors())));
+        }
     }
 
     private class AvisosPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
     	@Override
 		public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
-    		ExpedientEntity expedientEntity = expedientRepository.findById(entity.getId()).get();
-    		resource.setErrors(cacheHelper.findErrorsValidacioPerNode(entity.getId()));
+    		ExpedientEntity expedientEntity = TempsTraca.mesura("expedientRepository.findById", () -> expedientRepository.findById(entity.getId()).get());
+    		resource.setErrors(TempsTraca.mesura("cacheHelper.findErrorsValidacioPerNode", () -> cacheHelper.findErrorsValidacioPerNode(entity.getId())));
 	        resource.setValid(resource.getErrors().isEmpty());
-	        resource.setErrorLastEnviament(cacheHelper.hasEnviamentsPortafirmesAmbErrorPerExpedient(expedientEntity));
-			resource.setErrorLastNotificacio(cacheHelper.hasNotificacionsAmbErrorPerExpedient(expedientEntity));
-			resource.setAmbEnviamentsPendents(cacheHelper.hasEnviamentsPortafirmesPendentsPerExpedient(expedientEntity.getId()));
-			resource.setAmbNotificacionsPendents(cacheHelper.hasNotificacionsPendentsPerExpedient(expedientEntity));
-			resource.setNumAlert(entity.getAlertes().size());
+	        resource.setErrorLastEnviament(TempsTraca.mesura("cacheHelper.hasEnviamentsPortafirmesAmbErrorPerExpedient", () -> cacheHelper.hasEnviamentsPortafirmesAmbErrorPerExpedient(expedientEntity)));
+			resource.setErrorLastNotificacio(TempsTraca.mesura("cacheHelper.hasNotificacionsAmbErrorPerExpedient", () -> cacheHelper.hasNotificacionsAmbErrorPerExpedient(expedientEntity)));
+			resource.setAmbEnviamentsPendents(TempsTraca.mesura("cacheHelper.hasEnviamentsPortafirmesPendentsPerExpedient", () -> cacheHelper.hasEnviamentsPortafirmesPendentsPerExpedient(expedientEntity.getId())));
+			resource.setAmbNotificacionsPendents(TempsTraca.mesura("cacheHelper.hasNotificacionsPendentsPerExpedient", () -> cacheHelper.hasNotificacionsPendentsPerExpedient(expedientEntity)));
+			resource.setNumAlert(TempsTraca.mesura("entity.getAlertes (lazy)", () -> entity.getAlertes().size()));
 	        aplicarDocumentsFaltants(expedientEntity, resource);
     	}
-    }    
-    
+    }
+
     private class BasicPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
 		@Override
 		public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
-	        resource.setGestioAmbGrupsActiva(entity.getMetaExpedient().isGestioAmbGrupsActiva());
-	        usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName())
-	                .ifPresent(usuariResourceEntity -> resource.setSeguidor(entity.getSeguidors().contains(usuariResourceEntity)));
-	        resource.setUsuariActualWrite(entityComprovarHelper.comprovarPermisExpedient(entity.getId(), ExtendedPermission.WRITE, "WRITE", false));
-	        ExpedientEntity expedientEntity = expedientRepository.findById(entity.getId()).get();
-    		
+	        resource.setGestioAmbGrupsActiva(TempsTraca.mesura("entity.getMetaExpedient (lazy)", () -> entity.getMetaExpedient().isGestioAmbGrupsActiva()));
+	        TempsTraca.executa("seguidor (usuariResourceRepository.findById + getSeguidors lazy)", () -> usuariResourceRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName())
+	                .ifPresent(usuariResourceEntity -> resource.setSeguidor(entity.getSeguidors().contains(usuariResourceEntity))));
+	        resource.setUsuariActualWrite(TempsTraca.mesura("entityComprovarHelper.comprovarPermisExpedient (WRITE)", () -> entityComprovarHelper.comprovarPermisExpedient(entity.getId(), ExtendedPermission.WRITE, "WRITE", false)));
+	        ExpedientEntity expedientEntity = TempsTraca.mesura("expedientRepository.findById", () -> expedientRepository.findById(entity.getId()).get());
+
 	        //Calcular esValid, s'utilitza posteriorment
-	        resource.setErrors(cacheHelper.findErrorsValidacioPerNode(entity.getId()));
+	        resource.setErrors(TempsTraca.mesura("cacheHelper.findErrorsValidacioPerNode", () -> cacheHelper.findErrorsValidacioPerNode(entity.getId())));
 	        resource.setValid(resource.getErrors().isEmpty());
 	        aplicarDocumentsFaltants(expedientEntity, resource);
-	        
-	        resource.setConteDocuments(CollectionUtils.isNotEmpty(documentResourceRepository.findByExpedientAndEsborrat(entity, 0)));
-	        resource.setConteDocumentsDefinitius(documentResourceRepository.expedientHasDocumentsDefinitius(entity));
-	        resource.setConteDocumentsEnProcessDeFirma(CollectionUtils.isNotEmpty(documentResourceRepository.findEnProccessDeFirma(entity)));
-	        resource.setConteDocumentsDePortafirmesNoCustodiats(CollectionUtils.isNotEmpty(documentResourceRepository.findDocumentsDePortafirmesNoCustodiats(entity)));
-	        resource.setConteDocumentsPendentsReintentsArxiu(CollectionUtils.isNotEmpty(documentResourceRepository.findDocumentsPendentsReintentsArxiu(entity, contingutHelper.getArxiuMaxReintentsDocuments())));
+
+	        resource.setConteDocuments(TempsTraca.mesura("documentResourceRepository.findByExpedientAndEsborrat", () -> CollectionUtils.isNotEmpty(documentResourceRepository.findByExpedientAndEsborrat(entity, 0))));
+	        resource.setConteDocumentsDefinitius(TempsTraca.mesura("documentResourceRepository.expedientHasDocumentsDefinitius", () -> documentResourceRepository.expedientHasDocumentsDefinitius(entity)));
+	        resource.setConteDocumentsEnProcessDeFirma(TempsTraca.mesura("documentResourceRepository.findEnProccessDeFirma", () -> CollectionUtils.isNotEmpty(documentResourceRepository.findEnProccessDeFirma(entity))));
+	        resource.setConteDocumentsDePortafirmesNoCustodiats(TempsTraca.mesura("documentResourceRepository.findDocumentsDePortafirmesNoCustodiats", () -> CollectionUtils.isNotEmpty(documentResourceRepository.findDocumentsDePortafirmesNoCustodiats(entity))));
+	        resource.setConteDocumentsPendentsReintentsArxiu(TempsTraca.mesura("documentResourceRepository.findDocumentsPendentsReintentsArxiu", () -> CollectionUtils.isNotEmpty(documentResourceRepository.findDocumentsPendentsReintentsArxiu(entity, contingutHelper.getArxiuMaxReintentsDocuments()))));
 	        resource.setPotTancar(
 	                (resource.isValid() || resource.isPotTancarAmbDocumentsFaltants())
 	                        && resource.isConteDocuments()
@@ -859,24 +868,26 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 //	            if (resource.isConteDocumentsDeAnotacionesNoMogutsASerieFinal()) resource.setTancarDisabledMessage(messageHelper.getMessage("disabled.button.msg.conteDocumentsDeAnotacionesNoMogutsASerieFinal"));
 	        }
 
-			resource.setDataDarrerEnviament(cacheHelper.getDataDarrerEnviament(expedientEntity));
-			resource.setPotModificar(entityComprovarHelper.comprovarSiEsPotModificarExpedient(expedientEntity));
-			resource.setHasEsborranys(documentResourceRepository.hasFillsEsborranys(expedientEntity.getId()));
-			resource.setPendentExecucioMassiva(expedientHelper.isExpedientPendentExecucioMassivaMourerTot(expedientEntity.getId()));
-			
+			resource.setDataDarrerEnviament(TempsTraca.mesura("cacheHelper.getDataDarrerEnviament", () -> cacheHelper.getDataDarrerEnviament(expedientEntity)));
+			resource.setPotModificar(TempsTraca.mesura("entityComprovarHelper.comprovarSiEsPotModificarExpedient", () -> entityComprovarHelper.comprovarSiEsPotModificarExpedient(expedientEntity)));
+			resource.setHasEsborranys(TempsTraca.mesura("documentResourceRepository.hasFillsEsborranys", () -> documentResourceRepository.hasFillsEsborranys(expedientEntity.getId())));
+			resource.setPendentExecucioMassiva(TempsTraca.mesura("expedientHelper.isExpedientPendentExecucioMassivaMourerTot", () -> expedientHelper.isExpedientPendentExecucioMassivaMourerTot(expedientEntity.getId())));
+
+			TempsTraca.executa("expedientEntity.getMetaExpedient().isComu", () -> {
 			if (expedientEntity.getMetaExpedient()!=null) {
 				resource.setDisableOrganGestor(!expedientEntity.getMetaExpedient().isComu());
 			}
+			});
 		}
-    }    
-    
+    }
+
     private class PermisContingutPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
-    		UsuariEntity usuariEntity = usuariRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
+    		UsuariEntity usuariEntity = TempsTraca.mesura("usuariRepository.findById", () -> usuariRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null));
     		if (usuariEntity!=null && entity.getId()!=null && ExpedientEstatEnumDto.OBERT.equals(entity.getEstat())) {
     			try {
-    				ContingutEntity contingutEntity = contingutHelper.comprovarContingutDinsExpedientModificable(
+    				ContingutEntity contingutEntity = TempsTraca.mesura("contingutHelper.comprovarContingutDinsExpedientModificable", () -> contingutHelper.comprovarContingutDinsExpedientModificable(
     						entity.getEntitat().getId(),
     						entity.getId(),
     						false, //comprovarPermisRead
@@ -885,8 +896,8 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     						false, //comprovarPermisDelete
     						false, //checkPerMassiuAdmin
     						true, //comprovarAgafatPerUsuariActual
-    						configHelper.getRolActual());    				
-    				boolean isExpedientPendentExecucioMassiva = expedientHelper.isExpedientPendentExecucioMassivaMourerTot(contingutEntity.getId());
+    						configHelper.getRolActual()));
+    				boolean isExpedientPendentExecucioMassiva = TempsTraca.mesura("expedientHelper.isExpedientPendentExecucioMassivaMourerTot", () -> expedientHelper.isExpedientPendentExecucioMassivaMourerTot(contingutEntity.getId()));
     				resource.setPotModificarContingut(contingutEntity!=null && !isExpedientPendentExecucioMassiva);
     			}catch (Exception ex) {
     				resource.setPotModificarContingut(false);
@@ -906,13 +917,13 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
         	if (entity.getCreatedBy()!=null) {
-        		UsuariResourceEntity usuariResourceEntity = usuariResourceRepository.findById(entity.getCreatedBy()).orElse(null);
+        		UsuariResourceEntity usuariResourceEntity = TempsTraca.mesura("usuariResourceRepository.findById (createdBy)", () -> usuariResourceRepository.findById(entity.getCreatedBy()).orElse(null));
         		if (usuariResourceEntity!=null) {
         			resource.setCreatedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
         		}
         	}
         	if (entity.getLastModifiedBy()!=null) {
-        		UsuariResourceEntity usuariResourceEntity = usuariResourceRepository.findById(entity.getLastModifiedBy()).orElse(null);
+        		UsuariResourceEntity usuariResourceEntity = TempsTraca.mesura("usuariResourceRepository.findById (lastModifiedBy)", () -> usuariResourceRepository.findById(entity.getLastModifiedBy()).orElse(null));
         		resource.setLastModifiedByFullName(usuariResourceEntity.getNom() + " (" + usuariResourceEntity.getCodi() + ")");
         	}
         }
@@ -921,17 +932,17 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private class CountPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
-            resource.setNumInteressats((int) entity.getInteressats().stream().filter(interessatResourceEntity -> !interessatResourceEntity.isEsRepresentant()).count());
-            resource.setNumTasques(entity.getTasques().size());
-            resource.setNumAnotacions(entity.getPeticions().size());
-            resource.setNumPublicacions(entity.getPublicacions().size());
-            resource.setNumRemeses(entity.getNotificacions().size());
-            resource.setNumMetaDades(entity.getMetaExpedient().getMetaDades()!=null?entity.getMetaExpedient().getMetaDades().size():0);
-            resource.setNumDades(dadaRepository.countByNodeId(entity.getId()));
-            resource.setNumContingut(documentResourceRepository.countAllByExpedientIdAndEsborrat(entity.getId(), 0));
-            resource.setNumMoviments(contingutMovimentRepository.countByContingutId(entity.getId()));
-            resource.setNumComentaris(entity.getComentaris().size());
-            resource.setNumSeguidors(entity.getSeguidors().size());
+            resource.setNumInteressats(TempsTraca.mesura("entity.getInteressats (lazy)", () -> (int) entity.getInteressats().stream().filter(interessatResourceEntity -> !interessatResourceEntity.isEsRepresentant()).count()));
+            resource.setNumTasques(TempsTraca.mesura("entity.getTasques (lazy)", () -> entity.getTasques().size()));
+            resource.setNumAnotacions(TempsTraca.mesura("entity.getPeticions (lazy)", () -> entity.getPeticions().size()));
+            resource.setNumPublicacions(TempsTraca.mesura("entity.getPublicacions (lazy)", () -> entity.getPublicacions().size()));
+            resource.setNumRemeses(TempsTraca.mesura("entity.getNotificacions (lazy)", () -> entity.getNotificacions().size()));
+            resource.setNumMetaDades(TempsTraca.mesura("entity.getMetaExpedient().getMetaDades (lazy)", () -> entity.getMetaExpedient().getMetaDades()!=null?entity.getMetaExpedient().getMetaDades().size():0));
+            resource.setNumDades(TempsTraca.mesura("dadaRepository.countByNodeId", () -> dadaRepository.countByNodeId(entity.getId())));
+            resource.setNumContingut(TempsTraca.mesura("documentResourceRepository.countAllByExpedientIdAndEsborrat", () -> documentResourceRepository.countAllByExpedientIdAndEsborrat(entity.getId(), 0)));
+            resource.setNumMoviments(TempsTraca.mesura("contingutMovimentRepository.countByContingutId", () -> contingutMovimentRepository.countByContingutId(entity.getId())));
+            resource.setNumComentaris(TempsTraca.mesura("entity.getComentaris (lazy)", () -> entity.getComentaris().size()));
+            resource.setNumSeguidors(TempsTraca.mesura("entity.getSeguidors (lazy)", () -> entity.getSeguidors().size()));
         }
     }
 
@@ -943,26 +954,26 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private class CountResumPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
-            resource.setNumComentaris(entity.getComentaris().size());
-            resource.setNumSeguidors(entity.getSeguidors().size());
+            resource.setNumComentaris(TempsTraca.mesura("entity.getComentaris (lazy)", () -> entity.getComentaris().size()));
+            resource.setNumSeguidors(TempsTraca.mesura("entity.getSeguidors (lazy)", () -> entity.getSeguidors().size()));
         }
     }
 
     private class InteressatsPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
-            List<InteressatResource> interessats = entity.getInteressats().stream()
+            List<InteressatResource> interessats = TempsTraca.mesura("entity.getInteressats (lazy) + mapeig", () -> entity.getInteressats().stream()
                     .map(interessatResourceEntity -> objectMappingHelper.newInstanceMap(interessatResourceEntity, InteressatResource.class))
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toList()));
             resource.setInteressats(interessats);
         }
     }
-    
+
     private class MetaExpedientPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
-        	resource.setMetaExpedientInfo(objectMappingHelper.newInstanceMap(Hibernate.unproxy(entity.getMetaExpedient()), MetaExpedientResource.class));
-        	resource.setHideTasca(!expedientHelper.expedientOProcedimentTeTasques(entity.getId(), entity.getMetaExpedient().getId()));
+        	resource.setMetaExpedientInfo(TempsTraca.mesura("mapeig metaExpedient (unproxy + newInstanceMap)", () -> objectMappingHelper.newInstanceMap(Hibernate.unproxy(entity.getMetaExpedient()), MetaExpedientResource.class)));
+        	resource.setHideTasca(!TempsTraca.mesura("expedientHelper.expedientOProcedimentTeTasques", () -> expedientHelper.expedientOProcedimentTeTasques(entity.getId(), entity.getMetaExpedient().getId())));
         }
     }
 
@@ -978,24 +989,24 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     private class RelacionatPerspectiveApplicator implements PerspectiveApplicator<ExpedientResourceEntity, ExpedientResource> {
         @Override
         public void applySingle(String code, ExpedientResourceEntity entity, ExpedientResource resource) throws PerspectiveApplicationException {
-            List<ResourceReference<ExpedientResource, Long>> relacionatsAmb = entity.getRelacionatsAmb().stream()
+            List<ResourceReference<ExpedientResource, Long>> relacionatsAmb = TempsTraca.mesura("entity.getRelacionatsAmb (lazy) + mapeig", () -> entity.getRelacionatsAmb().stream()
                     .filter(expedientResourceEntity -> expedientResourceEntity.getEsborrat()==0)
                     .map(expedientResourceEntity -> objectMappingHelper.newInstanceMap(expedientResourceEntity, ExpedientResource.class))
                     .map(expedientResource -> ResourceReference.<ExpedientResource, Long>toResourceReference(
                             expedientResource.getId(),
                             "["+ expedientResource.getSequencia() +"/"+ expedientResource.getAny() +"] "+ expedientResource.getNom()
                     ))
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toList()));
             resource.setRelacionatsAmb(relacionatsAmb);
 
-            List<ResourceReference<ExpedientResource, Long>> relacionatsPer = entity.getRelacionatsPer().stream()
+            List<ResourceReference<ExpedientResource, Long>> relacionatsPer = TempsTraca.mesura("entity.getRelacionatsPer (lazy) + mapeig", () -> entity.getRelacionatsPer().stream()
                     .filter(expedientResourceEntity -> expedientResourceEntity.getEsborrat()==0)
                     .map(expedientResourceEntity -> objectMappingHelper.newInstanceMap(expedientResourceEntity, ExpedientResource.class))
                     .map(expedientResource -> ResourceReference.<ExpedientResource, Long>toResourceReference(
                             expedientResource.getId(),
                             "["+ expedientResource.getSequencia() +"/"+ expedientResource.getAny() +"] "+ expedientResource.getNom()
                     ))
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toList()));
             resource.setRelacionatsPer(relacionatsPer);
         }
     }

@@ -50,6 +50,7 @@ import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.CarpetaResourceService;
+import es.caib.ripea.service.intf.utils.TempsTraca;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -90,7 +91,7 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
                 FilterBuilder.equal(ContingutResource.Fields.entitat + "." + EntitatResource.Fields.codi, 
                 		entitatActualCodi != null?entitatActualCodi:"................................................................................")
         );
-        String resultat = filtreResultat.generate();
+        String resultat = TempsTraca.mesura("Filter.generate", () -> filtreResultat.generate());
         return resultat;
     }
 	
@@ -173,7 +174,7 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
     private class PathPerspectiveApplicator implements PerspectiveApplicator<CarpetaResourceEntity, CarpetaResource> {
         @Override
         public void applySingle(String code, CarpetaResourceEntity entity, CarpetaResource resource) throws PerspectiveApplicationException {
-            resource.setTreePath(contingutResourceHelper.getTreePath(entity));
+            resource.setTreePath(TempsTraca.mesura("contingutResourceHelper.getTreePath", () -> contingutResourceHelper.getTreePath(entity)));
         }
     }
     
@@ -193,7 +194,7 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
     private class RestriccionsPerspectiveApplicator implements PerspectiveApplicator<CarpetaResourceEntity, CarpetaResource> {
 		@Override
 		public void applySingle(String code, CarpetaResourceEntity entity, CarpetaResource resource) throws PerspectiveApplicationException {
-	        if (entity.getRestriccions() == null || entity.getRestriccions().isEmpty()) {
+	        if (TempsTraca.mesura("entity.getRestriccions (lazy)", () -> entity.getRestriccions() == null || entity.getRestriccions().isEmpty())) {
 	            resource.setRestriccions(Collections.emptyList());
 	            return;
 	        }
@@ -212,7 +213,7 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
     
     @Override
     protected void afterConversion(CarpetaResourceEntity entity, CarpetaResource resource) {
-    	resource.setHasDocumentsFills(contingutResourceHelper.contingutHasDocumentsFills(entity.getId()));
+    	resource.setHasDocumentsFills(TempsTraca.mesura("contingutResourceHelper.contingutHasDocumentsFills", () -> contingutResourceHelper.contingutHasDocumentsFills(entity.getId())));
     }
     
     private class ModificarNomActionExecutor implements ActionExecutor<CarpetaResourceEntity, CarpetaResource.ModificarFormAction, CarpetaResource> {

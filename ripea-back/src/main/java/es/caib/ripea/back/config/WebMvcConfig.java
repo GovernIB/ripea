@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import es.caib.ripea.back.diag.TempsTracaInterceptor;
 import es.caib.ripea.back.interceptor.*;
+import es.caib.ripea.service.intf.config.BaseConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -158,9 +160,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		registry.addInterceptor(metaExpedientInterceptor).excludePathPatterns(excludedPathPatterns);
 		registry.addInterceptor(aplicacioInterceptor).excludePathPatterns(excludedPathPatterns);
 		// Per processar autenticacio, no excloem /api/**
-		registry.addInterceptor(sessioInterceptor).excludePathPatterns(excludedSessionPathPatterns);
+		// Embolcallat per la traça de temps (TempsTraca): només mesura el temps, el comportament és el mateix.
+		registry.addInterceptor(TempsTracaInterceptor.cronometrat("SessioInterceptor", sessioInterceptor)).excludePathPatterns(excludedSessionPathPatterns);
 		// Per actualitzar entitat i organ gestor al threadLocal, no excloem /api/**
-		registry.addInterceptor(llistaEntitatsInterceptor).excludePathPatterns(excludedSessionPathPatterns);
+		registry.addInterceptor(TempsTracaInterceptor.cronometrat("LlistaEntitatsInterceptor", llistaEntitatsInterceptor)).excludePathPatterns(excludedSessionPathPatterns);
 		// Per a configurar el ResourceServiceLocator al threadLocal, no excloem /api/**
 		registry.addInterceptor(llistaRolsInterceptor).excludePathPatterns(excludedPathPatterns);
 		registry.addInterceptor(modalInterceptor).excludePathPatterns(excludedPathPatterns);
@@ -245,6 +248,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
 						"/avis/**").
 				excludePathPatterns(
 						"/entitat/getEntitatLogo");
+		// Traça de temps (TempsTraca): ha de ser el darrer interceptor, perquè el seu postHandle és el primer que
+		// s'executa després d'escriure la resposta i tanca el pas de serialització.
+		registry.addInterceptor(new TempsTracaInterceptor()).addPathPatterns(BaseConfig.API_PATH + "/**");
 	}
 
 
