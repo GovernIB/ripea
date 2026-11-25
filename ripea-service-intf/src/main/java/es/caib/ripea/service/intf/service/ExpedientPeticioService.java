@@ -16,7 +16,7 @@ public interface ExpedientPeticioService {
 
 	@PreAuthorize("isAuthenticated()")
 	public void crearExpedientPeticion(String clauAcces, String itentificador);
-	
+
 	@PreAuthorize("isAuthenticated()")
 	public PaginaDto<ExpedientPeticioListDto> findAmbFiltre(
 			Long entitatId,
@@ -49,6 +49,11 @@ public interface ExpedientPeticioService {
 			String observacions);
 
 	@PreAuthorize("isAuthenticated()")
+	public void revertirRebutjament(
+			Long expedientPeticioId,
+			String observacions);
+
+	@PreAuthorize("isAuthenticated()")
 	public List<MetaExpedientSelectDto> findMetaExpedientSelect(String entitatCodi);
 
 	@PreAuthorize("isAuthenticated()")
@@ -73,17 +78,17 @@ public interface ExpedientPeticioService {
 
 	@PreAuthorize("isAuthenticated()")
 	public boolean comprovarExistenciaInteressatsPeticio(
-			Long entitatId, 
-			Long expedientId, 
+			Long entitatId,
+			Long expedientId,
 			Long expedientPeticioId);
-	
+
 	@PreAuthorize("isAuthenticated()")
 	public ResultDto<RegistreAnnexDto> findAnnexosPendentsProcesarMassiu(
 			Long entitatId,
 			MassiuAnnexProcesarFiltreDto filtre,
 			PaginacioParamsDto paginacioParams,
 			ResultEnumDto resultEnum,
-			String rolActual, 
+			String rolActual,
 			Long organActualId) throws NotFoundException;
 
 
@@ -109,7 +114,7 @@ public interface ExpedientPeticioService {
 	@PreAuthorize("isAuthenticated()")
 	public void canviarProcediment(
 			Long expedientPeticioId,
-			Long procedimentId, 
+			Long procedimentId,
 			Long grupId);
 
 	@PreAuthorize("isAuthenticated()")
@@ -122,7 +127,7 @@ public interface ExpedientPeticioService {
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public ResultDto<ExpedientPeticioListDto> findComunicadesAmbFiltre(
 			ExpedientPeticioFiltreDto filtre,
-			PaginacioParamsDto paginacioParams, 
+			PaginacioParamsDto paginacioParams,
 			ResultEnumDto resultEnum);
 
 	@PreAuthorize("hasRole('IPA_ADMIN')")

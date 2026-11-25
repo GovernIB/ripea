@@ -57,45 +57,45 @@ table.dataTable td {
 		<div class="row">
 			<div class="col-md-4">
 				<rip:inputText name="numero" inline="true" placeholderKey="expedient.peticio.list.columna.numero.registre"/>
-			</div>	
+			</div>
 			<div class="col-md-4">
 				<rip:inputText name="extracte" inline="true" placeholderKey="expedient.peticio.list.placeholder.extracte"/>
-			</div>	
-			<div class="col-md-4">					
+			</div>
+			<div class="col-md-4">
 				<c:url value="/organgestorajax/organgestorcodi" var="urlConsultaInicial"/>
 				<c:url value="/organgestorajax/organgestorcodi" var="urlConsultaLlistat"/>
-				<rip:inputSuggest 
-						name="destinacioCodi"  
+				<rip:inputSuggest
+						name="destinacioCodi"
 						urlConsultaInicial="${urlConsultaInicial}"
 						urlConsultaLlistat="${urlConsultaLlistat}"
 						placeholderKey="expedient.peticio.list.placeholder.destinacio"
 						suggestValue="codi"
 						suggestText="codiINom"
-						inline="true"/>	
-			</div>	
+						inline="true"/>
+			</div>
 		</div>
 		<div class="row">
-		<!--  optionMinimumResultsForSearch -->		
-			<div class="col-md-4">					
+		<!--  optionMinimumResultsForSearch -->
+			<div class="col-md-4">
 				<rip:inputSelect name="metaExpedientId" optionItems="${metaExpedients}" optionMinimumResultsForSearch="1" optionValueAttribute="id" emptyOption="true" optionTextAttribute="nomICodiSia" placeholderKey="expedient.peticio.list.placeholder.metaExpedient" inline="true"/>
 			</div>
 <%--
-			<div class="col-md-4">					
+			<div class="col-md-4">
 				<c:url value="/metaexpedientajax/metaexpedient" var="urlConsultaInicial"/>
 				<c:url value="/metaexpedientajax/metaexpedients" var="urlConsultaLlistat"/>
-				<rip:inputSuggest 
-						name="metaExpedientId"  
+				<rip:inputSuggest
+						name="metaExpedientId"
 						urlConsultaInicial="${urlConsultaInicial}"
 						urlConsultaLlistat="${urlConsultaLlistat}"
 						placeholderKey="expedient.peticio.list.placeholder.metaExpedient"
 						suggestValue="codi"
 						suggestText="nom"
-						inline="true"/>	
+						inline="true"/>
 			</div>
- --%>			
+ --%>
 			<div class="col-md-4">
 				<rip:inputDate name="dataInicial" inline="true" placeholderKey="expedient.peticio.list.placeholder.dataInicial"/>
-			</div>	
+			</div>
 			<div class="col-md-4">
 				<rip:inputDate name="dataFinal" inline="true" placeholderKey="expedient.peticio.list.placeholder.dataFinal"/>
 			</div>
@@ -125,19 +125,19 @@ table.dataTable td {
 			</div>
 		</div>
 	</form:form>
-	
-	<script id="rowhrefTemplate" type="text/x-jsrender">nodeco/expedientPeticio/{{:id}}</script> 
+
+	<script id="rowhrefTemplate" type="text/x-jsrender">nodeco/expedientPeticio/{{:id}}</script>
 	<table
 		id="taulaDades"
-		data-toggle="datatable" 
+		data-toggle="datatable"
 		data-url="<c:url value="/expedientPeticio/datatable"/>"  <%-- URL which will load rows of datatable  --%>
-		class="table table-bordered table-striped table-hover" 
+		class="table table-bordered table-striped table-hover"
 		data-default-order="1" <%-- default column number to be sorted  --%>
 		data-default-dir="desc" <%-- default ordering direction  --%>
 		data-rowhref-template="#rowhrefTemplate"
 		data-rowhref-toggle="modal"
 		data-rowhref-maximized="true"
-		data-save-state="true" 
+		data-save-state="true"
 		style="width:100%">
 		<thead>
 			<tr>
@@ -185,6 +185,9 @@ table.dataTable td {
 								{{/if}}
 								{{if estatView == 'ACCEPTAT'}}
 									<li><a href="contingut/{{:expedientId}}"><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="expedient.peticio.list.btn.expedient"/></a></li>
+								{{/if}}
+								{{if estatView == 'REBUTJAT'}}
+									<li><a href="<c:url value="/expedientPeticio/revertRebutjar/{{:id}}"/>" data-toggle="modal" data-maximized="false"><span class="fa fa-undo"></span>&nbsp;&nbsp;<spring:message code="expedient.peticio.list.btn.revertRebutjar"/></a></li>
 								{{/if}}
 								<c:if test="${isRolActualAdmin}">
 									{{if pendentEnviarDistribucio}}

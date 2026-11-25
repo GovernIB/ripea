@@ -8,7 +8,7 @@ import {icons} from "../../util/icons.ts";
 import AnotacioFilter from "./AnotacioFilter.tsx";
 import Load from "../../components/Load.tsx";
 import {useMemo, useState} from "react";
-import {Box, Grid} from "@mui/material";
+import {Box, Grid, Icon} from "@mui/material";
 import GridFormField from "../../components/GridFormField.tsx";
 import {GridSortDirection} from "@mui/x-data-grid-pro";
 import useAnotacioDetail from "./details/AnotacioDetail.tsx";
@@ -97,6 +97,13 @@ const AnotacionsGrid = () => {
             field: 'estat',
             sortable: false,
             flex: 0.5,
+            renderCell: (params: any)=> (
+                <Box sx={{ display: 'flex', whiteSpace: 'pre-line' }}>
+                    {params?.formattedValue}
+                    {params?.row?.pendentCanviEstatDistribucio
+                        && <Icon title={t('page.anotacio.detall.pendentDistribucio')} color={"error"}>warning</Icon>}
+                </Box>
+            ),
         },
         {
             field: 'dataActualitzacio',

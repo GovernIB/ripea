@@ -425,6 +425,7 @@ const translationEs = {
                 rejectedDate: "Fecha rechazo",
                 acceptedDate: "Fecha aceptación",
                 usuariActualitzacio: "Usuario",
+                pendentDistribucio: "Esta anotación está pendiente de actualizar el estado en Distribución.",
             },
             action: {
                 justificant: {
@@ -445,6 +446,12 @@ const translationEs = {
                     button: "Rechaza",
                     title: "Rechazar expediente",
                     ok: "La anotación se ha rechazado correctamente",
+                },
+                revertRebutjar: {
+                    label: "Revertir el rechazo...",
+                    button: "Revertir el rechazo",
+                    title: "Revertir el rechazo del expediente",
+                    ok: "La anotación se ha revertido correctamente",
                 },
                 canviProcediment: {
                     label: "Modifica...",

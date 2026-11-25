@@ -41,13 +41,13 @@ public class ExpedientPeticioServiceEjb extends AbstractServiceEjb<ExpedientPeti
 	public void crearExpedientPeticion(List<AnotacioRegistreId> anotacioRegistreIds) {
 		delegateService.crearExpedientPeticion(anotacioRegistreIds);
 	}
-	
+
 	@Override
 	@RolesAllowed("**")
 	public void crearExpedientPeticion(String clauAcces, String itentificador) {
 		delegateService.crearExpedientPeticion(clauAcces, itentificador);
 	}
-	
+
 	@Override
 	@RolesAllowed("**")
 	public PaginaDto<ExpedientPeticioListDto> findAmbFiltre(
@@ -101,7 +101,13 @@ public class ExpedientPeticioServiceEjb extends AbstractServiceEjb<ExpedientPeti
 			Long expedientPeticioId,
 			String observacions) {
 		delegateService.rebutjar(expedientPeticioId, observacions);
-		
+
+	}
+
+	@Override
+	@RolesAllowed("**")
+	public void revertirRebutjament(Long expedientPeticioId, String observacions) {
+		delegateService.revertirRebutjament(expedientPeticioId, observacions);
 	}
 
 	@Override
@@ -163,8 +169,8 @@ public class ExpedientPeticioServiceEjb extends AbstractServiceEjb<ExpedientPeti
 				entitatId,
 				filtre,
 				paginacioParams,
-				resultEnum, 
-				rolActual, 
+				resultEnum,
+				rolActual,
 				organActualId);
 	}
 
@@ -189,7 +195,7 @@ public class ExpedientPeticioServiceEjb extends AbstractServiceEjb<ExpedientPeti
 		return delegateService.canviarEstatAnotacioDistribucio(entitatId, id);
 	}
 
-	
+
 	@Override
 	@RolesAllowed("**")
 	public List<MetaExpedientDto> findMetaExpedientsPermesosPerAnotacions(
@@ -206,13 +212,13 @@ public class ExpedientPeticioServiceEjb extends AbstractServiceEjb<ExpedientPeti
 	@RolesAllowed("**")
 	public void canviarProcediment(
 			Long expedientPeticioId,
-			Long procedimentId, 
+			Long procedimentId,
 			Long grupId) {
 		delegateService.canviarProcediment(
 				expedientPeticioId,
-				procedimentId, 
+				procedimentId,
 				grupId);
-		
+
 	}
 
 	@Override
@@ -226,18 +232,18 @@ public class ExpedientPeticioServiceEjb extends AbstractServiceEjb<ExpedientPeti
 	public void evictCountAnotacionsPendents(
 			Long entitatId) {
 		delegateService.evictCountAnotacionsPendents(entitatId);
-		
+
 	}
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
 	public ResultDto<ExpedientPeticioListDto> findComunicadesAmbFiltre(
 			ExpedientPeticioFiltreDto filtre,
-			PaginacioParamsDto paginacioParams, 
+			PaginacioParamsDto paginacioParams,
 			ResultEnumDto resultEnum) {
 		return delegateService.findComunicadesAmbFiltre(
 				filtre,
-				paginacioParams, 
+				paginacioParams,
 				resultEnum);
 	}
 

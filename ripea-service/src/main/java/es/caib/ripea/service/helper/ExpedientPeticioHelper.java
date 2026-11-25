@@ -47,7 +47,7 @@ import es.caib.ripea.service.permission.ExtendedPermission;
 
 @Component
 public class ExpedientPeticioHelper {
-	
+
 	@Autowired private ExpedientPeticioRepository expedientPeticioRepository;
 	@Autowired private RegistreRepository registreRepository;
 	@Autowired private RegistreInteressatRepository registreInteressatRepository;
@@ -65,7 +65,7 @@ public class ExpedientPeticioHelper {
 	@Autowired private OrganGestorRepository organGestorRepository;
 	@Autowired private PluginHelper pluginHelper;
     @Autowired private OrganGestorCacheHelper organGestorCacheHelper;
-    @Autowired private GrupRepository grupRepository;    
+    @Autowired private GrupRepository grupRepository;
 
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public void crearExpedientPeticion(String clauAcces, String itentificador) {
@@ -77,12 +77,12 @@ public class ExpedientPeticioHelper {
 				ExpedientPeticioEstatEnumDto.CREAT).build();
 		expedientPeticioRepository.save(expedientPeticioEntity);
 	}
-	
+
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void resetExpedientPeticion(Long peticioId) {
-			
+
 		ExpedientPeticioEntity peticio = expedientPeticioRepository.getOne(peticioId);
-		
+
 		if (peticio.getEstat() == ExpedientPeticioEstatEnumDto.PENDENT || peticio.getEstat() == ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT || peticio.getEstat() == ExpedientPeticioEstatEnumDto.PROCESSAT_NOTIFICAT) {
 			logger.info("No es pot netejar anotació en estat: " + peticio.getEstat() + ", " + peticio.getId() + ", " + peticio.getIdentificador());
 
@@ -112,7 +112,7 @@ public class ExpedientPeticioHelper {
 			cacheHelper.evictAllCountAnotacionsPendents();
 		}
 	}
-	
+
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void canviEstatExpedientPeticioNewTransaction(
 			Long expedientPeticioId,
@@ -140,8 +140,8 @@ public class ExpedientPeticioHelper {
 		expedientPeticioEntity.updateConsultaWsErrorDesc(null);
 		expedientPeticioEntity.updateConsultaWsErrorDate(null);
 	}
-	
-	
+
+
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public ExpedientPeticioInfoDto getExpedeintPeticiInfo(Long expedientPeticioId) {
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
@@ -153,7 +153,7 @@ public class ExpedientPeticioHelper {
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
 		expedientPeticioEntity.setEstatCanviatDistribucio(canviat);
 	}
-	
+
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void rebutjaPeticioEnArribada(Long expedientPeticioId, AnotacioRegistreId anotacioRegistreId, String motiu) {
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
@@ -162,7 +162,7 @@ public class ExpedientPeticioHelper {
 		expedientPeticioEntity.setDataActualitzacio(new Date());
 		expedientPeticioEntity.setEstatCanviatDistribucio(true);
 	}
-	
+
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void acceptaPeticioEnArribada(Long expedientPeticioId, AnotacioRegistreId anotacioRegistreId, boolean canviat) {
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
@@ -171,14 +171,14 @@ public class ExpedientPeticioHelper {
 		expedientPeticioEntity.setDataActualitzacio(new Date());
 		expedientPeticioEntity.setEstatCanviatDistribucio(canviat);
 	}
-	
+
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void crearRegistrePerPeticio(
 			AnotacioRegistreEntrada registreEntrada,
 			ExpedientPeticioEntity expedientPeticioEntity,
 			MetaExpedientEntity metaExpedientEntity,
 			EntitatEntity entitat) {
-		
+
 		RegistreEntity registreEntity = RegistreEntity.getBuilder(
 				registreEntrada.getAssumpteTipusCodi(),
 				registreEntrada.getData(),
@@ -221,14 +221,14 @@ public class ExpedientPeticioHelper {
 
 		expedientPeticioEntity.updateRegistre(registreEntity);
 		expedientPeticioEntity.updateMetaExpedient(metaExpedientEntity);
-		
+
 		calcularGrup(entitat, expedientPeticioEntity);
-		
+
 		ExpedientEntity expedientEntity = null;
 		if (metaExpedientEntity != null) {
 			expedientEntity = expedientRepository.findByEntitatAndMetaNodeAndNumero(
 					entitat,
-					metaExpedientEntity, 
+					metaExpedientEntity,
 					expedientPeticioEntity.getRegistre().getExpedientNumero());
 		}
 		// set accion to be performed if peticion is accepted
@@ -240,7 +240,7 @@ public class ExpedientPeticioHelper {
 					ExpedientPeticioAccioEnumDto.CREAR);
 		}
 		expedientPeticioRepository.save(expedientPeticioEntity);
-		
+
 		for (Interessat interessat: registreEntrada.getInteressats()) {
 			registreEntity.getInteressats().add(
 					crearInteressatEntity(
@@ -249,73 +249,73 @@ public class ExpedientPeticioHelper {
 		}
 
 		for (Annex annex: registreEntrada.getAnnexos()) {
-			
+
 			// Guardar annexos de les anotacions en FileSystem (instal·lació de Ripea i Distribució en servidors separats)
 			if (getPropertyGuardarContingutAnnexosDistribucio()) {
-				
+
 				EntitatDto entitatDto = conversioTipusHelper.convertir(entitat, EntitatDto.class);
 				ConfigHelper.setEntitat(entitatDto);
-				
+
 				// Crear contenidor annexos Distribució en FileSystem
 				String uuidExpedient = pluginHelper.arxiuExpedientDistribucioCrear(
-						registreEntity.getIdentificador(), 
+						registreEntity.getIdentificador(),
 						registreEntity.getExpedientNumero(),
 						registreEntity.getDestiCodi());
-				
+
 				// Crear annex Distribució en FileSystem dins contenidor anterior
 				String uuidDocument = pluginHelper.arxiuAnnexDistribucioCrear(
-						annex, 
-						registreEntity.getDestiCodi(), 
+						annex,
+						registreEntity.getDestiCodi(),
 						uuidExpedient);
-				
+
 				annex.setUuid(uuidDocument);
 			}
-			
+
 			registreEntity.getAnnexos().add(
 					crearAnnexEntity(
 							annex,
 							registreEntity));
-			
+
 		}
 
 		canviEstatExpedientPeticio(
 				expedientPeticioEntity,
 				ExpedientPeticioEstatEnumDto.PENDENT);
 	}
-	
+
 	private void calcularGrup(EntitatEntity entitat, ExpedientPeticioEntity expedientPeticioEntity) {
-		
+
 		if (cacheHelper.mostrarLogsGrups())
 			logger.info("calcularGrupAlRecibirAnotacio start (expedientPeticio=" + expedientPeticioEntity.getId() + " - " + expedientPeticioEntity.getIdentificador());
-		
+
 		GrupEntity grup = null;
 		MetaExpedientEntity metaExpedient = expedientPeticioEntity.getMetaExpedient();
-		
+
 		if (metaExpedient != null && metaExpedient.isGestioAmbGrupsActiva()) {
-			
+
 			if (cacheHelper.mostrarLogsGrups())
 				logger.info("metaExpedient= " + metaExpedient.getId() + " - " + metaExpedient.getCodi());
-			
+
 			if (cacheHelper.mostrarLogsGrups())
 				logger.info("gestioAmbGrupsActiva");
-			
+
 			List<GrupEntity> grups = metaExpedient.getGrups();
 			if (Utils.isNotEmpty(grups)) {
-				
+
 				if (cacheHelper.mostrarLogsGrups())
 					logger.info("grupsNotEmpty");
-				
+
 				OrganGestorEntity org = organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), expedientPeticioEntity.getRegistre().getDestiCodi());
-				
+
 				while (grup == null && org != null) {
-					
+
 					if (cacheHelper.mostrarLogsGrups())
 						logger.info("organ=" + org.getId() + " - " + org.getCodi());
-					
+
 					for (GrupEntity grupEntity : grups) {
 						if (cacheHelper.mostrarLogsGrups())
 							logger.info("grup=" + grupEntity.getId() + " - " + grupEntity.getCodi() + " - " + grupEntity.getOrganGestor());
-						
+
 						if (grupEntity.getOrganGestor() != null && grupEntity.getOrganGestor().getId().equals(org.getId())) {
 							grup = grupEntity;
 							if (cacheHelper.mostrarLogsGrups())
@@ -325,34 +325,34 @@ public class ExpedientPeticioHelper {
 					}
 					org = org.getPare();
 				}
-				
+
 				if (grup == null ) {
 					grup = metaExpedient.getGrupPerDefecte();
 				}
 			}
-		
+
 			expedientPeticioEntity.setGrup(grup);
 		}
-		
+
 		if (cacheHelper.mostrarLogsGrups())
 			logger.info("calcularGrupAlRecibirAnotacio end (expedientPeticio=" + expedientPeticioEntity.getId() + ", " + expedientPeticioEntity.getIdentificador());
 	}
-	
+
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public Exception reintentarCanviEstatDistribucio(Long id) {
-		
+
 		ExpedientPeticioEntity pendent = expedientPeticioRepository.getOne(id);
-		
+
 		long t2 = System.currentTimeMillis();
 		if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 			logger.info("reintentarCanviEstatDistribucio start (" + pendent.getIdentificador() + ", " + id + ")");
-		
+
 		Exception exception = null;
 		AnotacioRegistreId anotacio = new AnotacioRegistreId();
 		anotacio.setIndetificador(pendent.getIdentificador());
 		anotacio.setClauAcces(pendent.getClauAcces());
 		try {
-			
+
 			Estat estat = null;
 			String observacions = "";
 			switch (pendent.getEstat()) {
@@ -371,15 +371,15 @@ public class ExpedientPeticioHelper {
 				estat = Estat.REBUTJADA;
 				break;
 			}
-			
+
 			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 				logger.info("Canviant estat (" + pendent.getIdentificador() + "," + pendent.getClauAcces() + ", " + estat + "," + observacions + ")");
-			
+
 			pluginHelper.canviEstatAnotacio(anotacio, estat, observacions);
-			
+
 			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 				logger.info("Estat canviat (" + pendent.getIdentificador() + "," + pendent.getClauAcces() + ", " + estat + "," + observacions + ")");
-			
+
 			pendent.setEstatCanviatDistribucio(true);
 			pendent.setDataActualitzacio(new Date());
 
@@ -388,14 +388,14 @@ public class ExpedientPeticioHelper {
 			exception = ex;
 			pendent.setEstatCanviatDistribucio(false, true);
 		}
-		
+
 		if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 			logger.info("reintentarCanviEstatDistribucio end (" + pendent.getIdentificador() + ", " + id + "):  " + (System.currentTimeMillis() - t2) + " ms");
 		return exception;
 	}
-	
+
 	public PermisosPerAnotacions findPermisosPerAnotacions(Long entitatId, String usuariCodi, String rolActual, Long organActualId) {
-		PermisosPerAnotacions permisosPerAnotacionsDto = new PermisosPerAnotacions();		
+		PermisosPerAnotacions permisosPerAnotacionsDto = new PermisosPerAnotacions();
 		if (rolActual.equals("IPA_ADMIN")) {
 			// in this case all annotations of entitat are permitted, it is not equal to annotations belonging to any procediment of entitat because some of the annotations might not have procediment assigned
 			// so this is wrong -> permisosPerAnotacionsDto.setProcedimentsPermesos(metaExpedientRepository.findByEntitatId(entitatId));
@@ -438,17 +438,38 @@ public class ExpedientPeticioHelper {
 		}
 		pluginHelper.comandaAvisDelete(expedientPeticioEntity);
 	}
-	
-	public void canviarProcediment(Long expedientPeticioId, Long procedimentId, Long grupId) {
+
+    public void revertirRebutjament(Long expedientPeticioId, String observacions) {
+        ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
+        expedientPeticioEntity.updateEstat(ExpedientPeticioEstatEnumDto.PENDENT);
+        expedientPeticioEntity.setDataActualitzacio(new Date());
+        expedientPeticioEntity.setUsuariActualitzacio(usuariRepository.findByCodi(SecurityContextHolder.getContext().getAuthentication().getName()));
+        expedientPeticioEntity.setObservacions(observacions);
+
+        AnotacioRegistreId anotacioRegistreId = new AnotacioRegistreId();
+        anotacioRegistreId.setClauAcces(expedientPeticioEntity.getClauAcces());
+        anotacioRegistreId.setIndetificador(expedientPeticioEntity.getIdentificador());
+
+        pluginHelper.canviEstatAnotacio(anotacioRegistreId,
+            Estat.REBUDA,
+            observacions);
+
+        EntitatEntity entitatAnotacio = expedientPeticioEntity.getRegistre().getEntitat();
+        if (entitatAnotacio != null) {
+            cacheHelper.evictAllCountAnotacionsPendents();
+        }
+    }
+
+    public void canviarProcediment(Long expedientPeticioId, Long procedimentId, Long grupId) {
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
-		
+
 		if (procedimentId != null) {
 			MetaExpedientEntity metaExpedient = metaExpedientRepository.getOne(procedimentId);
 			expedientPeticioEntity.updateMetaExpedient(metaExpedient);
 		} else {
 			expedientPeticioEntity.updateMetaExpedient(null);
 		}
-		
+
 		if (grupId != null) {
 			GrupEntity grup = grupRepository.getOne(grupId);
 			expedientPeticioEntity.setGrup(grup);
@@ -456,7 +477,7 @@ public class ExpedientPeticioHelper {
 			expedientPeticioEntity.setGrup(null);
 		}
 	}
-	
+
 	public boolean getPropertyGuardarContingutAnnexosDistribucio() {
 		return configHelper.getAsBoolean(PropertyConfig.GUARDAR_CONTINGUT_ANNEXOS_DISTRIBUCIO);
 	}
@@ -466,7 +487,7 @@ public class ExpedientPeticioHelper {
 			RegistreEntity registreEntity) {
 		RegistreInteressatEntity representantEntity = null;
 		if (interessat.getRepresentant() != null){
-			representantEntity = RegistreInteressatEntity.getBuilder(	
+			representantEntity = RegistreInteressatEntity.getBuilder(
 		 			interessat.getRepresentant().getTipus()).
 		 			adresa (interessat.getRepresentant().getAdresa()).
 		 			canal (interessat.getRepresentant().getCanal()).
@@ -489,7 +510,7 @@ public class ExpedientPeticioHelper {
 		 			organCodi(interessat.getRepresentant().getOrganCodi()).
 					build();
 		}
-		RegistreInteressatEntity interessatEntity = RegistreInteressatEntity.getBuilder(	
+		RegistreInteressatEntity interessatEntity = RegistreInteressatEntity.getBuilder(
 		 			interessat.getTipus()).
 		 			adresa (interessat.getAdresa()).
 		 			canal (interessat.getCanal()).
@@ -506,7 +527,7 @@ public class ExpedientPeticioHelper {
 		 			provinciaCodi (interessat.getProvinciaCodi()).
 		 			pais (interessat.getPais()).
 		 			provincia (interessat.getProvincia()).
-		 			municipi (interessat.getMunicipi()).		 			
+		 			municipi (interessat.getMunicipi()).
 		 			raoSocial (interessat.getRaoSocial()).
 		 			telefon (interessat.getTelefon()).
 		 			organCodi(interessat.getOrganCodi()).
@@ -570,7 +591,7 @@ public class ExpedientPeticioHelper {
 		}
 		return null;
 	}
-	
+
 	private FirmaPerfil firmaPerfilRipeaToDistribucio(ArxiuFirmaPerfilEnumDto tipusRipea) {
 		if (tipusRipea!=null) {
 			switch (tipusRipea) {

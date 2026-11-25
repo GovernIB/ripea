@@ -9,6 +9,7 @@ import useAcceptar, {ACCIO_CREAR, ACCIO_INCORPORAR} from "../actions/Acceptar.ts
 import useSubsanarAnnexos from "../actions/SubsanarAnnexos.tsx";
 import useAfegirJustificant from "../actions/AfegirJustificant.tsx";
 import { icons as iconsAppMenu } from '@src/util/icons';
+import useRevertRebutjar from "@src/pages/anotacions/actions/RevertRebutjar.tsx";
 
 export const useActions = (refresh?: () => void) => {
     const { t } = useTranslation();
@@ -133,6 +134,7 @@ const useAnotacioActions = (refresh?: () => void) => {
 
     const { canviEstatDistribucio } = useActions(refresh)
     const {handleShow: handleRebutjar, content: contentRebutjar} = useRebutjar(refresh)
+    const {handleShow: handleRevertRebutjar, content: contentRevertRebutjar} = useRevertRebutjar(refresh)
     const {handleShow: handleAcceptar, content: contentAcceptar} = useAcceptar(refresh)
     const {handleShow: handleSubsanarAnnexos, content: contentSubsanarAnnexos} = useSubsanarAnnexos(refresh)
     const {handleShow: handleAfegirJustificant, content: contentAfegirJustificant} = useAfegirJustificant(refresh)
@@ -165,6 +167,13 @@ const useAnotacioActions = (refresh?: () => void) => {
             showInMenu: true,
             onClick: handleRebutjar,
             hidden: amagatSiNoPendent,
+        },
+        {
+            label: t('page.anotacio.action.revertRebutjar.label'),
+            icon: "close",
+            showInMenu: true,
+            onClick: handleRevertRebutjar,
+            hidden: (row:any) => row?.estat != 'REBUTJAT',
         },
         {
             label: t('page.anotacio.action.canviProcediment.label'),
@@ -207,6 +216,7 @@ const useAnotacioActions = (refresh?: () => void) => {
     const components = <>
         {dialog}
         {contentRebutjar}
+        {contentRevertRebutjar}
         {contentAcceptar}
         {contentSubsanarAnnexos}
         {contentAfegirJustificant}

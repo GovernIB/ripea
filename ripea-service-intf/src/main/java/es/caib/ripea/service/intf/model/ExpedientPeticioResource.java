@@ -67,6 +67,11 @@ import lombok.experimental.FieldNameConstants;
                         requiresId = true),
                 @ResourceArtifact(
                         type = ResourceArtifactType.ACTION,
+                        code = ExpedientPeticioResource.ACTION_REVERT_REBUTJAR_ANOTACIO,
+                        formClass = ExpedientPeticioResource.RebutjarAnotacioForm.class,
+                        requiresId = true),
+                @ResourceArtifact(
+                        type = ResourceArtifactType.ACTION,
                         code = ExpedientPeticioResource.ACTION_REBUTJAR_ANOTACIO,
                         formClass = ExpedientPeticioResource.RebutjarAnotacioForm.class,
                         requiresId = true),
@@ -115,6 +120,7 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
     public static final String PERSPECTIVE_EN_PROCES_ACTUALITZAR_ESTAT_CODE = "EN_PROCES_ACTUALITZAR_ESTAT";
     public static final String PERSPECTIVE_ANNEXOS_ERROR_CODE = "ANNEXOS_ERROR";
     public static final String REPORT_DOWNLOAD_JUSTIFICANT = "DOWNLOAD_JUSTIFICANT";
+    public static final String ACTION_REVERT_REBUTJAR_ANOTACIO = "REVERT_REBUTJAR_ANOTACIO";
     public static final String ACTION_REBUTJAR_ANOTACIO = "REBUTJAR_ANOTACIO";
     public static final String ACTION_ACCEPTAR_ANOTACIO = "ACCEPTAR_ANOTACIO";
     public static final String ACTION_ESTAT_DISTRIBUCIO = "ESTAT_DISTRIBUCIO";
@@ -145,7 +151,7 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
     private ResourceReference<MetaExpedientResource, Long> metaExpedient;
     private ResourceReference<GrupResource, Long> grup;
     private ResourceReference<ExpedientResource, Long> expedient;
-    
+
     private boolean pendentCanviEstatDistribucio;
     private int reintentsCanviEstatDistribucio;
 
@@ -205,7 +211,7 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
         private ResourceReference<GrupResource, Long> grup;
         private boolean nomesPendents = true;
     }
-    
+
     @Getter
     @Setter
     @NoArgsConstructor
@@ -251,7 +257,7 @@ public class ExpedientPeticioResource extends BaseAuditableResource<Long> {
         private String tipusDocument;
         private boolean seguidor;
     }
-    
+
     @Getter
     @Setter
     public static class RebutjarAnotacioForm implements Serializable {

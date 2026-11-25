@@ -427,6 +427,7 @@ const translationCa = {
                 rejectedDate: "Data de rebuig",
                 acceptedDate: "Data d'acceptació",
                 usuariActualitzacio: "Usuari",
+                pendentDistribucio: "Aquesta anotació està pendent de actualitzar l'estat a Distribució.",
             },
             action: {
                 justificant: {
@@ -447,6 +448,12 @@ const translationCa = {
                     button: "Rebutja",
                     title: "Rebutjar expedient",
                     ok: "L'anotació s'ha rebutjat correctament",
+                },
+                revertRebutjar: {
+                    label: "Revert rebutjament...",
+                    button: "Revert rebutjament",
+                    title: "Revertir rebutjament expedient",
+                    ok: "L'anotació s'ha revertit correctament",
                 },
                 canviProcediment: {
                     label: "Modifica...",

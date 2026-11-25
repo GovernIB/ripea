@@ -85,7 +85,7 @@ import es.caib.ripea.service.intf.utils.Utils;
 
 /**
  * Controlador per al llistat d'expedients peticions.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Controller
@@ -93,7 +93,7 @@ import es.caib.ripea.service.intf.utils.Utils;
 public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 
 	public static final String SESSION_ATTRIBUTE_FILTRE = "ExpedientPeticioController.session.filtre";
-	
+
 	/** Id fictici de la fila del justificant de registre dins la llista d'annexos de l'assistent d'acceptació. */
 	private static final Long JUSTIFICANT_ANNEX_ID = -1L;
 
@@ -103,30 +103,30 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 
 	@Autowired private ExpedientPeticioService expedientPeticioService;
 	@Autowired private EntitatService entitatService;
-	@Autowired private MetaExpedientService metaExpedientService;	
-	@Autowired private ExpedientService expedientService;		
+	@Autowired private MetaExpedientService metaExpedientService;
+	@Autowired private ExpedientService expedientService;
 	@Autowired private AplicacioService aplicacioService;
 	@Autowired private MetaDocumentService metaDocumentService;
 	@Autowired private OrganGestorService organGestorService;
 	@Autowired private GrupService grupService;
-	
+
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(HttpServletRequest request, Model model) {
-		
+
 		long t1 = System.currentTimeMillis();
     	if (aplicacioService.mostrarLogsCercadorAnotacio())
     		logger.info("expedientPeticio start ");
-    	
+
 		long t2 = System.currentTimeMillis();
 
 		model.addAttribute(getFiltreCommand(request));
 		String rolActual = RolHelper.getRolActual(request);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		Long organActualId = EntitatHelper.getOrganGestorActualId(request);
-		
+
 		if (aplicacioService.mostrarLogsCercadorAnotacio())
     		logger.info("getFiltreCommand time:  " + (System.currentTimeMillis() - t2) + " ms");
-		
+
 		long t3 = System.currentTimeMillis();
 		List<MetaExpedientDto> metaExpedientsPermesos = new ArrayList<MetaExpedientDto>();
 		MetaExpedientDto opcioBuida = new MetaExpedientDto();
@@ -156,7 +156,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 
 		if (aplicacioService.mostrarLogsCercadorAnotacio())
     		logger.info("findMetaExpedientsPermesosPerAnotacions time:  " + (System.currentTimeMillis() - t3) + " ms");
-		
+
     	if (aplicacioService.mostrarLogsCercadorAnotacio())
     		logger.info("expedientPeticio end:  " + (System.currentTimeMillis() - t1) + " ms");
 		return "expedientPeticioList";
@@ -184,7 +184,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request) {
-		
+
     	if (aplicacioService.mostrarLogsCercadorAnotacio())
     		logger.info("expedientPeticioDatatable start ");
 		long t1 = System.currentTimeMillis();
@@ -200,10 +200,10 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 						RolHelper.getRolActual(request),
 						EntitatHelper.getOrganGestorActualId(request)),
 				"id");
-		
+
     	if (aplicacioService.mostrarLogsCercadorAnotacio())
     		logger.info("expedientPeticioDatatable end:  " + (System.currentTimeMillis() - t1) + " ms");
-    	
+
     	return dr;
 	}
 
@@ -222,7 +222,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			return ex.getMessage();
 		}
 	}
-	
+
 	@RequestMapping(value = "/{registreAnnexId}/{expedientPeticioId}/reintentar", method = RequestMethod.GET)
 	public String retryCreateDocFromAnnex(
 			HttpServletRequest request,
@@ -232,7 +232,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 
 		RegistreAnnexDto registreAnnex = expedientPeticioService.findAnnexById(registreAnnexId);
 		if (registreAnnex.getDocumentId() != null) {
-			
+
 			Exception exception = expedientService.retryMoverAnnexArxiu(registreAnnexId);
 			if (exception == null) {
 				return getModalControllerReturnValueSuccess(request, "", "expedient.peticio.detalls.controller.reintentat.ok");
@@ -266,11 +266,11 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		model.addAttribute("registreAnnexCommand", registreAnnexCommand);
 		return "expedientPeticioReintentarMetaDoc";
 	}
-	
+
 	@RequestMapping(value = "/{expedientPeticioId}/reintentar", method = RequestMethod.POST)
 	public String retryCreateDocFromAnnexPost(HttpServletRequest request, @Valid RegistreAnnexCommand command, BindingResult bindingResult,
 											  @PathVariable Long expedientPeticioId, Model model) {
-		
+
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (command.getMetaDocumentId() == null) {
 			bindingResult.rejectValue("metaDocumentId", "NotNull");
@@ -280,7 +280,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			List<MetaDocumentDto> metaDocumentsQueQuedenPerCreacio = metaDocumentService.findActiusPerCreacio(entitatActual.getId(), expedientPeticioDto.getExpedientId(), null, false);
 			model.addAttribute("metaDocuments", metaDocumentsQueQuedenPerCreacio);
 			model.addAttribute("expedientPeticioId", expedientPeticioId);
-			command.setNtiFechaCaptura(expedientPeticioService.findAnnexById(command.getId()).getNtiFechaCaptura()); //in POST it is passed as date without time, we want timpestamp 
+			command.setNtiFechaCaptura(expedientPeticioService.findAnnexById(command.getId()).getNtiFechaCaptura()); //in POST it is passed as date without time, we want timpestamp
 			return "expedientPeticioReintentarMetaDoc";
 		}
 		Exception exception = expedientService.retryCreateDocFromAnnex(command.getId(), command.getMetaDocumentId(), RolHelper.getRolActual(request));
@@ -288,7 +288,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			return getModalControllerReturnValueSuccess(
 					request,
 					"",
-					"expedient.peticio.detalls.controller.reintentat.ok");			
+					"expedient.peticio.detalls.controller.reintentat.ok");
 		} else {
 			return getModalControllerReturnValueError(
 					request,
@@ -303,7 +303,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 	@RequestMapping(value = "/{expedientPeticioId}", method = RequestMethod.GET)
 	public String get(HttpServletRequest request, @PathVariable Long expedientPeticioId, Model model) {
 		ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
-		
+
 		boolean isErrorDocuments = false;
 		for (RegistreAnnexDto registreAnnexDto : expedientPeticioDto.getRegistre().getAnnexos()) {
 			if (registreAnnexDto.getExpedientId() != null && (registreAnnexDto.getDocumentId() == null || !StringUtils.isEmpty(registreAnnexDto.getError()))) {
@@ -344,7 +344,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 
 	@RequestMapping(value = "/rebutjar", method = RequestMethod.POST)
 	public String rebutjarPost(HttpServletRequest request, @Valid ExpedientPeticioRebutjarCommand command, BindingResult bindingResult, Model model) {
-		
+
 		ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(command.getId());
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("expedientPeticioRebutjarCommand", command);
@@ -364,9 +364,42 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		}
 	}
 
+    @RequestMapping(value = "/revertRebutjar/{expedientPeticioId}", method = RequestMethod.GET)
+    public String revertRebutjarGet(HttpServletRequest request, @PathVariable Long expedientPeticioId, Model model) {
+
+        ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
+        ExpedientPeticioRebutjarCommand command = new ExpedientPeticioRebutjarCommand();
+        command.setId(expedientPeticioId);
+        model.addAttribute("expedientPeticioCommand", command);
+        model.addAttribute("expedientPeticioId", expedientPeticioDto.getId());
+        return "expedientPeticioRevertRebutjar";
+    }
+
+	@RequestMapping(value = "/revertRebutjar", method = RequestMethod.POST)
+	public String revertRebutjarPost(HttpServletRequest request, @Valid ExpedientPeticioRebutjarCommand command, BindingResult bindingResult, Model model) {
+
+		ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(command.getId());
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("expedientPeticioCommand", command);
+            model.addAttribute("expedientPeticioId", command.getId());
+            return "expedientPeticioRevertRebutjar";
+        }
+		try {
+			expedientPeticioService.revertirRebutjament(command.getId(), command.getObservacions());
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:expedientPeticio",
+					"expedient.peticio.controller.revertRebutjar.ok",
+					new Object[] { expedientPeticioDto.getRegistre().getIdentificador() });
+		} catch (Exception ex) {
+			logger.error("Error al revertir rebujtament anotacio", ex);
+			return getModalControllerReturnValueErrorMessageText(request, "redirect:expedientPeticio", ex.getMessage(), ex);
+		}
+	}
+
 	@RequestMapping(value = "/acceptar/{expedientPeticioId}", method = RequestMethod.GET)
 	public String acceptar(HttpServletRequest request, @PathVariable Long expedientPeticioId, Model model) {
-		
+
 		ExpedientPeticioAcceptarCommand command = new ExpedientPeticioAcceptarCommand();
 		command.setAgafarExpedient(true);
 		command.setPrioritat(PrioritatEnumDto.B_NORMAL);
@@ -378,7 +411,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 	private void validateExpedient(
 			ExpedientPeticioAcceptarCommand command,
 			BindingResult bindingResult) {
-		
+
 		if (command.getMetaExpedientId() == null) {
 			bindingResult.rejectValue("metaExpedientId", "NotNull");
 		}
@@ -407,7 +440,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		if (exists) {
 			bindingResult.rejectValue("newExpedientTitol", "NomExpedienteRepetit");
 		}
-		
+
 		if (Utils.isBiggerThan(command.getNewExpedientTitol(), 239)) {
 			bindingResult.rejectValue("newExpedientTitol", "Size", new Object[] { null, 239, 0 }, null);
 		}
@@ -425,13 +458,13 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			BindingResult bindingResult,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		
+
 		validateExpedient(expedientPeticioAcceptarCommand, bindingResult);
 		if (bindingResult.hasErrors()) {
 			omplirModel(expedientPeticioId, request, model, expedientPeticioAcceptarCommand);
 			return "expedientPeticioAccept";
 		}
-		
+
 		RegistreDto registre = expedientPeticioService.findOne(expedientPeticioId).getRegistre();
 
 		//El justificant de registre s'incorpora amb un tipus de document propi del procediment. Si el
@@ -454,11 +487,11 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		}
 		model.addAttribute("metaDocuments", tipusDocsDisponibles);
 		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_TIPUS_DOCS_DISPONIBLES, tipusDocsDisponibles);
-		
+
 		// set annexos
 		expedientPeticioAcceptarCommand.setAnnexos(ConversioTipusHelper.convertirList(registre.getAnnexos(), RegistreAnnexCommand.class));
 		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_COMMAND, expedientPeticioAcceptarCommand);
-		
+
 		// set justificant
 		if (isIncorporacioJustificantActiva() && registre.getJustificant() != null) {
 			RegistreAnnexCommand justificant = ConversioTipusHelper.convertir(registre.getJustificant(), RegistreAnnexCommand.class);
@@ -483,20 +516,20 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 					registreAnnexCommand);
 		}
 		model.addAttribute("registreAnnexCommand", registreAnnexCommand);
-		
+
 		Integer index = 0;
 		setIndexAndSize(
 				request,
 				model,
 				index,
 				expedientPeticioAcceptarCommand.getAnnexos().size());
-		
+
 		model.addAttribute("isCrearNewExpedient", expedientPeticioAcceptarCommand.getAccio() == ExpedientPeticioAccioEnumDto.CREAR);
 		model.addAttribute("isAssociarInteressats", expedientPeticioAcceptarCommand.isAssociarInteressats());
 
 		return "expedientPeticioAcceptMetaDocs";
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private ExpedientPeticioAcceptarCommand processAnnex(
 			HttpServletRequest request,
@@ -504,27 +537,27 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			Model model,
 			BindingResult bindingResult,
 			boolean isThereNext) {
-		
+
 		List<MetaDocumentDto> tipusDocsDisponibles = (List<MetaDocumentDto>)RequestSessionHelper.obtenirObjecteSessio(
 				request,
-				SESSION_ATTRIBUTE_TIPUS_DOCS_DISPONIBLES);	
+				SESSION_ATTRIBUTE_TIPUS_DOCS_DISPONIBLES);
 		ExpedientPeticioAcceptarCommand expedientPeticioAcceptarCommand = (ExpedientPeticioAcceptarCommand)RequestSessionHelper.obtenirObjecteSessio(
 				request,
-				SESSION_ATTRIBUTE_COMMAND);	
-		
+				SESSION_ATTRIBUTE_COMMAND);
+
 		boolean noAnnexos = Utils.isEmpty(expedientPeticioAcceptarCommand.getAnnexos());
 		if (noAnnexos) {
 			return expedientPeticioAcceptarCommand;
 		}
-		
+
 		if (registreAnnexCommand.getMetaDocumentId() == null) {
 			bindingResult.rejectValue("metaDocumentId", "NotNull");
-		}	
+		}
 
 		Integer index = (Integer)RequestSessionHelper.obtenirObjecteSessio(
 				request,
-				SESSION_ATTRIBUTE_INDEX);	
-		
+				SESSION_ATTRIBUTE_INDEX);
+
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("metaDocuments", tipusDocsDisponibles);
 			setIndexAndSize(
@@ -541,11 +574,11 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 							: expedientPeticioService.findAnnexById(registreAnnexCommand.getId()).getNtiFechaCaptura());
 
 		} else {
-			
+
 			expedientPeticioAcceptarCommand.getAnnexos().get(index).setMetaDocumentId(registreAnnexCommand.getMetaDocumentId());
-			
+
 			if (isThereNext) {
-				
+
 				index++;
 				setIndexAndSize(
 						request,
@@ -554,13 +587,13 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 						expedientPeticioAcceptarCommand.getAnnexos().size());
 
 
-				
+
 				MetaDocumentDto metaDocument = metaDocumentService.findById(registreAnnexCommand.getMetaDocumentId());
 				if (!metaDocument.isPermetMultiple()) {
 					tipusDocsDisponibles.remove(metaDocument);
 				}
 				model.addAttribute("metaDocuments", tipusDocsDisponibles);
-				
+
 				RegistreAnnexCommand nextAnnexCommand = expedientPeticioAcceptarCommand.getAnnexos().get(index);
 				tipusPerDefecte(
 						request,
@@ -568,18 +601,18 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 						tipusDocsDisponibles,
 						nextAnnexCommand);
 				model.addAttribute("registreAnnexCommand", nextAnnexCommand);
-				
-				
+
+
 			}
-			
+
 		}
-		
+
 		model.addAttribute("isCrearNewExpedient", expedientPeticioAcceptarCommand.getAccio() == ExpedientPeticioAccioEnumDto.CREAR);
 		model.addAttribute("isAssociarInteressats", expedientPeticioAcceptarCommand.isAssociarInteressats());
 
 		return expedientPeticioAcceptarCommand;
 	}
-	
+
 	private void setIndexAndSize(
 			HttpServletRequest request,
 			Model model,
@@ -590,11 +623,11 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		model.addAttribute("size", size);
 		boolean isLast = (index + 1 == size) || size == 0;
 		model.addAttribute("isLast", isLast);
-		
+
 		boolean isFirst = (index == 0);
 		model.addAttribute("isFirst", isFirst);
 	}
-	
+
 	private void tipusPerDefecte(
 			HttpServletRequest request,
 			Long metaExpedientId,
@@ -621,9 +654,9 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 				MissatgesHelper.warning(request, getMessage(request, "expedient.peticio.controller.acceptar.warning.no.pot.crear.metadoc.per.defecte", new Object[] { tipusDocPerDefecte.getNom() }));
 			}
 		}
-		
+
 	}
-	
+
 	@RequestMapping(value = "/acceptar/{expedientPeticioId}/getNextAnnex", method = RequestMethod.POST)
 	public String acceptarPostNextAnnex(
 			HttpServletRequest request,
@@ -638,7 +671,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 				model,
 				bindingResult,
 				true);
-		
+
 		return "expedientPeticioAcceptMetaDocs";
 	}
 
@@ -778,10 +811,10 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 	public String previousPage(
 			HttpServletRequest request,
 			Model model) {
-		
+
 		ExpedientPeticioAcceptarCommand expedientPeticioAcceptarCommand = (ExpedientPeticioAcceptarCommand)RequestSessionHelper.obtenirObjecteSessio(
 				request,
-				SESSION_ATTRIBUTE_COMMAND);	
+				SESSION_ATTRIBUTE_COMMAND);
 		Integer index = (Integer)RequestSessionHelper.obtenirObjecteSessio(
 				request,
 				SESSION_ATTRIBUTE_INDEX);
@@ -796,12 +829,12 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 
 		List<MetaDocumentDto> tipusDocsDisponibles = (List<MetaDocumentDto>)RequestSessionHelper.obtenirObjecteSessio(
 				request,
-				SESSION_ATTRIBUTE_TIPUS_DOCS_DISPONIBLES);	
+				SESSION_ATTRIBUTE_TIPUS_DOCS_DISPONIBLES);
 		MetaDocumentDto metaDocument = metaDocumentService.findById(previousAnnexCommand.getMetaDocumentId());
 		if (!metaDocument.isPermetMultiple()) {
 			tipusDocsDisponibles.add(metaDocument);
 		}
-		
+
 		model.addAttribute("metaDocuments", tipusDocsDisponibles);
 		model.addAttribute("registreAnnexCommand", previousAnnexCommand);
 		model.addAttribute("expedientPeticioId", expedientPeticioAcceptarCommand.getId());
@@ -818,7 +851,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			@PathVariable Long expedientPeticioId,
 			BindingResult bindingResult,
 			Model model) {
-		
+
 		ExpedientPeticioAcceptarCommand expedientPeticioAcceptarCommand = processAnnex(
 				request,
 				registreAnnexCommand,
@@ -829,7 +862,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		if (bindingResult.hasErrors()) {
 			return "expedientPeticioAcceptMetaDocs";
 		}
-		
+
 		return processarAnotacio(request, expedientPeticioId, expedientPeticioAcceptarCommand);
 	}
 
@@ -980,17 +1013,17 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		}
 	}
 
-	
-	
+
+
 	@RequestMapping(value = "/canviarProcediment/{expedientPeticioId}", method = RequestMethod.GET)
 	public String canviarProcedimentGet(HttpServletRequest request, @PathVariable Long expedientPeticioId, Model model) {
-		
-		
+
+
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
 		List<MetaExpedientDto> metaExpedients =  metaExpedientService.findCreateWritePerm(entitatActual.getId(), RolHelper.getRolActual(request));
 		model.addAttribute("metaExpedients", metaExpedients);
-		
+
 		ExpedientPeticioModificarCommand command = new ExpedientPeticioModificarCommand();
 		command.setId(expedientPeticioId);
 		command.setExtracte(expedientPeticioDto.getRegistre().getExtracte());
@@ -999,42 +1032,42 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		command.setGrupId(expedientPeticioDto.getGrupId());
 		model.addAttribute("expedientPeticioModificarCommand", command);
 		model.addAttribute("rolActual", RolHelper.getRolActual(request));
-		
+
 		return "expedientPeticioModificarForm";
 
 	}
-	
-	
+
+
 	@RequestMapping(value = "/findGrups", method = RequestMethod.GET)
 	@ResponseBody
 	public List<GrupDto> findGrups(
 			HttpServletRequest request,
 			@RequestParam(value = "procedimentId", required = false) Long procedimentId,
 			Model model) {
-		
+
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		
-		
+
+
 		List<GrupDto> grups = grupService.findGrups(
 				entitatActual.getId(),
-				RolHelper.isRolActualAdministradorOrgan(request) ? EntitatHelper.getOrganGestorActualId(request) : null, 
+				RolHelper.isRolActualAdministradorOrgan(request) ? EntitatHelper.getOrganGestorActualId(request) : null,
 				procedimentId);
 
 		return grups;
 	}
-	
+
 	@RequestMapping(value = "/findGrupById/{grupId}", method = RequestMethod.GET)
 	@ResponseBody
 	public GrupDto findGrupById(
 			HttpServletRequest request,
 			@PathVariable(value = "grupId") Long grupId,
 			Model model) {
-		
+
 		GrupDto grup = grupService.findGrupById(grupId);
 
 		return grup;
 	}
-	
+
 	@RequestMapping(value = "/findGrupByProcedimentId/{expedientPeticioId}/{procedimentId}", method = RequestMethod.GET)
 	@ResponseBody
 	public GrupDto findGrupByProcedimentId(
@@ -1042,7 +1075,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			@PathVariable(value = "expedientPeticioId") Long expedientPeticioId,
 			@PathVariable(value = "procedimentId") Long procedimentId,
 			Model model) {
-		
+
 		GrupDto grup = grupService.findGrupByExpedientPeticioAndProcedimentId(expedientPeticioId, procedimentId);
 
 		return grup;
@@ -1056,13 +1089,13 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			@Valid ExpedientPeticioModificarCommand command,
 			BindingResult bindingResult,
 			Model model) throws JsonMappingException {
-		
+
 		getEntitatActualComprovantPermisos(request);
-		
+
 		try {
 			expedientPeticioService.canviarProcediment(
 					command.getId(),
-					command.getMetaExpedientId(), 
+					command.getMetaExpedientId(),
 					command.getGrupId());
 
 			return getModalControllerReturnValueSuccess(
@@ -1081,7 +1114,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 					new String[] {command.getNumero(), throwable.getMessage()},
 					throwable);
 		}
-		
+
 	}
 
 
@@ -1090,7 +1123,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 	public String canviarEstatDistribucio(HttpServletRequest request, @PathVariable Long id, Model model) {
 
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		
+
 		if (id == null) {
 			return getModalControllerReturnValueError(
 					request,
@@ -1115,16 +1148,16 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 					exception);
 		}
 	}
-	
-	
-	
+
+
+
 	@RequestMapping(value = "/expedients/{entitatId}/{metaExpedientId}", method = RequestMethod.GET)
 	@ResponseBody
 	public List<ExpedientDto> findByEntitatAndMetaExpedient(HttpServletRequest request, @PathVariable Long entitatId, @PathVariable Long metaExpedientId, Model model) {
 
 		return expedientService.findByEntitatAndMetaExpedient(entitatId, metaExpedientId, RolHelper.getRolActual(request), EntitatHelper.getOrganGestorActualId(request));
 	}
-	
+
 	@RequestMapping(value = "/comprovarInteressatsPeticio/{expedientId}/{expedientPeticioId}", method = RequestMethod.GET)
 	@ResponseBody
 	public boolean comprovarInteressatsPeticio(HttpServletRequest request, @PathVariable Long expedientId, @PathVariable Long expedientPeticioId, Model model) {
@@ -1133,7 +1166,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		EntitatDto entitat = entitatService.findByUnitatArrel(expedientPeticioDto.getRegistre().getEntitatCodi());
 		return expedientPeticioService.comprovarExistenciaInteressatsPeticio(entitat.getId(), expedientId, expedientPeticioId);
 	}
-	
+
 	@RequestMapping(value = "/comprovarPermisCreate/{metaExpedientId}", method = RequestMethod.GET)
 	@ResponseBody
 	public boolean comprovarPermisCreate(HttpServletRequest request, @PathVariable Long metaExpedientId, Model model) {
@@ -1142,7 +1175,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		return RolHelper.isRolActualAdministrador(request) || RolHelper.isRolActualAdministradorOrgan(request) ? true
 				:  metaExpedientService.comprovarPermisosMetaExpedient(entitatActual.getId(), metaExpedientId, PermissionEnumDto.CREATE);
 	}
-	
+
 	@RequestMapping(value = "/comprovarPermisWrite/{metaExpedientId}", method = RequestMethod.GET)
 	@ResponseBody
 	public boolean comprovarPermisWrite(HttpServletRequest request, @PathVariable Long metaExpedientId, Model model) {
@@ -1176,7 +1209,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			MissatgesHelper.warning(request, getMessage(request, "expedient.peticio.controller.acceptat.duplicat.warning", new Object[] {sb.toString()}));
 		}
 	}
-	
+
 	@RequestMapping(value = "/descarregarAnnex/{annexId}", method = RequestMethod.GET)
 	public String descarregarAnnex(HttpServletRequest request, HttpServletResponse response, @PathVariable Long annexId,
 								   @RequestParam boolean versioImprimible) throws IOException {
@@ -1189,7 +1222,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			return getModalControllerReturnValueError(request, "/expedientPeticio", "contingut.controller.document.descarregar.error", ex);
 		}
 	}
-	
+
 	@RequestMapping(value = "/annex/{annexId}/content", method = RequestMethod.GET)
 	public void descarregarBase64(HttpServletRequest request, HttpServletResponse response, @PathVariable Long annexId) throws Exception {
 		try {
@@ -1201,7 +1234,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			logger.error("Errol al descarregarBase64", e);
 		}
 	}
-	
+
 	@RequestMapping(value = "/firmaInfo/{annexId}/content", method = RequestMethod.GET)
 	@ResponseBody
 	public List<ArxiuFirmaDto> firmaInfoContent(HttpServletRequest request, HttpServletResponse response, @PathVariable Long annexId, Model model) {
@@ -1214,10 +1247,10 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		}
 		return null;
 	}
-	
+
 	@RequestMapping(value = "/descarregarJustificant/{registreId}", method = RequestMethod.GET)
 	public String descarregarJustificant(HttpServletRequest request, HttpServletResponse response, @PathVariable Long registreId) throws IOException {
-		
+
 		try{
 			RegistreDto registreDto = expedientPeticioService.findRegistreById(registreId);
 			organGestorService.actualitzarOrganCodi(registreDto.getDestiCodi());
@@ -1245,7 +1278,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			return "ajaxErrorPage";
 		}
 	}
-	
+
 	@RequestMapping(value = "/justificantFirmaInfo/{registreId}", method = RequestMethod.GET)
 	public String justificantFirmaInfo(HttpServletRequest request, HttpServletResponse response, @PathVariable Long registreId, Model model) {
 
@@ -1272,7 +1305,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 	/**
 	 * Gets filtreCommand from session, if it doesnt exist it creates new one in session
 	 * @param request
-	 * @return 
+	 * @return
 	 */
 	private ExpedientPeticioFiltreCommand getFiltreCommand(HttpServletRequest request) {
 
@@ -1285,7 +1318,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		}
 		return filtreCommand;
 	}
-	
+
 	private void omplirModel(Long expedientPeticioId, HttpServletRequest request, Model model, ExpedientPeticioAcceptarCommand command) {
 
 		ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
@@ -1297,7 +1330,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		List<MetaExpedientDto> metaExpedients =  metaExpedientService.findCreateWritePerm(entitat.getId(), rolActual);
 		model.addAttribute("metaExpedients", metaExpedients);
 		List<ExpedientDto> expedients = null;
-		
+
 		// if exists metaExpedient with matching codi procediment
 		if (expedientPeticioDto.getMetaExpedientId() != null) {
 			boolean hasPermissions = false;
@@ -1354,7 +1387,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 	private boolean isIncorporacioJustificantActiva() {
 		return Boolean.parseBoolean(aplicacioService.propertyFindByNom(PropertyConfig.INCORPORAR_JUSTIFICANT));
 	}
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientPeticioController.class);
 
 }

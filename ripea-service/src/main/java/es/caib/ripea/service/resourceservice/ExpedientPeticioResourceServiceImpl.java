@@ -150,6 +150,7 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
         register(ExpedientPeticioResource.PERSPECTIVE_EN_PROCES_ACTUALITZAR_ESTAT_CODE, perspectivesLotHelper.execucioMassivaEnCurs(
                 ElementTipusEnumDto.ANOTACIO, ExecucioMassivaTipusDto.ACTUALITZAR_ESTAT_ANOTACIONS, ExpedientPeticioResource::setExecucioMassivaActualitzarEstatId));
         register(ExpedientPeticioResource.REPORT_DOWNLOAD_JUSTIFICANT, new DescarregarJustificantReportGenerator());
+        register(ExpedientPeticioResource.ACTION_REVERT_REBUTJAR_ANOTACIO, new RevertRebutjarAnotacioActionExecutor());
         register(ExpedientPeticioResource.ACTION_REBUTJAR_ANOTACIO, new RebutjarAnotacioActionExecutor());
         register(ExpedientPeticioResource.ACTION_ACCEPTAR_ANOTACIO, new AcceptarAnotacioActionExecutor());
         register(ExpedientPeticioResource.ACTION_ESTAT_DISTRIBUCIO, new CanviEstatDistribucioActionExecutor());
@@ -1068,6 +1069,26 @@ public class ExpedientPeticioResourceServiceImpl extends BaseMutableResourceServ
 			} catch (Exception e) {
 				excepcioLogHelper.addExcepcio("/anotacio/"+entity.getId()+"/RebutjarAnotacioActionExecutor", e);
 				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("expedientPeticio.rebutjarAnotacio.reject", new Object[]{e.getMessage()}));
+			}
+		}
+    }
+
+    private class RevertRebutjarAnotacioActionExecutor implements ActionExecutor<ExpedientPeticioResourceEntity, ExpedientPeticioResource.RebutjarAnotacioForm, Serializable> {
+
+		@Override
+		public void onChange(Serializable id, RebutjarAnotacioForm previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, RebutjarAnotacioForm target) {}
+
+		@Override
+		public Serializable exec(String code, ExpedientPeticioResourceEntity entity, RebutjarAnotacioForm params) throws ActionExecutionException {
+			try {
+				expedientPeticioHelper.revertirRebutjament(entity.getId(), params.getMotiu());
+				try {
+					eventHelper.notifyAnotacionsPendents(entity.getId());
+				} catch (Exception ex) {}
+				return objectMappingHelper.newInstanceMap(entity, ExpedientPeticioResource.class);
+			} catch (Exception e) {
+				excepcioLogHelper.addExcepcio("/anotacio/"+entity.getId()+"/RevertRebutjarAnotacioActionExecutor", e);
+				throw new ActionExecutionException(getResourceClass(), entity.getId(), code, messageHelper.getMessage("expedientPeticio.revertRebutjarAnotacio.reject", new Object[]{e.getMessage()}));
 			}
 		}
     }

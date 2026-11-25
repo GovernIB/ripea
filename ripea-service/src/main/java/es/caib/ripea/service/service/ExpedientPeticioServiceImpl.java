@@ -62,27 +62,27 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	@Autowired private AnotacioDistribucioHelper anotacioDistribucioHelper;
 	@Autowired private GrupRepository grupRepository;
 	@Autowired private PermisosHelper permisosHelper;
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public PaginaDto<ExpedientPeticioListDto> findAmbFiltre(
 			Long entitatId,
 			ExpedientPeticioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams,
-			String rolActual, 
+			String rolActual,
 			Long organActualId) {
-		
+
 		long t1 = System.currentTimeMillis();
 		if (cacheHelper.mostrarLogsCercadorAnotacio())
 			log.info("findAmbFiltre start(" + "entitatId=" + entitatId + ", filtre=" + filtre + ", paginacioParams=" + paginacioParams + ", rolActual=" + rolActual + ", organActualId=" + organActualId +")");
-		
+
 		long t2 = System.currentTimeMillis();
 		final EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				false,
-				false, 
-				true, 
+				false,
+				true,
 				false);
 
 		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
@@ -91,7 +91,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 
 		// enum with states accesibles from filter in the view (without create state)
 		ExpedientPeticioEstatViewEnumDto estatView = filtre.getEstat();
-		
+
 		MetaExpedientEntity metaExpedient = null;
 		boolean senseMetaExpedientInformat = false;
 		if (filtre.getMetaExpedientId() != null) {
@@ -108,11 +108,11 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		PermisosPerAnotacions permisosPerAnotacions = expedientPeticioHelper.findPermisosPerAnotacions(
 				entitatId,
 				null,
-				rolActual, 
+				rolActual,
 				organActualId);
 		if (cacheHelper.mostrarLogsCercadorAnotacio())
     		log.info("findPermisosPerAnotacions time:  " + (System.currentTimeMillis() - t3) + " ms");
-		
+
 		long t4 = System.currentTimeMillis();
 		Page<ExpedientPeticioEntity> paginaExpedientPeticios = expedientPeticioRepository.findByEntitatAndFiltre(
 				entitat,
@@ -131,9 +131,9 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				senseMetaExpedientInformat,
 				metaExpedient,
 				StringUtils.isEmpty(filtre.getNumero()),
-				filtre.getNumero() != null ? StringUtils.trim(filtre.getNumero()) : "",		
+				filtre.getNumero() != null ? StringUtils.trim(filtre.getNumero()) : "",
 				StringUtils.isEmpty(filtre.getExtracte()),
-				filtre.getExtracte() != null ? StringUtils.trim(filtre.getExtracte()) : "",							
+				filtre.getExtracte() != null ? StringUtils.trim(filtre.getExtracte()) : "",
 				StringUtils.isEmpty(filtre.getDestinacioCodi()),
 				StringUtils.trim(filtre.getDestinacioCodi()),
 				filtre.getDataInicial() == null,
@@ -143,18 +143,18 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				estatView == null,
 				estatView != null ? estatView.toString() : null,
 				filtre.getAccioEnum() == null,
-				filtre.getAccioEnum(), 
-				StringUtils.isEmpty(filtre.getInteressat()), 
+				filtre.getAccioEnum(),
+				StringUtils.isEmpty(filtre.getInteressat()),
 				filtre.getInteressat() != null ? StringUtils.trim(filtre.getInteressat()) : "",
 				filtre.getGrupId() == null,
 				filtre.getGrupId(),
 				paginacioHelper.toSpringDataPageable(
 						paginacioParams,
 						ordenacioMap));
-		
+
 		if (cacheHelper.mostrarLogsCercadorAnotacio())
     		log.info("findByEntitatAndFiltre time:  " + (System.currentTimeMillis() - t4) + " ms");
-		
+
 		long t5 = System.currentTimeMillis();
 		PaginaDto<ExpedientPeticioListDto> result = paginacioHelper.toPaginaDto(
 				paginaExpedientPeticios,
@@ -198,7 +198,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	@Override
 	public ResultDto<ExpedientPeticioListDto> findComunicadesAmbFiltre(
 			ExpedientPeticioFiltreDto filtre,
-			PaginacioParamsDto paginacioParams, 
+			PaginacioParamsDto paginacioParams,
 			ResultEnumDto resultEnum) {
 		log.debug("Consultant els expedient peticions comunicades segons el filtre (" +
 				"filtre=" +
@@ -206,18 +206,18 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				", paginacioParams=" +
 				paginacioParams +
 				")");
-		
+
 		ResultDto<ExpedientPeticioListDto> result = new ResultDto<ExpedientPeticioListDto>();
 
 
 
 		if (resultEnum == ResultEnumDto.PAGE) {
-			
+
 			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 			// ================================  RETURNS PAGE (DATATABLE) ==========================================
 		Page<ExpedientPeticioEntity> paginaExpedientPeticios = expedientPeticioRepository.findComunicadesByFiltre(
 				StringUtils.isEmpty(filtre.getNumero()),
-				filtre.getNumero() != null ? StringUtils.trim(filtre.getNumero()) : "",		
+				filtre.getNumero() != null ? StringUtils.trim(filtre.getNumero()) : "",
 				filtre.getDataInicial() == null,
 				filtre.getDataInicial(),
 				filtre.getDataFinal() == null,
@@ -235,11 +235,11 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				ExpedientPeticioListDto.class);
 		result.setPagina(paginaDto);
 		} else {
-			
+
 			// ==================================  RETURNS IDS (SELECCIONAR TOTS) ============================================
 			List<Long> idsExpedientPeticios = expedientPeticioRepository.findIdsComunicadesByFiltre(
 					StringUtils.isEmpty(filtre.getNumero()),
-					filtre.getNumero() != null ? StringUtils.trim(filtre.getNumero()) : "",		
+					filtre.getNumero() != null ? StringUtils.trim(filtre.getNumero()) : "",
 					filtre.getDataInicial() == null,
 					filtre.getDataInicial(),
 					filtre.getDataFinal() == null,
@@ -247,7 +247,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 					filtre.getEstatAll() == null,
 					filtre.getEstatAll(),
 					filtre.isNomesAmbErrorsConsulta());
-			
+
 			result.setIds(idsExpedientPeticios);
 		}
 
@@ -276,8 +276,8 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				entitatId,
 				false,
 				false,
-				false, 
-				true, 
+				false,
+				true,
 				false);
 		MetaExpedientEntity metaExpedient = null;
 		if (metaExpedientId != null) {
@@ -309,7 +309,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				false,
 				null);
 		List<ExpedientPeticioEntity> peticions = expedientPeticioRepository.findByExpedient(
-				expedient, 
+				expedient,
 				paginacioHelper.toSpringDataPageable(paginacioParams));
 		return conversioTipusHelper.convertirList(
 				peticions,
@@ -327,17 +327,17 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	@Transactional(readOnly = true)
 	@Override
 	public FitxerDto getAnnexContent(Long annexId, boolean versioImprimible) {
-		
+
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromAnnexId(annexId));
 		RegistreAnnexEntity annex = registreAnnexRepository.getOne(annexId);
 		FitxerDto fitxer = new FitxerDto();
 		Document document = pluginHelper.arxiuDocumentConsultar(null, annex.getUuid(), null, true, versioImprimible);
 		RegistreAnnexEntity registreAnnex = registreAnnexRepository.getOne(annexId);
-		
+
 		if (document != null) {
 			DocumentContingut documentContingut = document.getContingut();
 			if (documentContingut != null) {
-				
+
 				fitxer.setNom(versioImprimible ? registreAnnex.getNom().replace(".pdf", "_imprimible.pdf") : registreAnnex.getNom());
 				fitxer.setContentType(documentContingut.getTipusMime());
 				fitxer.setContingut(documentContingut.getContingut());
@@ -346,7 +346,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		}
 		return fitxer;
 	}
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public FitxerDto getJustificantContent(String arxiuUuid) {
@@ -379,7 +379,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		RegistreAnnexDto annexDto = conversioTipusHelper.convertir(
 				annexEntity,
 				RegistreAnnexDto.class);
-		
+
 		if (annexEntity.getDocument() != null) {
 			annexDto.setDocumentId(annexEntity.getDocument().getId());
 		}
@@ -392,7 +392,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		log.debug("Obtenint annex firma info (fitxerArxiuUuid=" + fitxerArxiuUuid +	")");
 		return pluginHelper.validaSignaturaObtenirFirmes(fitxerArxiuUuid, false);
 	}
-	
+
 	@Transactional
 	@Override
 	public RegistreDto findRegistreById(Long registreId) {
@@ -406,25 +406,32 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		log.debug("Reutjant el expedient peticio expedientPeticioId=" + expedientPeticioId +")");
 		expedientPeticioHelper.rebutjar(expedientPeticioId, observacions);
 	}
-	
+
+	@Transactional
+	@Override
+	public void revertirRebutjament(Long expedientPeticioId, String observacions) {
+		log.debug("Revertirnt reutjament del expedient peticio expedientPeticioId=" + expedientPeticioId +")");
+		expedientPeticioHelper.revertirRebutjament(expedientPeticioId, observacions);
+	}
+
 	@Transactional(readOnly = true)
 	@Override
 	public void evictCountAnotacionsPendents(Long entitatId) {
 		cacheHelper.evictAllCountAnotacionsPendents();
 	}
-	
+
 	@Transactional
 	@Override
 	public void retornarPendent(Long expedientPeticioId) {
 
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
-		
-//TODO change back to BACK_REBUDA in distribucio		
+
+//TODO change back to BACK_REBUDA in distribucio
 //		try {
 //			AnotacioRegistreId anotacioRegistreId = new AnotacioRegistreId();
 //			anotacioRegistreId.setClauAcces(expedientPeticioEntity.getClauAcces());
 //			anotacioRegistreId.setIndetificador(expedientPeticioEntity.getIdentificador());
-//			
+//
 //			// change state of registre in DISTRIBUCIO to BACK_REBUDA
 //			DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(anotacioRegistreId, Estat.REBUDA, "");
 //			expedientPeticioEntity.setEstatCanviatDistribucio(true);
@@ -432,13 +439,13 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 //		} catch (Exception e) {
 //			throw e;
 //		}
-		
+
 		ExpedientEntity expedient = expedientPeticioEntity.getExpedient();
-		
+
 		if (expedient.getEstat() == ExpedientEstatEnumDto.TANCAT) {
 			throw new RuntimeException("No es pot retornar l'anotació a estat pendent. Expedient relacionat ja se ha tancat.");
 		}
-		
+
 		// indicates if expedient contains documents not related with this anotacion (documents from other annotacions or created manually)
 		boolean containsDocumentsNotRelated = false;
 		List<DocumentEntity> documents = documentRepository.findByExpedient(expedient);
@@ -447,13 +454,13 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				 containsDocumentsNotRelated = true;
 			 }
 		}
-		
+
 		if (containsDocumentsNotRelated) {
 			throw new RuntimeException("No es pot retornar l'anotació a estat pendent. Expedient relacionat conté documents no relacionts amb l'anotació.");
 		}
 
 		for (RegistreAnnexEntity registreAnnexEntity : expedientPeticioEntity.getRegistre().getAnnexos()) {
-			
+
 
 //			DocumentEntity document = registreAnnexEntity.getDocument();
 //			registreAnnexEntity.updateUuidDispatched(document.getArxiuUuid());
@@ -463,7 +470,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 //		if (!containsDocumentsNotRelated) {
 			expedientRepository.delete(expedient);
 //		}
-		
+
 		expedientPeticioEntity.setExpedient(null);
 		expedientPeticioEntity.updateEstat(ExpedientPeticioEstatEnumDto.PENDENT);
 	}
@@ -471,7 +478,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	@Transactional(readOnly = true)
 	@Override
 	public FitxerDto getAnnexFirmaContingut(Long annexId) {
-		
+
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromAnnexId(annexId));
 		RegistreAnnexEntity annex = registreAnnexRepository.getOne(annexId);
 		FitxerDto arxiu = new FitxerDto();
@@ -500,51 +507,51 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		}
 		return arxiu;
 	}
-	
+
 	@Transactional
 	@Override
 	public void canviarProcediment(Long expedientPeticioId, Long procedimentId, Long grupId) {
 		log.debug("canviarProcediment (expedientPeticioId=" + expedientPeticioId + ", procediment="+ procedimentId +", grup="+ grupId +")");
 		expedientPeticioHelper.canviarProcediment(expedientPeticioId, procedimentId, grupId);
 	}
-	
+
 	@Transactional
 	@Override
 	public ExpedientPeticioDto findOne(Long expedientPeticioId) {
-		
+
 		log.debug("Consultant el expedient peticio expedientPeticioId=" + expedientPeticioId + ")");
 
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.getOne(expedientPeticioId);
-		
+
 		for (RegistreAnnexEntity registreAnnex : expedientPeticioEntity.getRegistre().getAnnexos()) {
 			if (registreAnnex.getTamany() == 0) {
 				organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromAnnexId(registreAnnex.getId()));
 				Document documentDetalls = pluginHelper.arxiuDocumentConsultar(
-						null, 
-						registreAnnex.getUuid(), 
-						null, 
-						true, 
+						null,
+						registreAnnex.getUuid(),
+						null,
+						true,
 						false);
-				
+
 				registreAnnex.updateTamany(documentDetalls.getContingut().getTamany());
-				
+
 			}
 		}
 
 		ExpedientPeticioDto expedientPeticioDto = conversioTipusHelper.convertir(expedientPeticioEntity,
 				ExpedientPeticioDto.class);
-		
+
 		String arxiuUuid = expedientPeticioDto.getRegistre().getJustificantArxiuUuid();
 		if (arxiuUuid != null && isIncorporacioJustificantActiva()) {
 			RegistreJustificantDto justificantInfo = new RegistreJustificantDto();
 			Document documentDetalls = pluginHelper.arxiuDocumentConsultar(
-					null, 
-					arxiuUuid, 
-					null, 
-					true, 
+					null,
+					arxiuUuid,
+					null,
+					true,
 					false);
 			DocumentDto document = expedientHelper.toDocumentDto(
-					documentDetalls, 
+					documentDetalls,
 					expedientPeticioDto.getIdentificador());
 			justificantInfo.setTitol(document.getNom());
 			justificantInfo.setNtiFechaCaptura(document.getDataCaptura());
@@ -563,8 +570,8 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		return expedientPeticioDto;
 
 	}
-	
-	
+
+
 	@Transactional(readOnly = true)
 	@Override
 	public long countAnotacionsPendents(Long entitatId, String rolActual, Long organActualId) {
@@ -572,8 +579,8 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				entitatId,
 				false,
 				false,
-				false, 
-				true, 
+				false,
+				true,
 				false);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		return cacheHelper.countAnotacionsPendents(entitatActual, rolActual, auth.getName(), organActualId);
@@ -582,7 +589,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	private boolean isIncorporacioJustificantActiva() {
 		return configHelper.getAsBoolean(PropertyConfig.INCORPORAR_JUSTIFICANT);
 	}
-	
+
 	@Transactional
 	@Override
 	public boolean comprovarExistenciaInteressatsPeticio(Long entitatId, Long expedientId, Long expedientPeticioId) {
@@ -603,50 +610,50 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		}
 		return alreadyExists;
 	}
-	
-	
+
+
 	@Transactional(readOnly = true)
 	@Override
 	public ResultDto<RegistreAnnexDto> findAnnexosPendentsProcesarMassiu(
 			Long entitatId,
 			MassiuAnnexProcesarFiltreDto filtre,
 			PaginacioParamsDto paginacioParams,
-			ResultEnumDto resultEnum, 
-			String rolActual, 
+			ResultEnumDto resultEnum,
+			String rolActual,
 			Long organActualId) {
-		
+
 		ResultDto<RegistreAnnexDto> result = new ResultDto<RegistreAnnexDto>();
-		
+
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
-				false, 
-				false, 
-				true, 
+				false,
+				false,
+				true,
 				false);
-		
+
 		Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
 		Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
-		
+
 		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 		ordenacioMap.put("expedientCreatedDate", new String[] {"e.expedient.createdDate"});
-		
+
 		MetaExpedientEntity metaExpedient = null;
 		if (filtre.getMetaExpedientId() != null) {
 			metaExpedient = metaExpedientRepository.getOne(filtre.getMetaExpedientId());
 		}
-		
+
 		ExpedientEntity expedient = null;
 		if (filtre.getExpedientId() != null) {
 			expedient = expedientRepository.getOne(filtre.getExpedientId());
 		}
-		
+
 		PermisosPerAnotacions permisosPerAnotacions = expedientPeticioHelper.findPermisosPerAnotacions(
 				entitatId,
 				null,
-				rolActual, 
+				rolActual,
 				organActualId);
-		
+
 
 		if (resultEnum == ResultEnumDto.PAGE) {
 			// ================================  RETURNS PAGE (DATATABLE) ==========================================
@@ -673,7 +680,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 					pagina,
 					RegistreAnnexDto.class);
 			result.setPagina(paginaDto);
-			
+
 		} else {
 			// ==================================  RETURNS IDS (SELECCIONAR TOTS) ============================================
 			List<Long> documentsIds = registreAnnexRepository.findIdsPendentsProcesar(
@@ -694,7 +701,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 					metaExpedient,
 					expedient == null,
 					expedient);
-			
+
 			result.setIds(documentsIds);
 		}
 		return result;
@@ -705,9 +712,9 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	public ResultDto<ExpedientPeticioListDto> findPendentsCanviEstatDistribucio(
 			Long entitatId,
 			ExpedientPeticioFiltreDto filtre,
-			PaginacioParamsDto paginacioParams, 
+			PaginacioParamsDto paginacioParams,
 			ResultEnumDto resultEnum) {
-		
+
 		ResultDto<ExpedientPeticioListDto> result = new ResultDto<ExpedientPeticioListDto>();
 
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
@@ -719,7 +726,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				false);
 
 
-		
+
 		if (resultEnum == ResultEnumDto.PAGE) {
 
 			Page<ExpedientPeticioEntity> pagina = expedientPeticioRepository.findPendentsCanviEstatDistribucio(
@@ -739,9 +746,9 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 					paginacioHelper.toPaginaDto(
 							pagina,
 							ExpedientPeticioListDto.class));
-			
+
 		} else if (resultEnum == ResultEnumDto.IDS) {
-			
+
 			List<Long> ids = expedientPeticioRepository.findIdsPendentsCanviEstatDistribucio(
 					entitat,
 					Strings.isNullOrEmpty(filtre.getNumero()),
@@ -773,7 +780,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				false,
 				true,
 				false);
-		
+
 		return expedientPeticioHelper.reintentarCanviEstatDistribucio(id);
 	}
 
@@ -783,7 +790,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 			Long entitatId,
 			Long organActualId,
 			String rolActual) {
-		
+
 		long t1 = System.currentTimeMillis();
 		if (cacheHelper.mostrarLogsCercadorAnotacio())
 			log.info("findMetaExpedientsPermesosPerAnotacions start(" + "entitatId=" + entitatId + ", rolActual=" + rolActual + ", organActualId=" + organActualId +")");
@@ -795,7 +802,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				false,
 				true,
 				false);
-		
+
 		long t2 = System.currentTimeMillis();
 		List<MetaExpedientEntity> metaExpedientsPermesos = null;
 		if (rolActual.equals("IPA_ADMIN")) {
@@ -807,9 +814,9 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				metaExpedientsPermesos.addAll(procedimentsComuns);
 			}
 		} else if (rolActual.equals("tothom")) {
-			metaExpedientsPermesos = metaExpedientHelper.getCreateWritePermesos(entitat.getId()); 
+			metaExpedientsPermesos = metaExpedientHelper.getCreateWritePermesos(entitat.getId());
 		}
-		
+
 		if (cacheHelper.mostrarLogsCercadorAnotacio())
     		log.info("findMetaExpedients time:  " + (System.currentTimeMillis() - t2) + " ms");
 
@@ -830,10 +837,10 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		}
 		if (cacheHelper.mostrarLogsCercadorAnotacio())
     		log.info("convertirList time:  " + (System.currentTimeMillis() - t3) + " ms");
-		
+
 		if (cacheHelper.mostrarLogsCercadorAnotacio())
     		log.info("findMetaExpedientsPermesosPerAnotacions end:  " + (System.currentTimeMillis() - t1) + " ms");
-		
+
 		//#1502 ordenam el resultat per nom independentment de quina cerca s'hagi realitzat
 		Collections.sort(dto, new Comparator<MetaExpedientDto>() {
 			@Override
@@ -843,7 +850,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				} catch (Exception ex) {return 0;}
 			}
 		});
-		
+
 		return dto;
 	}
 
@@ -856,14 +863,14 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	@Transactional
 	public void crearExpedientPeticion(String clauAcces, String itentificador) {
 		long t3 = System.currentTimeMillis();
-		
+
 		try {
-		
+
 			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 				logger.info("Comunicant anotació start: " + itentificador);
-				
+
 			Long peticioId = expedientPeticioRepository.findIdByIdentificador(itentificador);
-			
+
 			if (peticioId == null) {
 				expedientPeticioHelper.crearExpedientPeticion(clauAcces, itentificador);
 			} else {
@@ -871,10 +878,10 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 					expedientPeticioHelper.resetExpedientPeticion(peticioId);
 				}
 			}
-			
+
 			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 				logger.info("Comunicant anotació end: " + itentificador + ":  " + (System.currentTimeMillis() - t3) + " ms");
-		
+
 		} catch (Throwable e) {
 			logger.error("Error comunicant anotació:" + itentificador + ":  " + (System.currentTimeMillis() - t3) + " ms", e);
 			throw e;
@@ -890,6 +897,6 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 			}
 		}
 	}
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientPeticioServiceImpl.class);
 }

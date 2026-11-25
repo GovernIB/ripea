@@ -5217,7 +5217,7 @@ public class PluginHelper {
 
 		return resultat;
 	}
-	
+
 	/**
 	 * Consulta a NOTIB si el procediment (codi SIA) i l'òrgan gestor de l'expedient tenen
 	 * l'entrega postal per CIE activa. S'empren els mateixos codis que en fer l'enviament.
@@ -6480,6 +6480,9 @@ public class PluginHelper {
 			applicationHelper.stopTimer(sample, "METRICS@Integracions.distribucio", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al canviar estat d'una anotació.";
+            if (ex.getCause().getMessage().contains("status of 409")) {
+                errorDescripcio = "No se puede realizar el cambio de estado en este momento, contacte con el administrador del sistema.";
+            }
 			integracioHelper.addAccioError(
 					IntegracioHelper.INTCODI_DISTRIBUCIO,
 					accioDescripcio,
