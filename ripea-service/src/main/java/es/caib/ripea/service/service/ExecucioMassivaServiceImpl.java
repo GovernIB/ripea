@@ -642,10 +642,17 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 	private void autenticarUsuariEmc(ExecucioMassivaEntity emc) {
 		Optional<String> usuariEmc = emc.getCreatedBy();
 		if (usuariEmc.isPresent()) {
+			List<String> rolsUsuariActual = pluginHelper.rolsUsuariFindAmbCodi(usuariEmc.get());
+			if (rolsUsuariActual.isEmpty())
+				rolsUsuariActual.add("tothom");
+			boolean afegirRolActual = emc.getRolActual() != null && !rolsUsuariActual.contains(emc.getRolActual());
+			if (afegirRolActual)
+				rolsUsuariActual.add(emc.getRolActual());
+
 			List<SimpleGrantedAuthority> authorities = new ArrayList<SimpleGrantedAuthority>();
-			SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority("IPA_ADMIN");
-			authorities.add(simpleGrantedAuthority);
-			
+			for (String rol : rolsUsuariActual)
+				authorities.add(new SimpleGrantedAuthority(rol));
+
 			Authentication authentication =  new UsernamePasswordAuthenticationToken(
 					usuariEmc.get(),
 					"N/A",
