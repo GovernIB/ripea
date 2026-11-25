@@ -5,6 +5,7 @@ import duration from 'dayjs/plugin/duration';
 import { BrowserRouter } from 'react-router-dom';
 import { LicenseInfo } from '@mui/x-license';
 import App from './App.tsx'
+import i18n from './i18n/i18n';
 import {
     envVar,
     ResourceApiProvider
@@ -58,7 +59,9 @@ const getEnvApiUrl = () => {
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
         {/*<AuthProvider config={getAuthConfig()} mandatory everetAuthPatch>*/}
-        <ResourceApiProvider apiUrl={getEnvApiUrl()} userSessionActive>
+        {/* defaultLanguage: la primera càrrega de l'índex de l'API ja surt amb l'idioma de la interfície; sense,
+            sortia sense Accept-Language i en fixar-lo BaseApp es tornaven a demanar l'índex i totes les arrels */}
+        <ResourceApiProvider apiUrl={getEnvApiUrl()} userSessionActive defaultLanguage={i18n.language}>
             <SessionStorageProvider>
                 <RipeaAuthProvider>
                     <PreBaseAppProvider>

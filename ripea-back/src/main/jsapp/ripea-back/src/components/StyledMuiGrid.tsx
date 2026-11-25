@@ -201,10 +201,15 @@ const StyledMuiGrid = (props:StyledMuiGridProps) => {
     ]
         .filter((e:any) => !e?.hidden)
 
+    // Refresca el grid (i onRefresh) quan canvia l'usuari de la sessió (entitat, rol, òrgan...), però no en
+    // muntar-se: el grid ja carrega les dades en muntar-se, i refrescar-lo aquí en repetia la càrrega (a
+    // DocumentsGrid, tot l'arbre de carpetes i expedients abans de demanar els documents).
+    const userAnterior = React.useRef(user);
     useEffect(() => {
-        if(!!user) {
+        if (user && userAnterior.current && user !== userAnterior.current) {
             refresh()
         }
+        userAnterior.current = user;
     }, [user]);
     React.useEffect(() => {
         if (datagridApiRef.current && Object.keys(datagridApiRef.current).length > 0 && rowExpansionChange) {
