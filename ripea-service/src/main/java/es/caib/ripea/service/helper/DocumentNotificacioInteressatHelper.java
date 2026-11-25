@@ -6,12 +6,15 @@ import es.caib.ripea.persistence.entity.*;
 import es.caib.ripea.plugin.notificacio.EnviamentReferencia;
 import es.caib.ripea.plugin.notificacio.RespostaEnviar;
 import es.caib.ripea.service.intf.dto.*;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Component
 public class DocumentNotificacioInteressatHelper {
@@ -79,13 +82,7 @@ public class DocumentNotificacioInteressatHelper {
 			notificacioEntity.updateEnviat(null, respostaEnviar.getEstat(), respostaEnviar.getIdentificador());
 		}
 
-		for (EnviamentReferencia enviamentReferencia : respostaEnviar.getReferencies()) {
-			for (DocumentEnviamentInteressatEntity documentEnviamentInteressat : notificacioEntity.getDocumentEnviamentInteressats()) {
-				if (documentEnviamentInteressat.getInteressat().getDocumentNum().equals(enviamentReferencia.getTitularNif())) {
-					documentEnviamentInteressat.updateEnviamentReferencia(enviamentReferencia.getReferencia());
-				}
-			}
-		}
+		guardarReferencies(respostaEnviar, notificacioEntity);
 
 		String destinitariAmbDocument = "";
 		for (DocumentEnviamentInteressatEntity interessatDto : notificacioEntity.getDocumentEnviamentInteressats()) {
@@ -95,6 +92,29 @@ public class DocumentNotificacioInteressatHelper {
 		cacheHelper.evictErrorsValidacioAndNotify(expedientEntity.getId());
 		cacheHelper.evictNotificacionsPendentsPerExpedient(expedientEntity);
 		logAll(notificacioEntity, LogTipusEnumDto.NOTIFICACIO_ENVIADA, destinitariAmbDocument);
+	}
+
+	// Amb passaport (FISICA_SENSE_NIF) Notib no retorna el NIF del titular, i sense referència no arriben els callbacks
+	private void guardarReferencies(RespostaEnviar respostaEnviar, DocumentNotificacioEntity notificacioEntity) {
+		List<EnviamentReferencia> referencies = respostaEnviar.getReferencies();
+		Set<DocumentEnviamentInteressatEntity> enviaments = notificacioEntity.getDocumentEnviamentInteressats();
+		if (referencies == null || referencies.isEmpty()) {
+			return;
+		}
+		boolean unSolEnviament = referencies.size() == 1 && enviaments.size() == 1;
+		if (unSolEnviament) {
+			enviaments.iterator().next().updateEnviamentReferencia(referencies.get(0).getReferencia());
+			return;
+		}
+		for (EnviamentReferencia enviamentReferencia : referencies) {
+			for (DocumentEnviamentInteressatEntity documentEnviamentInteressat : enviaments) {
+				String documentNum = StringUtils.trimToNull(documentEnviamentInteressat.getInteressat().getDocumentNum());
+				boolean mateixTitular = documentNum != null && documentNum.equalsIgnoreCase(StringUtils.trim(enviamentReferencia.getTitularNif()));
+				if (mateixTitular) {
+					documentEnviamentInteressat.updateEnviamentReferencia(enviamentReferencia.getReferencia());
+				}
+			}
+		}
 	}
 
 	private void logAll(DocumentNotificacioEntity notificacioEntity, LogTipusEnumDto tipusLog, String param1) {

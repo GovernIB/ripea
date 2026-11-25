@@ -61,6 +61,7 @@ public class NotibWsController {
 			aplicacioService.stopTimer(sample, "METRICS@Subsystem_Callback_Notib.notificaCanvi", "resultado", "exito");
 		} catch (Exception e) {
 			aplicacioService.stopTimer(sample, "METRICS@Subsystem_Callback_Notib.notificaCanvi", "resultado", "error");
+			throw e;
 		}			
 	}
 }
