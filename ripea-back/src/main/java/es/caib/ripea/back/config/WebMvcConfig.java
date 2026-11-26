@@ -4,9 +4,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.servlet.http.HttpSession;
+
 import es.caib.ripea.back.diag.TempsTracaInterceptor;
+import es.caib.ripea.back.helper.RolHelper;
 import es.caib.ripea.back.interceptor.*;
 import es.caib.ripea.service.intf.config.BaseConfig;
+import es.caib.ripea.service.intf.config.PropertyConfig;
+import es.caib.ripea.service.intf.dto.historic.AccesHistoricDto;
+import es.caib.ripea.service.intf.service.HistoricService;
+import es.caib.ripea.service.intf.utils.RegistreAccesHistoricFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -81,6 +88,26 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		registrationBean.setFilter(new SiteMeshFilter());
 		registrationBean.addUrlPatterns("/*");
 		registrationBean.setOrder(2);
+		return registrationBean;
+	}
+
+	/**
+	 * Registre d'accessos a la pantalla de dades estadístiques (històrics), per saber si algú la fa servir. Es
+	 * desa només si la propietat {@value PropertyConfig#HISTORIC_REGISTRE_ACCES_ACTIU} és activa. Ordre per defecte:
+	 * darrere de Spring Security, amb l'usuari ja autenticat.
+	 */
+	@Bean
+	public FilterRegistrationBean<RegistreAccesHistoricFilter> registreAccesHistoricFilter(HistoricService historicService) {
+		FilterRegistrationBean<RegistreAccesHistoricFilter> registrationBean = new FilterRegistrationBean<>();
+		registrationBean.setFilter(new RegistreAccesHistoricFilter(
+				historicService,
+				AccesHistoricDto.APLICACIO_JSP,
+				request -> {
+					// Sense RolHelper.getRolActual: no ha de crear la sessió ni canviar-hi el rol
+					HttpSession session = request.getSession(false);
+					return session != null ? (String) session.getAttribute(RolHelper.SESSION_ATTRIBUTE_ROL_ACTUAL) : null;
+				}));
+		registrationBean.addUrlPatterns("/historic", "/historic/*");
 		return registrationBean;
 	}
 

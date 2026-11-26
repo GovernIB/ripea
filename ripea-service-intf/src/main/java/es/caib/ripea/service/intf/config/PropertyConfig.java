@@ -338,6 +338,8 @@ public class PropertyConfig {
 	public static final String MOSTRAR_LOGS_CERCADOR_ANOTACIO 				        = "es.caib.ripea.mostrar.logs.cercador.anotacions";
 	public static final String MOSTRAR_LOGS_SEGONPLA 				                = "es.caib.ripea.mostrar.logs.segonpla";
 	public static final String MOSTRAR_LOGS_INTEGRACIO 				                = "es.caib.ripea.mostrar.logs.integracio";
+	// Desa en un CSV cada petició a la consulta d'estadístiques (pantalla JSP /historic i API interna /api/historic)
+	public static final String HISTORIC_REGISTRE_ACCES_ACTIU = "es.caib.ripea.historic.registre.acces.actiu";
 
     public static final String CONFIG_DIES_AVIS_EXPEDIENT_ANTIC                     = "es.caib.ripea.dies.avis.expedient.antic";
 	public static final String AVIS_FIRMA_PARCIAL 				                    = "es.caib.ripea.portafirmes.avis.firma.parcial";

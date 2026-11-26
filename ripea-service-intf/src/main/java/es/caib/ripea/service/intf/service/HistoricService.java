@@ -187,5 +187,13 @@ public interface HistoricService {
 	@PreAuthorize("isAuthenticated()")
 	FitxerDto exportarHistoricInteressats(String[] interessatsDocNum, Long entitatId, String rolActual, HistoricFiltreDto filtre, String format) throws Exception;
 
+	/**
+	 * Desa una petició HTTP a la consulta d'estadístiques (pantalla JSP o API interna) al registre d'accessos, si la
+	 * propietat {@code es.caib.ripea.historic.registre.acces.actiu} és activa. Un error en desar-la no es propaga.
+	 *
+	 * @param acces dades de la petició.
+	 */
+	@PreAuthorize("isAuthenticated()")
+	void registrarAcces(AccesHistoricDto acces);
 
 }

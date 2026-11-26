@@ -13,6 +13,7 @@ import es.caib.ripea.service.helper.ConversioTipusHelper;
 import es.caib.ripea.service.helper.EntityComprovarHelper;
 import es.caib.ripea.service.helper.HistoricHelper;
 import es.caib.ripea.service.helper.PaginacioHelper;
+import es.caib.ripea.service.helper.RegistreAccesHistoricHelper;
 import es.caib.ripea.service.historic.*;
 import es.caib.ripea.service.intf.dto.*;
 import es.caib.ripea.service.intf.dto.historic.*;
@@ -44,6 +45,7 @@ public class HistoricServiceImpl implements HistoricService {
 	@Autowired private PaginacioHelper paginacioHelper;
 	@Autowired private ConversioTipusHelper conversioTipusHelper;
 	@Autowired private HistoricHelper historicHelper;
+	@Autowired private RegistreAccesHistoricHelper registreAccesHistoricHelper;
 
 	@Autowired private ExportacioCsvHistoric exportacioCsvHistoric;
 	@Autowired private ExportacioXMLHistoric exportacioXMLHistoric;
@@ -633,8 +635,13 @@ public class HistoricServiceImpl implements HistoricService {
 		return fitxer;
 	}
 
+	@Override
+	public void registrarAcces(AccesHistoricDto acces) {
+		registreAccesHistoricHelper.registrar(acces);
+	}
+
 	/**
-	 * 
+	 *
 	 * @param <T>
 	 * @param filtre
 	 * @param historics Llista d'històrics, ha d'estar ordenada descendentment per

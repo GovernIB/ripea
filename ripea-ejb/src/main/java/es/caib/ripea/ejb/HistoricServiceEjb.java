@@ -13,6 +13,7 @@ import es.caib.ripea.service.intf.dto.FitxerDto;
 import es.caib.ripea.service.intf.dto.OrganGestorDto;
 import es.caib.ripea.service.intf.dto.PaginaDto;
 import es.caib.ripea.service.intf.dto.PaginacioParamsDto;
+import es.caib.ripea.service.intf.dto.historic.AccesHistoricDto;
 import es.caib.ripea.service.intf.dto.historic.HistoricExpedientDto;
 import es.caib.ripea.service.intf.dto.historic.HistoricFiltreDto;
 import es.caib.ripea.service.intf.dto.historic.HistoricInteressatDto;
@@ -164,6 +165,12 @@ public class HistoricServiceEjb extends AbstractServiceEjb<HistoricService> impl
 	@RolesAllowed("**")
 	public FitxerDto exportarHistoricInteressats(String[] interessatsDocNum, Long entitatId, String rolActual, HistoricFiltreDto filtre, String format) throws Exception {
 		return delegateService.exportarHistoricInteressats(interessatsDocNum, entitatId, rolActual, filtre, format);
+	}
+
+	@Override
+	@RolesAllowed("**")
+	public void registrarAcces(AccesHistoricDto acces) {
+		delegateService.registrarAcces(acces);
 	}
 
 }
