@@ -72,6 +72,8 @@ public class SchedulingConfig implements SchedulingConfigurer {
     private static final long DEFAULT_INITIAL_DELAY_MS = 30000L;
     /** Cada quant es comprova si el cron dels processos d'incorporació de documents té una execució pendent. */
     private static final long INTERVAL_COMPROVACIO_INICI_MS = 60000L;
+    /** Dies que es conserven les dades dels monitors d'integracions i d'excepcions si la propietat no té un valor vàlid. */
+    static final int DIES_CONSERVACIO_MONITOR_DEFECTE = 30;
     private ScheduledTaskRegistrar taskRegistrar;
     //Mantenir un registre de les tasques que s'han enregistrat
     private final Map<String, Runnable> tasks = new HashMap<>();
@@ -495,8 +497,9 @@ public class SchedulingConfig implements SchedulingConfigurer {
                         monitorTasquesService.inici(codiEsborrarExcepcionsMesAntigues);
                         try {
                             createAuthenticationContext();
-                            int esborrats = excepcioLogHelper.esborrarExcepcionsMesAntigues3Mesos();
-                            log.info("Esborrades {} excepcions de log amb més de 3 mesos d'antiguitat", esborrats);
+                            int dies = getDiesConservacioMonitor(PropertyConfig.MONITOR_EXCEPCIONS_DIES);
+                            int esborrats = excepcioLogHelper.esborrarExcepcionsAntigues(dies);
+                            log.info("Esborrades {} excepcions de log amb més de {} dies d'antiguitat", esborrats, dies);
                             monitorTasquesService.fi(codiEsborrarExcepcionsMesAntigues);
                         } catch (Throwable th) {
                             tractarErrorTascaSegonPla(th, codiEsborrarExcepcionsMesAntigues);
@@ -516,8 +519,9 @@ public class SchedulingConfig implements SchedulingConfigurer {
                         monitorTasquesService.inici(codiEsborrarIntegracionsAntigues);
                         try {
                             createAuthenticationContext();
-                            int esborrats = integracioHelper.esborrarAccionsMesAntigues3Mesos();
-                            log.info("Esborrades {} accions d'integració amb més de 3 mesos d'antiguitat", esborrats);
+                            int dies = getDiesConservacioMonitor(PropertyConfig.MONITOR_INTEGRACIONS_DIES);
+                            int esborrats = integracioHelper.esborrarAccionsAntigues(dies);
+                            log.info("Esborrades {} accions d'integració amb més de {} dies d'antiguitat", esborrats, dies);
                             monitorTasquesService.fi(codiEsborrarIntegracionsAntigues);
                         } catch (Throwable th) {
                             tractarErrorTascaSegonPla(th, codiEsborrarIntegracionsAntigues);
@@ -916,6 +920,31 @@ public class SchedulingConfig implements SchedulingConfigurer {
             };
         }
         return null;
+    }
+
+    /**
+     * Dies que es conserven les dades d'un monitor (integracions o excepcions), segons la propietat indicada. Es llegeix a
+     * cada execució: un canvi de la propietat s'aplica a la següent sense reiniciar. Si la propietat no té valor, no és un
+     * enter o és inferior a 1, es conserven els dies per defecte: un valor erroni no ha d'aturar l'esborrat (el monitor
+     * tornaria a omplir el tablespace RIPEA_LOB) ni esborrar tot el monitor.
+     */
+    int getDiesConservacioMonitor(String propietat) {
+        String valor = configHelper.getConfig(propietat);
+        if (valor != null) {
+            try {
+                int dies = Integer.parseInt(valor.trim());
+                if (dies >= 1) {
+                    return dies;
+                }
+            } catch (NumberFormatException ex) {
+                // Es conserven els dies per defecte
+            }
+        }
+        log.warn("La propietat {} no té un nombre de dies vàlid (\"{}\"): es conserven les dades dels darrers {} dies",
+                propietat,
+                valor,
+                DIES_CONSERVACIO_MONITOR_DEFECTE);
+        return DIES_CONSERVACIO_MONITOR_DEFECTE;
     }
 
     /** Enregistre l'error als logs i marca la tasca amb error. */

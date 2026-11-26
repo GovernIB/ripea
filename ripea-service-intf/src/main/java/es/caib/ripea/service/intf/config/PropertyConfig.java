@@ -58,6 +58,9 @@ public class PropertyConfig {
 	public static final String INCORPORAR_JUSTIFICANTS_REGISTRE_INICI = "es.caib.ripea.segonpla.justificants.registre.inici";
 	public static final String INCORPORAR_CERTIFICATS_REMESES_DARRER_ID = "es.caib.ripea.segonpla.certificats.remeses.darrerId";
 	public static final String INCORPORAR_JUSTIFICANTS_REGISTRE_DARRER_ID = "es.caib.ripea.segonpla.justificants.registre.darrerId";
+	// Dies que es conserven les dades dels monitors d'integracions i d'excepcions: les tasques setmanals esborren les més antigues
+	public static final String MONITOR_INTEGRACIONS_DIES = "es.caib.ripea.segonpla.monitor.integracions.dies";
+	public static final String MONITOR_EXCEPCIONS_DIES = "es.caib.ripea.segonpla.monitor.excepcions.dies";
 	public static final String TASCA_DURACIO_DEFAULT = "es.caib.ripea.duracio.tasca";
 	public static final String TASCA_PREAVIS_DATA_LIMIT = "es.caib.ripea.tasca.preavisDataLimitEnDies";
 	public static final String BUIDAR_CACHES_DOMINIS_RATE = "es.caib.ripea.dominis.cache.execucio";

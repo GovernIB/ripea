@@ -1,7 +1,6 @@
 package es.caib.ripea.service.helper;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -51,11 +50,17 @@ public class ExcepcioLogHelper {
 		return result;
 	}
 
+	/**
+	 * Esborra les excepcions registrades fa més de {@code dies} dies. Els dies els decideix qui la crida: la tasca
+	 * setmanal en segon pla els llegeix de la propietat es.caib.ripea.segonpla.monitor.excepcions.dies (veure
+	 * SchedulingConfig). No es llegeix aquí per no afegir la dependència de ConfigHelper, i de tot el que arrossega, a
+	 * aquest helper, que es fa servir des de molts blocs catch.
+	 *
+	 * @throws IllegalArgumentException si dies és inferior a 1 (no s'esborra res).
+	 */
 	@Transactional
-	public int esborrarExcepcionsMesAntigues3Mesos() {
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.MONTH, -3);
-		return excepcioLogResourceRepository.deleteByDataBefore(cal.getTime());
+	public int esborrarExcepcionsAntigues(int dies) {
+		return excepcioLogResourceRepository.deleteByDataBefore(DateHelper.dataLimitConservacio(dies));
 	}
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)

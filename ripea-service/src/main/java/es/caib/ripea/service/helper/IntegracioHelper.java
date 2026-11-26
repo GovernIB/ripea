@@ -1,7 +1,6 @@
 package es.caib.ripea.service.helper;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -260,11 +259,15 @@ public class IntegracioHelper {
 		return integracioResourceRepository.findById(id).map(this::toDto).orElse(null);
 	}
 
+	/**
+	 * Esborra les accions registrades fa més de {@code dies} dies. Els dies els decideix qui la crida: la tasca setmanal
+	 * en segon pla els llegeix de la propietat es.caib.ripea.segonpla.monitor.integracions.dies (veure SchedulingConfig).
+	 *
+	 * @throws IllegalArgumentException si dies és inferior a 1 (no s'esborra res).
+	 */
 	@Transactional
-	public int esborrarAccionsMesAntigues3Mesos() {
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.MONTH, -3);
-		return integracioResourceRepository.deleteByDataBefore(cal.getTime());
+	public int esborrarAccionsAntigues(int dies) {
+		return integracioResourceRepository.deleteByDataBefore(DateHelper.dataLimitConservacio(dies));
 	}
 
 	private IntegracioResourceEntity buildEntity(

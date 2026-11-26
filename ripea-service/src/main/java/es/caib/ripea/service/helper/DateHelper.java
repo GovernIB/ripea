@@ -42,6 +42,22 @@ public class DateHelper {
 	}
 
 
+	/**
+	 * Data límit d'un període de conservació: la data i hora de fa {@code dies} dies naturals. Les dades anteriors a
+	 * aquesta data ja no s'han de conservar.
+	 *
+	 * @throws IllegalArgumentException si dies és inferior a 1: la data límit seria l'hora actual o una de futura i
+	 *         s'esborraria tot.
+	 */
+	public static Date dataLimitConservacio(int dies) {
+		if (dies < 1) {
+			throw new IllegalArgumentException("El període de conservació ha de ser d'1 dia o més (dies=" + dies + ")");
+		}
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.DAY_OF_MONTH, -dies);
+		return cal.getTime();
+	}
+
 	public static Date toStartOfTheMonth(Date data) {
 		if (data == null) {
 			return null;

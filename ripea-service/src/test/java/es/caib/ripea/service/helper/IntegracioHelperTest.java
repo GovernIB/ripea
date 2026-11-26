@@ -1,17 +1,21 @@
 package es.caib.ripea.service.helper;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import java.util.Date;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
@@ -25,8 +29,8 @@ import es.caib.ripea.service.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.ripea.service.intf.dto.IntegracioCodiEnum;
 
 /**
- * Tests unitaris per a IntegracioHelper: les accions executades sense monitors no es registren, i la consulta de les
- * darreres accions limita les files a la BD.
+ * Tests unitaris per a IntegracioHelper: les accions executades sense monitors no es registren, la consulta de les
+ * darreres accions limita les files a la BD i l'esborrat de les antigues respecta els dies de conservació.
  */
 @ExtendWith(MockitoExtension.class)
 class IntegracioHelperTest {
@@ -114,6 +118,28 @@ class IntegracioHelperTest {
 	@Test
 	void capDarreraAccioNoConsulta() {
 		assertThat(helper.findDarreresAccionsByIntegracioCodi(ARXIU, 0)).isEmpty();
+		verifyNoInteractions(integracioResourceRepository);
+	}
+
+	// ---------------------------------------------------------------- esborrat de les accions antigues
+
+	@Test
+	void esborrarAccionsAntiguesEsborraLesAnteriorsALaDataLimit() {
+		when(integracioResourceRepository.deleteByDataBefore(any(Date.class))).thenReturn(7);
+
+		Date abans = DateHelper.dataLimitConservacio(30);
+		int esborrades = helper.esborrarAccionsAntigues(30);
+		Date despres = DateHelper.dataLimitConservacio(30);
+
+		assertThat(esborrades).isEqualTo(7);
+		ArgumentCaptor<Date> dataLimit = ArgumentCaptor.forClass(Date.class);
+		verify(integracioResourceRepository).deleteByDataBefore(dataLimit.capture());
+		assertThat(dataLimit.getValue()).isBetween(abans, despres, true, true);
+	}
+
+	@Test
+	void esborrarAccionsAntiguesSenseDiesNoEsborraRes() {
+		assertThatThrownBy(() -> helper.esborrarAccionsAntigues(-1)).isInstanceOf(IllegalArgumentException.class);
 		verifyNoInteractions(integracioResourceRepository);
 	}
 
