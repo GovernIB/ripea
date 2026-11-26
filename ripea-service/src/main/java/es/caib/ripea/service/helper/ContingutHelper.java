@@ -2012,6 +2012,21 @@ public class ContingutHelper {
 			Long tascaId,
 			String carpetaNova,
 			String rolActual) {
+		move(entitatId, contingutOrigenId, contingutDestiId, tascaId, carpetaNova, rolActual, false);
+	}
+
+	/**
+	 * Amb permetreTipusDiferent, si els expedients són de procediments diferents els documents moguts
+	 * es queden sense tipus documental.
+	 */
+	public void move(
+			Long entitatId,
+			Long contingutOrigenId,
+			Long contingutDestiId,
+			Long tascaId,
+			String carpetaNova,
+			String rolActual,
+			boolean permetreTipusDiferent) {
 
 		if (!StringUtils.isEmpty(carpetaNova)) {
 			CarpetaDto carpeta = carpetaHelper.create(
@@ -2104,7 +2119,8 @@ public class ContingutHelper {
 				true,
 				false,
 				false, null);
-		if (!expedientOrigen.getMetaExpedient().equals(expedientDesti.getMetaExpedient())) {
+		boolean mateixTipus = expedientOrigen.getMetaExpedient().equals(expedientDesti.getMetaExpedient());
+		if (!mateixTipus && !permetreTipusDiferent) {
 			throw new ValidationException(
 					contingutOrigenId,
 					contingutOrigen.getClass(),
@@ -2121,6 +2137,9 @@ public class ContingutHelper {
 					ContingutEntity.class,
 					"Ja existeix un altre contingut amb el mateix nom dins el contingut destí ("
 							+ "contingutDestiId=" + contingutDestiId + ")");
+		}
+		if (!mateixTipus) {
+			treureTipusDocumental(contingutOrigen);
 		}
 		// Realitza el moviment del contingut
 		moureBaseDades(contingutOrigen, contingutDesti);
@@ -2149,6 +2168,16 @@ public class ContingutHelper {
 		if (!expedientOrigen.getId().equals(expedientDesti.getId())) {
 			cacheHelper.evictErrorsValidacioAndNotify(expedientOrigen.getId());
 			cacheHelper.evictErrorsValidacioAndNotify(expedientDesti.getId());
+		}
+	}
+
+	private void treureTipusDocumental(ContingutEntity contingut) {
+		ContingutEntity deproxied = HibernateHelper.deproxy(contingut);
+		if (deproxied instanceof DocumentEntity) {
+			((DocumentEntity) deproxied).updateTipusDocument(null);
+		}
+		for (ContingutEntity fill : deproxied.getFills()) {
+			treureTipusDocumental(fill);
 		}
 	}
 

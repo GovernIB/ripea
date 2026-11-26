@@ -49,7 +49,7 @@ public class DocumentEntity extends NodeEntity {
 	//IPA_DOCUMENT.METADOCUMENT_ID (metaDocument). Qualsevol mètode que en canviï un ha de canviar l'altre.
 	//Caldria deixar-ne una sola font (p.ex. mapejar aquest camp insertable=false/updatable=false o derivar-lo
 	//de metaNode) i retirar la columna amb Liquibase, tocant també DocumentResourceEntity.
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "metaDocument_id")
 	@ForeignKey(name = BaseConfig.DB_PREFIX + "doc_metadoc_fk")
 	private MetaDocumentEntity metaDocument;

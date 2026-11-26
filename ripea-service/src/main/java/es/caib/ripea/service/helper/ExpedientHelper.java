@@ -3372,7 +3372,8 @@ public class ExpedientHelper {
 							expedientDestiId,
 							null,
 							null,
-							null);
+							null,
+							true);
 			}
 		} catch (Exception ex) {
 			logger.error("Hi ha hagut un error movent algun document/carpeta [expedientOrigenId={}, expedientDestiId={}]", expedientOrigenId, expedientDestiId);
@@ -3389,10 +3390,14 @@ public class ExpedientHelper {
 
 			for (InteressatEntity interessat: interessats) {
 				interessat.updateExpedient(expedientDesti);
+				expedientDesti.addInteressat(interessat);
 			}
+			// L'origen es carrega després del flush perquè la seva llista d'interessats ja vengui buida
+			interessatRepository.flush();
+			ExpedientEntity expedientOrigen = expedientRepository.findById(expedientOrigenId).get();
 
-			// Actualitzar arxiu
 			pluginHelper.arxiuExpedientActualitzar(expedientDesti);
+			pluginHelper.arxiuExpedientActualitzar(expedientOrigen);
 
 		} catch (Exception ex) {
 			logger.error("Hi ha hagut un error movent algun interessat [expedientOrigenId={}, expedientDestiId={}]", expedientOrigenId, expedientDestiId);
