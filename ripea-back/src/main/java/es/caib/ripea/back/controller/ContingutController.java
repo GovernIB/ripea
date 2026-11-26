@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -530,6 +531,10 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 	            .or(() -> Optional.ofNullable(command.getDestiId())) // <-- Vista llista
 	            .orElse(command.getExpedientOrigenId()); // <-- Mateix expedient
 		
+		if (StringUtils.isNotEmpty(command.getCarpetaNova())) {
+			destiId = carpetaService.create(entitatActual.getId(), destiId, command.getCarpetaNova()).getId();
+		}
+		
 		if (docsIdx != null && !docsIdx.isEmpty()) {
 			for (Long docIdx : docsIdx) {
 				contingutService.move(
@@ -537,7 +542,6 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 						docIdx,
 						destiId,
 						null,
-						command.getCarpetaNova(),
 						RolHelper.getRolActual(request));
 			}
 		} else {
@@ -546,7 +550,6 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					contingutOrigenId,
 					destiId,
 					null,
-					command.getCarpetaNova(),
 					RolHelper.getRolActual(request));
 		}
 		return getModalControllerReturnValueSuccess(
@@ -612,7 +615,6 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 						contingutOrigenId,
 						destiId,
 						tascaId,
-						null,
 						RolHelper.getRolActual(request));
 			}
 

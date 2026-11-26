@@ -50,6 +50,7 @@ import es.caib.ripea.service.intf.model.ContingutResource;
 import es.caib.ripea.service.intf.model.EntitatResource;
 import es.caib.ripea.service.intf.model.UsuariResource;
 import es.caib.ripea.service.intf.resourceservice.CarpetaResourceService;
+import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -305,12 +306,24 @@ public class CarpetaResourceServiceImpl extends BaseMutableResourceService<Carpe
 				Long contingutDestiId = params.getCarpeta()!=null?params.getCarpeta().getId():params.getExpedient().getId();
 				switch (params.getAction()) {
 				case MOURE:
+					if (Utils.hasValue(params.getCarpetaNova())) {
+						contingutDestiId = carpetaHelper.create(
+								entitatEntity.getId(),
+								contingutDestiId,
+								params.getCarpetaNova(),
+								false,
+								null,
+								false,
+								null,
+								false,
+								null,
+								false).getId();
+					}
 					contingutHelper.move(
 							entitatEntity.getId(),
 							entity.getId(),
 							contingutDestiId,
 							null,
-							params.getCarpetaNova(),
 							configHelper.getRolActual());							
 					break;
 				case COPIAR:

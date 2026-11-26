@@ -66,6 +66,7 @@ import es.caib.ripea.service.base.service.BaseMutableResourceService;
 import es.caib.ripea.service.firma.DocumentFirmaPortafirmesHelper;
 import es.caib.ripea.service.firma.DocumentFirmaViaFirmaHelper;
 import es.caib.ripea.service.helper.CacheHelper;
+import es.caib.ripea.service.helper.CarpetaHelper;
 import es.caib.ripea.service.helper.ConfigHelper;
 import es.caib.ripea.service.helper.ContingutHelper;
 import es.caib.ripea.service.helper.DocumentHelper;
@@ -172,6 +173,7 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
     private final CacheHelper cacheHelper;
     private final DocumentHelper documentHelper;
     private final ContingutHelper contingutHelper;
+    private final CarpetaHelper carpetaHelper;
     private final ExcepcioLogHelper excepcioLogHelper;
     private final DocumentNotificacioHelper documentNotificacioHelper;
     private final EntityComprovarHelper entityComprovarHelper;
@@ -1132,8 +1134,23 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
 
             try {
                 EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(configHelper.getEntitatActualCodi(), false, false, false, true, false);
+                Long contingutDestiId = params.getCarpeta()!=null?params.getCarpeta().getId():params.getExpedient().getId();
+                // La carpeta nova es crea una sola vegada i s'hi mouen tots els documents
+                boolean crearCarpetaNova = params.getAction() == DocumentResource.MoureFormAction.Action.MOURE && Utils.hasValue(params.getCarpetaNova());
+                if (crearCarpetaNova) {
+                    contingutDestiId = carpetaHelper.create(
+                            entitatEntity.getId(),
+                            contingutDestiId,
+                            params.getCarpetaNova(),
+                            false,
+                            null,
+                            false,
+                            null,
+                            false,
+                            null,
+                            false).getId();
+                }
                 for (Long contingutOrigenId: params.getIds()) {
-                    Long contingutDestiId = params.getCarpeta()!=null?params.getCarpeta().getId():params.getExpedient().getId();
                     switch (params.getAction()) {
                     case MOURE:
                         contingutHelper.move(
@@ -1141,7 +1158,6 @@ public class DocumentResourceServiceImpl extends BaseMutableResourceService<Docu
                         		contingutOrigenId,
                         		contingutDestiId,
                         		null,
-                        		params.getCarpetaNova(),
                         		configHelper.getRolActual());
                         break;
                     case COPIAR:

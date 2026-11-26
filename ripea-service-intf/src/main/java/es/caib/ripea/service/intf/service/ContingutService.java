@@ -114,7 +114,6 @@ public interface ContingutService {
 			Long contingutOrigenId,
 			Long contingutDestiId,
 			Long tascaId,
-			String carpetaNova,
 			String rolActual) throws NotFoundException, ValidationException;
 
 	/**

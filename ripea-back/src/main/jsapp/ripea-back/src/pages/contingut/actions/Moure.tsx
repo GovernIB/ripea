@@ -84,7 +84,7 @@ const useMassiveAction = (code:string, title:string, onSuccess?: () => void) => 
 
     return {
         handleMassiveShow,
-        content: <Moure apiRef={apiRef} title={title} onSuccess={onSuccess}/>
+        content: <Moure apiRef={apiRef} title={title} onSuccess={onSuccess} tipus={code}/>
     }
 }
 

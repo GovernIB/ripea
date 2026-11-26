@@ -94,9 +94,8 @@ public class ContingutServiceEjb extends AbstractServiceEjb<ContingutService> im
 			Long contingutOrigenId,
 			Long contingutDestiId,
 			Long tascaId,
-			String carpetaNova,
 			String rolActual) {
-		delegateService.move(entitatId, contingutOrigenId, contingutDestiId, tascaId, carpetaNova, rolActual);
+		delegateService.move(entitatId, contingutOrigenId, contingutDestiId, tascaId, rolActual);
 	}
 	
 	@Override

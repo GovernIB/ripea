@@ -168,7 +168,6 @@ public class ContingutHelper {
 	@Autowired private DocumentNotificacioRepository documentNotificacioRepository;
 	@Autowired private ExpedientInteressatHelper expedientInteressatHelper;
 	@Autowired private DocumentFirmaPortafirmesHelper documentFirmaPortafirmesHelper;
-	@Autowired private CarpetaHelper carpetaHelper;
 	@Autowired private ExecutorService executor;
 	@Autowired private Environment env;
 
@@ -2010,9 +2009,8 @@ public class ContingutHelper {
 			Long contingutOrigenId,
 			Long contingutDestiId,
 			Long tascaId,
-			String carpetaNova,
 			String rolActual) {
-		move(entitatId, contingutOrigenId, contingutDestiId, tascaId, carpetaNova, rolActual, false);
+		move(entitatId, contingutOrigenId, contingutDestiId, tascaId, rolActual, false);
 	}
 
 	/**
@@ -2024,25 +2022,9 @@ public class ContingutHelper {
 			Long contingutOrigenId,
 			Long contingutDestiId,
 			Long tascaId,
-			String carpetaNova,
 			String rolActual,
 			boolean permetreTipusDiferent) {
 
-		if (!StringUtils.isEmpty(carpetaNova)) {
-			CarpetaDto carpeta = carpetaHelper.create(
-					entitatId,
-					contingutDestiId,
-					carpetaNova,
-					false,
-					null,
-					false,
-					null, 
-					false, 
-					null, 
-					false);
-			contingutDestiId = carpeta.getId();
-		}
-		
 		ContingutEntity contingutOrigen = null;
 		ContingutEntity contingutDesti = null;
 		
