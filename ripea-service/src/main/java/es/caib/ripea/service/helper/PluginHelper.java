@@ -6480,9 +6480,13 @@ public class PluginHelper {
 			applicationHelper.stopTimer(sample, "METRICS@Integracions.distribucio", "resultado", "exito", "endpoint", Utils.hasValue(endpoint)?endpoint:"N/D");
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al canviar estat d'una anotació.";
-            if (ex.getCause().getMessage().contains("status of 409")) {
-                errorDescripcio = "No se puede realizar el cambio de estado en este momento, contacte con el administrador del sistema.";
-            }
+			if (ex.getCause()!=null) {
+	            if (ex.getCause().getMessage().contains("status of 409")) {
+	                errorDescripcio = "No se puede realizar el cambio de estado en este momento, contacte con el administrador del sistema.";
+	            } else {
+	            	errorDescripcio = ex.getCause().getMessage();
+	            }
+			}
 			integracioHelper.addAccioError(
 					IntegracioHelper.INTCODI_DISTRIBUCIO,
 					accioDescripcio,

@@ -449,8 +449,8 @@ const translationEs = {
                 },
                 revertRebutjar: {
                     label: "Revertir el rechazo...",
-                    button: "Revertir el rechazo",
-                    title: "Revertir el rechazo del expediente",
+                    button: "Revierte",
+                    title: "Revertir el rechazo de la anotación",
                     ok: "La anotación se ha revertido correctamente",
                 },
                 canviProcediment: {

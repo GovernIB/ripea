@@ -450,9 +450,9 @@ const translationCa = {
                     ok: "L'anotació s'ha rebutjat correctament",
                 },
                 revertRebutjar: {
-                    label: "Revert rebutjament...",
-                    button: "Revert rebutjament",
-                    title: "Revertir rebutjament expedient",
+                    label: "Revertir rebutjament...",
+                    button: "Reverteix",
+                    title: "Revertir rebutjament de l'anotació",
                     ok: "L'anotació s'ha revertit correctament",
                 },
                 canviProcediment: {
