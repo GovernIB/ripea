@@ -344,6 +344,12 @@ public class PropertyConfig {
     public static final String CONFIG_DIES_AVIS_EXPEDIENT_ANTIC                     = "es.caib.ripea.dies.avis.expedient.antic";
     /** Dies sense activitat (sense modificacions ni comentaris) a partir dels quals una tasca pendent es considera inactiva. */
     public static final String CONFIG_DIES_TASCA_SENSE_ACTIVITAT                    = "es.caib.ripea.dies.tasca.sense.activitat";
+    /** Segons que es guarden a memòria les targetes i les llistes de la pantalla d'inici de cada usuari (0: sense caché). */
+    public static final String INICI_CACHE_SEGONS                                   = "es.caib.ripea.inici.cache.segons";
+    /** Segons que es guarda la llista «Expedients més antics que es podrien tancar», la més costosa (0: sense caché). */
+    public static final String INICI_CACHE_EXPEDIENTS_TANCAR_SEGONS                 = "es.caib.ripea.inici.cache.expedients.tancar.segons";
+    /** Límit de temps de cada consulta de la pantalla d'inici, en segons (0: sense límit). */
+    public static final String INICI_CONSULTA_TIMEOUT_SEGONS                        = "es.caib.ripea.inici.consulta.timeout.segons";
 	public static final String AVIS_FIRMA_PARCIAL 				                    = "es.caib.ripea.portafirmes.avis.firma.parcial";
 	public static final String FIRMA_PARCIAL 				                        = "es.caib.ripea.portafirmes.firma.parcial";
 	public static final String FILTRAR_USUARI_DESCRIPCIO 				            = "es.caib.ripea.plugin.portafirmes.flux.filtrar.usuari.descripcio";

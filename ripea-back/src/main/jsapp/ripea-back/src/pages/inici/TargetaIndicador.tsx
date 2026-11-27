@@ -30,9 +30,11 @@ const Targeta = ({ indicador, presentacio }: TargetaProps) => {
     const total = disponible && indicador.total != null
         ? t('page.inici.deTotal', { total: formatValor(indicador.total, presentacio.format, i18n.language) })
         : undefined;
+    // Si el càlcul ha superat el límit de temps de les consultes, ho diu en lloc del «No disponible» genèric
+    const noDisponible = t(indicador.tempsEsgotat ? 'page.inici.tempsEsgotat' : 'page.inici.noDisponible');
     const nomAccessible = disponible
         ? [`${titol}: ${valor}`, total].filter(Boolean).join(' ')
-        : `${titol}: ${t('page.inici.noDisponible')}`;
+        : `${titol}: ${noDisponible}`;
 
     // Disposició del disseny proposat: icona i xifra a la mateixa alçada, el títol a sota i, separat per una
     // línia, el nom del llistat de destinació amb estil d'enllaç (només visual: tota la targeta ja és l'enllaç).
@@ -69,7 +71,7 @@ const Targeta = ({ indicador, presentacio }: TargetaProps) => {
                     )}
                     {!disponible && (
                         <Typography variant="caption" color="error" sx={{ mt: 0.5 }}>
-                            {t('page.inici.noDisponible')}
+                            {noDisponible}
                         </Typography>
                     )}
                     {/* Empeny el peu avall perquè totes les targetes de la fila l'alineïn */}

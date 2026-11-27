@@ -32,8 +32,7 @@ import es.caib.ripea.persistence.entity.MetaExpedientEntity;
 import es.caib.ripea.persistence.entity.OrganGestorEntity;
 import es.caib.ripea.persistence.entity.resourceentity.GrupResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientResourceEntity;
-import es.caib.ripea.service.resourcehelper.inici.LlistesRecurs;
-import es.caib.ripea.service.resourcehelper.inici.RecomptesRecurs;
+import es.caib.ripea.service.resourcehelper.inici.VisibilitatRecurs;
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.GrupResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaDadaResourceRepository;
@@ -120,7 +119,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService<MetaExpedientResource, Long, MetaExpedientResourceEntity> implements MetaExpedientResourceService, RecomptesRecurs<MetaExpedientResourceEntity>, LlistesRecurs<MetaExpedientResourceEntity> {
+public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService<MetaExpedientResource, Long, MetaExpedientResourceEntity> implements MetaExpedientResourceService, VisibilitatRecurs<MetaExpedientResourceEntity> {
 
 	private final ConfigHelper configHelper;
 	private final PerspectivesLotHelper perspectivesLotHelper;
@@ -176,14 +175,7 @@ public class MetaExpedientResourceServiceImpl extends BaseMutableResourceService
     	register(MetaExpedientResource.Fields.procedimentComu,		new OnchangeLogicProcessor());
     }
     
-    /** Recomptes de la pantalla d'inici amb la visibilitat del llistat de procediments (veure RecomptesRecurs). */
-    @Override
-    @Transactional(readOnly = true)
-    public Map<String, Long> comptar(Map<String, Specification<MetaExpedientResourceEntity>> criteris, String[] namedQueries) {
-        return RecomptesRecurs.comptar(criteris, this.<MetaExpedientResourceEntity>toFindProcessedSpecification(null, null, namedQueries), entityRepository);
-    }
-
-    /** Llistes de la pantalla d'inici amb la visibilitat del llistat (veure LlistesRecurs). */
+    /** Consultes de la pantalla d'inici (targetes i llistes) amb la visibilitat del llistat (veure VisibilitatRecurs). */
     @Override
     @Transactional(readOnly = true)
     public <T> T ambVisibles(String[] namedQueries, Function<Specification<MetaExpedientResourceEntity>, T> consulta) {

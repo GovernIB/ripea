@@ -81,7 +81,7 @@ export const LlistaResum = ({ llista }: { llista: Llista }) => {
             </Box>
             {llista.error ? (
                 <Typography variant="body2" color="error">
-                    {t('page.inici.llistaError')}
+                    {t(llista.tempsEsgotat ? 'page.inici.llistaTempsEsgotat' : 'page.inici.llistaError')}
                 </Typography>
             ) : files.length === 0 ? (
                 <Typography variant="body2" color="text.secondary">
@@ -132,9 +132,9 @@ export const LlistaResum = ({ llista }: { llista: Llista }) => {
     );
 };
 
-/** Esquelet d'una llista mentre es carreguen. */
+/** Esquelet d'una llista mentre es carrega. */
 export const LlistaResumCarregant = () => (
-    <Card variant="outlined" sx={{ height: '100%', p: { xs: 2, sm: 2.5 } }}>
+    <Card variant="outlined" aria-busy sx={{ height: '100%', p: { xs: 2, sm: 2.5 } }}>
         <Skeleton width="45%" height={28} />
         <Skeleton width="75%" sx={{ mb: 1.5 }} />
         {[0, 1, 2, 3, 4].map((i) => (

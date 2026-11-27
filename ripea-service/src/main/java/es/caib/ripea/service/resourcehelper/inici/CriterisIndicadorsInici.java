@@ -24,7 +24,7 @@ import es.caib.ripea.service.intf.dto.TascaEstatEnumDto;
 
 /**
  * Criteris de les targetes de la pantalla d'inici. S'apliquen a sobre de la visibilitat del llistat de
- * destinació (veure {@link RecomptesRecurs}): aquí només hi ha el que distingeix cada targeta.
+ * destinació (veure {@link VisibilitatRecurs}): aquí només hi ha el que distingeix cada targeta.
  */
 public final class CriterisIndicadorsInici {
 

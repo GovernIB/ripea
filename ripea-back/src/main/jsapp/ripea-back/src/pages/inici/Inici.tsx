@@ -22,6 +22,7 @@ export const PAGINA_ENTRADA_INICI = 'INICI';
 const RESOURCE_NAME = 'iniciResource';
 const REPORT_INDICADORS = 'INDICADORS';
 const REPORT_LLISTES = 'LLISTES';
+const REPORT_LLISTA = 'LLISTA';
 
 /** Targeta d'indicador (IniciResource.Indicador). */
 export type Indicador = {
@@ -31,6 +32,8 @@ export type Indicador = {
     /** Dies que fa servir el càlcul (configurables), per mostrar-los al text de la targeta. */
     dies?: number;
     error?: boolean;
+    /** El càlcul ha superat el límit de temps de les consultes (també té error). */
+    tempsEsgotat?: boolean;
 };
 
 /** Llista resum (IniciResource.Llista). */
@@ -42,18 +45,24 @@ export type Llista = {
     /** Minuts configurables del criteri (excepcions: finestra d'agrupació de les repetides; sense valor, no s'agrupen). */
     minuts?: number;
     error?: boolean;
+    /** La consulta ha superat el límit de temps (també té error). */
+    tempsEsgotat?: boolean;
 };
 
 /**
  * Demana un informe de la pantalla d'inici i el torna a demanar quan canvia el rol, l'entitat o l'òrgan
- * actius. Les targetes i les llistes es demanen per separat i en paral·lel: cada part es pot mostrar
- * tan bon punt arriba la seva resposta.
+ * actius. Les targetes, el catàleg de llistes i cada llista es demanen per separat i en paral·lel: cada part
+ * es pot mostrar tan bon punt arriba la seva resposta, i una llista lenta no endarrereix les altres.
+ *
+ * @param data paràmetres de l'informe (p. ex. el codi de la llista).
  */
-const useInformeInici = <T,>(code: string) => {
+const useInformeInici = <T,>(code: string, data?: Record<string, any>) => {
     const { value: user } = useUserSession();
     const { isReady, artifactReport } = useResourceApiService(RESOURCE_NAME);
     const [dades, setDades] = React.useState<T[]>();
     const [error, setError] = React.useState<boolean>(false);
+    // Els paràmetres com a text: un objecte nou a cada render no ha de tornar a llançar la petició
+    const parametres = data != null ? JSON.stringify(data) : undefined;
 
     React.useEffect(() => {
         if (!isReady || !user) {
@@ -64,7 +73,7 @@ const useInformeInici = <T,>(code: string) => {
         let vigent = true;
         setDades(undefined);
         setError(false);
-        artifactReport(undefined, { code })
+        artifactReport(undefined, parametres != null ? { code, data: JSON.parse(parametres) } : { code })
             .then((resultat) => {
                 if (vigent) {
                     setDades((resultat as T[]) ?? []);
@@ -79,7 +88,7 @@ const useInformeInici = <T,>(code: string) => {
         return () => {
             vigent = false;
         };
-    }, [isReady, code, user?.rolActual, user?.entitatActualId, user?.organActualId]);
+    }, [isReady, code, parametres, user?.rolActual, user?.entitatActualId, user?.organActualId]);
 
     return { dades, error };
 };
@@ -142,34 +151,48 @@ const AmbDetallTasca = ({ children }: { children: React.ReactNode }) => {
     );
 };
 
-/** Llistes resum del rol, sota les targetes, o esquelets mentre es calculen. */
-const Llistes = ({ dades }: { dades?: Llista[] }) => {
-    if (dades != null && dades.length === 0) {
+/**
+ * Una llista del rol: es demana per separat (no espera les altres) i mostra l'esquelet fins que arriba. Si la
+ * petició falla, o el backend no la torna (el rol ha canviat mentrestant), surt amb el missatge d'error.
+ */
+const LlistaDelRol = ({ codi }: { codi: string }) => {
+    const { dades, error } = useInformeInici<Llista>(REPORT_LLISTA, { codi });
+    if (dades == null) {
+        return <LlistaResumCarregant />;
+    }
+    const llista = !error && dades.length > 0 ? dades[0] : { codi, error: true };
+    return <LlistaResum llista={llista} />;
+};
+
+/** Llistes resum del rol (catàleg sense files), sota les targetes, o esquelets mentre arriba el catàleg. */
+const Llistes = ({ cataleg }: { cataleg?: Llista[] }) => {
+    if (cataleg != null && cataleg.length === 0) {
         return null;
     }
     const graella = (
-        <Grid container spacing={2} aria-busy={dades == null}>
-            {dades == null
+        <Grid container spacing={2} aria-busy={cataleg == null}>
+            {cataleg == null
                 ? [0, 1].map((i) => (
                     <Grid key={i} size={midaLlista}>
                         <LlistaResumCarregant />
                     </Grid>
                 ))
-                : dades.map((llista) => (
+                : cataleg.map((llista) => (
                     <Grid key={llista.codi} size={midaLlista}>
-                        <LlistaResum llista={llista} />
+                        <LlistaDelRol codi={llista.codi} />
                     </Grid>
                 ))}
         </Grid>
     );
     // El diàleg només es munta si alguna llista té tasques: els altres rols no han de consultar el recurs de tasques
-    const ambTasques = dades?.some((llista) => CATALEG_LLISTES[llista.codi]?.detallTasca);
+    const ambTasques = cataleg?.some((llista) => CATALEG_LLISTES[llista.codi]?.detallTasca);
     return ambTasques ? <AmbDetallTasca>{graella}</AmbDetallTasca> : graella;
 };
 
 const Inici: React.FC = () => {
     const { t } = useTranslation();
     const indicadors = useInformeInici<Indicador>(REPORT_INDICADORS);
+    // Catàleg de llistes del rol (només els codis): cada llista es demana després per separat
     const llistes = useInformeInici<Llista>(REPORT_LLISTES);
 
     const carregat = indicadors.dades != null && llistes.dades != null;
@@ -183,7 +206,7 @@ const Inici: React.FC = () => {
                     {indicadors.error && <Alert severity="error">{t('page.inici.error')}</Alert>}
                     {llistes.error && <Alert severity="error">{t('page.inici.errorLlistes')}</Alert>}
                     {!indicadors.error && <Indicadors dades={indicadors.dades} />}
-                    {!llistes.error && <Llistes dades={llistes.dades} />}
+                    {!llistes.error && <Llistes cataleg={llistes.dades} />}
                     {!error && buit && (
                         <Typography variant="body1" color="text.secondary">
                             {t('page.inici.buit')}

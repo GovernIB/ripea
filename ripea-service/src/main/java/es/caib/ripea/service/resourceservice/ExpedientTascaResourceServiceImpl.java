@@ -33,8 +33,7 @@ import es.caib.ripea.persistence.entity.EntitatEntity;
 import es.caib.ripea.persistence.entity.ExpedientTascaEntity;
 import es.caib.ripea.persistence.entity.resourceentity.ExpedientTascaResourceEntity;
 import es.caib.ripea.persistence.entity.resourceentity.MetaExpedientTascaResourceEntity;
-import es.caib.ripea.service.resourcehelper.inici.LlistesRecurs;
-import es.caib.ripea.service.resourcehelper.inici.RecomptesRecurs;
+import es.caib.ripea.service.resourcehelper.inici.VisibilitatRecurs;
 import es.caib.ripea.persistence.entity.resourceentity.UsuariResourceEntity;
 import es.caib.ripea.persistence.entity.resourcerepository.ExpedientTascaResourceRepository;
 import es.caib.ripea.persistence.entity.resourcerepository.MetaExpedientTascaResourceRepository;
@@ -74,7 +73,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceService<ExpedientTascaResource, Long, ExpedientTascaResourceEntity> implements ExpedientTascaResourceService, RecomptesRecurs<ExpedientTascaResourceEntity>, LlistesRecurs<ExpedientTascaResourceEntity> {
+public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceService<ExpedientTascaResource, Long, ExpedientTascaResourceEntity> implements ExpedientTascaResourceService, VisibilitatRecurs<ExpedientTascaResourceEntity> {
 
     private final ExpedientTascaResourceRepository expedientTascaResourceRepository;
     private final PerspectivesLotHelper perspectivesLotHelper;
@@ -128,14 +127,7 @@ public class ExpedientTascaResourceServiceImpl extends BaseMutableResourceServic
         return Sort.by(orders);
     }
 
-    /** Recomptes de la pantalla d'inici amb la visibilitat del llistat de tasques (veure RecomptesRecurs). */
-    @Override
-    @Transactional(readOnly = true)
-    public Map<String, Long> comptar(Map<String, Specification<ExpedientTascaResourceEntity>> criteris, String[] namedQueries) {
-        return RecomptesRecurs.comptar(criteris, this.<ExpedientTascaResourceEntity>toFindProcessedSpecification(null, null, namedQueries), entityRepository);
-    }
-
-    /** Llistes de la pantalla d'inici amb la visibilitat del llistat (veure LlistesRecurs). */
+    /** Consultes de la pantalla d'inici (targetes i llistes) amb la visibilitat del llistat (veure VisibilitatRecurs). */
     @Override
     @Transactional(readOnly = true)
     public <T> T ambVisibles(String[] namedQueries, Function<Specification<ExpedientTascaResourceEntity>, T> consulta) {

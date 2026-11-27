@@ -39,15 +39,14 @@ import es.caib.ripea.service.intf.model.IntegracioResource;
 import es.caib.ripea.service.intf.model.IntegracioResource.DiagnosticResetForm;
 import es.caib.ripea.service.intf.resourceservice.IntegracioResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
-import es.caib.ripea.service.resourcehelper.inici.LlistesRecurs;
-import es.caib.ripea.service.resourcehelper.inici.RecomptesRecurs;
+import es.caib.ripea.service.resourcehelper.inici.VisibilitatRecurs;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class IntegracioResourceServiceImpl extends BaseMutableResourceService<IntegracioResource, Long, IntegracioResourceEntity> implements IntegracioResourceService, RecomptesRecurs<IntegracioResourceEntity>, LlistesRecurs<IntegracioResourceEntity> {
+public class IntegracioResourceServiceImpl extends BaseMutableResourceService<IntegracioResource, Long, IntegracioResourceEntity> implements IntegracioResourceService, VisibilitatRecurs<IntegracioResourceEntity> {
 
 	private final OrganGestorRepository organGestorRepository;
 	private final EntitatRepository entitatRepository;
@@ -71,14 +70,7 @@ public class IntegracioResourceServiceImpl extends BaseMutableResourceService<In
         return super.toFindProcessedSpecification(quickFilter, translateEntitatFilter(filter), namedQueries);
     }
 
-    /** Recomptes de la pantalla d'inici sobre el monitor d'integracions (veure RecomptesRecurs). */
-    @Override
-    @Transactional(readOnly = true)
-    public Map<String, Long> comptar(Map<String, Specification<IntegracioResourceEntity>> criteris, String[] namedQueries) {
-        return RecomptesRecurs.comptar(criteris, this.<IntegracioResourceEntity>toFindProcessedSpecification(null, null, namedQueries), entityRepository);
-    }
-
-    /** Llistes de la pantalla d'inici amb la visibilitat del llistat (veure LlistesRecurs). */
+    /** Consultes de la pantalla d'inici (targetes i llistes) amb la visibilitat del llistat (veure VisibilitatRecurs). */
     @Override
     @Transactional(readOnly = true)
     public <T> T ambVisibles(String[] namedQueries, Function<Specification<IntegracioResourceEntity>, T> consulta) {

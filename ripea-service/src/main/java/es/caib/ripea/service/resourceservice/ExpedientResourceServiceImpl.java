@@ -28,7 +28,6 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.Hibernate;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
@@ -160,8 +159,9 @@ import es.caib.ripea.service.intf.service.AplicacioService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.intf.config.BaseConfig;
 import es.caib.ripea.service.resourcehelper.ExpedientPermisosFiltreHelper;
+import es.caib.ripea.service.resourcehelper.inici.ConsultesInici;
 import es.caib.ripea.service.resourcehelper.inici.ExpedientsPerTancarRecurs;
-import es.caib.ripea.service.resourcehelper.inici.RecomptesRecurs;
+import es.caib.ripea.service.resourcehelper.inici.VisibilitatRecurs;
 import es.caib.ripea.service.intf.utils.ZipDocumentExtractor;
 import es.caib.ripea.service.permission.ExtendedPermission;
 import es.caib.ripea.service.resourcehelper.ContingutResourceHelper;
@@ -173,7 +173,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ExpedientResourceServiceImpl extends BaseMutableResourceService<ExpedientResource, Long, ExpedientResourceEntity> implements ExpedientResourceService, RecomptesRecurs<ExpedientResourceEntity>, ExpedientsPerTancarRecurs {
+public class ExpedientResourceServiceImpl extends BaseMutableResourceService<ExpedientResource, Long, ExpedientResourceEntity> implements ExpedientResourceService, VisibilitatRecurs<ExpedientResourceEntity>, ExpedientsPerTancarRecurs {
 
 	private final EntitatRepository entitatRepository;
 	private final ExpedientRepository expedientRepository;
@@ -198,6 +198,7 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
 
     private final ContingutResourceHelper contingutResourceHelper;
     private final PerspectivesLotHelper perspectivesLotHelper;
+    private final ConsultesInici consultesInici;
     private final ApplicationHelper applicationHelper;
     private final PluginHelper pluginHelper;
     private final CacheHelper cacheHelper;
@@ -348,13 +349,13 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
     }
 
     /**
-     * Recomptes de la pantalla d'inici amb la visibilitat del llistat d'expedients. Els permisos
-     * (additionalSpringFilter) es calculen un sol cop per a tots els criteris (veure RecomptesRecurs).
+     * Consultes de la pantalla d'inici amb la visibilitat del llistat. Els permisos (additionalSpringFilter) es calculen un sol cop
+     * per a totes les consultes (veure VisibilitatRecurs).
      */
     @Override
     @Transactional(readOnly = true)
-    public Map<String, Long> comptar(Map<String, Specification<ExpedientResourceEntity>> criteris, String[] namedQueries) {
-        return RecomptesRecurs.comptar(criteris, this.<ExpedientResourceEntity>toFindProcessedSpecification(null, null, namedQueries), entityRepository);
+    public <T> T ambVisibles(String[] namedQueries, Function<Specification<ExpedientResourceEntity>, T> consulta) {
+        return consulta.apply(this.<ExpedientResourceEntity>toFindProcessedSpecification(null, null, namedQueries));
     }
 
     /**
@@ -372,16 +373,13 @@ public class ExpedientResourceServiceImpl extends BaseMutableResourceService<Exp
             return new ArrayList<>();
         }
         String codiUsuariActual = SecurityContextHolder.getContext().getAuthentication().getName();
-        List<Long> ids = expedientRepository.findIdsExpedientsPerTancamentMassiuMesAntics(
+        // Amb el límit de temps de la pantalla d'inici (el llistat de l'acció massiva no en té)
+        List<Long> ids = consultesInici.idsExpedientsPerTancarMesAntics(
                 entitat,
                 isNomesAgafatsAccioMassiva(rolActual),
                 usuariRepository.findByCodi(codiUsuariActual),
                 procedimentsPermesos,
-                true, null, //esNullMetaExpedient
-                true, null, //esNullNom
-                true, null, //esNullDataInici
-                true, null, //esNullDataFi
-                PageRequest.of(0, maxim));
+                maxim);
         Map<Long, ExpedientResourceEntity> expedients = new HashMap<>();
         entityRepository.findAllById(ids).forEach(expedient -> expedients.put(expedient.getId(), expedient));
         return ids.stream()

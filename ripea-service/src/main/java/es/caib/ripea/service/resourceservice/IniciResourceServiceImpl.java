@@ -1,6 +1,7 @@
 package es.caib.ripea.service.resourceservice;
 
 import java.io.Serializable;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -26,6 +27,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Root;
 
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -65,14 +67,14 @@ import es.caib.ripea.service.intf.model.IniciResource;
 import es.caib.ripea.service.intf.resourceservice.IniciResourceService;
 import es.caib.ripea.service.intf.service.ExpedientPeticioService;
 import es.caib.ripea.service.resourcehelper.PerspectivesLotHelper;
-import es.caib.ripea.service.resourcehelper.inici.ConsultesLlistesInici;
+import es.caib.ripea.service.resourcehelper.inici.CacheInici;
+import es.caib.ripea.service.resourcehelper.inici.ConsultesInici;
 import es.caib.ripea.service.resourcehelper.inici.CriterisIndicadorsInici;
 import es.caib.ripea.service.resourcehelper.inici.ExpedientsPerTancarRecurs;
 import es.caib.ripea.service.resourcehelper.inici.FilesLlistesInici;
 import es.caib.ripea.service.resourcehelper.inici.IndicadorInici;
 import es.caib.ripea.service.resourcehelper.inici.LlistaInici;
-import es.caib.ripea.service.resourcehelper.inici.LlistesRecurs;
-import es.caib.ripea.service.resourcehelper.inici.RecomptesRecurs;
+import es.caib.ripea.service.resourcehelper.inici.VisibilitatRecurs;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -80,11 +82,23 @@ import lombok.extern.slf4j.Slf4j;
  * Servei de la pantalla d'inici (veure {@link IniciResource}).
  *
  * Recurs sense taula: el llistat surt sempre buit i el detall no existeix. Tota la informació es
- * genera als informes {@link IniciResource#REPORT_INDICADORS} i {@link IniciResource#REPORT_LLISTES}.
+ * genera als informes {@link IniciResource#REPORT_INDICADORS}, {@link IniciResource#REPORT_LLISTES} (quines
+ * llistes té el rol) i {@link IniciResource#REPORT_LLISTA} (una llista).
  *
- * Cada targeta es compta sobre el servei del seu llistat de destinació ({@link RecomptesRecurs}), amb les
+ * Cada targeta es compta sobre el servei del seu llistat de destinació ({@link VisibilitatRecurs}), amb les
  * mateixes regles de visibilitat. Els recomptes d'un mateix llistat formen un grup: cada grup va en una
- * transacció pròpia i, si falla, només les seves targetes surten amb error.
+ * transacció pròpia i, si falla, només les seves targetes surten amb error. Les llistes, igual, una per una.
+ *
+ * <ul>
+ *   <li><b>Caché</b> ({@link CacheInici}): el resultat de cada grup de targetes i de cada llista es guarda per a
+ *   l'usuari i el context durant {@link PropertyConfig#INICI_CACHE_SEGONS} segons
+ *   ({@link PropertyConfig#INICI_CACHE_EXPEDIENTS_TANCAR_SEGONS} la llista d'expedients per tancar, la més costosa).
+ *   Els errors no es guarden; el temps esgotat, sí (amb la caducitat general), perquè recarregar la pantalla no
+ *   torni a llançar la mateixa consulta. No es guarden les anotacions pendents (ja tenen la caché del comptador del
+ *   menú) ni la memòria i el disc del monitor del sistema (són valors del moment).</li>
+ *   <li><b>Límit de temps</b> ({@link ConsultesInici}): una consulta que el supera es cancel·la i les targetes del
+ *   grup o la llista surten amb l'avís de temps esgotat.</li>
+ * </ul>
  */
 @Slf4j
 @Service
@@ -95,19 +109,20 @@ public class IniciResourceServiceImpl extends BaseReadonlyResourceService<IniciR
 	private static final int TASCA_PREAVIS_DATA_LIMIT_DEFAULT = 3;
 	private static final int DIES_EXPEDIENTS_TANCATS_RECENTS = 7;
 	private static final int HORES_MONITOR = 24;
+	/** Caducitat per defecte de la caché de targetes i llistes, si la propietat no hi és. */
+	static final int CACHE_SEGONS_DEFECTE = 120;
+	/** Caducitat per defecte de la caché de la llista d'expedients per tancar, si la propietat no hi és. */
+	static final int CACHE_EXPEDIENTS_TANCAR_SEGONS_DEFECTE = 900;
 
-	private final RecomptesRecurs<ExpedientResourceEntity> recomptesExpedients;
-	private final RecomptesRecurs<AlertaResourceEntity> recomptesAlertes;
-	private final RecomptesRecurs<ExpedientTascaResourceEntity> recomptesTasques;
-	private final RecomptesRecurs<MetaExpedientResourceEntity> recomptesProcediments;
-	private final RecomptesRecurs<IntegracioResourceEntity> recomptesIntegracions;
-	private final RecomptesRecurs<ExcepcioLogResourceEntity> recomptesExcepcions;
-	private final LlistesRecurs<ExpedientTascaResourceEntity> llistesTasques;
-	private final LlistesRecurs<MetaExpedientResourceEntity> llistesProcediments;
-	private final LlistesRecurs<IntegracioResourceEntity> llistesIntegracions;
-	private final LlistesRecurs<ExcepcioLogResourceEntity> llistesExcepcions;
+	private final VisibilitatRecurs<ExpedientResourceEntity> recursExpedients;
+	private final VisibilitatRecurs<AlertaResourceEntity> recursAlertes;
+	private final VisibilitatRecurs<ExpedientTascaResourceEntity> recursTasques;
+	private final VisibilitatRecurs<MetaExpedientResourceEntity> recursProcediments;
+	private final VisibilitatRecurs<IntegracioResourceEntity> recursIntegracions;
+	private final VisibilitatRecurs<ExcepcioLogResourceEntity> recursExcepcions;
 	private final ExpedientsPerTancarRecurs expedientsPerTancar;
-	private final ConsultesLlistesInici consultesLlistes;
+	private final ConsultesInici consultes;
+	private final CacheInici cache;
 	private final PerspectivesLotHelper perspectivesLotHelper;
 	private final IntegracioHelper integracioHelper;
 	private final ExpedientPeticioService expedientPeticioService;
@@ -119,11 +134,13 @@ public class IniciResourceServiceImpl extends BaseReadonlyResourceService<IniciR
 	public void init() {
 		register(IniciResource.REPORT_INDICADORS, new IndicadorsReportGenerator());
 		register(IniciResource.REPORT_LLISTES, new LlistesReportGenerator());
+		register(IniciResource.REPORT_LLISTA, new LlistaReportGenerator());
 	}
 
 	/**
-	 * Sense transacció: cada grup de recomptes obre la seva (els mètodes comptar són transaccionals). Així, un
-	 * grup que falla no marca per a rollback una transacció compartida, que faria fallar tota la pantalla.
+	 * Sense transacció: cada grup de recomptes i cada llista obre la seva (VisibilitatRecurs#ambVisibles és
+	 * transaccional). Així, un grup que falla no marca per a rollback una transacció compartida, que faria fallar
+	 * tota la pantalla.
 	 */
 	@Override
 	@Transactional(propagation = Propagation.NOT_SUPPORTED)
@@ -168,7 +185,7 @@ public class IniciResourceServiceImpl extends BaseReadonlyResourceService<IniciR
 		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {}
 	}
 
-	/** Llistes resum del rol actiu, en l'ordre en què s'han de mostrar. */
+	/** Quines llistes resum té el rol actiu, en l'ordre en què s'han de mostrar (només els codis, sense consultes). */
 	private class LlistesReportGenerator implements ReportGenerator<IniciResourceEntity, Serializable, IniciResource.Llista> {
 
 		@Override
@@ -181,6 +198,21 @@ public class IniciResourceServiceImpl extends BaseReadonlyResourceService<IniciR
 
 		@Override
 		public void onChange(Serializable id, Serializable previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, Serializable target) {}
+	}
+
+	/** Una llista resum del rol actiu amb les seves primeres files. */
+	private class LlistaReportGenerator implements ReportGenerator<IniciResourceEntity, IniciResource.LlistaForm, IniciResource.Llista> {
+
+		@Override
+		public List<IniciResource.Llista> generateData(
+				String code,
+				IniciResourceEntity entity,
+				IniciResource.LlistaForm params) throws ReportGenerationException {
+			return calcularLlista(params != null ? params.getCodi() : null);
+		}
+
+		@Override
+		public void onChange(Serializable id, IniciResource.LlistaForm previous, String fieldName, Object fieldValue, Map<String, AnswerValue> answers, String[] previousFieldNames, IniciResource.LlistaForm target) {}
 	}
 
 	private List<IniciResource.Indicador> calcularIndicadors() {
@@ -212,14 +244,15 @@ public class IniciResourceServiceImpl extends BaseReadonlyResourceService<IniciR
 		expedients.put(IndicadorInici.EXPEDIENTS_OBERTS, CriterisIndicadorsInici.expedientsOberts());
 		expedients.put(IndicadorInici.EXPEDIENTS_TANCATS_RECENTS, CriterisIndicadorsInici.expedientsTancatsDesDe(
 				new Date(ara.getTime() - TimeUnit.DAYS.toMillis(DIES_EXPEDIENTS_TANCATS_RECENTS))));
-		recull.comptar(expedients, recomptesExpedients, null);
+		recull.comptar("EXPEDIENTS", ExpedientResourceEntity.class, expedients, recursExpedients, null);
 
 		// Consulta «Alertes d'expedients»: les no llegides són les de la icona del llistat d'expedients
 		Map<IndicadorInici, Specification<AlertaResourceEntity>> alertes = new EnumMap<>(IndicadorInici.class);
 		alertes.put(IndicadorInici.ALERTES_NO_LLEGIDES, CriterisIndicadorsInici.alertesNoLlegides());
-		recull.comptar(alertes, recomptesAlertes, new String[] { AlertaResource.NAMED_QUERY_CONSULTA });
+		recull.comptar("ALERTES", AlertaResourceEntity.class, alertes, recursAlertes, new String[] { AlertaResource.NAMED_QUERY_CONSULTA });
 
-		// Llistat d'anotacions: el mateix comptador (amb caché) que el menú
+		// Llistat d'anotacions: el mateix comptador que el menú, amb la seva pròpia caché (no es guarda aquí: la
+		// targeta ha de coincidir amb el comptador del menú)
 		recull.valor(IndicadorInici.ANOTACIONS_PENDENTS, this::comptarAnotacionsPendents);
 
 		// «Les meves tasques»: la mateixa named query que el llistat (responsable, observador o delegat). També les
@@ -238,13 +271,13 @@ public class IniciResourceServiceImpl extends BaseReadonlyResourceService<IniciR
 				.and(CriterisIndicadorsInici.tasquesVencimentProper(dema, toDate(avui.plusDays(diesPreavis + 1L)))));
 		tasques.put(IndicadorInici.TASQUES_FORA_TERMINI, tasquesUsuariPendents
 				.and(CriterisIndicadorsInici.tasquesForaTermini(dema)));
-		recull.comptar(tasques, recomptesTasques, new String[] { CriterisIndicadorsInici.NAMED_QUERY_TASQUES_USUARI });
+		recull.comptar("TASQUES_USUARI", ExpedientTascaResourceEntity.class, tasques, recursTasques, new String[] { CriterisIndicadorsInici.NAMED_QUERY_TASQUES_USUARI });
 
 		// Consulta de tasques assignades de l'entitat (administrador): totes, sigui qui sigui el responsable
 		Map<IndicadorInici, Specification<ExpedientTascaResourceEntity>> tasquesEntitat = new EnumMap<>(IndicadorInici.class);
 		tasquesEntitat.put(IndicadorInici.TASQUES_SENSE_ACTIVITAT, CriterisIndicadorsInici.tasquesSenseActivitat(
 				LocalDateTime.now().minusDays(diesSenseActivitat)));
-		recull.comptar(tasquesEntitat, recomptesTasques, null);
+		recull.comptar("TASQUES_ENTITAT", ExpedientTascaResourceEntity.class, tasquesEntitat, recursTasques, null);
 
 		// Llistat de procediments (els d'estat de revisió només hi són al catàleg amb la revisió activa)
 		Map<IndicadorInici, Specification<MetaExpedientResourceEntity>> procediments = new EnumMap<>(IndicadorInici.class);
@@ -254,15 +287,16 @@ public class IniciResourceServiceImpl extends BaseReadonlyResourceService<IniciR
 		procediments.put(IndicadorInici.PROCEDIMENTS_REVISATS, CriterisIndicadorsInici.procedimentsEnEstatRevisio(MetaExpedientRevisioEstatEnumDto.REVISAT));
 		procediments.put(IndicadorInici.PROCEDIMENTS_ACTIUS, CriterisIndicadorsInici.procedimentsActius(revisioActiva));
 		procediments.put(IndicadorInici.PROCEDIMENTS_INACTIUS, CriterisIndicadorsInici.procedimentsInactius(revisioActiva));
-		recull.comptar(procediments, recomptesProcediments, null);
+		recull.comptar("PROCEDIMENTS", MetaExpedientResourceEntity.class, procediments, recursProcediments, null);
 
-		// Monitor d'integracions, registre d'excepcions i monitor del sistema (del node que respon)
+		// Monitor d'integracions, registre d'excepcions i monitor del sistema (del node que respon; aquest, sense
+		// caché: són valors del moment i no fan consultes)
 		Map<IndicadorInici, Specification<IntegracioResourceEntity>> integracions = new EnumMap<>(IndicadorInici.class);
 		integracions.put(IndicadorInici.INTEGRACIONS_ERROR, CriterisIndicadorsInici.integracionsErrorDesDe(fa24Hores));
-		recull.comptar(integracions, recomptesIntegracions, null);
+		recull.comptar("INTEGRACIONS", IntegracioResourceEntity.class, integracions, recursIntegracions, null);
 		Map<IndicadorInici, Specification<ExcepcioLogResourceEntity>> excepcions = new EnumMap<>(IndicadorInici.class);
 		excepcions.put(IndicadorInici.EXCEPCIONS, CriterisIndicadorsInici.excepcionsDesDe(fa24Hores));
-		recull.comptar(excepcions, recomptesExcepcions, null);
+		recull.comptar("EXCEPCIONS", ExcepcioLogResourceEntity.class, excepcions, recursExcepcions, null);
 		recull.valor(IndicadorInici.MEMORIA_LLIURE, () -> {
 			MonitorHelper.MemoryUsage memoria = MonitorHelper.getJvmMemory();
 			recull.totals.put(IndicadorInici.MEMORIA_LLIURE, memoria.getTotalMemory());
@@ -300,29 +334,62 @@ public class IniciResourceServiceImpl extends BaseReadonlyResourceService<IniciR
 
 	// --- Llistes resum ---------------------------------------------------------------------------------
 
-	/**
-	 * Llistes del catàleg del rol. Cada una es consulta sobre el servei del seu llistat de destinació, en una
-	 * transacció pròpia i amb les mateixes regles de visibilitat; si falla, només aquella surt amb error.
-	 */
+	/** Llistes del catàleg del rol, només amb el codi: el front demana després cada una (REPORT_LLISTA). */
 	private List<IniciResource.Llista> calcularLlistes() {
-		String rol = configHelper.getRolActual();
-		List<LlistaInici> cataleg = senseEntitat(rol)
-				? new ArrayList<LlistaInici>()
-				: LlistaInici.llistes(rol, metaExpedientHelper.isRevisioActiva());
 		List<IniciResource.Llista> resultat = new ArrayList<>();
-		for (LlistaInici codi: cataleg) {
+		for (LlistaInici codi: catalegLlistes()) {
 			IniciResource.Llista llista = new IniciResource.Llista();
 			llista.setCodi(codi.name());
-			try {
-				llista.setFiles(files(codi, llista));
-			} catch (Exception ex) {
-				log.error("Error calculant la llista de la pantalla d'inici " + codi, ex);
-				llista.setFiles(new ArrayList<>());
-				llista.setError(true);
-			}
 			resultat.add(llista);
 		}
 		return resultat;
+	}
+
+	/**
+	 * Una llista del catàleg del rol, amb les seves files (de la caché si n'hi ha). Si el codi no és una llista del
+	 * rol actiu (p. ex. l'usuari ha canviat de rol mentre el front la demanava) no torna res.
+	 */
+	private List<IniciResource.Llista> calcularLlista(String codi) {
+		LlistaInici llista = catalegLlistes().stream()
+				.filter(delRol -> delRol.name().equals(codi))
+				.findFirst()
+				.orElse(null);
+		if (llista == null) {
+			return new ArrayList<>();
+		}
+		Duration caducitat = llista == LlistaInici.EXPEDIENTS_LLESTOS_TANCAR
+				? caducitat(PropertyConfig.INICI_CACHE_EXPEDIENTS_TANCAR_SEGONS, CACHE_EXPEDIENTS_TANCAR_SEGONS_DEFECTE)
+				: caducitatGeneral();
+		IniciResource.Llista resultat = cache.obtenir(
+				clau("LLISTA." + llista.name()),
+				caducitat,
+				() -> consultarLlista(llista),
+				calculada -> caducitatResultat(calculada.isError(), calculada.isTempsEsgotat()));
+		return Collections.singletonList(resultat);
+	}
+
+	private List<LlistaInici> catalegLlistes() {
+		String rol = configHelper.getRolActual();
+		return senseEntitat(rol)
+				? new ArrayList<LlistaInici>()
+				: LlistaInici.llistes(rol, metaExpedientHelper.isRevisioActiva());
+	}
+
+	/**
+	 * Consulta d'una llista sobre el servei del seu llistat de destinació, en una transacció pròpia i amb les
+	 * mateixes regles de visibilitat. Si falla, la llista surt amb error (i amb temps esgotat, si n'és la causa).
+	 */
+	private IniciResource.Llista consultarLlista(LlistaInici codi) {
+		IniciResource.Llista llista = new IniciResource.Llista();
+		llista.setCodi(codi.name());
+		try {
+			llista.setFiles(files(codi, llista));
+		} catch (Exception ex) {
+			llista.setFiles(new ArrayList<>());
+			llista.setError(true);
+			llista.setTempsEsgotat(registrarError("la llista " + codi, ex));
+		}
+		return llista;
 	}
 
 	private List<Map<String, Object>> files(LlistaInici codi, IniciResource.Llista llista) {
@@ -339,8 +406,8 @@ public class IniciResourceServiceImpl extends BaseReadonlyResourceService<IniciR
 			case DARRERES_INTEGRACIONS:
 				// Només per data (sense desempat per id): així les llegeix en ordre de l'índex de DATA (1.1.0_DDL_3)
 				// sense haver d'ordenar tota la taula
-				return llistesIntegracions.ambVisibles(null, visibles -> files(
-						consultesLlistes.primeres(
+				return recursIntegracions.ambVisibles(null, visibles -> files(
+						consultes.primeres(
 								IntegracioResourceEntity.class,
 								visibles,
 								(root, cb) -> Collections.singletonList(cb.desc(root.get("data"))),
@@ -350,8 +417,8 @@ public class IniciResourceServiceImpl extends BaseReadonlyResourceService<IniciR
 				// Les excepcions repetides s'agrupen en una fila: l'ordre és el de la darrera ocurrència
 				int minutsAgrupacio = configHelper.getAsInt(PropertyConfig.EXCEPCIONS_DEDUP_MINUTS, ExcepcioLogHelper.DEDUP_MINUTS_DEFECTE);
 				llista.setMinuts(minutsAgrupacio > 0 ? minutsAgrupacio : null);
-				return llistesExcepcions.ambVisibles(null, visibles -> files(
-						consultesLlistes.primeres(
+				return recursExcepcions.ambVisibles(null, visibles -> files(
+						consultes.primeres(
 								ExcepcioLogResourceEntity.class,
 								visibles,
 								(root, cb) -> Arrays.asList(
@@ -378,10 +445,10 @@ public class IniciResourceServiceImpl extends BaseReadonlyResourceService<IniciR
 		LocalDate avui = LocalDate.now();
 		Date dema = toDate(avui.plusDays(1));
 		Date fiPreavisExclos = toDate(avui.plusDays(diesPreavisDataLimit() + 1L));
-		return llistesTasques.ambVisibles(
+		return recursTasques.ambVisibles(
 				new String[] { CriterisIndicadorsInici.NAMED_QUERY_TASQUES_USUARI },
 				visibles -> files(
-						consultesLlistes.primeres(
+						consultes.primeres(
 								ExpedientTascaResourceEntity.class,
 								visibles.and(CriterisIndicadorsInici.tasquesPendents()),
 								(root, cb) -> Arrays.asList(
@@ -400,9 +467,9 @@ public class IniciResourceServiceImpl extends BaseReadonlyResourceService<IniciR
 	private List<Map<String, Object>> tasquesSenseActivitat(int dies, int maxim) {
 		Specification<ExpedientTascaResourceEntity> criteri = CriterisIndicadorsInici.tasquesSenseActivitat(
 				LocalDateTime.now().minusDays(dies));
-		return llistesTasques.ambVisibles(null, visibles -> {
-			Map<Long, LocalDateTime> darreraActivitat = consultesLlistes.tasquesMesInactives(visibles.and(criteri), maxim);
-			Map<Long, ExpedientTascaResourceEntity> tasques = consultesLlistes.tasquesAmbResponsables(darreraActivitat.keySet());
+		return recursTasques.ambVisibles(null, visibles -> {
+			Map<Long, LocalDateTime> darreraActivitat = consultes.tasquesMesInactives(visibles.and(criteri), maxim);
+			Map<Long, ExpedientTascaResourceEntity> tasques = consultes.tasquesAmbResponsables(darreraActivitat.keySet());
 			List<Map<String, Object>> files = new ArrayList<>();
 			darreraActivitat.forEach((id, activitat) -> {
 				ExpedientTascaResourceEntity tasca = tasques.get(id);
@@ -416,8 +483,8 @@ public class IniciResourceServiceImpl extends BaseReadonlyResourceService<IniciR
 
 	/** Darrers comentaris dels procediments que l'usuari veu al llistat de procediments. */
 	private List<Map<String, Object>> darrersComentaris(int maxim) {
-		return llistesProcediments.ambVisibles(null, visibles -> {
-			List<MetaExpedientComentariResourceEntity> comentaris = consultesLlistes.darrersComentaris(visibles, maxim);
+		return recursProcediments.ambVisibles(null, visibles -> {
+			List<MetaExpedientComentariResourceEntity> comentaris = consultes.darrersComentaris(visibles, maxim);
 			Map<String, UsuariResourceEntity> autors = perspectivesLotHelper.findUsuaris(comentaris.stream()
 					.map(MetaExpedientComentariResourceEntity::getCreatedBy)
 					.filter(Objects::nonNull)
@@ -428,8 +495,8 @@ public class IniciResourceServiceImpl extends BaseReadonlyResourceService<IniciR
 
 	/** Procediments pendents de revisió, del que fa més temps que espera (darrera modificació) al que menys. */
 	private List<Map<String, Object>> procedimentsPendentsRevisio(int maxim) {
-		return llistesProcediments.ambVisibles(null, visibles -> files(
-				consultesLlistes.primeres(
+		return recursProcediments.ambVisibles(null, visibles -> files(
+				consultes.primeres(
 						MetaExpedientResourceEntity.class,
 						visibles.and(CriterisIndicadorsInici.procedimentsEnEstatRevisio(MetaExpedientRevisioEstatEnumDto.PENDENT)),
 						(root, cb) -> Arrays.asList(cb.asc(darreraModificacio(root, cb)), cb.asc(root.get("id"))),
@@ -440,13 +507,13 @@ public class IniciResourceServiceImpl extends BaseReadonlyResourceService<IniciR
 
 	/** Procediments rebutjats, del rebutjat més recentment (darrera modificació) al més antic, amb el darrer comentari. */
 	private List<Map<String, Object>> procedimentsRebutjats(int maxim) {
-		return llistesProcediments.ambVisibles(null, visibles -> {
-			List<MetaExpedientResourceEntity> procediments = consultesLlistes.primeres(
+		return recursProcediments.ambVisibles(null, visibles -> {
+			List<MetaExpedientResourceEntity> procediments = consultes.primeres(
 					MetaExpedientResourceEntity.class,
 					visibles.and(CriterisIndicadorsInici.procedimentsEnEstatRevisio(MetaExpedientRevisioEstatEnumDto.REBUTJAT)),
 					(root, cb) -> Arrays.asList(cb.desc(darreraModificacio(root, cb)), cb.desc(root.get("id"))),
 					maxim);
-			Map<Long, MetaExpedientComentariResourceEntity> comentaris = consultesLlistes.darrerComentariPerProcediment(
+			Map<Long, MetaExpedientComentariResourceEntity> comentaris = consultes.darrerComentariPerProcediment(
 					PerspectivesLotHelper.ids(procediments));
 			Map<String, UsuariResourceEntity> autors = perspectivesLotHelper.findUsuaris(comentaris.values().stream()
 					.map(MetaExpedientComentariResourceEntity::getCreatedBy)
@@ -479,6 +546,52 @@ public class IniciResourceServiceImpl extends BaseReadonlyResourceService<IniciR
 		return elements.stream().map(fila).collect(Collectors.toList());
 	}
 
+	/** Clau de la caché: usuari i context actuals (els mateixos que fan servir les consultes) i element. */
+	private CacheInici.Clau clau(String element) {
+		return new CacheInici.Clau(
+				SecurityContextHolder.getContext().getAuthentication().getName(),
+				configHelper.getEntitatActualCodi(),
+				configHelper.getRolActual(),
+				configHelper.getOrganActualCodi(),
+				LocaleContextHolder.getLocale().getLanguage(),
+				element);
+	}
+
+	/** Caducitat de la caché de targetes i llistes (es llegeix a cada petició: es pot canviar sense desplegar). */
+	private Duration caducitatGeneral() {
+		return caducitat(PropertyConfig.INICI_CACHE_SEGONS, CACHE_SEGONS_DEFECTE);
+	}
+
+	private Duration caducitat(String propietat, int defecte) {
+		return Duration.ofSeconds(Math.max(configHelper.getAsInt(propietat, defecte), 0));
+	}
+
+	/**
+	 * Temps que es guarda un resultat calculat: els errors no es guarden (la petició següent ho torna a provar); el
+	 * temps esgotat, amb la caducitat general, perquè recarregar la pantalla no torni a llançar la mateixa consulta;
+	 * la resta, amb la caducitat de l'element (null).
+	 */
+	private Duration caducitatResultat(boolean error, boolean tempsEsgotat) {
+		if (tempsEsgotat) {
+			return caducitatGeneral();
+		}
+		return error ? Duration.ZERO : null;
+	}
+
+	/**
+	 * Registra l'error d'una part de la pantalla.
+	 *
+	 * @return cert si la causa és el límit de temps de les consultes.
+	 */
+	private static boolean registrarError(String part, Exception ex) {
+		if (ConsultesInici.esTempsEsgotat(ex)) {
+			log.warn("Temps esgotat calculant " + part + " de la pantalla d'inici: " + ex.getMessage());
+			return true;
+		}
+		log.error("Error calculant " + part + " de la pantalla d'inici", ex);
+		return false;
+	}
+
 	private Long comptarAnotacionsPendents() {
 		EntitatDto entitat = ConfigHelper.getEntitat().get();
 		OrganGestorEntity organActual = organGestorRepository.findByEntitatIdAndCodi(entitat.getId(), configHelper.getOrganActualCodi());
@@ -492,21 +605,29 @@ public class IniciResourceServiceImpl extends BaseReadonlyResourceService<IniciR
 	 * Valors de les targetes del catàleg del rol. Només es calcula el que hi ha al catàleg; un grup de
 	 * recomptes que falla marca totes les seves targetes amb error i la resta es mostra igualment.
 	 */
-	private static class Recull {
+	private class Recull {
 
 		private final List<IndicadorInici> cataleg;
 		private final Map<IndicadorInici, Long> valors = new EnumMap<>(IndicadorInici.class);
 		private final Map<IndicadorInici, Long> totals = new EnumMap<>(IndicadorInici.class);
 		private final Map<IndicadorInici, Integer> dies = new EnumMap<>(IndicadorInici.class);
 		private final Set<IndicadorInici> errors = EnumSet.noneOf(IndicadorInici.class);
+		private final Set<IndicadorInici> tempsEsgotats = EnumSet.noneOf(IndicadorInici.class);
 
 		private Recull(List<IndicadorInici> cataleg) {
 			this.cataleg = cataleg;
 		}
 
+		/**
+		 * Recomptes d'un grup (un llistat de destinació) amb la caché de la pantalla d'inici.
+		 *
+		 * @param grup nom del grup a la clau de la caché.
+		 */
 		private <E> void comptar(
+				String grup,
+				Class<E> classe,
 				Map<IndicadorInici, Specification<E>> criteris,
-				RecomptesRecurs<E> recurs,
+				VisibilitatRecurs<E> recurs,
 				String[] namedQueries) {
 			Map<String, Specification<E>> delCataleg = new LinkedHashMap<>();
 			criteris.forEach((indicador, criteri) -> {
@@ -517,14 +638,44 @@ public class IniciResourceServiceImpl extends BaseReadonlyResourceService<IniciR
 			if (delCataleg.isEmpty()) {
 				return;
 			}
-			try {
-				recurs.comptar(delCataleg, namedQueries).forEach((codi, valor) -> valors.put(IndicadorInici.valueOf(codi), valor));
-			} catch (Exception ex) {
-				log.error("Error calculant els indicadors de la pantalla d'inici " + delCataleg.keySet(), ex);
-				delCataleg.keySet().forEach(codi -> errors.add(IndicadorInici.valueOf(codi)));
+			RecomptesGrup recomptes = cache.obtenir(
+					clau("INDICADORS." + grup),
+					caducitatGeneral(),
+					() -> consultarGrup(grup, classe, delCataleg, recurs, namedQueries),
+					calculat -> caducitatResultat(calculat.error, calculat.tempsEsgotat));
+			if (recomptes.error) {
+				delCataleg.keySet().forEach(codi -> {
+					errors.add(IndicadorInici.valueOf(codi));
+					if (recomptes.tempsEsgotat) {
+						tempsEsgotats.add(IndicadorInici.valueOf(codi));
+					}
+				});
+			} else {
+				recomptes.valors.forEach((codi, valor) -> valors.put(IndicadorInici.valueOf(codi), valor));
 			}
 		}
 
+		/** Tots els recomptes del grup en una transacció, amb una sola especificació de visibilitat. */
+		private <E> RecomptesGrup consultarGrup(
+				String grup,
+				Class<E> classe,
+				Map<String, Specification<E>> criteris,
+				VisibilitatRecurs<E> recurs,
+				String[] namedQueries) {
+			try {
+				Map<String, Long> recomptes = recurs.ambVisibles(namedQueries, visibles -> {
+					Map<String, Long> perCodi = new LinkedHashMap<>();
+					criteris.forEach((codi, criteri) -> perCodi.put(codi, consultes.comptar(classe, visibles.and(criteri))));
+					return perCodi;
+				});
+				return new RecomptesGrup(Collections.unmodifiableMap(recomptes), false, false);
+			} catch (Exception ex) {
+				boolean tempsEsgotat = registrarError("els indicadors " + grup + " " + criteris.keySet(), ex);
+				return new RecomptesGrup(Collections.<String, Long>emptyMap(), true, tempsEsgotat);
+			}
+		}
+
+		/** Una targeta que no surt d'un llistat (comptador del menú, monitor del sistema): sense caché. */
 		private void valor(IndicadorInici indicador, Supplier<Long> calcul) {
 			if (!cataleg.contains(indicador)) {
 				return;
@@ -532,8 +683,10 @@ public class IniciResourceServiceImpl extends BaseReadonlyResourceService<IniciR
 			try {
 				valors.put(indicador, calcul.get());
 			} catch (Exception ex) {
-				log.error("Error calculant l'indicador de la pantalla d'inici " + indicador, ex);
 				errors.add(indicador);
+				if (registrarError("l'indicador " + indicador, ex)) {
+					tempsEsgotats.add(indicador);
+				}
 			}
 		}
 
@@ -543,12 +696,27 @@ public class IniciResourceServiceImpl extends BaseReadonlyResourceService<IniciR
 				IniciResource.Indicador targeta = new IniciResource.Indicador();
 				targeta.setCodi(indicador.name());
 				targeta.setError(errors.contains(indicador));
+				targeta.setTempsEsgotat(tempsEsgotats.contains(indicador));
 				targeta.setValor(targeta.isError() ? null : valors.get(indicador));
 				targeta.setTotal(totals.get(indicador));
 				targeta.setDies(dies.get(indicador));
 				resultat.add(targeta);
 			}
 			return resultat;
+		}
+	}
+
+	/** Resultat d'un grup de recomptes, tal com es guarda a la caché (no es modifica un cop calculat). */
+	private static class RecomptesGrup {
+
+		private final Map<String, Long> valors;
+		private final boolean error;
+		private final boolean tempsEsgotat;
+
+		private RecomptesGrup(Map<String, Long> valors, boolean error, boolean tempsEsgotat) {
+			this.valors = valors;
+			this.error = error;
+			this.tempsEsgotat = tempsEsgotat;
 		}
 	}
 

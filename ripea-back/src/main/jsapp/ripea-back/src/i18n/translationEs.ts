@@ -2681,11 +2681,13 @@ const translationEs = {
             error: "No se han podido cargar los indicadores.",
             indicadors: "Indicadores",
             noDisponible: "No disponible",
+            tempsEsgotat: "Tarda demasiado en calcularse",
             deTotal: "de {{total}}",
             errorLlistes: "No se han podido cargar las listas.",
             veureTot: "Ver todo",
             llistaBuida: "No hay ningún elemento.",
             llistaError: "No se ha podido cargar esta lista.",
+            llistaTempsEsgotat: "Esta lista tarda demasiado en calcularse. Vuelve a intentarlo más tarde.",
             estatIntegracio: { OK: "Correcta", ERROR: "Error" },
             columna: {
                 tasca: "Tarea",

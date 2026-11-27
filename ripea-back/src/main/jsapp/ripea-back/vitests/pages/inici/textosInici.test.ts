@@ -31,6 +31,10 @@ describe.each(idiomes)('textos de la pantalla d\'inici (%s)', (_idioma, traducci
         expect(inici.llista[codi]?.descripcio).toBeTruthy();
     });
 
+    it.each(['noDisponible', 'tempsEsgotat', 'llistaError', 'llistaTempsEsgotat'])('missatge %s de les parts que no es poden mostrar', (clau) => {
+        expect(inici[clau]).toBeTruthy();
+    });
+
     it('mateixes capçaleres de columna que en català', () => {
         expect(Object.keys(inici.columna).sort()).toEqual(Object.keys(translationCa.page.inici.columna).sort());
     });

@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -29,7 +30,7 @@ import es.caib.ripea.service.intf.resourceservice.AlertaResourceService;
 import es.caib.ripea.service.intf.utils.Utils;
 import es.caib.ripea.service.resourcehelper.AlertaPermisosFiltreHelper;
 import es.caib.ripea.service.resourcehelper.PerspectivesLotHelper;
-import es.caib.ripea.service.resourcehelper.inici.RecomptesRecurs;
+import es.caib.ripea.service.resourcehelper.inici.VisibilitatRecurs;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,7 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AlertaResourceServiceImpl extends BaseMutableResourceService<AlertaResource, Long, AlertaResourceEntity> implements AlertaResourceService, RecomptesRecurs<AlertaResourceEntity> {
+public class AlertaResourceServiceImpl extends BaseMutableResourceService<AlertaResource, Long, AlertaResourceEntity> implements AlertaResourceService, VisibilitatRecurs<AlertaResourceEntity> {
 
 	private final AlertaResourceRepository alertaResourceRepository;
 	private final ExpedientResourceRepository expedientResourceRepository;
@@ -67,13 +68,13 @@ public class AlertaResourceServiceImpl extends BaseMutableResourceService<Alerta
     }
 
     /**
-     * Recomptes de la pantalla d'inici. Amb la named query de la consulta «Alertes d'expedients» compten el mateix
-     * que la consulta (veure RecomptesRecurs).
+     * Consultes de la pantalla d'inici amb la visibilitat del llistat: amb la named query de la consulta «Alertes d'expedients»,
+     * les mateixes alertes que la consulta (veure VisibilitatRecurs).
      */
     @Override
     @Transactional(readOnly = true)
-    public Map<String, Long> comptar(Map<String, Specification<AlertaResourceEntity>> criteris, String[] namedQueries) {
-        return RecomptesRecurs.comptar(criteris, this.<AlertaResourceEntity>toFindProcessedSpecification(null, null, namedQueries), entityRepository);
+    public <T> T ambVisibles(String[] namedQueries, Function<Specification<AlertaResourceEntity>, T> consulta) {
+        return consulta.apply(this.<AlertaResourceEntity>toFindProcessedSpecification(null, null, namedQueries));
     }
 
     protected class LlegitActionExecutor implements ActionExecutor<AlertaResourceEntity, ExpedientResource.MassiveAction, Serializable> {

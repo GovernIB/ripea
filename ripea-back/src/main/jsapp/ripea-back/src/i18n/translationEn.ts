@@ -2668,11 +2668,13 @@ const translationEn = {
             error: "The indicators could not be loaded.",
             indicadors: "Indicators",
             noDisponible: "Not available",
+            tempsEsgotat: "Taking too long to calculate",
             deTotal: "of {{total}}",
             errorLlistes: "The lists could not be loaded.",
             veureTot: "View all",
             llistaBuida: "There are no items.",
             llistaError: "This list could not be loaded.",
+            llistaTempsEsgotat: "This list is taking too long to calculate. Please try again later.",
             estatIntegracio: { OK: "Successful", ERROR: "Error" },
             columna: {
                 tasca: "Task",

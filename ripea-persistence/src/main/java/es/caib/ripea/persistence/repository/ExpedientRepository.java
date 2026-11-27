@@ -710,7 +710,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullPrioritat") boolean esNullPrioritat,
 			@Param("prioritatEnum") PrioritatEnumDto prioritatEnum);
 
-	/** Expedients que l'acció massiva de tancament permet tancar (veure findIdsExpedientsPerTancamentMassiu). */
+	/** Expedients que l'acció massiva de tancament permet tancar (veure findIdsExpedientsPerTancamentMassiu). La pantalla d'inici en demana els més antics amb la mateixa consulta (ConsultesInici, amb límit de temps). */
 	String CONSULTA_IDS_EXPEDIENTS_PER_TANCAMENT_MASSIU = "select " +
 			"    e.id " +
 			"from " +
@@ -765,26 +765,6 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("dataInici") LocalDateTime dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
 			@Param("dataFi") LocalDateTime dataFi);
-
-	/**
-	 * Mateixa consulta, dels més antics als més recents: la pantalla d'inici en demana només els primers (Pageable)
-	 * sense haver de carregar tots els ids.
-	 */
-	@Query(CONSULTA_IDS_EXPEDIENTS_PER_TANCAMENT_MASSIU + " order by e.createdDate asc, e.id asc")
-	List<Long> findIdsExpedientsPerTancamentMassiuMesAntics(
-			@Param("entitat") EntitatEntity entitat,
-			@Param("nomesAgafats") boolean nomesAgafats,
-			@Param("usuariActual") UsuariEntity usuariActual,
-			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
-			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
-			@Param("metaExpedient") MetaNodeEntity metaExpedient,
-			@Param("esNullNom") boolean esNullNom,
-			@Param("nom") String nom,
-			@Param("esNullDataInici") boolean esNullDataInici,
-			@Param("dataInici") LocalDateTime dataInici,
-			@Param("esNullDataFi") boolean esNullDataFi,
-			@Param("dataFi") LocalDateTime dataFi,
-			Pageable pageable);
 
 
 	static final String FIND_BY_ARXIU_PENDENT =	"select " +

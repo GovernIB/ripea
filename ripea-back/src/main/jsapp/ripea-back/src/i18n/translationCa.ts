@@ -2683,11 +2683,13 @@ const translationCa = {
             error: "No s'han pogut carregar els indicadors.",
             indicadors: "Indicadors",
             noDisponible: "No disponible",
+            tempsEsgotat: "Triga massa a calcular-se",
             deTotal: "de {{total}}",
             errorLlistes: "No s'han pogut carregar les llistes.",
             veureTot: "Veure-ho tot",
             llistaBuida: "No hi ha cap element.",
             llistaError: "No s'ha pogut carregar aquesta llista.",
+            llistaTempsEsgotat: "Aquesta llista triga massa a calcular-se. Torna-ho a provar més tard.",
             estatIntegracio: { OK: "Correcta", ERROR: "Error" },
             columna: {
                 tasca: "Tasca",
