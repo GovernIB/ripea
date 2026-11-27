@@ -229,8 +229,7 @@ export const useActionReportLogic = (
                     .catch((error) => {
                         onError?.(error);
                         reject(error);
-                    })
-                    .finally(() => setFinished(true));
+                    });
             } else {
                 console.error("Couldn't exec action without code");
             }
@@ -254,12 +253,12 @@ export const useActionReportLogic = (
                             temporalMessageShow(null, t('actionreport.report.success'), 'success');
                         }
                         resolve(formDialogResultProcessor?.(result));
+                        setFinished(true);
                     })
                     .catch((error) => {
                         onError?.(error);
                         reject(error);
-                    })
-                    .finally(() => setFinished(true));
+                    });
             } else {
                 console.error("Couldn't generate report without code");
             }
